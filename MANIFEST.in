@@ -1,0 +1,33 @@
+include README.md
+include CONTRIBUTING.md
+include CHANGES
+include MANIFEST.in
+include tox.ini
+include Pipfile.lock
+include Pipfile
+include src
+
+exclude .tox
+exclude .dockerignore
+exclude .style.yapf
+exclude .jshintrc
+exclude Dockerfile.dev
+exclude Makefile
+exclude manage.py
+exclude tests
+exclude manage.py
+exclude entrypoint.sh
+
+prune .circleci
+prune tests
+
+recursive-include src/etools_datamart *.*
+recursive-exclude tests *
+recursive-include docs *
+
+exclude deploy
+exclude docker
+exclude hooks
+recursive-exclude docker *
+recursive-exclude deploy *
+recursive-exclude hooks *
