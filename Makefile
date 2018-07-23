@@ -14,8 +14,8 @@ develop:
 
 
 .init-db:
-	@sh -c "if [ '${DBENGINE}' = 'pg' ]; then psql -h localhost -c 'DROP DATABASE IF EXISTS etools_datamart;' -U postgres; fi"
-	@sh -c "if [ '${DBENGINE}' = 'pg' ]; then psql -h localhost -c 'CREATE DATABASE etools_datamart;' -U postgres; fi"
+	psql -h 127.0.0.1 -c 'DROP DATABASE IF EXISTS etools_datamart;' -U postgres
+	psql -h 127.0.0.1 -c 'CREATE DATABASE etools_datamart;' -U postgres
 
 test:
 	pipenv run py.test -v --create-db

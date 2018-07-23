@@ -1,0 +1,10 @@
+{
+  "system": {
+    "username": "username1",
+    "password": "password1"
+  },
+  "global": {
+    "username": "username1",
+    "password": "password1"
+  }
+}

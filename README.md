@@ -1,5 +1,5 @@
 eTools DataMart
-===================================
+===============
 
 [![CircleCI](https://circleci.com/gh/unicef/etools-datamart/tree/develop.svg?style=svg&circle-token=)](https://circleci.com/gh/unicef/etools-datamart/tree/develop)
 

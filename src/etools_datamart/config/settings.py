@@ -7,6 +7,7 @@ from pathlib import Path
 import environ
 
 import etools_datamart
+from etools_datamart.libs.dbrouter import router_factory
 
 env = environ.Env(DEBUG=(bool, False),
                   SECRET_KEY=(str, 'secret'),
@@ -39,8 +40,13 @@ ADMINS = (
 )
 
 DATABASES = {
-    'default': env.db()
+    'default': env.db(),
+    'etools': env.db('DATABASE_URL_ETOOLS'),
 }
+
+DATABASE_ROUTERS = [
+    router_factory('etools', ['etools'], syncdb=False),
+]
 
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
@@ -194,6 +200,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'unicef_rest_framework',
+
     'etools_datamart.api',
 ]
 

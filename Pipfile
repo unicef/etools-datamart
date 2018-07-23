@@ -16,6 +16,8 @@ raven = "*"
 whitenoise = "*"
 django-picklefield = "*"
 drf-dynamic-serializer = ">=1.2.0"
+djangorestframework-jwt = "*"
+coreapi = "*"
 
 [dev-packages]
 pytest = "*"

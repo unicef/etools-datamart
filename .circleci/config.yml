@@ -77,7 +77,7 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
             git status
-            git show-branch $TAG
+            git show-branch release/$TAG
             if [ $? -gt 0 ];then
               git reset --hard
 
