@@ -42,7 +42,9 @@ etools-datamart = {editable = true, path = "."}
 python_version = "3.6"
 
 [scripts]
-test = "tox"
+test = "pytest tests"
+tox = "tox"
+init-setup = "./manage.py init-setup"
 
 [pipenv]
 allow_prereleases = false

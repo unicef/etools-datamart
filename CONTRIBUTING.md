@@ -3,37 +3,21 @@
 ### Prerequisites
 
  - [pipenv](https://github.com/pypa/pipenv)
- - postgresql running on 5432
  - [docker](https://www.docker.com/get-docker)
 
-**Hint**
 
-### Configure development environment
 
-    $ make develop
+setup local en0 alias 
 
-This project uses [django-environ](https://github.com/joke2k/django-environ) to 
-enable [12factor](https://www.12factor.net/).
-You can customize your env creating and `.env` file in the root folder of the project to 
-set your specific environment variables.
- 
+    $ sudo ifconfig en0 alias 192.168.66.66
 
 ### Initialize app
 
     $ make init-demo
 
-Note `admin` user password will be displayed. You'll need to remember this in
+**Note** `admin` user password will be displayed. You'll need to remember this in
 order to login.
 
-
-### View API via browser
-
-    $ make run
-
-Using a browser visit the following;
-
-    http://localhost:8000/admin <-- to login (use `admin` credentials from above `init` command)
-    http://localhost:8000/api <-- to discover API endpoints
 
  
 ### Make a release

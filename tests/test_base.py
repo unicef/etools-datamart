@@ -2,9 +2,9 @@
 from django.urls import reverse
 
 
-def test_login(app, admin_user):
+def test_login(django_app, admin_user):
     url = reverse('admin:login')
-    res = app.get(url)
+    res = django_app.get(url)
     res.form['username'] = 'admin'
     res.form['password'] = 'password'
     res = res.form.submit()

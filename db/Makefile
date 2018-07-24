@@ -15,5 +15,5 @@ run:
 	docker run --rm \
 		-p 15432:5432 -it \
 		-v /data/storage/etools-db/data:/var/lib/postgresql/data \
-		etools-db:dev
+		unicef/etools-db:dev
 

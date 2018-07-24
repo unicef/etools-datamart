@@ -12,6 +12,7 @@ from etools_datamart.libs.dbrouter import router_factory
 env = environ.Env(DEBUG=(bool, False),
                   SECRET_KEY=(str, 'secret'),
                   DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
+                  DATABASE_URL_ETOOLS=(str, "postgres://postgres:@127.0.0.1:15432/etools"),
                   CACHE_URL=(str, "locmemcache://"),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   STATIC_ROOT=(str, '/tmp/static'),
@@ -25,8 +26,9 @@ SETTINGS_DIR = Path(__file__).parent
 SOURCE_DIR = SETTINGS_DIR.parent.parent.parent
 env_file = env.path('ENV_FILE_PATH', default=SOURCE_DIR / '.env')
 
-if Path(str(env_file)).exists():  # pragma: no cover
-    environ.Env.read_env(str(env_file))
+# if Path(str(env_file)).exists():  # pragma: no cover
+environ.Env.read_env(str(env_file))
+
 
 MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
@@ -38,13 +40,44 @@ ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 ADMINS = (
 
 )
+# from django.db.backends.signals import connection_created
+#
+# def set_search_path(sender, **kwargs):
+#     # FIXME: remove this line (pdb)
+#     import pdb; pdb.set_trace()
+#     conn = kwargs.get('connection')
+#     schema = "public"
+#     if conn is not None:
+#         cursor = conn.cursor()
+#         cursor.execute(f"SET search_path={schema}")
+#
+# connection_created.connect(set_search_path)
 
 DATABASES = {
     'default': env.db(),
     'etools': env.db('DATABASE_URL_ETOOLS'),
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'etools_datamart',
+    #     'HOST': '127.0.0.1',
+    #     'USER': 'postgres',
+    #     'PORT': '',
+    #     'AUTOCOMMIT': False,
+    #
+    # },
+    # 'etools': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'etools',
+    #     'USER': 'postgres',
+    #     'PASSWORD': '',
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '15432',
+    #     'AUTOCOMMIT': False,
+    # },
 }
 
 DATABASE_ROUTERS = [
+    router_factory('default', ['default'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
 ]
 
@@ -120,6 +153,7 @@ STATICFILES_FINDERS = (
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'etools_datamart.apps.core.middleware.ApiMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -151,7 +185,6 @@ TEMPLATES = [
         'OPTIONS': {
             'loaders': [
                 'django.template.loaders.app_directories.Loader',
-                'unicef_notification.loaders.EmailTemplateLoader',
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -202,6 +235,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'unicef_rest_framework',
 
+    'etools_datamart.apps.mart',
     'etools_datamart.api',
 ]
 
@@ -263,10 +297,6 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
-        "unicef_rest_export.renderers.ExportCSVRenderer",
-        "unicef_rest_export.renderers.ExportOpenXMLRenderer",
-        "unicef_rest_export.renderers.ExportExcelRenderer",
-        "unicef_rest_export.renderers.ExportPDFRenderer",
     )
 }
 
@@ -378,7 +408,7 @@ LOGGING = {
             'propagate': True
         },
         'raven': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'handlers': ['console'],
             'propagate': False,
         },
