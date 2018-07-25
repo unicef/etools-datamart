@@ -54,8 +54,8 @@ DATABASES = {
         },
     },
     'etools': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # 'ENGINE': 'etools_datamart.libs.postgresql',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'etools_datamart.libs.postgresql',
         'NAME': 'etools',
         'USER': 'postgres',
         'PASSWORD': '',

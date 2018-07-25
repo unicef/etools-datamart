@@ -22,5 +22,10 @@ def test_query(db):
     # Public
     assert AuthGroup.objects.all()
 
-    # Tenant
-    assert PartnersPartnerorganization.objects.all()
+    conn = connections['etools']
+
+    # conn.set_schema('bolivia')
+    # assert PartnersPartnerorganization.objects.count() == 190
+
+    conn.set_schema('bolivia,chad')
+    assert PartnersPartnerorganization.objects.count() == 190

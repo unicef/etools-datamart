@@ -126,18 +126,21 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
             if not self.schema_name:
                 raise ImproperlyConfigured("Database schema not set. Did you forget "
                                            "to call set_schema() or set_tenant()?")
-            _check_schema_name(self.schema_name)
+
             public_schema_name = get_public_schema_name()
+            # if ',' in self.schema_name:
+            schemas = self.schema_name.split(',')
+            [_check_schema_name(schema) for schema in schemas]
+
             search_paths = []
 
             if self.schema_name == public_schema_name:
                 search_paths = [public_schema_name]
             elif self.include_public_schema:
-                search_paths = [self.schema_name, public_schema_name]
+                search_paths.extend(schemas)
+                search_paths.append(public_schema_name)
             else:
-                search_paths = [self.schema_name]
-
-            search_paths.extend(EXTRA_SEARCH_PATHS)
+                search_paths.extend(schemas)
 
             if name:
                 # Named cursor can only be used once
