@@ -18,6 +18,8 @@ django-picklefield = "*"
 drf-dynamic-serializer = ">=1.2.0"
 djangorestframework-jwt = "*"
 coreapi = "*"
+django-tenant-schemas = "*"
+django-regex = "*"
 
 [dev-packages]
 pytest = "*"

@@ -5,12 +5,27 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.constants import LOOKUP_SEP
+from django_regex.utils import RegexList
+
+INGNORED_TABLES = RegexList([
+    # Both
+    'django_migra.*',
+    'reversion_.*',
+    # Public
+    'filer_.*',
+    'users_equitrackregistration.*',
+    'registration_emailregistrationprofile.*',
+    'waffle_.*',
+    'djcelery_.*',
+    'celery_.*',
+    # Tenant
+])
 
 
 class Command(BaseCommand):
     help = "Introspects the database tables in the given database/schema and outputs a Django model module."
     requires_system_checks = False
-    stealth_options = ('table_name_filter', )
+    stealth_options = ('table_name_filter',)
     db_module = 'django.db'
 
     def add_arguments(self, parser):
@@ -66,6 +81,8 @@ class Command(BaseCommand):
             tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
 
             for table_name in tables_to_introspect:
+                if table_name in INGNORED_TABLES:
+                    continue
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
@@ -92,6 +109,7 @@ class Command(BaseCommand):
                 yield ''
                 yield ''
                 yield 'class %s(models.Model):' % table2model(table_name)
+
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
@@ -120,10 +138,21 @@ class Command(BaseCommand):
                             "self" if relations[column_name][1] == table_name
                             else table2model(relations[column_name][1])
                         )
-                        if rel_to in known_models:
-                            field_type = 'ForeignKey(%s' % rel_to
+
+                        if 'unique' in extra_params:
+                            extra_params.pop('unique')
+                            ftype = 'OneToOneField'
+                        elif 'primary_key' in extra_params:
+                            extra_params.pop('primary_key')
+                            ftype = 'OneToOneField'
                         else:
-                            field_type = "ForeignKey('%s'" % rel_to
+                            ftype = 'ForeignKey'
+
+                        if rel_to in known_models:
+                            field_type = f"{ftype}({rel_to}"
+                        else:
+                            field_type = f"{ftype}('{rel_to}'"
+
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.
@@ -156,8 +185,9 @@ class Command(BaseCommand):
                         '' if '.' in field_type else 'models.',
                         field_type,
                     )
-                    if field_type.startswith('ForeignKey('):
+                    if field_type.startswith('ForeignKey(') or field_type.startswith('OneToOneField('):
                         field_desc += ', models.DO_NOTHING'
+                        field_desc += ", related_name='+'"
 
                     if extra_params:
                         if not field_desc.endswith('('):
@@ -280,12 +310,15 @@ class Command(BaseCommand):
                     cols = set(columns)
                     # we do not want to include the u"" or u'' prefix
                     # so we build the string rather than interpolate the tuple
-                    tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in cols) + ')'
-                    unique_together.add(tup)
+                    fields = [column_to_field_name[c] for c in cols if len(cols) > 1]
+                    if fields:
+                        tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in cols if len(cols) > 1) + ')'
+                        unique_together.add(tup)
         meta = ["",
                 "    class Meta:",
                 "        managed = False",
                 "        db_table = '%s'" % table_name]
+
         if unique_together:
             tup = '(' + ', '.join(unique_together) + ',)'
             meta += ["        unique_together = %s" % tup]

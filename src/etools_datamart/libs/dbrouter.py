@@ -1,6 +1,5 @@
+
 def router_factory(db_name, app_list, syncdb=True):  # noqa
-    # def get_model_name(model):
-    #     return (".".join([model._meta.app_label, model.__name__])).lower()
 
     class InnerRouter(object):
 
@@ -13,7 +12,8 @@ def router_factory(db_name, app_list, syncdb=True):  # noqa
 
         def db_for_write(self, model, **hints):
             if model._meta.app_label in app_list:
-                return db_name
+                return False
+                # return db_name
             return None
 
         def allow_relation(self, obj1, obj2, **hints):

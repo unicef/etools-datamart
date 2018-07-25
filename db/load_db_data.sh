@@ -26,11 +26,14 @@ EOSQL
 # it imports the base database structure and create the database for the tests
 
 # export DATABASE_NAME="etools"
-export DB_DUMP_LOCATION=/tmp/psql_data/db1.bz2
 # export DATABASE_USER="etoolusr"
 
-echo "*** CREATING DATABASE ***"
 
+done
+
+#export DB_DUMP_LOCATION=/tmp/psql_data/db1.bz2
+
+echo "*** CREATING DATABASE ***"
 # create default database
 "${psql[@]}" <<- 'EOSQL'
 CREATE ROLE etoolusr WITH superuser login;
@@ -38,9 +41,9 @@ CREATE DATABASE etools;
 GRANT ALL PRIVILEGES ON DATABASE etools TO etoolusr;
 EOSQL
 
-echo "*** UPDATING DATABASE ***"
-bzcat $DB_DUMP_LOCATION | nice pg_restore -U etoolusr -F t -d etools
 
-echo "*** DATABASE CREATED! ***"
+#echo "*** UPDATING DATABASE ***"
+#bzcat $DB_DUMP_LOCATION | nice pg_restore -U etoolusr -F t -d etools
+#
+#echo "*** DATABASE CREATED! ***"
 
-done

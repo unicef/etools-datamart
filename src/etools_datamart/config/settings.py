@@ -12,7 +12,7 @@ from etools_datamart.libs.dbrouter import router_factory
 env = environ.Env(DEBUG=(bool, False),
                   SECRET_KEY=(str, 'secret'),
                   DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
-                  DATABASE_URL_ETOOLS=(str, "postgres://postgres:@127.0.0.1:15432/etools"),
+                  DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   CACHE_URL=(str, "locmemcache://"),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   STATIC_ROOT=(str, '/tmp/static'),
@@ -29,7 +29,6 @@ env_file = env.path('ENV_FILE_PATH', default=SOURCE_DIR / '.env')
 # if Path(str(env_file)).exists():  # pragma: no cover
 environ.Env.read_env(str(env_file))
 
-
 MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
@@ -40,44 +39,41 @@ ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 ADMINS = (
 
 )
-# from django.db.backends.signals import connection_created
-#
-# def set_search_path(sender, **kwargs):
-#     # FIXME: remove this line (pdb)
-#     import pdb; pdb.set_trace()
-#     conn = kwargs.get('connection')
-#     schema = "public"
-#     if conn is not None:
-#         cursor = conn.cursor()
-#         cursor.execute(f"SET search_path={schema}")
-#
-# connection_created.connect(set_search_path)
 
 DATABASES = {
-    'default': env.db(),
-    'etools': env.db('DATABASE_URL_ETOOLS'),
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'etools_datamart',
-    #     'HOST': '127.0.0.1',
-    #     'USER': 'postgres',
-    #     'PORT': '',
-    #     'AUTOCOMMIT': False,
-    #
-    # },
-    # 'etools': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'etools',
-    #     'USER': 'postgres',
-    #     'PASSWORD': '',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '15432',
-    #     'AUTOCOMMIT': False,
-    # },
+    # 'default': env.db(),
+    # 'etools': env.db('DATABASE_URL_ETOOLS'),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'etools_datamart',
+        'HOST': '127.0.0.1',
+        'USER': 'postgres',
+        'PORT': '',
+        'OPTIONS': {
+            'options': '-c search_path=public'
+        },
+    },
+    'etools': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'ENGINE': 'etools_datamart.libs.postgresql',
+        'NAME': 'etools',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '15432',
+        # 'TEST': {
+        #     'NAME': 'etools',
+        # }
+        # 'OPTIONS': {
+        #     'options': '-c search_path=bolivia,public'
+        # },
+    },
 }
 
+
 DATABASE_ROUTERS = [
-    router_factory('default', ['default'], syncdb=True),
+    # 'tenant_schemas.routers.TenantSyncRouter',
+    # router_factory('default', ['default'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
 ]
 
@@ -218,8 +214,8 @@ AUTH_PASSWORD_VALIDATORS = [
 INSTALLED_APPS = [
     'etools_datamart.apps.init',
 
-    'constance',
-    'constance.backends.database',
+    # 'constance',
+    # 'constance.backends.database',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -235,9 +231,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'unicef_rest_framework',
 
-    'etools_datamart.apps.mart',
+    'etools_datamart.apps.core',
+    'etools_datamart.apps.etools',
     'etools_datamart.api',
 ]
+
+# R_APPS = ['etools_datamart.apps.etools']
+
 
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
@@ -299,7 +299,6 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     )
 }
-
 
 LOG_DIR = os.environ.get('SIR_LOG_DIR',
                          os.path.expanduser('~/logs'))
