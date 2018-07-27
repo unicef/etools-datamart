@@ -16,6 +16,7 @@ env = environ.Env(DEBUG=(bool, False),
                   CACHE_URL=(str, "locmemcache://"),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   STATIC_ROOT=(str, '/tmp/static'),
+                  SENTRY_DSN=(str, ''),
 
                   SECURE_SSL_REDIRECT=(bool, True),
                   CSRF_COOKIE_SECURE=(bool, True),
@@ -156,6 +157,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.RemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -214,9 +216,8 @@ AUTH_PASSWORD_VALIDATORS = [
 INSTALLED_APPS = [
     'etools_datamart.apps.init',
 
-    # 'constance',
-    # 'constance.backends.database',
-
+    'constance',
+    'constance.backends.database',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -278,7 +279,8 @@ EMAIL_SUBJECT_PREFIX = "[SIR]"
 
 RAVEN_CONFIG = {
     'CELERY_LOGLEVEL': logging.INFO,
-    'release': etools_datamart.VERSION,
+        'dsn': env('SENTRY_DSN'),
+        'release': etools_datamart.VERSION,
 }
 
 # django-constance

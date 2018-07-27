@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
-import logging
-from django.utils.translation import gettext as _
 
-logger = logging.getLogger(__name__)
+from threading import local
+
+
+class State(local):
+    request = None
+    schemas = []
+    data = {}
+
+    def clear(self):
+        self.data = {}
+        self.request = None
+
+    def set(self, key, value):
+        self.data[key] = value
+
+
+state = State()

@@ -20,6 +20,8 @@ djangorestframework-jwt = "*"
 coreapi = "*"
 django-tenant-schemas = "*"
 django-regex = "*"
+sqlparse = "*"
+pyparsing = "*"
 
 [dev-packages]
 pytest = "*"

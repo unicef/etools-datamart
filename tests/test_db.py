@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.models import Group
-from django.db import connections
-from django.urls import reverse
+import pytest
 
+from etools_datamart.state import state
 from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganization
 
 
@@ -18,14 +17,45 @@ from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganiz
 #
 # connection_created.connect(set_search_path)
 
-def test_query(db):
+@pytest.mark.parametrize("schema", [["bolivia"], ["bolivia", "chad"]])
+def test_query(schema):
+    # FIXME: remove me (print)
+    print(111, schema)
+
+
+def test_query_public(db):
+    state.schemas = ['bolivia']
     # Public
     assert AuthGroup.objects.all()
 
-    conn = connections['etools']
 
-    # conn.set_schema('bolivia')
-    # assert PartnersPartnerorganization.objects.count() == 190
+def test_query_single_tenant(db):
+    state.schemas = ['bolivia']
+    assert len(PartnersPartnerorganization.objects.all()) == 190
 
-    conn.set_schema('bolivia,chad')
+
+def test_query_multi_tenant(db):
+    state.schemas = ['bolivia', 'chad']
+    assert len(PartnersPartnerorganization.objects.all()) == 622
+
+
+def test_count_single_tenant(db):
+    state.schemas = ['bolivia']
     assert PartnersPartnerorganization.objects.count() == 190
+
+
+def test_count_multi_tenant(db):
+    state.schemas = ['bolivia', 'chad']
+    assert PartnersPartnerorganization.objects.count() == 622
+
+
+def test_synthax_1(db):
+    sql = '''(SELECT DISTINCT "bolivia"."partners_partnerorganization"."country" 
+FROM "bolivia"."partners_partnerorganization" 
+ORDER BY "bolivia"."partners_partnerorganization"."country" ASC) 
+UNION 
+(SELECT DISTINCT "chad"."partners_partnerorganization"."country" 
+FROM "chad"."partners_partnerorganization" 
+ORDER BY "chad"."partners_partnerorganization"."country" ASC';'''
+    state.schemas = ['bolivia', 'chad']
+    assert len(PartnersPartnerorganization.objects.all().order_by('country')) == 622
