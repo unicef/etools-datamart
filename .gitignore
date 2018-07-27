@@ -25,3 +25,4 @@ settings_local.py
 .project
 .pydevproject
 db/db1.bz2
+.env

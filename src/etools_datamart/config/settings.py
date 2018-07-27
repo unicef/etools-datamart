@@ -274,8 +274,8 @@ SESSION_COOKIE_HTTPONLY = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-NOTIFICATION_SENDER = "sir@unicef.org"
-EMAIL_SUBJECT_PREFIX = "[SIR]"
+NOTIFICATION_SENDER = "etools_datamart@unicef.org"
+EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
 
 RAVEN_CONFIG = {
     'CELERY_LOGLEVEL': logging.INFO,
@@ -345,7 +345,7 @@ LOGGING = {
         'security': file_handler('security', 'DEBUG'),
         'business': file_handler('business', 'DEBUG'),
         'root': file_handler('messages', 'DEBUG'),
-        'application': file_handler('sir', 'DEBUG'),
+        'application': file_handler('etools_datamart', 'DEBUG'),
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -398,12 +398,12 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True
         },
-        'sir': {
+        'etools_datamart': {
             'handlers': ['application'],
             'level': 'ERROR',
             'propagate': True
         },
-        'sir.settings': {
+        'etools_datamart.settings': {
             'handlers': ['application'],
             'level': 'ERROR',
             'propagate': True
