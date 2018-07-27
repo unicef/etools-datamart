@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import pytest
+from django.utils.safestring import mark_safe
 
-from etools_datamart.libs.sql import get_tables, add_schema, Parser
+from etools_datamart.libs.sql import Parser
 
 one_table = [
     # 'SELECT * FROM t1',
@@ -35,6 +36,7 @@ ordered_table = [
     'SELECT * FROM t1 ORDER BY f1,f2 DESC',
 ]
 
+
 @pytest.mark.parametrize('sql', one_table)
 def test_single_table(sql):
     p = Parser(sql)
@@ -51,7 +53,6 @@ def test_join(sql):
     assert p.tables == ["t1", "t2"]
 
 
-
 @pytest.mark.parametrize('sql', ordered_table)
 def test_order(sql):
     p = Parser(sql)
@@ -59,6 +60,15 @@ def test_order(sql):
     assert p.order == ["f1", "f2"]
 
 
+def test_add_schema1():
+    sql = mark_safe('SELECT f1 AS f1 FROM t1')
+    p = Parser(sql)
+    assert p.set_schema("bolivia") == 'SELECT f1 AS f1 FROM "bolivia".t1'
+
+
+def test_count_multitenant():
+    p = Parser("SELECT COUNT(*) FROM t1")
+    assert p.with_schemas("b", "c") == 'SELECT count(id) FROM (SELECT id FROM "b".t1 UNION ALL SELECT id FROM "c".t1) as _count'
 
 # @pytest.mark.parametrize('clause', ["SELECT", "SELECT DISTINCT"])
 # @pytest.mark.parametrize('field', ['f1', '"f1"', 't1.f1', '"t1"."f1"', '"s1"."t1"."f1"'])

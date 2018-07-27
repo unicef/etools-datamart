@@ -1,13 +1,41 @@
 # -*- coding: utf-8 -*-
 import sqlparse
-from django.utils.functional import cached_property
-from sqlparse.sql import IdentifierList, Identifier
+from django.utils.functional import cached_property, Promise
+from sqlparse.sql import Comparison, Identifier, IdentifierList, Parenthesis, Where, Function
 from sqlparse.tokens import Keyword, Whitespace
 
-SHARED_TABLES = ['"auth_group"', ]
+SHARED_TABLES = ['auth_group', ]
 
-import sqlparse
-from sqlparse.sql import Where, Comparison, Parenthesis, Identifier
+
+class RawSql(str):
+    """
+    A str subclass that has been specifically marked as "raw"
+    skip any tenant related manipulation
+    """
+    def __add__(self, rhs):
+        """
+        Concatenating a raw string with another string
+        Otherwise, the result is no longer safe.
+        """
+        t = super().__add__(rhs)
+        if isinstance(rhs, RawSql):
+            return RawSql(t)
+        return t
+
+    def __str__(self):
+        return self
+
+
+def raw_sql(s):
+    """
+    Explicitly mark a string as raw sql. The returned
+    object can be used everywhere a string is appropriate.
+
+    Can be called multiple times on a single string.
+    """
+    if isinstance(s, (str, Promise)):
+        return RawSql(s)
+    return RawSql(str(s))
 
 
 class Parser:
@@ -20,6 +48,8 @@ class Parser:
         self._unknown = []
         self._parsed = False
 
+        self.is_count = False
+
     @cached_property
     def order(self):
         return [s.replace(" ASC", "").replace(" DESC", "") for s in self.raw_order]
@@ -31,7 +61,7 @@ class Parser:
             if " AS " in name:
                 ret.append(name.split(" AS ")[-1])
             elif "." in name:
-               ret.append(name.split(".")[-1])
+                ret.append(name.split(".")[-1])
             else:
                 ret.append(name)
         return ret
@@ -41,7 +71,7 @@ class Parser:
         ret = []
         for name in self.raw_tables:
             if "." in name:
-               ret.append(name.split(".")[-1])
+                ret.append(name.split(".")[-1])
             else:
                 ret.append(name)
         return ret
@@ -53,12 +83,12 @@ class Parser:
             return getattr(self, f'_{item}')
         raise AttributeError(item)
 
-
     def parse(self):
+        if self._parsed:
+            return
         target = self._unknown
         parsed = sqlparse.parse(self.sql)
         self.tokens = parsed[0].tokens
-
         for token in self.tokens:
             if token.ttype in [Whitespace]:
                 continue
@@ -72,82 +102,52 @@ class Parser:
                     target = self._raw_order
                 else:
                     target = self._unknown
-                # continue
             elif token.ttype is Keyword.DML:
                 target = self._raw_fields
-                # continue
-            else:
-            # if seen:
-                # if token.ttype is Keyword:
-                #     continue
-                # else:
-                    if isinstance(token, IdentifierList):
-                        for identifier in token.get_identifiers():
-                            target.append(str(identifier))
-                    elif isinstance(token, Identifier):
-                        target.append(str(token))
-                    else:
-                        pass
-            # if token.ttype is Keyword and token.value.upper() == "FROM":
-            #     from_seen = True
-        self._parsed = True
-    # @cached_property
-    # def tables(self):
-    #     tables = []
-    #     from_seen = False
-    #     for token in self.tokens:
-    #         if token.ttype is Keyword and token.value.upper() == "ORDER":
-    #             break
-    #         if from_seen:
-    #             if token.ttype is Keyword:
-    #                 continue
-    #             else:
-    #                 if isinstance(token, IdentifierList):
-    #                     for identifier in token.get_identifiers():
-    #                         tables.append(str(identifier))
-    #                 elif isinstance(token, Identifier):
-    #                     tables.append(str(token))
-    #                 else:
-    #                     pass
-    #         if token.ttype is Keyword and token.value.upper() == "FROM":
-    #             from_seen = True
-    #     return tables
-
-
-def get_tables(sql):
-    sql = sql.replace('"', '')
-    tables = []
-    parsed = sqlparse.parse(sql)
-    stmt = parsed[0]
-    from_seen = False
-    for token in stmt.tokens:
-        if token.ttype is Keyword and token.value.upper() == "ORDER":
-            break
-        if from_seen:
-            if token.ttype is Keyword:
-                continue
             else:
                 if isinstance(token, IdentifierList):
                     for identifier in token.get_identifiers():
-                        tables.append(str(identifier))
+                        target.append(str(identifier))
                 elif isinstance(token, Identifier):
-                    tables.append(str(token))
+                    if 'COUNT(*)' in str(token):
+                        self.is_count = True
+                    target.append(str(token))
+                elif isinstance(token, Function):
+                    if 'COUNT(*)' in str(token):
+                        self.is_count = True
+                    target.append(str(token))
                 else:
                     pass
-        if token.ttype is Keyword and token.value.upper() == "FROM":
-            from_seen = True
-    return tables
+        self._parsed = True
 
+    def set_schema(self, schema, target=None):
+        ret = target or self.sql
+        for t in self.tables:
+            if t in SHARED_TABLES:
+                ret = ret.replace(t, f'"public".{t}')
+            else:
+                ret = ret.replace(f" {t}", f' "{schema}".{t}')
+        return ret
 
-def add_schema(statement, schema):
-    tables = get_tables(statement)
-    ret = statement
-    for t in tables:
-        if t in SHARED_TABLES:
-            ret = ret.replace(t, f'"public".{t}')
+    def with_schemas(self, *schemas):
+        if not self._parsed:
+            self.parse()
+        sql = self.sql
+        if self.is_count:
+            base = f"SELECT id FROM {','.join(self.tables)}"
+            ret = 'SELECT count(id) FROM ('
+            ret += " UNION ALL ".join([self.set_schema(s, base)  for s in schemas])
+            ret += ") as _count"
+            return ret
+        if len(schemas) == 1:
+            return self.set_schema(schemas[0])
         else:
-            ret = ret.replace(f" {t}", f' "{schema}".{t}')
-    return ret
+            base = f"SELECT {','.join(self._raw_fields)} FROM {','.join(self.tables)}"
+            ret = 'SELECT * FROM ('
+            ret += " UNION ALL ".join([self.set_schema(s, base)  for s in schemas])
+            ret += ") as aa"
+            return ret
+
 
 
 def make_multitenant(sql):

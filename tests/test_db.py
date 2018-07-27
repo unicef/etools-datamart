@@ -17,11 +17,6 @@ from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganiz
 #
 # connection_created.connect(set_search_path)
 
-@pytest.mark.parametrize("schema", [["bolivia"], ["bolivia", "chad"]])
-def test_query(schema):
-    # FIXME: remove me (print)
-    print(111, schema)
-
 
 def test_query_public(db):
     state.schemas = ['bolivia']
@@ -48,14 +43,3 @@ def test_count_multi_tenant(db):
     state.schemas = ['bolivia', 'chad']
     assert PartnersPartnerorganization.objects.count() == 622
 
-
-def test_synthax_1(db):
-    sql = '''(SELECT DISTINCT "bolivia"."partners_partnerorganization"."country" 
-FROM "bolivia"."partners_partnerorganization" 
-ORDER BY "bolivia"."partners_partnerorganization"."country" ASC) 
-UNION 
-(SELECT DISTINCT "chad"."partners_partnerorganization"."country" 
-FROM "chad"."partners_partnerorganization" 
-ORDER BY "chad"."partners_partnerorganization"."country" ASC';'''
-    state.schemas = ['bolivia', 'chad']
-    assert len(PartnersPartnerorganization.objects.all().order_by('country')) == 622

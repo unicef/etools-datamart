@@ -21,7 +21,7 @@ from tenant_schemas.postgresql_backend.introspection import DatabaseSchemaIntros
 
 from django.db.backends.postgresql_psycopg2 import base as original_backend
 
-from etools_datamart.libs.sql import add_schema
+from etools_datamart.libs.sql import Parser
 from etools_datamart.state import state
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
@@ -66,28 +66,17 @@ class TenantCursor(CursorWrapper):
         # This is very low performance code
         # it is only a starting point
 
-        if sql.startswith('SELECT COUNT('):
-            if len(state.schemas) <= 1:
-                return super(TenantCursor, self).execute(sql, params)
-            """SELECT count(*) FROM (
-                SELECT * FROM user_1.customers
-              UNION ALL
-                SELECT * FROM user_2.customers
-            """
-
-            raise NotImplementedError
-        elif sql.startswith('SET'):
+        # if sql.startswith('SELECT COUNT('):
+        #     p = Parser(sql)
+        #     sql = p.with_schemas(*state.schemas)
+        if sql.startswith('SET'):
             return super(TenantCursor, self).execute(sql, params)
 
         if len(state.schemas) == 0:
             pass
-        elif len(state.schemas) == 1:
-            sql = add_schema(sql, state.schemas[0])
         else:
-            stmts = []
-            for t in state.schemas:
-                stmts.append("(%s)" % add_schema(sql, t))
-            sql = " UNION ".join(stmts)
+            p = Parser(sql)
+            sql = p.with_schemas(*state.schemas)
         return super(TenantCursor, self).execute(sql, params)
 
 
