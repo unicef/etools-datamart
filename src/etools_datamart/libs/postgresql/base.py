@@ -77,7 +77,7 @@ class TenantCursor(CursorWrapper):
         else:
             p = Parser(sql)
             sql = p.with_schemas(*state.schemas)
-        return super(TenantCursor, self).execute(sql, params)
+        return super(TenantCursor, self).execute(sql, params * len(state.schemas))
 
 
 class TenantDebugCursor(TenantCursor):

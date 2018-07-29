@@ -2,7 +2,7 @@
 import sqlparse
 from django.utils.functional import cached_property, Promise
 from sqlparse.sql import Comparison, Identifier, IdentifierList, Parenthesis, Where, Function
-from sqlparse.tokens import Keyword, Whitespace
+from sqlparse.tokens import Keyword, Whitespace, Wildcard
 
 SHARED_TABLES = ['auth_group', ]
 
@@ -42,9 +42,12 @@ class Parser:
     def __init__(self, sql):
         self.raw_sql = sql
         self.sql = sql.replace('"', '')
+        self.where = ""
         self._raw_tables = []
         self._raw_order = []
         self._raw_fields = []
+        self._raw_joins = []
+        self._raw_where = []
         self._unknown = []
         self._parsed = False
 
@@ -53,6 +56,14 @@ class Parser:
     @cached_property
     def order(self):
         return [s.replace(" ASC", "").replace(" DESC", "") for s in self.raw_order]
+
+    @cached_property
+    def cleaned_order(self):
+        ret = []
+        for entry in self.raw_order:
+            cleaned = entry.split(".")[-1]
+            ret.append(cleaned)
+        return ", ".join(ret)
 
     @cached_property
     def fields(self):
@@ -77,7 +88,7 @@ class Parser:
         return ret
 
     def __getattr__(self, item):
-        if item in ['raw_tables', 'raw_order', 'raw_fields', 'unknown']:
+        if item in ['raw_tables', 'raw_order', 'raw_fields', 'raw_joins', 'raw_where', 'unknown']:
             if not self._parsed:
                 self.parse()
             return getattr(self, f'_{item}')
@@ -98,6 +109,10 @@ class Parser:
                     target = self._raw_fields
                 elif value in ['FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'LEFT OUTER JOIN', 'RIGHT OUTER JOIN']:
                     target = self._raw_tables
+                elif value in ['ON']:
+                    target = self._raw_joins
+                elif value in ['WHERE']:
+                    target = self._raw_where
                 elif value in ['ORDER', 'BY']:
                     target = self._raw_order
                 else:
@@ -112,12 +127,20 @@ class Parser:
                     if 'COUNT(*)' in str(token):
                         self.is_count = True
                     target.append(str(token))
+                elif isinstance(token, Comparison):
+                    target.append(str(token))
                 elif isinstance(token, Function):
                     if 'COUNT(*)' in str(token):
                         self.is_count = True
                     target.append(str(token))
+                elif isinstance(token, Where):
+                    # target.append(str(token))
+                    self.where = str(token)
+                elif token.ttype  == Wildcard:
+                    target.append(str(token))
                 else:
                     pass
+                    # raise AttributeError(type(token))
         self._parsed = True
 
     def set_schema(self, schema, target=None):
@@ -135,17 +158,22 @@ class Parser:
         sql = self.sql
         if self.is_count:
             base = f"SELECT id FROM {','.join(self.tables)}"
-            ret = 'SELECT count(id) FROM ('
+            ret = "SELECT count(id) FROM ("
             ret += " UNION ALL ".join([self.set_schema(s, base)  for s in schemas])
-            ret += ") as _count"
+            ret += ") as __count"
             return ret
         if len(schemas) == 1:
             return self.set_schema(schemas[0])
         else:
-            base = f"SELECT {','.join(self._raw_fields)} FROM {','.join(self.tables)}"
-            ret = 'SELECT * FROM ('
-            ret += " UNION ALL ".join([self.set_schema(s, base)  for s in schemas])
-            ret += ") as aa"
+            base = f"SELECT {', '.join(self._raw_fields)} FROM {','.join(self.tables)}"
+            if self.where:
+                base += f" {self.where}"
+
+            ret = f"SELECT {', '.join(self.fields)} FROM ("
+            ret += " UNION ALL ".join([self.set_schema(s, base) for s in schemas])
+            ret += ") as __query"
+            if self.order:
+                ret += f" ORDER BY {self.cleaned_order}"
             return ret
 
 
