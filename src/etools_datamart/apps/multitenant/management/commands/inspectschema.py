@@ -7,6 +7,10 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.constants import LOOKUP_SEP
 from django_regex.utils import RegexList
 
+from etools_datamart import state
+from etools_datamart.libs.postgresql.base import SINGLE_TENANT
+from etools_datamart.libs.postgresql.utils import raw_sql
+
 INGNORED_TABLES = RegexList([
     # Both
     'django_migra.*',
@@ -26,7 +30,7 @@ class Command(BaseCommand):
     help = "Introspects the database tables in the given database/schema and outputs a Django model module."
     requires_system_checks = False
     stealth_options = ('table_name_filter',)
-    db_module = 'django.db'
+    db_module = 'etools_datamart.apps.multitenant'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -63,9 +67,11 @@ class Command(BaseCommand):
 
         def strip_prefix(s):
             return s[1:] if s.startswith("u'") else s
-
+        # connection.mode = SINGLE_TENANT
+        state.schemas = [schema, "public"]
+        connection.schema_name = schema
         with connection.cursor() as cursor:
-            cursor.execute(f"SET search_path={schema}")
+            # cursor.execute(raw_sql(f"SET search_path={schema}"))
             yield "# This is an auto-generated Django model module."
             yield "# You'll have to do the following manually to clean this up:"
             yield "#   * Rearrange models' order"
@@ -108,7 +114,7 @@ class Command(BaseCommand):
 
                 yield ''
                 yield ''
-                yield 'class %s(models.Model):' % table2model(table_name)
+                yield 'class %s(models.TenantModel):' % table2model(table_name)
 
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far

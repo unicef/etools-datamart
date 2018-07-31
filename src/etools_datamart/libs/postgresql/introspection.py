@@ -7,6 +7,9 @@ from django.db.backends.base.introspection import (
 )
 from django.utils.encoding import force_text
 
+from etools_datamart.state import state
+from etools_datamart.libs.postgresql.utils import raw_sql
+
 fields = FieldInfo._fields
 if 'default' not in fields:
     fields += ('default',)
@@ -39,22 +42,22 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
 
     ignored_tables = []
 
-    _get_table_list_query = """
+    _get_table_list_query = raw_sql("""
         SELECT c.relname, c.relkind
         FROM pg_catalog.pg_class c
         LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
         WHERE c.relkind IN ('r', 'v')
            AND n.nspname = %(schema)s;
-    """
+    """)
 
-    _get_table_description_query = """
+    _get_table_description_query = raw_sql("""
         SELECT column_name, is_nullable, column_default
         FROM information_schema.columns
         WHERE table_name = %(table)s
           AND table_schema = %(schema)s
-    """
+    """)
 
-    _get_relations_query = """
+    _get_relations_query = raw_sql("""
         SELECT c2.relname, a1.attname, a2.attname
         FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
@@ -65,9 +68,9 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
         WHERE c1.relname = %(table)s
             AND n1.nspname = %(schema)s
             AND con.contype = 'f'
-    """
+    """)
 
-    _get_key_columns_query = """
+    _get_key_columns_query = raw_sql("""
         SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
         FROM information_schema.constraint_column_usage ccu
             LEFT JOIN information_schema.key_column_usage kcu
@@ -81,9 +84,9 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
         WHERE kcu.table_name = %(table)s
           AND kcu.table_schame = %(schema)s
           AND tc.constraint_type = 'FOREIGN KEY'
-    """
+    """)
 
-    _get_indexes_query = """
+    _get_indexes_query = raw_sql("""
         SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
         FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
             pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
@@ -93,9 +96,9 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             AND attr.attnum = idx.indkey[0]
             AND c.relname = %(table)s
             AND n.nspname = %(schema)s
-    """
+    """)
 
-    _get_constraints_query = """
+    _get_constraints_query = raw_sql("""
         SELECT
             c.conname,
             array(
@@ -118,9 +121,9 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
         JOIN pg_class AS cl ON c.conrelid = cl.oid
         JOIN pg_namespace AS ns ON cl.relnamespace = ns.oid
         WHERE ns.nspname = %(schema)s AND cl.relname = %(table)s
-    """
+    """)
 
-    _get_check_constraints_query = """
+    _get_check_constraints_query = raw_sql("""
         SELECT kc.constraint_name, kc.column_name
         FROM information_schema.constraint_column_usage AS kc
         JOIN information_schema.table_constraints AS c ON
@@ -131,9 +134,9 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             c.constraint_type = 'CHECK' AND
             kc.table_schema = %(schema)s AND
             kc.table_name = %(table)s
-    """
+    """)
 
-    _get_index_constraints_query = """
+    _get_index_constraints_query = raw_sql("""
         SELECT
                 indexname, array_agg(attname), indisunique, indisprimary,
                 array_agg(ordering), amname, exprdef
@@ -164,7 +167,7 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
                   AND n.nspname = %(schema)s
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef;
-    """
+    """)
 
     def get_field_type(self, data_type, description):
         field_type = super(DatabaseSchemaIntrospection, self).get_field_type(data_type, description)
@@ -182,7 +185,6 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
         cursor.execute(self._get_table_list_query, {
             'schema': self.connection.schema_name
         })
-
         return [
             TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]))
             for row in cursor.fetchall()
@@ -201,7 +203,10 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             'table': table_name
         })
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
-        cursor.execute('SELECT * FROM %s LIMIT 1' % self.connection.ops.quote_name(table_name))
+        cursor.execute(raw_sql('SELECT * FROM %s.%s LIMIT 1' % (
+            self.connection.ops.quote_name(self.connection.schema_name),
+            self.connection.ops.quote_name(table_name)
+        )))
 
         return [
             FieldInfo(*(

@@ -24,8 +24,9 @@ env = environ.Env(DEBUG=(bool, False),
                   )
 
 SETTINGS_DIR = Path(__file__).parent
-SOURCE_DIR = SETTINGS_DIR.parent.parent.parent
-env_file = env.path('ENV_FILE_PATH', default=SOURCE_DIR / '.env')
+PACKAGE_DIR = SETTINGS_DIR.parent
+DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
+env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
 
 # if Path(str(env_file)).exists():  # pragma: no cover
 environ.Env.read_env(str(env_file))
@@ -70,7 +71,6 @@ DATABASES = {
         # },
     },
 }
-
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
@@ -175,13 +175,15 @@ ROOT_URLCONF = 'etools_datamart.config.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'etools_datamart.config.wsgi.application'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [str(PACKAGE_DIR / 'templates')],
         'APP_DIRS': False,
         'OPTIONS': {
             'loaders': [
+                'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
             ],
             'context_processors': [
@@ -215,6 +217,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 INSTALLED_APPS = [
     'etools_datamart.apps.init',
+    'etools_datamart.apps.multitenant',
 
     'constance',
     'constance.backends.database',
@@ -279,8 +282,8 @@ EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
 
 RAVEN_CONFIG = {
     'CELERY_LOGLEVEL': logging.INFO,
-        'dsn': env('SENTRY_DSN'),
-        'release': etools_datamart.VERSION,
+    'dsn': env('SENTRY_DSN'),
+    'release': etools_datamart.VERSION,
 }
 
 # django-constance

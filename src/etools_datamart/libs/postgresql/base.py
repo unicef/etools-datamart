@@ -11,8 +11,8 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 import django.db.utils
 from django.db.backends.utils import CursorWrapper, CursorDebugWrapper
 
-from tenant_schemas.utils import get_public_schema_name, get_limit_set_calls
-from tenant_schemas.postgresql_backend.introspection import DatabaseSchemaIntrospection
+# from tenant_schemas.utils import get_public_schema_name, get_limit_set_calls
+# from tenant_schemas.postgresql_backend.introspection import DatabaseSchemaIntrospection
 
 # ORIGINAL_BACKEND = getattr(settings, 'ORIGINAL_BACKEND', 'django.db.backends.postgresql_psycopg2')
 # Django 1.9+ takes care to rename the default backend to 'django.db.backends.postgresql'
@@ -21,6 +21,8 @@ from tenant_schemas.postgresql_backend.introspection import DatabaseSchemaIntros
 
 from django.db.backends.postgresql_psycopg2 import base as original_backend
 
+from etools_datamart.libs.postgresql.introspection import DatabaseSchemaIntrospection
+from etools_datamart.libs.postgresql.utils import raw_sql, RawSql, get_public_schema_name
 from etools_datamart.libs.sql import Parser
 from etools_datamart.state import state
 
@@ -32,6 +34,9 @@ SQL_SCHEMA_NAME_RESERVED_RE = re.compile(r'^pg_', re.IGNORECASE)
 
 dj_logger = logging.getLogger('django.db.backends')
 logger = logging.getLogger(__name__)
+
+SINGLE_TENANT = 1
+MULTI_TENANT = 2
 
 
 def _is_valid_identifier(identifier):
@@ -52,33 +57,39 @@ def _check_schema_name(name):
         raise ValidationError("Invalid string used for the schema name.")
 
 
+MODE_PARSE = 1
+MODE_RAW = 2
+
+
 class TenantCursor(CursorWrapper):
 
     def __init__(self, cursor, db):
         super().__init__(cursor, db)
-        self._cursors = {}
+        self.mode = MODE_PARSE
 
     def fetchall(self):
         with self.db.wrap_database_errors:
             return self.cursor.fetchall()
 
     def execute(self, sql, params=None):
-        # This is very low performance code
-        # it is only a starting point
 
-        # if sql.startswith('SELECT COUNT('):
-        #     p = Parser(sql)
-        #     sql = p.with_schemas(*state.schemas)
-        if sql.startswith('SET'):
+        if isinstance(sql, RawSql):
             return super(TenantCursor, self).execute(sql, params)
 
         if len(state.schemas) == 0:
             pass
         else:
-            p = Parser(sql)
-            sql = p.with_schemas(*state.schemas)
-        return super(TenantCursor, self).execute(sql, params * len(state.schemas))
-
+            if self.mode == MODE_PARSE:
+                p = Parser(sql)
+                sql = p.with_schemas(*state.schemas)
+                try:
+                    return super(TenantCursor, self).execute(sql, params * len(state.schemas))
+                except:
+                    # FIXME: remove me (print)
+                    print(111, sql)
+                    raise
+            else:
+                return super(TenantCursor, self).execute(sql, params)
 
 class TenantDebugCursor(TenantCursor):
 
@@ -135,6 +146,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         # currently selected schema.
         self.introspection = DatabaseSchemaIntrospection(self)
         self.set_schema_to_public()
+        self.mode = MULTI_TENANT
 
     def close(self):
         self.search_path_set = False
@@ -191,17 +203,42 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     def make_debug_cursor(self, cursor):
         """Create a cursor that logs all queries in self.queries_log."""
-        return TenantDebugCursor(cursor, self)
+        if self.mode == SINGLE_TENANT:
+            return CursorDebugWrapper(cursor, self)
+        else:
+            return TenantDebugCursor(cursor, self)
 
     def make_cursor(self, cursor):
         """Create a cursor without debug logging."""
-        return TenantCursor(cursor, self)
+        if self.mode == SINGLE_TENANT:
+            return CursorWrapper(cursor, self)
+        else:
+            return TenantCursor(cursor, self)
+
+    def single_cursor(self, name=None, ):
+        if name:
+            # Only supported and required by Django 1.11 (server-side cursor)
+            cursor = super(DatabaseWrapper, self)._cursor(name=name)
+        else:
+            cursor = super(DatabaseWrapper, self)._cursor()
+        return cursor
+
+    def set_search_paths(self, cursor, *schemas):
+        state.schema = schemas
+        q = 'SET search_path = {0}'.format(','.join(schemas))
+        self.search_path_set = True
+
+    def clear_search_paths(self, cursor, *schemas):
+        state.schema = []
+        cursor.execute('SET search_path = public;')
+        self.search_path_set = True
 
     def _cursor(self, name=None):
         """
         Here it happens. We hope every Django db operation using PostgreSQL
         must go through this to get the cursor handle. We change the path.
         """
+
         if name:
             # Only supported and required by Django 1.11 (server-side cursor)
             cursor = super(DatabaseWrapper, self)._cursor(name=name)
@@ -210,28 +247,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
         # optionally limit the number of executions - under load, the execution
         # of `set search_path` can be quite time consuming
-        if (not get_limit_set_calls()) or not self.search_path_set:
-            # Actual search_path modification for the cursor. Database will
-            # search schemata from left to right when looking for the object
-            # (table, index, sequence, etc.).
-            if not self.schema_name:
-                raise ImproperlyConfigured("Database schema not set. Did you forget "
-                                           "to call set_schema() or set_tenant()?")
-
-            # public_schema_name = get_public_schema_name()
-            # # if ',' in self.schema_name:
-            # schemas = self.schema_name.split(',')
-            # [_check_schema_name(schema) for schema in schemas]
-            #
-            # search_paths = []
-            #
-            # if self.schema_name == public_schema_name:
-            #     search_paths = [public_schema_name]
-            # elif self.include_public_schema:
-            #     search_paths.extend(schemas)
-            #     search_paths.append(public_schema_name)
-            # else:
-            #     search_paths.extend(schemas)
+        if not self.search_path_set:
             search_paths = ["public"]
             search_paths.extend(state.schemas)
             if name:
@@ -245,8 +261,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
             # if the next instruction is not a rollback it will just fail also, so
             # we do not have to worry that it's not the good one
             try:
-                q = 'SET search_path = {0}'.format(','.join(search_paths))
-                cursor_for_search_path.execute(q)
+                self.set_search_paths(cursor_for_search_path, *search_paths)
             except (django.db.utils.DatabaseError, psycopg2.InternalError):
                 self.search_path_set = False
             else:
