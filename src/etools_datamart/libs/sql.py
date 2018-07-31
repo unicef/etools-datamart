@@ -7,7 +7,7 @@ from django_regex.utils import RegexList
 from sqlparse.sql import Comparison, Identifier, IdentifierList, Parenthesis, Where, Function
 from sqlparse.tokens import Keyword, Whitespace, Wildcard
 
-SHARED_TABLES = RegexList(['auth_.*',])
+SHARED_TABLES = RegexList(['"auth_.*',])
 
 
 class RawSql(str):
@@ -201,9 +201,9 @@ class Parser:
         _f = parts["from"].strip()
         for t in self.tables:
             if t in SHARED_TABLES:
-                _f = _f.replace(t, f'"public"."{t}"')
+                _f = _f.replace(t, f'"public".{t}')
             else:
-                _f = _f.replace(f'{t}', f'"{schema}".{t}')
+                _f = _f.replace(t, f'"{schema}".{t}')
 
         ret = f'{parts["select"].strip()}, \'{schema}\' AS __schema {_f}'
         if self.where:
