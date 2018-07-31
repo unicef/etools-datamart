@@ -4,8 +4,6 @@ from __future__ import absolute_import
 import logging
 import threading
 
-from django.db import connections
-
 from etools_datamart.state import state
 
 logger = logging.getLogger(__name__)

@@ -98,22 +98,22 @@ def test_split(sql):
 def test_add_schema1():
     sql = 'SELECT "f1" AS "f1" FROM "t1"'
     p = Parser(sql)
-    assert p.set_schema2("bolivia") == 'SELECT "f1" AS "f1", \'bolivia\' AS __schema FROM "bolivia"."t1"'
+    assert p.set_schema("bolivia") == 'SELECT "f1" AS "f1", \'bolivia\' AS __schema FROM "bolivia"."t1"'
 
 
 def test_count_multitenant():
     p = Parser('SELECT COUNT(*) FROM "t1"')
     assert p.with_schemas("b",
-                          "c") == 'SELECT count(id) FROM (SELECT id, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT id, \'c\' AS __schema FROM "c"."t1") as __count'
+                          "c") == 'SELECT COUNT(id) FROM (SELECT id, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT id, \'c\' AS __schema FROM "c"."t1") as __count'
 
 
 def test_select_multitenant():
-    p = Parser("SELECT * FROM t1")
+    p = Parser('SELECT * FROM "t1"')
     assert p.with_schemas("b",
-                          "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b".t1 UNION ALL SELECT *, \'c\' AS __schema FROM "c".t1) as __query'
+                          "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT *, \'c\' AS __schema FROM "c"."t1") as __query'
 
 
 def test_select_with_order_multitenant():
-    p = Parser("SELECT * FROM t1 ORDER BY f1")
+    p = Parser('SELECT * FROM "t1" ORDER BY "f1"')
     assert p.with_schemas("b",
-                          "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b".t1 UNION ALL SELECT *, \'c\' AS __schema FROM "c".t1) as __query ORDER BY f1'
+                          "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT *, \'c\' AS __schema FROM "c"."t1") as __query ORDER BY "f1"'

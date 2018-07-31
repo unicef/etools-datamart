@@ -2,12 +2,13 @@
 import re
 
 import sqlparse
-from django.utils.functional import cached_property, Promise
+from django.utils.functional import cached_property
 from django_regex.utils import RegexList
-from sqlparse.sql import Comparison, Identifier, IdentifierList, Parenthesis, Where, Function
+from sqlparse.sql import Comparison, Identifier, IdentifierList, Where, Function
 from sqlparse.tokens import Keyword, Whitespace, Wildcard
 
-SHARED_TABLES = RegexList(['"auth_.*',])
+SHARED_TABLES = RegexList(['"auth_.*', ])
+
 
 class Parser:
     def __init__(self, sql):
@@ -72,11 +73,16 @@ class Parser:
         _from = '(?P<from> FROM (?P<tables>.*))'
         _where = '(?P<where> WHERE .*)'
         _order = '(?P<order> ORDER BY .*)'
+        _limit = '(?P<limit> LIMIT .*)'
 
         rexx = [
+            f"{_select}{_from}{_where}{_order}{_limit}",
             f"{_select}{_from}{_where}{_order}",
+            f"{_select}{_from}{_order}{_limit}",
             f"{_select}{_from}{_order}",
+            f"{_select}{_from}{_where}{_limit}",
             f"{_select}{_from}{_where}",
+            f"{_select}{_from}{_limit}",
             f"{_select}{_from}",
             # '(?P<select>SELECT( DISTINCT)?) (?P<fields>.*) (?P<from>FROM (?P<tables>.*)) WHERE (?P<where>.*) ORDER BY (?P<order>.*)',
             # '(?P<select>SELECT( DISTINCT)?) (?P<fields>.*) (?P<from>FROM (?P<tables>.*)) ORDER BY (?P<order>.*)',
@@ -96,7 +102,7 @@ class Parser:
             ret += (parts.get(part, "") or "").rstrip()
         return ret
 
-    def parse(self):
+    def parse(self):  # noqa
         if self._parsed:
             return
         target = self._unknown
@@ -146,17 +152,6 @@ class Parser:
                     # raise AttributeError(type(token))
         self._parsed = True
 
-    # def set_schema(self, schema, target=None):
-    #     if not self._parsed:
-    #         self.parse()
-    #     ret = target or self.sql
-    #     for t in self.tables:
-    #         if t in SHARED_TABLES:
-    #             ret = ret.replace(t, f'"public".{t}')
-    #         else:
-    #             ret = ret.replace(f" {t}", f' "{schema}".{t}')
-    #     return ret
-
     def set_schema(self, schema, **overrides):
         if not self._parsed:
             self.parse()
@@ -173,15 +168,19 @@ class Parser:
                 _f = _f.replace(t, f'"{schema}".{t}')
 
         ret = f'{parts["select"].strip()} {_f}'
+        ret = re.sub('".[^"]*"\."__schema"', f"'{schema}' AS __schema", ret)
+        if '__schema' not in ret:
+            ret = f'{parts["select"].strip()}, \'{schema}\' AS __schema {_f}'
+
         if self.where:
             ret += f" {parts['where']}"
-        return re.sub('".[^"]*"\."__schema"', f"'{schema}' AS __schema", ret)
+        return ret
 
     def with_schemas(self, *schemas):
         if not self._parsed:
             self.parse()
         if self.is_count:
-            ret = "SELECT count(id) FROM ("
+            ret = "SELECT COUNT(id) FROM ("
             ret += " UNION ALL ".join([self.set_schema(s, select='SELECT id') for s in schemas])
             ret += ") as __count"
             return ret
@@ -193,4 +192,6 @@ class Parser:
             ret += ") as __query"
             if self.parts.get('order'):
                 ret += f" ORDER BY {self.cleaned_order}"
+            if self.parts.get('limit'):
+                ret += f" {self.parts['limit']}"
             return ret

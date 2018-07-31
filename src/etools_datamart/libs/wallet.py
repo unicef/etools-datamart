@@ -68,7 +68,6 @@ class Wallet(object):
                                          __decrypter=self._decrypter,
                                          __silent=self._silent)
 
-
         if os.path.exists(GLOBAL_CREDENTIALS):
             self._load(GLOBAL_CREDENTIALS)
         self._load(self._filename)

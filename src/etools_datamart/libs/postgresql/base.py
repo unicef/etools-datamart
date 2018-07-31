@@ -4,20 +4,11 @@ import warnings
 from time import time
 
 import psycopg2
-import sqlparse
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ValidationError
 import django.db.utils
 from django.db.backends.utils import CursorWrapper, CursorDebugWrapper
-
-# from tenant_schemas.utils import get_public_schema_name, get_limit_set_calls
-# from tenant_schemas.postgresql_backend.introspection import DatabaseSchemaIntrospection
-
-# ORIGINAL_BACKEND = getattr(settings, 'ORIGINAL_BACKEND', 'django.db.backends.postgresql_psycopg2')
-# Django 1.9+ takes care to rename the default backend to 'django.db.backends.postgresql'
-# original_backend = django.db.utils.load_backend(ORIGINAL_BACKEND)
-#
 
 from django.db.backends.postgresql_psycopg2 import base as original_backend
 
@@ -84,17 +75,13 @@ class TenantCursor(CursorWrapper):
                 sql = p.with_schemas(*state.schemas)
                 try:
                     return super(TenantCursor, self).execute(sql, params * len(state.schemas))
-                except:
-                    # FIXME: remove me (print)
-                    print(111, sql)
+                except Exception:
                     raise
             else:
                 return super(TenantCursor, self).execute(sql, params)
 
+
 class TenantDebugCursor(TenantCursor):
-
-    # XXX callproc isn't instrumented at this time.
-
     def execute(self, sql, params=None):
         start = time()
         try:
@@ -225,7 +212,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     def set_search_paths(self, cursor, *schemas):
         state.schema = schemas
-        q = 'SET search_path = {0}'.format(','.join(schemas))
+        cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(schemas))))
         self.search_path_set = True
 
     def clear_search_paths(self, cursor, *schemas):

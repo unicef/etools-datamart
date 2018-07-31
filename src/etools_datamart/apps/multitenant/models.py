@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.db.models import *
+from django.db.models import *  # noqa
 
 
 class TenantModel(Model):

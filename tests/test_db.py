@@ -20,7 +20,6 @@ from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganiz
 
 def test_query_public(db):
     state.schemas = ['bolivia']
-    # Public
     assert AuthGroup.objects.all()
 
 
@@ -39,7 +38,11 @@ def test_count_single_tenant(db):
     assert PartnersPartnerorganization.objects.count() == 190
 
 
-def test_count_multi_tenant(db):
+def test_count_multi_tenant1(db):
     state.schemas = ['bolivia', 'chad']
     assert PartnersPartnerorganization.objects.count() == 622
 
+
+def test_count_multi_tenant2(db):
+    state.schemas = ['bolivia', 'chad']
+    assert PartnersPartnerorganization.objects.count() == 622

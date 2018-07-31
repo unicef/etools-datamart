@@ -8,8 +8,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django_regex.utils import RegexList
 
 from etools_datamart import state
-from etools_datamart.libs.postgresql.base import SINGLE_TENANT
-from etools_datamart.libs.postgresql.utils import raw_sql
 
 INGNORED_TABLES = RegexList([
     # Both
@@ -53,13 +51,9 @@ class Command(BaseCommand):
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
-    def handle_inspection(self, options):
+    def handle_inspection(self, options):  # noqa
         connection = connections[options['database']]
         schema = options['schema']
-        # cursor = connection.cursor()
-        # cursor.execute(f"SET search_path={schema}")
-
-        # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 
         def table2model(table_name):
@@ -67,6 +61,7 @@ class Command(BaseCommand):
 
         def strip_prefix(s):
             return s[1:] if s.startswith("u'") else s
+
         # connection.mode = SINGLE_TENANT
         state.schemas = [schema, "public"]
         connection.schema_name = schema

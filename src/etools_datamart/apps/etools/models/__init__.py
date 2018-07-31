@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-from .public import *
-from .tenant import *
+from .public import *  # noqa
+from .tenant import *  # noqa
