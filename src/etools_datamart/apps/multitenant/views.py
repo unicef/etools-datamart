@@ -2,6 +2,7 @@
 import logging
 
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connections
 from django.http import HttpResponseRedirect
@@ -19,6 +20,7 @@ class SchemasForm(forms.Form):
         for schema in schemas:
             self.fields[schema.schema_name] = forms.BooleanField(
                 label=schema.name,
+                # label=f"{schema.name} - {schema.schema_name}",
                 required=False)
 
     def clean(self):
@@ -26,6 +28,15 @@ class SchemasForm(forms.Form):
         if not selected:
             raise ValidationError("Select at least one workspace")
         return super().clean()
+
+    @property
+    def media(self):
+        extra = '' if settings.DEBUG else '.min'
+        js = [
+            'vendor/jquery/jquery%s.js' % extra,
+            'jquery.init.js',
+        ]
+        return forms.Media(js=['admin/js/%s' % url for url in js])
 
 
 class SelectSchema(FormView):
@@ -51,6 +62,6 @@ class SelectSchema(FormView):
         return response
 
     def render_to_response(self, context, **response_kwargs):
-        self.selected = self.request.COOKIES.get('schemas', '')
+        # self.selected = self.request.COOKIES.get('schemas', '')
         response = super().render_to_response(context, **response_kwargs)
         return response

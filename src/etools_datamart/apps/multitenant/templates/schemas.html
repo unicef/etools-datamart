@@ -1,7 +1,20 @@
-{% extends "admin/base_site.html" %}{% load columns %}
+{% extends "admin/base_site.html" %}{% load columns i18n %}
+{% block extrahead %}{{ block.super }}
+{{ form.media }}
+{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; Select workspace
+</div>
+{% endblock %}
 {% block content %}
+
     <form method="post">
         {% csrf_token %}
+        <span style="width: 180px;display: inline-block">
+                    <input type="checkbox" name="_all" id="checkAll">&nbsp;&nbsp;Select All
+                </span>
         <div>
             {% for f in form %}
                 <span style="width: 180px;display: inline-block">
@@ -14,3 +27,12 @@
         </div>
     </form>
 {% endblock content %}
+{% block footer %}
+
+    <script language="JavaScript">
+        django.jQuery("#checkAll").click(function () {
+            django.jQuery("input:checkbox").not(this).prop("checked", this.checked);
+        });
+    </script>
+
+{% endblock %}

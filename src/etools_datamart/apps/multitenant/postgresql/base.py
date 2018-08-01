@@ -14,7 +14,7 @@ from etools_datamart.state import state
 
 from ..sql import Parser
 from .introspection import DatabaseSchemaIntrospection
-from .utils import raw_sql, RawSql
+from .utils import raw_sql, RawSql, current_schema, clear_schemas
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
 
@@ -141,7 +141,8 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     def get_tenants(self):
         model = apps.get_model(settings.TENANT_MODEL)
-        return model.objects.all().order_by('schema_name')
+        with clear_schemas():
+            return model.objects.exclude(schema_name='public').order_by('name')
     # def rollback(self):
     #     super(DatabaseWrapper, self).rollback()
     #     # Django's rollback clears the search path so we have to set it again the next time.

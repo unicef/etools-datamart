@@ -18,9 +18,9 @@ class ActivitiesActivity(TenantModelAdmin):
 
 @register(models.PartnersPartnerorganization)
 class PartnersPartnerorganization(TenantModelAdmin):
-    list_display = ('vendor_number', 'partner_type', 'name', 'short_name')
+    list_display = ('vendor_number', 'partner_type', 'name', 'short_name', 'schema')
     search_fields = ('name',)
-    list_filter = ('country',)
+    # list_filter = ('schema',)
 
 
 @register(models.PartnersAssessment)

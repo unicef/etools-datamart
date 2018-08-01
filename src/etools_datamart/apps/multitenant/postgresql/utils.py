@@ -2,8 +2,8 @@
 from contextlib import contextmanager
 
 from django.conf import settings
+from django.db import connections
 from django.utils.functional import Promise
-
 from etools_datamart.state import state
 
 
@@ -49,3 +49,20 @@ def current_schema(schema):
     state.schemas = [schema]
     yield
     state.schemas = _old
+
+@contextmanager
+def clear_schemas():
+    _old = state.schemas
+    state.schemas = []
+    yield
+    state.schemas = _old
+
+@contextmanager
+def single():
+    _old = state.schemas
+    conn = connections['etools']
+    state.schemas = []
+    conn.mode = 1
+    yield
+    state.schemas = _old
+    conn.mode = 2
