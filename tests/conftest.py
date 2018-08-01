@@ -5,7 +5,6 @@ import warnings
 import psycopg2
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
-from django.db import connections
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
@@ -57,8 +56,9 @@ def django_db_setup(request,
                     django_db_keepdb,
                     django_db_createdb,
                     django_db_modify_db_settings):
+    pass
     # never touch etools DB
-    from pytest_django.fixtures import django_db_setup as dj_db_setup
+    # from pytest_django.fixtures import django_db_setup as dj_db_setup
     # dj_db_setup(request,
     #             django_test_environment,
     #             django_db_blocker,

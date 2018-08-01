@@ -1,6 +1,6 @@
 from django.conf.urls import include
 from django.contrib.admin import site
-from django.urls import re_path, path
+from django.urls import path
 from django.views.generic import TemplateView
 
 import etools_datamart.api.urls

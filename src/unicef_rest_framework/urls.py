@@ -1,7 +1,6 @@
 from django.conf.urls import url
 from django.contrib import admin
-from django.views.generic.base import TemplateView
-from rest_framework_jwt.views import obtain_jwt_token,refresh_jwt_token,verify_jwt_token
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 admin.autodiscover()
 

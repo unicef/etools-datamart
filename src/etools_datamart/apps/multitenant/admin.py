@@ -3,10 +3,9 @@ from django.contrib import messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
-from django.core.exceptions import ValidationError, MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-
 
 from etools_datamart.state import state
 

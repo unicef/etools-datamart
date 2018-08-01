@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import pytest
-from django.utils.safestring import mark_safe
 
 from etools_datamart.apps.multitenant.sql import Parser
 

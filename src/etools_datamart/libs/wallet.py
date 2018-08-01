@@ -5,6 +5,7 @@ import base64
 import json
 import logging
 import os
+
 import six
 
 logger = logging.getLogger(__name__)

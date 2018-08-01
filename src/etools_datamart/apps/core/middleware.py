@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import logging
 import threading
-
-from etools_datamart.state import state
 
 logger = logging.getLogger(__name__)
 

@@ -177,14 +177,10 @@ ROOT_URLCONF = 'etools_datamart.config.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'etools_datamart.config.wsgi.application'
 
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            str(PACKAGE_DIR / 'templates')
-            ]
-        ,
+        'DIRS': [str(PACKAGE_DIR / 'templates')],
         'APP_DIRS': False,
         'OPTIONS': {
             'loaders': [
@@ -245,7 +241,6 @@ INSTALLED_APPS = [
     'etools_datamart.apps.etools',
     'etools_datamart.api',
 ]
-
 
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'

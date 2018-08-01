@@ -4,7 +4,7 @@ import re
 import sqlparse
 from django.utils.functional import cached_property
 from django_regex.utils import RegexList
-from sqlparse.sql import Comparison, Identifier, IdentifierList, Where, Function
+from sqlparse.sql import Comparison, Function, Identifier, IdentifierList, Where
 from sqlparse.tokens import Keyword, Whitespace, Wildcard
 
 SHARED_TABLES = RegexList(['"auth_.*',

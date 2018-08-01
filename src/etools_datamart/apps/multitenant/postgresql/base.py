@@ -1,21 +1,20 @@
 import logging
 import re
-import warnings
 from time import time
 
 import django.db.utils
 import psycopg2
+from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.backends.postgresql_psycopg2 import base as original_backend
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
-from django.apps import apps, AppConfig
 
 from etools_datamart.state import state
 
 from ..sql import Parser
 from .introspection import DatabaseSchemaIntrospection
-from .utils import get_public_schema_name, raw_sql, RawSql
+from .utils import raw_sql, RawSql
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
 
