@@ -29,15 +29,16 @@ def configure_test(settings):
     settings.AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
     )
-    # settings.CSRF_COOKIE_SECURE = False
-    # settings.SECURE_BROWSER_XSS_FILTER = False
-    # settings.SECURE_CONTENT_TYPE_NOSNIFF = False
-    # settings.SECURE_FRAME_DENY = False
-    # settings.SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    # settings.SECURE_HSTS_SECONDS = 1
-    # settings.SECURE_SSL_REDIRECT = False
-    # settings.SESSION_COOKIE_HTTPONLY = True
-    # settings.SESSION_COOKIE_SECURE = False
+    settings.CSRF_COOKIE_SECURE = False
+    settings.SECURE_BROWSER_XSS_FILTER = False
+    settings.SECURE_CONTENT_TYPE_NOSNIFF = False
+    settings.SECURE_FRAME_DENY = False
+    settings.SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    settings.SECURE_HSTS_SECONDS = 1
+    settings.SECURE_SSL_REDIRECT = False
+    settings.SESSION_COOKIE_HTTPONLY = False
+    settings.ALLOWED_HOSTS = ['*']
+    settings.SESSION_COOKIE_SECURE = False
 
 
 def run_sql(sql):

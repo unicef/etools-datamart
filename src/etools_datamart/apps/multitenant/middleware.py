@@ -24,8 +24,7 @@ class MultiTenantMiddleware(object):
         # the view (and later middleware) are called.
         select_schema_url = reverse('multitenant:select-schema')
         if request.user and request.user.is_authenticated:
-            schemas = request.COOKIES.get('schemas', '')
-            # schema = request.META.get('HTTP_X_SCHEMA', "")
+            schemas = request.COOKIES.get('schemas', request.META.get('HTTP_X_SCHEMA', ""))
             if not schemas:
                 if request.path != select_schema_url:
                     return HttpResponseRedirect(select_schema_url)
