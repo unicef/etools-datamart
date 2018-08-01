@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}{% load columns %}
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            {% for f in form %}
+                <span style="width: 180px;display: inline-block">
+                    {{ f }}&nbsp;&nbsp;{{ f.label }}
+                </span>
+            {% endfor %}
+        </div>
+        <div>
+            <input type="submit" value="Select">
+        </div>
+    </form>
+{% endblock content %}

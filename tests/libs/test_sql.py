@@ -2,7 +2,7 @@
 import pytest
 from django.utils.safestring import mark_safe
 
-from etools_datamart.libs.sql import Parser
+from etools_datamart.apps.multitenant.sql import Parser
 
 one_table = [
     # 'SELECT * FROM t1',

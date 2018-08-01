@@ -16,7 +16,9 @@ def pytest_configure(config):
     warnings.simplefilter('once', DeprecationWarning)
     warnings.simplefilter('ignore', RemovedInPytest4Warning)
 
-    # os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
+    os.environ['CSRF_COOKIE_SECURE'] = "0"
+    os.environ['SECURE_SSL_REDIRECT'] = "0"
+    os.environ['SESSION_COOKIE_SECURE'] = "0"
 
 
 @pytest.fixture(autouse=True)
@@ -28,7 +30,15 @@ def configure_test(settings):
     settings.AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
     )
-    settings.SECURE_SSL_REDIRECT = False
+    # settings.CSRF_COOKIE_SECURE = False
+    # settings.SECURE_BROWSER_XSS_FILTER = False
+    # settings.SECURE_CONTENT_TYPE_NOSNIFF = False
+    # settings.SECURE_FRAME_DENY = False
+    # settings.SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    # settings.SECURE_HSTS_SECONDS = 1
+    # settings.SECURE_SSL_REDIRECT = False
+    # settings.SESSION_COOKIE_HTTPONLY = True
+    # settings.SESSION_COOKIE_SECURE = False
 
 
 def run_sql(sql):

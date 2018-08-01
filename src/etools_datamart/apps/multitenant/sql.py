@@ -7,7 +7,10 @@ from django_regex.utils import RegexList
 from sqlparse.sql import Comparison, Identifier, IdentifierList, Where, Function
 from sqlparse.tokens import Keyword, Whitespace, Wildcard
 
-SHARED_TABLES = RegexList(['"auth_.*', ])
+SHARED_TABLES = RegexList(['"auth_.*',
+                           '"publics_.*',
+                           '"users_.*',
+                           ])
 
 
 class Parser:
@@ -69,11 +72,11 @@ class Parser:
         raise AttributeError(item)
 
     def split(self, stm):
-        _select = '(?P<select>SELECT( DISTINCT)? (?P<fields>.*))'
-        _from = '(?P<from> FROM (?P<tables>.*))'
-        _where = '(?P<where> WHERE .*)'
-        _order = '(?P<order> ORDER BY .*)'
-        _limit = '(?P<limit> LIMIT .*)'
+        _select = r'(?P<select>SELECT( DISTINCT)? (?P<fields>.*))'
+        _from = r'(?P<from> FROM (?P<tables>.*))'
+        _where = r'(?P<where> WHERE .*)'
+        _order = r'(?P<order> ORDER BY .*)'
+        _limit = r'(?P<limit> LIMIT .*)'
 
         rexx = [
             f"{_select}{_from}{_where}{_order}{_limit}",
@@ -168,7 +171,7 @@ class Parser:
                 _f = _f.replace(t, f'"{schema}".{t}')
 
         ret = f'{parts["select"].strip()} {_f}'
-        ret = re.sub('".[^"]*"\."__schema"', f"'{schema}' AS __schema", ret)
+        ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", ret)
         if '__schema' not in ret:
             ret = f'{parts["select"].strip()}, \'{schema}\' AS __schema {_f}'
 

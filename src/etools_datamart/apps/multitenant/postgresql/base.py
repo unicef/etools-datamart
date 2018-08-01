@@ -3,19 +3,19 @@ import re
 import warnings
 from time import time
 
+import django.db.utils
 import psycopg2
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
-import django.db.utils
-from django.db.backends.utils import CursorWrapper, CursorDebugWrapper
-
 from django.db.backends.postgresql_psycopg2 import base as original_backend
+from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
+from django.apps import apps, AppConfig
 
-from etools_datamart.libs.postgresql.introspection import DatabaseSchemaIntrospection
-from etools_datamart.libs.postgresql.utils import raw_sql, RawSql, get_public_schema_name
-from etools_datamart.libs.sql import Parser
 from etools_datamart.state import state
+
+from ..sql import Parser
+from .introspection import DatabaseSchemaIntrospection
+from .utils import get_public_schema_name, raw_sql, RawSql
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
 
@@ -132,17 +132,21 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         # Use a patched version of the DatabaseIntrospection that only returns the table list for the
         # currently selected schema.
         self.introspection = DatabaseSchemaIntrospection(self)
-        self.set_schema_to_public()
+        # self.clear_search_paths()
         self.mode = MULTI_TENANT
+        self.search_path_set = False
 
     def close(self):
         self.search_path_set = False
         super(DatabaseWrapper, self).close()
 
-    def rollback(self):
-        super(DatabaseWrapper, self).rollback()
-        # Django's rollback clears the search path so we have to set it again the next time.
-        self.search_path_set = False
+    def get_tenants(self):
+        model = apps.get_model(settings.TENANT_MODEL)
+        return model.objects.all().order_by('schema_name')
+    # def rollback(self):
+    #     super(DatabaseWrapper, self).rollback()
+    #     # Django's rollback clears the search path so we have to set it again the next time.
+    #     self.search_path_set = False
 
     # def set_tenant(self, tenant, include_public=True):
     #     """
@@ -155,33 +159,33 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     #     self.set_settings_schema(self.schema_name)
     #     self.search_path_set = False
 
-    def set_schema(self, schema_name, include_public=True):
-        """
-        Main API method to current database schema,
-        but it does not actually modify the db connection.
-        """
-        # self.tenant = FakeTenant(schema_name=schema_name)
-        self.schema_name = schema_name
-        self.include_public_schema = include_public
-        self.set_settings_schema(schema_name)
-        self.search_path_set = False
+    # def set_schema(self, schema_name, include_public=True):
+    #     """
+    #     Main API method to current database schema,
+    #     but it does not actually modify the db connection.
+    #     """
+    #     # self.tenant = FakeTenant(schema_name=schema_name)
+    #     self.schema_name = schema_name
+    #     self.include_public_schema = include_public
+    #     # self.set_settings_schema(schema_name)
+    #     self.search_path_set = False
 
-    def set_schema_to_public(self):
+    # def set_schema_to_public(self):
         """
         Instructs to stay in the common 'public' schema.
-        """
+        # """
         # self.tenant = FakeTenant(schema_name=get_public_schema_name())
-        self.schema_name = get_public_schema_name()
-        self.set_settings_schema(self.schema_name)
-        self.search_path_set = False
+        # self.schema_name = get_public_schema_name()
+        # self.set_settings_schema(self.schema_name)
+        # self.search_path_set = False
 
-    def set_settings_schema(self, schema_name):
-        self.settings_dict['SCHEMA'] = schema_name
+    # def set_settings_schema(self, schema_name):
+    #     self.settings_dict['SCHEMA'] = schema_name
 
-    def get_schema(self):
-        warnings.warn("connection.get_schema() is deprecated, use connection.schema_name instead.",
-                      category=DeprecationWarning)
-        return self.schema_name
+    # def get_schema(self):
+    #     warnings.warn("connection.get_schema() is deprecated, use connection.schema_name instead.",
+    #                   category=DeprecationWarning)
+    #     return self.schema_name
 
     # def get_tenant(self):
     #     warnings.warn("connection.get_tenant() is deprecated, use connection.tenant instead.",
@@ -202,13 +206,13 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         else:
             return TenantCursor(cursor, self)
 
-    def single_cursor(self, name=None, ):
-        if name:
-            # Only supported and required by Django 1.11 (server-side cursor)
-            cursor = super(DatabaseWrapper, self)._cursor(name=name)
-        else:
-            cursor = super(DatabaseWrapper, self)._cursor()
-        return cursor
+    # def single_cursor(self, name=None, ):
+    #     if name:
+    #         # Only supported and required by Django 1.11 (server-side cursor)
+    #         cursor = super(DatabaseWrapper, self)._cursor(name=name)
+    #     else:
+    #         cursor = super(DatabaseWrapper, self)._cursor()
+    #     return cursor
 
     def set_search_paths(self, cursor, *schemas):
         state.schema = schemas
@@ -217,8 +221,8 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     def clear_search_paths(self, cursor, *schemas):
         state.schema = []
-        cursor.execute('SET search_path = public;')
-        self.search_path_set = True
+        cursor.execute(raw_sql('SET search_path = public;'))
+        self.search_path_set = False
 
     def _cursor(self, name=None):
         """

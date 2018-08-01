@@ -3,7 +3,7 @@ from collections import namedtuple
 from django.db.backends.base.introspection import BaseDatabaseIntrospection, FieldInfo, TableInfo
 from django.utils.encoding import force_text
 
-from etools_datamart.libs.postgresql.utils import raw_sql
+from .utils import raw_sql
 
 fields = FieldInfo._fields
 if 'default' not in fields:

@@ -57,7 +57,7 @@ DATABASES = {
     },
     'etools': {
         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'ENGINE': 'etools_datamart.libs.postgresql',
+        'ENGINE': 'etools_datamart.apps.multitenant.postgresql',
         'NAME': 'etools',
         'USER': 'postgres',
         'PASSWORD': '',
@@ -102,9 +102,10 @@ LANGUAGES = (
 )
 
 SITE_ID = 1
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
 # If you set this to False, Django will make some optimizations so as not
-# to load the internationalization machinery.
+# to load the ernationalization machinery.
 USE_I18N = True
 
 # If you set this to False, Django will not format dates, numbers and
@@ -158,6 +159,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware',
+    'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -179,7 +181,10 @@ WSGI_APPLICATION = 'etools_datamart.config.wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [str(PACKAGE_DIR / 'templates')],
+        'DIRS': [
+            str(PACKAGE_DIR / 'templates')
+            ]
+        ,
         'APP_DIRS': False,
         'OPTIONS': {
             'loaders': [
@@ -230,6 +235,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 
     'raven.contrib.django.raven_compat',
+    'columns',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -239,8 +245,6 @@ INSTALLED_APPS = [
     'etools_datamart.apps.etools',
     'etools_datamart.api',
 ]
-
-# R_APPS = ['etools_datamart.apps.etools']
 
 
 DATE_INPUT_FORMATS = [
@@ -267,15 +271,15 @@ DATETIME_INPUT_FORMATS = [
 ]
 
 # django-secure
-SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT')
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE')
-SECURE_HSTS_SECONDS = 1
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_FRAME_DENY = True
-SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
-SESSION_COOKIE_HTTPONLY = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_FRAME_DENY = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_SECONDS = 1
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT')
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
 
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
@@ -428,3 +432,5 @@ LOGGING_DEBUG = {
     'version': 1,
     'disable_existing_loggers': True,
 }
+
+TENANT_MODEL = 'etools.UsersCountry'

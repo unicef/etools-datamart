@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin.utils import quote, flatten_fieldsets
+from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from etools_datamart.libs.postgresql.utils import current_schema
+
 from etools_datamart.state import state
 
 
