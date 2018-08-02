@@ -1177,6 +1177,8 @@ class ReportsResulttype(models.TenantModel):
         managed = False
         db_table = 'reports_resulttype'
 
+    def __str__(self):
+        return self.name
 
 class ReportsSector(models.TenantModel):
     name = models.CharField(unique=True, max_length=45)

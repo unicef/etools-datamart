@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+from collections import OrderedDict
 
 import sqlparse
 from django.utils.functional import cached_property
@@ -11,6 +12,8 @@ SHARED_TABLES = RegexList(['"auth_.*',
                            '"publics_.*',
                            '"users_.*',
                            ])
+
+cache = {}
 
 
 class Parser:
@@ -28,10 +31,6 @@ class Parser:
 
         self.is_count = False
 
-    # @cached_property
-    # def order(self):
-    #     return [s.replace(" ASC", "").replace(" DESC", "").replace('"','') for s in self.raw_order]
-
     @cached_property
     def cleaned_order(self):
         ret = []
@@ -40,18 +39,18 @@ class Parser:
             ret.append(cleaned)
         return ", ".join(ret)
 
-    @cached_property
-    def fields(self):
-        ret = []
-        for name in self.raw_fields:
-            # name = name.replace('"', '')
-            if " AS " in name:
-                ret.append(name.split(" AS ")[-1])
-            elif "." in name:
-                ret.append(name.split(".")[-1])
-            else:
-                ret.append(name)
-        return ret
+    # @cached_property
+    # def fields(self):
+    #     ret = []
+    #     for name in self.raw_fields:
+    #         # name = name.replace('"', '')
+    #         # if " AS " in name:
+    #         #     ret.append(name.split(" AS ")[-1])
+    #         # elif "." in name:
+    #         #     ret.append(name.split(".")[-1])
+    #         # else:
+    #         ret.append(name)
+    #     return ret
 
     @cached_property
     def tables(self):
@@ -72,7 +71,8 @@ class Parser:
         raise AttributeError(item)
 
     def split(self, stm):
-        _select = r'(?P<select>SELECT( DISTINCT)? (?P<fields>.*))'
+        # TODO: improve regex
+        _select = r'(?P<query>(?P<select>SELECT( DISTINCT)? )(?P<fields>.*))'
         _from = r'(?P<from> FROM (?P<tables>.*))'
         _where = r'(?P<where> WHERE .*)'
         _order = r'(?P<order> ORDER BY .*)'
@@ -87,10 +87,6 @@ class Parser:
             f"{_select}{_from}{_where}",
             f"{_select}{_from}{_limit}",
             f"{_select}{_from}",
-            # '(?P<select>SELECT( DISTINCT)?) (?P<fields>.*) (?P<from>FROM (?P<tables>.*)) WHERE (?P<where>.*) ORDER BY (?P<order>.*)',
-            # '(?P<select>SELECT( DISTINCT)?) (?P<fields>.*) (?P<from>FROM (?P<tables>.*)) ORDER BY (?P<order>.*)',
-            # '(?P<select>SELECT( DISTINCT)?) (?P<fields>.*) (?P<from>FROM (?P<tables>.*)) WHERE (?P<where>.*)',
-            # '(?P<select>SELECT( DISTINCT)?) (?P<fields>.*) (?P<from>FROM (?P<tables>.*))'
         ]
         for rex in rexx:
             m = re.match(rex, stm, re.I)
@@ -170,8 +166,16 @@ class Parser:
             else:
                 _f = _f.replace(t, f'"{schema}".{t}')
 
-        ret = f'{parts["select"].strip()} {_f}'
-        ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", ret)
+        ret = self.parts['select']
+        self.mapping = OrderedDict()
+        for field in self.raw_fields:
+            if '__schema' in field:
+                self.mapping['schema'] = f"'{schema}' AS __schema"
+            else:
+                self.mapping[field] = re.sub(r'("(.[^"]*)"\."(.[^"]*)")', r'"\2"."\3" AS \2__\3', field)
+
+        ret += ", ".join(self.mapping.values())
+        ret += f" {_f}"
         if '__schema' not in ret:
             ret = f'{parts["select"].strip()}, \'{schema}\' AS __schema {_f}'
 
@@ -180,6 +184,11 @@ class Parser:
         return ret
 
     def with_schemas(self, *schemas):
+        if len(schemas) == 1:
+            schema = schemas[0]
+            ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.sql)
+            return ret
+
         if not self._parsed:
             self.parse()
         if self.is_count:
@@ -190,11 +199,13 @@ class Parser:
         if len(schemas) == 1:
             return self.set_schema(schemas[0])
         else:
-            ret = f"SELECT { ', '.join(self.fields)} FROM ("
+            ret = f"SELECT * FROM ("
             ret += " UNION ALL ".join([self.set_schema(s) for s in schemas])
             ret += ") as __query"
             if self.parts.get('order'):
-                ret += f" ORDER BY {self.cleaned_order}"
+                base = self.parts.get('order')
+                for part in base.split(","):
+                    ret += part.replace('"','').replace(".", "__")
             if self.parts.get('limit'):
                 ret += f" {self.parts['limit']}"
             return ret

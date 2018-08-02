@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import pytest
+
 from etools_datamart.state import state
-from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganization
+from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganization, ReportsResult
 
 
 #
@@ -44,3 +46,11 @@ def test_count_multi_tenant1(db):
 def test_count_multi_tenant2(db):
     state.schemas = ['bolivia', 'chad']
     assert PartnersPartnerorganization.objects.count() == 622
+
+
+def test_select_related(db):
+    # state.schemas = ['bolivia', 'chad', 'lebanon', 'angola', 'kenya']
+    state.schemas = ['bolivia']
+    qs = ReportsResult.objects.only('id', 'result_type').select_related('result_type').order_by('id')
+    for obj in qs:
+        assert obj.result_type.name

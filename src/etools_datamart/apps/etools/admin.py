@@ -55,4 +55,9 @@ class ReportsAppliedindicator(TenantModelAdmin):
 
 @register(models.ReportsResult)
 class ReportsResult(TenantModelAdmin):
-    pass
+    list_display = ('name', 'code', 'result_type',)
+
+@register(models.ReportsResulttype)
+class ReportsResulttype(TenantModelAdmin):
+    list_display = ('id', 'name')
+

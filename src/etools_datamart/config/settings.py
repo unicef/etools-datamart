@@ -177,6 +177,21 @@ ROOT_URLCONF = 'etools_datamart.config.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'etools_datamart.config.wsgi.application'
 
+class InvalidVarException(object):
+    def __mod__(self, missing):
+        try:
+            missing_str=str(missing)
+        except:
+            missing_str='Failed to create string representation'
+        raise Exception('Unknown template variable %r %s' % (missing, missing_str))
+    def __contains__(self, search):
+        if search=='%s':
+            return True
+        return False
+
+TEMPLATE_DEBUG=True
+TEMPLATE_STRING_IF_INVALID = InvalidVarException()
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -301,7 +316,9 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
-    )
+    ),
+    "PAGE_SIZE": 1,
+    "DEFAULT_PAGINATION_CLASS": None
 }
 
 LOG_DIR = os.environ.get('SIR_LOG_DIR',
