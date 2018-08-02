@@ -8,8 +8,16 @@ class PartnerSerializer(serializers.ModelSerializer):
         exclude = ()
 
 
+class PK(serializers.PrimaryKeyRelatedField):
+    def to_representation(self, value):
+        # FIXME: remove this line (pdb)
+        import pdb; pdb.set_trace()
+        if self.pk_field is not None:
+            return self.pk_field.to_representation(value.pk)
+        return value.pk
+
+
 class ReportsResultSerializer(serializers.ModelSerializer):
-    # result_type_name = serializers.CharField()
     class Meta:
         model = ReportsResult
         exclude = ()

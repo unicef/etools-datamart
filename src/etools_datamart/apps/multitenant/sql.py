@@ -170,7 +170,9 @@ class Parser:
         self.mapping = OrderedDict()
         fields = parts['fields'].split(',')
         for field in fields:
-            if '__schema' not in field:
+            if '__schema' in field:
+                self.mapping['schema'] = f"'{schema}' AS __schema"
+            else:
                 self.mapping[field] = re.sub(r'("(.[^"]*)"\."(.[^"]*)")', r'"\2"."\3" AS \2__\3', field)
 
         self.mapping['schema'] = f"'{schema}' AS __schema"

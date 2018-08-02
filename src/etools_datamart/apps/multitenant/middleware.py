@@ -30,8 +30,8 @@ class MultiTenantMiddleware(object):
                     return HttpResponseRedirect(select_schema_url)
             state.schemas = schemas.split(',')
 
-        state.request = request
 
+        state.request = request
         response = self.get_response(request)
 
         # Code to be executed for each request/response after
