@@ -4,18 +4,12 @@ import pytest
 from etools_datamart.apps.multitenant.sql import Parser
 
 one_table = [
-    # 'SELECT * FROM t1',
-    'SELECT f1 AS f1 FROM t1',
-    'SELECT f1 FROM t1',
-    'SELECT DISTINCT f1 FROM t1',
-    'SELECT f1 FROM t1 ORDER BY o1',
     'SELECT "f1" FROM "t1" ORDER BY "o1" ASC',
     'SELECT DISTINCT "f1" FROM "t1" ORDER BY "o1" ASC',
     'SELECT DISTINCT "t1"."f1" FROM "t1" ORDER BY "o1" ASC',
     'SELECT DISTINCT "t1"."f1" FROM "t1" ORDER BY "t1"."f1" ASC',
     'SELECT DISTINCT "s1"."t1"."f1" FROM "s1"."t1" ORDER BY "t1"."f1" ASC',
     'SELECT DISTINCT "s1"."t1"."f1" FROM "t1" ORDER BY "s1"."t1"."f1" ASC',
-    # 'SELECT "s1"."t1"."f1", "t2"."f2" FROM "t1" INNER JOIN "t2" ON "f1"="f2" ORDER BY "t1"."f1" ASC',
 ]
 
 multi_table = [
@@ -43,48 +37,31 @@ filtered_table = [
 @pytest.mark.parametrize('sql', one_table)
 def test_single_table(sql):
     p = Parser(sql)
-    assert p.unknown == []
+    # assert p.unknown == []
     # assert p.fields == ["f1"]
-    # assert p.tables == ["t1"]
+    assert p.tables == ['"t1"']
 
 
-# @pytest.mark.parametrize('sql', one_table)
 def test_star():
     p = Parser('SELECT * FROM "s1"."t1" ORDER BY "t1"."f1"')
-    assert p.unknown == []
-    # assert p.raw_fields == ["*"]
-    # assert p.fields == ["*"]
-    # assert p.tables == ['"t1"']
-    # assert p.order == ["t1.f1"]
-
-
-# @pytest.mark.parametrize('sql', multi_table)
-# def test_join(sql):
-#     p = Parser(sql)
-#     assert p.unknown == []
-#     assert p.fields == ["f1", "f2"]
-#     assert p.tables == ["t1", "t2"]
-#
+    assert p.tables == ['"t1"']
 
 @pytest.mark.parametrize('sql', ordered_table)
 def test_order(sql):
     p = Parser(sql)
-    assert p.unknown == []
-    # assert p.order == ["f1", "f2"]
+    p.parse()
     assert p.parts['from'] == ' FROM t1'
 
 
 def test_where1():
     p = Parser('SELECT "f1" FROM t1 WHERE f1=1 AND f2=2')
-    assert p.unknown == []
-    # assert p.fields == ["f1"]
+    p.parse()
     assert p.where == "WHERE f1=1 AND f2=2"
 
 
 def test_where2():
     p = Parser('SELECT "f1" FROM t1 WHERE f1=%s')
-    assert p.unknown == []
-    # assert p.fields == ["f1"]
+    p.parse()
     assert p.where == "WHERE f1=%s"
 
 
@@ -115,4 +92,4 @@ def test_select_multitenant():
 def test_select_with_order_multitenant():
     p = Parser('SELECT * FROM "t1" ORDER BY "f1"')
     assert p.with_schemas("b",
-                          "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT *, \'c\' AS __schema FROM "c"."t1") as __query ORDER BY "f1"'
+                          "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT *, \'c\' AS __schema FROM "c"."t1") as __query ORDER BY f1'

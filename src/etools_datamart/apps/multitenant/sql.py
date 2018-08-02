@@ -22,10 +22,10 @@ class Parser:
         self.sql = sql
         self.where = ""
         self._raw_tables = []
-        self._raw_order = []
-        self._raw_fields = []
-        self._raw_joins = []
-        self._raw_where = []
+        # self._raw_order = []
+        # self._raw_fields = []
+        # self._raw_joins = []
+        # self._raw_where = []
         self._unknown = []
         self._parsed = False
 
@@ -97,7 +97,7 @@ class Parser:
 
     def join(self, parts):
         ret = ""
-        for part in ['select', 'from', 'where', 'order']:
+        for part in ['query', 'from', 'where', 'order']:
             ret += (parts.get(part, "") or "").rstrip()
         return ret
 
@@ -113,39 +113,39 @@ class Parser:
                 continue
             elif token.ttype is Keyword:
                 value = token.value.upper()
-                if value in ['SELECT', 'DISTINCT']:
-                    target = self._raw_fields
-                elif value in ['FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'LEFT OUTER JOIN', 'RIGHT OUTER JOIN']:
+                if value in ['FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'LEFT OUTER JOIN', 'RIGHT OUTER JOIN']:
                     target = self._raw_tables
-                elif value in ['ON']:
-                    target = self._raw_joins
-                elif value in ['WHERE']:
-                    target = self._raw_where
-                elif value in ['ORDER', 'BY']:
-                    target = self._raw_order
+                # elif value in ['SELECT', 'DISTINCT']:
+                #     target = self._raw_fields
+                # elif value in ['ON']:
+                #     target = self._raw_joins
+                # elif value in ['WHERE']:
+                #     target = self._raw_where
+                # elif value in ['ORDER', 'BY']:
+                #     target = self._raw_order
                 else:
                     target = self._unknown
-            elif token.ttype is Keyword.DML:
-                target = self._raw_fields
+            # elif token.ttype is Keyword.DML:
+            #     target = self._raw_fields
             else:
                 if isinstance(token, IdentifierList):
                     for identifier in token.get_identifiers():
                         target.append(str(identifier))
                 elif isinstance(token, Identifier):
-                    if 'COUNT(*)' in str(token):
+                    if 'COUNT(' in str(token):
                         self.is_count = True
                     target.append(str(token))
-                elif isinstance(token, Comparison):
-                    target.append(str(token))
+                # elif isinstance(token, Comparison):
+                #     target.append(str(token))
                 elif isinstance(token, Function):
-                    if 'COUNT(*)' in str(token):
+                    if 'COUNT(' in str(token):
                         self.is_count = True
                     target.append(str(token))
                 elif isinstance(token, Where):
                     # target.append(str(token))
                     self.where = str(token)
-                elif token.ttype == Wildcard:
-                    target.append(str(token))
+                # elif token.ttype == Wildcard:
+                #     target.append(str(token))
                 else:
                     pass
                     # raise AttributeError(type(token))
@@ -166,18 +166,17 @@ class Parser:
             else:
                 _f = _f.replace(t, f'"{schema}".{t}')
 
-        ret = self.parts['select']
+        ret = parts['select']
         self.mapping = OrderedDict()
-        for field in self.raw_fields:
-            if '__schema' in field:
-                self.mapping['schema'] = f"'{schema}' AS __schema"
-            else:
+        fields = parts['fields'].split(',')
+        for field in fields:
+            if '__schema' not in field:
                 self.mapping[field] = re.sub(r'("(.[^"]*)"\."(.[^"]*)")', r'"\2"."\3" AS \2__\3', field)
+
+        self.mapping['schema'] = f"'{schema}' AS __schema"
 
         ret += ", ".join(self.mapping.values())
         ret += f" {_f}"
-        if '__schema' not in ret:
-            ret = f'{parts["select"].strip()}, \'{schema}\' AS __schema {_f}'
 
         if self.where:
             ret += f" {parts['where']}"
@@ -193,7 +192,7 @@ class Parser:
             self.parse()
         if self.is_count:
             ret = "SELECT COUNT(id) FROM ("
-            ret += " UNION ALL ".join([self.set_schema(s, select='SELECT id') for s in schemas])
+            ret += " UNION ALL ".join([self.set_schema(s, fields='id') for s in schemas])
             ret += ") as __count"
             return ret
         if len(schemas) == 1:
@@ -205,7 +204,7 @@ class Parser:
             if self.parts.get('order'):
                 base = self.parts.get('order')
                 for part in base.split(","):
-                    ret += part.replace('"','').replace(".", "__")
+                    ret += part.replace('"', '').replace(".", "__")
             if self.parts.get('limit'):
                 ret += f" {self.parts['limit']}"
             return ret
