@@ -5,8 +5,8 @@ from collections import OrderedDict
 import sqlparse
 from django.utils.functional import cached_property
 from django_regex.utils import RegexList
-from sqlparse.sql import Comparison, Function, Identifier, IdentifierList, Where
-from sqlparse.tokens import Keyword, Whitespace, Wildcard
+from sqlparse.sql import Function, Identifier, IdentifierList, Where
+from sqlparse.tokens import Keyword, Whitespace
 
 SHARED_TABLES = RegexList(['"auth_.*',
                            '"publics_.*',

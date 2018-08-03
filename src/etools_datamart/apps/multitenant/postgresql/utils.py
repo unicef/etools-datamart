@@ -50,12 +50,14 @@ def current_schema(schema):
     yield
     state.schemas = _old
 
+
 @contextmanager
 def clear_schemas():
     _old = state.schemas
     state.schemas = []
     yield
     state.schemas = _old
+
 
 @contextmanager
 def single():

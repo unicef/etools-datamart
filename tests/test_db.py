@@ -53,7 +53,7 @@ def test_select_order(db, schema):
     state.schemas = schema
     qs = ReportsResult.objects.only('id',
                                     'name').order_by('id',
-                                                            'name')
+                                                     'name')
     for obj in qs:
         assert obj.name
 

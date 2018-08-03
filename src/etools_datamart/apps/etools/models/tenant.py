@@ -25,7 +25,8 @@ class ActionPointsActionpoint(models.TenantModel):
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='+', blank=True, null=True)
     location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='+', blank=True, null=True)
     office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='+')
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True,
+                                null=True)
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='+')
     tpm_activity = models.ForeignKey('TpmTpmactivity', models.DO_NOTHING, related_name='+', blank=True, null=True)
     travel_activity = models.ForeignKey('T2FTravelactivity', models.DO_NOTHING, related_name='+', blank=True, null=True)
@@ -39,7 +40,8 @@ class ActivitiesActivity(models.TenantModel):
     date = models.DateField(blank=True, null=True)
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='+', blank=True, null=True)
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='+', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True,
+                                null=True)
 
     class Meta:
         managed = False
@@ -65,9 +67,11 @@ class ActstreamAction(models.TenantModel):
     timestamp = models.DateTimeField()
     public = models.BooleanField()
     data = models.TextField(blank=True, null=True)
-    action_object_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    action_object_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True,
+                                                   null=True)
     actor_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+')
-    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True,
+                                            null=True)
 
     class Meta:
         managed = False
@@ -171,7 +175,8 @@ class AuditEngagement(models.TenantModel):
     date_of_final_report = models.DateField(blank=True, null=True)
     date_of_cancel = models.DateField(blank=True, null=True)
     amount_refunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2, blank=True,
+                                                                       null=True)
     justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     write_off_required = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     cancel_comment = models.TextField()
@@ -179,7 +184,8 @@ class AuditEngagement(models.TenantModel):
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+')
     joint_audit = models.BooleanField()
     agreement = models.ForeignKey('PurchaseOrderPurchaseorder', models.DO_NOTHING, related_name='+')
-    po_item = models.ForeignKey('PurchaseOrderPurchaseorderitem', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    po_item = models.ForeignKey('PurchaseOrderPurchaseorderitem', models.DO_NOTHING, related_name='+', blank=True,
+                                null=True)
     shared_ip_with = models.TextField()  # This field type is a guess.
     exchange_rate = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
@@ -598,10 +604,12 @@ class PartnersAgreement(models.TenantModel):
     signed_by_unicef_date = models.DateField(blank=True, null=True)
     signed_by_partner_date = models.DateField(blank=True, null=True)
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+')
-    partner_manager = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    partner_manager = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='+', blank=True,
+                                        null=True)
     signed_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+', blank=True, null=True)
     status = models.CharField(max_length=32)
-    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='+', blank=True,
+                                          null=True)
 
     class Meta:
         managed = False
@@ -659,10 +667,12 @@ class PartnersDirectcashtransfer(models.TenantModel):
     amount_usd = models.DecimalField(max_digits=20, decimal_places=2)
     liquidation_usd = models.DecimalField(max_digits=20, decimal_places=2)
     outstanding_balance_usd = models.DecimalField(max_digits=20, decimal_places=2)
-    amount_less_than_3_months_usd = models.DecimalField(db_column='amount_less_than_3_Months_usd', max_digits=20, decimal_places=2)  # Field name made lowercase.
+    amount_less_than_3_months_usd = models.DecimalField(db_column='amount_less_than_3_Months_usd', max_digits=20,
+                                                        decimal_places=2)  # Field name made lowercase.
     amount_3_to_6_months_usd = models.DecimalField(max_digits=20, decimal_places=2)
     amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2)
-    amount_more_than_9_months_usd = models.DecimalField(db_column='amount_more_than_9_Months_usd', max_digits=20, decimal_places=2)  # Field name made lowercase.
+    amount_more_than_9_months_usd = models.DecimalField(db_column='amount_more_than_9_Months_usd', max_digits=20,
+                                                        decimal_places=2)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -712,10 +722,12 @@ class PartnersIntervention(models.TenantModel):
     signed_by_partner_date = models.DateField(blank=True, null=True)
     population_focus = models.CharField(max_length=130, blank=True, null=True)
     agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name='+')
-    partner_authorized_officer_signatory = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    partner_authorized_officer_signatory = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING,
+                                                             related_name='+', blank=True, null=True)
     unicef_signatory = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+', blank=True, null=True)
     signed_pd_document = models.CharField(max_length=1024, blank=True, null=True)
-    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='+', blank=True,
+                                          null=True)
     contingency_pd = models.BooleanField()
     metadata = models.TextField(blank=True, null=True)  # This field type is a guess.
     in_amendment = models.BooleanField()
@@ -812,7 +824,8 @@ class PartnersInterventionbudget(models.TenantModel):
     unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2)
     in_kind_amount_local = models.DecimalField(max_digits=20, decimal_places=2)
     total = models.DecimalField(max_digits=20, decimal_places=2)
-    intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='+', blank=True,
+                                        null=True)
     total_local = models.DecimalField(max_digits=20, decimal_places=2)
     currency = models.CharField(max_length=4)
 
@@ -883,7 +896,8 @@ class PartnersInterventionsectorlocationlink(models.TenantModel):
 
 
 class PartnersInterventionsectorlocationlinkLocations(models.TenantModel):
-    interventionsectorlocationlink = models.ForeignKey(PartnersInterventionsectorlocationlink, models.DO_NOTHING, related_name='+')
+    interventionsectorlocationlink = models.ForeignKey(PartnersInterventionsectorlocationlink, models.DO_NOTHING,
+                                                       related_name='+')
     location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='+')
 
     class Meta:
@@ -981,7 +995,8 @@ class ReportsAppliedindicator(models.TenantModel):
     baseline = models.IntegerField(blank=True, null=True)
     assumptions = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
-    indicator = models.ForeignKey('ReportsIndicatorblueprint', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    indicator = models.ForeignKey('ReportsIndicatorblueprint', models.DO_NOTHING, related_name='+', blank=True,
+                                  null=True)
     lower_result = models.ForeignKey('ReportsLowerresult', models.DO_NOTHING, related_name='+')
     means_of_verification = models.CharField(max_length=255, blank=True, null=True)
     cluster_indicator_id = models.IntegerField(blank=True, null=True)
@@ -1160,7 +1175,8 @@ class ReportsResult(models.TenantModel):
     from_date = models.DateField(blank=True, null=True)
     to_date = models.DateField(blank=True, null=True)
     ram = models.BooleanField()
-    country_programme = models.ForeignKey(ReportsCountryprogramme, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    country_programme = models.ForeignKey(ReportsCountryprogramme, models.DO_NOTHING, related_name='+', blank=True,
+                                          null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
@@ -1179,6 +1195,7 @@ class ReportsResulttype(models.TenantModel):
 
     def __str__(self):
         return self.name
+
 
 class ReportsSector(models.TenantModel):
     name = models.CharField(unique=True, max_length=45)

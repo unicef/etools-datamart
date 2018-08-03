@@ -14,7 +14,7 @@ from etools_datamart.state import state
 
 from ..sql import Parser
 from .introspection import DatabaseSchemaIntrospection
-from .utils import raw_sql, RawSql, current_schema, clear_schemas
+from .utils import raw_sql, RawSql, clear_schemas
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
 

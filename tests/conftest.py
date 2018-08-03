@@ -8,7 +8,6 @@ from _pytest.deprecated import RemovedInPytest4Warning
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
-
 def pytest_configure(config):
     here = os.path.dirname(__file__)
     sys.path.insert(0, os.path.join(here, 'extras'))

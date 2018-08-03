@@ -1,6 +1,6 @@
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
-from rest_framework.pagination import LimitOffsetPagination, CursorPagination, PageNumberPagination
+from rest_framework.pagination import CursorPagination
 
 from etools_datamart.apps.etools import models
 from . import serializers

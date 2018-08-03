@@ -6,6 +6,7 @@ from . import views
 
 app_name = 'api'
 
+
 class ReadOnlyRouter(routers.DefaultRouter):
     include_format_suffixes = False
     routes = [
@@ -58,10 +59,6 @@ class ReadOnlyRouter(routers.DefaultRouter):
             view = self.get_api_root_view(api_urls=urls)
             root_url = url(r'^$', view, name=self.root_view_name)
             urls.append(root_url)
-
-        if self.include_format_suffixes:
-            urls = format_suffix_patterns(urls)
-
 
         return urls
 
