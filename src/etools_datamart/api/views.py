@@ -1,5 +1,6 @@
+from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination, CursorPagination, PageNumberPagination
 
 from etools_datamart.apps.etools import models
 from . import serializers
@@ -9,12 +10,15 @@ class ApiMixin:
     permission_classes = []
 
 
+def paginator(ordering='-created'):
+    return type("TenantPaginator", (CursorPagination,), {'ordering': ordering})
+
+
 class ReadOnlyModelViewSet(ApiMixin, viewsets.ReadOnlyModelViewSet):
-    pagination_class = LimitOffsetPagination  # PageNumberPagination
-
-
-class ModelViewSet(ApiMixin, viewsets.ReadOnlyModelViewSet):
-    pass
+    pagination_class = paginator()
+    filter_backends = [QueryStringFilterBackend]
+    filter_blacklist = []
+    filter_fields = []
 
 
 class PartnerViewSet(ReadOnlyModelViewSet):

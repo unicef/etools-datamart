@@ -29,7 +29,8 @@ class MultiTenantMiddleware(object):
                 if request.path != select_schema_url:
                     return HttpResponseRedirect(select_schema_url)
             state.schemas = schemas.split(',')
-
+        else:
+            state.schemas = []
 
         state.request = request
         response = self.get_response(request)

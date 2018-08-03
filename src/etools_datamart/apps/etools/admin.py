@@ -57,7 +57,7 @@ class ReportsAppliedindicator(TenantModelAdmin):
 class ReportsResult(TenantModelAdmin):
     list_display = ('name', 'code', 'result_type',)
 
+
 @register(models.ReportsResulttype)
 class ReportsResulttype(TenantModelAdmin):
-    list_display = ('id', 'name')
-
+    list_display = ('id', 'name', 'schema')

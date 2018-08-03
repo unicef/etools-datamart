@@ -48,9 +48,22 @@ def test_count_multi_tenant2(db):
     assert PartnersPartnerorganization.objects.count() == 622
 
 
-def test_select_related(db):
-    # state.schemas = ['bolivia', 'chad', 'lebanon', 'angola', 'kenya']
-    state.schemas = ['bolivia']
-    qs = ReportsResult.objects.only('id', 'result_type').select_related('result_type').order_by('id')
+@pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
+def test_select_order(db, schema):
+    state.schemas = schema
+    qs = ReportsResult.objects.only('id',
+                                    'name').order_by('id',
+                                                            'name')
+    for obj in qs:
+        assert obj.name
+
+
+@pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
+def test_select_related(db, schema):
+    state.schemas = schema
+    qs = ReportsResult.objects.only('id',
+                                    'name',
+                                    'result_type').select_related('result_type').order_by('id',
+                                                                                          'name')
     for obj in qs:
         assert obj.result_type.name

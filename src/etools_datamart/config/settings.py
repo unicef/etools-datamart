@@ -317,7 +317,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
-    "PAGE_SIZE": 1,
+    "PAGE_SIZE": 100,
     "DEFAULT_PAGINATION_CLASS": None
 }
 

@@ -204,9 +204,9 @@ class Parser:
             ret += " UNION ALL ".join([self.set_schema(s) for s in schemas])
             ret += ") as __query"
             if self.parts.get('order'):
-                base = self.parts.get('order')
-                for part in base.split(","):
-                    ret += part.replace('"', '').replace(".", "__")
+                parts = self.parts.get('order').split(',')
+                parts = map(lambda p: p.replace('"', '').replace(".", "__"), parts)
+                ret += ",".join(parts)
             if self.parts.get('limit'):
                 ret += f" {self.parts['limit']}"
             return ret
