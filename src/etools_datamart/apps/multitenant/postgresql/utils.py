@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from django.conf import settings
 from django.db import connections
 from django.utils.functional import Promise
+
 from etools_datamart.state import state
 
 

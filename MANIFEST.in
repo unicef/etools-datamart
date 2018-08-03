@@ -20,6 +20,7 @@ exclude entrypoint.sh
 
 prune .circleci
 prune tests
+prune db
 
 recursive-include src/etools_datamart *.*
 recursive-exclude tests *

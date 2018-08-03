@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from rest_framework import routers
-from rest_framework.routers import Route, DynamicRoute
+from rest_framework.routers import DynamicRoute, Route
 
 from . import views
 
