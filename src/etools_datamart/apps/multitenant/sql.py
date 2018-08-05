@@ -31,14 +31,14 @@ class Parser:
 
         self.is_count = False
 
-    @cached_property
-    def cleaned_order(self):
-        ret = []
-        for entry in self.raw_order:
-            cleaned = entry.split(".")[-1]
-            ret.append(cleaned)
-        return ", ".join(ret)
-
+    # @cached_property
+    # def cleaned_order(self):
+    #     ret = []
+    #     for entry in self.raw_order:
+    #         cleaned = entry.split(".")[-1]
+    #         ret.append(cleaned)
+    #     return ", ".join(ret)
+    #
     # @cached_property
     # def fields(self):
     #     ret = []
@@ -68,7 +68,7 @@ class Parser:
             if not self._parsed:
                 self.parse()
             return getattr(self, f'_{item}')
-        raise AttributeError(item)
+        raise AttributeError(item)  # pragma: no cover
 
     def split(self, stm):
         # TODO: improve regex
@@ -93,7 +93,7 @@ class Parser:
             if m:
                 self.parts = m.groupdict()
                 return self.parts
-        raise Exception(stm)
+        raise Exception(stm)  # pragma: no cover
 
     def join(self, parts):
         ret = ""
@@ -102,17 +102,17 @@ class Parser:
         return ret
 
     def parse(self):  # noqa
-        if self._parsed:
+        if self._parsed:  # pragma: no cover
             return
         target = self._unknown
         self.split(self.sql)
         parsed = sqlparse.parse(self.sql)
         self.tokens = parsed[0].tokens
         for token in self.tokens:
+            value = token.value.upper()
             if token.ttype in [Whitespace]:
                 continue
             elif token.ttype is Keyword:
-                value = token.value.upper()
                 if value in ['FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'LEFT OUTER JOIN', 'RIGHT OUTER JOIN']:
                     target = self._raw_tables
                 # elif value in ['SELECT', 'DISTINCT']:
@@ -146,9 +146,11 @@ class Parser:
                     self.where = str(token)
                 # elif token.ttype == Wildcard:
                 #     target.append(str(token))
-                else:
+                # elif value in ["SELECT", "*"]:
+                #     pass
+                else:  # pragma: no cover
                     pass
-                    # raise AttributeError(type(token))
+                    # raise AttributeError(f"{token}: {type(token)} {value}")
         self._parsed = True
 
     def set_schema(self, schema, **overrides):
@@ -190,15 +192,13 @@ class Parser:
             ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.sql)
             return ret
 
-        if not self._parsed:
+        if not self._parsed:  # pragma: no cover
             self.parse()
         if self.is_count:
             ret = "SELECT COUNT(id) FROM ("
             ret += " UNION ALL ".join([self.set_schema(s, fields='id') for s in schemas])
             ret += ") as __count"
             return ret
-        if len(schemas) == 1:
-            return self.set_schema(schemas[0])
         else:
             ret = f"SELECT * FROM ("
             ret += " UNION ALL ".join([self.set_schema(s) for s in schemas])

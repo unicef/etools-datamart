@@ -2,7 +2,8 @@
 import pytest
 
 from etools_datamart.state import state
-from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganization, ReportsResult
+from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganization, ReportsResult, \
+    ActionPointsActionpoint
 
 
 #
@@ -67,3 +68,19 @@ def test_select_related(db, schema):
                                                                                           'name')
     for obj in qs:
         assert obj.result_type.name
+
+
+@pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
+def test_mixed_schema(db, schema):
+    state.schemas = schema
+    qs = ActionPointsActionpoint.objects.only('assigned_by').select_related('assigned_by')
+    for obj in qs:
+        assert obj.assigned_by.username
+
+
+@pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
+def test_filtering(db, schema):
+    state.schemas = schema
+    qs = ReportsResult.objects.filter(id__gt=10).order_by('id', 'name')
+    for obj in qs:
+        assert obj.name

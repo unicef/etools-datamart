@@ -41,3 +41,22 @@ def test_change_form(django_app, admin_user):
     assert res.context['original'].pk == obj.pk
     res = res.form.submit()
     assert res.status_code == 302
+
+
+def test_select_schema(django_app, admin_user):
+    url = reverse('admin:login')
+    res = django_app.get(url)
+    res.form['username'] = 'admin'
+    res.form['password'] = 'password'
+    res = res.form.submit()
+    res = res.follow().follow()
+
+    url = reverse("multitenant:select-schema")
+    res = django_app.get(url, extra_environ={'HTTP_X_SCHEMA': ""})
+    res = res.form.submit()
+    assert res.status_code == 200
+
+    res.form['bolivia'] = True
+    res = res.form.submit()
+    assert res.status_code == 302
+

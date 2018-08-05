@@ -47,9 +47,9 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
             pk = field.to_python(pk)
             state.schemas = [schema]
             return queryset.get(**{field.name: pk})
-        except MultipleObjectsReturned as e:
+        except MultipleObjectsReturned:  # pragma: no cover
             raise
-        except (model.DoesNotExist, ValidationError, ValueError):
+        except (model.DoesNotExist, ValidationError, ValueError):  # pragma: no cover
             return None
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):

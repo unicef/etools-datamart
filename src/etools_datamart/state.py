@@ -8,12 +8,12 @@ class State(local):
     schemas = []
     data = {}
 
-    def clear(self):
-        self.data = {}
-        self.request = None
-
-    def set(self, key, value):
-        self.data[key] = value
+    # def clear(self):
+    #     self.data = {}
+    #     self.request = None
+    #
+    # def set(self, key, value):
+    #     self.data[key] = value
 
 
 state = State()

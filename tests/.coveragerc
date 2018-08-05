@@ -7,6 +7,7 @@ omit =
         **/reset-migrations.py
         **/inspectschema.py
         **/introspection.py
+        **/db_router.py
 
 
 [report]
