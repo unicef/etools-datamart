@@ -232,6 +232,7 @@ INSTALLED_APPS = [
 
     'raven.contrib.django.raven_compat',
     'columns',
+    'admin_extra_urls',
 
     'rest_framework',
     'rest_framework.authtoken',

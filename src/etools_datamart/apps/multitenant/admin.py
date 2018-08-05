@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from admin_extra_urls.extras import ExtraUrlMixin, link
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.utils import quote
@@ -16,12 +17,15 @@ class TenantChangeList(ChangeList):
         return reverse('admin:%s_%s_change' % (self.opts.app_label,
                                                self.opts.model_name),
                        args=[quote(f"{pk}-{ result.schema}")],
-                       # args=[quote(pk)],
                        current_app=self.model_admin.admin_site.name)
 
 
-class TenantModelAdmin(ModelAdmin):
+class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
+
+    @link(label='Raw SQL')
+    def _export(self, request):
+        return self.export_action(request)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
