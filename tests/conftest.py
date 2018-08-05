@@ -5,6 +5,7 @@ import warnings
 import psycopg2
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
+from django.db import connections
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
@@ -85,3 +86,11 @@ def reset():
     from etools_datamart.state import state
     state.schema = []
     state.request = None
+    conn = connections['etools']
+    conn.clear_search_paths()
+
+
+@pytest.fixture()
+def bolivia():
+    from etools_datamart.state import state
+    state.schema = ['bolivia']

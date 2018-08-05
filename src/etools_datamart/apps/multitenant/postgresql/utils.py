@@ -40,16 +40,16 @@ def raw_sql(s):
     return RawSql(str(s))
 
 
-def get_public_schema_name():
-    return getattr(settings, 'PUBLIC_SCHEMA_NAME', 'public')
+# def get_public_schema_name():
+#     return getattr(settings, 'PUBLIC_SCHEMA_NAME', 'public')
 
 
-@contextmanager
-def current_schema(schema):
-    _old = state.schemas
-    state.schemas = [schema]
-    yield
-    state.schemas = _old
+# @contextmanager
+# def current_schema(schema):
+#     _old = state.schemas
+#     state.schemas = [schema]
+#     yield
+#     state.schemas = _old
 
 
 @contextmanager
@@ -60,12 +60,12 @@ def clear_schemas():
     state.schemas = _old
 
 
-@contextmanager
-def single():
-    _old = state.schemas
-    conn = connections['etools']
-    state.schemas = []
-    conn.mode = 1
-    yield
-    state.schemas = _old
-    conn.mode = 2
+# @contextmanager
+# def single():
+#     _old = state.schemas
+#     conn = connections['etools']
+#     state.schemas = []
+#     conn.mode = 1
+#     yield
+#     state.schemas = _old
+#     conn.mode = 2

@@ -49,17 +49,10 @@ class ReadOnlyRouter(routers.DefaultRouter):
     ]
 
     def get_urls(self):
-        """
-        Generate the list of URL patterns, including a default root view
-        for the API, and appending `.json` style format suffixes.
-        """
         urls = super(ReadOnlyRouter, self).get_urls()
-
-        if self.include_root_view:
-            view = self.get_api_root_view(api_urls=urls)
-            root_url = url(r'^$', view, name=self.root_view_name)
-            urls.append(root_url)
-
+        view = self.get_api_root_view(api_urls=urls)
+        root_url = url(r'^$', view, name=self.root_view_name)
+        urls.append(root_url)
         return urls
 
 

@@ -23,9 +23,9 @@ class TenantChangeList(ChangeList):
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
 
-    @link(label='Raw SQL')
-    def _export(self, request):
-        return self.export_action(request)
+    # @link(label='Raw SQL')
+    # def _export(self, request):
+    #     return self.export_action(request)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:

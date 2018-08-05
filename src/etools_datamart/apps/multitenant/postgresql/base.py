@@ -171,9 +171,9 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     #     self.search_path_set = False
 
     # def set_schema_to_public(self):
-        """
-        Instructs to stay in the common 'public' schema.
-        # """
+    #     """
+    #     Instructs to stay in the common 'public' schema.
+    #     """
         # self.tenant = FakeTenant(schema_name=get_public_schema_name())
         # self.schema_name = get_public_schema_name()
         # self.set_settings_schema(self.schema_name)
@@ -219,9 +219,10 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(schemas))))
         self.search_path_set = True
 
-    def clear_search_paths(self, cursor, *schemas):
+    def clear_search_paths(self, cursor=None):
         state.schema = []
-        cursor.execute(raw_sql('SET search_path = public;'))
+        if cursor:
+            cursor.execute(raw_sql('SET search_path = public;'))
         self.search_path_set = False
 
     def _cursor(self, name=None):

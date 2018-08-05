@@ -8,14 +8,6 @@ class PartnerSerializer(serializers.ModelSerializer):
         model = models.PartnersPartnerorganization
         exclude = ()
 
-
-class PK(serializers.PrimaryKeyRelatedField):
-    def to_representation(self, value):
-        if self.pk_field is not None:
-            return self.pk_field.to_representation(value.pk)
-        return value.pk
-
-
 class ReportsResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ReportsResult

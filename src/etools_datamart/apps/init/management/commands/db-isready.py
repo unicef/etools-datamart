@@ -1,0 +1,68 @@
+# -*- coding: utf-8 -*-
+import sys
+import time
+
+from django.core.management.base import BaseCommand
+from django.db import connections, OperationalError
+
+
+class Command(BaseCommand):
+    args = ''
+    help = 'Help text here....'
+    requires_migrations_checks = False
+    requires_system_checks = False
+
+    def __init__(self, *args, **kwargs):
+        super(Command, self).__init__(*args, **kwargs)
+
+    def add_arguments(self, parser):
+        super(Command, self).add_arguments(parser)
+
+        parser.add_argument(
+            '--wait', default=False,
+            action="store_true",
+            help='wait until database is available',
+        )
+        parser.add_argument(
+            '--debug', default=False,
+            action="store_true",
+            help='debug mode. WARNING can dump passwords',
+        )
+        parser.add_argument(
+            '--timeout', default=30,
+            type=int,
+            help='timeout in sec before OperationalError',
+        )
+
+    def _get_cursor(self, conn):
+        conn.cursor()
+        return conn
+
+    def handle(self, *args, **options):
+        conn = connections['default']
+        elapsed = 0
+        retcode = 1
+        try:
+            while True:
+                try:
+                    conn = self._get_cursor(conn)
+                except OperationalError as e:
+                    if options['wait'] and elapsed < options['timeout']:
+                        self.stdout.write("." * elapsed, ending='\r')
+                        self.stdout.flush()
+                        time.sleep(1)
+                        elapsed += 1
+                    else:
+                        self.stdout.write(f"\nDatabase on {conn.settings_dict['HOST']}:{conn.settings_dict['PORT']} "
+                                          f"is not available after {elapsed} secs")
+                        if options['debug']:
+                            self.stdout.write(f"Error is: {e}")
+                        retcode = 1
+                        break
+                else:
+                    self.stdout.write("Connected")
+                    retcode = 0
+                    break
+        except KeyboardInterrupt:  # pragma: no-cover
+            self.stdout.write('Interrupted')
+        sys.exit(retcode)
