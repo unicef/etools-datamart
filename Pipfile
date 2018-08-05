@@ -22,7 +22,6 @@ django-tenant-schemas = "*"
 django-regex = "*"
 sqlparse = "*"
 pyparsing = "*"
-django-columns = "*"
 admin-extra-urls = "*"
 
 [dev-packages]

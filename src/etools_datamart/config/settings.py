@@ -231,7 +231,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 
     'raven.contrib.django.raven_compat',
-    'columns',
     'admin_extra_urls',
 
     'rest_framework',
