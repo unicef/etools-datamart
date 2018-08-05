@@ -1,4 +1,4 @@
-{% load i18n static %}<!DOCTYPE html>
+{% load i18n static multitenant %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
@@ -40,7 +40,7 @@
 {#                    <a href="{{ site_url }}">{% trans 'View site' %}</a> /#}
 {#                {% endif %}#}
                 {% if user.is_active and user.is_staff %}
-                    <a href="{% url "multitenant:select-schema" %}">{% trans 'select workspace' %}</a> /
+                    <a href="{% select_schema %}">{% trans 'select workspace' %}</a> /
                     {% url 'django-admindocs-docroot' as docsroot %}
                     {% if docsroot %}
                         <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /

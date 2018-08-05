@@ -40,7 +40,8 @@ class AuditEngagement(TenantModelAdmin):
 
 @register(models.PartnersIntervention)
 class PartnersIntervention(TenantModelAdmin):
-    pass
+    list_display = ('number', 'title', 'document_type', 'schema')
+    list_filter = ('document_type',)
 
 
 @register(models.T2FTravel)
