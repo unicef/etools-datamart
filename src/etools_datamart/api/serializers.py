@@ -8,6 +8,7 @@ class PartnerSerializer(serializers.ModelSerializer):
         model = models.PartnersPartnerorganization
         exclude = ()
 
+
 class ReportsResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ReportsResult

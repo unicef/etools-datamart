@@ -46,6 +46,7 @@ def test_simple():
     p = Parser('SELECT id FROM "s1"."t1"')
     assert p.tables == ['"t1"']
 
+
 def test_star():
     p = Parser('SELECT * FROM "s1"."t1" ORDER BY "t1"."f1"')
     assert p.tables == ['"t1"']

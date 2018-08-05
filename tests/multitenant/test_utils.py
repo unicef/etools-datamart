@@ -11,5 +11,5 @@ def test_raw_sql():
     assert isinstance(raw_sql(1), RawSql)
 
     assert not isinstance("" + q, RawSql)
-    assert not isinstance(q+ "", RawSql)
+    assert not isinstance(q + "", RawSql)
     assert str(q) == target

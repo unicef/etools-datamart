@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.db import connections
 from django.urls import reverse
 
 from etools_datamart.apps.etools.models import PartnersPartnerorganization

@@ -23,8 +23,9 @@ def test_init_setup_migrate(db, settings):
     ModelUser = get_user_model()
     assert ModelUser.objects.exists()
 
+
 @pytest.mark.django_db
-def test_init_setup_all(db, settings):
+def test_init_setup_plain(db, settings):
     settings.DEBUG = True
     call_command("init-setup", all=False, stdout=StringIO(), migrate=False)
     ModelUser = get_user_model()

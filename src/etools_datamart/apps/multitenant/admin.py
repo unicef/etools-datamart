@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import ExtraUrlMixin, link
+from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.utils import quote
