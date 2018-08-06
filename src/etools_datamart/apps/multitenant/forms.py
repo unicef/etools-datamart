@@ -1,12 +1,50 @@
 # -*- coding: utf-8 -*-
 import logging
 
+import sqlparse
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import BaseValidator
 from django.db import connections
+from sqlparse.exceptions import SQLParseError
+from sqlparse.tokens import Keyword
 
 logger = logging.getLogger(__name__)
+
+
+class SQLStatementValidator(BaseValidator):
+    message = 'Ensure this value is valid SQL clause.'
+    code = 'sql'
+
+    def __call__(self, value):
+        try:
+            parts = sqlparse.parse(value)
+            tokens = parts[0].tokens
+            dml = [token for token in tokens if token.ttype is Keyword.DML]
+            if not dml or dml[0].value != 'SELECT':
+                raise ValidationError("Only SELECT statement allowed", code=self.code)
+
+        except SQLParseError:
+            raise ValidationError(self.message, code=self.code)
+
+
+class SQLForm(forms.Form):
+    raw = forms.BooleanField(required=False)
+    statement = forms.CharField(widget=forms.Textarea,
+                                validators=[SQLStatementValidator("")])
+    original = forms.CharField(widget=forms.HiddenInput,
+                               required=False,
+                               validators=[SQLStatementValidator("")])
+
+    @property
+    def media(self):
+        extra = '' if settings.DEBUG else '.min'
+        js = [
+            'vendor/jquery/jquery%s.js' % extra,
+            'jquery.init.js',
+        ]
+        return forms.Media(js=['admin/js/%s' % url for url in js])
 
 
 class SchemasForm(forms.Form):
@@ -17,7 +55,6 @@ class SchemasForm(forms.Form):
         for schema in schemas:
             self.fields[schema.schema_name] = forms.BooleanField(
                 label=schema.name,
-                # label=f"{schema.name} - {schema.schema_name}",
                 required=False)
 
     def clean(self):

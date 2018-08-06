@@ -26,6 +26,11 @@ class SelectSchema(FormView):
         self.selected = self.request.COOKIES.get('schemas', '')
         return {k: True for k in self.selected.split(',')}
 
+    def get_success_url(self):
+        if 'from' in self.request.GET:
+            return self.request.GET['from']
+        return super().get_success_url()
+
     def form_valid(self, form):
         self.selected = ",".join([k for (k, v) in form.cleaned_data.items() if v])
         response = HttpResponseRedirect(self.get_success_url())

@@ -1,38 +1,48 @@
-{% extends "admin/base_site.html" %}{% load columns i18n %}
+{% extends "admin/change_list.html" %}{% load  i18n multitenant admin_urls %}
 {% block extrahead %}{{ block.super }}
-{{ form.media }}
+    {{ form.media }}
 {% endblock %}
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; Select workspace
-</div>
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; Raw SQL Statement
+    </div>
 {% endblock %}
 {% block content %}
-
+    <style>
+        textarea {
+            width: 100%;
+        }
+    </style>
+    <hr/>
     <form method="post">
         {% csrf_token %}
-        <span style="width: 180px;display: inline-block">
-                    <input type="checkbox" name="_all" id="checkAll">&nbsp;&nbsp;Select All
-                </span>
-        <div>
-            {% for f in form %}
-                <span style="width: 180px;display: inline-block">
-                    {{ f }}&nbsp;&nbsp;{{ f.label }}
-                </span>
-            {% endfor %}
-        </div>
-        <div>
-            <input type="submit" value="Select">
-        </div>
+        {% if statement %}
+            <div>Query for: {% for schema in state.schemas %}{{ schema }}&nbsp;{% endfor %}<div>
+            {{ form.statement }}
+            {{ form.original }}
+            <input type="submit" value="Back" name="back">
+            <input type="submit" value="Submit" name="doit">
+            <input type="submit" value="Reset" name="reset">
+        {% else %}
+            <div>Selected workspaces: {% for schema in state.schemas %}{{ schema }}&nbsp;{% endfor %}
+                {% if not statement %}<a href="{% select_schema %}">change</a>{% endif %}</div>
+            <div>
+            <div>{{ form.raw.label }} : {{ form.raw }}</div>
+
+            <div>{{ form.statement.label }}{{ form.statement.errors }}</div>
+            <div>{{ form.statement }}</div>
+            <div>
+                <input type="submit" value="Submit" name="submit">
+                <input type="submit" value="Reset" name="reset">
+            </div>
+        {% endif %}
     </form>
+    </div>
 {% endblock content %}
 {% block footer %}
 
-    <script language="JavaScript">
-        django.jQuery("#checkAll").click(function () {
-            django.jQuery("input:checkbox").not(this).prop("checked", this.checked);
-        });
-    </script>
 
 {% endblock %}

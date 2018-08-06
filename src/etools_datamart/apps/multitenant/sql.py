@@ -19,7 +19,7 @@ cache = {}
 class Parser:
     def __init__(self, sql):
         self.raw_sql = sql
-        self.sql = sql
+        self.original = sql
         self.where = ""
         self._raw_tables = []
         # self._raw_order = []
@@ -105,8 +105,8 @@ class Parser:
         if self._parsed:  # pragma: no cover
             return
         target = self._unknown
-        self.split(self.sql)
-        parsed = sqlparse.parse(self.sql)
+        self.split(self.original)
+        parsed = sqlparse.parse(self.original)
         self.tokens = parsed[0].tokens
         for token in self.tokens:
             value = token.value.upper()
@@ -189,7 +189,7 @@ class Parser:
     def with_schemas(self, *schemas):
         if len(schemas) == 1:
             schema = schemas[0]
-            ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.sql)
+            ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.original)
             return ret
 
         if not self._parsed:  # pragma: no cover

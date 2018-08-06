@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import ExtraUrlMixin
+import sqlparse
+from admin_extra_urls.extras import ExtraUrlMixin, link
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin
+from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
 from django.urls import reverse
 
+from etools_datamart.apps.multitenant.forms import SQLForm
+from etools_datamart.apps.multitenant.sql import Parser
 from etools_datamart.state import state
 
 
@@ -23,9 +28,58 @@ class TenantChangeList(ChangeList):
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
 
-    # @link(label='Raw SQL')
-    # def _export(self, request):
-    #     return self.export_action(request)
+    def get_queryset(self, request):
+        if state.get("query"):
+            return self.model._default_manager.raw(state.get("query"))
+        return super().get_queryset(request)
+
+    @link(label='Raw SQL')
+    def raw_sql(self, request):
+        opts = self.model._meta
+        context = dict(app_label=opts.app_label,
+                       opts=opts,
+                       state=state)
+        if request.method == 'POST':
+            form = SQLForm(data=request.POST)
+
+            if form.is_valid():
+                if 'submit' in request.POST:
+                    p = Parser(form.cleaned_data['statement'])
+                    sql = sqlparse.format(p.with_schemas(*state.schemas),
+                                          keyword_case="upper",
+                                          reindent=True,
+                                          indent_width=4,
+                                          wrap_after=80)
+
+                    form = SQLForm(initial={'statement': sql,
+                                            'original': p.original
+                                            })
+                    context['statement'] = sql
+
+                elif 'reset' in request.POST:
+                    return HttpResponseRedirect(reverse(admin_urlname(opts, 'raw_sql')))
+                elif 'back' in request.POST:
+                    form = SQLForm(initial={'statement': form.cleaned_data['original'],
+                                            'original': ""
+                                            })
+                elif 'doit' in request.POST:
+                    try:
+                        data = self.model._default_manager.raw(form.cleaned_data['statement'])
+                        assert data
+                    except Exception as e:
+                        self.message_user(request, str(e), messages.ERROR)
+                    else:
+                        state.set("query", form.cleaned_data['statement'])
+                        return HttpResponseRedirect(reverse(admin_urlname(opts, 'changelist')))
+            else:
+                pass
+        else:
+            form = SQLForm(initial={'statement': f'SELECT * FROM "{self.model._meta.db_table}"'})
+
+        context['form'] = form
+        return TemplateResponse(request,
+                                'raw_sql.html',
+                                context=context)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
