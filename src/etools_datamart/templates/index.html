@@ -5,6 +5,11 @@
     <title>Title</title>
 </head>
 <body>
-
+    <ul>
+        <li><a href="{% url "api:api-root" %}">API</a> </li>
+        <li><a href="{% url "admin:index" %}">admin</a> </li>
+        <li><a href="{% url "api:schema-redoc" %}">API Doc</a> </li>
+        <li><a href="{% url "api:schema-swagger-ui" %}">Swagger</a> </li>
+    </ul>
 </body>
 </html>

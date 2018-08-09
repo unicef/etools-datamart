@@ -4,12 +4,12 @@ from rest_framework import viewsets
 from rest_framework.pagination import CursorPagination
 
 
-class ApiMixin:
-    permission_classes = []
-
-
 def paginator(ordering='-created'):
     return type("TenantPaginator", (CursorPagination,), {'ordering': ordering})
+
+
+class ApiMixin:
+    permission_classes = []
 
 
 class ReadOnlyModelViewSet(ApiMixin, viewsets.ReadOnlyModelViewSet):

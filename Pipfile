@@ -23,6 +23,7 @@ django-regex = "*"
 sqlparse = "*"
 pyparsing = "*"
 admin-extra-urls = "*"
+drf-yasg = {version = "*", extras = ["validation"]}
 
 [dev-packages]
 pytest = "*"

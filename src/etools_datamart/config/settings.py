@@ -232,9 +232,9 @@ INSTALLED_APPS = [
 
     'raven.contrib.django.raven_compat',
     'admin_extra_urls',
-
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
     'unicef_rest_framework',
 
     'etools_datamart.apps.core',
