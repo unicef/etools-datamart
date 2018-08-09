@@ -13,3 +13,9 @@ class ReportsResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ReportsResult
         exclude = ()
+
+
+class AppliedindicatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ReportsAppliedindicator
+        exclude = ()

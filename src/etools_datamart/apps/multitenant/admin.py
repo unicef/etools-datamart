@@ -7,12 +7,14 @@ from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
+from django.db import connections
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from etools_datamart.apps.multitenant.forms import SQLForm
-from etools_datamart.apps.multitenant.sql import Parser
+from etools_datamart.apps.multitenant.postgresql.utils import raw_sql
+from etools_datamart.apps.multitenant.sql import clean_stm, Parser
 from etools_datamart.state import state
 
 
@@ -25,12 +27,20 @@ class TenantChangeList(ChangeList):
                        current_app=self.model_admin.admin_site.name)
 
 
+def format_stm(stm):
+    return sqlparse.format(stm,
+                           keyword_case="upper",
+                           reindent=True,
+                           indent_width=4,
+                           wrap_after=80)
+
+
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
 
     def get_queryset(self, request):
-        if state.get("query"):
-            return self.model._default_manager.raw(state.get("query"))
+        # if state.get("query"):
+        #     return self.model._default_manager.raw(state.get("query"))
         return super().get_queryset(request)
 
     @link(label='Raw SQL')
@@ -44,29 +54,40 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
 
             if form.is_valid():
                 if 'submit' in request.POST:
-                    p = Parser(form.cleaned_data['statement'])
-                    sql = sqlparse.format(p.with_schemas(*state.schemas),
-                                          keyword_case="upper",
-                                          reindent=True,
-                                          indent_width=4,
-                                          wrap_after=80)
+                    if form.cleaned_data['raw']:
+                        sql = original = form.cleaned_data['statement']
+                    else:
+                        p = Parser(form.cleaned_data['statement'])
+                        original = p.original
+                        sql = format_stm(p.with_schemas(*state.schemas))
 
-                    form = SQLForm(initial={'statement': sql,
-                                            'original': p.original
+                    form = SQLForm(confirm=True,
+                                   initial={'statement': sql,
+                                            'original': original,
+                                            'raw': form.cleaned_data['raw']
                                             })
                     context['statement'] = sql
 
-                elif 'reset' in request.POST:
-                    return HttpResponseRedirect(reverse(admin_urlname(opts, 'raw_sql')))
                 elif 'back' in request.POST:
                     form = SQLForm(initial={'statement': form.cleaned_data['original'],
                                             'original': ""
                                             })
                 elif 'doit' in request.POST:
                     try:
-                        data = self.model._default_manager.raw(form.cleaned_data['statement'])
-                        assert data
+                        if form.cleaned_data['raw']:
+                            stm = raw_sql(clean_stm(form.cleaned_data['statement']))
+                        else:
+                            stm = clean_stm(form.cleaned_data['statement'])
+                        conn = connections['etools']
+                        cur = conn.cursor()
+                        cur.execute(stm)
+                        cur.fetchone()
+                        # data = self.model._default_manager.raw(raw_sql(stm))
+                        # assert data
                     except Exception as e:
+                        form = SQLForm(initial={'statement': form.cleaned_data['original'],
+                                                'original': ""
+                                                })
                         self.message_user(request, str(e), messages.ERROR)
                     else:
                         state.set("query", form.cleaned_data['statement'])
@@ -74,7 +95,8 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
             else:
                 pass
         else:
-            form = SQLForm(initial={'statement': f'SELECT * FROM "{self.model._meta.db_table}"'})
+            qs = self.model._default_manager.get_queryset().defer("schema")
+            form = SQLForm(initial={'statement': format_stm(str(qs.query))})
 
         context['form'] = form
         return TemplateResponse(request,

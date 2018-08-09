@@ -33,9 +33,16 @@ class SQLForm(forms.Form):
     raw = forms.BooleanField(required=False)
     statement = forms.CharField(widget=forms.Textarea,
                                 validators=[SQLStatementValidator("")])
-    original = forms.CharField(widget=forms.HiddenInput,
+    original = forms.CharField(widget=forms.Textarea,
                                required=False,
                                validators=[SQLStatementValidator("")])
+
+    def __init__(self, *args, **kwargs):
+        self.confirm = kwargs.pop('confirm', False)
+        super().__init__(*args, **kwargs)
+        if self.confirm:
+            self.fields['raw'].widget = forms.HiddenInput()
+            self.fields['raw'].original = forms.HiddenInput()
 
     @property
     def media(self):

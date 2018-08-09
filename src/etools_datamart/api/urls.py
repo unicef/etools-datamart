@@ -57,7 +57,19 @@ class ReadOnlyRouter(routers.DefaultRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r'partners', views.PartnerViewSet, base_name='partners')
-router.register(r'results', views.ReportsResultViewSet)
+router.register(r'partners/partner-organization', views.PartnerViewSet, base_name='partners')
+router.register(r'reports/results', views.ReportsResultViewSet)
+router.register(r'funds/grant', views.GrantViewSet)
+router.register(r'partners/assessment', views.AssessmentViewSet)
+router.register(r'partners/agreement', views.AgreementViewSet)
+router.register(r'audit/engagement', views.EngagementViewSet)
+router.register(r'partners/intervention', views.InterventionViewSet)
+router.register(r't2/ftravel', views.FTravelViewSet)
+router.register(r'reports/appliedindicator', views.AppliedindicatorViewSet)
+router.register(r'funds/fundsreservationitem', views.FundsreservationitemViewSet)
+router.register(r'funds/fundsreservationheader', views.FundsReservationHeaderViewSet)
+router.register(r'partners/plannedengagement', views.PlannedengagementViewSet)
+router.register(r'partners/plannedengagement', views.PlannedengagementViewSet)
+router.register(r'partners/plannedengagement', views.PlannedengagementViewSet)
 
 urlpatterns = router.urls

@@ -16,10 +16,13 @@ SHARED_TABLES = RegexList(['"auth_.*',
 cache = {}
 
 
+def clean_stm(sql):
+    return sql.replace("\n", " ").replace("\r", " ")
+
+
 class Parser:
     def __init__(self, sql):
-        self.raw_sql = sql
-        self.original = sql
+        self.raw_sql = self.original = clean_stm(sql)
         self.where = ""
         self._raw_tables = []
         # self._raw_order = []
@@ -89,7 +92,7 @@ class Parser:
             f"{_select}{_from}",
         ]
         for rex in rexx:
-            m = re.match(rex, stm, re.I)
+            m = re.match(rex, stm, re.I + re.M)
             if m:
                 self.parts = m.groupdict()
                 return self.parts

@@ -62,3 +62,18 @@ class ReportsResult(TenantModelAdmin):
 @register(models.ReportsResulttype)
 class ReportsResulttype(TenantModelAdmin):
     list_display = ('id', 'name', 'schema')
+
+
+@register(models.PartnersPlannedengagement)
+class PartnersPlannedEngagement(TenantModelAdmin):
+    pass
+
+
+@register(models.FundsFundsReservationHeader)
+class FundsReservationHeader(TenantModelAdmin):
+    pass
+
+
+@register(models.FundsFundsreservationitem)
+class Fundsreservationitem(TenantModelAdmin):
+    pass

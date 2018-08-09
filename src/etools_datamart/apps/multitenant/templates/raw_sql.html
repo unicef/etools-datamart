@@ -21,28 +21,37 @@
         {% csrf_token %}
         {% if statement %}
             <div>Query for: {% for schema in state.schemas %}{{ schema }}&nbsp;{% endfor %}<div>
-            {{ form.statement }}
-            {{ form.original }}
+            <div>{{ form.raw }}</div>
+            <div>{{ form.statement.label }}{{ form.statement.errors }}</div>
+            <div>{{ form.statement }}</div>
+            <div>{{ form.original }}</div>
             <input type="submit" value="Back" name="back">
-            <input type="submit" value="Submit" name="doit">
-            <input type="submit" value="Reset" name="reset">
+            <input type="submit" value="Run Statement" name="doit" class="default">
+            <input type="button" value="Reset" id="reset">
         {% else %}
             <div>Selected workspaces: {% for schema in state.schemas %}{{ schema }}&nbsp;{% endfor %}
                 {% if not statement %}<a href="{% select_schema %}">change</a>{% endif %}</div>
             <div>
             <div>{{ form.raw.label }} : {{ form.raw }}</div>
-
             <div>{{ form.statement.label }}{{ form.statement.errors }}</div>
             <div>{{ form.statement }}</div>
+            <div>{{ form.original }}</div>
             <div>
-                <input type="submit" value="Submit" name="submit">
-                <input type="submit" value="Reset" name="reset">
+                <input type="submit" value="Submit" name="submit" class="default">
+                <input type="button" value="Reset" id="reset" >
             </div>
         {% endif %}
     </form>
     </div>
 {% endblock content %}
 {% block footer %}
+
+    <script language="JavaScript">
+        django.jQuery("#reset").click(function () {
+            location="{% url opts|admin_urlname:'raw_sql' %}"
+        });
+    </script>
+
 
 
 {% endblock %}

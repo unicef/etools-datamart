@@ -442,7 +442,7 @@ class FundsFundscommitmentitem(models.TenantModel):
         unique_together = (('line_item', 'fund_commitment'),)
 
 
-class FundsFundsreservationheader(models.TenantModel):
+class FundsFundsReservationHeader(models.TenantModel):
     vendor_code = models.CharField(max_length=20)
     fr_number = models.CharField(unique=True, max_length=20)
     document_date = models.DateField(blank=True, null=True)
@@ -479,7 +479,7 @@ class FundsFundsreservationitem(models.TenantModel):
     overall_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     due_date = models.DateField(blank=True, null=True)
     line_item_text = models.CharField(max_length=255)
-    fund_reservation = models.ForeignKey(FundsFundsreservationheader, models.DO_NOTHING, related_name='+')
+    fund_reservation = models.ForeignKey(FundsFundsReservationHeader, models.DO_NOTHING, related_name='+')
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
