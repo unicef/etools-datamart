@@ -62,7 +62,7 @@ class Command(LabelCommand):
         )
         parser.add_argument(
             '--views', action='store', dest='views',
-            default='etools_datamart.api.views',
+            default='etools_datamart.api.endpoints',
             help='',
         )
         parser.add_argument(

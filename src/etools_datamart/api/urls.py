@@ -2,7 +2,7 @@ from django.conf.urls import url
 from rest_framework import routers
 from rest_framework.routers import DynamicRoute, Route
 
-from . import views
+from . import endpoints
 
 app_name = 'api'
 
@@ -57,25 +57,25 @@ class ReadOnlyRouter(routers.DefaultRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r'partners/partner-organization', views.PartnerViewSet, base_name='partners')
-router.register(r'reports/results', views.ReportsResultViewSet)
-router.register(r'funds/grant', views.GrantViewSet)
-router.register(r'partners/assessment', views.AssessmentViewSet)
-router.register(r'partners/agreement', views.AgreementViewSet)
-router.register(r'audit/engagement', views.EngagementViewSet)
-router.register(r'partners/intervention', views.InterventionViewSet)
-router.register(r't2/ftravel', views.FTravelViewSet)
-router.register(r'reports/appliedindicator', views.AppliedindicatorViewSet)
-router.register(r'funds/fundsreservationitem', views.FundsreservationitemViewSet)
-router.register(r'funds/fundsreservationheader', views.FundsReservationHeaderViewSet)
-router.register(r'partners/plannedengagement', views.PlannedengagementViewSet)
-router.register(r'partners/plannedengagement', views.PlannedengagementViewSet)
-router.register(r'partners/plannedengagement', views.PlannedengagementViewSet)
+router.register(r'partners/partner-organization', endpoints.PartnerViewSet, base_name='partners')
+router.register(r'reports/results', endpoints.ReportsResultViewSet)
+router.register(r'funds/grant', endpoints.GrantViewSet)
+router.register(r'partners/assessment', endpoints.AssessmentViewSet)
+router.register(r'partners/agreement', endpoints.AgreementViewSet)
+router.register(r'audit/engagement', endpoints.EngagementViewSet)
+router.register(r'partners/intervention', endpoints.InterventionViewSet)
+router.register(r't2/ftravel', endpoints.FTravelViewSet)
+router.register(r'reports/appliedindicator', endpoints.AppliedindicatorViewSet)
+router.register(r'funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
+router.register(r'funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
+router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
+router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
+router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
 
 urlpatterns = router.urls
 
 urlpatterns += [
-   url(r'^swagger(?P<format>\.json|\.yaml)$', views.schema_view.without_ui(cache_timeout=0), name='schema-json'),
-   url(r'^swagger/$', views.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-   url(r'^redoc/$', views.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    url(r'^swagger(?P<format>\.json|\.yaml)$', endpoints.schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^swagger/$', endpoints.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^redoc/$', endpoints.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

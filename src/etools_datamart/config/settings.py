@@ -151,7 +151,7 @@ STATICFILES_FINDERS = (
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'etools_datamart.apps.core.middleware.ApiMiddleware',
+    'etools_datamart.api.middleware.ApiMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',

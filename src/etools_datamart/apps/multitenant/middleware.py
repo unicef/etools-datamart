@@ -35,6 +35,8 @@ class MultiTenantMiddleware(object):
         state.request = request
         response = self.get_response(request)
 
+        response["X-Schemas"] = ",".join(state.schemas)
+
         # Code to be executed for each request/response after
         # the view is called.
 
