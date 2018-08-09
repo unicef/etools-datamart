@@ -57,20 +57,20 @@ class ReadOnlyRouter(routers.DefaultRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r'partners/partner-organization', endpoints.PartnerViewSet, base_name='partners')
-router.register(r'reports/results', endpoints.ReportsResultViewSet)
-router.register(r'funds/grant', endpoints.GrantViewSet)
-router.register(r'partners/assessment', endpoints.AssessmentViewSet)
-router.register(r'partners/agreement', endpoints.AgreementViewSet)
 router.register(r'audit/engagement', endpoints.EngagementViewSet)
-router.register(r'partners/intervention', endpoints.InterventionViewSet)
-router.register(r't2/ftravel', endpoints.FTravelViewSet)
-router.register(r'reports/appliedindicator', endpoints.AppliedindicatorViewSet)
-router.register(r'funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
 router.register(r'funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
+router.register(r'funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
+router.register(r'funds/grant', endpoints.GrantViewSet)
+router.register(r'partners/agreement', endpoints.AgreementViewSet)
+router.register(r'partners/assessment', endpoints.AssessmentViewSet)
+router.register(r'partners/intervention', endpoints.InterventionViewSet)
+router.register(r'partners/partner-organization', endpoints.PartnerViewSet, base_name='partners')
 router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
 router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
 router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
+router.register(r'reports/appliedindicator', endpoints.AppliedindicatorViewSet)
+router.register(r'reports/results', endpoints.ReportsResultViewSet)
+router.register(r't2/ftravel', endpoints.FTravelViewSet)
 
 urlpatterns = router.urls
 
