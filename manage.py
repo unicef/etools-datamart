@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import os
 import sys
+import warnings
+
+warnings.simplefilter("ignore", UserWarning, 144)
 
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
