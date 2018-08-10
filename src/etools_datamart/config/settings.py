@@ -431,3 +431,5 @@ LOGGING_DEBUG = {
 }
 
 TENANT_MODEL = 'etools.UsersCountry'
+
+UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'

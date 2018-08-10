@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+
 from django.db.models import *  # noqa
 from django.db.models.manager import BaseManager
 

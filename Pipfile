@@ -24,6 +24,9 @@ sqlparse = "*"
 pyparsing = "*"
 admin-extra-urls = "*"
 drf-yasg = {version = "*", extras = ["validation"]}
+django-strategy-field = "*"
+humanize = "*"
+celery = "*"
 
 [dev-packages]
 pytest = "*"
@@ -43,6 +46,7 @@ docker = "*"
 django-extensions = "*"
 tox-pipenv = "==1.6.0"
 etools-datamart = {editable = true, path = "."}
+ipython = "*"
 
 [requires]
 python_version = "3.6"

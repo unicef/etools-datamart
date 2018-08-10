@@ -2,7 +2,11 @@ from django.conf.urls import url
 from django.contrib import admin
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
+from .routers import APIRouter
+
 admin.autodiscover()
+
+router = APIRouter()
 
 urlpatterns = (
     url(r'^api-token-auth/', obtain_jwt_token),

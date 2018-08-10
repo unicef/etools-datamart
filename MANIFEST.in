@@ -23,6 +23,7 @@ prune tests
 prune db
 
 recursive-include src/etools_datamart *.*
+recursive-include src/unicef_rest_framework *.*
 recursive-exclude tests *
 recursive-include docs *
 

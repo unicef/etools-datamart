@@ -1,0 +1,173 @@
+{% extends "admin_extra_urls/change_form.html" %}{% load urf i18n  admin_urls %}
+{% block extrastyle %}
+    <style>
+        #info * {
+            font-size: 12pt;
+        }
+
+        input {
+            width: 50px;
+        }
+
+        pre {
+            display: block;
+            padding: 9.5px;
+            margin: 0 0 10px;
+            font-size: 13px;
+            line-height: 1.42857143;
+            color: #333;
+            word-break: break-all;
+            word-wrap: break-word;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: auto;
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+        }
+
+        #monitor {
+            margin-left: 20px;
+        }
+
+        #monitor pre {
+            width: 100%;
+            height: 500px;
+        }
+
+        #monitor input[type=text] {
+            width: 90%;
+            margin-right: 10px;
+        }
+
+        #monitor input[type=button] {
+            width: 40px;
+            float: right;
+        }
+    </style>
+{% endblock %}
+{% block breadcrumbs %}
+    {% if not is_popup %}
+        <ul>
+            <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>
+            <li><a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+            </li>
+            <li>
+                {% url opts|admin_urlname:'changelist' as changelist_url %}
+                <a href="{% add_preserved_filters changelist_url %}">{{ opts.verbose_name_plural|capfirst }}</a>
+            </li>
+            <li>
+                <a href="{{ changelist_url }}?source__id__exact={{ service.source.pk }}">{{ service.source.name }}</a>
+            </li>
+            <li>
+                <a href="{% url opts|admin_urlname:'change' service.pk %}">{{ service.name }}</a>
+            </li>
+            <li>
+                info
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% block object-tools %}
+        <ul class="grp-object-tools">
+            {% block object-tools-items %}
+                {{ block.super }}
+                {% include "admin_extra_urls/includes/change_form_buttons.html" %}
+            {% endblock %}
+        </ul>
+    {% endblock %}
+    <div class="g-d-48">
+        <div class="g-d-14">
+            <table id="info">
+                <tr>
+                    <th>Name</th>
+                    <td>{{ service.name }}</td>
+                </tr>
+                <tr>
+                    <th>url</th>
+                    <td><a class="json" href="{{ service.entry_point }}?format=json">{{ service.entry_point }}</a>
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>ser</th>
+                    <td>{% for ser  in service.view.serializers_fieldsets %}
+                        <a class="json" href="{{ service.entry_point }}?format=json&serializer={{ ser }}">
+                            {{ ser }}</a>
+                    {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>filters</th>
+                    <td>{{ service.view.filter_fields|join:", " }}</td>
+                </tr>
+                <tr>
+                    <th>qs</th>
+                    <td><input type="text" name="fs" width="10"></td>
+                </tr>
+                <tr>
+                    <th>access</th>
+                    <td>{{ service.get_access_display }}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Code</th>
+                </tr>
+                <tr>
+                    <th>View</th>
+                    <td>{% code service.view %}</td>
+                </tr>
+                <tr>
+                    <th>Model</th>
+                    <td>{% code service.managed_model %}</td>
+                </tr>
+                {% for ser in serializers %}
+                    <tr>
+                        <th>{{ ser.0 }}</th>
+                        <td>{% code ser.1 %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="g-d-16" id="monitor">
+            <div>
+                <input type="text" name="qs" readonly="readonly"><input value='go' type="button" id="go">
+                <pre class="code"></pre>
+            </div>
+        </div>
+    </div>
+    {#    </div>#}
+    <script>
+        (function ($) {
+            function fetch() {
+                console.log($('input[name=qs]').val());
+                $.ajax($('input[name=qs]').val())
+                        .success(function (e) {
+                            $('#monitor pre').html(JSON.stringify(e, null, "    "))
+                        })
+                        .fail(function (e, err) {
+                            $('#monitor pre').html(JSON.stringify(e, null, "    "));
+                            alert(err)
+                        })
+            }
+
+            $("#go").on('click', function (e) {
+                $('#monitor pre').html('');
+                $('input[name=qs]').val($('input[name=qs]').val() + '&' + $('input[name=fs]').val());
+                fetch()
+            });
+            $("#info a.json").on('click', function (e) {
+                e.preventDefault();
+                $('input[name=qs]').val(this.href);
+                $("#go").click();
+            });
+            $("#info a.code").on('click', function (e) {
+                e.preventDefault();
+                $.ajax(e.target.href).success(function (e) {
+                    $('#monitor pre').html(e)
+                })
+            });
+        })(grp.jQuery);
+
+    </script>
+{% endblock content %}

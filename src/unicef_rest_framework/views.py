@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from drf_querystringfilter.backend import QueryStringFilterBackend
+from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework import viewsets
 from rest_framework.pagination import CursorPagination
+from unicef_rest_framework import acl
 
 
 def paginator(ordering='-created'):
@@ -10,10 +12,16 @@ def paginator(ordering='-created'):
 
 class ApiMixin:
     permission_classes = []
+    default_access = acl.ACL_ACCESS_LOGIN
 
 
-class ReadOnlyModelViewSet(ApiMixin, viewsets.ReadOnlyModelViewSet):
+class DynamicSerializerViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ModelViewSet):
+    pass
+
+
+class ReadOnlyModelViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
     pagination_class = paginator()
+    serializers_fieldsets = {}
     filter_backends = [QueryStringFilterBackend]
     filter_blacklist = []
     filter_fields = []

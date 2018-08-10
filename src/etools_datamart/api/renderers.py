@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from rest_framework.renderers import BrowsableAPIRenderer as _BrowsableAPIRenderer
+from unicef_rest_framework.renderers import APIBrowsableAPIRenderer as _BrowsableAPIRenderer
 
 from etools_datamart.state import state
 

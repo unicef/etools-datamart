@@ -4,3 +4,4 @@ from django.apps import AppConfig
 
 class Config(AppConfig):
     name = 'unicef_rest_framework'
+    label = 'API Configuration'

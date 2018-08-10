@@ -1,0 +1,154 @@
+{% extends "admin_extra_urls/change_form.html" %}{% load admin_static urf extra_urls i18n  admin_urls %}
+{% block extrastyle %}
+    <link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
+    {{ block.super }}
+
+    <style>
+        #info * {
+            font-size: 12pt;
+        }
+
+        input {
+            width: 50px;
+        }
+
+        pre {
+            display: block;
+            padding: 9.5px;
+            margin: 0 0 10px;
+            font-size: 13px;
+            line-height: 1.42857143;
+            color: #333;
+            word-break: break-all;
+            word-wrap: break-word;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: auto;
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+        }
+        .acl-info{
+{#            display: inline-block;#}
+            max-height: 100px;
+        }
+        #monitor {
+            margin-left: 20px;
+        }
+
+        #response {
+            width: 100%;
+            max-height: 500px;
+        }
+        #headers {
+            width: 100%;
+            max-height: 100px;
+        }
+
+        #monitor input[type=text] {
+            width: 90%;
+            margin-right: 2px;
+            margin-bottom: 5px;
+        }
+
+        #monitor input[type=button] {
+            width: 30px;
+            float: right;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+{% endblock %}
+{% block extrahead %}
+    <script src="{% static "js/jquery-1.11.0.js" %}"></script>
+    <script src="{% static "js/js.cookie.js" %}"></script>
+    <script src="{% static "js/jquery.splitter.js" %}"></script>
+    <script type="text/javascript">
+        var $monitor = null;
+
+        var serialize = function (obj) {
+            var str = [];
+            for (var p in obj)
+                if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                }
+            return str.join("&");
+        };
+        var deserialize = function (query) {
+            var match,
+                    pl = /\+/g,  // Regex for replacing addition symbol with a space
+                    search = /([^&=]+)=?([^&]*)/g,
+                    decode = function (s) {
+                        return decodeURIComponent(s.replace(pl, " "));
+                    },
+
+            urlParams = {};
+            while (match = search.exec(query))
+                urlParams[decode(match[1])] = decode(match[2]);
+            return urlParams;
+        };
+        var get_qs = function () {
+            if ($('#pk').val()){
+                var serializer = $('input[name=serializer]:checked').val();
+                return "{{ service.entry_point }}" + $('#pk').val() + "/?serializer=" + serializer;
+
+            }else {
+                var args = deserialize($('input[name=fs]').val() || '');
+                args.serializer = $('input[name=serializer]:checked').val();
+                args.format = 'json';
+                var qs = serialize(args);
+                return "{{ service.entry_point }}?" + qs
+            }
+        };
+
+    </script>
+
+{% endblock %}
+
+{#{% block breadcrumbs %}#}
+{#    <ul>#}
+{#        <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>#}
+{#        <li><a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            {% url opts|admin_urlname:'changelist' as changelist_url %}#}
+{#            <a href="{% add_preserved_filters changelist_url %}">{{ opts.verbose_name_plural|capfirst }}</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="{{ changelist_url }}?source__id__exact={{ service.source.pk }}">{{ service.source.name }}</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="{% url opts|admin_urlname:'change' service.pk %}">{{ service.name }}</a>#}
+{#        </li>#}
+{#        {% block breadcrumbs-current %}{% endblock %}#}
+{#    </ul>#}
+{#{% endblock %}#}
+{#{% block object-tools %}#}
+{#    <br>#}
+{#    <br>#}
+{#    <ul class="grp-object-tools">#}
+{#        {% block object-tools-items %}#}
+{#            {% for method_name, urlattrs in model_admin.extra_detail_buttons %}#}
+{#                {% has_permission urlattrs.perm as authorized %}#}
+{#                {% if authorized and urlattrs.visible %}#}
+{#                    {% nlless %}#}
+{#                        <li><a id="btn-{{ method_name }}" href="#}
+{##}
+{##}
+{##}
+{##}
+{#                                {% url opts|admin_urlname:method_name original.pk %}{% if is_popup %}?_popup=1{% endif %}"#}
+{#                               class="extra-link {{ urlattrs.css_class }} {{ urlattrs.method_name }}">#}
+{#                            {% if icon %}#}
+{#                                <i class="{{ urlattrs.icon }}"></i>&nbsp;#}
+{#                            {% endif %}#}
+{#                            {{ urlattrs.label }}#}
+{#                        </a></li>#}
+{#                    {% endnlless %}#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
+{#        {% endblock %}#}
+{#    </ul>#}
+{#{% endblock %}#}
+
+{% block content %}
+{% endblock content %}
