@@ -1,8 +1,8 @@
 #!/bin/bash -e
 set -e
 
-if [ ! -f /var/sir/.bootstrapped ]; then
-    touch /var/sir/.bootstrapped
+if [ ! -f /var/datamart/.bootstrapped ]; then
+    touch /var/datamart/.bootstrapped
     echo "done"
 fi
 

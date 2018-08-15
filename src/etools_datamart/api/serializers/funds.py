@@ -18,5 +18,5 @@ class FundsreservationitemSerializer(serializers.ModelSerializer):
 
 class FundsReservationHeaderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.FundsFundsReservationHeader
+        model = models.FundsFundsreservationheader
         exclude = ()

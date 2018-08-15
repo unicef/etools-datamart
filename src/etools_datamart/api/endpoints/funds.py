@@ -17,4 +17,4 @@ class FundsreservationitemViewSet(common.ReadOnlyModelViewSet):
 
 class FundsReservationHeaderViewSet(common.ReadOnlyModelViewSet):
     serializer_class = serializers.FundsReservationHeaderSerializer
-    queryset = models.FundsFundsReservationHeader.objects.all()
+    queryset = models.FundsFundsreservationheader.objects.all()

@@ -239,6 +239,8 @@ INSTALLED_APPS = [
 
     'etools_datamart.apps.core',
     'etools_datamart.apps.etools',
+    'etools_datamart.apps.data',
+    'etools_datamart.apps.etl',
     'etools_datamart.api',
 ]
 

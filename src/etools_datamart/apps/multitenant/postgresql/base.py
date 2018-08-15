@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db.backends.postgresql_psycopg2 import base as original_backend
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
 
+from etools_datamart.apps.multitenant.admin import format_stm
 from etools_datamart.state import state
 
 from ..sql import Parser
@@ -62,10 +63,8 @@ class TenantCursor(CursorWrapper):
             return self.cursor.fetchall()
 
     def execute(self, sql, params=None):
-
         if isinstance(sql, RawSql):
             return super(TenantCursor, self).execute(sql, params)
-
         if len(state.schemas) == 0:
             pass
         else:

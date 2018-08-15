@@ -77,7 +77,12 @@ class Command(BaseCommand):
                 "Django to create, modify, and delete the table"
             )
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
-            yield 'from %s import models' % self.db_module
+            if schema == "public":
+                basemodel = 'models.Model'
+                yield 'from django.db import models'
+            else:
+                basemodel = 'models.TenantModel'
+                yield 'from %s import models' % self.db_module
             known_models = []
             tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
 
@@ -109,7 +114,7 @@ class Command(BaseCommand):
 
                 yield ''
                 yield ''
-                yield 'class %s(models.TenantModel):' % table2model(table_name)
+                yield 'class %s(%s):' % (table2model(table_name), basemodel)
 
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
@@ -313,7 +318,7 @@ class Command(BaseCommand):
                     # so we build the string rather than interpolate the tuple
                     fields = [column_to_field_name[c] for c in cols if len(cols) > 1]
                     if fields:
-                        tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in cols if len(cols) > 1) + ')'
+                        tup = '(' + ', '.join(sorted(["'%s'" % column_to_field_name[c] for c in cols if len(cols) > 1])) + ')'
                         unique_together.add(tup)
         meta = ["",
                 "    class Meta:",
@@ -321,6 +326,6 @@ class Command(BaseCommand):
                 "        db_table = '%s'" % table_name]
 
         if unique_together:
-            tup = '(' + ', '.join(unique_together) + ',)'
+            tup = '(' + ', '.join(sorted(unique_together)) + ',)'
             meta += ["        unique_together = %s" % tup]
         return meta

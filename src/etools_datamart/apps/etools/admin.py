@@ -69,7 +69,7 @@ class PartnersPlannedEngagement(TenantModelAdmin):
     pass
 
 
-@register(models.FundsFundsReservationHeader)
+@register(models.FundsFundsreservationheader)
 class FundsReservationHeader(TenantModelAdmin):
     pass
 

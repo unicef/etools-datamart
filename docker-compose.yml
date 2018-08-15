@@ -1,0 +1,60 @@
+web:
+  build:
+    context: ./dir
+    dockerfile: ./docker/Dockerfile
+  volumes:
+    - src:/code
+  ports:
+    - "8080:8080"
+#  links:
+#    - db
+#    - redis
+##    - sync-gateway
+#  environment:
+#    - REDIS_URL=redis://redis:6379/0
+#    - DATABASE_URL=postgis://postgres:password@db:5432/postgres
+#    - DJANGO_SETTINGS_MODULE=EquiTrack.settings.base
+#    - DJANGO_DEBUG=true
+#    - COUCHBASE_URL=http://sync-gateway:4984/default
+#  env_file:
+#    - env_prod
+#
+
+db:
+  build: ./db
+  ports:
+    -  15432:5432
+  volumes:
+    - /data/storage/etools-db/data:/var/lib/postgresql/data
+
+redis:
+  image: redis
+  ports:
+    -  15432:5432
+
+superset:
+  image: amancevice/superset
+  ports:
+    -  15432:5432
+  volumes:
+    - /data/storage/superset:/var/lib/superset
+
+#couchbase:
+#  image: couchbase/server:community-4.0.0
+#  ports:
+#    - 8091:8091
+#    - 8092:8092
+#    - 8093:8093
+#    - 18091:18091
+#
+#sync-gateway:
+#  image: couchbase/sync-gateway
+#  command: sync-gateway.json
+#  volumes:
+#    - ./couchbase/sync-gateway.json:/sync-gateway.json
+#  links:
+#    - couchbase:couchbase
+#  ports:
+#    - 4984:4984
+#    - 4985:4985
+

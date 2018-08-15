@@ -28,7 +28,7 @@ class TenantChangeList(ChangeList):
 
 
 def format_stm(stm):
-    return sqlparse.format(stm,
+    return sqlparse.format(str(stm),
                            keyword_case="upper",
                            reindent=True,
                            indent_width=4,

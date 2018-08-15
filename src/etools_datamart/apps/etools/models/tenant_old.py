@@ -89,7 +89,7 @@ class ActstreamFollow(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'actstream_follow'
-        unique_together = (('content_type', 'object_id', 'user'),)
+        unique_together = (('user', 'content_type', 'object_id'),)
 
 
 class AttachmentsAttachment(models.TenantModel):
@@ -212,7 +212,7 @@ class AuditEngagementAuthorizedOfficers(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'audit_engagement_authorized_officers'
-        unique_together = (('engagement', 'partnerstaffmember'),)
+        unique_together = (('partnerstaffmember', 'engagement'),)
 
 
 class AuditEngagementStaffMembers(models.TenantModel):
@@ -222,7 +222,7 @@ class AuditEngagementStaffMembers(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'audit_engagement_staff_members'
-        unique_together = (('auditorstaffmember', 'engagement'),)
+        unique_together = (('engagement', 'auditorstaffmember'),)
 
 
 class AuditEngagementactionpoint(models.TenantModel):
@@ -371,7 +371,7 @@ class DjangoCommentFlags(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'django_comment_flags'
-        unique_together = (('comment', 'flag', 'user'),)
+        unique_together = (('flag', 'comment', 'user'),)
 
 
 class DjangoComments(models.TenantModel):
@@ -440,10 +440,10 @@ class FundsFundscommitmentitem(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'funds_fundscommitmentitem'
-        unique_together = (('fund_commitment', 'line_item'),)
+        unique_together = (('line_item', 'fund_commitment'),)
 
 
-class FundsFundsreservationheader(models.TenantModel):
+class FundsFundsReservationHeader(models.TenantModel):
     vendor_code = models.CharField(max_length=20)
     fr_number = models.CharField(unique=True, max_length=20)
     document_date = models.DateField(blank=True, null=True)
@@ -481,14 +481,14 @@ class FundsFundsreservationitem(models.TenantModel):
     overall_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     due_date = models.DateField(blank=True, null=True)
     line_item_text = models.CharField(max_length=255)
-    fund_reservation = models.ForeignKey(FundsFundsreservationheader, models.DO_NOTHING, related_name='+')
+    fund_reservation = models.ForeignKey(FundsFundsReservationHeader, models.DO_NOTHING, related_name='+')
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
     class Meta:
         managed = False
         db_table = 'funds_fundsreservationitem'
-        unique_together = (('fund_reservation', 'line_item'),)
+        unique_together = (('line_item', 'fund_reservation'),)
 
 
 class FundsGrant(models.TenantModel):
@@ -577,7 +577,7 @@ class LocationsLocation(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'locations_location'
-        unique_together = (('gateway', 'name', 'p_code'),)
+        unique_together = (('p_code', 'gateway', 'name'),)
 
 
 class ManagementFlaggedissue(models.TenantModel):
@@ -625,7 +625,7 @@ class PartnersAgreementAuthorizedOfficers(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_agreement_authorized_officers'
-        unique_together = (('agreement', 'partnerstaffmember'),)
+        unique_together = (('partnerstaffmember', 'agreement'),)
 
 
 class PartnersAgreementamendment(models.TenantModel):
@@ -662,19 +662,6 @@ class PartnersAssessment(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_assessment'
-
-
-class PartnersCorevaluesassessment(models.TenantModel):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    date = models.DateField(blank=True, null=True)
-    assessment = models.CharField(max_length=1024, blank=True, null=True)
-    archived = models.BooleanField()
-    partner_id = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'partners_corevaluesassessment'
 
 
 class PartnersDirectcashtransfer(models.TenantModel):
@@ -720,7 +707,7 @@ class PartnersFundingcommitment(models.TenantModel):
         db_table = 'partners_fundingcommitment'
 
 
-from django.db.models import Case, CharField, Count, F, Max, Min, Q, Sum, When, Aggregate, Value, Func
+from django.db.models import Case, CharField, Count, F, Max, Min, Q, Sum, When, Aggregate, Value
 
 
 class StringConcat(Aggregate):
@@ -741,7 +728,6 @@ class StringConcat(Aggregate):
     def as_postgresql(self, compiler, connection):
         self.function = 'STRING_AGG'
         return super(StringConcat, self).as_sql(compiler, connection)
-
 
 class InterventionManager(TenantManager):
 
@@ -789,9 +775,9 @@ class InterventionManager(TenantManager):
             Sum("frs__intervention_amt"),
             Count("frs__currency", distinct=True),
             location_p_codes=StringConcat("flat_locations__p_code", separator="|", distinct=True),
-            # donors=StringConcat("frs__fr_items__donor", separator="|", distinct=True),
-            # donor_codes=StringConcat("frs__fr_items__donor_code", separator="|", distinct=True),
-            # grants=StringConcat("frs__fr_items__grant_number", separator="|", distinct=True),
+            donors=StringConcat("frs__fr_items__donor", separator="|", distinct=True),
+            donor_codes=StringConcat("frs__fr_items__donor_code", separator="|", distinct=True),
+            grants=StringConcat("frs__fr_items__grant_number", separator="|", distinct=True),
             max_fr_currency=Max("frs__currency", output_field=CharField(), distinct=True),
             multi_curr_flag=Count(Case(When(frs__multi_curr_flag=True, then=1)))
         )
@@ -826,12 +812,6 @@ class PartnersIntervention(models.TenantModel):
     metadata = models.TextField(blank=True, null=True)  # This field type is a guess.
     in_amendment = models.BooleanField()
 
-    flat_locations = models.ManyToManyField(LocationsLocation,
-                                            through_fields=('intervention', 'location'),
-                                            through='PartnersInterventionFlatLocations',
-                                            related_query_name='sss',
-                                            related_name="intervention_flat_locations", blank=True)
-
     objects = InterventionManager()
 
     class Meta:
@@ -840,8 +820,7 @@ class PartnersIntervention(models.TenantModel):
 
 
 class PartnersInterventionFlatLocations(models.TenantModel):
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING,
-                                     related_name='+')
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
     location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='+')
 
     class Meta:
@@ -851,8 +830,7 @@ class PartnersInterventionFlatLocations(models.TenantModel):
 
 
 class PartnersInterventionOffices(models.TenantModel):
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING,
-                                     related_name='offices')
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
     office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='+')
 
     class Meta:
@@ -862,35 +840,33 @@ class PartnersInterventionOffices(models.TenantModel):
 
 
 class PartnersInterventionPartnerFocalPoints(models.TenantModel):
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING,
-                                     related_name='partner_focal_points')
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
     partnerstaffmember = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'partners_intervention_partner_focal_points'
-        unique_together = (('intervention', 'partnerstaffmember'),)
+        unique_together = (('partnerstaffmember', 'intervention'),)
 
 
 class PartnersInterventionSections(models.TenantModel):
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='sections')
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
     sector = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'partners_intervention_sections'
-        unique_together = (('intervention', 'sector'),)
+        unique_together = (('sector', 'intervention'),)
 
 
 class PartnersInterventionUnicefFocalPoints(models.TenantModel):
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING,
-                                     related_name='unicef_focal_points')
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'partners_intervention_unicef_focal_points'
-        unique_together = (('intervention', 'user'),)
+        unique_together = (('user', 'intervention'),)
 
 
 class PartnersInterventionamendment(models.TenantModel):
@@ -930,8 +906,7 @@ class PartnersInterventionbudget(models.TenantModel):
     unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2)
     in_kind_amount_local = models.DecimalField(max_digits=20, decimal_places=2)
     total = models.DecimalField(max_digits=20, decimal_places=2)
-    intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING,
-                                        related_name='planned_budget', blank=True,
+    intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='+', blank=True,
                                         null=True)
     total_local = models.DecimalField(max_digits=20, decimal_places=2)
     currency = models.CharField(max_length=4)
@@ -954,7 +929,7 @@ class PartnersInterventionplannedvisits(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_interventionplannedvisits'
-        unique_together = (('intervention', 'year'),)
+        unique_together = (('year', 'intervention'),)
 
 
 class PartnersInterventionreportingperiod(models.TenantModel):
@@ -972,7 +947,7 @@ class PartnersInterventionreportingperiod(models.TenantModel):
 
 class PartnersInterventionresultlink(models.TenantModel):
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='+')
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='result_links')
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
@@ -988,7 +963,7 @@ class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_interventionresultlink_ram_indicators'
-        unique_together = (('indicator', 'interventionresultlink'),)
+        unique_together = (('interventionresultlink', 'indicator'),)
 
 
 class PartnersInterventionsectorlocationlink(models.TenantModel):
@@ -1055,22 +1030,6 @@ class PartnersPartnerorganization(models.TenantModel):
         unique_together = (('name', 'vendor_number'),)
 
 
-class PartnersPartnerplannedvisits(models.TenantModel):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    year = models.IntegerField()
-    programmatic_q1 = models.IntegerField()
-    programmatic_q2 = models.IntegerField()
-    programmatic_q3 = models.IntegerField()
-    programmatic_q4 = models.IntegerField()
-    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='+')
-
-    class Meta:
-        managed = False
-        db_table = 'partners_partnerplannedvisits'
-        unique_together = (('partner', 'year'),)
-
-
 class PartnersPartnerstaffmember(models.TenantModel):
     title = models.CharField(max_length=64, blank=True, null=True)
     first_name = models.CharField(max_length=64)
@@ -1135,7 +1094,7 @@ class ReportsAppliedindicator(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'reports_appliedindicator'
-        unique_together = (('indicator', 'lower_result'),)
+        unique_together = (('lower_result', 'indicator'),)
 
 
 class ReportsAppliedindicatorDisaggregation(models.TenantModel):
@@ -1145,7 +1104,7 @@ class ReportsAppliedindicatorDisaggregation(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'reports_appliedindicator_disaggregation'
-        unique_together = (('appliedindicator', 'disaggregation'),)
+        unique_together = (('disaggregation', 'appliedindicator'),)
 
 
 class ReportsAppliedindicatorLocations(models.TenantModel):
@@ -1215,7 +1174,7 @@ class ReportsIndicator(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'reports_indicator'
-        unique_together = (('name', 'result', 'sector'),)
+        unique_together = (('sector', 'result', 'name'),)
 
 
 class ReportsIndicatorblueprint(models.TenantModel):
@@ -1246,7 +1205,7 @@ class ReportsLowerresult(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'reports_lowerresult'
-        unique_together = (('code', 'result_link'),)
+        unique_together = (('result_link', 'code'),)
 
 
 class ReportsQuarter(models.TenantModel):
@@ -1306,7 +1265,7 @@ class ReportsResult(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'reports_result'
-        unique_together = (('country_programme', 'wbs'),)
+        unique_together = (('wbs', 'country_programme'),)
 
 
 class ReportsResulttype(models.TenantModel):
@@ -1315,6 +1274,9 @@ class ReportsResulttype(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'reports_resulttype'
+
+    # def __str__(self):
+    #     return self.name
 
 
 class ReportsSector(models.TenantModel):
@@ -1330,18 +1292,6 @@ class ReportsSector(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'reports_sector'
-
-
-class ReportsSpecialreportingrequirement(models.TenantModel):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    description = models.CharField(max_length=256)
-    due_date = models.DateField()
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
-
-    class Meta:
-        managed = False
-        db_table = 'reports_specialreportingrequirement'
 
 
 class ReportsUnit(models.TenantModel):
@@ -1551,7 +1501,7 @@ class T2FTravelactivityLocations(models.TenantModel):
     class Meta:
         managed = False
         db_table = 't2f_travelactivity_locations'
-        unique_together = (('location', 'travelactivity'),)
+        unique_together = (('travelactivity', 'location'),)
 
 
 class T2FTravelactivityTravels(models.TenantModel):
@@ -1561,7 +1511,7 @@ class T2FTravelactivityTravels(models.TenantModel):
     class Meta:
         managed = False
         db_table = 't2f_travelactivity_travels'
-        unique_together = (('travel', 'travelactivity'),)
+        unique_together = (('travelactivity', 'travel'),)
 
 
 class T2FTravelattachment(models.TenantModel):
@@ -1610,7 +1560,7 @@ class TpmTpmactivityOffices(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'tpm_tpmactivity_offices'
-        unique_together = (('office', 'tpmactivity'),)
+        unique_together = (('tpmactivity', 'office'),)
 
 
 class TpmTpmactivityUnicefFocalPoints(models.TenantModel):
@@ -1633,7 +1583,7 @@ class TpmTpmpermission(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'tpm_tpmpermission'
-        unique_together = (('instance_status', 'permission_type', 'target', 'user_type'),)
+        unique_together = (('permission_type', 'target', 'user_type', 'instance_status'),)
 
 
 class TpmTpmvisit(models.TenantModel):
@@ -1666,7 +1616,7 @@ class TpmTpmvisitTpmPartnerFocalPoints(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'tpm_tpmvisit_tpm_partner_focal_points'
-        unique_together = (('tpmpartnerstaffmember', 'tpmvisit'),)
+        unique_together = (('tpmvisit', 'tpmpartnerstaffmember'),)
 
 
 class TpmTpmvisitreportrejectcomment(models.TenantModel):
@@ -1677,18 +1627,3 @@ class TpmTpmvisitreportrejectcomment(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'tpm_tpmvisitreportrejectcomment'
-
-
-class UnicefSnapshotActivity(models.TenantModel):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    target_object_id = models.CharField(max_length=255)
-    action = models.CharField(max_length=50)
-    data = models.TextField()  # This field type is a guess.
-    change = models.TextField()  # This field type is a guess.
-    by_user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
-    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+')
-
-    class Meta:
-        managed = False
-        db_table = 'unicef_snapshot_activity'
