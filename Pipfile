@@ -27,6 +27,7 @@ drf-yasg = {version = "*", extras = ["validation"]}
 django-strategy-field = "*"
 humanize = "*"
 celery = "*"
+django-adminfilters = "==1.1"
 
 [dev-packages]
 pytest = "*"

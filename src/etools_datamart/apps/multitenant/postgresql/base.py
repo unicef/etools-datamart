@@ -72,6 +72,10 @@ class TenantCursor(CursorWrapper):
                 p = Parser(sql)
                 tenant_sql = p.with_schemas(*state.schemas)
                 try:
+                    logger.debug(f"""{sql}
+
+{tenant_sql}                    
+""")
                     return super(TenantCursor, self).execute(tenant_sql, params * len(state.schemas))
                 except django.db.utils.ProgrammingError as e:
                     msg = f"""Message: {e}
@@ -80,6 +84,7 @@ sql: {sql}
 
 tenant: {tenant_sql}
 """
+                    logger.error(msg)
                     raise django.db.utils.ProgrammingError(msg)
                 except Exception:
 
@@ -150,22 +155,21 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     def get_tenants(self):
         model = apps.get_model(settings.TENANT_MODEL)
         with clear_schemas():
-            return model.objects.exclude(schema_name='public').order_by('name')
+            return model.objects.exclude(schema_name__in=['public', 'uat', 'frg']).order_by('name')
     # def rollback(self):
     #     super(DatabaseWrapper, self).rollback()
     #     # Django's rollback clears the search path so we have to set it again the next time.
     #     self.search_path_set = False
 
-    # def set_tenant(self, tenant, include_public=True):
-    #     """
-    #     Main API method to current database schema,
-    #     but it does not actually modify the db connection.
-    #     """
-    #     self.tenant = tenant
-    #     self.schema_name = tenant.schema_name
-    #     self.include_public_schema = include_public
-    #     self.set_settings_schema(self.schema_name)
-    #     self.search_path_set = False
+    def set_tenant(self, country, include_public=True):
+        """
+        Main API method to current database schema,
+        but it does not actually modify the db connection.
+        """
+        state.schemas = [country.schema_name]
+        self.tenant = country
+        self.schema_name = country.schema_name
+        self.search_path_set = False
 
     # def set_schema(self, schema_name, include_public=True):
     #     """

@@ -5,3 +5,4 @@ from .reports import *  # noqa
 from .funds import *  # noqa
 from .partners import *  # noqa
 from .openapi import schema_view, get_schema_view  # noqa
+from .datamart import *  # noqa

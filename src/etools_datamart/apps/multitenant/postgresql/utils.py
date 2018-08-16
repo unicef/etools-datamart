@@ -53,7 +53,7 @@ def raw_sql(s):
 @contextmanager
 def clear_schemas():
     _old = state.schemas
-    state.schemas = []
+    state.schemas = ["public"]
     yield
     state.schemas = _old
 

@@ -236,6 +236,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_yasg',
     'unicef_rest_framework',
+    'adminfilters',
 
     'etools_datamart.apps.core',
     'etools_datamart.apps.etools',
@@ -406,6 +407,11 @@ LOGGING = {
         },
         'etools_datamart': {
             'handlers': ['application'],
+            'level': 'ERROR',
+            'propagate': True
+        },
+        'etools_datamart.apps.multitenat': {
+            'handlers': ['console'],
             'level': 'ERROR',
             'propagate': True
         },

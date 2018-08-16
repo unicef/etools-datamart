@@ -5,6 +5,8 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+from django.utils.functional import cached_property
+
 from etools_datamart.apps.multitenant import models
 from etools_datamart.apps.multitenant.models import TenantManager
 
@@ -670,7 +672,10 @@ class PartnersCorevaluesassessment(models.TenantModel):
     date = models.DateField(blank=True, null=True)
     assessment = models.CharField(max_length=1024, blank=True, null=True)
     archived = models.BooleanField()
-    partner_id = models.IntegerField()
+    # partner_id = models.IntegerField()
+    partner = models.ForeignKey("PartnersPartnerOrganization", verbose_name="Partner",
+                                related_name='core_values_assessments',
+                                on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -800,12 +805,32 @@ class InterventionManager(TenantManager):
 
 
 class PartnersIntervention(models.TenantModel):
+    DRAFT = 'draft'
+    SIGNED = 'signed'
+    ACTIVE = 'active'
+    ENDED = 'ended'
+    IMPLEMENTED = 'implemented'
+    CLOSED = 'closed'
+    SUSPENDED = 'suspended'
+    TERMINATED = 'terminated'
+
+    INTERVENTION_STATUS = (
+        (DRAFT, "Draft"),
+        (SIGNED, 'Signed'),
+        (ACTIVE, "Active"),
+        (ENDED, "Ended"),
+        (CLOSED, "Closed"),
+        (SUSPENDED, "Suspended"),
+        (TERMINATED, "Terminated"),
+    )
+
     created = models.DateTimeField()
     modified = models.DateTimeField()
     document_type = models.CharField(max_length=255)
     number = models.CharField(unique=True, max_length=64, blank=True, null=True)
     title = models.CharField(max_length=256)
-    status = models.CharField(max_length=32)
+    status = models.CharField(max_length=32, choices=INTERVENTION_STATUS,
+                              default=DRAFT)
     start = models.DateField(blank=True, null=True)
     end = models.DateField(blank=True, null=True)
     submission_date = models.DateField(blank=True, null=True)
@@ -837,6 +862,26 @@ class PartnersIntervention(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_intervention'
+
+    @cached_property
+    def total_unicef_cash(self):
+        return self.planned_budget.unicef_cash_local if hasattr(self, 'planned_budget') else 0
+
+    @cached_property
+    def total_in_kind_amount(self):
+        return self.planned_budget.in_kind_amount_local if hasattr(self, 'planned_budget') else 0
+
+    @cached_property
+    def total_budget(self):
+        return self.total_unicef_cash + self.total_partner_contribution + self.total_in_kind_amount
+
+    @cached_property
+    def total_unicef_budget(self):
+        return self.total_unicef_cash + self.total_in_kind_amount
+
+    @cached_property
+    def total_partner_contribution(self):
+        return self.planned_budget.partner_contribution_local if hasattr(self, 'planned_budget') else 0
 
 
 class PartnersInterventionFlatLocations(models.TenantModel):
@@ -1053,6 +1098,10 @@ class PartnersPartnerorganization(models.TenantModel):
         managed = False
         db_table = 'partners_partnerorganization'
         unique_together = (('name', 'vendor_number'),)
+
+    @cached_property
+    def current_core_value_assessment(self):
+        return self.core_values_assessments.filter(archived=False).first()
 
 
 class PartnersPartnerplannedvisits(models.TenantModel):

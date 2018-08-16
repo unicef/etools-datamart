@@ -77,29 +77,28 @@ class Parser:
         # TODO: improve regex
         _select = r'(?P<query>(?P<select>SELECT( DISTINCT)? )(?P<fields>.*))'
         _from = r'(?P<from> FROM (?P<tables>.*))'
-        _group = r'(?P<group> GROUP BY .*)'
         _where = r'(?P<where> WHERE .*)'
+        _group = r'(?P<group> GROUP BY .*)'
         _order = r'(?P<order> ORDER BY .*)'
         _limit = r'(?P<limit> LIMIT .*)'
 
         rexx = [
-            f"{_select}{_from}{_where}{_group}{_order}{_limit}",
-            f"{_select}{_from}{_where}{_group}{_order}",
+            f"{_select}{_from}{_where}{_order}{_group}{_limit}",
+            f"{_select}{_from}{_where}{_order}{_group}",
             f"{_select}{_from}{_where}{_group}",
-            f"{_select}{_from}{_where}{_group}{_limit}",
-            f"{_select}{_from}{_where}{_group}",
+            f"{_select}{_from}{_group}",
+            f"{_select}{_from}{_group}{_limit}",
+            f"{_select}{_from}{_order}{_group}",
+
+
+            f"{_select}{_from}{_where}{_order}{_limit}",
             f"{_select}{_from}{_where}{_order}",
             f"{_select}{_from}{_order}{_limit}",
             f"{_select}{_from}{_order}",
-            f"{_select}{_from}{_group}",
-            f"{_select}{_from}{_group}{_order}",
             f"{_select}{_from}{_where}{_limit}",
             f"{_select}{_from}{_where}",
-            f"{_select}{_from}{_where}{_group}",
-            f"{_select}{_from}{_group}{_limit}",
             f"{_select}{_from}{_limit}",
             f"{_select}{_from}",
-            f"{_select}{_from}{_group}",
         ]
         for rex in rexx:
             m = re.match(rex, stm, re.I + re.M)
@@ -166,7 +165,7 @@ class Parser:
                     # raise AttributeError(f"{token}: {type(token)} {value}")
         self._parsed = True
 
-    def set_schema(self, schema, alias=True, **overrides):
+    def set_schema(self, schema, **overrides):
         if not self._parsed:
             self.parse()
 
@@ -182,35 +181,28 @@ class Parser:
                 _from = _from.replace(t, f'"{schema}".{t}')
 
         ret = parts['select']
-        if alias:
-            self.mapping = OrderedDict()
-            fields = parts['fields'].split(',')
-            for field in fields:
-                if '__schema' in field:
-                    self.mapping['schema'] = f"'{schema}' AS __schema"
-                else:
-                    self.mapping[field] = re.sub(r'("(.[^"]*)"\."(.[^"]*)")', r'"\2"."\3" AS \2__\3', field)
+        self.mapping = OrderedDict()
+        fields = parts['fields'].split(',')
+        for field in fields:
+            if '__schema' in field:
+                self.mapping['schema'] = f"'{schema}' AS __schema"
+            else:
+                self.mapping[field] = re.sub(r'("(.[^"]*)"\."(.[^"]*)")', r'"\2"."\3" AS \2__\3', field)
 
-            self.mapping['schema'] = f"'{schema}' AS __schema"
+        self.mapping['schema'] = f"'{schema}' AS __schema"
 
-            ret += ", ".join(self.mapping.values())
-        else:
-            ret += re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", parts['fields'])
-
+        ret += ", ".join(self.mapping.values())
         ret += f" {_from}"
+
         if self.where:
             ret += f" {parts['where']}"
-        if 'group' in parts:
-            ret += re.sub(r'".[^"]*"\."__schema",', f"", parts['group'])
-        if 'limit' in parts:
-            ret += f" {parts['limit']}"
         return ret
 
     def with_schemas(self, *schemas):
         if len(schemas) == 1:
             schema = schemas[0]
-            # ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.original)
-            return self.set_schema(schema, alias=False)
+            ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.original)
+            return ret
 
         if not self._parsed:  # pragma: no cover
             self.parse()
