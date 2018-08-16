@@ -1,4 +1,4 @@
-CMD?=datamart
+CMD?=
 TARGET?=dev
 DOCKER_IMAGE=unicef/datamart:${TARGET}
 DOCKERFILE?=docker/Dockerfile
