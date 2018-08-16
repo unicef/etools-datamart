@@ -36,7 +36,7 @@ def refresh_service_table():
     router = conf.ROUTER
     created = deleted = 0
     for prefix, viewset, basename in router.registry:
-        name = fqn(viewset)
+        name = getattr(viewset, 'label', viewset.__name__)
         try:
             s, isnew = Service.objects.get_or_create(name=name,
                                                      defaults={

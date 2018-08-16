@@ -70,10 +70,19 @@ class TenantCursor(CursorWrapper):
         else:
             if self.mode == MODE_PARSE:
                 p = Parser(sql)
-                sql = p.with_schemas(*state.schemas)
+                tenant_sql = p.with_schemas(*state.schemas)
                 try:
-                    return super(TenantCursor, self).execute(sql, params * len(state.schemas))
+                    return super(TenantCursor, self).execute(tenant_sql, params * len(state.schemas))
+                except django.db.utils.ProgrammingError as e:
+                    msg = f"""Message: {e}
+
+sql: {sql}
+
+tenant: {tenant_sql}
+"""
+                    raise django.db.utils.ProgrammingError(msg)
                 except Exception:
+
                     raise
             else:
                 return super(TenantCursor, self).execute(sql, params)

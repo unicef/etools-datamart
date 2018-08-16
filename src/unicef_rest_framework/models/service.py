@@ -96,7 +96,7 @@ class Service(MasterDataModel):
         super(Service, self).save(force_insert, force_update, using, update_fields)
         # self.invalidate_cache()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
         # return "Service:{} ({})".format(self.name, self.viewset)
 

@@ -24,7 +24,7 @@ class Application(MasterDataModel):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     # def set_password(self, raw_password):

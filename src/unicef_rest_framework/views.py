@@ -10,9 +10,21 @@ def paginator(ordering='-created'):
     return type("TenantPaginator", (CursorPagination,), {'ordering': ordering})
 
 
+class classproperty(object):
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, instance, owner):
+        return self.getter(owner)
+
+
 class ApiMixin:
     permission_classes = []
     default_access = acl.ACL_ACCESS_LOGIN
+
+    @classproperty
+    def label(cls):
+        return cls.__name__.replace("ViewSet", "")
 
 
 class DynamicSerializerViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ModelViewSet):
