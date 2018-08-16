@@ -43,33 +43,33 @@ ADMINS = (
 )
 
 DATABASES = {
-    # 'default': env.db(),
-    # 'etools': env.db('DATABASE_URL_ETOOLS'),
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'etools_datamart',
-        'HOST': '127.0.0.1',
-        'USER': 'postgres',
-        'PORT': '',
-        'OPTIONS': {
-            'options': '-c search_path=public'
-        },
-    },
-    'etools': {
-        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'ENGINE': 'etools_datamart.apps.multitenant.postgresql',
-        'NAME': 'etools',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '15432',
+    'default': env.db(),
+    'etools': env.db('DATABASE_URL_ETOOLS', engine='etools_datamart.apps.multitenant.postgresql'),
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'etools_datamart',
+    #     'HOST': '127.0.0.1',
+    #     'USER': 'postgres',
+    #     'PORT': '',
+    #     'OPTIONS': {
+    #         'options': '-c search_path=public'
+    #     },
+    # },
+    # 'etools': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'ENGINE': 'etools_datamart.apps.multitenant.postgresql',
+    #     'NAME': 'etools',
+    #     'USER': 'postgres',
+    #     'PASSWORD': '',
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '15432',
         # 'TEST': {
         #     'NAME': 'etools2',
-        # }
+        # },
         # 'OPTIONS': {
         #     'options': '-c search_path=bolivia,public'
         # },
-    },
+    # },
 }
 
 DATABASE_ROUTERS = [

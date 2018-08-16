@@ -11,10 +11,10 @@ ENV PIPSI_HOME=/usr/local/pipsi/environments
 ENV PIPSI_BIN_DIR=/usr/local/bin
 ENV DEBUG 1
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE sir.config.settings
+ENV DJANGO_SETTINGS_MODULE etools_datamart.config.settings
 ENV PYTHONUNBUFFERED 1
 ENV GUNICORN_CMD_ARGS "-b 0.0.0.0:8000 \
---chdir /var/sir \
+--chdir /var/etools_datamart \
 --access-logfile - \
 --access-logformat \"%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s\""
 ENV SECURE_SSL_REDIRECT False
@@ -45,9 +45,8 @@ RUN pipenv install -v --system --deploy \
 
 RUN mkdir -p /var/datamart/
 WORKDIR /var/datamart
-VOLUME /var/datamart/
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD ["sir"]
+CMD ["etools_datamart"]
