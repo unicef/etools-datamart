@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE etools_datamart.config.settings
 ENV PYTHONUNBUFFERED 1
 ENV GUNICORN_CMD_ARGS "-b 0.0.0.0:8000 \
---chdir /var/etools_datamart \
+--chdir /var/datamart \
 --access-logfile - \
 --access-logformat \"%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s\""
 ENV SECURE_SSL_REDIRECT False
