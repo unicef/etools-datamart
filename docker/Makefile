@@ -24,14 +24,14 @@ run:
 	cd .. && docker run -p 8000:8000 --rm \
 			-e DATABASE_URL=${DATABASE_URL} \
 			-e DATABASE_URL_ETOOLS=${DATABASE_URL_ETOOLS} \
-			-e USE_GUNICORN=0 \
+			-e USE_GUNICORN=1 \
 			-e DEBUG=true \
 			-e SECURE_SSL_REDIRECT=false \
 			-e SESSION_COOKIE_SECURE=false \
 			-e SESSION_COOKIE_HTTPONLY=false \
 			-e SESSION_COOKIE_HTTPONLY=false \
 			-e CSRF_COOKIE_SECURE=false \
-			-e STATIC_ROOT=/var/etools_datamart/static/ \
+			-e STATIC_ROOT=/var/datamart/static/ \
 			-e DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \
 			-it ${DOCKER_IMAGE} \
 			${CMD}

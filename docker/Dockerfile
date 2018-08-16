@@ -43,7 +43,7 @@ ADD . /code
 RUN pipenv install -v --system --deploy \
     && pip install -e .
 
-RUN mkdir -p /var/datamart/
+RUN mkdir -p /var/datamart/static
 WORKDIR /var/datamart
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
