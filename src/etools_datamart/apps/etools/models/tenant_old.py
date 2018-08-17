@@ -5,6 +5,8 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+from django.db.models import Aggregate, Case, CharField, Count, Max, Min, Sum, Value, When
+
 from etools_datamart.apps.multitenant import models
 from etools_datamart.apps.multitenant.models import TenantManager
 
@@ -707,9 +709,6 @@ class PartnersFundingcommitment(models.TenantModel):
         db_table = 'partners_fundingcommitment'
 
 
-from django.db.models import Case, CharField, Count, F, Max, Min, Q, Sum, When, Aggregate, Value
-
-
 class StringConcat(Aggregate):
     """ A custom aggregation function that returns "," separated strings """
 
@@ -728,6 +727,7 @@ class StringConcat(Aggregate):
     def as_postgresql(self, compiler, connection):
         self.function = 'STRING_AGG'
         return super(StringConcat, self).as_sql(compiler, connection)
+
 
 class InterventionManager(TenantManager):
 

@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import os
 import sys
+import warnings
 
 from django.core.management import execute_from_command_line
+
+warnings.simplefilter("ignore", UserWarning, 144)
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 SRC = os.path.realpath(os.path.join(ROOT, 'src'))
@@ -28,6 +31,7 @@ if __name__ == '__main__':
     except Exception as e:
         if debug_on_error:
             import pdb, traceback
+
             __, __, tb = sys.exc_info()
             traceback.print_exc()
             pdb.post_mortem(tb)

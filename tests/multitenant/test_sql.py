@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
-import re
-
 import pytest
-import sqlparse
-from django.db import connections
 
-from etools_datamart.apps.multitenant.admin import format_stm
-from etools_datamart.apps.multitenant.postgresql.utils import raw_sql
 from etools_datamart.apps.multitenant.sql import Parser
-from etools_datamart.state import state
 
 one_table = [
     'SELECT "f1" FROM "t1" ORDER BY "o1" ASC',
@@ -106,4 +99,3 @@ def test_select_with_order_multitenant():
     p = Parser('SELECT * FROM "t1" ORDER BY "f1"')
     assert p.with_schemas("b",
                           "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT *, \'c\' AS __schema FROM "c"."t1") as __query ORDER BY f1'
-

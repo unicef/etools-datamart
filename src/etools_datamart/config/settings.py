@@ -69,12 +69,12 @@ DATABASES = {
     #     'PASSWORD': '',
     #     'HOST': '127.0.0.1',
     #     'PORT': '15432',
-        # 'TEST': {
-        #     'NAME': 'etools2',
-        # },
-        # 'OPTIONS': {
-        #     'options': '-c search_path=bolivia,public'
-        # },
+    # 'TEST': {
+    #     'NAME': 'etools2',
+    # },
+    # 'OPTIONS': {
+    #     'options': '-c search_path=bolivia,public'
+    # },
     # },
 }
 

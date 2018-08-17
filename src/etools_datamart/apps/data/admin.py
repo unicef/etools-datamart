@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-from django.contrib.admin.templatetags.admin_urls import admin_urlname
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
+from adminfilters.filters import AllValuesComboFilter, AllValuesRadioFilter
 from django.contrib import messages
-from django.contrib.admin import ModelAdmin, register, ListFilter, FieldListFilter
+from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin.templatetags.admin_urls import admin_urlname
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
-from adminfilters.filters import RelatedFieldComboFilter, AllValuesComboFilter, AllValuesRadioFilter, StartWithFilter
 from etools_datamart.apps.etl.tasks import load_pmp_indicator
+
 from . import models
 
 
@@ -36,7 +37,6 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
             self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
             return HttpResponseRedirect(redirect_url)
         return self._changeform_view(request, object_id, form_url, extra_context)
-
 
     @link()
     def refresh(self, request):

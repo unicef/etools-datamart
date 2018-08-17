@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from etools_datamart.apps.data import models
 
-from .. import common
 from . import serializers
+from .. import common
 
 
 class PMPIndicatorsViewSet(common.ReadOnlyModelViewSet):

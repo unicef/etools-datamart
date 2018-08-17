@@ -17,10 +17,13 @@ exclude manage.py
 exclude tests
 exclude manage.py
 exclude entrypoint.sh
+exclude .env
+exclude .env.tpl
 
 prune .circleci
 prune tests
 prune db
+prune docker
 
 recursive-include src/etools_datamart *.*
 recursive-include src/unicef_rest_framework *.*

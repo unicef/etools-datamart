@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.db.backends.postgresql_psycopg2 import base as original_backend
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
 
-from etools_datamart.apps.multitenant.admin import format_stm
 from etools_datamart.state import state
 
 from ..sql import Parser
@@ -74,7 +73,7 @@ class TenantCursor(CursorWrapper):
                 try:
                     logger.debug(f"""{sql}
 
-{tenant_sql}                    
+{tenant_sql}
 """)
                     return super(TenantCursor, self).execute(tenant_sql, params * len(state.schemas))
                 except django.db.utils.ProgrammingError as e:

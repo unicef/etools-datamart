@@ -4,7 +4,6 @@ import os
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from rest_framework.settings import api_settings
-from strategy_field.utils import fqn
 from unicef_rest_framework.config import conf
 from unicef_rest_framework.models import Service
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
-from rest_framework import viewsets, permissions
+from rest_framework import permissions, viewsets
 from rest_framework.pagination import CursorPagination
 from unicef_rest_framework import acl
 

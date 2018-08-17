@@ -6,11 +6,12 @@ from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
 from etools_datamart.apps.data.models import PMPIndicators
-from etools_datamart.apps.etools.models import PartnersIntervention, PartnersPartnerorganization, UsersCountry
+from etools_datamart.apps.etools.models import PartnersIntervention, PartnersPartnerorganization
 from etools_datamart.apps.multitenant.postgresql.utils import clear_schemas
 from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)
+
 
 @app.task(bind=True)
 def load_pmp_indicator():
@@ -19,7 +20,7 @@ def load_pmp_indicator():
         schemas = connections['etools'].get_tenants()
 
     base_url = 'https://etools.unicef.org'
-    connection = connections['etools']
+    # connection = connections['etools']
     for country in schemas:
         connection.set_tenant(country)
         logger.info(u'Running on %s' % country.name)
