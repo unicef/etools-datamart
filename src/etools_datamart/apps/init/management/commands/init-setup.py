@@ -1,10 +1,14 @@
 import os
 
+from django_celery_beat.models import PeriodicTask, PeriodicTasks, IntervalSchedule, CrontabSchedule
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from strategy_field.utils import fqn
+
+from etools_datamart.apps.etl.tasks import load_pmp_indicator
 
 
 class Command(BaseCommand):
@@ -31,6 +35,13 @@ class Command(BaseCommand):
             default=True,
             help='select all production deployment options')
 
+        parser.add_argument(
+            '--tasks',
+            action='store_true',
+            dest='tasks',
+            default=False,
+            help='schedule tasks')
+
     def handle(self, *args, **options):
         verbosity = options['verbosity']
         migrate = options['migrate']
@@ -56,3 +67,10 @@ class Command(BaseCommand):
             self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
         else:
             self.stdout.write(f"Superuser `{admin}` already exists`.")
+
+        if options['tasks'] or _all:
+            midnight,__ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
+            PeriodicTask.objects.get_or_create(
+                name=fqn(load_pmp_indicator.name),
+                task=fqn(load_pmp_indicator.name),
+                crontab=midnight)
