@@ -34,7 +34,6 @@ ENV SECURE_HSTS_PRELOAD True
 ENV SECURE_HSTS_SECONDS 1
 ENV SECURE_SSL_REDIRECT True
 ENV SENTRY_DSN ""
-ENV SERVICES "redis,workers,beat"
 ENV SESSION_COOKIE_HTTPONLY True
 ENV SESSION_COOKIE_SECURE True
 ENV STATIC_ROOT /tmp/media
@@ -66,6 +65,10 @@ ADD docker/redis.conf /etc/redis.conf
 ADD docker/supervisord.conf /etc/supervisord.conf
 
 WORKDIR /var/datamart
+
+EXPOSE 8000
+EXPOSE 5555
+EXPOSE 15000
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]

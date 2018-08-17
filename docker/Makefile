@@ -1,4 +1,5 @@
 CMD?=
+RUN_OPTIONS?=
 TARGET?=dev
 DOCKER_IMAGE=unicef/datamart:${TARGET}
 DOCKERFILE?=docker/Dockerfile
@@ -6,14 +7,7 @@ BUILD_OPTIONS?=
 DATABASE_URL?=postgres://postgres:@192.168.66.66:5432/etools_datamart
 DATABASE_URL_ETOOLS?=postgis://postgres:@192.168.66.66:15432/etools
 PYPI_INDEX?=https://pypi.org/simple/
-
-#builder:
-#	cd .. && docker build ${BUILD_OPTIONS} \
-#			--target builder \
-#			--build-arg PYPI_SERVER=${PYPI_SERVER} \
-#			--build-arg PYPI_INDEX=${PYPI_INDEX} \
-#			-t ${DOCKER_IMAGE} \
-#			-f ${DOCKERFILE} .
+CONTAINER_NAME?=datamart-${TARGET}
 
 build:
 	cd .. && docker build ${BUILD_OPTIONS} \
@@ -25,6 +19,7 @@ build:
 run:
 	cd .. && docker run \
 	 		--rm \
+	 		--name=${CONTAINER_NAME} \
 			-p 8000:8000 \
 			-p 5555:5555 \
 			-e CACHE_URL=redis://127.0.0.1:6379/1 \
@@ -41,7 +36,6 @@ run:
 			-e SECURE_HSTS_SECONDS=0 \
 			-e SECURE_HSTS_PRELOAD=false \
 			-e SECURE_SSL_REDIRECT=false \
-			-e SERVICES="redis,workers,beat,datamart" \
 			-e SESSION_COOKIE_HTTPONLY=false \
 			-e SESSION_COOKIE_SECURE=false \
 			-e STATIC_ROOT=/var/datamart/static/ \
@@ -49,11 +43,15 @@ run:
 			-e USE_GUNICORN=1 \
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
 			-v $$PWD/~build/volumes/var/datamart:/var/datamart/ \
-			-it ${DOCKER_IMAGE} \
+			${RUN_OPTIONS} \
+			${DOCKER_IMAGE} \
 			${CMD}
 
 test:
 	CMD='django-admin check --deploy' $(MAKE) run
 
+scratch:
+	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) run
+
 shell:
-	CMD='/bin/bash' $(MAKE) run
+	docker exec -it ${CONTAINER_NAME} /bin/bash

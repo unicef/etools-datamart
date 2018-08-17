@@ -4,6 +4,7 @@ set -e
 
 if [ "$@" == "datamart" ];then
     mkdir -p /var/datamart/{static,log,conf,run,redis}
+    rm -f /var/datamart/run/*
 
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
@@ -17,13 +18,7 @@ if [ "$@" == "datamart" ];then
             python /code/manage.py runserver 0.0.0.0:8000
         fi
     else
-        if [ -n "$SERVICES" ]; then
-            supervisord -c /var/datamart/conf/supervisord.conf
-            supervisorctl -c /var/datamart/conf/supervisord.conf start ${SERVICES//,/ }
-        else
-            echo "Empty 'SERVICES' environment. supervisord not started"
-            echo "$SERVICES"
-        fi
+        exec supervisord --nodaemon
     fi
 else
     exec "$@"
