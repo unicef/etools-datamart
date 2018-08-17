@@ -1,5 +1,4 @@
 *.egg-info
-*.pyc
 *.pyo
 *.sqlite
 *.~*
@@ -22,7 +21,8 @@ local.yaml
 pytest.xml
 settings_local.py
 ~*
-.project
 .pydevproject
 db/db1.bz2
 .env
+.venv
+docker/cache

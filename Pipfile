@@ -28,6 +28,9 @@ django-strategy-field = "*"
 humanize = "*"
 celery = "*"
 django-adminfilters = "==1.1"
+flower = "*"
+django-celery-beat = "*"
+django-redis = "*"
 
 [dev-packages]
 pytest = "*"
@@ -46,7 +49,6 @@ django-webtest = "*"
 docker = "*"
 django-extensions = "*"
 tox-pipenv = "==1.6.0"
-etools-datamart = {editable = true, path = "."}
 ipython = "*"
 
 [requires]

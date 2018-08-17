@@ -13,7 +13,8 @@ setup local en0 alias
 
 ### Initialize app
    
-   Create a
+   Create a `.env` file in the root folder based on the content for `.env.tpl`
+   
     $ pipenv install
     $ pipenv shell
     $ ./manage.py init-setup --all

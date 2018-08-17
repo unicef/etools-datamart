@@ -10,17 +10,23 @@ import etools_datamart
 from etools_datamart.libs.dbrouter import router_factory
 
 env = environ.Env(DEBUG=(bool, False),
-                  SECRET_KEY=(str, 'secret'),
+                  CACHE_URL=(str, "locmemcache://"),
+                  CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
+                  CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
+                  CSRF_COOKIE_SECURE=(bool, True),
                   DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
-                  CACHE_URL=(str, "locmemcache://"),
                   MEDIA_ROOT=(str, '/tmp/media'),
-                  STATIC_ROOT=(str, '/tmp/static'),
-                  SENTRY_DSN=(str, ''),
-
+                  SECRET_KEY=(str, 'secret'),
+                  SECURE_HSTS_PRELOAD=(bool, 'True'),
                   SECURE_SSL_REDIRECT=(bool, True),
-                  CSRF_COOKIE_SECURE=(bool, True),
+                  SECURE_BROWSER_XSS_FILTER=(bool, True),
+                  SECURE_CONTENT_TYPE_NOSNIFF=(bool, True),
+                  SECURE_FRAME_DENY=(bool, True),
+                  SENTRY_DSN=(str, ''),
                   SESSION_COOKIE_SECURE=(bool, True),
+                  STATIC_ROOT=(str, '/tmp/static'),
+                  X_FRAME_OPTIONS=(str, 'DENY'),
                   )
 
 SETTINGS_DIR = Path(__file__).parent
@@ -238,6 +244,8 @@ INSTALLED_APPS = [
     'unicef_rest_framework',
     'adminfilters',
 
+    'django_celery_beat',
+
     'etools_datamart.apps.core',
     'etools_datamart.apps.etools',
     'etools_datamart.apps.data',
@@ -278,6 +286,7 @@ SECURE_HSTS_SECONDS = 1
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT')
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
+X_FRAME_OPTIONS = env('X_FRAME_OPTIONS')
 
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
@@ -296,7 +305,12 @@ CONSTANCE_CONFIG = {
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_RESULT_BACKEND = 'django_celery_results.backends.database:DatabaseBackend'
 CELERY_TIMEZONE = 'America/New_York'
-CELERY_BROKER_URL = 'redis://'
+CELERY_BROKER_URL = env('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_BEAT_SCHEDULE = {}
 
 CONCURRENCY_IGNORE_DEFAULT = False
 
