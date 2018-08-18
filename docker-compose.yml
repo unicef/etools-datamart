@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+  datamart:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    environment:
+      CACHE_URL: redis://redis:6379/1
+      CELERY_BROKER_URL: redis://redis:6379/2
+      CELERY_RESULT_BACKEND: redis://redis:6379/3
+      DATABASE_URL: postgres://postgres:@db:5432/etools_datamart
+      DATABASE_URL_ETOOLS: postgis://postgres:@etools:15432/etools
+    ports:
+      - "8080:8000"
+    depends_on:
+      - db
+      - polymer_pmp
+
+  db:
+    image: mdillon/postgis:9.5
+    environment:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB: etools_datamart
+
+  etools:
+    image: unicef/etools-db:dev
+    volumes:
+      - /data/storage/etools-db/data:/var/lib/postgresql/data
+
+  redis:
+    image: unicef/etools-db:dev
+
+  celery:
+    image: unicef/etools-db:dev
+    ports:
+      - 5555:5555

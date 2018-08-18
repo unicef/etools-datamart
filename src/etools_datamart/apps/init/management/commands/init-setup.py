@@ -70,8 +70,10 @@ class Command(BaseCommand):
 
         if options['tasks'] or _all:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-            for task in [load_pmp_indicator]:
-                PeriodicTask.objects.get_or_create(
-                    name=fqn(task.name),
-                    task=fqn(task.name),
-                    crontab=midnight)
+            from celery import current_app
+            tasks = list(sorted(name for name in current_app.tasks
+                                if name.startswith('etl_')))
+            for task in tasks:
+                PeriodicTask.objects.get_or_create(task=fqn(task.name),
+                                                   defaults={'name': fqn(task.name),
+                                                             'crontab': midnight})

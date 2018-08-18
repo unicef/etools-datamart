@@ -17,7 +17,9 @@ class Command(LabelCommand):
         from celery import current_app
         tasks = list(sorted(name for name in current_app.tasks
                             if not name.startswith('celery.')))
+
         if task not in tasks:
+            self.stdout.write("\n".join(tasks))
             raise CommandError(f"'{task}' is not a registered Celery task")
 
         cmd = import_string(task)

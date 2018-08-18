@@ -22,6 +22,7 @@ run:
 	 		--name=${CONTAINER_NAME} \
 			-p 8000:8000 \
 			-p 5555:5555 \
+			-p 15000:15000 \
 			-e CACHE_URL=redis://127.0.0.1:6379/1 \
 			-e CELERY_BROKER_URL=redis://127.0.0.1:6379/2 \
 			-e CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/3 \
@@ -41,6 +42,8 @@ run:
 			-e STATIC_ROOT=/var/datamart/static/ \
 			-e DEVELOPMENT_MODE=0 \
 			-e USE_GUNICORN=1 \
+			-e SUPERVISOR_USER=admin \
+			-e SUPERVISOR_PWD=supersecret \
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
 			-v $$PWD/~build/volumes/var/datamart:/var/datamart/ \
 			${RUN_OPTIONS} \
