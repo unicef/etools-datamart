@@ -41,9 +41,7 @@ run:
 			-e SESSION_COOKIE_SECURE=false \
 			-e STATIC_ROOT=/var/datamart/static/ \
 			-e DEVELOPMENT_MODE=0 \
-			-e USE_GUNICORN=1 \
-			-e SUPERVISOR_USER=admin \
-			-e SUPERVISOR_PWD=supersecret \
+			-e STACK=1 \
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
 			-v $$PWD/~build/volumes/var/datamart:/var/datamart/ \
 			${RUN_OPTIONS} \

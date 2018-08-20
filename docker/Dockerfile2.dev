@@ -12,7 +12,7 @@ ENV USE_GUNICORN 0
 ENV GUNICORN_CMD_ARGS "-b 0.0.0.0:8000 \
 --chdir /var/datamart \
 --access-logfile - \
---access-logformat \"%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s\" "
+--access-logformat \"%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s\""
 
 ENV ALLOWED_HOSTS *
 ENV CACHE_URL "redis://127.0.0.1:6379/1"
@@ -36,7 +36,7 @@ ENV SECURE_SSL_REDIRECT True
 ENV SENTRY_DSN ""
 ENV SESSION_COOKIE_HTTPONLY True
 ENV SESSION_COOKIE_SECURE True
-ENV STATIC_ROOT /tmp/static
+ENV STATIC_ROOT /tmp/media
 ENV SUPERVISOR_USER admin
 ENV SUPERVISOR_PWD ""
 ENV X_FRAME_OPTIONS "DENY"
@@ -52,6 +52,8 @@ RUN mkdir -p /code /root/.local/bin \
     && pip install virtualenv \
     && pipsi install pipenv
 
+#FROM python:3.6-slim
+#COPY --from=0 /root /root
 
 WORKDIR /code
 ADD . /code
@@ -67,6 +69,8 @@ ADD docker/supervisord.conf /etc/supervisord.conf
 WORKDIR /var/datamart
 
 EXPOSE 8000
+EXPOSE 5555
+EXPOSE 15000
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]

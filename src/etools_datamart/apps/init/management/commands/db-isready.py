@@ -34,15 +34,22 @@ class Command(BaseCommand):
             help='timeout in sec before OperationalError',
         )
 
+        parser.add_argument(
+            '--connection', default='default',
+            help='timeout in sec before OperationalError',
+        )
+
     def _get_cursor(self, conn):
         conn.cursor()
         return conn
 
     def handle(self, *args, **options):
-        conn = connections['default']
+        conn = connections[options['connection']]
         elapsed = 0
         retcode = 1
         try:
+            self.stdout.write(f"Checking connnection {options['connection']}...")
+
             while True:
                 try:
                     conn = self._get_cursor(conn)
@@ -53,14 +60,14 @@ class Command(BaseCommand):
                         time.sleep(1)
                         elapsed += 1
                     else:
-                        self.stdout.write(f"\nDatabase on {conn.settings_dict['HOST']}:{conn.settings_dict['PORT']} "
+                        self.stderr.write(f"\nDatabase on {conn.settings_dict['HOST']}:{conn.settings_dict['PORT']} "
                                           f"is not available after {elapsed} secs")
                         if options['debug']:
-                            self.stdout.write(f"Error is: {e}")
+                            self.stderr.write(f"Error is: {e}")
                         retcode = 1
                         break
                 else:
-                    self.stdout.write("Connected")
+                    self.stdout.write(f"Connection {options['connection']} successful")
                     retcode = 0
                     break
         except KeyboardInterrupt:  # pragma: no-cover
