@@ -1,6 +1,7 @@
 import os
 import sys
 import warnings
+from pathlib import Path
 
 import psycopg2
 import pytest
@@ -39,7 +40,7 @@ def configure_test(settings):
     settings.SECURE_SSL_REDIRECT = False
     settings.SESSION_COOKIE_HTTPONLY = False
     settings.ALLOWED_HOSTS = ['*']
-    settings.SESSION_COOKIE_SECURE = False
+    settings.STATIC_ROOT = str(Path(__file__).parent)
 
 
 def run_sql(sql):

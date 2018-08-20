@@ -11,8 +11,6 @@ class ActionPointsActionpoint(models.TenantModel):
     status = models.CharField(max_length=10)
     description = models.TextField()
     due_date = models.DateField(blank=True, null=True)
-    priority = models.CharField(max_length=10)
-    action_taken = models.TextField()
     date_of_completion = models.DateTimeField(blank=True, null=True)
     assigned_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
     assigned_to = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
@@ -21,12 +19,13 @@ class ActionPointsActionpoint(models.TenantModel):
     engagement = models.ForeignKey('AuditEngagement', models.DO_NOTHING, related_name='+', blank=True, null=True)
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='+', blank=True, null=True)
     location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='+', blank=True, null=True)
-    office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='+')
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True,
-                                null=True)
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='+')
+    office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='+', blank=True, null=True)
     tpm_activity = models.ForeignKey('TpmTpmactivity', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    high_priority = models.BooleanField()
     travel_activity = models.ForeignKey('T2FTravelactivity', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    category = models.ForeignKey('CategoriesCategory', models.DO_NOTHING, related_name='+', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -37,8 +36,7 @@ class ActivitiesActivity(models.TenantModel):
     date = models.DateField(blank=True, null=True)
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='+', blank=True, null=True)
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='+', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True,
-                                null=True)
+    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -64,11 +62,9 @@ class ActstreamAction(models.TenantModel):
     timestamp = models.DateTimeField()
     public = models.BooleanField()
     data = models.TextField(blank=True, null=True)
-    action_object_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True,
-                                                   null=True)
+    action_object_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True, null=True)
     actor_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+')
-    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True,
-                                            null=True)
+    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -93,10 +89,10 @@ class AttachmentsAttachment(models.TenantModel):
     modified = models.DateTimeField()
     file = models.CharField(max_length=1024, blank=True, null=True)
     hyperlink = models.CharField(max_length=255)
-    object_id = models.IntegerField()
+    object_id = models.IntegerField(blank=True, null=True)
     code = models.CharField(max_length=64)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+')
-    file_type = models.ForeignKey('AttachmentsFiletype', models.DO_NOTHING, related_name='+')
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    file_type = models.ForeignKey('AttachmentsFiletype', models.DO_NOTHING, related_name='+', blank=True, null=True)
     uploaded_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+', blank=True, null=True)
 
     class Meta:
@@ -115,6 +111,8 @@ class AttachmentsAttachmentflat(models.TenantModel):
     created = models.CharField(max_length=50)
     attachment = models.ForeignKey(AttachmentsAttachment, models.DO_NOTHING, related_name='+')
     filename = models.CharField(max_length=1024)
+    agreement_reference_number = models.CharField(max_length=100)
+    object_link = models.CharField(max_length=200)
 
     class Meta:
         managed = False
@@ -172,8 +170,7 @@ class AuditEngagement(models.TenantModel):
     date_of_final_report = models.DateField(blank=True, null=True)
     date_of_cancel = models.DateField(blank=True, null=True)
     amount_refunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2, blank=True,
-                                                                       null=True)
+    additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     write_off_required = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     cancel_comment = models.TextField()
@@ -181,8 +178,7 @@ class AuditEngagement(models.TenantModel):
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+')
     joint_audit = models.BooleanField()
     agreement = models.ForeignKey('PurchaseOrderPurchaseorder', models.DO_NOTHING, related_name='+')
-    po_item = models.ForeignKey('PurchaseOrderPurchaseorderitem', models.DO_NOTHING, related_name='+', blank=True,
-                                null=True)
+    po_item = models.ForeignKey('PurchaseOrderPurchaseorderitem', models.DO_NOTHING, related_name='+', blank=True, null=True)
     shared_ip_with = models.TextField()  # This field type is a guess.
     exchange_rate = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
@@ -219,22 +215,6 @@ class AuditEngagementStaffMembers(models.TenantModel):
         managed = False
         db_table = 'audit_engagement_staff_members'
         unique_together = (('auditorstaffmember', 'engagement'),)
-
-
-class AuditEngagementactionpoint(models.TenantModel):
-    category = models.CharField(max_length=100)
-    due_date = models.DateField()
-    description = models.TextField()
-    author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='+')
-    person_responsible = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
-    action_taken = models.TextField()
-    status = models.CharField(max_length=10)
-    high_priority = models.BooleanField()
-
-    class Meta:
-        managed = False
-        db_table = 'audit_engagementactionpoint'
 
 
 class AuditFinancialfinding(models.TenantModel):
@@ -292,7 +272,6 @@ class AuditRisk(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'audit_risk'
-        unique_together = (('blueprint', 'engagement'),)
 
 
 class AuditRiskblueprint(models.TenantModel):
@@ -469,7 +448,7 @@ class FundsFundsreservationheader(models.TenantModel):
 
 class FundsFundsreservationitem(models.TenantModel):
     fr_ref_number = models.CharField(max_length=30)
-    line_item = models.CharField(max_length=5)
+    line_item = models.SmallIntegerField()
     wbs = models.CharField(max_length=30)
     grant_number = models.CharField(max_length=20)
     fund = models.CharField(max_length=10)
@@ -480,6 +459,8 @@ class FundsFundsreservationitem(models.TenantModel):
     fund_reservation = models.ForeignKey(FundsFundsreservationheader, models.DO_NOTHING, related_name='+')
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    donor = models.CharField(max_length=256, blank=True, null=True)
+    donor_code = models.CharField(max_length=30, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -602,12 +583,12 @@ class PartnersAgreement(models.TenantModel):
     signed_by_unicef_date = models.DateField(blank=True, null=True)
     signed_by_partner_date = models.DateField(blank=True, null=True)
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+')
-    partner_manager = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='+', blank=True,
-                                        null=True)
+    partner_manager = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='+', blank=True, null=True)
     signed_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+', blank=True, null=True)
     status = models.CharField(max_length=32)
-    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='+', blank=True,
-                                          null=True)
+    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    reference_number_year = models.IntegerField()
+    special_conditions_pca = models.BooleanField()
 
     class Meta:
         managed = False
@@ -666,10 +647,7 @@ class PartnersCorevaluesassessment(models.TenantModel):
     date = models.DateField(blank=True, null=True)
     assessment = models.CharField(max_length=1024, blank=True, null=True)
     archived = models.BooleanField()
-    # partner_id = models.IntegerField()
-    partner = models.ForeignKey("PartnersPartnerOrganization", verbose_name="Partner",
-                                related_name='core_values_assessments',
-                                on_delete=models.CASCADE)
+    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='+')
 
     class Meta:
         managed = False
@@ -681,12 +659,10 @@ class PartnersDirectcashtransfer(models.TenantModel):
     amount_usd = models.DecimalField(max_digits=20, decimal_places=2)
     liquidation_usd = models.DecimalField(max_digits=20, decimal_places=2)
     outstanding_balance_usd = models.DecimalField(max_digits=20, decimal_places=2)
-    amount_less_than_3_months_usd = models.DecimalField(db_column='amount_less_than_3_Months_usd', max_digits=20,
-                                                        decimal_places=2)  # Field name made lowercase.
+    amount_less_than_3_months_usd = models.DecimalField(db_column='amount_less_than_3_Months_usd', max_digits=20, decimal_places=2)  # Field name made lowercase.
     amount_3_to_6_months_usd = models.DecimalField(max_digits=20, decimal_places=2)
     amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2)
-    amount_more_than_9_months_usd = models.DecimalField(db_column='amount_more_than_9_Months_usd', max_digits=20,
-                                                        decimal_places=2)  # Field name made lowercase.
+    amount_more_than_9_months_usd = models.DecimalField(db_column='amount_more_than_9_Months_usd', max_digits=20, decimal_places=2)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -717,82 +693,6 @@ class PartnersFundingcommitment(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_fundingcommitment'
-
-
-class StringConcat(Aggregate):
-    """ A custom aggregation function that returns "," separated strings """
-
-    function = 'GROUP_CONCAT'
-    template = '%(function)s(%(distinct)s%(expressions)s)'
-
-    def __init__(self, expression, separator=",", distinct=False, **extra):
-        super(StringConcat, self).__init__(
-            expression,
-            Value(separator),
-            distinct='DISTINCT ' if distinct else '',
-            output_field=CharField(),
-            **extra
-        )
-
-    def as_postgresql(self, compiler, connection):
-        self.function = 'STRING_AGG'
-        return super(StringConcat, self).as_sql(compiler, connection)
-
-
-class InterventionManager(TenantManager):
-
-    def get_queryset(self):
-        return super(InterventionManager, self).get_queryset().prefetch_related(
-            'agreement__partner',
-            'partner_focal_points',
-            'unicef_focal_points',
-            'offices',
-            'planned_budget',
-            'sections',
-        )
-
-    def detail_qs(self):
-        qs = self.get_queryset().prefetch_related(
-            'frs',
-            'frs__fr_items',
-            'result_links__cp_output',
-            'result_links__ll_results',
-            'result_links__ll_results__applied_indicators__indicator',
-            'result_links__ll_results__applied_indicators__disaggregation',
-            'result_links__ll_results__applied_indicators__locations',
-            'flat_locations',
-        )
-        return qs
-
-    def frs_qs(self):
-        qs = self.get_queryset().prefetch_related(
-            'agreement__partner',
-            'planned_budget',
-            'offices',
-            'sections',
-            # 'frs__fr_items',
-            # TODO: Figure out a way in which to add locations that is more performant
-            # 'flat_locations',
-            'result_links__cp_output',
-            'unicef_focal_points',
-        )
-        qs = qs.annotate(
-            Max("frs__end_date"),
-            Min("frs__start_date"),
-            Sum("frs__total_amt_local"),
-            Sum("frs__outstanding_amt_local"),
-            Sum("frs__actual_amt_local"),
-            Sum("frs__intervention_amt"),
-            Count("frs__currency", distinct=True),
-            location_p_codes=StringConcat("flat_locations__p_code", separator="|", distinct=True),
-            # donors=StringConcat("frs__fr_items__donor", separator="|", distinct=True),
-            # donor_codes=StringConcat("frs__fr_items__donor_code", separator="|", distinct=True),
-            # grants=StringConcat("frs__fr_items__grant_number", separator="|", distinct=True),
-            max_fr_currency=Max("frs__currency", output_field=CharField(), distinct=True),
-            multi_curr_flag=Count(Case(When(frs__multi_curr_flag=True, then=1)))
-        )
-
-        return qs
 
 
 class PartnersIntervention(models.TenantModel):
@@ -841,14 +741,8 @@ class PartnersIntervention(models.TenantModel):
     contingency_pd = models.BooleanField()
     metadata = models.TextField(blank=True, null=True)  # This field type is a guess.
     in_amendment = models.BooleanField()
-
-    flat_locations = models.ManyToManyField(LocationsLocation,
-                                            through_fields=('intervention', 'location'),
-                                            through='PartnersInterventionFlatLocations',
-                                            related_query_name='sss',
-                                            related_name="intervention_flat_locations", blank=True)
-
-    objects = InterventionManager()
+    reference_number_year = models.IntegerField(blank=True, null=True)
+    signed_by_unicef = models.BooleanField()
 
     class Meta:
         managed = False
@@ -1084,6 +978,7 @@ class PartnersPartnerorganization(models.TenantModel):
     reported_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     total_ct_ytd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     basis_for_risk_rating = models.CharField(max_length=50)
+    manually_blocked = models.BooleanField()
 
     class Meta:
         managed = False
@@ -1130,14 +1025,14 @@ class PartnersPartnerstaffmember(models.TenantModel):
 class PartnersPlannedengagement(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    spot_check_mr = models.CharField(max_length=2, blank=True, null=True)
-    spot_check_follow_up_q1 = models.IntegerField()
-    spot_check_follow_up_q2 = models.IntegerField()
-    spot_check_follow_up_q3 = models.IntegerField()
-    spot_check_follow_up_q4 = models.IntegerField()
+    spot_check_planned_q1 = models.IntegerField()
+    spot_check_planned_q2 = models.IntegerField()
+    spot_check_planned_q3 = models.IntegerField()
+    spot_check_planned_q4 = models.IntegerField()
     scheduled_audit = models.BooleanField()
     special_audit = models.BooleanField()
     partner = models.OneToOneField(PartnersPartnerorganization, models.DO_NOTHING, related_name='+')
+    spot_check_follow_up = models.IntegerField()
 
     class Meta:
         managed = False
@@ -1154,12 +1049,9 @@ class PartnersWorkspacefiletype(models.TenantModel):
 
 class ReportsAppliedindicator(models.TenantModel):
     context_code = models.CharField(max_length=50, blank=True, null=True)
-    target = models.IntegerField()
-    baseline = models.IntegerField(blank=True, null=True)
     assumptions = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
-    indicator = models.ForeignKey('ReportsIndicatorblueprint', models.DO_NOTHING, related_name='+', blank=True,
-                                  null=True)
+    indicator = models.ForeignKey('ReportsIndicatorblueprint', models.DO_NOTHING, related_name='+', blank=True, null=True)
     lower_result = models.ForeignKey('ReportsLowerresult', models.DO_NOTHING, related_name='+')
     means_of_verification = models.CharField(max_length=255, blank=True, null=True)
     cluster_indicator_id = models.IntegerField(blank=True, null=True)
@@ -1171,6 +1063,12 @@ class ReportsAppliedindicator(models.TenantModel):
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='+', blank=True, null=True)
     is_active = models.BooleanField()
     is_high_frequency = models.BooleanField()
+    baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
+    denominator_label = models.CharField(max_length=256, blank=True, null=True)
+    label = models.TextField(blank=True, null=True)
+    measurement_specifications = models.TextField(blank=True, null=True)
+    numerator_label = models.CharField(max_length=256, blank=True, null=True)
+    target = models.TextField()  # This field type is a guess.
 
     class Meta:
         managed = False
@@ -1307,7 +1205,6 @@ class ReportsReportingrequirement(models.TenantModel):
     end_date = models.DateField(blank=True, null=True)
     due_date = models.DateField()
     report_type = models.CharField(max_length=50)
-    description = models.CharField(max_length=256)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='+')
 
     class Meta:
@@ -1559,12 +1456,11 @@ class T2FTravel(models.TenantModel):
     approved_cost_travel_agencies = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='+', blank=True, null=True)
     office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='+', blank=True, null=True)
-    section = models.ForeignKey('UsersSection', models.DO_NOTHING, related_name='+', blank=True, null=True)
     supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+', blank=True, null=True)
     traveler = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+', blank=True, null=True)
     first_submission_date = models.DateTimeField(blank=True, null=True)
     preserved_expenses_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
-    sector = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='+', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1615,22 +1511,6 @@ class T2FTravelattachment(models.TenantModel):
         db_table = 't2f_travelattachment'
 
 
-class TpmTpmactionpoint(models.TenantModel):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    due_date = models.DateField()
-    description = models.TextField()
-    comments = models.TextField()
-    status = models.CharField(max_length=9)
-    author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
-    person_responsible = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
-    tpm_visit = models.ForeignKey('TpmTpmvisit', models.DO_NOTHING, related_name='+')
-
-    class Meta:
-        managed = False
-        db_table = 'tpm_tpmactionpoint'
-
-
 class TpmTpmactivity(models.TenantModel):
     activity_ptr = models.OneToOneField(ActivitiesActivity, models.DO_NOTHING, related_name='+')
     additional_information = models.TextField()
@@ -1663,19 +1543,6 @@ class TpmTpmactivityUnicefFocalPoints(models.TenantModel):
         unique_together = (('tpmactivity', 'user'),)
 
 
-class TpmTpmpermission(models.TenantModel):
-    user_type = models.CharField(max_length=30)
-    permission = models.CharField(max_length=10)
-    permission_type = models.CharField(max_length=10)
-    target = models.CharField(max_length=100)
-    instance_status = models.CharField(max_length=32)
-
-    class Meta:
-        managed = False
-        db_table = 'tpm_tpmpermission'
-        unique_together = (('instance_status', 'permission_type', 'target', 'user_type'),)
-
-
 class TpmTpmvisit(models.TenantModel):
     deleted_at = models.DateTimeField()
     created = models.DateTimeField()
@@ -1693,6 +1560,7 @@ class TpmTpmvisit(models.TenantModel):
     date_of_unicef_approved = models.DateField(blank=True, null=True)
     tpm_partner = models.ForeignKey('TpmpartnersTpmpartner', models.DO_NOTHING, related_name='+', blank=True, null=True)
     cancel_comment = models.TextField()
+    author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+', blank=True, null=True)
 
     class Meta:
         managed = False

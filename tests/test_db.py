@@ -25,27 +25,27 @@ def test_query_public(db):
 
 def test_query_single_tenant(db):
     state.schemas = ['bolivia']
-    assert len(PartnersPartnerorganization.objects.all()) == 190
+    assert len(PartnersPartnerorganization.objects.all()) == 191
 
 
 def test_query_multi_tenant(db):
     state.schemas = ['bolivia', 'chad']
-    assert len(PartnersPartnerorganization.objects.all()) == 622
+    assert len(PartnersPartnerorganization.objects.all()) == 625
 
 
 def test_count_single_tenant(db):
     state.schemas = ['bolivia']
-    assert PartnersPartnerorganization.objects.count() == 190
+    assert PartnersPartnerorganization.objects.count() == 191
 
 
 def test_count_multi_tenant1(db):
     state.schemas = ['bolivia', 'chad']
-    assert PartnersPartnerorganization.objects.count() == 622
+    assert PartnersPartnerorganization.objects.count() == 625
 
 
 def test_count_multi_tenant2(db):
     state.schemas = ['bolivia', 'chad']
-    assert PartnersPartnerorganization.objects.count() == 622
+    assert PartnersPartnerorganization.objects.count() == 625
 
 
 @pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])

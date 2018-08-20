@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import pytest
 from django.urls import reverse
 
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
 from etools_datamart.state import state
 
 
+@pytest.mark.django_db(transaction=True)
 def test_changelist(django_app, admin_user):
     url = reverse('admin:login')
     res = django_app.get(url)
