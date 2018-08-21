@@ -1,10 +1,18 @@
 import factory
 from django.contrib.auth import models
 
+from etools_datamart.apps.etools.admin import PartnersPartnerorganization
+
 
 class GroupFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.Group
+        django_get_or_create = ('name',)
+
+
+class PartnerOrganizationFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = PartnersPartnerorganization
         django_get_or_create = ('name',)
 
 

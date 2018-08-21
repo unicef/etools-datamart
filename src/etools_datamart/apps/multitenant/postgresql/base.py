@@ -14,6 +14,7 @@ from etools_datamart.state import state
 
 from ..sql import Parser
 from .introspection import DatabaseSchemaIntrospection
+from .creation import DatabaseCreation
 from .utils import clear_schemas, raw_sql, RawSql
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
@@ -65,8 +66,10 @@ class TenantCursor(CursorWrapper):
         if isinstance(sql, RawSql):
             return super(TenantCursor, self).execute(sql, params)
         if len(state.schemas) == 0:
-            pass
+            return super(TenantCursor, self).execute(sql, params)
         else:
+            if not sql.strip().startswith('SELECT'):
+                return super(TenantCursor, self).execute(sql, params)
             if self.mode == MODE_PARSE:
                 p = Parser(sql)
                 tenant_sql = p.with_schemas(*state.schemas)
@@ -136,16 +139,19 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     Adds the capability to manipulate the search_path using set_tenant and set_schema_name
     """
     include_public_schema = True
+    creation_class = DatabaseCreation
+    introspection_class = DatabaseSchemaIntrospection
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         # Use a patched version of the DatabaseIntrospection that only returns the table list for the
         # currently selected schema.
-        self.introspection = DatabaseSchemaIntrospection(self)
+        # self.introspection = DatabaseSchemaIntrospection(self)
         # self.clear_search_paths()
         self.mode = MULTI_TENANT
         self.search_path_set = False
+        # self.schema_name = "public"
 
     def close(self):
         self.search_path_set = False

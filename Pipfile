@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "==2.0"
 django-concurrency = "*"
 django-environ = "*"
 django-constance = "*"
@@ -31,6 +30,8 @@ django-adminfilters = "==1.1"
 flower = "*"
 django-celery-beat = "*"
 django-redis = "*"
+django = "==2.0"
+pytest-pythonpath = "*"
 
 [dev-packages]
 pytest = "*"

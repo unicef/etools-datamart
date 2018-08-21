@@ -7,13 +7,20 @@ build:
 clean:
 	docker rmi unicef/etools-db:dev
 
-run0restore:
+init:
+	docker run --rm -it \
+			-e DB_DUMP_LOCATION=/tmp/psql_data/db2.bz2 \
+			-v /data/storage/etools-db/dumps:/tmp/psql_data/ \
+			-v /data/storage/etools-db/data:/var/lib/postgresql/data \
+			unicef/etools-db:dev
+
+restore:
 	docker run --rm -it \
 			-e DB_DUMP_LOCATION=/tmp/psql_data/db2.bz2 \
 			-v /data/storage/etools-db/dumps:/tmp/psql_data/ \
 			-v /data/storage/etools-db/data:/var/lib/postgresql/data \
 			unicef/etools-db:dev \
-			postgres
+			/usr/local/bin/restore-db.sh
 
 run:
 	docker run --rm \

@@ -36,6 +36,11 @@ fullclean:
 	$(MAKE) clean
 
 
+dump-schema:
+	pg_dump -O -U postgres -d etools -h 127.0.0.1 -p 15432 -s -n public > src/etools_datamart/apps/multitenant/postgresql/public.sql
+	pg_dump -O -U postgres -d etools -h 127.0.0.1 -p 15432 -s -n bolivia > src/etools_datamart/apps/multitenant/postgresql/bolivia.sql
+	pg_dump -O -U postgres -d etools -h 127.0.0.1 -p 15432 -s -n chad > src/etools_datamart/apps/multitenant/postgresql/chad.sql
+
 docs: .mkbuilddir
 	mkdir -p ${BUILDDIR}/docs
 	sphinx-build -aE docs/ ${BUILDDIR}/docs
