@@ -63,7 +63,7 @@ def django_db_setup(request,
     from pytest_django.fixtures import django_db_setup as dj_db_setup, _disable_native_migrations
     from pytest_django.compat import teardown_databases
     from django.test.utils import setup_databases
-    
+    return
     setup_databases_args = {}
     if not django_db_use_migrations:
         _disable_native_migrations()

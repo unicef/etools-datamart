@@ -11,6 +11,7 @@ from sqlparse.tokens import Keyword, Whitespace
 SHARED_TABLES = RegexList(['"auth_.*',
                            '"publics_.*',
                            '"users_.*',
+                           '"categories_.*',
                            ])
 
 cache = {}
