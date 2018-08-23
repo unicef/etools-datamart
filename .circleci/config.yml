@@ -26,13 +26,18 @@ jobs:
 #        ports:
 #          - 15432:5432
     steps:
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get update && sudo apt-get -y install postgresql
+
       - restore_cache:
           keys:
             - source-{{ .Branch }}-{{ .Revision }}
       - checkout
       - restore_cache:
           keys:
-            - deps-v1-{{ checksum "Pipfile.lock" }}
+            - deps-v2-{{ checksum "Pipfile.lock" }}
 
       - run:
           name: run tests
@@ -40,7 +45,7 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install tox --user
-            tox -re py36-d20
+            tox -e py36-d20
 
       - store_artifacts:
           path: ~build/coverage
@@ -52,8 +57,9 @@ jobs:
             - ".git"
 
       - save_cache:
-          key: deps-v1-{{ checksum "Pipfile.lock" }}
+          key: deps-v2-{{ checksum "Pipfile.lock" }}
           paths:
+            - ".tox"
             - ".venv"
             - "~/.cache/pip"
 
