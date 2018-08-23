@@ -1,3 +1,4 @@
+import subprocess
 import sys
 from pathlib import Path
 
@@ -93,21 +94,36 @@ class DatabaseCreation(original_creation.DatabaseCreation):
         cur = self.connection.cursor()
         cur.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA pg_catalog;")
 
-        for schema in ['public', 'bolivia', 'chad', 'lebanon']:
-            try:
-                header = """
+        header = """
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA {schema};
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA {schema};
 CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA {schema};
 SET default_tablespace = '';
 """
-                sql = (Path(__file__).parent / f'{schema}.sql').read_text()
-                sql = sql.replace("SET default_tablespace = '';", header.format(schema=schema))
-                # cur.execute(raw_sql(f'CREATE SCHEMA  IF NOT EXISTS {schema};'))
-                # cur.execute(raw_sql(f'SET search_path={schema}'))
-                # for extension in ['postgis', 'pg_trgm', 'postgis_topology', 'fuzzystrmatch', 'postgis_tiger_geocoder']:
-                #     cur.execute(raw_sql(f'CREATE EXTENSION IF NOT EXISTS {extension} WITH SCHEMA {schema};'))
-                (Path(__file__).parent / f'{schema}2.sql').write_text(sql)
+
+        cmds = ["pg_restore",
+                "-U", self.connection.settings_dict['USER'],
+                "-p", str(self.connection.settings_dict['PORT']),
+                "-h", self.connection.settings_dict['HOST'],
+                "-d", self.connection.settings_dict['NAME'],
+                "--no-owner",
+                "--disable-triggers",
+                "--exit-on-error",
+                str(Path(__file__).parent / "public.dump")]
+
+        subprocess.check_call(cmds)
+
+        try:
+            cur.execute(raw_sql(header.format(schema='public')))
+        except Exception as e:
+            raise Exception(f"Error creating schema 'public'") from e
+
+        for schema in ['bolivia', 'chad', 'lebanon']:
+            try:
+                sql = (Path(__file__).parent / f'tenant.sql').read_text()
+                sql = sql.replace("[[schema]]", schema).replace("SET default_tablespace = '';",
+                                                                header.format(schema=schema))
+                # (Path(__file__).parent / f'{schema}2.sql').write_text(sql)
                 cur.execute(raw_sql(sql))
             except Exception as e:
                 raise Exception(f"Error creating schema {schema}") from e

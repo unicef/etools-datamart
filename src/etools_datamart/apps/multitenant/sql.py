@@ -32,7 +32,7 @@ class Parser:
         # self._raw_where = []
         self._unknown = []
         self._parsed = False
-
+        self.clause = None
         self.is_count = False
 
     # @cached_property
@@ -123,6 +123,9 @@ class Parser:
         self.tokens = parsed[0].tokens
         for token in self.tokens:
             value = token.value.upper()
+            if token.value in ["SELECT", ]:
+                self.clause = token.value
+                continue
             if token.ttype in [Whitespace]:
                 continue
             elif token.ttype is Keyword:
@@ -200,19 +203,21 @@ class Parser:
         return ret
 
     def with_schemas(self, *schemas):
-        if len(schemas) == 1:
-            schema = schemas[0]
-            ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.original)
-            return ret
+        # if len(schemas) == 1:
+        #     schema = schemas[0]
+        #     ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.original)
+        #     return ret
 
         if not self._parsed:  # pragma: no cover
             self.parse()
+
         if self.is_count:
             ret = "SELECT COUNT(id) FROM ("
             ret += " UNION ALL ".join([self.set_schema(s, fields='id') for s in schemas])
             ret += ") as __count"
             return ret
-        else:
+
+        if self.clause == "SELECT":
             ret = f"SELECT * FROM ("
             ret += " UNION ALL ".join([self.set_schema(s) for s in schemas])
             ret += ") as __query"
