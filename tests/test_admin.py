@@ -61,3 +61,18 @@ def test_select_schema(django_app, admin_user):
     res = res.form.submit()
     assert res.status_code == 302
 
+
+
+@pytest.mark.django_db(transaction=True)
+def test_pmpindicators(django_app, admin_user):
+    url = reverse('admin:login')
+    res = django_app.get(url)
+    res.form['username'] = 'admin'
+    res.form['password'] = 'password'
+    res = res.form.submit()
+    res = res.follow().follow()
+
+    url = reverse("admin:data_pmpindicators_changelist")
+    res = django_app.get(url,
+                         extra_environ={'HTTP_X_SCHEMA': "bolivia,chad,lebanon"})
+    assert res.status_code == 200

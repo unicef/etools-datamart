@@ -17,6 +17,7 @@ from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganiz
 #
 # connection_created.connect(set_search_path)
 
+RECORDS = 324  # Change this number each time etools dump is updated
 
 def test_query_public(db):
     state.schemas = ['bolivia']
@@ -25,27 +26,27 @@ def test_query_public(db):
 
 def test_query_single_tenant(db):
     state.schemas = ['bolivia']
-    assert len(PartnersPartnerorganization.objects.all()) == 437
+    assert len(PartnersPartnerorganization.objects.all()) == RECORDS
 
 
 def test_query_multi_tenant(db):
     state.schemas = ['bolivia', 'chad']
-    assert len(PartnersPartnerorganization.objects.all()) == 874
+    assert len(PartnersPartnerorganization.objects.all()) == RECORDS*2
 
 
 def test_count_single_tenant(db):
     state.schemas = ['bolivia']
-    assert PartnersPartnerorganization.objects.count() == 437
+    assert PartnersPartnerorganization.objects.count() == RECORDS
 
 
 def test_count_multi_tenant1(db):
     state.schemas = ['bolivia', 'chad']
-    assert PartnersPartnerorganization.objects.count() == 874
+    assert PartnersPartnerorganization.objects.count() == RECORDS*2
 
 
 def test_count_multi_tenant2(db):
     state.schemas = ['bolivia', 'chad']
-    assert PartnersPartnerorganization.objects.count() == 874
+    assert PartnersPartnerorganization.objects.count() == RECORDS*2
 
 
 @pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])

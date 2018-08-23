@@ -111,7 +111,7 @@ jobs:
       - run:
           name: release
           command: |
-             export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
             echo
             export TODAY=`date '+%d %B %Y at %H:%M'`
             function is_pre()

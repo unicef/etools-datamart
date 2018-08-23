@@ -203,10 +203,10 @@ class Parser:
         return ret
 
     def with_schemas(self, *schemas):
-        if len(schemas) == 1:
-            schema = schemas[0]
-            ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.original)
-            return ret
+        # if len(schemas) == 1:
+        #     schema = schemas[0]
+        #     ret = re.sub(r'".[^"]*"\."__schema"', f"'{schema}' AS __schema", self.original)
+        #     return ret
 
         if not self._parsed:  # pragma: no cover
             self.parse()
