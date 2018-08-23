@@ -2,9 +2,7 @@
 set -e
 
 
-if [ "$@" == "celery" ];then
-
-elif [ "$@" == "datamart" ];then
+if [ "$@" == "datamart" ];then
     mkdir -p /var/datamart/{static,log,conf,run,redis}
     rm -f /var/datamart/run/*
 
