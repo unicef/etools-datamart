@@ -8,6 +8,7 @@ jobs:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
+          DATABASE_URL_ETOOLS: "postgres://postgres:postgres@127.0.0.1:5432/etools"
           RELEASE_MATCH: "release/*"
       - image: circleci/postgres:9.6-alpine-postgis
         environment:
@@ -20,7 +21,6 @@ jobs:
       - restore_cache:
           keys:
             - source-{{ .Branch }}-{{ .Revision }}
-
       - checkout
       - restore_cache:
           keys:
@@ -77,25 +77,42 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
             git status
-            git show-branch release/$TAG
-            if [ $? -gt 0 ];then
-              git reset --hard
+            git show-branch "release/$TAG"
+            git reset --hard
 
-              git config user.email "ci@unicef.org"
-              git config user.name "CI"
+            git config user.email "ci@unicef.org"
+            git config user.name "CI"
 
-              git checkout master
-              git merge --no-ff release/$TAG -m "merge release/$TAG"
-              git tag -a -m "v$TAG" $TAG
-              git checkout develop
-              git merge --no-ff release/$TAG -m "merge release/$TAG"
-              git push --verbose --tags
-              git push origin --verbose --delete release/$TAG
-            fi
+            echo
+            echo "Process master"
+            git checkout master
+            git pull
+            git merge --no-ff release/$TAG -m "merge release/$TAG"
+            echo
+
+            echo "Creating tag $TAG"
+            git tag -a -m "v$TAG" $TAG
+            echo
+
+            echo "Process develop"
+            git checkout develop
+            git pull
+            git merge --no-ff release/$TAG -m "merge release/$TAG"
+            echo
+
+            echo "Deleting branch release/$TAG"
+            git branch -d release/$TAG
+            echo
+
+            echo "Pushing everything to origin"
+            git push --verbose --all
+            git push --verbose --tags
+            git push origin --verbose --delete release/$TAG
       - run:
           name: release
           command: |
-            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+             export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            echo
             export TODAY=`date '+%d %B %Y at %H:%M'`
             function is_pre()
             {
@@ -137,7 +154,8 @@ jobs:
         environment:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
-          DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/test"
+          DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
+          DATABASE_URL_ETOOLS: "postgres://postgres:postgres@127.0.0.1:5432/etools"
       - image: circleci/postgres:9.6-alpine-postgis
         environment:
           POSTGRES_USER: postgres

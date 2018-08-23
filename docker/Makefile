@@ -1,7 +1,8 @@
 CMD?=
 RUN_OPTIONS?=
 TARGET?=dev
-DOCKER_IMAGE=unicef/datamart:${TARGET}
+DOCKER_IMAGE_NAME=unicef/datamart
+DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=docker/Dockerfile
 BUILD_OPTIONS?=
 DATABASE_URL?=postgres://postgres:@192.168.66.66:5432/etools_datamart
@@ -15,6 +16,12 @@ build:
 			--build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
 			-t ${DOCKER_IMAGE} \
 			-f ${DOCKERFILE} .
+
+release:
+	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
+	docker push ${DOCKER_IMAGE_NAME}:latest
+	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 
 run:
 	cd .. && docker run \
