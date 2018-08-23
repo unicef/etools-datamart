@@ -8,8 +8,6 @@ from django.core.management.base import BaseCommand
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from strategy_field.utils import fqn
 
-from etools_datamart.apps.etl.tasks import load_pmp_indicator
-
 
 class Command(BaseCommand):
     help = "My shiny new management command."

@@ -3,8 +3,6 @@ import sys
 from pathlib import Path
 
 from django.conf import settings
-from psycopg2 import errorcodes
-from django.db.backends.postgresql_psycopg2 import base as original_backend
 from django.db.backends.postgresql_psycopg2 import creation as original_creation
 
 from etools_datamart.apps.multitenant.postgresql.utils import raw_sql
@@ -65,7 +63,6 @@ class DatabaseCreation(original_creation.DatabaseCreation):
         database already exists. Return the name of the test database created.
         """
         # Don't import django.core.management if it isn't needed.
-        from django.core.management import call_command
 
         test_database_name = self._get_test_db_name()
         if verbosity >= 1:
@@ -174,7 +171,7 @@ SET default_tablespace = '';
         cursor.execute(raw_sql('CREATE DATABASE %(dbname)s %(suffix)s' % parameters))
         try:
             cursor.execute(raw_sql('CREATE ROLE etoolusr'))
-        except:
+        except Exception:
             pass
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):

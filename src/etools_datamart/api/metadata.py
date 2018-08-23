@@ -1,6 +1,3 @@
-from collections import OrderedDict
-
-from django.utils.encoding import force_text
 from rest_framework.metadata import SimpleMetadata
 
 

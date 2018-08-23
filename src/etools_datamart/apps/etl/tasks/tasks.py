@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+
 from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)

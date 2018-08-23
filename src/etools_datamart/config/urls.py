@@ -1,13 +1,13 @@
 from django.conf.urls import include
 from django.contrib.admin import site
+from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.views.generic import TemplateView
-from django.contrib.auth import views as auth_views
 
 import etools_datamart.api.urls
 
 urlpatterns = [
-    path(r'login/', auth_views.login,  {'template_name': 'login.html'}, name='login'),
+    path(r'login/', auth_views.login, {'template_name': 'login.html'}, name='login'),
     path(r'logout/', auth_views.logout, {'next_page': '/'}, name='logout'),
 
     path(r'', include('etools_datamart.apps.multitenant.urls')),

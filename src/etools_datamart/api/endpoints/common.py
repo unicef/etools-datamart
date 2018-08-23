@@ -1,8 +1,8 @@
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+from unicef_rest_framework.views import ReadOnlyModelViewSet as BaseReadOnlyModelViewSet
 
 from etools_datamart.state import state
-from unicef_rest_framework.views import ReadOnlyModelViewSet as BaseReadOnlyModelViewSet
 
 from ..renderers import APIBrowsableAPIRenderer
 
@@ -24,4 +24,3 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
         if not state.schemas:
             return Response({'error': 'Please set X-Schema header with selected workspaces'}, status=400)
         return super().list(request, *args, **kwargs)
-

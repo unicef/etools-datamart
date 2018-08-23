@@ -3,11 +3,8 @@ import sys
 import warnings
 from pathlib import Path
 
-import psycopg2
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-
 
 
 def pytest_configure(config):
@@ -63,12 +60,12 @@ def django_db_setup(request,
     # never touch etools DB
     from pytest_django.fixtures import django_db_setup as dj_db_setup
     dj_db_setup(request,
-                    django_test_environment,
-                    django_db_blocker,
-                    django_db_use_migrations,
-                    django_db_keepdb,
-                    django_db_createdb,
-                    django_db_modify_db_settings)
+                django_test_environment,
+                django_db_blocker,
+                django_db_use_migrations,
+                django_db_keepdb,
+                django_db_createdb,
+                django_db_modify_db_settings)
 
 
 @pytest.fixture

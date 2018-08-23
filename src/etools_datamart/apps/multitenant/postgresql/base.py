@@ -13,8 +13,8 @@ from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
 from etools_datamart.state import state
 
 from ..sql import Parser
-from .introspection import DatabaseSchemaIntrospection
 from .creation import DatabaseCreation
+from .introspection import DatabaseSchemaIntrospection
 from .utils import clear_schemas, raw_sql, RawSql
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])

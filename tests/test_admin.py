@@ -62,7 +62,6 @@ def test_select_schema(django_app, admin_user):
     assert res.status_code == 302
 
 
-
 @pytest.mark.django_db(transaction=True)
 def test_pmpindicators(django_app, admin_user):
     url = reverse('admin:login')

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import pytest
-from etools_datamart.state import state
-from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganization, ReportsResult, \
-    ActionPointsActionpoint
 
+from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuthGroup,
+                                                PartnersPartnerorganization, ReportsResult,)
+from etools_datamart.state import state
 
 #
 # from django.db.backends.signals import connection_created
@@ -19,6 +19,7 @@ from etools_datamart.apps.etools.models import AuthGroup, PartnersPartnerorganiz
 
 RECORDS = 324  # Change this number each time etools dump is updated
 
+
 def test_query_public(db):
     state.schemas = ['bolivia']
     assert AuthGroup.objects.all()
@@ -31,7 +32,7 @@ def test_query_single_tenant(db):
 
 def test_query_multi_tenant(db):
     state.schemas = ['bolivia', 'chad']
-    assert len(PartnersPartnerorganization.objects.all()) == RECORDS*2
+    assert len(PartnersPartnerorganization.objects.all()) == RECORDS * 2
 
 
 def test_count_single_tenant(db):
@@ -41,12 +42,12 @@ def test_count_single_tenant(db):
 
 def test_count_multi_tenant1(db):
     state.schemas = ['bolivia', 'chad']
-    assert PartnersPartnerorganization.objects.count() == RECORDS*2
+    assert PartnersPartnerorganization.objects.count() == RECORDS * 2
 
 
 def test_count_multi_tenant2(db):
     state.schemas = ['bolivia', 'chad']
-    assert PartnersPartnerorganization.objects.count() == RECORDS*2
+    assert PartnersPartnerorganization.objects.count() == RECORDS * 2
 
 
 @pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
