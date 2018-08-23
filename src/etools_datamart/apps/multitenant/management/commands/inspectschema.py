@@ -20,6 +20,7 @@ INGNORED_TABLES = RegexList([
     'waffle_.*',
     'djcelery_.*',
     'celery_.*',
+    'snapshotactivity'
     # Tenant
 ])
 
@@ -119,7 +120,7 @@ class Command(BaseCommand):
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
-                for row in table_description:
+                for index, row in enumerate(table_description):
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                     extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                     column_name = row[0]
@@ -192,8 +193,9 @@ class Command(BaseCommand):
                         field_type,
                     )
                     if field_type.startswith('ForeignKey(') or field_type.startswith('OneToOneField('):
+                        _related_name = f'{table2model(relations[column_name][1]).lower()}_{table_name}_{column_name}'
                         field_desc += ', models.DO_NOTHING'
-                        field_desc += ", related_name='+'"
+                        field_desc += f", related_name='{_related_name}'"
 
                     if extra_params:
                         if not field_desc.endswith('('):

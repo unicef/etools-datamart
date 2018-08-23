@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from django.db import connection, connections
+from django.db import connections
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
@@ -13,21 +13,21 @@ from etools_datamart.celery import app
 logger = logging.getLogger(__name__)
 
 
-@app.task(bind=True)
+@app.task()
 def load_pmp_indicator():
     # qs = UsersCountry.objects.exclude(schema_name__in=['public', 'uat', 'frg'])
+    connection = connections['etools']
     with clear_schemas():
-        schemas = connections['etools'].get_tenants()
+        schemas = connection.get_tenants()
 
     base_url = 'https://etools.unicef.org'
-    # connection = connections['etools']
     for country in schemas:
         connection.set_tenant(country)
         logger.info(u'Running on %s' % country.name)
-        for partner in PartnersPartnerorganization.objects.prefetch_related('core_values_assessments'):
+        for partner in PartnersPartnerorganization.objects.prefetch_related('partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
             for intervention in PartnersIntervention.objects.filter(
-                    agreement__partner=partner).select_related('planned_budget'):
-                planned_budget = getattr(intervention, 'planned_budget', None)
+                    agreement__partner=partner).select_related('partnersintervention_partners_interventionbudget_intervention_id'):
+                planned_budget = getattr(intervention, 'partnersintervention_partners_interventionbudget_intervention_id', None)
                 fr_currencies = intervention.frs.all().values_list('currency', flat=True).distinct()
                 has_assessment = bool(getattr(partner.current_core_value_assessment, 'assessment', False))
                 PMPIndicators.objects.update_or_create(
@@ -36,10 +36,13 @@ def load_pmp_indicator():
                     intervention_id=intervention.pk,
                     defaults={
                         'country_name': country.name,
+                        'business_area_code': country.business_area_code,
                         'partner_name': partner.name,
                         'partner_type': partner.cso_type,
+                        'vendor_number': partner.vendor_number,
+
                         'pd_ssfa_ref': intervention.number.replace(',', '-'),
-                        'pd_ssfa_status': intervention.get_status_display(),
+                        'pd_ssfa_status': intervention.status.title(),
                         'pd_ssfa_start_date': intervention.start,
                         'pd_ssfa_creation_date': intervention.created,
                         'pd_ssfa_end_date': intervention.end,

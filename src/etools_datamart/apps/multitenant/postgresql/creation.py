@@ -109,7 +109,7 @@ SET default_tablespace = '';
                 "--no-owner",
                 "--disable-triggers",
                 "--exit-on-error",
-                str(Path(__file__).parent / "public.dump")]
+                str(Path(__file__).parent / "public.sqldump")]
 
         subprocess.check_call(cmds)
 
@@ -118,27 +118,15 @@ SET default_tablespace = '';
         except Exception as e:
             raise Exception(f"Error creating schema 'public'") from e
 
-        for schema in ['bolivia', 'chad', 'lebanon']:
+        for schema in settings.TEST_SCHEMAS:
             try:
                 sql = (Path(__file__).parent / f'tenant.sql').read_text()
                 sql = sql.replace("[[schema]]", schema).replace("SET default_tablespace = '';",
                                                                 header.format(schema=schema))
-                # (Path(__file__).parent / f'{schema}2.sql').write_text(sql)
                 cur.execute(raw_sql(sql))
             except Exception as e:
                 raise Exception(f"Error creating schema {schema}") from e
-            # ret = cur.execute(raw_sql(sql.replace(" etoolusr", " postgres")))
 
-        # We then serialize the current state of the database into a string
-        # and store it on the connection. This slightly horrific process is so people
-        # who are testing on databases without transactions or who are using
-        # a TransactionTestCase still get a clean database on every test run.
-        # if serialize:
-        #     self.connection._test_serialized_contents = self.serialize_db_to_string()
-
-        # call_command('createcachetable', database=self.connection.alias)
-        #
-        # Ensure a connection for the side effect of initializing the test database.
         self.connection.ensure_connection()
 
         return test_database_name

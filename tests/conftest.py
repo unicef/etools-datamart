@@ -9,6 +9,7 @@ from _pytest.deprecated import RemovedInPytest4Warning
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
+
 def pytest_configure(config):
     here = os.path.dirname(__file__)
     sys.path.insert(0, os.path.join(here, 'extras'))
@@ -52,7 +53,7 @@ def configure_test(settings):
 
 
 @pytest.yield_fixture(scope='session')
-def ___django_db_setup(request,
+def django_db_setup(request,
                     django_test_environment,
                     django_db_blocker,
                     django_db_use_migrations,
@@ -60,33 +61,14 @@ def ___django_db_setup(request,
                     django_db_createdb,
                     django_db_modify_db_settings):
     # never touch etools DB
-    from pytest_django.fixtures import django_db_setup as dj_db_setup, _disable_native_migrations
-    from pytest_django.compat import teardown_databases
-    from django.test.utils import setup_databases
-    return
-    setup_databases_args = {}
-    if not django_db_use_migrations:
-        _disable_native_migrations()
-
-    if django_db_keepdb and not django_db_createdb:
-        setup_databases_args['keepdb'] = True
-
-    with django_db_blocker.unblock():
-        db_cfg = setup_databases(
-            verbosity=pytest.config.option.verbose,
-            interactive=False,
-            **setup_databases_args
-        )
-
-    def teardown_database():
-        with django_db_blocker.unblock():
-            teardown_databases(
-                db_cfg,
-                verbosity=pytest.config.option.verbose,
-            )
-
-    if not django_db_keepdb:
-        request.addfinalizer(teardown_database)
+    from pytest_django.fixtures import django_db_setup as dj_db_setup
+    dj_db_setup(request,
+                    django_test_environment,
+                    django_db_blocker,
+                    django_db_use_migrations,
+                    django_db_keepdb,
+                    django_db_createdb,
+                    django_db_modify_db_settings)
 
 
 @pytest.fixture
@@ -96,9 +78,20 @@ def user1(db):
 
 
 @pytest.fixture(autouse=True)
-def reset():
+def reset(monkeypatch):
+    def get_tenants():
+        return UsersCountry.objects.filter(schema_name__in=settings.TEST_SCHEMAS).order_by('name')
+
+    from etools_datamart.apps.etools.models import UsersCountry
+    from django.conf import settings
     from etools_datamart.state import state
+
+    monkeypatch.setattr('etools_datamart.apps.multitenant.postgresql.base.DatabaseWrapper.get_tenants',
+                        lambda s: [])
+
     from django.db import connections
+    conn = connections['etools']
+    conn.get_tenants = get_tenants
 
     state.schema = []
     state.request = None

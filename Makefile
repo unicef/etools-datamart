@@ -65,7 +65,7 @@ sync-etools:
 		--exclude-table-data vision_* \
 		--exclude-table-data waffle_* \
 		-f src/etools_datamart/apps/multitenant/postgresql/public.sqldump
-	pg_dump --inserts -O -U postgres -p 15432 -d etools -h 127.0.0.1 -n chad | sed 's/chad/[[schema]]/g' >src/etools_datamart/apps/multitenant/postgresql/tenant.sql
+	pg_dump --inserts -O -U postgres -p 15432 -d etools -h 127.0.0.1 -n zambia | sed 's/zambia/[[schema]]/g' >src/etools_datamart/apps/multitenant/postgresql/tenant.sql
 	ls -aslkG src/etools_datamart/apps/multitenant/postgresql/*.sql*
 
 

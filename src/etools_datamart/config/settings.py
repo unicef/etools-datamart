@@ -16,7 +16,6 @@ env = environ.Env(DEBUG=(bool, False),
                   CSRF_COOKIE_SECURE=(bool, True),
                   DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
-                  # DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:5432/etools"),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   SECRET_KEY=(str, 'secret'),
                   SECURE_HSTS_PRELOAD=(bool, 'True'),
@@ -232,7 +231,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.core',
     'etools_datamart.apps.etools',
     'etools_datamart.apps.data',
-    'etools_datamart.apps.etl',
+    'etools_datamart.apps.etl.apps.Config',
     'etools_datamart.api',
 ]
 
@@ -302,7 +301,9 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
     "PAGE_SIZE": 100,
-    "DEFAULT_PAGINATION_CLASS": None
+    "DEFAULT_PAGINATION_CLASS": None,
+    'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters'
+
 }
 
 LOG_DIR = os.environ.get('SIR_LOG_DIR',
@@ -437,3 +438,5 @@ LOGGING_DEBUG = {
 TENANT_MODEL = 'etools.UsersCountry'
 
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
+
+TEST_SCHEMAS=['bolivia', 'chad', 'lebanon']

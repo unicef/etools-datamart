@@ -37,3 +37,4 @@ class ReadOnlyModelViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ReadOnlyMo
     filter_backends = [QueryStringFilterBackend]
     filter_blacklist = []
     filter_fields = []
+    ordering_fields = []
