@@ -48,7 +48,6 @@ def _check_schema_name(name):
         raise ValidationError("Invalid string used for the schema name.")
 
 
-
 class TenantCursor(CursorWrapper):
 
     # def fetchall(self):
@@ -160,6 +159,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         model = apps.get_model(settings.TENANT_MODEL)
         with clear_schemas():
             return model.objects.exclude(schema_name__in=['public', 'uat', 'frg']).order_by('name')
+
     # def rollback(self):
     #     super(DatabaseWrapper, self).rollback()
     #     # Django's rollback clears the search path so we have to set it again the next time.
@@ -191,10 +191,10 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     #     """
     #     Instructs to stay in the common 'public' schema.
     #     """
-        # self.tenant = FakeTenant(schema_name=get_public_schema_name())
-        # self.schema_name = get_public_schema_name()
-        # self.set_settings_schema(self.schema_name)
-        # self.search_path_set = False
+    # self.tenant = FakeTenant(schema_name=get_public_schema_name())
+    # self.schema_name = get_public_schema_name()
+    # self.set_settings_schema(self.schema_name)
+    # self.search_path_set = False
 
     # def set_settings_schema(self, schema_name):
     #     self.settings_dict['SCHEMA'] = schema_name

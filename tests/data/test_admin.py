@@ -5,12 +5,14 @@ from django_webtest import WebTestMixin
 
 from test_utils.factories import PMPIndicatorFactory
 
+
 class MixinWithInstanceVariables(WebTestMixin):
     """
     Override WebTestMixin to make all of its variables instance variables
     not class variables; otherwise multiple django_app_factory fixtures contend
     for the same class variables
     """
+
     def __init__(self):
         self.extra_environ = {}
         self.csrf_checks = True
@@ -45,6 +47,7 @@ def test_pmpindicators_list(django_app, admin_user):
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "bolivia,chad,lebanon"})
     assert res.status_code == 200
+
 
 @pytest.mark.django_db(transaction=True)
 def test_pmpindicators_detail(django_app, admin_user, settings):

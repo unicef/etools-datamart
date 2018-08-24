@@ -2,7 +2,6 @@ import factory
 from django.contrib.auth import models
 
 from etools_datamart.apps.data.models import PMPIndicators
-from etools_datamart.apps.etools.admin import PartnersPartnerorganization
 
 
 # class GroupFactory(factory.DjangoModelFactory):

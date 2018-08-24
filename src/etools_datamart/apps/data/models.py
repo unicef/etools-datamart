@@ -13,6 +13,7 @@ class DataMartManager(models.Manager):
         # cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
         self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
+
 class PMPIndicators(models.Model):
     country_name = models.CharField(max_length=255, null=True, db_index=True)
     vendor_number = models.CharField(max_length=255, null=True, db_index=True)
