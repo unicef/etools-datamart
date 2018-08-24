@@ -19,7 +19,7 @@ def load_pmp_indicator():
     connection = connections['etools']
     with clear_schemas():
         schemas = connection.get_tenants()
-
+    PMPIndicators.objects.truncate()
     base_url = 'https://etools.unicef.org'
     for country in schemas:
         connection.set_tenant(country)

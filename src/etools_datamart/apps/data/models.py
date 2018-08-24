@@ -6,6 +6,13 @@ from django.db import models
 logger = logging.getLogger(__name__)
 
 
+class DataMartManager(models.Manager):
+    def truncate(self):
+        # from django.db import connection
+        # with connection.cursor() as cursor:
+        # cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
+        self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
+
 class PMPIndicators(models.Model):
     country_name = models.CharField(max_length=255, null=True, db_index=True)
     vendor_number = models.CharField(max_length=255, null=True, db_index=True)
@@ -44,3 +51,5 @@ class PMPIndicators(models.Model):
     intervention_id = models.IntegerField(null=True)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
+
+    objects = DataMartManager()
