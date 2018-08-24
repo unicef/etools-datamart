@@ -3,20 +3,22 @@ from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
-from adminfilters.filters import AllValuesComboFilter, AllValuesRadioFilter
+from adminfilters.filters import AllValuesComboFilter
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from etools_datamart.apps.etl.tasks import load_pmp_indicator
+from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
 
 from . import models
 
 
 class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
+    load_handler = None
+    list_filter = (('country_name', AllValuesComboFilter),)
 
     def has_add_permission(self, request):
         return False
@@ -40,7 +42,18 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
 
     @link()
     def refresh(self, request):
-        raise NotImplementedError
+        try:
+            start = time()
+            # load_pmp_indicator()
+            self.load_handler()
+            stop = time()
+            duration = stop - start
+            self.message_user(request, "Data loaded in %.3f" % duration)
+        except Exception as e:
+            self.message_user(request, str(e), messages.ERROR)
+        finally:
+            return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
+                                                              'changelist')))
 
     @link()
     def truncate(self, request):
@@ -56,24 +69,23 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
 
 @register(models.PMPIndicators)
 class PMPIndicatorsAdmin(DataModelAdmin):
-    list_display = ('country_name', 'partner_name', 'partner_type')
+    list_display = ('country_name', 'partner_name', 'partner_type', 'business_area_code')
     list_filter = (('country_name', AllValuesComboFilter),
-                   ('partner_type', AllValuesRadioFilter),
+                   ('partner_type', AllValuesComboFilter),
                    )
     search_fields = ('partner_name',)
     date_hierarchy = 'pd_ssfa_creation_date'
+    load_handler = load_pmp_indicator
 
-    @link()
-    def refresh(self, request):
-        try:
-            start = time()
-            load_pmp_indicator()
-            stop = time()
-            duration = stop - start
-            self.message_user(request, "Data loaded in %.3f" % duration)
-        except Exception as e:
-            self.message_user(request, str(e), messages.ERROR)
 
-        finally:
-            return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
-                                                              'changelist')))
+@register(models.Intervention)
+class InterventionAdmin(DataModelAdmin):
+    list_display = ('country_name', 'title', 'document_type', 'number', 'status')
+    list_filter = (('country_name', AllValuesComboFilter),
+                   ('document_type', AllValuesComboFilter),
+                   ('status', AllValuesComboFilter),
+                   'start_date',
+                   )
+    search_fields = ('number', 'title')
+    date_hierarchy = 'start_date'
+    load_handler = load_intervention

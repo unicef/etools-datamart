@@ -8,3 +8,9 @@ class PMPIndicatorsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PMPIndicators
         exclude = ()
+
+
+class InterventionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Intervention
+        exclude = ()

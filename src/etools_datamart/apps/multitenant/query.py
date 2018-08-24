@@ -57,7 +57,8 @@ class TenantRelatedPopulator:
             obj = None
         else:
             init_list = self.init_list.copy()
-            init_list.remove('schema')
+            if 'schema' in init_list:
+                init_list.remove('schema')
             obj = self.model_cls.from_db(self.db, init_list, obj_data)
             if self.related_populators:
                 for rel_iter in self.related_populators:

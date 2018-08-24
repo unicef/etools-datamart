@@ -27,6 +27,7 @@ router.register(r'reports/results', endpoints.ReportsResultViewSet)
 router.register(r't2/ftravel', endpoints.FTravelViewSet)
 
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
+router.register(r'datamart/interventions', endpoints.InterventionViewSet)
 
 urlpatterns = router.urls
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 logger = logging.getLogger(__name__)
@@ -14,8 +15,15 @@ class DataMartManager(models.Manager):
         self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
 
-class PMPIndicators(models.Model):
-    country_name = models.CharField(max_length=255, null=True, db_index=True)
+class DataMartModel(models.Model):
+    class Meta:
+        abstract = True
+
+    objects = DataMartManager()
+
+
+class PMPIndicators(DataMartModel):
+    country_name = models.CharField(max_length=50, null=True, db_index=True)
     vendor_number = models.CharField(max_length=255, null=True, db_index=True)
     business_area_code = models.CharField(max_length=100, null=True, db_index=True)
 
@@ -53,4 +61,50 @@ class PMPIndicators(models.Model):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
 
-    objects = DataMartManager()
+
+class Intervention(DataMartModel):
+    country_name = models.CharField(max_length=50, null=True, db_index=True)
+    created = models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(null=True)
+    document_type = models.CharField(max_length=255, null=True)
+    number = models.CharField(max_length=64, null=True)
+    title = models.CharField(max_length=256, null=True)
+    status = models.CharField(max_length=32, null=True)
+    start_date = models.DateTimeField(null=True)
+    end_date = models.DateTimeField(null=True)
+    submission_date = models.DateTimeField(null=True)
+    submission_date_prc = models.DateTimeField(null=True)
+    review_date_prc = models.DateTimeField(null=True)
+    prc_review_document = models.CharField(max_length=1024, null=True)
+    signed_by_unicef_date = models.DateTimeField(null=True)
+    signed_by_partner_date = models.DateTimeField(null=True)
+    population_focus = models.CharField(max_length=130, null=True)
+    partner_authorized_officer_signatory_id = models.IntegerField(null=True)
+    signed_pd_document = models.CharField(max_length=1024, null=True)
+    contingency_pd = models.NullBooleanField(null=True)
+    metadata = JSONField()
+
+    unicef_signatory_first_name = models.CharField(max_length=30, null=True)
+    unicef_signatory_last_name = models.CharField(max_length=30, null=True)
+    unicef_signatory_email = models.CharField(max_length=254, null=True)
+
+    partner_signatory_title = models.CharField(max_length=64, null=True)
+    partner_signatory_first_name = models.CharField(max_length=64, null=True)
+    partner_signatory_last_name = models.CharField(max_length=64, null=True)
+    partner_signatory_email = models.CharField(max_length=128, null=True)
+    partner_signatory_phone = models.CharField(max_length=64, null=True)
+
+    unicef_focal_point_first_name = models.CharField(max_length=30, null=True)
+    unicef_focal_point_last_name = models.CharField(max_length=30, null=True)
+    unicef_focal_point_email = models.CharField(max_length=254, null=True)
+
+    partner_focal_point_title = models.CharField(max_length=64, null=True)
+    partner_focal_point_first_name = models.CharField(max_length=64, null=True)
+    partner_focal_point_last_name = models.CharField(max_length=64, null=True)
+    partner_focal_point_email = models.CharField(max_length=128, null=True)
+    partner_focal_point_phone = models.CharField(max_length=64, null=True)
+
+    intervention_id = models.IntegerField(null=True)
+    agreement_id = models.IntegerField(null=True)
+    country_programme_id = models.IntegerField(null=True)
+    unicef_signatory_id = models.IntegerField(null=True)
