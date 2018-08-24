@@ -19,6 +19,7 @@ exclude manage.py
 exclude entrypoint.sh
 exclude .env
 exclude .env.tpl
+exclude docker-compose.yml
 
 prune .circleci
 prune tests

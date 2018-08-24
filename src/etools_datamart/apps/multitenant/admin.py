@@ -1,20 +1,13 @@
 # -*- coding: utf-8 -*-
-import sqlparse
-from admin_extra_urls.extras import ExtraUrlMixin, link
+from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
-from django.db import connections
 from django.http import HttpResponseRedirect
-from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from etools_datamart.apps.multitenant.forms import SQLForm
-from etools_datamart.apps.multitenant.postgresql.utils import raw_sql
-from etools_datamart.apps.multitenant.sql import clean_stm, Parser
 from etools_datamart.state import state
 
 
