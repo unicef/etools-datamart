@@ -8,6 +8,8 @@ omit =
         **/inspectschema.py
         **/introspection.py
         **/db_router.py
+        **/api-builder.py
+        **/queue.py
 
 
 [report]
@@ -27,6 +29,7 @@ exclude_lines =
     #if 0:
     if __name__ == .__main__.:
 
+fail_under = 90
 
 ignore_errors = True
 

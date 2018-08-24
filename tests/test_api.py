@@ -30,3 +30,12 @@ def test_partners(client, url, format, schema):
     assert state.schemas == schema
     assert res.status_code == 200, res
     assert res.json()
+
+
+@pytest.mark.parametrize('schema', [['bolivia'], ['bolivia', 'chad']])
+@pytest.mark.parametrize('format', ['json', 'html'])
+def test_options(client, url, format, schema):
+    res = client.options(url, format=format, HTTP_X_SCHEMA=",".join(schema))
+    assert state.schemas == schema
+    assert res.status_code == 200, res
+    assert res.json()

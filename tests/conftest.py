@@ -90,7 +90,7 @@ def reset(monkeypatch):
     conn = connections['etools']
     conn.get_tenants = get_tenants
 
-    state.schema = []
+    # state.schemas = []
     state.request = None
     conn = connections['etools']
     conn.clear_search_paths()
@@ -99,4 +99,4 @@ def reset(monkeypatch):
 @pytest.fixture()
 def bolivia():
     from etools_datamart.state import state
-    state.schema = ['bolivia']
+    # state.schemas = ['bolivia']

@@ -232,12 +232,12 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     #     return cursor
 
     def set_search_paths(self, cursor, *schemas):
-        state.schema = schemas
+        # state.schema = schemas
         cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(schemas))))
         self.search_path_set = True
 
     def clear_search_paths(self, cursor=None):
-        state.schema = []
+        # state.schemas = []
         if cursor:
             cursor.execute(raw_sql('SET search_path = public;'))
         self.search_path_set = False

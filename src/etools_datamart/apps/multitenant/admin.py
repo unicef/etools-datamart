@@ -27,12 +27,12 @@ class TenantChangeList(ChangeList):
                        current_app=self.model_admin.admin_site.name)
 
 
-def format_stm(stm):
-    return sqlparse.format(str(stm),
-                           keyword_case="upper",
-                           reindent=True,
-                           indent_width=4,
-                           wrap_after=80)
+# def format_stm(stm):
+#     return sqlparse.format(str(stm),
+#                            keyword_case="upper",
+#                            reindent=True,
+#                            indent_width=4,
+#                            wrap_after=80)
 
 
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
@@ -43,65 +43,65 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
         #     return self.model._default_manager.raw(state.get("query"))
         return super().get_queryset(request)
 
-    @link(label='Raw SQL')
-    def raw_sql(self, request):
-        opts = self.model._meta
-        context = dict(app_label=opts.app_label,
-                       opts=opts,
-                       state=state)
-        if request.method == 'POST':
-            form = SQLForm(data=request.POST)
-
-            if form.is_valid():
-                if 'submit' in request.POST:
-                    if form.cleaned_data['raw']:
-                        sql = original = form.cleaned_data['statement']
-                    else:
-                        p = Parser(form.cleaned_data['statement'])
-                        original = p.original
-                        sql = format_stm(p.with_schemas(*state.schemas))
-
-                    form = SQLForm(confirm=True,
-                                   initial={'statement': sql,
-                                            'original': original,
-                                            'raw': form.cleaned_data['raw']
-                                            })
-                    context['statement'] = sql
-
-                elif 'back' in request.POST:
-                    form = SQLForm(initial={'statement': form.cleaned_data['original'],
-                                            'original': ""
-                                            })
-                elif 'doit' in request.POST:
-                    try:
-                        if form.cleaned_data['raw']:
-                            stm = raw_sql(clean_stm(form.cleaned_data['statement']))
-                        else:
-                            stm = clean_stm(form.cleaned_data['statement'])
-                        conn = connections['etools']
-                        cur = conn.cursor()
-                        cur.execute(stm)
-                        cur.fetchone()
-                        # data = self.model._default_manager.raw(raw_sql(stm))
-                        # assert data
-                    except Exception as e:
-                        form = SQLForm(initial={'statement': form.cleaned_data['original'],
-                                                'original': ""
-                                                })
-                        self.message_user(request, str(e), messages.ERROR)
-                    else:
-                        state.set("query", form.cleaned_data['statement'])
-                        return HttpResponseRedirect(reverse(admin_urlname(opts, 'changelist')))
-            else:
-                pass
-        else:
-            qs = self.model._default_manager.get_queryset().defer("schema")
-            form = SQLForm(initial={'statement': format_stm(str(qs.query))})
-
-        context['form'] = form
-        return TemplateResponse(request,
-                                'raw_sql.html',
-                                context=context)
+    # @link(label='Raw SQL')
+    # def raw_sql(self, request):
+    #     opts = self.model._meta
+    #     context = dict(app_label=opts.app_label,
+    #                    opts=opts,
+    #                    state=state)
+    #     if request.method == 'POST':
+    #         form = SQLForm(data=request.POST)
+    #
+    #         if form.is_valid():
+    #             if 'submit' in request.POST:
+    #                 if form.cleaned_data['raw']:
+    #                     sql = original = form.cleaned_data['statement']
+    #                 else:
+    #                     p = Parser(form.cleaned_data['statement'])
+    #                     original = p.original
+    #                     sql = format_stm(p.with_schemas(*state.schemas))
+    #
+    #                 form = SQLForm(confirm=True,
+    #                                initial={'statement': sql,
+    #                                         'original': original,
+    #                                         'raw': form.cleaned_data['raw']
+    #                                         })
+    #                 context['statement'] = sql
+    #
+    #             elif 'back' in request.POST:
+    #                 form = SQLForm(initial={'statement': form.cleaned_data['original'],
+    #                                         'original': ""
+    #                                         })
+    #             elif 'doit' in request.POST:
+    #                 try:
+    #                     if form.cleaned_data['raw']:
+    #                         stm = raw_sql(clean_stm(form.cleaned_data['statement']))
+    #                     else:
+    #                         stm = clean_stm(form.cleaned_data['statement'])
+    #                     conn = connections['etools']
+    #                     cur = conn.cursor()
+    #                     cur.execute(stm)
+    #                     cur.fetchone()
+    #                     # data = self.model._default_manager.raw(raw_sql(stm))
+    #                     # assert data
+    #                 except Exception as e:
+    #                     form = SQLForm(initial={'statement': form.cleaned_data['original'],
+    #                                             'original': ""
+    #                                             })
+    #                     self.message_user(request, str(e), messages.ERROR)
+    #                 else:
+    #                     state.set("query", form.cleaned_data['statement'])
+    #                     return HttpResponseRedirect(reverse(admin_urlname(opts, 'changelist')))
+    #         else:
+    #             pass
+    #     else:
+    #         qs = self.model._default_manager.get_queryset().defer("schema")
+    #         form = SQLForm(initial={'statement': format_stm(str(qs.query))})
+    #
+    #     context['form'] = form
+    #     return TemplateResponse(request,
+    #                             'raw_sql.html',
+    #                             context=context)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
