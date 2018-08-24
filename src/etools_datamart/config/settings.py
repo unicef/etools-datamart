@@ -220,10 +220,10 @@ INSTALLED_APPS = [
 
     'raven.contrib.django.raven_compat',
     'admin_extra_urls',
+    'unicef_rest_framework',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
-    'unicef_rest_framework',
     'adminfilters',
 
     'django_celery_beat',

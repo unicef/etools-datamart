@@ -19,6 +19,12 @@ class Command(BaseCommand):
         super(Command, self).add_arguments(parser)
 
         parser.add_argument(
+            '--sleep', default=1,
+            action="store",
+            type=int,
+            help='sleep time between attempt',
+        )
+        parser.add_argument(
             '--wait', default=False,
             action="store_true",
             help='wait until database is available',
@@ -57,7 +63,7 @@ class Command(BaseCommand):
                     if options['wait'] and elapsed < options['timeout']:
                         self.stdout.write("." * elapsed, ending='\r')
                         self.stdout.flush()
-                        time.sleep(1)
+                        time.sleep(options['sleep'])
                         elapsed += 1
                     else:
                         self.stderr.write(f"\nDatabase on {conn.settings_dict['HOST']}:{conn.settings_dict['PORT']} "

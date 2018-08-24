@@ -7,4 +7,4 @@ logger = logging.getLogger(__name__)
 
 
 class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
-    template = 'unicef_rest_framework/api.html'
+    template = 'rest_framework/api.html'
