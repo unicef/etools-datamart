@@ -27,13 +27,7 @@ def pytest_configure(config):
 @pytest.fixture(autouse=True)
 def configure_test(settings):
     from etools_datamart.config.settings import env
-    settings.PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.MD5PasswordHasher',
 
-    ]
-    settings.AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-    )
     settings.DATABASES['default'] = env.db()
     settings.DATABASES['etools'] = env.db('DATABASE_URL_ETOOLS', engine='etools_datamart.apps.multitenant.postgresql')
     settings.CSRF_COOKIE_SECURE = False
@@ -48,24 +42,24 @@ def configure_test(settings):
     settings.STATIC_ROOT = str(Path(__file__).parent)
     settings.SESSION_COOKIE_SECURE = False
 
-
-@pytest.yield_fixture(scope='session')
-def django_db_setup(request,
-                    django_test_environment,
-                    django_db_blocker,
-                    django_db_use_migrations,
-                    django_db_keepdb,
-                    django_db_createdb,
-                    django_db_modify_db_settings):
-    # never touch etools DB
-    from pytest_django.fixtures import django_db_setup as dj_db_setup
-    dj_db_setup(request,
-                django_test_environment,
-                django_db_blocker,
-                django_db_use_migrations,
-                django_db_keepdb,
-                django_db_createdb,
-                django_db_modify_db_settings)
+#
+# @pytest.yield_fixture(scope='session')
+# def django_db_setup(request,
+#                     django_test_environment,
+#                     django_db_blocker,
+#                     django_db_use_migrations,
+#                     django_db_keepdb,
+#                     django_db_createdb,
+#                     django_db_modify_db_settings):
+#     # never touch etools DB
+#     from pytest_django.fixtures import django_db_setup as dj_db_setup
+#     dj_db_setup(request,
+#                 django_test_environment,
+#                 django_db_blocker,
+#                 django_db_use_migrations,
+#                 django_db_keepdb,
+#                 django_db_createdb,
+#                 django_db_modify_db_settings)
 
 
 @pytest.fixture
@@ -93,4 +87,5 @@ def reset(monkeypatch):
     # state.schemas = []
     state.request = None
     conn = connections['etools']
-    conn.clear_search_paths()
+    # conn.search_path_set = False
+    conn.search_path = None

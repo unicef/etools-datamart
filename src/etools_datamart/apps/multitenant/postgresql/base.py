@@ -48,51 +48,48 @@ def _check_schema_name(name):
         raise ValidationError("Invalid string used for the schema name.")
 
 
-MODE_PARSE = 1
-MODE_RAW = 2
-
 
 class TenantCursor(CursorWrapper):
 
-    def __init__(self, cursor, db):
-        super().__init__(cursor, db)
-        self.mode = MODE_PARSE
-
-    def fetchall(self):
-        with self.db.wrap_database_errors:
-            return self.cursor.fetchall()
+    # def fetchall(self):
+    #     with self.db.wrap_database_errors:
+    #         return self.cursor.fetchall()
 
     def execute(self, sql, params=None):
         if isinstance(sql, RawSql):
             return super(TenantCursor, self).execute(sql, params)
-        if len(state.schemas) == 0:
-            return super(TenantCursor, self).execute(sql, params)
-        else:
+        msg = f"""
+schemas: {state.schemas}
+search_path: {self.db.search_path}
+
+sql: {sql}
+"""
+        try:
+            if len(state.schemas) == 0:
+                return super(TenantCursor, self).execute(sql, params)
             if not sql.strip().startswith('SELECT'):
                 return super(TenantCursor, self).execute(sql, params)
-            if self.mode == MODE_PARSE:
-                p = Parser(sql)
-                tenant_sql = p.with_schemas(*state.schemas)
-                try:
-                    logger.debug(f"""{sql}
 
-{tenant_sql}
-""")
-                    return super(TenantCursor, self).execute(tenant_sql, params * len(state.schemas))
-                except django.db.utils.ProgrammingError as e:
-                    msg = f"""Message: {e}
+            p = Parser(sql)
+            tenant_sql = p.with_schemas(*state.schemas)
+            msg = f"""
+
+schemas: {state.schemas}
+search_path: {self.db.search_path}
 
 sql: {sql}
 
 tenant: {tenant_sql}
 """
-                    logger.error(msg)
-                    raise django.db.utils.ProgrammingError(msg)
-                except Exception:
 
-                    raise
-            else:
-                return super(TenantCursor, self).execute(sql, params)
+            logger.debug(msg)
+            return super(TenantCursor, self).execute(tenant_sql, params * len(state.schemas))
+        except django.db.utils.ProgrammingError as e:
+            logger.error(msg)
+            raise django.db.utils.ProgrammingError(msg) from e
+        except Exception as e:
+            logger.error(msg)
+            raise Exception(msg) from e
 
 
 class TenantDebugCursor(TenantCursor):
@@ -113,25 +110,25 @@ class TenantDebugCursor(TenantCursor):
                 extra={'duration': duration, 'sql': sql, 'params': params}
             )
 
-    def executemany(self, sql, param_list):
-        start = time()
-        try:
-            return super().executemany(sql, param_list)
-        finally:
-            stop = time()
-            duration = stop - start
-            try:
-                times = len(param_list)
-            except TypeError:  # param_list could be an iterator
-                times = '?'
-            self.db.queries_log.append({
-                'sql': '%s times: %s' % (times, sql),
-                'time': "%.3f" % duration,
-            })
-            dj_logger.debug(
-                '(%.3f) %s; args=%s', duration, sql, param_list,
-                extra={'duration': duration, 'sql': sql, 'params': param_list}
-            )
+    # def executemany(self, sql, param_list):
+    #     start = time()
+    #     try:
+    #         return super().executemany(sql, param_list)
+    #     finally:
+    #         stop = time()
+    #         duration = stop - start
+    #         try:
+    #             times = len(param_list)
+    #         except TypeError:  # param_list could be an iterator
+    #             times = '?'
+    #         self.db.queries_log.append({
+    #             'sql': '%s times: %s' % (times, sql),
+    #             'time': "%.3f" % duration,
+    #         })
+    #         dj_logger.debug(
+    #             '(%.3f) %s; args=%s', duration, sql, param_list,
+    #             extra={'duration': duration, 'sql': sql, 'params': param_list}
+    #         )
 
 
 class DatabaseWrapper(original_backend.DatabaseWrapper):
@@ -150,11 +147,13 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         # self.introspection = DatabaseSchemaIntrospection(self)
         # self.clear_search_paths()
         self.mode = MULTI_TENANT
-        self.search_path_set = False
+        # self.search_path_set = False
+        self.search_path = None
         # self.schema_name = "public"
 
     def close(self):
-        self.search_path_set = False
+        # self.search_path_set = False
+        self.search_path = None
         super(DatabaseWrapper, self).close()
 
     def get_tenants(self):
@@ -174,7 +173,8 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         state.schemas = [country.schema_name]
         self.tenant = country
         self.schema_name = country.schema_name
-        self.search_path_set = False
+        # self.search_path_set = False
+        self.search_path = None
 
     # def set_schema(self, schema_name, include_public=True):
     #     """
@@ -231,16 +231,15 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     #         cursor = super(DatabaseWrapper, self)._cursor()
     #     return cursor
 
-    def set_search_paths(self, cursor, *schemas):
-        # state.schema = schemas
-        cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(schemas))))
-        self.search_path_set = True
+    # def set_search_paths(self, cursor, *schemas):
+    #     # state.schema = schemas
+    #     cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(schemas))))
+    #     self.search_path_set = True
 
-    def clear_search_paths(self, cursor=None):
-        # state.schemas = []
-        if cursor:
-            cursor.execute(raw_sql('SET search_path = public;'))
-        self.search_path_set = False
+    # def clear_search_paths(self, cursor):
+    #     # state.schemas = []
+    #     cursor.execute(raw_sql('SET search_path = public;'))
+    #     self.search_path_set = False
 
     def _cursor(self, name=None):
         """
@@ -256,7 +255,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
         # optionally limit the number of executions - under load, the execution
         # of `set search_path` can be quite time consuming
-        if not self.search_path_set:
+        if self.search_path != state.schemas:
             search_paths = ["public"]
             search_paths.extend(state.schemas)
             if name:
@@ -270,11 +269,14 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
             # if the next instruction is not a rollback it will just fail also, so
             # we do not have to worry that it's not the good one
             try:
-                self.set_search_paths(cursor_for_search_path, *search_paths)
+                # self.set_search_paths(cursor_for_search_path, *search_paths)
+                cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(search_paths))))
             except (django.db.utils.DatabaseError, psycopg2.InternalError):
-                self.search_path_set = False
+                # self.search_path_set = False
+                self.search_path = None
             else:
-                self.search_path_set = True
+                # self.search_path_set = True
+                self.search_path = state.schemas
 
             if name:
                 cursor_for_search_path.close()

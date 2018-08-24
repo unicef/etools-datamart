@@ -3,9 +3,33 @@
 from threading import local
 
 
+class SchemaList(list):
+
+    def append(self, schema: str):
+        if schema:
+            super(SchemaList, self).append(schema)
+
+    def insert(self, index: int, schema: str):
+        super(SchemaList, self).insert(index, schema)
+
+    def clean(self):
+        return [e for e in self if e]
+
+
+class SchemaDescriptor:
+    def __init__(self):
+        self.val = SchemaList()
+
+    def __get__(self, instance, owner):
+        return self.val.clean()
+
+    def __set__(self, instance, value):
+        self.val = SchemaList(value)
+
+
 class State(local):
     request = None
-    schemas = []
+    schemas = SchemaDescriptor()
     data = {}
 
     def clear(self):
