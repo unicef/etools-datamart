@@ -1,9 +1,14 @@
 FROM python:3.6-slim as builder
 
 ARG PYPI_INDEX="https://pypi.org/simple/"
+ARG DATAMART_VERSION
+ARG GITHUB_TOKEN
 
 ENV PYPI_INDEX ${PYPI_INDEX}
+ENV GITHUB_TOKEN ${GITHUB_TOKEN}
+ENV DATAMART_VERSION ${DATAMART_VERSION}
 
+ENV HOME /root/
 ENV HOME /root/
 ENV PIPSI_HOME=/usr/local/pipsi/environments
 ENV PIPSI_BIN_DIR=/usr/local/bin
@@ -39,7 +44,12 @@ ENV SESSION_COOKIE_SECURE True
 ENV STATIC_ROOT /tmp/static
 ENV SUPERVISOR_USER admin
 ENV SUPERVISOR_PWD ""
+ENV FLOWER_USER admin
+ENV FLOWER_PWD ""
 ENV X_FRAME_OPTIONS "DENY"
+ENV START_DATAMART "true"
+ENV START_REDIS "true"
+ENV START_CELERY "true"
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -53,10 +63,14 @@ RUN mkdir -p /code /root/.local/bin \
     && pipsi install pipenv
 
 
+#RUN curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1 \
+#    && pipenv install --system --deploy --ignore-pipfile \
+#    && pip install .
+
 WORKDIR /code
 ADD . /code
 
-RUN pipenv install -v --system --deploy --pypi-mirror $PYPI_INDEX \
+RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
     && pip install -e .
 
 RUN mkdir -p /var/datamart/{static,log,conf,run}
@@ -67,6 +81,9 @@ ADD docker/supervisord.conf /etc/supervisord.conf
 WORKDIR /var/datamart
 
 EXPOSE 8000
+EXPOSE 15000
+EXPOSE 5555
+EXPOSE 6379
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]

@@ -185,7 +185,7 @@ jobs:
             fi
             docker build  \
                     --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
-                    --build-arg BACKEND_VERSION=${TAG} \
+                    --build-arg DATAMART_VERSION=${TAG} \
                     -t ${DOCKER_IMAGE}:${TAG} \
                     -f Dockerfile .
             docker images

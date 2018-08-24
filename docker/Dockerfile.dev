@@ -1,24 +1,8 @@
-FROM unicef/datamart:dev
+FROM unicef/datamart:latest
 
-ENV DEVELOPMENT_MODE 1
-ENV USE_GUNICORN 1
+WORKDIR /code
+ADD . /code
 
-RUN apt-get update && apt-get install -y \
-    supervisor \
-    redis-server
-
-RUN mkdir -p /var/datamart/{static,log,conf,run}
-
-ADD docker/redis.conf /etc/redis.conf
-ADD docker/supervisord.conf /etc/supervisord.conf
-
-WORKDIR /var/datamart
-
-EXPOSE 8000
-EXPOSE 5555
-EXPOSE 15000
-
-ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
-
-CMD ["datamart"]
+RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
+    && pip uninstall etools-datamart .
+    && pip install -e .

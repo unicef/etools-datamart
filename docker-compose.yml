@@ -18,10 +18,12 @@ services:
       SECURE_SSL_REDIRECT: "false"
       SESSION_COOKIE_SECURE: "false"
       CSRF_COOKIE_SECURE: "false"
+      DEVELOPMENT_MODE: "false"
+      STACK: "0"
+    command: datamart
     ports:
       - "8000:8000"
       - "15000:15000"
-      - "5555:5555"
     depends_on:
       - etools
       - db
@@ -45,18 +47,22 @@ services:
     image: unicef/datamart:dev
     ports:
       - 5555:5555
+      - 25000:15000
     environment:
       CACHE_URL: redis://redis:6379/1
       CELERY_BROKER_URL: redis://redis:6379/2
       CELERY_RESULT_BACKEND: redis://redis:6379/3
       DATABASE_URL: postgres://postgres:@db:5432/etools_datamart
       DATABASE_URL_ETOOLS: postgis://postgres:@etools:5432/etools
-      SUPERVISOR_USER: admin
-      SUPERVISOR_PWD: ""
+      SUPERVISOR_USER: $SUPERVISOR_USER
+      SUPERVISOR_PWD: $SUPERVISOR_PWD
       DEBUG: "true"
       SECURE_SSL_REDIRECT: "false"
       SESSION_COOKIE_SECURE: "false"
       CSRF_COOKIE_SECURE: "false"
+      DEVELOPMENT_MODE: "false"
+      STACK: "0"
+    command: celery
     depends_on:
       - redis
       - datamart

@@ -1,14 +1,14 @@
-CMD?=
-RUN_OPTIONS?=
-TARGET?=dev
-DOCKER_IMAGE_NAME=unicef/datamart
-DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
-DOCKERFILE?=docker/Dockerfile
 BUILD_OPTIONS?=
+CMD?=datamart
+CONTAINER_NAME?=datamart-${TARGET}
 DATABASE_URL?=postgres://postgres:@192.168.66.66:5432/etools_datamart
 DATABASE_URL_ETOOLS?=postgis://postgres:@192.168.66.66:15432/etools
+DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
+DOCKER_IMAGE_NAME=unicef/datamart
+DOCKERFILE?=docker/Dockerfile
 PYPI_INDEX?=https://pypi.org/simple/
-CONTAINER_NAME?=datamart-${TARGET}
+RUN_OPTIONS?=
+TARGET?=dev
 
 build:
 	cd .. && docker build ${BUILD_OPTIONS} \
