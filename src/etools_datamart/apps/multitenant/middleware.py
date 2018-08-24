@@ -17,27 +17,21 @@ _thread_locals = threading.local()
 class MultiTenantMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
-        # One-time configuration and initialization.
 
     def __call__(self, request):
-        # Code to be executed for each request before
-        # the view (and later middleware) are called.
-        select_schema_url = reverse('multitenant:select-schema')
-        if request.user and request.user.is_authenticated:
-            schemas = request.META.get('HTTP_X_SCHEMA', request.COOKIES.get('schemas', ""))
-            if not schemas:
+        schemas = request.META.get('HTTP_X_SCHEMA', request.COOKIES.get('schemas', ""))
+        if not schemas:
+            if request.user and request.user.is_authenticated:
+                select_schema_url = reverse('multitenant:select-schema')
                 if request.path != select_schema_url:
                     return HttpResponseRedirect(select_schema_url)
-            state.schemas = schemas.split(',')
-        else:
             state.schemas = []
+        else:
+            state.schemas = schemas.split(',')
 
         state.request = request
         response = self.get_response(request)
 
-        response["X-Schemas"] = ",".join(state.schemas)
-
-        # Code to be executed for each request/response after
-        # the view is called.
+        response["X-Schema"] = ",".join(state.schemas)
 
         return response
