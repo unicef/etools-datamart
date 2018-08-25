@@ -3,7 +3,6 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 from etools_datamart.api.urls import router
-from etools_datamart.state import state
 
 
 @pytest.fixture()

@@ -3,7 +3,6 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 from etools_datamart.api.urls import router
-from etools_datamart.state import state
 
 
 @pytest.fixture()
@@ -19,12 +18,12 @@ def path_from_url(route):
 
 def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:
-        urls = filter(lambda url:'datamart' in url,
+        urls = filter(lambda url: 'datamart' in url,
                       [reverse("api:%s" % url.name) for url in router.urls if url.name.endswith('-list')])
         metafunc.parametrize("url", urls)
 
 
-@pytest.mark.parametrize('format', ['json', 'html'])
+@pytest.mark.parametrize('format', ['json', 'html', 'csv'])
 def test_partners(client, url, format):
     res = client.get(url, format=format, HTTP_X_SCHEMA="public")
     assert res.status_code == 200, res

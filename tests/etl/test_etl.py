@@ -4,7 +4,7 @@ from etools_datamart.apps.etl.tasks import load_pmp_indicator, PMPIndicators, lo
 
 def test_load_pmp_indicator(db):
     load_pmp_indicator()
-    assert PMPIndicators.objects.count() == 21
+    assert PMPIndicators.objects.count() == 42
 
 
 def test_load_intervention(db):

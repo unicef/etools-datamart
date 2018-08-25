@@ -30,7 +30,7 @@ def pytest_generate_tests(metafunc):
 
 
 @pytest.mark.parametrize('schema', [['bolivia'], ['bolivia', 'chad']], ids=["single", "multiple"])
-@pytest.mark.parametrize('format', ['json', 'html'])
+@pytest.mark.parametrize('format', ['json', 'html', 'csv'])
 def test_list(client, url, format, schema):
     res = client.get(url, format=format, HTTP_X_SCHEMA=",".join(schema))
     assert state.schemas == schema
@@ -38,8 +38,8 @@ def test_list(client, url, format, schema):
     assert res.json()
 
 
-@pytest.mark.parametrize('schema', ['bolivia', 'chad'])
-@pytest.mark.parametrize('format', ['json', 'html'])
+@pytest.mark.parametrize('schema', ['bolivia'])
+@pytest.mark.parametrize('format', ['json', 'html', 'csv'])
 def test_retrieve(client, url, format, schema):
     res = client.get(url, format=format, HTTP_X_SCHEMA=schema)
     assert state.schemas == [schema]
