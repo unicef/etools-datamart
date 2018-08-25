@@ -5,7 +5,7 @@ services:
 #    build:
 #      context: .
 #      dockerfile: ./docker/Dockerfile
-    image: unicef/datamart:dev
+    image: unicef/datamart:$TAG
     environment:
       CACHE_URL: redis://redis:6379/1
       CELERY_BROKER_URL: redis://redis:6379/2
@@ -44,7 +44,7 @@ services:
     image: redis:alpine
 
   celery:
-    image: unicef/datamart:dev
+    image: unicef/datamart:$TAG
     ports:
       - 5555:5555
       - 25000:15000
@@ -56,6 +56,8 @@ services:
       DATABASE_URL_ETOOLS: postgis://postgres:@etools:5432/etools
       SUPERVISOR_USER: $SUPERVISOR_USER
       SUPERVISOR_PWD: $SUPERVISOR_PWD
+      FLOWER_USER: $FLOWER_USER
+      FLOWER_PWD: $FLOWER_PWD
       DEBUG: "true"
       SECURE_SSL_REDIRECT: "false"
       SESSION_COOKIE_SECURE: "false"

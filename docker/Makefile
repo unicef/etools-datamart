@@ -14,6 +14,7 @@ build:
 	cd .. && docker build ${BUILD_OPTIONS} \
 			--build-arg PYPI_INDEX=${PYPI_INDEX} \
 			--build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
+			--build-arg DATAMART_VERSION=${TARGET} \
 			-t ${DOCKER_IMAGE} \
 			-f ${DOCKERFILE} .
 
