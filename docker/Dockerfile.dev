@@ -1,0 +1,8 @@
+FROM unicef/datamart:latest
+
+WORKDIR /code
+ADD . /code
+
+RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
+    && pip uninstall etools-datamart .
+    && pip install -e .

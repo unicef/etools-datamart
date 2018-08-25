@@ -1,0 +1,64 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django-concurrency = "*"
+django-environ = "*"
+django-constance = "*"
+drf-querystringfilter = ">=1.0.0"
+django-cors-headers = "*"
+gunicorn = "*"
+"psycopg2-binary" = "*"
+raven = "*"
+whitenoise = "*"
+django-picklefield = "*"
+drf-dynamic-serializer = ">=1.2.0"
+djangorestframework-jwt = "*"
+coreapi = "*"
+django-tenant-schemas = "*"
+django-regex = "*"
+sqlparse = "*"
+pyparsing = "*"
+admin-extra-urls = "*"
+drf-yasg = {version = "*", extras = ["validation"]}
+django-strategy-field = "*"
+humanize = "*"
+celery = "*"
+django-adminfilters = "==1.1"
+flower = "*"
+django-celery-beat = "*"
+django-redis = "*"
+django = "==2.0"
+pytest-pythonpath = "*"
+
+[dev-packages]
+pytest = "*"
+yapf = "*"
+check-manifest= "*"
+pytest-coverage = "*"
+pytest-django = "*"
+pytest-echo = "*"
+"flake8" = "*"
+isort = "*"
+pytest-pythonpath = "*"
+pdbpp = "*"
+factory-boy = "*"
+drf-api-checker = ">=0.3"
+django-webtest = "*"
+docker = "*"
+django-extensions = "*"
+tox-pipenv = "==1.6.0"
+ipython = "*"
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+test = "pytest tests"
+tox = "tox"
+init-setup = "./manage.py init-setup"
+
+[pipenv]
+allow_prereleases = false

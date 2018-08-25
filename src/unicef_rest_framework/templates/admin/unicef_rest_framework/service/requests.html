@@ -1,0 +1,26 @@
+{% extends "admin/unicef_rest_framework/service/_extra.html" %}{% load urf i18n  admin_urls %}
+{% block breadcrumbs-current %}
+    <li>requests</li>{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+    <table>
+        <tr>{% for entry in log %}
+            <th>Day</th>
+            <th>Path</th>
+            <th>Total</th>
+            <th>Cached</th>
+            <th>Response Max</th>
+            <th>Response Min</th>
+        {% endfor %}</tr>
+        <tr>{% for entry in log %}
+            <td>{{ entry.day }}</td>
+            <td>{{ entry.path }}</td>
+            <td>{{ entry.total }}</td>
+            <td>{{ entry.cached }}</td>
+            <td>{{ entry.response_max }}</td>
+            <td>{{ entry.response_min }}</td>
+        {% endfor %}</tr>
+    </table>
+    </div>
+{% endblock content %}

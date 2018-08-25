@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}{% load geo static %}
+{% block extrahead %}
+    {{ block.super }}
+
+{% endblock %}
+{% block content %}
+    {{ block.super }}
+
+    <script>
+        $('#id_icon').after($('<span id="preview_icon" style="margin-left:10px"></span>'));
+        $('#preview_icon').html('<i class="fa fa-share-alt"></i>');
+
+        $('#id_icon').change(function(){
+            var value = $('#id_icon').val();
+            $('#preview_icon').html('<i class="fa '+value+'"></i>');
+
+        });
+    </script>
+{% endblock %}
+
+{#{% endblock content %}#}

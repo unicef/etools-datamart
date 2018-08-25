@@ -1,0 +1,39 @@
+include README.md
+include CONTRIBUTING.md
+include CHANGES
+include MANIFEST.in
+include tox.ini
+include Pipfile.lock
+include Pipfile
+include src
+
+exclude .tox
+exclude .dockerignore
+exclude .style.yapf
+exclude .jshintrc
+exclude Dockerfile.dev
+exclude Makefile
+exclude manage.py
+exclude tests
+exclude manage.py
+exclude entrypoint.sh
+exclude .env
+exclude .env.tpl
+exclude docker-compose.yml
+
+prune .circleci
+prune tests
+prune db
+prune docker
+
+recursive-include src/etools_datamart *.*
+recursive-include src/unicef_rest_framework *.*
+recursive-exclude tests *
+recursive-include docs *
+
+exclude deploy
+exclude docker
+exclude hooks
+recursive-exclude docker *
+recursive-exclude deploy *
+recursive-exclude hooks *

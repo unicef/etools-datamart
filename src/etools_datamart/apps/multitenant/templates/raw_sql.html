@@ -1,0 +1,57 @@
+{% extends "admin/change_list.html" %}{% load  i18n multitenant admin_urls %}
+{% block extrahead %}{{ block.super }}
+    {{ form.media }}
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; Raw SQL Statement
+    </div>
+{% endblock %}
+{% block content %}
+    <style>
+        textarea {
+            width: 100%;
+        }
+    </style>
+    <hr/>
+    <form method="post">
+        {% csrf_token %}
+        {% if statement %}
+            <div>Query for: {% for schema in state.schemas %}{{ schema }}&nbsp;{% endfor %}<div>
+            <div>{{ form.raw }}</div>
+            <div>{{ form.statement.label }}{{ form.statement.errors }}</div>
+            <div>{{ form.statement }}</div>
+            <div>{{ form.original }}</div>
+            <input type="submit" value="Back" name="back">
+            <input type="submit" value="Run Statement" name="doit" class="default">
+            <input type="button" value="Reset" id="reset">
+        {% else %}
+            <div>Selected workspaces: {% for schema in state.schemas %}{{ schema }}&nbsp;{% endfor %}
+                {% if not statement %}<a href="{% select_schema %}">change</a>{% endif %}</div>
+            <div>
+            <div>{{ form.raw.label }} : {{ form.raw }}</div>
+            <div>{{ form.statement.label }}{{ form.statement.errors }}</div>
+            <div>{{ form.statement }}</div>
+            <div>{{ form.original }}</div>
+            <div>
+                <input type="submit" value="Submit" name="submit" class="default">
+                <input type="button" value="Reset" id="reset" >
+            </div>
+        {% endif %}
+    </form>
+    </div>
+{% endblock content %}
+{% block footer %}
+
+    <script language="JavaScript">
+        django.jQuery("#reset").click(function () {
+            location="{% url opts|admin_urlname:'raw_sql' %}"
+        });
+    </script>
+
+
+
+{% endblock %}

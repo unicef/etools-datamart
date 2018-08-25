@@ -1,0 +1,229 @@
+{% extends "admin/unicef_rest_framework/service/_extra.html" %}{% load urf i18n  admin_urls %}
+
+{% block breadcrumbs-current %}
+    <li>security</li>{% endblock %}
+
+{% block content %}
+    <div class="g-d-48">
+    <div class="g-d-14">
+        <table id="info">
+            <tr>
+                <th>url</th>
+                <td><a class="json" href="{{ service.entry_point }}?format=json">{{ service.entry_point }}</a>
+                    <input type="text" name="pk" id="pk" size="5" style="width: 60px">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span style="float: right"><a id="invalidate_cache"
+                                                  href="{% url 'admin:core_service_invalidate_cache' service.pk %}">{{ service.cache_version }}</a></span>
+                </td>
+            </tr>
+            <tr>
+                <th>ser</th>
+                <td>{% for ser  in service.view.serializers_fieldsets %}
+                    {{ ser }}<input type="radio" checked="checked" name="serializer" value="{{ ser }}">
+                {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <th>filters</th>
+                <td>{{ service.view.filter_fields|join:", " }}</td>
+            </tr>
+            <tr>
+                <th>qs</th>
+                <td><input type="text" name="fs" id="kwargs" width="10"></td>
+            </tr>
+            <tr>
+                <th>access</th>
+                <td>{% acl_icon service as ico %}
+                    <i class="icon {{ ico.0 }}" style="color: {{ ico.1 }};ont-size:14pt"></i>
+                    {{ service.get_access_display }}
+                </td>
+            </tr>
+            <tr class="acl-info">
+                <th>acl</th>
+                <td>
+                    <table>
+                        <tr>
+                            <th>user/app</th>
+                            <th>ser</th>
+                            <th>acl</th>
+                            <th>filter</th>
+                            <th>-</th>
+                        </tr>
+                        <tr>
+                            <td>{{ request.user }}</td>
+                            <td>*</td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <input type="radio" checked="checked" name="impersonate" value="u">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>anonymous</td>
+                            <td>*</td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <input type="radio" name="impersonate" value="a">
+                            </td>
+                        </tr>
+                        {% for acl in acls %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'admin:core_application_change' acl.application.pk %}">{{ acl.application.name }}</a>
+                                </td>
+                                <td>{{ acl.serializers|join:", " }} </td>
+                                <td>
+                                    <a href="{% url 'admin:core_applicationaccesscontrol_change' acl.acl.pk %}">edit</a>
+                                </td>
+                                {% if acl.filter %}
+                                    <td>
+                                        <a href="{% url 'admin:core_systemfilter_change' acl.filter.pk %}">edit</a>
+                                    </td>
+                                {% else %}
+                                    <td>{{ acl.filter|default:"" }}</td>
+                                {% endif %}
+                                <td>
+                                    <input type="radio" name="impersonate"
+                                           value="{{ acl.application.uuid }}:{{ acl.application.password }}">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="g-d-16" id="monitor">
+        {#            <div>#}
+        {#                <div>#}
+        {#                    <a href="" id="rawUrl" target="_new"></a></div>#}
+        <input type="text" name="qs" readonly="readonly">
+        <input value='go' type="button" id="go">
+        <pre class="headers" id="headers"></pre>
+        <pre class="code" id="response"></pre>
+        {#            </div>#}
+        {#        </div>#}
+    </div>
+    <script>
+        (function ($) {
+            {#          $('#monitor').width(700).height(400).split({orientation:'vertical', limit:100});#}
+
+            $monitor = $('#response');
+            $headers = $('#headers');
+            function get_token(credentials) {
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'json-token-plain' %}",
+                    data: {'app': credentials[0], 'password': credentials[1]},
+                    success: function (token) {
+                        fetch(token)
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $monitor.html(JSON.stringify(jqXHR, null, "    "));
+                        console.log(jqXHR, textStatus, errorThrown);
+                    }
+                });
+            }
+
+            function fetch(token) {
+                var t = "";
+                if (token) {
+                    t = "token " + token
+                }
+                var start_time = new Date().getTime();
+                $.ajax({
+                    url: $('input[name=qs]').val(),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Authorization", t)
+                    }
+                })
+                        .success(function (res, status, xhr) {
+                            $monitor.html(JSON.stringify(res, null, "    "));
+                        })
+                        .fail(function (e, err) {
+                            $monitor.html(JSON.stringify(e, null, "    "));
+                        })
+                        .complete(function (xhr, textStatus) {
+                            var request_time = new Date().getTime() - start_time;
+
+                            var headers = xhr.getAllResponseHeaders();
+                            var xx = headers.split('\n');
+                            var c1 = xx.sort().filter(function (e) {
+                                return e != ""
+                            }).join('\n');
+                            $headers.html("<div><b>" + xhr.status +
+                                    "<span> (" + request_time + "ms)</span>" +
+                                    "</div>" +
+                                    c1);
+                        })
+            }
+
+            $('input[name=qs]').on('click', function (e) {
+                $("#go").click();
+                window.open($(this).val(), 'acl_view_json')
+            });
+
+            $("#go").on('click', function (e) {
+                $monitor.html('');
+                $headers.html('');
+                var qs = get_qs();
+                $('input[name=qs]').val(qs);
+                $('#rawUrl').attr('href', qs).text(qs);
+                var as = $('input[name=impersonate]:checked').val();
+
+                if (as == 'u') {
+                    fetch()
+                } else if (as == 'a') {
+                    var aa1 = Cookies.get().{{ cookie_name }};
+                    Cookies.remove("{{ cookie_name }}", {path: '{{ cookie_path }}'});
+                    fetch();
+                    Cookies.set("{{ cookie_name }}", aa1, {path: '{{ cookie_path }}'});
+                } else {
+                    var aa2 = Cookies.get().{{ cookie_name }};
+                    Cookies.remove("{{ cookie_name }}", {path: '{{ cookie_path }}'});
+                    get_token(as.split(':'));
+                    Cookies.set("{{ cookie_name }}", aa2, {path: '{{ cookie_path }}'});
+
+                }
+            });
+            $('input[name=impersonate], input[name=serializer]').change(function () {
+                $("#go").click();
+            });
+
+            $("#invalidate_cache").on('click', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: this.href,
+                    success: function (data) {
+                        $(e.target).text(data);
+                    }
+                })
+
+            });
+            $('input').on('keypress', function (e) {
+                var code = e.keyCode || e.which;
+                if (code == 13) { //Enter keycode
+                    var sender = $(e.target).attr('id');
+                    if (sender == 'pk') {
+
+                    }else if (sender == 'kwargs'){
+                        $('#pk').val('');
+                    }
+                    $("#go").click();
+                }
+            });
+            $("#info a.json").on('click', function (e) {
+                e.preventDefault();
+                $('input[name=qs]').val(this.href);
+                $("#go").click();
+            });
+            $('.delete-acl').on('click', function (e) {
+                e.preventDefault();
+                var url = $(e.target).data('url');
+                location.href = url + "?+backto=" + window.location.href;
+            });
+        })(jQuery);
+
+    </script>
+{% endblock content %}

@@ -1,0 +1,6 @@
+.git
+.tox
+.venv
+~build
+.pytest_cache
+.circleci

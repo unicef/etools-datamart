@@ -1,0 +1,224 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/python:3.6
+        environment:
+          PGHOST: 127.0.0.1
+          PIPENV_VENV_IN_PROJECT: 1
+          DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
+          DATABASE_URL_ETOOLS: "postgis://postgres:postgres@127.0.0.1:5432/etools"
+          RELEASE_MATCH: "release/*"
+      - image: circleci/postgres:9.6-alpine-postgis
+        environment:
+          POSTGRES_USER: postgres
+          PGUSER: postgres
+          POSTGRES_DB: etools_datamart
+          POSTGRES_PASSWORD: postgres
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get update && sudo apt-get -y install postgresql
+
+      - restore_cache:
+          keys:
+            - source-{{ .Branch }}-{{ .Revision }}
+      - checkout
+      - restore_cache:
+          keys:
+            - deps-v2-{{ checksum "Pipfile.lock" }}
+
+      - run:
+          name: run tests
+          command: |
+            export PATH=/home/circleci/.local/bin:$PATH
+            export PYTHONHASHSEED=${RANDOM}
+            pip install tox --user
+            tox -e py36-d20
+
+      - store_artifacts:
+          path: ~build/coverage
+          destination: coverage
+
+      - save_cache:
+          key: source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+
+      - save_cache:
+          key: deps-v2-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".tox"
+            - ".venv"
+            - "~/.cache/pip"
+
+      - deploy:
+          name: tag and release if release candidate
+          command: |
+              if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
+                curl --user ${CIRCLE_TOKEN}: \
+                  --data build_parameters[CIRCLE_JOB]=tag \
+                  --data revision=$CIRCLE_SHA1 \
+                  https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
+              else
+                echo "Skipped as '$CIRCLE_BRANCH' does not match '$RELEASE_MATCH' branch"
+              fi
+  tag:
+    docker:
+      - image: circleci/python:3.6
+        environment:
+          API_URL: https://api.github.com/repos/unicef/etools-datamart
+          RELEASE_MATCH: "release/*"
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "36:e1:ae:c3:f2:0f:27:67:85:44:78:5d:ec:2f:b2:0d"
+      - run:
+          name: package and release
+          command: |
+            export PATH=/home/circleci/.local/bin:$PATH
+            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            git status
+            git show-branch "release/$TAG"
+            git reset --hard
+
+            git config user.email "ci@unicef.org"
+            git config user.name "CI"
+
+            echo
+            echo "Process master"
+            git checkout master
+            git pull
+            git merge --no-ff release/$TAG -m "merge release/$TAG"
+            echo
+
+            echo "Creating tag $TAG"
+            git tag -a -m "v$TAG" $TAG
+            echo
+
+            echo "Process develop"
+            git checkout develop
+            git pull
+            git merge --no-ff release/$TAG -m "merge release/$TAG"
+            echo
+
+            echo "Deleting branch release/$TAG"
+            git branch -d release/$TAG
+            echo
+
+            echo "Pushing everything to origin"
+            git push --verbose --all
+            git push --verbose --tags
+            git push origin --verbose --delete release/$TAG
+      - run:
+          name: release
+          command: |
+            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            echo
+            export TODAY=`date '+%d %B %Y at %H:%M'`
+            function is_pre()
+            {
+                [[ "$(echo "$TAG" | sed 's/[0-9.]//g')" == "" ]] && echo false || echo true
+            }
+            function data() {
+            cat <<EOF
+            { "tag_name": "$TAG",
+              "name": "v$TAG",
+              "body": "version $TAG - Built on $TODAY",
+              "draft": false,
+              "prerelease": $(is_pre)
+            }
+            EOF
+            }
+            data=$(data)
+            curl -X POST -s \
+              --fail --verbose \
+              -H "Accept: application/json" \
+              -H "Content-Type:application/json" \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              ${API_URL}/releases \
+              -d "$data"
+      - deploy:
+          name: dockerize
+          command: |
+              if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
+                curl --user ${CIRCLE_TOKEN}: \
+                  --data build_parameters[TAG]=$TAG \
+                  --data build_parameters[JOB]=dockerize \
+                  https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/develop
+              else
+                echo "Skipped as '$CIRCLE_BRANCH' does not match '$RELEASE_MATCH' branch"
+              fi
+  dockerize:
+    working_directory: ~/code
+    docker:
+      - image: docker:17.05.0-ce-git
+        environment:
+          PGHOST: 127.0.0.1
+          PIPENV_VENV_IN_PROJECT: 1
+          DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
+          DATABASE_URL_ETOOLS: "postgres://postgres:postgres@127.0.0.1:5432/etools"
+      - image: circleci/postgres:9.6-alpine-postgis
+        environment:
+          POSTGRES_USER: postgres
+          PGUSER: postgres
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: postgres
+
+    environment:
+      DOCKER_IMAGE: unicef/etools-datamart
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "2b:6f:56:d6:6d:01:3d:81:44:3f:81:98:e9:ef:fe:ff"
+      - setup_remote_docker
+      - run:
+          name: Build docker image
+          command: |
+            if [ -z "$TAG" ];then
+              echo "Tag not set. exit"
+              exit 1
+            fi
+            docker build  \
+                    --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
+                    --build-arg DATAMART_VERSION=${TAG} \
+                    -t ${DOCKER_IMAGE}:${TAG} \
+                    -f Dockerfile .
+            docker images
+      - run:
+          name: Test Backend docker image
+          command: |
+              docker run -p 8000:8000 --rm \
+                      -e DATABASE_URL=${DATABASE_URL} \
+                      -e DEBUG=0 \
+                      -e SECURE_SSL_REDIRECT=0 \
+                      -e SESSION_COOKIE_SECURE=0 \
+                      -e SESSION_COOKIE_HTTPONLY=9 \
+                      -e SESSION_COOKIE_HTTPONLY=0 \
+                      -e CSRF_COOKIE_SECURE=0 \
+                      -it ${DOCKER_IMAGE}:${TAG} \
+                      django-admin check --deploy
+      - deploy:
+          name: Push Backend docker image
+          command: |
+              export TODAY=`date '+%d %B %Y at %H:%M'`
+
+              git config --global user.email "s.apostolico@gmail.com"
+              git config --global user.name "CI"
+              echo "$TODAY Backend $TAG released" | cat - CHANGES > temp && mv temp CHANGES
+              git add CHANGES
+              git commit -m "Released Backend v$TAG"
+              git push
+              git tag -a -m "backend/$TAG" backend/$TAG
+              git push --tags
+
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+
+              docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
+              docker push ${DOCKER_IMAGE}:latest
+              docker push ${DOCKER_IMAGE}:${TAG}
+

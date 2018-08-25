@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+import logging
+import threading
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+from etools_datamart.state import state
+
+logger = logging.getLogger(__name__)
+
+_thread_locals = threading.local()
+
+
+class MultiTenantMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        schemas = request.META.get('HTTP_X_SCHEMA', request.COOKIES.get('schemas', ""))
+        if not schemas:
+            if request.user and request.user.is_authenticated:
+                select_schema_url = reverse('multitenant:select-schema')
+                if request.path != select_schema_url:
+                    return HttpResponseRedirect(select_schema_url)
+            state.schemas = []
+        else:
+            state.schemas = schemas.split(',')
+
+        state.request = request
+        response = self.get_response(request)
+
+        response["X-Schema"] = ",".join(state.schemas)
+
+        return response
