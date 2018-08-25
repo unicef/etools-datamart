@@ -1,5 +1,9 @@
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.http import Http404
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+from rest_pandas import PandasMixin
+
 from unicef_rest_framework.views import ReadOnlyModelViewSet as BaseReadOnlyModelViewSet
 
 from etools_datamart.state import state
@@ -9,9 +13,24 @@ from ..renderers import APIBrowsableAPIRenderer
 __all__ = ['ReadOnlyModelViewSet']
 
 
-class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
+class ReadOnlyModelViewSet(PandasMixin, BaseReadOnlyModelViewSet):
     renderer_classes = [JSONRenderer,
                         APIBrowsableAPIRenderer]
+
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        selection = self.kwargs[lookup_url_kwarg]
+        if selection == '_lastest_':
+            queryset = self.filter_queryset(self.get_queryset())
+            try:
+                obj = queryset.latest('id')
+            except (TypeError, ValueError, ValidationError, ObjectDoesNotExist):
+                raise Http404
+            else:
+                self.check_object_permissions(self.request, obj)
+                return obj
+
+        return super().get_object()
 
     def retrieve(self, request, *args, **kwargs):
         if not state.schemas:
