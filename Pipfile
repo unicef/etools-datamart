@@ -33,6 +33,7 @@ django-redis = "*"
 django = "==2.0"
 pytest-pythonpath = "*"
 djangorestframework-csv = "*"
+drf-extensions = "*"
 
 [dev-packages]
 pytest = "*"

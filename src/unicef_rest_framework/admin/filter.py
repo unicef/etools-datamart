@@ -26,12 +26,11 @@ class SystemFilterParamInline(TabularInline):
 
 
 class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('service', 'application', 'user', 'group', 'handler')
+    list_display = ('service', 'user', 'group', 'handler')
     readonly_fields = ('handler',)
-    list_filter = ('service', 'application', 'user')
+    list_filter = ('service', 'user')
     search_fields = ('service__name',)
     inlines = [SystemFilterRuleInline, SystemFilterParamInline]
-    raw_id_fields = ('service', 'application', 'user', 'group')
 
     @action()
     def test(self, request, pk):

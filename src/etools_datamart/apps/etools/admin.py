@@ -12,68 +12,73 @@ class ActionPoint(TenantModelAdmin):
 
 
 @register(models.ActivitiesActivity)
-class ActivitiesActivity(TenantModelAdmin):
+class ActivitiesActivityAdmin(TenantModelAdmin):
     pass
 
 
 @register(models.PartnersPartnerorganization)
-class PartnersPartnerorganization(TenantModelAdmin):
+class PartnerOrganizationAdmin(TenantModelAdmin):
     list_display = ('vendor_number', 'partner_type', 'name', 'short_name', 'schema')
     search_fields = ('name',)
     # list_filter = ('schema',)
 
 
 @register(models.PartnersAssessment)
-class PartnersAssessment(TenantModelAdmin):
+class PartnersAssessmentAdmin(TenantModelAdmin):
     pass
 
 
 @register(models.PartnersAgreement)
-class PartnersAgreement(TenantModelAdmin):
-    pass
+class PartnersAgreementAdmin(TenantModelAdmin):
+    search_fields = ('partner__name',)
+    list_display = ('agreement_number', 'agreement_type', 'partner', 'schema')
+    # list_filter = ('agreement_type', )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('partner')
 
 
 @register(models.AuditEngagement)
-class AuditEngagement(TenantModelAdmin):
+class AuditEngagementAdmin(TenantModelAdmin):
     pass
 
 
 @register(models.PartnersIntervention)
-class PartnersIntervention(TenantModelAdmin):
+class PartnersInterventionAdmin(TenantModelAdmin):
     list_display = ('number', 'title', 'document_type', 'schema')
     list_filter = ('document_type',)
 
 
 @register(models.T2FTravel)
-class T2FTravel(TenantModelAdmin):
+class T2FTravelAdmin(TenantModelAdmin):
     pass
 
 
 @register(models.ReportsAppliedindicator)
-class ReportsAppliedindicator(TenantModelAdmin):
+class ReportsAppliedindicatorAdmin(TenantModelAdmin):
     pass
 
 
 @register(models.ReportsResult)
-class ReportsResult(TenantModelAdmin):
+class ReportsResultAdmin(TenantModelAdmin):
     list_display = ('name', 'code', 'result_type',)
 
 
 @register(models.ReportsResulttype)
-class ReportsResulttype(TenantModelAdmin):
+class ReportsResulttypeAdmin(TenantModelAdmin):
     list_display = ('id', 'name', 'schema')
 
 
 @register(models.PartnersPlannedengagement)
-class PartnersPlannedEngagement(TenantModelAdmin):
+class PartnersPlannedEngagementAdmin(TenantModelAdmin):
     pass
 
 
 @register(models.FundsFundsreservationheader)
-class FundsReservationHeader(TenantModelAdmin):
+class FundsReservationHeaderAdmin(TenantModelAdmin):
     pass
 
 
 @register(models.FundsFundsreservationitem)
-class Fundsreservationitem(TenantModelAdmin):
+class FundsreservationitemAdmin(TenantModelAdmin):
     pass

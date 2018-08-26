@@ -35,18 +35,6 @@ class AbstractAccessControl(MasterDataModel):
         abstract = True
 
 
-# class ApplicationAccessControl(AbstractAccessControl):
-#     application = models.ForeignKey(Application, related_name='acl')
-#
-#     class Meta:
-#         verbose_name = 'Application ACL'
-#         verbose_name_plural = 'Application ACLs'
-#         ordering = ('application',)
-#
-#     def __unicode__(self):
-#         return "{0.application} {0.service}".format(self)
-
-
 class UserAccessControl(AbstractAccessControl):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='acl')
 

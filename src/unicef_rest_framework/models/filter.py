@@ -8,7 +8,8 @@ from django.core.exceptions import FieldError, ValidationError
 from django.db import models
 from strategy_field.utils import fqn
 
-from .application import Application, Service
+from .application import Application
+from .service import Service
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class SystemFilterHandler(object):
 
 
 class SystemFilter(models.Model):
-    """ Store 'hardcoded' filters per user/application
+    """ Store 'hardcoded' filters per user
     @see AutoFilterRule
     """
     application = models.ForeignKey(Application, models.CASCADE, blank=True, null=True)
@@ -51,8 +52,7 @@ class SystemFilter(models.Model):
                                default=fqn(SystemFilterHandler))
 
     class Meta:
-        unique_together = (('service', 'application'),
-                           ('service', 'user'),
+        unique_together = (('service', 'user'),
                            ('service', 'group'))
 
     def set_rule(self, **kwargs):

@@ -12,13 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class ApplicationForm(forms.ModelForm):
-    # services = MultipleServiceFormField()
-    # maintainers = MultipleUserFormField()
-    # requestor = UserFormField()
-    # division = DivisionFormField()
-    # office = OfficeFormField()
-    # FIXME: re-enable select2 fields
-    # password = forms.CharField(required=False)
 
     class Meta:
         model = Application

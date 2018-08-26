@@ -14,7 +14,7 @@ from etools_datamart.celery import app
 logger = logging.getLogger(__name__)
 
 
-@app.task()
+@app.etl(PMPIndicators)
 def load_pmp_indicator():
     # qs = UsersCountry.objects.exclude(schema_name__in=['public', 'uat', 'frg'])
     connection = connections['etools']
@@ -70,7 +70,7 @@ def load_pmp_indicator():
                     })
 
 
-@app.task()
+@app.etl(Intervention)
 def load_intervention():
     connection = connections['etools']
     schemas = connection.get_tenants()

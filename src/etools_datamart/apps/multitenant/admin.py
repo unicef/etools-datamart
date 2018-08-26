@@ -30,6 +30,7 @@ class TenantChangeList(ChangeList):
 
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
+    # list_filter = ('schema',)
 
     def get_queryset(self, request):
         # if state.get("query"):

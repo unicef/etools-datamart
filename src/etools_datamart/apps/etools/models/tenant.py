@@ -1093,6 +1093,9 @@ class PartnersPartnerorganization(models.TenantModel):
     def current_core_value_assessment(self):
         return self.core_values_assessments.filter(archived=False).first()
 
+    def __str__(self):
+        return self.name
+
 
 class PartnersPartnerplannedvisits(models.TenantModel):
     created = models.DateTimeField()

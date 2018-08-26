@@ -23,16 +23,6 @@ class AccessControlAdmin(admin.ModelAdmin):
         return field
 
 
-class ApplicationACLAdmin(AccessControlAdmin):
-    list_display = ('application',) + AccessControlAdmin.list_display
-    list_filter = ('application',) + AccessControlAdmin.list_filter
-    search_fields = ('application',) + AccessControlAdmin.search_fields
-    raw_id_fields = select2_fields = ('application', 'service',)
-
-    def get_queryset(self, request):
-        return super(ApplicationACLAdmin, self).get_queryset(request).select_related(*self.raw_id_fields)
-
-
 class UserACLAdminForm(forms.ModelForm):
     class Meta:
         model = UserAccessControl

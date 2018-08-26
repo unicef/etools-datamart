@@ -68,10 +68,13 @@ class Command(BaseCommand):
 
         if options['tasks'] or _all:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-            from celery import current_app
-            tasks = list(sorted(name for name in current_app.tasks
-                                if name.startswith('etl_')))
+            from etools_datamart.celery import ETLTask, app
+            tasks = [cls for (name, cls) in app.tasks.items()
+                     if isinstance(cls, ETLTask)]
             for task in tasks:
                 PeriodicTask.objects.get_or_create(task=fqn(task.name),
                                                    defaults={'name': fqn(task.name),
                                                              'crontab': midnight})
+
+        from unicef_rest_framework.utils import refresh_service_table
+        refresh_service_table()

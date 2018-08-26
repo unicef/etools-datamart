@@ -29,10 +29,6 @@ class TokenDecodeError(Exception):
     default_detail = _('Token tampered with')
 
 
-class ApplicationDisabled(AuthenticationFailed):
-    default_detail = _('Application disabled. Contact CommonAPI administrators')
-
-
 class InvalidQueryArgumentError(ApiException):
     def __init__(self, field, *args, **kwargs):
         self.field = field

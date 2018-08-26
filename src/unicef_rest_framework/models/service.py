@@ -13,7 +13,6 @@ from unicef_rest_framework.config import conf
 
 from .. import acl
 from .base import MasterDataModel
-from .category import Category
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +20,6 @@ cluster_cache = caches[conf.API_CACHE]
 
 
 class Service(MasterDataModel):
-    category = models.ForeignKey(Category, models.CASCADE, blank=True, null=True)
-
     name = models.CharField(max_length=100, help_text='unique service name',
                             db_index=True, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -39,6 +36,7 @@ class Service(MasterDataModel):
 
     cache_version = models.IntegerField(default=1)
     cache_ttl = models.CharField(default='1d', max_length=5)
+    # cache_expire = models.TimeField(blank=True, null=True)
     cache_key = models.CharField(max_length=1000,
                                  null=True, blank=True,
                                  help_text='Key used to invalidate service cache')
@@ -90,7 +88,7 @@ class Service(MasterDataModel):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.pk:
             try:
-                self.view._service = None
+                self.viewset._service = None
             except Exception as e:
                 logger.exception(e)
         super(Service, self).save(force_insert, force_update, using, update_fields)

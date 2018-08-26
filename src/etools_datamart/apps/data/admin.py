@@ -44,8 +44,9 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     def refresh(self, request):
         try:
             start = time()
-            # load_pmp_indicator()
-            self.load_handler()
+            # _etl_loader is set by DatamartCelery.etl()
+            # used to decorate any ETL task
+            self.model._etl_loader()
             stop = time()
             duration = stop - start
             self.message_user(request, "Data loaded in %.3f" % duration)

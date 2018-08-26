@@ -42,14 +42,13 @@ def get_stash_url(obj, label=None, **kwargs):
 class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('name', 'visible', 'security', 'cache_version',
                     'json', 'admin')
-    list_filter = ('category', 'hidden', 'access')
+    list_filter = ('hidden', 'access')
 
     search_fields = ('name', 'viewset')
     readonly_fields = ('cache_version', 'cache_ttl', 'cache_key', 'viewset', 'name', 'uuid',
                        'last_modify_user')
     form = ServiceForm
     filter_horizontal = ('linked_models',)
-    raw_id_fields = select2_fields = ('category',)
 
     # change_list_template = 'admin/unicef_rest_framework/service/change_list.html'
 
