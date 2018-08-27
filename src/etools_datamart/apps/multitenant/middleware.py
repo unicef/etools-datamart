@@ -32,6 +32,7 @@ class MultiTenantMiddleware(object):
         state.request = request
         response = self.get_response(request)
 
+        response.set_cookie('schemas', ",".join(state.schemas))
         response["X-Schema"] = ",".join(state.schemas)
 
         return response

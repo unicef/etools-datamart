@@ -75,3 +75,5 @@ def test_pmpindicators(django_app, admin_user):
     res = django_app.get(url,
                          extra_environ={'HTTP_X_SCHEMA': "bolivia,chad,lebanon"})
     assert res.status_code == 200
+    # FIXME: remove me (res.showbrowser)
+    res.showbrowser()

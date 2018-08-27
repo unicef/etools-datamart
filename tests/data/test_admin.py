@@ -64,3 +64,19 @@ def test_pmpindicators_detail(django_app, admin_user, settings):
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "bolivia,chad,lebanon"})
     assert res.status_code == 200
+
+
+@pytest.mark.django_db(transaction=True)
+def test_pmpindicators_refresh(django_app, admin_user):
+    url = reverse('admin:login')
+    res = django_app.get(url)
+    res.form['username'] = 'admin'
+    res.form['password'] = 'password'
+    res = res.form.submit()
+    res = res.follow().follow()
+    url = reverse("admin:data_pmpindicators_changelist")
+    res = django_app.get(url,
+                         user=admin_user,
+                         extra_environ={'HTTP_X_SCHEMA': "bolivia,chad,lebanon"})
+    res = res.click('Refresh').follow()
+    assert res.status_code == 200
