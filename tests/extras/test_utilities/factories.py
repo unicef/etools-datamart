@@ -3,7 +3,6 @@ from django.contrib.auth import models
 
 from etools_datamart.apps.data.models import PMPIndicators
 
-
 # class GroupFactory(factory.DjangoModelFactory):
 #     class Meta:
 #         model = models.Group
@@ -14,6 +13,7 @@ from etools_datamart.apps.data.models import PMPIndicators
 #     class Meta:
 #         model = PartnersPartnerorganization
 #         django_get_or_create = ('name',)
+from unicef_rest_framework.models import UserAccessControl, Service
 
 
 class PMPIndicatorFactory(factory.DjangoModelFactory):
@@ -50,3 +50,15 @@ class UserFactory(factory.DjangoModelFactory):
                 user.save()
         user_grant_permissions(user, permissions).start()
         return user
+
+
+class UserAccessControlFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = UserAccessControl
+        django_get_or_create = ('user',)
+
+
+class ServiceFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Service
+        django_get_or_create = ('name',)

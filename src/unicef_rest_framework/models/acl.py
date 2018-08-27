@@ -25,12 +25,12 @@ def default_serializer():
 
 
 class AbstractAccessControl(MasterDataModel):
-    POLICY_FORBID = 0
-    POLICY_GRANT = 1
+    POLICY_DENY = 0
+    POLICY_ALLOW = 1
     POLICY_DEFAULT = 2
 
-    POLICIES = ((POLICY_FORBID, "Forbid"),
-                (POLICY_GRANT, "Grant"),
+    POLICIES = ((POLICY_DENY, "Forbid"),
+                (POLICY_ALLOW, "Grant"),
                 (POLICY_DEFAULT, "Default"),
                 )
     service = models.ForeignKey(Service, models.CASCADE)

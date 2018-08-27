@@ -5,8 +5,8 @@ from django.db import migrations
 
 
 def forwards_func(apps, schema_editor):
-    from unicef_rest_framework.utils import refresh_service_table
-    refresh_service_table()
+    from unicef_rest_framework.models import Service
+    Service.objects.load_services()
 
 
 def reverse_func(apps, schema_editor):

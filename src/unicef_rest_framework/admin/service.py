@@ -15,7 +15,6 @@ from strategy_field.utils import fqn, import_by_name
 from unicef_rest_framework import acl
 from unicef_rest_framework.forms import ServiceForm
 from unicef_rest_framework.models import Service
-from unicef_rest_framework.utils import refresh_service_table
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +110,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def refresh(self, request):
         msgs = {False: 'No new services found',
                 True: 'Found {} new services. Removed {}'}
-        created, deleted = refresh_service_table()
+        created, deleted = Service.objects.load_services()
         self.message_user(request, msgs[bool(created | deleted)].format(created, deleted))
         info = self.model._meta.app_label, self.model._meta.model_name
         return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % info))

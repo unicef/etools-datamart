@@ -76,5 +76,5 @@ class Command(BaseCommand):
                                                    defaults={'name': fqn(task.name),
                                                              'crontab': midnight})
 
-        from unicef_rest_framework.utils import refresh_service_table
-        refresh_service_table()
+        from unicef_rest_framework.models import Service
+        Service.objects.load_services()

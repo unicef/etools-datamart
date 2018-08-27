@@ -42,29 +42,33 @@ def configure_test(settings):
     settings.STATIC_ROOT = str(Path(__file__).parent)
     settings.SESSION_COOKIE_SECURE = False
 
-#
-# @pytest.yield_fixture(scope='session')
-# def django_db_setup(request,
-#                     django_test_environment,
-#                     django_db_blocker,
-#                     django_db_use_migrations,
-#                     django_db_keepdb,
-#                     django_db_createdb,
-#                     django_db_modify_db_settings):
-#     # never touch etools DB
-#     from pytest_django.fixtures import django_db_setup as dj_db_setup
-#     dj_db_setup(request,
-#                 django_test_environment,
-#                 django_db_blocker,
-#                 django_db_use_migrations,
-#                 django_db_keepdb,
-#                 django_db_createdb,
-#                 django_db_modify_db_settings)
+
+@pytest.yield_fixture(scope='session')
+def django_db_setup(request,
+                    django_test_environment,
+                    django_db_blocker,
+                    django_db_use_migrations,
+                    django_db_keepdb,
+                    django_db_createdb,
+                    django_db_modify_db_settings):
+    # never touch etools DB
+    from pytest_django.fixtures import django_db_setup as dj_db_setup
+    dj_db_setup(request,
+                django_test_environment,
+                django_db_blocker,
+                django_db_use_migrations,
+                django_db_keepdb,
+                django_db_createdb,
+                django_db_modify_db_settings)
+
+    from unicef_rest_framework.models import Service
+    with django_db_blocker.unblock():
+        Service.objects.load_services()
 
 
 @pytest.fixture
 def user1(db):
-    from test_utils.factories import UserFactory
+    from test_utilities.factories import UserFactory
     return UserFactory()
 
 
@@ -89,3 +93,4 @@ def reset(monkeypatch):
     conn = connections['etools']
     # conn.search_path_set = False
     conn.search_path = None
+
