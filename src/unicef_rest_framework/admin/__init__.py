@@ -4,13 +4,11 @@ from django.contrib import admin
 from .base import APIModelAdmin  # noqa
 from .filter import SystemFilterAdmin
 from ..models import (Application,
-                      Authorization,
                       Service,
                       CacheVersion,
                       UserAccessControl,
                       SystemFilter)
 from .base import ListDisplayAllMixin, ReadOnlyModelAdmin, TruncateTableMixin  # noqa
-from .auth import AuthorizationAdmin
 from .application import ApplicationAdmin
 from .service import ServiceAdmin
 from .cache import CacheVersionAdmin
@@ -29,4 +27,3 @@ admin.site.register(CacheVersion, CacheVersionAdmin)
 admin.site.register(Service, ServiceAdmin)
 admin.site.register(UserAccessControl, UserACLAdmin)
 admin.site.register(SystemFilter, SystemFilterAdmin)
-admin.site.register(Authorization, AuthorizationAdmin)

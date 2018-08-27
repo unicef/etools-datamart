@@ -25,11 +25,20 @@ def default_serializer():
 
 
 class AbstractAccessControl(MasterDataModel):
+    POLICY_FORBID = 0
+    POLICY_GRANT = 1
+    POLICY_DEFAULT = 2
+
+    POLICIES = ((POLICY_FORBID, "Forbid"),
+                (POLICY_GRANT, "Grant"),
+                (POLICY_DEFAULT, "Default"),
+                )
     service = models.ForeignKey(Service, models.CASCADE)
     rate = models.CharField(max_length=50)
     serializers = ArrayField(SerializerField(),
                              default=default_serializer,
                              blank=True)
+    policy = models.IntegerField(choices=POLICIES)
 
     class Meta:
         abstract = True
