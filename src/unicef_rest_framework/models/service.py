@@ -5,7 +5,7 @@ import logging
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import IntegrityError, models
 from django.db.models import F
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -36,17 +36,17 @@ class ServiceManager(models.Manager):
         for prefix, viewset, basename in router.registry:
             name = getattr(viewset, 'label', viewset.__name__)
             try:
-                service, isnew = Service.objects.get_or_create(name=name,
-                                                               defaults={
-                                                                   'viewset': viewset,
-                                                                   'access': getattr(viewset, 'default_access',
-                                                                                     conf.DEFAULT_ACCESS),
-                                                                   'description': getattr(viewset, '__doc__', "")})
+                service, isnew = self.model.objects.get_or_create(name=name,
+                                                                  defaults={
+                                                                      'viewset': viewset,
+                                                                      'access': getattr(viewset, 'default_access',
+                                                                                        conf.DEFAULT_ACCESS),
+                                                                      'description': getattr(viewset, '__doc__', "")})
 
                 if isnew:
                     created += 1
             except IntegrityError:
-                service = Service.objects.get(name=name)
+                service = self.model.objects.get(name=name)
                 # s.source=source
                 service.icon = viewset.icon
                 service.description = viewset.short_description
@@ -62,14 +62,14 @@ class ServiceManager(models.Manager):
             #         s.cache.ttl_red = ttl_red
             #         s.cache.save()
 
-        for service in Service.objects.all():
+        for service in self.model.objects.all():
             try:
                 assert service.viewset
             except ValidationError:
                 service.delete()
                 deleted += 1
 
-        return created, deleted
+        return created, deleted, self.model.objects.count()
 
 
 class Service(MasterDataModel):

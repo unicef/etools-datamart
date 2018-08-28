@@ -35,7 +35,7 @@ class DatamartCelery(Celery):
         prefix = ""
         if module.endswith('.tasks.etl'):
             module = module[:-10]
-            # prefix = 'etl_'
+            prefix = 'etl_'
         if module.endswith('.tasks'):
             module = module[:-6]
         return prefix + super(DatamartCelery, self).gen_task_name(name, module)

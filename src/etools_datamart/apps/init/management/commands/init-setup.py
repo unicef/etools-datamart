@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from strategy_field.utils import fqn
 
@@ -68,13 +69,24 @@ class Command(BaseCommand):
 
         if options['tasks'] or _all:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-            from etools_datamart.celery import ETLTask, app
-            tasks = [cls for (name, cls) in app.tasks.items()
-                     if isinstance(cls, ETLTask)]
+            from etools_datamart.celery import app
+
+            tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
+            counters = {True: 0, False: 0}
             for task in tasks:
-                PeriodicTask.objects.get_or_create(task=fqn(task.name),
-                                                   defaults={'name': fqn(task.name),
-                                                             'crontab': midnight})
+                __, is_new = PeriodicTask.objects.get_or_create(task=fqn(task),
+                                                                defaults={'name': task.name,
+                                                                          'crontab': midnight})
+            for task in PeriodicTask.objects.all():
+                try:
+                    import_string(task.task)
+                except ImportError as e:
+                    task.delete()
+                    counters[False] += 1
+
+            self.stdout.write(
+                f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
 
         from unicef_rest_framework.models import Service
-        Service.objects.load_services()
+        created, deleted, total = Service.objects.load_services()
+        self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
