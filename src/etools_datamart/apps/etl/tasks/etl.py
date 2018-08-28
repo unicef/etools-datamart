@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 @app.etl(PMPIndicators)
 def load_pmp_indicator():
-    # qs = UsersCountry.objects.exclude(schema_name__in=['public', 'uat', 'frg'])
     connection = connections['etools']
     with clear_schemas():
         schemas = connection.get_tenants()

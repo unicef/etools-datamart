@@ -1,8 +1,8 @@
 import os
+
 from time import time
 
 from celery import Celery
-# set the default Django settings module for the 'celery' program.
 from celery.app.task import TaskType
 from celery.signals import task_prerun, task_postrun
 from celery.task import Task
@@ -18,14 +18,14 @@ class DatamartCelery(Celery):
     etl_cls = ETLTask
     _mapping = {}
 
-    def task(self, *args, **opts):
-        return super().task(*args, **opts)
-
     def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
         if 'model' in options:
             model = options.pop('model')
             model._etl_loader = fun
-        return super()._task_from_fun(fun, name=None, base=None, bind=False, **options)
+
+        task = super()._task_from_fun(fun, name=None, base=None, bind=False, **options)
+        model._etl_task = task
+        return task
 
     def etl(self, model, *args, **opts):
         opts['base'] = ETLTask
@@ -62,4 +62,10 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         cost = time() - app.timers.pop(task_id)
     except KeyError:
         cost = -1
+
+    from etools_datamart.apps.etl.models import Execution
+    Execution.objects.update_or_create(task=task.name,
+                                       defaults={'elapsed': cost,
+                                                 'result': state,
+                                                 })
     app.timers[task.name] = cost

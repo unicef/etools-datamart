@@ -9,6 +9,7 @@ from django.contrib.admin import ModelAdmin, register
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from humanize import naturaldelta
 
 from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
 
@@ -41,15 +42,26 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         return self._changeform_view(request, object_id, form_url, extra_context)
 
     @link()
+    def queue(self, request):
+        try:
+            self.model._etl_task.delay()
+            self.message_user(request, "ETL task scheduled")
+        except Exception as e:
+            self.message_user(request, str(e), messages.ERROR)
+        finally:
+            return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
+                                                              'changelist')))
+
+    @link()
     def refresh(self, request):
         try:
             start = time()
             # _etl_loader is set by DatamartCelery.etl()
             # used to decorate any ETL task
-            self.model._etl_loader()
+            self.model._etl_task.apply()
             stop = time()
             duration = stop - start
-            self.message_user(request, "Data loaded in %.3f" % duration)
+            self.message_user(request, "Data loaded in %f" % naturaldelta(duration))
         except Exception as e:
             self.message_user(request, str(e), messages.ERROR)
         finally:
