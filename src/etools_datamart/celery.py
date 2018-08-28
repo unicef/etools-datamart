@@ -1,8 +1,10 @@
 import os
+from time import time
 
 from celery import Celery
 # set the default Django settings module for the 'celery' program.
 from celery.app.task import TaskType
+from celery.signals import task_prerun, task_postrun
 from celery.task import Task
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
@@ -45,3 +47,19 @@ app = DatamartCelery('datamart')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks(related_name='tasks')
 app.autodiscover_tasks(related_name='etl')
+
+app.timers = {}
+
+
+@task_prerun.connect
+def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
+    app.timers[task_id] = time()
+
+
+@task_postrun.connect
+def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
+    try:
+        cost = time() - app.timers.pop(task_id)
+    except KeyError:
+        cost = -1
+    app.timers[task.name] = cost
