@@ -6,6 +6,7 @@ from celery import Celery
 from celery.app.task import TaskType
 from celery.signals import task_prerun, task_postrun
 from celery.task import Task
+from datetime import datetime
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
@@ -64,8 +65,14 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         cost = -1
 
     from etools_datamart.apps.etl.models import Execution
+    defs = {'elapsed': cost,
+            'result': state,
+            }
+    if state == 'SUCCESS':
+        defs['last_success'] = datetime.now()
+    else:
+        defs['last_failure'] = datetime.now()
+
     Execution.objects.update_or_create(task=task.name,
-                                       defaults={'elapsed': cost,
-                                                 'result': state,
-                                                 })
+                                       defaults=defs)
     app.timers[task.name] = cost

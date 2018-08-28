@@ -8,3 +8,5 @@ class Execution(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
     result = models.CharField(max_length=200)
     elapsed = models.IntegerField()
+    last_success = models.DateTimeField(null=True)
+    last_failure = models.DateTimeField(null=True)

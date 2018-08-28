@@ -10,7 +10,8 @@ from . import models
 
 @register(models.Execution)
 class ExecutionAdmin(admin.ModelAdmin):
-    list_display = readonly_fields = ('task', 'timestamp', 'result', 'time')
+    list_display = readonly_fields = ('task', 'timestamp', 'result', 'time',
+                                      'last_success', 'last_failure')
     date_hierarchy = 'timestamp'
     actions = None
 
