@@ -12,7 +12,7 @@ from .base import ListDisplayAllMixin, ReadOnlyModelAdmin, TruncateTableMixin  #
 from .application import ApplicationAdmin
 from .service import ServiceAdmin
 from .cache import CacheVersionAdmin
-from .acl import UserACLAdmin
+from .acl import UserAccessControlAdmin
 
 __all__ = ['ApplicationAdmin',
            'CacheVersionAdmin'
@@ -25,5 +25,5 @@ __all__ = ['ApplicationAdmin',
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(CacheVersion, CacheVersionAdmin)
 admin.site.register(Service, ServiceAdmin)
-admin.site.register(UserAccessControl, UserACLAdmin)
+admin.site.register(UserAccessControl, UserAccessControlAdmin)
 admin.site.register(SystemFilter, SystemFilterAdmin)
