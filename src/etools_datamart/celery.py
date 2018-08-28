@@ -1,18 +1,23 @@
 import os
-
+from datetime import datetime
 from time import time
 
 from celery import Celery
 from celery.app.task import TaskType
-from celery.signals import task_prerun, task_postrun
+from celery.signals import task_postrun, task_prerun
 from celery.task import Task
-from datetime import datetime
+
+from etools_datamart.apps.etl.lock import only_one
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
 
 class ETLTask(Task, metaclass=TaskType):
     abstract = True
+
+    @only_one(key="SingleTask", timeout=60 * 60)
+    def run(self, **kwargs):
+        print("Acquired lock for up to 5 minutes and ran task!")
 
 
 class DatamartCelery(Celery):
@@ -25,7 +30,8 @@ class DatamartCelery(Celery):
             model._etl_loader = fun
 
         task = super()._task_from_fun(fun, name=None, base=None, bind=False, **options)
-        model._etl_task = task
+        if 'model' in options:
+            model._etl_task = task
         return task
 
     def etl(self, model, *args, **opts):

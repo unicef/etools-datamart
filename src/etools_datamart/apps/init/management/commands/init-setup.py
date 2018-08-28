@@ -1,4 +1,5 @@
 import os
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -6,9 +7,10 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-from strategy_field.utils import fqn
-from etools_datamart.celery import app
 from humanize import naturaldelta
+from strategy_field.utils import fqn
+
+from etools_datamart.celery import app
 
 
 class Command(BaseCommand):

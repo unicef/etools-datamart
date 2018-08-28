@@ -2,9 +2,9 @@ version: '2'
 
 services:
   datamart:
-#    build:
-#      context: .
-#      dockerfile: ./docker/Dockerfile
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev
     image: unicef/datamart:$TAG
     environment:
       CACHE_URL: redis://redis:6379/1
@@ -36,6 +36,7 @@ services:
       POSTGRES_DB: etools_datamart
 
   etools:
+#   this image should be created running `make build` into `./db` directory
     image: unicef/etools-db:dev
     volumes:
       - /data/storage/etools-db/data:/var/lib/postgresql/data
