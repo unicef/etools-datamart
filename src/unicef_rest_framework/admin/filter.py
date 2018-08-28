@@ -54,8 +54,8 @@ class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
         rule = SystemFilter.objects.get(pk=pk)
         try:
             filter = rule.get_querystring()
-            url = "{}{}?{}".format(settings.COMMONAPI_SERVER,
-                                   rule.service.entry_point,
+            url = "{}{}?{}".format(settings.DATAMART_SERVER,
+                                   rule.service.endpoint,
                                    filter)
             res = requests.get(url)
             if res.status_code == 200:

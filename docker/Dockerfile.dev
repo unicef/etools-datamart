@@ -4,5 +4,8 @@ WORKDIR /code
 ADD . /code
 
 RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
-    && pip uninstall etools-datamart .
+    && pip uninstall -y etools-datamart \
     && pip install -e .
+
+ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]

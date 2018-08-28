@@ -140,7 +140,7 @@ def load_intervention():
                                         partner_focal_point_phone=get_attr(record,
                                                                            'partner_focal_point.phone'),
 
-                                        metadata={},
+                                        metadata=record.metadata,
                                         document_type=record.document_type,
                                         updated=record.modified,
                                         created=record.created,

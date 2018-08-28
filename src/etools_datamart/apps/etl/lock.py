@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from functools import wraps
 
 from django.core.cache import caches
 
@@ -16,6 +17,7 @@ def only_one(function=None, key="", timeout=None):
     def _dec(run_func):
         """Decorator."""
 
+        @wraps(run_func)
         def _caller(*args, **kwargs):
             """Caller."""
             ret_value = None
@@ -25,8 +27,11 @@ def only_one(function=None, key="", timeout=None):
                 have_lock = lock.acquire(blocking=False)
                 if have_lock:
                     ret_value = run_func(*args, **kwargs)
+
             finally:
+                print("111: lock.py:26 finally")
                 if have_lock:
+                    print("111: lock.py:26 release")
                     lock.release()
 
             return ret_value

@@ -15,22 +15,20 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings
 class ETLTask(Task, metaclass=TaskType):
     abstract = True
 
-    @only_one(key="SingleTask", timeout=60 * 60)
-    def run(self, **kwargs):
-        print("Acquired lock for up to 5 minutes and ran task!")
-
 
 class DatamartCelery(Celery):
     etl_cls = ETLTask
     _mapping = {}
 
     def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
+        model = None
         if 'model' in options:
             model = options.pop('model')
             model._etl_loader = fun
+        fun = only_one(fun, f"{name}-lock")
 
         task = super()._task_from_fun(fun, name=None, base=None, bind=False, **options)
-        if 'model' in options:
+        if model:
             model._etl_task = task
         return task
 
