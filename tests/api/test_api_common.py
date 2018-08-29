@@ -1,15 +1,7 @@
 # -*- coding: utf-8 -*-
-import pytest
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
+
 from etools_datamart.api.urls import router
-
-
-@pytest.fixture()
-def client(admin_user):
-    client = APIClient()
-    assert client.login(username='admin', password='password')
-    return client
 
 
 def path_from_url(route):

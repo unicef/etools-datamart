@@ -35,13 +35,6 @@ def django_app(django_app_mixin):
 
 @pytest.mark.django_db(transaction=True)
 def test_pmpindicators_list(django_app, admin_user):
-    url = reverse('admin:login')
-    res = django_app.get(url)
-    res.form['username'] = 'admin'
-    res.form['password'] = 'password'
-    res = res.form.submit()
-    res = res.follow().follow()
-
     url = reverse("admin:data_pmpindicators_changelist")
     res = django_app.get(url,
                          user=admin_user,
@@ -52,12 +45,6 @@ def test_pmpindicators_list(django_app, admin_user):
 @pytest.mark.django_db(transaction=True)
 def test_pmpindicators_detail(django_app, admin_user, settings):
     i = PMPIndicatorFactory()
-    url = reverse('admin:login')
-    res = django_app.get(url)
-    res.form['username'] = 'admin'
-    res.form['password'] = 'password'
-    res = res.form.submit()
-    res = res.follow().follow()
     url = reverse("admin:data_pmpindicators_change", args=[i.pk])
     assert admin_user.is_authenticated
     res = django_app.get(url,
@@ -68,12 +55,6 @@ def test_pmpindicators_detail(django_app, admin_user, settings):
 
 @pytest.mark.django_db(transaction=True)
 def test_pmpindicators_refresh(django_app, admin_user):
-    url = reverse('admin:login')
-    res = django_app.get(url)
-    res.form['username'] = 'admin'
-    res.form['password'] = 'password'
-    res = res.form.submit()
-    res = res.follow().follow()
     url = reverse("admin:data_pmpindicators_changelist")
     res = django_app.get(url,
                          user=admin_user,
