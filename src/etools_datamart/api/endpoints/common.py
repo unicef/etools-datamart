@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import Http404
+from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_csv import renderers as r
@@ -12,11 +13,26 @@ from ..renderers import APIBrowsableAPIRenderer
 __all__ = ['MultiTenantReadOnlyModelViewSet']
 
 
+class TenantQueryStringFilterBackend(QueryStringFilterBackend):
+    @property
+    def query_params(self):
+        """
+        More semantically correct name for request.GET.
+        """
+        params = self.request._request.GET
+        if 'country_name' in params:
+            # params['_schema'] = params['country_name']
+            state.schemas = params['country_name']
+            state.schemas = []
+        return params
+
+
 class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
     renderer_classes = [JSONRenderer,
                         APIBrowsableAPIRenderer,
                         r.CSVRenderer,
                         ]
+    filter_backends = [TenantQueryStringFilterBackend]
 
     def drf_ignore_filter(self, request, field):
         return field in '_schemas'

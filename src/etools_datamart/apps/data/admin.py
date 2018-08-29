@@ -7,19 +7,36 @@ from adminfilters.filters import AllValuesComboFilter
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
+from django.contrib.admin.views.main import ChangeList
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
+from etools_datamart.state import state
 
 from . import models
+
+
+class DatamartChangeList(ChangeList):
+    IGNORED_PARAMS = ['_schemas', ]
+
+    def get_filters_params(self, params=None):
+        state.schemas = []
+        ret = super().get_filters_params(params)
+        for ignored in self.IGNORED_PARAMS:
+            if ignored in ret:
+                del ret[ignored]
+        return ret
 
 
 class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
     load_handler = None
     list_filter = (('country_name', AllValuesComboFilter),)
+
+    def get_changelist(self, request, **kwargs):
+        return DatamartChangeList
 
     def has_add_permission(self, request):
         return False
