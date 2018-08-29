@@ -10,6 +10,7 @@ jobs:
           DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
           DATABASE_URL_ETOOLS: "postgis://postgres:postgres@127.0.0.1:5432/etools"
           RELEASE_MATCH: "release/*"
+      - image: redis:alpine
       - image: circleci/postgres:9.6-alpine-postgis
         environment:
           POSTGRES_USER: postgres

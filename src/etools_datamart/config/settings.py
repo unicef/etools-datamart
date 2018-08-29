@@ -10,7 +10,7 @@ import etools_datamart
 from etools_datamart.libs.dbrouter import router_factory
 
 env = environ.Env(DEBUG=(bool, False),
-                  CACHE_URL=(str, "locmemcache://"),
+                  CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
