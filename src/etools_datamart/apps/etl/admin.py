@@ -12,7 +12,7 @@ from etools_datamart.apps.etl.lock import cache
 from . import models
 
 
-@register(models.Execution)
+@register(models.TaskLog)
 class ExecutionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
                     'last_success', 'last_failure', 'running')

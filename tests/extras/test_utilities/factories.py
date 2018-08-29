@@ -1,19 +1,16 @@
 import factory
 from django.contrib.auth import models
+from unicef_rest_framework.models import Service, UserAccessControl
 
-from etools_datamart.apps.data.models import PMPIndicators, Intervention
+from etools_datamart.apps.data.models import Intervention, PMPIndicators
+from etools_datamart.apps.etl.models import TaskLog
 
-# class GroupFactory(factory.DjangoModelFactory):
-#     class Meta:
-#         model = models.Group
-#         django_get_or_create = ('name',)
-#
-#
-# class PartnerOrganizationFactory(factory.DjangoModelFactory):
-#     class Meta:
-#         model = PartnersPartnerorganization
-#         django_get_or_create = ('name',)
-from unicef_rest_framework.models import UserAccessControl, Service
+
+class TaskLogFactory(factory.DjangoModelFactory):
+    elapsed = 10
+
+    class Meta:
+        model = TaskLog
 
 
 class PMPIndicatorFactory(factory.DjangoModelFactory):

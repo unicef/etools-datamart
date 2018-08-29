@@ -69,7 +69,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     except KeyError:
         cost = -1
 
-    from etools_datamart.apps.etl.models import Execution
+    from etools_datamart.apps.etl.models import TaskLog
     defs = {'elapsed': cost,
             'result': state,
             }
@@ -78,8 +78,8 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     else:
         defs['last_failure'] = datetime.now()
 
-    Execution.objects.update_or_create(task=task.name,
-                                       content_type=ContentType.objects.get_for_model(task._model),
-                                       table_name=task._model._meta.db_table,
-                                       defaults=defs)
+    TaskLog.objects.update_or_create(task=task.name,
+                                     content_type=ContentType.objects.get_for_model(task._model),
+                                     table_name=task._model._meta.db_table,
+                                     defaults=defs)
     app.timers[task.name] = cost

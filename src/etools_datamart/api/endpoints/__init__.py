@@ -6,3 +6,4 @@ from .funds import *  # noqa
 from .partners import *  # noqa
 from .openapi import schema_view, get_schema_view  # noqa
 from .datamart import *  # noqa
+from .system import *  # noqa

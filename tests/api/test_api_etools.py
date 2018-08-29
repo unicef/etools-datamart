@@ -4,18 +4,18 @@ from rest_framework.reverse import reverse
 from etools_datamart.api.urls import router
 from etools_datamart.state import state
 
-
-def path_from_url(route):
-    return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
+#
+# def path_from_url(route):
+#     return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
 
 
 def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:
         if metafunc.function.__name__ == 'test_list':
-            urls = filter(lambda url: 'datamart' not in url,
+            urls = filter(lambda url: 'etools/' in url,
                           [reverse("api:%s" % url.name) for url in router.urls if url.name.endswith('-list')])
         elif metafunc.function.__name__ == 'test_retrieve':
-            urls = filter(lambda url: 'datamart' not in url,
+            urls = filter(lambda url: 'etools/' in url,
                           [reverse("api:%s" % url.name, args=['_lastest_']) for url in router.urls if
                            url.name.endswith('-detail')])
         metafunc.parametrize("url", urls)

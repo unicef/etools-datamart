@@ -16,7 +16,7 @@ def pytest_generate_tests(metafunc):
 
 
 @pytest.mark.parametrize('format', ['json', 'html', 'csv'])
-def test_partners(client, url, format):
+def test_list(client, url, format):
     res = client.get(url, format=format, HTTP_X_SCHEMA="public")
     assert res.status_code == 200, res
     assert res.json()
