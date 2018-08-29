@@ -6,6 +6,7 @@ from celery import Celery
 from celery.app.task import TaskType
 from celery.signals import task_postrun, task_prerun
 from celery.task import Task
+from django.contrib.contenttypes.models import ContentType
 
 from etools_datamart.apps.etl.lock import only_one
 
@@ -26,9 +27,9 @@ class DatamartCelery(Celery):
             model = options.pop('model')
             model._etl_loader = fun
         fun = only_one(fun, f"{name}-lock")
-
         task = super()._task_from_fun(fun, name=None, base=None, bind=False, **options)
         if model:
+            task._model = model
             model._etl_task = task
         return task
 
@@ -78,5 +79,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['last_failure'] = datetime.now()
 
     Execution.objects.update_or_create(task=task.name,
+                                       content_type=ContentType.objects.get_for_model(task._model),
+                                       table_name=task._model._meta.db_table,
                                        defaults=defs)
     app.timers[task.name] = cost

@@ -29,9 +29,7 @@ def only_one(function=None, key="", timeout=None):
                     ret_value = run_func(*args, **kwargs)
 
             finally:
-                print("111: lock.py:26 finally")
                 if have_lock:
-                    print("111: lock.py:26 release")
                     lock.release()
 
             return ret_value

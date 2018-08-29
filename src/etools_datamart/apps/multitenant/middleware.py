@@ -28,7 +28,6 @@ class MultiTenantMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        # schemas = request.META.get('HTTP_X_SCHEMA', request.COOKIES.get('schemas', ""))
         schemas = _get_schemas(request)
         if not schemas:
             if request.user and request.user.is_authenticated:
@@ -40,9 +39,6 @@ class MultiTenantMiddleware(object):
             state.schemas = schemas.split(',')
         state.request = request
         response = self.get_response(request)
-
         response.set_cookie('schemas', ",".join(state.schemas))
-
-        response["X-Schema"] = ",".join(state.schemas)
 
         return response

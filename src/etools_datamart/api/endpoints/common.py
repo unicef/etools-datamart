@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import Http404
 from drf_querystringfilter.backend import QueryStringFilterBackend
@@ -21,8 +23,6 @@ class TenantQueryStringFilterBackend(QueryStringFilterBackend):
         """
         params = self.request._request.GET
         if 'country_name' in params:
-            # params['_schema'] = params['country_name']
-            state.schemas = params['country_name']
             state.schemas = []
         return params
 
@@ -53,7 +53,18 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
         return super().get_object()
 
 
+def set_schema_header(func):
+    @wraps(func)
+    def _inner(*args, **kwargs):
+        ret = func(*args, **kwargs)
+        ret['X-Schema'] = ','.join(state.schemas)
+        return ret
+
+    return _inner
+
+
 class MultiTenantReadOnlyModelViewSet(ReadOnlyModelViewSet):
+    @set_schema_header
     def retrieve(self, request, *args, **kwargs):
         if not state.schemas:
             return Response({'error': 'Please set X-Schema header with selected workspace'}, status=400)
@@ -61,6 +72,7 @@ class MultiTenantReadOnlyModelViewSet(ReadOnlyModelViewSet):
             return Response({'error': 'Please set X-Schema header with only one workspace'}, status=400)
         return super().retrieve(request, *args, **kwargs)
 
+    @set_schema_header
     def list(self, request, *args, **kwargs):
         if not state.schemas:
             return Response({'error': 'Please set X-Schema header with selected workspaces'}, status=400)

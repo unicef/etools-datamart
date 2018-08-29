@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
@@ -10,3 +10,8 @@ class Execution(models.Model):
     elapsed = models.IntegerField()
     last_success = models.DateTimeField(null=True)
     last_failure = models.DateTimeField(null=True)
+    table_name = models.CharField(max_length=200, null=True)
+    content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.task

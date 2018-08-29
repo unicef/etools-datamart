@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
@@ -13,16 +14,16 @@ from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
-from etools_datamart.state import state
 
 from . import models
+
+logger = logging.getLogger(__name__)
 
 
 class DatamartChangeList(ChangeList):
     IGNORED_PARAMS = ['_schemas', ]
 
     def get_filters_params(self, params=None):
-        state.schemas = []
         ret = super().get_filters_params(params)
         for ignored in self.IGNORED_PARAMS:
             if ignored in ret:
@@ -80,6 +81,10 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
             duration = stop - start
             self.message_user(request, "Data loaded in %f" % naturaldelta(duration))
         except Exception as e:
+            raise
+            # FIXME: remove me (print)
+            print(f"111: admin.py:85 - {e}")
+            logger.exception(e)
             self.message_user(request, str(e), messages.ERROR)
         finally:
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,

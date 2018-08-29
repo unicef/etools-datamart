@@ -17,7 +17,7 @@ class ExecutionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
                     'last_success', 'last_failure', 'running')
     readonly_fields = ('task', 'timestamp', 'result', 'elapsed', 'time',
-                       'last_success', 'last_failure')
+                       'last_success', 'last_failure', 'table_name', 'content_type')
     date_hierarchy = 'timestamp'
     actions = None
 

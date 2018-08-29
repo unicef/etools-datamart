@@ -76,6 +76,7 @@ def test_api_call_queryparam(client, admin_user):
     res = client.get(url)
     assert res.status_code == 200
     assert state.schemas == ['bolivia', 'lebanon']
+    assert res['X-Schema'] == 'bolivia,lebanon'
 
 
 def test_api_call_queryparam_conflict(client, admin_user):
@@ -89,7 +90,7 @@ def test_api_call_queryparam_conflict(client, admin_user):
     res = client.get(url)
     assert res.status_code == 200
     assert not list(filter(lambda x: x['country_name'] != 'lebanon', res.json()['results']))
-    assert res['X-Schema'] == ''
+    assert 'X-Schema' not in res
 
 
 def test_queryparam_api_vs_admin(client, django_app, admin_user):
@@ -103,9 +104,7 @@ def test_queryparam_api_vs_admin(client, django_app, admin_user):
     res = client.get(url)
     assert res.status_code == 200
     assert not list(filter(lambda x: x['country_name'] != 'lebanon', res.json()['results']))
-    assert res['X-Schema'] == ''
 
     url = f'{reverse("admin:data_intervention_changelist")}?_schemas=bolivia&country_name=lebanon'
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
-    assert res['X-Schema'] == ''
