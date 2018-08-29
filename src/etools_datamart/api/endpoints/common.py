@@ -9,7 +9,7 @@ from etools_datamart.state import state
 
 from ..renderers import APIBrowsableAPIRenderer
 
-__all__ = ['ReadOnlyModelViewSet']
+__all__ = ['MultiTenantReadOnlyModelViewSet']
 
 
 class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
@@ -17,6 +17,9 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
                         APIBrowsableAPIRenderer,
                         r.CSVRenderer,
                         ]
+
+    def drf_ignore_filter(self, request, field):
+        return field in '_schemas'
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
@@ -33,6 +36,8 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
 
         return super().get_object()
 
+
+class MultiTenantReadOnlyModelViewSet(ReadOnlyModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         if not state.schemas:
             return Response({'error': 'Please set X-Schema header with selected workspace'}, status=400)

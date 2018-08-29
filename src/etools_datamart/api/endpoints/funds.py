@@ -5,16 +5,16 @@ from . import common
 from .. import serializers
 
 
-class GrantViewSet(common.ReadOnlyModelViewSet):
+class GrantViewSet(common.MultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.GrantSerializer
     queryset = models.FundsGrant.objects.all()
 
 
-class FundsreservationitemViewSet(common.ReadOnlyModelViewSet):
+class FundsreservationitemViewSet(common.MultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.FundsreservationitemSerializer
     queryset = models.FundsFundsreservationitem.objects.all()
 
 
-class FundsReservationHeaderViewSet(common.ReadOnlyModelViewSet):
+class FundsReservationHeaderViewSet(common.MultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.FundsReservationHeaderSerializer
     queryset = models.FundsFundsreservationheader.objects.all()

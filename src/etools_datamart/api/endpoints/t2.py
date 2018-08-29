@@ -5,6 +5,6 @@ from . import common
 from .. import serializers
 
 
-class FTravelViewSet(common.ReadOnlyModelViewSet):
+class FTravelViewSet(common.MultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.FTravelSerializer
     queryset = models.T2FTravel.objects.all()

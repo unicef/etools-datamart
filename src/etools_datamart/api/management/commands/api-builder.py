@@ -17,7 +17,7 @@ class {realname}Serializer(serializers.ModelSerializer):
 
 VIEWSET = """
 
-class {realname}ViewSet(common.ReadOnlyModelViewSet):
+class {realname}ViewSet(common.MultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.{realname}Serializer
     queryset = models.{model}.objects.all()
 """

@@ -1,7 +1,7 @@
 import factory
 from django.contrib.auth import models
 
-from etools_datamart.apps.data.models import PMPIndicators
+from etools_datamart.apps.data.models import PMPIndicators, Intervention
 
 # class GroupFactory(factory.DjangoModelFactory):
 #     class Meta:
@@ -19,6 +19,13 @@ from unicef_rest_framework.models import UserAccessControl, Service
 class PMPIndicatorFactory(factory.DjangoModelFactory):
     class Meta:
         model = PMPIndicators
+
+
+class InterventionFactory(factory.DjangoModelFactory):
+    metadata = {}
+
+    class Meta:
+        model = Intervention
 
 
 class UserFactory(factory.DjangoModelFactory):
