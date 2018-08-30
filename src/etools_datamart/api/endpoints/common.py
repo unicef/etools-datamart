@@ -1,6 +1,11 @@
-from functools import wraps
+from functools import wraps, lru_cache
 
+import coreapi
+import coreschema
+from babel._compat import force_text
+from coreschema.schemas import Schema
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import models
 from django.http import Http404
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework.renderers import JSONRenderer
@@ -14,8 +19,35 @@ from ..renderers import APIBrowsableAPIRenderer
 
 __all__ = ['MultiTenantReadOnlyModelViewSet']
 
+SCHEMAMAP = {
+    models.BooleanField: coreschema.Boolean,
+    models.IntegerField: coreschema.Integer,
+    models.DecimalField: coreschema.Number,
+    # models.DateField: coreschema.Anything,
+}
+
 
 class TenantQueryStringFilterBackend(QueryStringFilterBackend):
+
+    @lru_cache(100)
+    def get_schema_fields(self, view):
+        ret = []
+        if hasattr(view, 'filter_fields'):
+            for field in view.filter_fields:
+                model = view.serializer_class.Meta.model
+                model_field = model._meta.get_field(field)
+                coreapi_type = SCHEMAMAP.get(type(model_field), coreschema.String)
+                ret.append(coreapi.Field(
+                    name=field,
+                    required=False,
+                    location='query',
+                    schema=coreapi_type(
+                        title=force_text(field),
+                        description=f'{model_field.help_text} - django queryset synthax allowed'
+                    )
+                ))
+        return ret
+
     @property
     def query_params(self):
         """
@@ -33,6 +65,7 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
                         r.CSVRenderer,
                         ]
     filter_backends = [TenantQueryStringFilterBackend]
+
 
     def drf_ignore_filter(self, request, field):
         return field in '_schemas'

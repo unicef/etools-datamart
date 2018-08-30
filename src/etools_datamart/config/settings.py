@@ -442,7 +442,7 @@ UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 TEST_SCHEMAS = ['bolivia', 'chad', 'lebanon']
 
-
-import os
-import raven
-
+SWAGGER_SETTINGS = {
+    # 'DEFAULT_FILTER_INSPECTORS': 'drf_yasg.inspectors.CoreAPICompatInspector',
+    # 'DEFAULT_FILTER_INSPECTORS': 'etools_datamart.api.swagger.FilterInspector',
+}
