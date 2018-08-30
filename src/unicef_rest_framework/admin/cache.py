@@ -29,7 +29,7 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     search_fields = ('name', 'viewset')
     actions = ['incr_version', 'reset_version', 'generate_cache_token']
     readonly_fields = ('cache_key', )
-    list_filter = ('category', 'hidden')
+    list_filter = ('hidden',)
     form = CacheVersionForm
 
     def get_queryset(self, request):

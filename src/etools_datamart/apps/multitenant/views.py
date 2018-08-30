@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
 from etools_datamart.apps.multitenant.forms import SchemasForm
+from etools_datamart.state import state
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ class SelectSchema(FormView):
     def form_valid(self, form):
         self.selected = ",".join([k for (k, v) in form.cleaned_data.items() if v])
         response = HttpResponseRedirect(self.get_success_url())
+        state.schemas = self.selected.split(',')
         response.set_cookie('schemas', self.selected)
         return response
 

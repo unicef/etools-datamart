@@ -54,24 +54,32 @@ ENV START_CELERY "true"
 RUN apt-get update && apt-get install -y \
     curl \
     supervisor \
-    redis-server
+    redis-server \
+    gcc
 
 RUN mkdir -p /code /root/.local/bin \
     && pip install -U pip \
-    && curl https://raw.githubusercontent.com/mitsuhiko/pipsi/master/get-pipsi.py | python \
-    && pip install virtualenv \
-    && pipsi install pipenv
-
-
-#RUN curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1 \
-#    && pipenv install --system --deploy --ignore-pipfile \
-#    && pip install .
+    && pip install pipenv
 
 WORKDIR /code
-ADD . /code
 
-RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
-    && pip install -e .
+RUN curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1 \
+    && pipenv install --system --deploy --ignore-pipfile \
+    && pip install .
+
+# cleanup
+RUN rm -fr \
+    .circleci \
+    db \
+    docker \
+    docs \
+    tests
+#
+
+#ADD . /code
+#
+#RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
+#    && pip install -e .
 
 RUN mkdir -p /var/datamart/{static,log,conf,run}
 

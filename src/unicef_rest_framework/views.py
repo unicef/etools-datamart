@@ -5,6 +5,7 @@ from rest_framework import permissions, viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.pagination import CursorPagination
 from unicef_rest_framework import acl
+from unicef_rest_framework.permissions import URFPermission
 
 
 def paginator(ordering='-created'):
@@ -20,7 +21,7 @@ class classproperty(object):
 
 
 class ApiMixin:
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, URFPermission]
     default_access = acl.ACL_ACCESS_LOGIN
     authentication_classes = (SessionAuthentication, BasicAuthentication)
 

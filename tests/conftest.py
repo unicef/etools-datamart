@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
+from django_webtest import WebTestMixin
 
 
 def pytest_configure(config):
@@ -42,29 +43,33 @@ def configure_test(settings):
     settings.STATIC_ROOT = str(Path(__file__).parent)
     settings.SESSION_COOKIE_SECURE = False
 
-#
-# @pytest.yield_fixture(scope='session')
-# def django_db_setup(request,
-#                     django_test_environment,
-#                     django_db_blocker,
-#                     django_db_use_migrations,
-#                     django_db_keepdb,
-#                     django_db_createdb,
-#                     django_db_modify_db_settings):
-#     # never touch etools DB
-#     from pytest_django.fixtures import django_db_setup as dj_db_setup
-#     dj_db_setup(request,
-#                 django_test_environment,
-#                 django_db_blocker,
-#                 django_db_use_migrations,
-#                 django_db_keepdb,
-#                 django_db_createdb,
-#                 django_db_modify_db_settings)
+
+@pytest.yield_fixture(scope='session')
+def django_db_setup(request,
+                    django_test_environment,
+                    django_db_blocker,
+                    django_db_use_migrations,
+                    django_db_keepdb,
+                    django_db_createdb,
+                    django_db_modify_db_settings):
+    # never touch etools DB
+    from pytest_django.fixtures import django_db_setup as dj_db_setup
+    dj_db_setup(request,
+                django_test_environment,
+                django_db_blocker,
+                django_db_use_migrations,
+                django_db_keepdb,
+                django_db_createdb,
+                django_db_modify_db_settings)
+
+    from unicef_rest_framework.models import Service
+    with django_db_blocker.unblock():
+        Service.objects.load_services()
 
 
 @pytest.fixture
 def user1(db):
-    from test_utils.factories import UserFactory
+    from test_utilities.factories import UserFactory
     return UserFactory()
 
 
@@ -89,3 +94,64 @@ def reset(monkeypatch):
     conn = connections['etools']
     # conn.search_path_set = False
     conn.search_path = None
+
+
+#
+# this is required due a bug in django-webtest that does not
+# properly authenticate if RemoteUserMiddleware is in MIDDLEWARE
+# WebtestUserMiddleware should go AFTER RemoteUserMiddleware if present,
+# official code put it after AuthenticationMiddleware and before RemoteUserMiddleware.
+#
+# Note: This is not a patch, it only works here
+
+class MixinWithInstanceVariables(WebTestMixin):
+    """
+    Override WebTestMixin to make all of its variables instance variables
+    not class variables; otherwise multiple django_app_factory fixtures contend
+    for the same class variables
+    """
+
+    def __init__(self):
+        self.extra_environ = {}
+        self.csrf_checks = True
+        self.setup_auth = True
+
+    def _setup_auth_middleware(self):
+        webtest_auth_middleware = (
+            'django_webtest.middleware.WebtestUserMiddleware')
+        django_auth_middleware = (
+            'django.contrib.auth.middleware.RemoteUserMiddleware')
+
+        if django_auth_middleware not in self.settings_middleware:
+            self.settings_middleware.append(webtest_auth_middleware)
+        else:
+            index = self.settings_middleware.index(django_auth_middleware)
+            self.settings_middleware.insert(index + 1, webtest_auth_middleware)
+
+
+@pytest.fixture(scope='session')
+def django_app_mixin():
+    app_mixin = MixinWithInstanceVariables()
+    return app_mixin
+
+
+@pytest.yield_fixture
+def django_app(django_app_mixin):
+    django_app_mixin._patch_settings()
+    django_app_mixin.renew_app()
+    yield django_app_mixin.app
+    django_app_mixin._unpatch_settings()
+
+
+@pytest.yield_fixture
+def django_app_factory():
+    def factory(csrf_checks=True, extra_environ=None):
+        app_mixin = MixinWithInstanceVariables()
+        app_mixin.csrf_checks = csrf_checks
+        if extra_environ:
+            app_mixin.extra_environ = extra_environ
+        app_mixin._patch_settings()
+        app_mixin.renew_app()
+        return app_mixin.app
+
+    yield factory

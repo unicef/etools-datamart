@@ -113,8 +113,8 @@ class ViewRateThrottle(APIRateThrottle):
         return getattr(view, 'throttle_rate', None)
 
     def get_cache_key(self, request, view):
-        self.uuid = request.application.uuid
-        ident = self.uuid
+        self.pk = request.user.pk
+        ident = self.pk
 
         return self.cache_format % {
             'view': view.fqn,
@@ -131,10 +131,9 @@ class ACLRateThrottle(APIRateThrottle):
             service = view.get_service()
         except AttributeError:
             return None
-        application = request.application
         if request.user.is_superuser:
             return None
-        acl = UserAccessControl.objects.filter(user=application, service=service).first()
+        acl = UserAccessControl.objects.filter(user=request.user, service=service).first()
 
         if acl is None or acl.rate == '*':
             return None
@@ -142,8 +141,8 @@ class ACLRateThrottle(APIRateThrottle):
         return acl.rate
 
     def get_cache_key(self, request, view):
-        messages.info(request._request, request._request.application.uuid)
-        ident = request.application.uuid
+        messages.info(request._request, request._request.user.pk)
+        ident = request._request.user.pk
 
         return self.cache_format % {
             'view': view.fqn,

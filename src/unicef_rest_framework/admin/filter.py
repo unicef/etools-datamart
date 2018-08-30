@@ -26,12 +26,11 @@ class SystemFilterParamInline(TabularInline):
 
 
 class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('service', 'application', 'user', 'group', 'handler')
+    list_display = ('service', 'user', 'group', 'handler')
     readonly_fields = ('handler',)
-    list_filter = ('service', 'application', 'user')
+    list_filter = ('service', 'user')
     search_fields = ('service__name',)
     inlines = [SystemFilterRuleInline, SystemFilterParamInline]
-    raw_id_fields = ('service', 'application', 'user', 'group')
 
     @action()
     def test(self, request, pk):
@@ -55,8 +54,8 @@ class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
         rule = SystemFilter.objects.get(pk=pk)
         try:
             filter = rule.get_querystring()
-            url = "{}{}?{}".format(settings.COMMONAPI_SERVER,
-                                   rule.service.entry_point,
+            url = "{}{}?{}".format(settings.DATAMART_SERVER,
+                                   rule.service.endpoint,
                                    filter)
             res = requests.get(url)
             if res.status_code == 200:

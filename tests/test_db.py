@@ -78,17 +78,17 @@ def test_mixed_schema(db, schema):
     for obj in qs:
         assert obj.assigned_by.username
 
-# @pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
-# def test_filtering(db, schema):
-#     state.schemas = schema
-#     qs = ReportsResult.objects.filter(id__gt=10).order_by('id', 'name')
-#     for obj in qs:
-#         assert obj.name
-#
-#
-# @pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
-# def test_group_by(db, schema):
-#     state.schemas = schema
-#     qs = ReportsResult.objects.values('result_type__name').annotate(total=Count('result_type'))
-#     for obj in qs:
-#         assert obj
+
+@pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
+def test_latest(db, schema):
+    state.schemas = schema
+    obj = ReportsResult.objects.all().latest('id')
+    assert obj.name
+
+
+@pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
+def test_filtering(db, schema):
+    state.schemas = schema
+    qs = ReportsResult.objects.filter(id__gt=10).order_by('id', 'name')
+    for obj in qs:
+        assert obj.name

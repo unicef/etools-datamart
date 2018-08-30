@@ -1,24 +1,28 @@
 import factory
 from django.contrib.auth import models
+from unicef_rest_framework.models import Service, UserAccessControl
 
-from etools_datamart.apps.data.models import PMPIndicators
+from etools_datamart.apps.data.models import Intervention, PMPIndicators
+from etools_datamart.apps.etl.models import TaskLog
 
 
-# class GroupFactory(factory.DjangoModelFactory):
-#     class Meta:
-#         model = models.Group
-#         django_get_or_create = ('name',)
-#
-#
-# class PartnerOrganizationFactory(factory.DjangoModelFactory):
-#     class Meta:
-#         model = PartnersPartnerorganization
-#         django_get_or_create = ('name',)
+class TaskLogFactory(factory.DjangoModelFactory):
+    elapsed = 10
+
+    class Meta:
+        model = TaskLog
 
 
 class PMPIndicatorFactory(factory.DjangoModelFactory):
     class Meta:
         model = PMPIndicators
+
+
+class InterventionFactory(factory.DjangoModelFactory):
+    metadata = {}
+
+    class Meta:
+        model = Intervention
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -50,3 +54,15 @@ class UserFactory(factory.DjangoModelFactory):
                 user.save()
         user_grant_permissions(user, permissions).start()
         return user
+
+
+class UserAccessControlFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = UserAccessControl
+        django_get_or_create = ('user',)
+
+
+class ServiceFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Service
+        django_get_or_create = ('name',)

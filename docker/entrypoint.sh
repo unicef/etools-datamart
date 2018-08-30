@@ -12,6 +12,8 @@ if [ "$@" == "celery" ];then
     django-admin db-isready --wait --timeout 60 --sleep 5
     django-admin db-isready --wait --timeout 300  --sleep 5 --connection etools
 
+    cd /var/datamart
+
     exec supervisord --nodaemon
 elif [ "$@" == "datamart" ];then
 
@@ -30,6 +32,8 @@ elif [ "$@" == "stack" ];then
     django-admin check --deploy
     django-admin init-setup --all --verbosity 1
     django-admin db-isready --wait --timeout 300 --connection etools
+
+    cd /var/datamart
     exec supervisord --nodaemon
 else
     exec "$@"

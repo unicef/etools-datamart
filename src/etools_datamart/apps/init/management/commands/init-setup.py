@@ -5,8 +5,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from humanize import naturaldelta
 from strategy_field.utils import fqn
+
+from etools_datamart.celery import app
 
 
 class Command(BaseCommand):
@@ -40,6 +44,20 @@ class Command(BaseCommand):
             default=False,
             help='schedule tasks')
 
+        parser.add_argument(
+            '--refresh',
+            action='store_true',
+            dest='refresh',
+            default=False,
+            help='refresh datamart tables')
+
+        parser.add_argument(
+            '--async',
+            action='store_true',
+            dest='async',
+            default=False,
+            help='use celery to refresh datamart')
+
     def handle(self, *args, **options):
         verbosity = options['verbosity']
         migrate = options['migrate']
@@ -66,12 +84,41 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"Superuser `{admin}` already exists`.")
 
+        from unicef_rest_framework.models import Service
+        created, deleted, total = Service.objects.load_services()
+        self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
+
         if options['tasks'] or _all:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-            from celery import current_app
-            tasks = list(sorted(name for name in current_app.tasks
-                                if name.startswith('etl_')))
+
+            tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
+            counters = {True: 0, False: 0}
             for task in tasks:
-                PeriodicTask.objects.get_or_create(task=fqn(task.name),
-                                                   defaults={'name': fqn(task.name),
-                                                             'crontab': midnight})
+                __, is_new = PeriodicTask.objects.get_or_create(task=fqn(task),
+                                                                defaults={'name': task.name,
+                                                                          'crontab': midnight})
+            for task in PeriodicTask.objects.all():
+                try:
+                    import_string(task.task)
+                except ImportError as e:
+                    task.delete()
+                    counters[False] += 1
+
+            self.stdout.write(
+                f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
+
+        if options['refresh']:
+
+            self.stdout.write("Refreshing datamart...")
+            for task in PeriodicTask.objects.all()[1:]:
+                etl = import_string(task.task)
+                self.stdout.write(f"Running {task.name}...", ending='\r')
+                self.stdout.flush()
+
+                if options['async']:
+                    etl.delay()
+                    self.stdout.write(f"{task.name} scheduled")
+                else:
+                    ret = etl.apply()
+                    cost = naturaldelta(app.timers[task.name])
+                    self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")

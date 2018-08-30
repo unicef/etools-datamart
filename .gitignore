@@ -1,3 +1,4 @@
+.DS_Store
 *.egg-info
 *.pyo
 *.sqlite
@@ -14,7 +15,8 @@
 __pycache__
 CACHE
 celerybeat-schedule
-coverage.xml
+coverage.
+xml
 djcelery.schedulers.DatabaseScheduler
 LOCAL
 local.yaml

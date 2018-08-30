@@ -25,26 +25,23 @@ def default_serializer():
 
 
 class AbstractAccessControl(MasterDataModel):
+    POLICY_DENY = 0
+    POLICY_ALLOW = 1
+    POLICY_DEFAULT = 2
+
+    POLICIES = ((POLICY_DENY, "Forbid"),
+                (POLICY_ALLOW, "Grant"),
+                (POLICY_DEFAULT, "Default"),
+                )
     service = models.ForeignKey(Service, models.CASCADE)
     rate = models.CharField(max_length=50)
     serializers = ArrayField(SerializerField(),
                              default=default_serializer,
                              blank=True)
+    policy = models.IntegerField(choices=POLICIES)
 
     class Meta:
         abstract = True
-
-
-# class ApplicationAccessControl(AbstractAccessControl):
-#     application = models.ForeignKey(Application, related_name='acl')
-#
-#     class Meta:
-#         verbose_name = 'Application ACL'
-#         verbose_name_plural = 'Application ACLs'
-#         ordering = ('application',)
-#
-#     def __unicode__(self):
-#         return "{0.application} {0.service}".format(self)
 
 
 class UserAccessControl(AbstractAccessControl):

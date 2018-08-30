@@ -5,17 +5,24 @@ DATABASE_URL?=postgres://postgres:@192.168.66.66:5432/etools_datamart
 DATABASE_URL_ETOOLS?=postgis://postgres:@192.168.66.66:15432/etools
 DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKER_IMAGE_NAME=unicef/datamart
-DOCKERFILE?=docker/Dockerfile
+DOCKERFILE?=Dockerfile
 PYPI_INDEX?=https://pypi.org/simple/
 RUN_OPTIONS?=
 TARGET?=dev
+
+dev:
+	cd .. && docker build ${BUILD_OPTIONS} \
+			--build-arg PYPI_INDEX=${PYPI_INDEX} \
+			-t ${DOCKER_IMAGE_NAME}:dev \
+			-f docker/Dockerfile.dev .
 
 build:
 	cd .. && docker build ${BUILD_OPTIONS} \
 			--build-arg PYPI_INDEX=${PYPI_INDEX} \
 			--build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
+			--build-arg DATAMART_VERSION=${TARGET} \
 			-t ${DOCKER_IMAGE} \
-			-f ${DOCKERFILE} .
+			-f docker/${DOCKERFILE} .
 
 release:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}

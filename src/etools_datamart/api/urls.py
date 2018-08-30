@@ -17,7 +17,7 @@ router.register(r'funds/fundsreservationitem', endpoints.FundsreservationitemVie
 router.register(r'funds/grant', endpoints.GrantViewSet)
 router.register(r'partners/agreement', endpoints.AgreementViewSet)
 router.register(r'partners/assessment', endpoints.AssessmentViewSet)
-router.register(r'partners/intervention', endpoints.InterventionViewSet)
+# router.register(r'partners/intervention', endpoints.InterventionViewSet)
 router.register(r'partners/partner-organization', endpoints.PartnerViewSet, base_name='partners')
 router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
 router.register(r'partners/plannedengagement', endpoints.PlannedengagementViewSet)
@@ -28,6 +28,8 @@ router.register(r't2/ftravel', endpoints.FTravelViewSet)
 
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/interventions', endpoints.InterventionViewSet)
+
+router.register(r'system/tasks-log', endpoints.TaskLogViewSet)
 
 urlpatterns = router.urls
 

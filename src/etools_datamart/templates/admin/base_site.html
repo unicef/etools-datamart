@@ -5,5 +5,13 @@
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ 'eTools' }}</a></h1>
 {% endblock %}
-
+{% block userlinks %}
+    {{ block.super }}
+    {% if user.is_superuser %}
+        {% url 'sys-admin-info' as sysinfo %}
+        {% if sysinfo %}
+            <a href="{{ sysinfo }}">Sys Infos</a>
+        {% endif %}
+    {% endif %}
+{% endblock %}
 {% block nav-global %}{% endblock %}

@@ -7,22 +7,16 @@ from ..models import (Application,
                       Service,
                       CacheVersion,
                       UserAccessControl,
-                      SystemFilter,
-                      Category)
+                      SystemFilter)
 from .base import ListDisplayAllMixin, ReadOnlyModelAdmin, TruncateTableMixin  # noqa
 from .application import ApplicationAdmin
 from .service import ServiceAdmin
 from .cache import CacheVersionAdmin
-from .category import CategoryAdmin
-from .acl import (ApplicationACLAdmin,
-                  UserACLAdmin,
-                  GroupACLAdmin)
+from .acl import UserAccessControlAdmin
 
 __all__ = ['ApplicationAdmin',
            'CacheVersionAdmin'
-           'CategoryAdmin',
            'GroupACLAdmin',
-           'ApplicationACLAdmin',
            'ServiceAdmin',
            'UserACLAdmin',
            'ListDisplayAllMixin',
@@ -30,7 +24,6 @@ __all__ = ['ApplicationAdmin',
 
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(CacheVersion, CacheVersionAdmin)
-admin.site.register(Category, CategoryAdmin)
 admin.site.register(Service, ServiceAdmin)
-admin.site.register(UserAccessControl, UserACLAdmin)
+admin.site.register(UserAccessControl, UserAccessControlAdmin)
 admin.site.register(SystemFilter, SystemFilterAdmin)

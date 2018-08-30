@@ -75,6 +75,9 @@ class AuthUser(models.Model):
         managed = False
         db_table = 'auth_user'
 
+    def __str__(self):
+        return self.last_name
+
 
 class AuthUserGroups(models.Model):
     user_id = models.IntegerField()
@@ -176,9 +179,12 @@ class DjangoCeleryBeatPeriodictask(models.Model):
     total_run_count = models.IntegerField()
     date_changed = models.DateTimeField()
     description = models.TextField()
-    crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.DO_NOTHING, related_name='+', blank=True, null=True)
-    interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.DO_NOTHING, related_name='+', blank=True, null=True)
-    solar = models.ForeignKey('DjangoCeleryBeatSolarschedule', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.DO_NOTHING, related_name='+', blank=True,
+                                null=True)
+    interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.DO_NOTHING, related_name='+', blank=True,
+                                 null=True)
+    solar = models.ForeignKey('DjangoCeleryBeatSolarschedule', models.DO_NOTHING, related_name='+', blank=True,
+                              null=True)
 
     class Meta:
         managed = False

@@ -32,6 +32,10 @@ django-celery-beat = "*"
 django-redis = "*"
 django = "==2.0"
 pytest-pythonpath = "*"
+djangorestframework-csv = "*"
+drf-extensions = "*"
+django-sysinfo = "*"
+pre-commit = "*"
 
 [dev-packages]
 pytest = "*"

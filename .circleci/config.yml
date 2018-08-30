@@ -10,6 +10,7 @@ jobs:
           DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
           DATABASE_URL_ETOOLS: "postgis://postgres:postgres@127.0.0.1:5432/etools"
           RELEASE_MATCH: "release/*"
+      - image: redis:alpine
       - image: circleci/postgres:9.6-alpine-postgis
         environment:
           POSTGRES_USER: postgres
@@ -75,7 +76,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "36:e1:ae:c3:f2:0f:27:67:85:44:78:5d:ec:2f:b2:0d"
+            - "79:ac:55:77:7f:2d:33:4f:e4:71:43:d1:78:48:d5:9f"
       - run:
           name: package and release
           command: |
@@ -174,7 +175,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "2b:6f:56:d6:6d:01:3d:81:44:3f:81:98:e9:ef:fe:ff"
+            - "70:aa:15:2a:d9:1c:74:f3:a1:f7:c4:cd:9b:d2:d1:f5"
       - setup_remote_docker
       - run:
           name: Build docker image
@@ -221,4 +222,3 @@ jobs:
               docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
               docker push ${DOCKER_IMAGE}:latest
               docker push ${DOCKER_IMAGE}:${TAG}
-

@@ -14,15 +14,17 @@ from etools_datamart.celery import app
 logger = logging.getLogger(__name__)
 
 
-@app.task()
+@app.etl(PMPIndicators)
 def load_pmp_indicator():
-    # qs = UsersCountry.objects.exclude(schema_name__in=['public', 'uat', 'frg'])
     connection = connections['etools']
     with clear_schemas():
         schemas = connection.get_tenants()
     PMPIndicators.objects.truncate()
     base_url = 'https://etools.unicef.org'
+    created = {}
+
     for country in schemas:
+        created[country.name] = 0
         connection.set_tenant(country)
         logger.info(u'Running on %s' % country.name)
         for partner in PartnersPartnerorganization.objects.prefetch_related(
@@ -68,13 +70,16 @@ def load_pmp_indicator():
                         'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
                         'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
                     })
+                created[country.name] += 1
+    return created
 
 
-@app.task()
+@app.etl(Intervention)
 def load_intervention():
     connection = connections['etools']
     schemas = connection.get_tenants()
     Intervention.objects.truncate()
+    created = {}
     for schema in schemas:
         connection.set_tenant(schema)
         qs = PartnersIntervention.objects.all().select_related('agreement',
@@ -82,62 +87,65 @@ def load_intervention():
                                                                'unicef_signatory',
                                                                'country_programme',
                                                                )
-        for record in qs:
-            Intervention.objects.update_or_create(country_name=schema.name,
-                                                  number=record.number,
-                                                  title=record.title,
-                                                  status=record.status,
-                                                  start_date=record.start,
-                                                  end_date=record.end,
-                                                  review_date_prc=record.review_date_prc,
-                                                  prc_review_document=record.prc_review_document,
+        for num, record in enumerate(qs, 1):
+            Intervention.objects.create(country_name=schema.name,
+                                        number=record.number,
+                                        title=record.title,
+                                        status=record.status,
+                                        start_date=record.start,
+                                        end_date=record.end,
+                                        review_date_prc=record.review_date_prc,
+                                        prc_review_document=record.prc_review_document,
 
-                                                  agreement_id=record.agreement.pk,
-                                                  partner_authorized_officer_signatory_id=get_attr(record,
-                                                                                                   'partner_authorized_officer_signatory.pk'),
-                                                  country_programme_id=get_attr(record, 'country_programme.pk'),
-                                                  intervention_id=record.pk,
-                                                  unicef_signatory_id=get_attr(record, 'unicef_signatory.pk'),
+                                        agreement_id=record.agreement.pk,
+                                        partner_authorized_officer_signatory_id=get_attr(record,
+                                                                                         'partner_authorized_officer_signatory.pk'),
+                                        country_programme_id=get_attr(record, 'country_programme.pk'),
+                                        intervention_id=record.pk,
+                                        unicef_signatory_id=get_attr(record, 'unicef_signatory.pk'),
 
-                                                  signed_by_unicef_date=record.signed_by_unicef_date,
-                                                  signed_by_partner_date=record.signed_by_partner_date,
-                                                  population_focus=record.population_focus,
-                                                  signed_pd_document=record.signed_pd_document,
+                                        signed_by_unicef_date=record.signed_by_unicef_date,
+                                        signed_by_partner_date=record.signed_by_partner_date,
+                                        population_focus=record.population_focus,
+                                        signed_pd_document=record.signed_pd_document,
 
-                                                  submission_date=record.submission_date,
-                                                  submission_date_prc=record.submission_date_prc,
+                                        submission_date=record.submission_date,
+                                        submission_date_prc=record.submission_date_prc,
 
-                                                  unicef_signatory_first_name=get_attr(record,
-                                                                                       'unicef_signatory.first_name'),
-                                                  unicef_signatory_last_name=get_attr(record,
-                                                                                      'unicef_signatory.last_name'),
-                                                  unicef_signatory_email=get_attr(record, 'unicef_signatory.email'),
+                                        unicef_signatory_first_name=get_attr(record,
+                                                                             'unicef_signatory.first_name'),
+                                        unicef_signatory_last_name=get_attr(record,
+                                                                            'unicef_signatory.last_name'),
+                                        unicef_signatory_email=get_attr(record, 'unicef_signatory.email'),
 
-                                                  partner_signatory_title=get_attr(record,
-                                                                                   'partner_authorized_officer_signatory.title'),
-                                                  partner_signatory_first_name=get_attr(record,
-                                                                                        'partner_authorized_officer_signatory.first_name'),
-                                                  partner_signatory_last_name=get_attr(record,
-                                                                                       'partner_authorized_officer_signatory.last_name'),
-                                                  partner_signatory_email=get_attr(record,
-                                                                                   'partner_authorized_officer_signatory.email'),
-                                                  partner_signatory_phone=get_attr(record,
-                                                                                   'partner_authorized_officer_signatory.phone'),
+                                        partner_signatory_title=get_attr(record,
+                                                                         'partner_authorized_officer_signatory.title'),
+                                        partner_signatory_first_name=get_attr(record,
+                                                                              'partner_authorized_officer_signatory.first_name'),
+                                        partner_signatory_last_name=get_attr(record,
+                                                                             'partner_authorized_officer_signatory.last_name'),
+                                        partner_signatory_email=get_attr(record,
+                                                                         'partner_authorized_officer_signatory.email'),
+                                        partner_signatory_phone=get_attr(record,
+                                                                         'partner_authorized_officer_signatory.phone'),
 
-                                                  partner_focal_point_title=get_attr(record,
-                                                                                     'partner_focal_point.title'),
-                                                  partner_focal_point_first_name=get_attr(record,
-                                                                                          'partner_focal_point.first_name'),
-                                                  partner_focal_point_last_name=get_attr(record,
-                                                                                         'partner_focal_point.last_name'),
-                                                  partner_focal_point_email=get_attr(record,
-                                                                                     'partner_focal_point.email'),
-                                                  partner_focal_point_phone=get_attr(record,
-                                                                                     'partner_focal_point.phone'),
+                                        partner_focal_point_title=get_attr(record,
+                                                                           'partner_focal_point.title'),
+                                        partner_focal_point_first_name=get_attr(record,
+                                                                                'partner_focal_point.first_name'),
+                                        partner_focal_point_last_name=get_attr(record,
+                                                                               'partner_focal_point.last_name'),
+                                        partner_focal_point_email=get_attr(record,
+                                                                           'partner_focal_point.email'),
+                                        partner_focal_point_phone=get_attr(record,
+                                                                           'partner_focal_point.phone'),
 
-                                                  metadata={},
-                                                  document_type=record.document_type,
-                                                  updated=record.modified,
-                                                  created=record.created,
+                                        metadata=record.metadata,
+                                        document_type=record.document_type,
+                                        updated=record.modified,
+                                        created=record.created,
 
-                                                  )
+                                        )
+        created[schema.name] = num
+
+    return created

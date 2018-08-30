@@ -47,4 +47,3 @@ if [ -f "$DB_DUMP_LOCATION" ];then
     bzcat $DB_DUMP_LOCATION | nice pg_restore -U etoolusr -F t -d etools
     echo "*** DATABASE CREATED! ***"
 fi
-

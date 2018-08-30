@@ -10,7 +10,7 @@ import etools_datamart
 from etools_datamart.libs.dbrouter import router_factory
 
 env = environ.Env(DEBUG=(bool, False),
-                  CACHE_URL=(str, "locmemcache://"),
+                  CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
@@ -132,7 +132,6 @@ STATICFILES_FINDERS = (
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'etools_datamart.api.middleware.ApiMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -140,6 +139,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware',
+    'etools_datamart.api.middleware.ApiMiddleware',
     'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -217,14 +217,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-
     'raven.contrib.django.raven_compat',
+
     'admin_extra_urls',
     'unicef_rest_framework',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
     'adminfilters',
+    'django_sysinfo',
 
     'django_celery_beat',
 
@@ -440,3 +441,8 @@ TENANT_MODEL = 'etools.UsersCountry'
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 TEST_SCHEMAS = ['bolivia', 'chad', 'lebanon']
+
+SWAGGER_SETTINGS = {
+    # 'DEFAULT_FILTER_INSPECTORS': 'drf_yasg.inspectors.CoreAPICompatInspector',
+    # 'DEFAULT_FILTER_INSPECTORS': 'etools_datamart.api.swagger.FilterInspector',
+}

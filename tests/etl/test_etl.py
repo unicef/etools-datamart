@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from etools_datamart.apps.etl.tasks import load_pmp_indicator, PMPIndicators, load_intervention, Intervention
+from etools_datamart.apps.etl.tasks import Intervention, load_intervention, load_pmp_indicator, PMPIndicators
 
 
 def test_load_pmp_indicator(db):
-    load_pmp_indicator()
+    assert load_pmp_indicator() == {'Bolivia': 7, 'Chad': 7, 'Lebanon': 7}
     assert PMPIndicators.objects.count() == 21
 
 

@@ -20,6 +20,8 @@ exclude entrypoint.sh
 exclude .env
 exclude .env.tpl
 exclude docker-compose.yml
+exclude .pre-commit-config.yaml
+exclude .secrets.baseline
 
 prune .circleci
 prune tests

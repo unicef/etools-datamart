@@ -85,7 +85,7 @@ tenant: {tenant_sql}
             return super(TenantCursor, self).execute(tenant_sql, params * len(state.schemas))
         except django.db.utils.ProgrammingError as e:
             logger.error(msg)
-            raise django.db.utils.ProgrammingError(msg) from e
+            raise django.db.utils.ProgrammingError(f"{e} {msg}") from e
         except Exception as e:
             logger.error(msg)
             raise Exception(msg) from e

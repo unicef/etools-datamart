@@ -4,7 +4,8 @@ import logging
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
-from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, models
 from django.db.models import F
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -13,16 +14,65 @@ from unicef_rest_framework.config import conf
 
 from .. import acl
 from .base import MasterDataModel
-from .category import Category
 
 logger = logging.getLogger(__name__)
 
 cluster_cache = caches[conf.API_CACHE]
 
 
-class Service(MasterDataModel):
-    category = models.ForeignKey(Category, models.CASCADE, blank=True, null=True)
+class ServiceManager(models.Manager):
 
+    def load_services(self):
+        """
+            create a row in the Service table for each known service.
+        Note: do not update existing entries.
+
+        :param request:
+        :param code:
+        :return:
+        """
+        router = conf.ROUTER
+        created = deleted = 0
+        for prefix, viewset, basename in router.registry:
+            name = getattr(viewset, 'label', viewset.__name__)
+            try:
+                service, isnew = self.model.objects.get_or_create(name=name,
+                                                                  defaults={
+                                                                      'viewset': viewset,
+                                                                      'access': getattr(viewset, 'default_access',
+                                                                                        conf.DEFAULT_ACCESS),
+                                                                      'description': getattr(viewset, '__doc__', "")})
+
+                if isnew:
+                    created += 1
+            except IntegrityError:
+                service = self.model.objects.get(name=name)
+                # s.source=source
+                service.icon = viewset.icon
+                service.description = viewset.short_description
+
+            service.viewset = viewset
+            service.save()
+
+            # if viewset_fqn in manager:
+            #     if not s.cache.refresh_function:
+            #         refresh_function, ttl_green, ttl_red = manager[viewset_fqn]
+            #         s.cache.refresh_function = fqn(refresh_function)
+            #         s.cache.ttl_green = ttl_green
+            #         s.cache.ttl_red = ttl_red
+            #         s.cache.save()
+
+        for service in self.model.objects.all():
+            try:
+                assert service.viewset
+            except ValidationError:
+                service.delete()
+                deleted += 1
+
+        return created, deleted, self.model.objects.count()
+
+
+class Service(MasterDataModel):
     name = models.CharField(max_length=100, help_text='unique service name',
                             db_index=True, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -39,6 +89,7 @@ class Service(MasterDataModel):
 
     cache_version = models.IntegerField(default=1)
     cache_ttl = models.CharField(default='1d', max_length=5)
+    # cache_expire = models.TimeField(blank=True, null=True)
     cache_key = models.CharField(max_length=1000,
                                  null=True, blank=True,
                                  help_text='Key used to invalidate service cache')
@@ -50,6 +101,8 @@ class Service(MasterDataModel):
     class Meta:
         ordering = ('name',)
         permissions = (("do_not_scramble", "Can read any service unscrambled"),)
+
+    objects = ServiceManager()
 
     def invalidate_cache(self):
         Service.objects.filter(id=self.pk).update(cache_version=F("cache_version") + 1)
@@ -64,13 +117,11 @@ class Service(MasterDataModel):
         return max(self.access, self.viewset.default_acl)
 
     @cached_property
-    def entry_point(self):
-        try:
-            for __, viewset, base_name, __ in conf.router.registry:
-                if viewset == self.viewset:
-                    return reverse('{}-list'.format(base_name))
-        except Exception as e:
-            logger.exception(e)
+    def endpoint(self):
+        for __, viewset, base_name in conf.ROUTER.registry:
+            if viewset == self.viewset:
+                return reverse(f'api:{base_name}-list')
+        else:
             return None
 
     @cached_property
@@ -90,7 +141,7 @@ class Service(MasterDataModel):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.pk:
             try:
-                self.view._service = None
+                self.viewset._service = None
             except Exception as e:
                 logger.exception(e)
         super(Service, self).save(force_insert, force_update, using, update_fields)
