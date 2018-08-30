@@ -1,4 +1,4 @@
-from functools import wraps, lru_cache
+from functools import lru_cache, wraps
 
 import coreapi
 import coreschema

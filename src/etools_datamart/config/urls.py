@@ -3,7 +3,7 @@ from django.contrib.admin import site
 from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.views.generic import TemplateView
-from django_sysinfo.views import http_basic_login, sysinfo, version, admin_sysinfo
+from django_sysinfo.views import admin_sysinfo, http_basic_login, sysinfo, version
 
 import etools_datamart.api.urls
 
