@@ -3,6 +3,12 @@ FROM unicef/datamart:latest
 WORKDIR /code
 ADD . /code
 
+RUN apt-get update && apt-get install -y \
+    curl \
+    supervisor \
+    redis-server \
+    gcc
+
 RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
     && pip uninstall -y etools-datamart \
     && pip install -e .
