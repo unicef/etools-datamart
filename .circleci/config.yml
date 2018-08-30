@@ -175,7 +175,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "2b:6f:56:d6:6d:01:3d:81:44:3f:81:98:e9:ef:fe:ff"
+            - "70:aa:15:2a:d9:1c:74:f3:a1:f7:c4:cd:9b:d2:d1:f5"
       - setup_remote_docker
       - run:
           name: Build docker image
