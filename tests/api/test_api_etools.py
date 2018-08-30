@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from rest_framework.reverse import reverse
+
 from etools_datamart.api.urls import router
 from etools_datamart.state import state
 

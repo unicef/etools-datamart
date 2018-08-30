@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from etools_datamart.apps.etl.models import TaskLog
-from etools_datamart.apps.etl.tasks import load_intervention, Intervention
+from etools_datamart.apps.etl.tasks import Intervention, load_intervention
 
 
 def test_log(db):

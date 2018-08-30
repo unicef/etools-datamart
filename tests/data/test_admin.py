@@ -2,7 +2,6 @@
 import pytest
 from django.urls import reverse
 from django_webtest import WebTestMixin
-
 from test_utilities.factories import PMPIndicatorFactory
 
 

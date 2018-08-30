@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from etools_datamart.apps.etl.tasks import load_pmp_indicator, PMPIndicators, load_intervention, Intervention
+from etools_datamart.apps.etl.tasks import Intervention, load_intervention, load_pmp_indicator, PMPIndicators
 
 
 def test_load_pmp_indicator(db):

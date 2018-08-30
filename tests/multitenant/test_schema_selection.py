@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import pytest
 from django.urls import reverse
+from test_utilities.factories import InterventionFactory
 
 from etools_datamart.state import state
-from test_utilities.factories import InterventionFactory
 
 
 @pytest.fixture()

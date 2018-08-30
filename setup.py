@@ -5,7 +5,7 @@ import codecs
 import os
 import re
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 init = os.path.join(ROOT, 'src', 'etools_datamart', '__init__.py')

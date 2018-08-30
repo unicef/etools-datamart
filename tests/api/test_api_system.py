@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from rest_framework.reverse import reverse
-from etools_datamart.api.urls import router
 from test_utilities.factories import TaskLogFactory
+
+from etools_datamart.api.urls import router
 
 
 def pytest_generate_tests(metafunc):

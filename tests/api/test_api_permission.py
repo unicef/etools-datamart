@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from rest_framework.test import APIClient
-from unicef_rest_framework.models import UserAccessControl, Service
+from unicef_rest_framework.models import Service, UserAccessControl
 
 
 @pytest.fixture()
