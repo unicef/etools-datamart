@@ -19,7 +19,7 @@ if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_file)
     import logging
 
-    l = logging.getLogger('raven.contrib.django.client.DjangoClient')
+    logger = logging.getLogger('raven.contrib.django.client.DjangoClient')
 
     # from django.core.management import execute_from_command_line
 

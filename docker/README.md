@@ -24,5 +24,3 @@ to configure which services should be started, set `SERVICES` appropriately, ie:
         -e SERVICES="redis,workers,beat,datamart,flower"
         
 **Note** If `SERVICES` is empty internal `supervisord` daemon does not start. 
-
-

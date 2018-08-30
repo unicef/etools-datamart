@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
-import os
-import subprocess
-
 from django import template
 
 from etools_datamart.libs.version import get_full_version
@@ -19,5 +15,4 @@ def server_ip(context):
 
 @register.simple_tag
 def version():
-
     return get_full_version()

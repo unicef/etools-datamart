@@ -37,4 +37,3 @@ shell:
 		-v /data/storage/etools-db/data:/var/lib/postgresql/data \
 		unicef/etools-db:dev \
 		/bin/bash
-

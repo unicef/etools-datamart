@@ -3,7 +3,6 @@ from functools import wraps, lru_cache
 import coreapi
 import coreschema
 from babel._compat import force_text
-from coreschema.schemas import Schema
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.http import Http404
@@ -65,7 +64,6 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
                         r.CSVRenderer,
                         ]
     filter_backends = [TenantQueryStringFilterBackend]
-
 
     def drf_ignore_filter(self, request, field):
         return field in '_schemas'

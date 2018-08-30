@@ -14,6 +14,7 @@ help:
 
 develop:
 	@pipenv install -d
+	pre-commit install
 	$(MAKE) .init-db
 
 
@@ -55,6 +56,7 @@ sync-etools:
 		--exclude-table-data easy_* \
 		--exclude-table-data environment_* \
 		--exclude-table-data filer_* \
+		--exclude-table-data locations_location \
 		--exclude-table-data generic_* \
 		--exclude-table-data notification_* \
 		--exclude-table-data permissions2_* \
