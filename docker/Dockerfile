@@ -54,7 +54,8 @@ ENV START_CELERY "true"
 RUN apt-get update && apt-get install -y \
     curl \
     supervisor \
-    redis-server
+    redis-server \
+    gcc
 
 RUN mkdir -p /code /root/.local/bin \
     && pip install -U pip \
