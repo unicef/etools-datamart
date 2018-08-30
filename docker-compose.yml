@@ -1,46 +1,12 @@
 version: '2'
 
 services:
-  datamart-dev:
+  datamart:
   # to use this docker file with local code, set env var TAG=dev and uncomment
   # build section
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.dev
-    image: unicef/datamart:dev
-    restart: "no"
-    environment:
-      CACHE_URL: redis://redis:6379/1
-      CELERY_BROKER_URL: redis://redis:6379/2
-      CELERY_RESULT_BACKEND: redis://redis:6379/3
-      DATABASE_URL: postgres://postgres:@db:5432/etools_datamart
-      DATABASE_URL_ETOOLS: postgis://postgres:@etools:5432/etools
-      SUPERVISOR_USER: admin
-      SUPERVISOR_PWD: ""
-      DEBUG: "true"
-      STATIC_ROOT: /tmp/static
-      SECURE_SSL_REDIRECT: "false"
-      SESSION_COOKIE_SECURE: "false"
-      CSRF_COOKIE_SECURE: "false"
-      DEVELOPMENT_MODE: "false"
-      STACK: "0"
-    volumes:
-      - $PWD:/code
-    command: datamart
-    ports:
-      - "8000:8000"
-      - "15000:15000"
-    depends_on:
-      - etools
-      - db
-      - redis
-
-  datamart:
-  # to use this docker file with local code, set env var TAG=dev and uncomment
-  # build section
-#    build:
-#      context: .
-#      dockerfile: ./docker/Dockerfile.dev
+      dockerfile: ./docker/$DOCKERFILE
     image: unicef/datamart:$TAG
     environment:
       CACHE_URL: redis://redis:6379/1

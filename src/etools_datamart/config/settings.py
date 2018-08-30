@@ -217,14 +217,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-
     'raven.contrib.django.raven_compat',
+
     'admin_extra_urls',
     'unicef_rest_framework',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
     'adminfilters',
+    'django_sysinfo',
 
     'django_celery_beat',
 
@@ -440,3 +441,8 @@ TENANT_MODEL = 'etools.UsersCountry'
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 TEST_SCHEMAS = ['bolivia', 'chad', 'lebanon']
+
+
+import os
+import raven
+
