@@ -7,6 +7,7 @@ from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.pagination import CursorPagination
 from unicef_rest_framework import acl
+from unicef_rest_framework.config import conf
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.permissions import URFPermission
 
@@ -35,8 +36,15 @@ class ApiMixin:
     @lru_cache()
     def get_service(self):
         from unicef_rest_framework.models import Service
-
-        return Service.objects.get(viewset=self)
+        try:
+            return Service.objects.get(viewset=self)
+        except Service.DoesNotExist:
+            name = getattr(self, 'label', self.__class__.__name__)
+            return Service.objects.create(name=name,
+                                          viewset=self,
+                                          access=getattr(self, 'default_access',
+                                                         conf.DEFAULT_ACCESS),
+                                          description=getattr(self, '__doc__', ""))
 
 
 class DynamicSerializerViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ModelViewSet):
