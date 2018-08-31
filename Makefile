@@ -42,22 +42,7 @@ fullclean:
 
 
 sync-etools:
-	psql ${PG_ETOOLS_PARAMS} -d etools -c "UPDATE auth_user SET \
-						password='', \
-						email = CONCAT('username', id, '@nowhere.org'), \
-						first_name=CONCAT('FIRST_NAME_', id), \
-						last_name=CONCAT('LAST_NAME_', id), \
-						username=CONCAT('username', id)"
-	psql ${PG_ETOOLS_PARAMS} -d etools -c "UPDATE zambia.partners_partnerorganization SET \
-						name = CONCAT('Partner', id), \
-						address = CONCAT('Address', id), \
-						email = CONCAT('email', id, '@nowhere.org'), \
-						phone_number = id, \
-						vendor_number = id, \
-						total_ct_cp = id, \
-						total_ct_cy = id, \
-						net_ct_cy = id, \
-						city = CONCAT('City ', id)"
+	psql ${PG_ETOOLS_PARAMS} -d etools -f src/etools_datamart/apps/multitenant/postgresql/clean.sql
 
 	pg_dump --inserts -O \
 		${PG_ETOOLS_PARAMS} -d etools -n public \
@@ -86,6 +71,7 @@ sync-etools:
 		--exclude-table-data spatial_* \
 		--exclude-table-data tpm_partners_* \
 		--exclude-table-data unicef_notification_* \
+		--exclude-table-data unicef_snapshot_* \
 		--exclude-table-data vision_* \
 		--exclude-table-data waffle_* \
 		-f src/etools_datamart/apps/multitenant/postgresql/public.sqldump
