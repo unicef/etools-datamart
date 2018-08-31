@@ -42,10 +42,28 @@ fullclean:
 
 
 sync-etools:
+	psql ${PG_ETOOLS_PARAMS} -d etools -c "UPDATE auth_user SET \
+						password='', \
+						email = CONCAT('username', id, '@nowhere.org'), \
+						first_name=CONCAT('FIRST_NAME_', id), \
+						last_name=CONCAT('LAST_NAME_', id), \
+						username=CONCAT('username', id)"
+	psql ${PG_ETOOLS_PARAMS} -d etools -c "UPDATE zambia.partners_partnerorganization SET \
+						name = CONCAT('Partner', id), \
+						address = CONCAT('Address', id), \
+						email = CONCAT('email', id, '@nowhere.org'), \
+						phone_number = id, \
+						vendor_number = id, \
+						total_ct_cp = id, \
+						total_ct_cy = id, \
+						net_ct_cy = id, \
+						city = CONCAT('City ', id)"
+
 	pg_dump --inserts -O \
 		${PG_ETOOLS_PARAMS} -d etools -n public \
 		--format c \
 		--blobs \
+		--exclude-table-data authtoken_* \
 		--exclude-table-data celery_* \
 		--exclude-table-data django_admin_log \
 		--exclude-table-data django_celery_* \
