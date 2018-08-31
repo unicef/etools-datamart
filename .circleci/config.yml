@@ -76,9 +76,9 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "70:aa:15:2a:d9:1c:74:f3:a1:f7:c4:cd:9b:d2:d1:f5"
+            - "73:a6:f1:56:5a:28:c5:ea:50:ed:4d:c5:b3:00:54:9c"
       - run:
-          name: package and release
+          name: close release branch and create tag
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
@@ -115,7 +115,7 @@ jobs:
             git push --verbose --tags
             git push origin --verbose --delete release/$TAG
       - run:
-          name: release
+          name: create github release
           command: |
             export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
             echo
