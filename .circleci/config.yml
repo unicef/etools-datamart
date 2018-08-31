@@ -76,7 +76,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "79:ac:55:77:7f:2d:33:4f:e4:71:43:d1:78:48:d5:9f"
+            - "70:aa:15:2a:d9:1c:74:f3:a1:f7:c4:cd:9b:d2:d1:f5"
       - run:
           name: package and release
           command: |
