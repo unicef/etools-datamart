@@ -1,0 +1,15 @@
+.menu-content:before {
+  content: '';
+  /* with class ModalCarrot ??*/
+  background: url("unicef_logo.png");
+  background-size: 100px;
+  background-repeat: no-repeat;
+  margin-left: 80px;
+  margin-bottom: 10px;
+  height: 100px;
+  overflow: hidden;
+  display: block;
+  left: -50px;
+  top: 10px; }
+
+/*# sourceMappingURL=api-doc.css.map */
