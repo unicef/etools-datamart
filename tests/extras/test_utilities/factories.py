@@ -1,6 +1,6 @@
 import factory
 from django.contrib.auth import models
-from unicef_rest_framework.models import Service, UserAccessControl
+from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
 from etools_datamart.apps.data.models import Intervention, PMPIndicators
 from etools_datamart.apps.etl.models import TaskLog
@@ -59,10 +59,28 @@ class UserFactory(factory.DjangoModelFactory):
 class UserAccessControlFactory(factory.DjangoModelFactory):
     class Meta:
         model = UserAccessControl
-        django_get_or_create = ('user',)
+        django_get_or_create = ('user', 'service')
 
 
 class ServiceFactory(factory.DjangoModelFactory):
     class Meta:
         model = Service
         django_get_or_create = ('name',)
+
+
+class SystemFilterFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = SystemFilter
+        django_get_or_create = ('user', 'service')
+
+    @factory.post_generation
+    def rules(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            # if isinstance(extracted, dict):
+            for field, value in extracted.items():
+                rule = self.rules.create(field=field, value=value)
+                rule.save()

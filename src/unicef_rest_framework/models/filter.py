@@ -55,6 +55,9 @@ class SystemFilter(models.Model):
         unique_together = (('service', 'user'),
                            ('service', 'group'))
 
+    def __str__(self):
+        return f"{self.user}/{self.service}"
+
     def set_rule(self, **kwargs):
         for field, value in kwargs.items():
             self.test(**{field: value})
@@ -65,7 +68,7 @@ class SystemFilter(models.Model):
 
     def test(self, **kwargs):
         try:
-            self.service.view().get_queryset().filter(**kwargs)
+            self.service.viewset().get_queryset().filter(**kwargs)
         except (FieldError, TypeError) as e:
             raise InvalidField(e)
 
@@ -93,6 +96,9 @@ class SystemFilterFieldRule(models.Model):
 
     class Meta:
         unique_together = ('filter', 'field')
+
+    def __str__(self):
+        return f"{self.filter}: {self.field}={self.value}"
 
 
 class SystemFilterParam(models.Model):

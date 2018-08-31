@@ -18,10 +18,9 @@ class SystemFilterBackend(BaseFilterBackend):
         """
         return SystemFilter.objects.filter(user=target)
 
-    def filter_queryset(self, request, queryset, view):  # noqa
+    def filter_queryset(self, request, queryset, view):
         filters = {}
-
-        if request.user and request.user.is_authenticated():
+        if request.user and request.user.is_authenticated:
             filters['user'] = request.user
         else:
             return queryset

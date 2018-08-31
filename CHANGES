@@ -1,3 +1,8 @@
+0.4
+---
+* SystemFilters. Ability to force per user/service filters
+
+
 0.3
 ---
 * TaskLog to monitor ETL task

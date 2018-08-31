@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from rest_framework.test import APIClient
-from unicef_rest_framework.models import Service, UserAccessControl
+from unicef_rest_framework.models import UserAccessControl
 
 
 @pytest.fixture()
@@ -24,12 +24,6 @@ def deny(user1, service):
     return UserAccessControlFactory(policy=UserAccessControl.POLICY_DENY,
                                     service=service,
                                     user=user1)
-
-
-@pytest.fixture()
-def service(db):
-    Service.objects.load_services()
-    return Service.objects.order_by('?').first()
 
 
 def test_permission_deny(client, deny):

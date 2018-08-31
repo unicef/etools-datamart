@@ -10,6 +10,7 @@ from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_csv import renderers as r
+from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet as BaseReadOnlyModelViewSet
 
 from etools_datamart.state import state
@@ -63,7 +64,7 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
                         APIBrowsableAPIRenderer,
                         r.CSVRenderer,
                         ]
-    filter_backends = [TenantQueryStringFilterBackend]
+    filter_backends = [SystemFilterBackend, TenantQueryStringFilterBackend]
 
     def drf_ignore_filter(self, request, field):
         return field in '_schemas'
