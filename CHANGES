@@ -1,3 +1,11 @@
+0.3
+---
+* TaskLog to monitor ETL task
+* Avoid ETL taks overlapping
+* Login page
+* Add Filtering information to swagger
+
+
 0.2
 ---
 * add Interventions
