@@ -42,42 +42,7 @@ fullclean:
 
 
 sync-etools:
-	psql ${PG_ETOOLS_PARAMS} -d etools -f src/etools_datamart/apps/multitenant/postgresql/clean.sql
-
-	pg_dump --inserts -O \
-		${PG_ETOOLS_PARAMS} -d etools -n public \
-		--format c \
-		--blobs \
-		--exclude-table-data authtoken_* \
-		--exclude-table-data celery_* \
-		--exclude-table-data django_admin_log \
-		--exclude-table-data django_celery_* \
-		--exclude-table-data django_migrations \
-		--exclude-table-data django_session \
-		--exclude-table-data djcelery_* \
-		--exclude-table-data drfpasswordless_* \
-		--exclude-table-data easy_* \
-		--exclude-table-data environment_* \
-		--exclude-table-data filer_* \
-		--exclude-table-data locations_location \
-		--exclude-table-data generic_* \
-		--exclude-table-data notification_* \
-		--exclude-table-data permissions2_* \
-		--exclude-table-data post_office_* \
-		--exclude-table-data purchase_order_* \
-		--exclude-table-data registration_* \
-		--exclude-table-data reversion_* \
-		--exclude-table-data social_account_* \
-		--exclude-table-data spatial_* \
-		--exclude-table-data tpm_partners_* \
-		--exclude-table-data unicef_notification_* \
-		--exclude-table-data unicef_snapshot_* \
-		--exclude-table-data vision_* \
-		--exclude-table-data waffle_* \
-		-f src/etools_datamart/apps/multitenant/postgresql/public.sqldump
-	pg_dump --inserts -O -U postgres -p 15432 -d etools -h 127.0.0.1 -n zambia | sed 's/zambia/[[schema]]/g' >src/etools_datamart/apps/multitenant/postgresql/tenant.sql
-	ls -aslkG src/etools_datamart/apps/multitenant/postgresql/*.sql*
-
+	sh src/etools_datamart/apps/multitenant/postgresql/dump.sh ${PG_ETOOLS_PARAMS}
 
 docs: .mkbuilddir
 	mkdir -p ${BUILDDIR}/docs

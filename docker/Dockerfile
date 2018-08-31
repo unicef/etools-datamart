@@ -65,16 +65,9 @@ WORKDIR /code
 
 RUN curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1 \
     && pipenv install --system --deploy --ignore-pipfile \
-    && pip install .
+    && pip install . \
+    && rm -fr /code/*
 
-# cleanup
-RUN rm -fr \
-    .circleci \
-    db \
-    docker \
-    docs \
-    tests
-#
 
 #ADD . /code
 #

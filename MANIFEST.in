@@ -23,6 +23,7 @@ exclude docker-compose.yml
 exclude .pre-commit-config.yaml
 exclude .secrets.baseline
 
+
 prune .circleci
 prune tests
 prune db
@@ -32,6 +33,8 @@ recursive-include src/etools_datamart *.*
 recursive-include src/unicef_rest_framework *.*
 recursive-exclude tests *
 recursive-include docs *
+recursive-include src *.sql
+recursive-include src *.sqldump
 
 exclude deploy
 exclude docker

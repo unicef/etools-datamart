@@ -9,7 +9,12 @@ import environ
 import etools_datamart
 from etools_datamart.libs.dbrouter import router_factory
 
+SETTINGS_DIR = Path(__file__).parent
+PACKAGE_DIR = SETTINGS_DIR.parent
+DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
+
 env = environ.Env(DEBUG=(bool, False),
+                  ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
@@ -28,13 +33,7 @@ env = environ.Env(DEBUG=(bool, False),
                   STATIC_ROOT=(str, '/tmp/static'),
                   X_FRAME_OPTIONS=(str, 'DENY'),
                   )
-
-SETTINGS_DIR = Path(__file__).parent
-PACKAGE_DIR = SETTINGS_DIR.parent
-DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
-
-# if Path(str(env_file)).exists():  # pragma: no cover
 environ.Env.read_env(str(env_file))
 
 MEDIA_ROOT = env('MEDIA_ROOT')
@@ -437,6 +436,7 @@ LOGGING_DEBUG = {
 }
 
 TENANT_MODEL = 'etools.UsersCountry'
+ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
