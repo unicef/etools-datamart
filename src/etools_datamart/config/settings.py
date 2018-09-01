@@ -14,6 +14,7 @@ PACKAGE_DIR = SETTINGS_DIR.parent
 DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 
 env = environ.Env(DEBUG=(bool, False),
+                  API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
@@ -307,8 +308,10 @@ REST_FRAMEWORK = {
 
 }
 SWAGGER_SETTINGS = {
-    # 'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
-    'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.FilterInspector', ],
+    'DEFAULT_API_URL': env('API_URL'),
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
+    'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
+    'DEFAULT_GENERATOR_CLASS': 'etools_datamart.api.swagger.generators.APISchemaGenerator',
     'SECURITY_DEFINITIONS': {
         'basic': {
             'type': 'basic'

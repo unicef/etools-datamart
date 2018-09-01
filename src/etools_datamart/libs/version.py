@@ -2,7 +2,8 @@ import datetime
 import functools
 import os
 import subprocess
-from distutils.version import LooseVersion
+
+# from distutils.version import LooseVersion
 
 
 @functools.lru_cache()
@@ -22,7 +23,7 @@ def get_git_changeset():
     timestamp = git_log.communicate()[0]
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
-    except ValueError:
+    except ValueError:  # pragma: no cover
         return None
     return timestamp.strftime('%Y%m%d%H%M%S')
 
@@ -33,17 +34,17 @@ def get_full_version():
     if commit:
         return f"{VERSION} - {commit}"
     return VERSION
-
-
-def get_version_tuple(version):
-    """
-    Return a tuple of version numbers (e.g. (1, 2, 3)) from the version
-    string (e.g. '1.2.3').
-    """
-    loose_version = LooseVersion(version)
-    version_numbers = []
-    for item in loose_version.version:
-        if not isinstance(item, int):
-            break
-        version_numbers.append(item)
-    return tuple(version_numbers)
+#
+#
+# def get_version_tuple(version):
+#     """
+#     Return a tuple of version numbers (e.g. (1, 2, 3)) from the version
+#     string (e.g. '1.2.3').
+#     """
+#     loose_version = LooseVersion(version)
+#     version_numbers = []
+#     for item in loose_version.version:
+#         if not isinstance(item, int):
+#             break
+#         version_numbers.append(item)
+#     return tuple(version_numbers)

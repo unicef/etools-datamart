@@ -29,7 +29,7 @@ SCHEMAMAP = {
 }
 
 
-class Serializer(coreschema.Enum):
+class SchemaSerializerField(coreschema.Enum):
 
     def __init__(self, view: DynamicSerializerMixin, **kwargs):
         self.view = view
@@ -60,14 +60,6 @@ class TenantQueryStringFilterBackend(QueryStringFilterBackend):
     @lru_cache(100)
     def get_schema_fields(self, view):
         ret = []
-        if hasattr(view, 'param_name'):
-            if view.serializers_fieldsets:
-                ret.append(coreapi.Field(
-                    name=view.param_name,
-                    required=False,
-                    location='query',
-                    schema=Serializer(view)
-                ))
         if hasattr(view, 'filter_fields'):
             for field in view.filter_fields:
                 model = view.serializer_class.Meta.model
@@ -103,8 +95,22 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
     filter_backends = [SystemFilterBackend, TenantQueryStringFilterBackend]
     schema = DefaultSchema()
 
+    def filter_queryset(self, queryset):
+        return super().filter_queryset(queryset)
+
+    def get_schema_fields(self):
+        ret = []
+        if self.serializers_fieldsets:
+            ret.append(coreapi.Field(
+                name=self.param_name,
+                required=False,
+                location='query',
+                schema=SchemaSerializerField(self)
+            ))
+        return ret
+
     def drf_ignore_filter(self, request, field):
-        return field in ['_schemas', 'serializer']
+        return field in ['_schemas', 'serializer', 'cursor']
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
@@ -146,3 +152,13 @@ class MultiTenantReadOnlyModelViewSet(ReadOnlyModelViewSet):
         if not state.schemas:
             return Response({'error': 'Please set X-Schema header with selected workspaces'}, status=400)
         return super().list(request, *args, **kwargs)
+
+    def get_schema_fields(self):
+        ret = super(MultiTenantReadOnlyModelViewSet, self).get_schema_fields()
+        ret.append(coreapi.Field(
+            name='_schema',
+            required=False,
+            location='query',
+            schema=coreschema.String(description="comma separated list of schemas")
+        ))
+        return ret

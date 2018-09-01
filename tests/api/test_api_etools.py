@@ -5,9 +5,9 @@ from rest_framework.reverse import reverse
 from etools_datamart.api.urls import router
 from etools_datamart.state import state
 
-#
-# def path_from_url(route):
-#     return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
+
+def path_from_url(route):
+    return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
 
 
 def pytest_generate_tests(metafunc):
@@ -19,7 +19,7 @@ def pytest_generate_tests(metafunc):
             urls = filter(lambda url: 'etools/' in url,
                           [reverse("api:%s" % url.name, args=['_lastest_']) for url in router.urls if
                            url.name.endswith('-detail')])
-        metafunc.parametrize("url", urls)
+        metafunc.parametrize("url", list(urls))
 
 
 @pytest.mark.parametrize('schema', [['bolivia'], ['bolivia', 'chad']], ids=["single", "multiple"])
