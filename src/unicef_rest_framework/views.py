@@ -4,7 +4,7 @@ from functools import lru_cache
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework import viewsets
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.pagination import CursorPagination
 from unicef_rest_framework import acl
 from unicef_rest_framework.config import conf
@@ -27,7 +27,7 @@ class classproperty(object):
 class ApiMixin:
     permission_classes = [URFPermission, ]
     default_access = acl.ACL_ACCESS_LOGIN
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     @classproperty
     def label(cls):
@@ -48,7 +48,8 @@ class ApiMixin:
 
 
 class DynamicSerializerViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ModelViewSet):
-    pass
+    def get_serializer_class(self, target=None):
+        return self.strategy._get_serializer_from_param()
 
 
 class ReadOnlyModelViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):

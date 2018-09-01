@@ -301,11 +301,24 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
     "PAGE_SIZE": 100,
-    "DEFAULT_PAGINATION_CLASS": None,
-    'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters'
+    "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
+    'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
+    # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
 
 }
+SWAGGER_SETTINGS = {
+    # 'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
+    'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.FilterInspector', ],
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        },
+        'token': {
+            'type': 'basic'
+        }
 
+    }
+}
 LOG_DIR = os.environ.get('SIR_LOG_DIR',
                          os.path.expanduser('~/logs'))
 
@@ -441,8 +454,3 @@ ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 TEST_SCHEMAS = ['bolivia', 'chad', 'lebanon']
-
-SWAGGER_SETTINGS = {
-    # 'DEFAULT_FILTER_INSPECTORS': 'drf_yasg.inspectors.CoreAPICompatInspector',
-    # 'DEFAULT_FILTER_INSPECTORS': 'etools_datamart.api.swagger.FilterInspector',
-}

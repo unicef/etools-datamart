@@ -7,8 +7,10 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.http import Http404
 from drf_querystringfilter.backend import QueryStringFilterBackend
+from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+from rest_framework.schemas import DefaultSchema
 from rest_framework_csv import renderers as r
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet as BaseReadOnlyModelViewSet
@@ -27,11 +29,45 @@ SCHEMAMAP = {
 }
 
 
+class Serializer(coreschema.Enum):
+
+    def __init__(self, view: DynamicSerializerMixin, **kwargs):
+        self.view = view
+        kwargs.setdefault('title', 'serializers')
+        kwargs.setdefault('description', self.build_description())
+        super().__init__(list(view.serializers_fieldsets.keys()), **kwargs)
+
+    def build_description(self):
+        defs = []
+        names = []
+        for k, v in self.view.serializers_fieldsets.items():
+            names.append(k)
+            defs.append(f"""- **{k}**: {self.view.get_serializer_fields(v)}
+""")
+
+        description = f"""Define the set of fields to return. Allowed values are:
+            [{'*, *'.join(names)}*]
+
+{''.join(defs)}
+        """
+        return description
+
+
+# class TenantQueryStringFilterBackend(QueryStringFilterBackend):
+
 class TenantQueryStringFilterBackend(QueryStringFilterBackend):
 
     @lru_cache(100)
     def get_schema_fields(self, view):
         ret = []
+        if hasattr(view, 'param_name'):
+            if view.serializers_fieldsets:
+                ret.append(coreapi.Field(
+                    name=view.param_name,
+                    required=False,
+                    location='query',
+                    schema=Serializer(view)
+                ))
         if hasattr(view, 'filter_fields'):
             for field in view.filter_fields:
                 model = view.serializer_class.Meta.model
@@ -65,9 +101,10 @@ class ReadOnlyModelViewSet(BaseReadOnlyModelViewSet):
                         r.CSVRenderer,
                         ]
     filter_backends = [SystemFilterBackend, TenantQueryStringFilterBackend]
+    schema = DefaultSchema()
 
     def drf_ignore_filter(self, request, field):
-        return field in '_schemas'
+        return field in ['_schemas', 'serializer']
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field

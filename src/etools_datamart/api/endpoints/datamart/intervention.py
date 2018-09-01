@@ -13,3 +13,4 @@ class InterventionViewSet(common.ReadOnlyModelViewSet):
     queryset = models.Intervention.objects.all()
     filter_fields = ('country_name', 'title', 'status',
                      'start_date', 'submission_date',)
+    serializers_fieldsets = {'std': None, 'short': ["title", "number"]}
