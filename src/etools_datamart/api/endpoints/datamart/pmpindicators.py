@@ -5,7 +5,7 @@ from . import serializers
 from .. import common
 
 
-class PMPIndicatorsViewSet(common.ReadOnlyModelViewSet):
+class PMPIndicatorsViewSet(common.APIReadOnlyModelViewSet):
     """
 
     """

@@ -16,7 +16,12 @@ DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 env = environ.Env(DEBUG=(bool, False),
                   API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
+
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
+                  API_CACHE_URL=(str, "locmemcache://"),
+                  # CACHE_URL=(str, "dummycache://"),
+                  # API_CACHE_URL=(str, "dummycache://"),
+
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
@@ -34,7 +39,7 @@ env = environ.Env(DEBUG=(bool, False),
                   STATIC_ROOT=(str, '/tmp/static'),
                   X_FRAME_OPTIONS=(str, 'DENY'),
                   )
-env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
+env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env2')
 environ.Env.read_env(str(env_file))
 
 MEDIA_ROOT = env('MEDIA_ROOT')
@@ -150,7 +155,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 CACHES = {
-    'default': env.cache()
+    'default': env.cache(),
+    'api': env.cache('API_CACHE_URL')
 }
 
 ROOT_URLCONF = 'etools_datamart.config.urls'
@@ -321,6 +327,13 @@ SWAGGER_SETTINGS = {
         }
 
     }
+}
+
+REST_FRAMEWORK_EXTENSIONS = {
+    'DEFAULT_OBJECT_CACHE_KEY_FUNC':
+        'rest_framework_extensions.utils.default_object_cache_key_func',
+    'DEFAULT_LIST_CACHE_KEY_FUNC':
+        'rest_framework_extensions.utils.default_list_cache_key_func',
 }
 LOG_DIR = os.environ.get('SIR_LOG_DIR',
                          os.path.expanduser('~/logs'))

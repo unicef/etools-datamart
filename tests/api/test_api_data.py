@@ -4,9 +4,8 @@ from rest_framework.reverse import reverse
 
 from etools_datamart.api.urls import router
 
-
-def path_from_url(route):
-    return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
+# def path_from_url(route):
+#     return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
 
 
 def pytest_generate_tests(metafunc):

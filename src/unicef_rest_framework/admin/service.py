@@ -78,8 +78,8 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     security.allow_tags = True
 
     def json(self, obj):
-        if obj.entry_point:
-            return mark_safe("<a href='{}' target='a'>call</a>".format(obj.entry_point))
+        if obj.endpoint:
+            return mark_safe("<a href='{}' target='a'>call</a>".format(obj.endpoint))
         else:
             return ''
 

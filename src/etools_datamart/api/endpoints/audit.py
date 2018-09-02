@@ -5,6 +5,6 @@ from . import common
 from .. import serializers
 
 
-class EngagementViewSet(common.MultiTenantReadOnlyModelViewSet):
+class EngagementViewSet(common.APIMultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.EngagementSerializer
     queryset = models.AuditEngagement.objects.all()

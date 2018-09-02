@@ -5,7 +5,7 @@ import logging
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, models
+from django.db import models
 from django.db.models import F
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -22,6 +22,20 @@ cluster_cache = caches[conf.API_CACHE]
 
 class ServiceManager(models.Manager):
 
+    def get_for_viewset(self, viewset):
+        name = getattr(viewset, 'label', viewset.__name__)
+
+        service, isnew = self.model.objects.get_or_create(viewset=viewset,
+                                                          defaults={
+                                                              'name': name,
+                                                              'cache_ttl': '1y',
+                                                              'access': getattr(viewset, 'default_access',
+                                                                                conf.DEFAULT_ACCESS),
+                                                              'description': getattr(viewset, '__doc__', "")})
+
+        viewset.get_service.cache_clear()
+        return service, isnew
+
     def load_services(self):
         """
             create a row in the Service table for each known service.
@@ -34,25 +48,17 @@ class ServiceManager(models.Manager):
         router = conf.ROUTER
         created = deleted = 0
         for prefix, viewset, basename in router.registry:
-            name = getattr(viewset, 'label', viewset.__name__)
-            try:
-                service, isnew = self.model.objects.get_or_create(name=name,
-                                                                  defaults={
-                                                                      'viewset': viewset,
-                                                                      'access': getattr(viewset, 'default_access',
-                                                                                        conf.DEFAULT_ACCESS),
-                                                                      'description': getattr(viewset, '__doc__', "")})
+            service, isnew = self.get_for_viewset(viewset)
+            # try:
+            if isnew:
+                created += 1
+            # except IntegrityError:
+            #     service = self.model.objects.get(name=name)
+            #     service.description = viewset.short_description
 
-                if isnew:
-                    created += 1
-            except IntegrityError:
-                service = self.model.objects.get(name=name)
-                # s.source=source
-                service.icon = viewset.icon
-                service.description = viewset.short_description
-
-            service.viewset = viewset
-            service.save()
+            # viewset.get_service.cache_clear()
+            # service.viewset = viewset
+            # service.save()
 
             # if viewset_fqn in manager:
             #     if not s.cache.refresh_function:
@@ -106,6 +112,12 @@ class Service(MasterDataModel):
 
     def invalidate_cache(self):
         Service.objects.filter(id=self.pk).update(cache_version=F("cache_version") + 1)
+        self.refresh_from_db()
+        self.viewset.get_service.cache_clear()
+        cluster_cache.set('{}{}'.format(self.pk, self.name), True)
+
+    def reset_cache(self, value=0):
+        Service.objects.filter(id=self.pk).update(cache_version=value)
         self.refresh_from_db()
         cluster_cache.set('{}{}'.format(self.pk, self.name), True)
 

@@ -25,11 +25,20 @@ def teardown_module(module):
     """
 
 
-def test_user_system_filter(client: APIClient, data_service: Service, user1: User):
+def test_user_system_filter(client: APIClient, data_service: Service, user1: User,
+                            django_assert_no_duplicate_queries,
+                            django_assert_num_queries, settings):
+    settings.CACHES = {'api': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+
     client.force_authenticate(user1)
+    data_service.invalidate_cache()
     SystemFilterFactory(service=data_service, user=user1,
                         rules={'country_name': 'a'})
-    res = client.get(data_service.endpoint, HTTP_X_SCHEMA="public")
+    with django_assert_no_duplicate_queries():
+        with django_assert_num_queries(7):
+            res = client.get(data_service.endpoint, HTTP_X_SCHEMA="public")
     results = res.json()['results']
-    assert [r['country_name'] for r in results] == ['a']
+    assert res['system-filter'] == "country_name=a"
+    assert res['cache-hit'] == "False"
     assert len(results) == 1
+    assert [r['country_name'] for r in results] == ['a']

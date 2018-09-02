@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 import logging
+from functools import lru_cache
 
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -39,6 +39,16 @@ class SystemFilterHandler(object):
         return queryset
 
 
+class SystemFilterManager(models.Manager):
+    @lru_cache()
+    def match(self, request, view):
+        try:
+            return SystemFilter.objects.get(service=view.get_service(),
+                                            user=request.user)
+        except SystemFilter.DoesNotExist:
+            return None
+
+
 class SystemFilter(models.Model):
     """ Store 'hardcoded' filters per user
     @see AutoFilterRule
@@ -50,6 +60,8 @@ class SystemFilter(models.Model):
     description = models.TextField(blank=True)
     handler = models.CharField(max_length=500,
                                default=fqn(SystemFilterHandler))
+
+    objects = SystemFilterManager()
 
     class Meta:
         unique_together = (('service', 'user'),
@@ -72,12 +84,14 @@ class SystemFilter(models.Model):
         except (FieldError, TypeError) as e:
             raise InvalidField(e)
 
+    @lru_cache()
     def get_filters(self):
         f = {}
         for r in self.rules.all():
             f[r.field] = r.value
         return f
 
+    @lru_cache()
     def get_querystring(self):
         f = []
         for field, value in self.get_filters().items():

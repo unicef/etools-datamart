@@ -7,6 +7,8 @@ def test_load_pmp_indicator(db):
     assert PMPIndicators.objects.count() == 21
 
 
-def test_load_intervention(db):
+def test_load_intervention(db, settings, monkeypatch):
+    # settings.CACHES = {'default': {'BACKEND': 'django_redis.cache.RedisCache'}}
+    # monkeypatch.setattr('etools_datamart.apps.etl.lock.cache', caches['default'])
     load_intervention()
     assert Intervention.objects.count() == 21

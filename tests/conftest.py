@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
-from django_webtest import WebTestMixin
 
 
 def pytest_configure(config):
@@ -15,18 +14,26 @@ def pytest_configure(config):
     warnings.simplefilter('once', DeprecationWarning)
     warnings.simplefilter('ignore', RemovedInPytest4Warning)
 
+    # os.environ['DJANGO_SETTINGS_MODULE'] = 'settings_test'
+    os.environ['ENV_FILE_PATH'] = os.path.abspath(os.path.dirname(__file__))
     os.environ['CSRF_COOKIE_SECURE'] = "0"
     os.environ['SECURE_SSL_REDIRECT'] = "0"
     os.environ['SESSION_COOKIE_SECURE'] = "0"
+    os.environ['API_CACHE_URL'] = "dummycache://"
+    # import django
+    # django.setup()
     # os.environ['DATABASE_URL'] = "postgres://postgres:@127.0.0.1:5432/etools_datamart"
     # os.environ['DATABASE_URL_ETOOLS'] = "postgis://postgres:@127.0.0.1:5432/etools"
     # from etools_datamart.config import settings
     # settings.DATABASES['etools']['HOST'] = '127.0.0.1'
     # settings.DATABASES['etools']['PORT'] = '5432'
+    # import django.core.cache
+    # from django.core.cache import CacheHandler
+    # django.core.cache.caches = CacheHandler()
 
 
 @pytest.fixture(autouse=True)
-def configure_test(settings):
+def configure_test(settings, monkeypatch):
     from etools_datamart.config.settings import env
 
     settings.DATABASES['default'] = env.db()
@@ -42,6 +49,9 @@ def configure_test(settings):
     settings.ALLOWED_HOSTS = ['*']
     settings.STATIC_ROOT = str(Path(__file__).parent)
     settings.SESSION_COOKIE_SECURE = False
+    settings.CACHES['api']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+    # settings.CACHES['default']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+    #
 
 
 @pytest.yield_fixture(scope='session')
@@ -97,40 +107,42 @@ def reset(monkeypatch):
 
 
 #
-# this is required due a bug in django-webtest that does not
+# Below code is required due a bug in django-webtest that does not
 # properly authenticate if RemoteUserMiddleware is in MIDDLEWARE
 # WebtestUserMiddleware should go AFTER RemoteUserMiddleware if present,
 # official code put it after AuthenticationMiddleware and before RemoteUserMiddleware.
 #
 # Note: This is not a patch, it only works here
 
-class MixinWithInstanceVariables(WebTestMixin):
-    """
-    Override WebTestMixin to make all of its variables instance variables
-    not class variables; otherwise multiple django_app_factory fixtures contend
-    for the same class variables
-    """
-
-    def __init__(self):
-        self.extra_environ = {}
-        self.csrf_checks = True
-        self.setup_auth = True
-
-    def _setup_auth_middleware(self):
-        webtest_auth_middleware = (
-            'django_webtest.middleware.WebtestUserMiddleware')
-        django_auth_middleware = (
-            'django.contrib.auth.middleware.RemoteUserMiddleware')
-
-        if django_auth_middleware not in self.settings_middleware:
-            self.settings_middleware.append(webtest_auth_middleware)
-        else:
-            index = self.settings_middleware.index(django_auth_middleware)
-            self.settings_middleware.insert(index + 1, webtest_auth_middleware)
-
 
 @pytest.fixture(scope='session')
 def django_app_mixin():
+    from django_webtest import WebTestMixin
+
+    class MixinWithInstanceVariables(WebTestMixin):
+        """
+        Override WebTestMixin to make all of its variables instance variables
+        not class variables; otherwise multiple django_app_factory fixtures contend
+        for the same class variables
+        """
+
+        def __init__(self):
+            self.extra_environ = {}
+            self.csrf_checks = True
+            self.setup_auth = True
+
+        def _setup_auth_middleware(self):
+            webtest_auth_middleware = (
+                'django_webtest.middleware.WebtestUserMiddleware')
+            django_auth_middleware = (
+                'django.contrib.auth.middleware.RemoteUserMiddleware')
+
+            if django_auth_middleware not in self.settings_middleware:
+                self.settings_middleware.append(webtest_auth_middleware)
+            else:
+                index = self.settings_middleware.index(django_auth_middleware)
+                self.settings_middleware.insert(index + 1, webtest_auth_middleware)
+
     app_mixin = MixinWithInstanceVariables()
     return app_mixin
 
@@ -142,16 +154,16 @@ def django_app(django_app_mixin):
     yield django_app_mixin.app
     django_app_mixin._unpatch_settings()
 
-
-@pytest.yield_fixture
-def django_app_factory():
-    def factory(csrf_checks=True, extra_environ=None):
-        app_mixin = MixinWithInstanceVariables()
-        app_mixin.csrf_checks = csrf_checks
-        if extra_environ:
-            app_mixin.extra_environ = extra_environ
-        app_mixin._patch_settings()
-        app_mixin.renew_app()
-        return app_mixin.app
-
-    yield factory
+#
+# @pytest.yield_fixture
+# def django_app_factory():
+#     def factory(csrf_checks=True, extra_environ=None):
+#         app_mixin = MixinWithInstanceVariables()
+#         app_mixin.csrf_checks = csrf_checks
+#         if extra_environ:
+#             app_mixin.extra_environ = extra_environ
+#         app_mixin._patch_settings()
+#         app_mixin.renew_app()
+#         return app_mixin.app
+#
+#     yield factory

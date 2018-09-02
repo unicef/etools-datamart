@@ -7,7 +7,6 @@ from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.pagination import CursorPagination
 from unicef_rest_framework import acl
-from unicef_rest_framework.config import conf
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.permissions import URFPermission
 
@@ -24,38 +23,29 @@ class classproperty(object):
         return self.getter(owner)
 
 
-class ApiMixin:
-    permission_classes = [URFPermission, ]
-    default_access = acl.ACL_ACCESS_LOGIN
+# class ApiMixin:
+# class DynamicSerializerViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ModelViewSet):
+#     def get_serializer_class(self, target=None):
+#         return self.strategy._get_serializer_from_param()
+
+
+class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    default_access = acl.ACL_ACCESS_LOGIN
+    filter_backends = [SystemFilterBackend, QueryStringFilterBackend]
+    filter_blacklist = []
+    filter_fields = []
+    ordering_fields = []
+    pagination_class = paginator()
+    permission_classes = [URFPermission, ]
+    serializers_fieldsets = {}
 
     @classproperty
     def label(cls):
         return cls.__name__.replace("ViewSet", "")
 
+    @classmethod
     @lru_cache()
-    def get_service(self):
+    def get_service(cls):
         from unicef_rest_framework.models import Service
-        try:
-            return Service.objects.get(viewset=self)
-        except Service.DoesNotExist:
-            name = getattr(self, 'label', self.__class__.__name__)
-            return Service.objects.create(name=name,
-                                          viewset=self,
-                                          access=getattr(self, 'default_access',
-                                                         conf.DEFAULT_ACCESS),
-                                          description=getattr(self, '__doc__', ""))
-
-
-class DynamicSerializerViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ModelViewSet):
-    def get_serializer_class(self, target=None):
-        return self.strategy._get_serializer_from_param()
-
-
-class ReadOnlyModelViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
-    pagination_class = paginator()
-    serializers_fieldsets = {}
-    filter_backends = [SystemFilterBackend, QueryStringFilterBackend]
-    filter_blacklist = []
-    filter_fields = []
-    ordering_fields = []
+        return Service.objects.get_for_viewset(cls)[0]
