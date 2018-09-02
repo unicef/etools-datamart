@@ -2,12 +2,14 @@
 import pytest
 from rest_framework.reverse import reverse
 
+from etools_datamart.api.endpoints import PartnerViewSet
 from etools_datamart.api.urls import router
+from etools_datamart.apps.etools.models import PartnersPartnerorganization
+from etools_datamart.apps.multitenant.postgresql.utils import current_schema
 from etools_datamart.state import state
 
-
-def path_from_url(route):
-    return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
+# def path_from_url(route):
+#     return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
 
 
 def pytest_generate_tests(metafunc):
@@ -31,6 +33,13 @@ def test_list(client, url, format, schema):
     assert res.json()
 
 
+def test_list_requires_schema(client):
+    url = reverse("api:partners-list")
+    res = client.get(url, HTTP_X_SCHEMA="")
+    assert res.status_code == 400
+    assert res.json()['error'] == "Please set X-Schema header with selected workspaces"
+
+
 @pytest.mark.parametrize('schema', ['bolivia'])
 @pytest.mark.parametrize('format', ['json', 'html', 'csv'])
 def test_retrieve(client, url, format, schema):
@@ -40,16 +49,25 @@ def test_retrieve(client, url, format, schema):
     assert res.json()
 
 
-def test_retrieve_requires_only_one_Schema(client):
+def test_retrieve_requires_only_one_schema(client):
     url = reverse("api:partners-detail", args=['_lastest_'])
     res = client.get(url, HTTP_X_SCHEMA="bolivia,chad")
     assert res.status_code == 400
-    assert res.json()
+    assert res.json()['error'] == "Please set X-Schema header with only one workspace"
 
-# @pytest.mark.parametrize('schema', [['bolivia'], ['bolivia', 'chad']])
-# @pytest.mark.parametrize('format', ['json', 'html'])
-# def test_options(client, url, format, schema):
-#     res = client.options(url, format=format, HTTP_X_SCHEMA=",".join(schema))
-#     assert state.schemas == schema
-#     assert res.status_code == 200, res
-#     assert res.json()
+
+def test_retrieve_requires_one_schema(client):
+    url = reverse("api:partners-detail", args=['_lastest_'])
+    res = client.get(url, HTTP_X_SCHEMA="")
+    assert res.status_code == 400
+    assert res.json()['error'] == "Please set X-Schema header with selected workspace"
+
+
+def test_retrieve_id(client):
+    url = PartnerViewSet.get_service().endpoint
+    with current_schema('bolivia'):
+        target = PartnersPartnerorganization.objects.first()
+    res = client.get(f"{url}{target.pk}/", HTTP_X_SCHEMA="bolivia")
+    assert state.schemas == ["bolivia"]
+    assert res.status_code == 200, res
+    assert res.json()

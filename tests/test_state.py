@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
 
+import pytest
+
 from etools_datamart.state import State
 
 logger = logging.getLogger(__name__)
+
+pytestmark = pytest.mark.django_db
 
 
 def test_():
@@ -14,8 +18,8 @@ def test_():
 
 def test_clean_empty():
     s = State()
-    s.schemas = ['', 1, 2]
-    assert s.schemas == [1, 2]
+    s.schemas = ['', ' ', 'bolivia', 'chad']
+    assert s.schemas == ['bolivia', 'chad']
 
 
 def test_append_empty():

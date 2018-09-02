@@ -38,7 +38,7 @@ class APIAutoSchema(SwaggerAutoSchema):
 
     def get_query_parameters(self):
         ret = super().get_query_parameters()
-        if hasattr(self._sch.view, 'get_schema_fields'):
+        if hasattr(self._sch.view, 'get_schema_fields'):  # pragma: no cover
             ret += [self.coreapi_field_to_parameter(field) for field in
                     self._sch.view.get_schema_fields()]
         return ret

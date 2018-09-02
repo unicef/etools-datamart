@@ -42,12 +42,12 @@ def raw_sql(s):
 #     return getattr(settings, 'PUBLIC_SCHEMA_NAME', 'public')
 
 
-# @contextmanager
-# def current_schema(schema):
-#     _old = state.schemas
-#     state.schemas = [schema]
-#     yield
-#     state.schemas = _old
+@contextmanager
+def current_schema(schema):
+    _old = state.schemas
+    state.schemas = [schema]
+    yield
+    state.schemas = _old
 
 
 @contextmanager

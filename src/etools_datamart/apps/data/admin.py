@@ -81,9 +81,6 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
             duration = stop - start
             self.message_user(request, "Data loaded in %f" % naturaldelta(duration))
         except Exception as e:
-            raise
-            # FIXME: remove me (print)
-            print(f"111: admin.py:85 - {e}")
             logger.exception(e)
             self.message_user(request, str(e), messages.ERROR)
         finally:

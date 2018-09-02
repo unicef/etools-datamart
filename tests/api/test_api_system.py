@@ -14,6 +14,6 @@ def pytest_generate_tests(metafunc):
 
 def test_list(client, url):
     TaskLogFactory()
-    res = client.get(url, HTTP_X_SCHEMA="-")
+    res = client.get(url, HTTP_X_SCHEMA="public")
     assert res.status_code == 200, res
     assert res.json()

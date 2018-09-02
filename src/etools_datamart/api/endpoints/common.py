@@ -69,20 +69,19 @@ class TenantQueryStringFilterBackend(QueryStringFilterBackend):
     @lru_cache(100)
     def get_schema_fields(self, view):
         ret = []
-        if hasattr(view, 'filter_fields'):
-            for field in view.filter_fields:
-                model = view.serializer_class.Meta.model
-                model_field = model._meta.get_field(field)
-                coreapi_type = SCHEMAMAP.get(type(model_field), coreschema.String)
-                ret.append(coreapi.Field(
-                    name=field,
-                    required=False,
-                    location='query',
-                    schema=coreapi_type(
-                        title=force_text(field),
-                        description=f'{model_field.help_text} - django queryset synthax allowed'
-                    )
-                ))
+        for field in view.filter_fields:
+            model = view.serializer_class.Meta.model
+            model_field = model._meta.get_field(field)
+            coreapi_type = SCHEMAMAP.get(type(model_field), coreschema.String)
+            ret.append(coreapi.Field(
+                name=field,
+                required=False,
+                location='query',
+                schema=coreapi_type(
+                    title=force_text(field),
+                    description=f'{model_field.help_text} - django queryset synthax allowed'
+                )
+            ))
         return ret
 
     @property
@@ -165,24 +164,21 @@ class APICacheResponse(CacheResponse):
             args=args,
             kwargs=kwargs
         )
-        # from django.core.cache import caches
-        self.cache = caches[self.cache_name]
-        # response = self.cache.get(key)
-        response = self.cache.get(key)
+        cache = caches[self.cache_name]
+        response = cache.get(key)
         if not response:
             state.set('cache-hit', False)
             response = view_method(view_instance, request, *args, **kwargs)
             response = view_instance.finalize_response(request, response, *args, **kwargs)
             response.render()  # should be rendered, before picklining while storing to cache
 
-            if not response.status_code >= 400 or self.cache_errors:
-                self.cache.set(key, response, parse_ttl(view_instance.get_service().cache_ttl or '1y'))
-                # self.cache.set(key, response, self.timeout)
+            if not response.status_code >= 400 or self.cache_errors:  # pragma: no cover
+                cache.set(key, response, parse_ttl(view_instance.get_service().cache_ttl or '1y'))
         else:
             state.set('cache-hit', True)
         state.set('cache-ttl', view_instance.get_service().cache_ttl)
 
-        if not hasattr(response, '_closable_objects'):
+        if not hasattr(response, '_closable_objects'):  # pragma: no cover
             response._closable_objects = []
 
         return response

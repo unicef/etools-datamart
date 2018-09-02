@@ -30,10 +30,11 @@ class MultiTenantMiddleware(object):
     def __call__(self, request):
         schemas = _get_schemas(request)
         if not schemas:
-            if request.user and request.user.is_authenticated:
-                select_schema_url = reverse('multitenant:select-schema')
-                if request.path != select_schema_url:
-                    return HttpResponseRedirect(select_schema_url)
+            if request.path.startswith('/admin/'):
+                if request.user and request.user.is_authenticated:
+                    select_schema_url = reverse('multitenant:select-schema')
+                    if request.path != select_schema_url:
+                        return HttpResponseRedirect(select_schema_url)
             state.schemas = []
         else:
             state.schemas = schemas.split(',')
