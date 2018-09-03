@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.urls import reverse
 
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
 from etools_datamart.state import state
 
 
-@pytest.mark.django_db(transaction=True)
 def test_changelist(django_app, admin_user):
     url = reverse("admin:etools_partnerspartnerorganization_changelist")
     res = django_app.get(url,
@@ -20,6 +18,9 @@ def test_change_form(django_app, admin_user):
     state.schemas = schemas
 
     obj = PartnersPartnerorganization.objects.first()
+    assert obj
+    assert state.schemas
+
     url = reverse("admin:etools_partnerspartnerorganization_change", args=[f"{obj.pk}-bolivia"])
     res = django_app.get(url,
                          user=admin_user,
@@ -41,3 +42,11 @@ def test_select_schema(django_app, admin_user):
     res.form['bolivia'] = True
     res = res.form.submit()
     assert res.status_code == 302
+
+
+def test_changelist2(django_app, admin_user):
+    url = reverse("admin:etools_partnersagreement_changelist")
+    res = django_app.get(url,
+                         user=admin_user,
+                         extra_environ={'HTTP_X_SCHEMA': "bolivia,chad,lebanon"})
+    assert res.status_code == 200

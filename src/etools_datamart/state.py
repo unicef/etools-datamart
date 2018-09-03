@@ -24,12 +24,12 @@ class SchemaList(list):
             super(SchemaList, self).insert(index, schema)
 
     def clean(self):
-        return [e for e in self if e]
+        return SchemaList([e for e in self if e])
 
     def _clean(self, value):
         value = value.lower().strip()
 
-        if value not in self.valid:
+        if value and value not in self.valid:
             raise InvalidSchema(value)
         return value
 
@@ -44,7 +44,7 @@ class SchemaDescriptor:
         self.val = SchemaList()
 
     def __get__(self, instance, owner):
-        return self.val.clean()
+        return self.val
 
     def __set__(self, instance, value):
         self.val = SchemaList(value)

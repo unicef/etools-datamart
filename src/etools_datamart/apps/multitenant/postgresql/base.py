@@ -6,9 +6,8 @@ import django.db.utils
 import psycopg2
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db.backends.postgresql_psycopg2 import base as original_backend
-from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
+from django.db.backends.utils import CursorWrapper
 
 from etools_datamart.state import state
 
@@ -30,23 +29,23 @@ SINGLE_TENANT = 1
 MULTI_TENANT = 2
 
 
-def _is_valid_identifier(identifier):
-    return bool(SQL_IDENTIFIER_RE.match(identifier))
-
-
-def _check_identifier(identifier):
-    if not _is_valid_identifier(identifier):
-        raise ValidationError("Invalid string used for the identifier.")
-
-
-def _is_valid_schema_name(name):
-    return _is_valid_identifier(name) and not SQL_SCHEMA_NAME_RESERVED_RE.match(name)
-
-
-def _check_schema_name(name):
-    if not _is_valid_schema_name(name):
-        raise ValidationError("Invalid string used for the schema name.")
-
+# def _is_valid_identifier(identifier):
+#     return bool(SQL_IDENTIFIER_RE.match(identifier))
+#
+#
+# def _check_identifier(identifier):
+#     if not _is_valid_identifier(identifier):
+#         raise ValidationError("Invalid string used for the identifier.")
+#
+#
+# def _is_valid_schema_name(name):
+#     return _is_valid_identifier(name) and not SQL_SCHEMA_NAME_RESERVED_RE.match(name)
+#
+#
+# def _check_schema_name(name):
+#     if not _is_valid_schema_name(name):
+#         raise ValidationError("Invalid string used for the schema name.")
+#
 
 class TenantCursor(CursorWrapper):
 
@@ -66,8 +65,8 @@ sql: {sql}
         try:
             if len(state.schemas) == 0:
                 return super(TenantCursor, self).execute(sql, params)
-            if not sql.strip().startswith('SELECT'):
-                return super(TenantCursor, self).execute(sql, params)
+            # if not sql.strip().startswith('SELECT'):
+            #     return super(TenantCursor, self).execute(sql, params)
 
             p = Parser(sql)
             tenant_sql = p.with_schemas(*state.schemas)
@@ -83,15 +82,15 @@ tenant: {tenant_sql}
 
             logger.debug(msg)
             return super(TenantCursor, self).execute(tenant_sql, params * len(state.schemas))
-        except django.db.utils.ProgrammingError as e:
+        except django.db.utils.ProgrammingError as e:  # pragma: no cover
             logger.error(msg)
             raise django.db.utils.ProgrammingError(f"{e} {msg}") from e
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.error(msg)
             raise Exception(msg) from e
 
 
-class TenantDebugCursor(TenantCursor):
+class TenantDebugCursor(TenantCursor):  # pragma: no cover
     def execute(self, sql, params=None):
         start = time()
         try:
@@ -210,17 +209,11 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     def make_debug_cursor(self, cursor):
         """Create a cursor that logs all queries in self.queries_log."""
-        if self.mode == SINGLE_TENANT:
-            return CursorDebugWrapper(cursor, self)
-        else:
-            return TenantDebugCursor(cursor, self)
+        return TenantDebugCursor(cursor, self)
 
     def make_cursor(self, cursor):
         """Create a cursor without debug logging."""
-        if self.mode == SINGLE_TENANT:
-            return CursorWrapper(cursor, self)
-        else:
-            return TenantCursor(cursor, self)
+        return TenantCursor(cursor, self)
 
     # def single_cursor(self, name=None, ):
     #     if name:
@@ -246,7 +239,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         must go through this to get the cursor handle. We change the path.
         """
 
-        if name:
+        if name:  # pragma: no cover
             # Only supported and required by Django 1.11 (server-side cursor)
             cursor = super(DatabaseWrapper, self)._cursor(name=name)
         else:
@@ -257,7 +250,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         if self.search_path != state.schemas:
             search_paths = ["public"]
             search_paths.extend(state.schemas)
-            if name:
+            if name:  # pragma: no cover
                 # Named cursor can only be used once
                 cursor_for_search_path = self.connection.cursor()
             else:
@@ -270,14 +263,14 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
             try:
                 # self.set_search_paths(cursor_for_search_path, *search_paths)
                 cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(search_paths))))
-            except (django.db.utils.DatabaseError, psycopg2.InternalError):
+            except (django.db.utils.DatabaseError, psycopg2.InternalError):  # pragma: no cover
                 # self.search_path_set = False
                 self.search_path = None
             else:
                 # self.search_path_set = True
                 self.search_path = state.schemas
 
-            if name:
+            if name:  # pragma: no cover
                 cursor_for_search_path.close()
 
         return cursor

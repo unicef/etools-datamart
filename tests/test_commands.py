@@ -11,7 +11,7 @@ from django.db import OperationalError
 @pytest.mark.django_db
 def test_init_setup_all(db, settings):
     settings.DEBUG = True
-    call_command("init-setup", all=True, stdout=StringIO())
+    call_command("init-setup", all=True, refresh=True, stdout=StringIO())
     ModelUser = get_user_model()
     assert ModelUser.objects.exists()
 

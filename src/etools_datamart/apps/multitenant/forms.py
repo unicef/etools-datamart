@@ -1,57 +1,53 @@
 # -*- coding: utf-8 -*-
 import logging
 
-import sqlparse
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import BaseValidator
 from django.db import connections
-from sqlparse.exceptions import SQLParseError
-from sqlparse.tokens import Keyword
 
 logger = logging.getLogger(__name__)
 
 
-class SQLStatementValidator(BaseValidator):
-    message = 'Ensure this value is valid SQL clause.'
-    code = 'sql'
+# class SQLStatementValidator(BaseValidator):
+#     message = 'Ensure this value is valid SQL clause.'
+#     code = 'sql'
+#
+#     def __call__(self, value):
+#         try:
+#             parts = sqlparse.parse(value)
+#             tokens = parts[0].tokens
+#             dml = [token for token in tokens if token.ttype is Keyword.DML]
+#             if not dml or dml[0].value != 'SELECT':
+#                 raise ValidationError("Only SELECT statement allowed", code=self.code)
+#
+#         except SQLParseError:
+#             raise ValidationError(self.message, code=self.code)
 
-    def __call__(self, value):
-        try:
-            parts = sqlparse.parse(value)
-            tokens = parts[0].tokens
-            dml = [token for token in tokens if token.ttype is Keyword.DML]
-            if not dml or dml[0].value != 'SELECT':
-                raise ValidationError("Only SELECT statement allowed", code=self.code)
 
-        except SQLParseError:
-            raise ValidationError(self.message, code=self.code)
-
-
-class SQLForm(forms.Form):
-    raw = forms.BooleanField(required=False)
-    statement = forms.CharField(widget=forms.Textarea,
-                                validators=[SQLStatementValidator("")])
-    original = forms.CharField(widget=forms.Textarea,
-                               required=False,
-                               validators=[SQLStatementValidator("")])
-
-    def __init__(self, *args, **kwargs):
-        self.confirm = kwargs.pop('confirm', False)
-        super().__init__(*args, **kwargs)
-        if self.confirm:
-            self.fields['raw'].widget = forms.HiddenInput()
-            self.fields['raw'].original = forms.HiddenInput()
-
-    @property
-    def media(self):
-        extra = '' if settings.DEBUG else '.min'
-        js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
-        ]
-        return forms.Media(js=['admin/js/%s' % url for url in js])
+# class SQLForm(forms.Form):
+#     raw = forms.BooleanField(required=False)
+#     statement = forms.CharField(widget=forms.Textarea,
+#                                 validators=[SQLStatementValidator("")])
+#     original = forms.CharField(widget=forms.Textarea,
+#                                required=False,
+#                                validators=[SQLStatementValidator("")])
+#
+#     def __init__(self, *args, **kwargs):
+#         self.confirm = kwargs.pop('confirm', False)
+#         super().__init__(*args, **kwargs)
+#         if self.confirm:
+#             self.fields['raw'].widget = forms.HiddenInput()
+#             self.fields['raw'].original = forms.HiddenInput()
+#
+#     @property
+#     def media(self):
+#         extra = '' if settings.DEBUG else '.min'
+#         js = [
+#             'vendor/jquery/jquery%s.js' % extra,
+#             'jquery.init.js',
+#         ]
+#         return forms.Media(js=['admin/js/%s' % url for url in js])
 
 
 class SchemasForm(forms.Form):

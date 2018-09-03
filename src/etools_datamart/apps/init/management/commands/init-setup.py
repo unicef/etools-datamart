@@ -82,7 +82,7 @@ class Command(BaseCommand):
                                                                               "password": make_password(pwd)})
         if created:  # pragma: no cover
             self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
-        else:
+        else:  # pragma: no cover
             self.stdout.write(f"Superuser `{admin}` already exists`.")
 
         from unicef_rest_framework.models import Service

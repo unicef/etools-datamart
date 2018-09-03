@@ -36,9 +36,7 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
         return super().get_queryset(request)
 
     def get_readonly_fields(self, request, obj=None):
-        if obj:
-            self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
-        return self.readonly_fields
+        return [field.name for field in self.model._meta.fields]
 
     def has_add_permission(self, request):
         return False
