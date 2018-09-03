@@ -3,6 +3,7 @@ import logging
 
 import pytest
 
+from etools_datamart.apps.multitenant.exceptions import InvalidSchema
 from etools_datamart.state import State
 
 logger = logging.getLogger(__name__)
@@ -52,3 +53,17 @@ def test_insert_empty():
     s.schemas = []
     s.schemas.insert(0, '')
     assert s.schemas == []
+
+
+def test_append_invalid(monkeypatch):
+    s = State()
+    monkeypatch.setattr(s.schemas, 'valid', ['bolivia', 'chad', 'zambia'])
+    s.schemas = []
+    with pytest.raises(InvalidSchema):
+        s.schemas.append('--')
+
+
+def test_clear():
+    s = State()
+    s.schemas = []
+    assert not s.clear()

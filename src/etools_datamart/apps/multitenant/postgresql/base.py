@@ -156,7 +156,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     def get_tenants(self):
         model = apps.get_model(settings.TENANT_MODEL)
-        return model.objects.exclude(schema_name__in=['public', 'uat', 'frg']).order_by('name')
+        return model.objects.filter(**settings.SCHEMA_FILTER).exclude(**settings.SCHEMA_EXCLUDE).order_by('name')
 
     # def rollback(self):
     #     super(DatabaseWrapper, self).rollback()

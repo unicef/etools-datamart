@@ -89,7 +89,7 @@ class Command(BaseCommand):
         created, deleted, total = Service.objects.load_services()
         self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
 
-        if options['tasks'] or _all:
+        if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
 
             tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
@@ -110,7 +110,6 @@ class Command(BaseCommand):
                 f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
 
         if options['refresh']:
-
             self.stdout.write("Refreshing datamart...")
             for task in PeriodicTask.objects.all()[1:]:
                 etl = import_string(task.task)

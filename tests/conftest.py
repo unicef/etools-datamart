@@ -84,95 +84,23 @@ def user1(db):
 
 @pytest.fixture(autouse=True)
 def reset(monkeypatch):
-    def get_tenants():
-        return UsersCountry.objects.filter(schema_name__in=settings.TEST_SCHEMAS).order_by('name')
+    # def get_tenants():
+    #     return UsersCountry.objects.filter(schema_name__in=settings.TEST_SCHEMAS).order_by('name')
 
-    from etools_datamart.apps.etools.models import UsersCountry
-    from django.conf import settings
+    # from etools_datamart.apps.etools.models import UsersCountry
+    # from django.conf import settings
     from etools_datamart.state import state
 
-    monkeypatch.setattr('etools_datamart.apps.multitenant.postgresql.base.DatabaseWrapper.get_tenants',
-                        lambda s: [])
+    # monkeypatch.setattr('etools_datamart.apps.multitenant.postgresql.base.DatabaseWrapper.get_tenants',
+    #                     lambda s: settings.TEST_SCHEMAS)
 
     from django.db import connections
-    conn = connections['etools']
-    conn.get_tenants = get_tenants
+    # conn = connections['etools']
+    # conn.get_tenants = get_tenants
 
-    # state.schemas = []
+    if 'valid' in state.schemas.__dict__:
+        del state.schemas.valid
+
     state.request = None
     conn = connections['etools']
-    # conn.search_path_set = False
     conn.search_path = None
-
-
-#
-# Below code is required due a bug in django-webtest that does not
-# properly authenticate if RemoteUserMiddleware is in MIDDLEWARE
-# WebtestUserMiddleware should go AFTER RemoteUserMiddleware if present,
-# official code put it after AuthenticationMiddleware and before RemoteUserMiddleware.
-#
-# Note: This is not a patch, it only works here
-
-
-@pytest.fixture(scope='session')
-def __django_app_mixin():
-    from django_webtest import WebTestMixin
-    from django_webtest import DjangoTestApp, _notgiven
-
-    class APIDjangoTestApp(DjangoTestApp):
-
-        def get(self, url, **kwargs):
-            user = kwargs.pop('user', _notgiven)
-            self.set_user(user)
-            return super().get(url, **kwargs)
-
-    class MixinWithInstanceVariables(WebTestMixin):
-        """
-        Override WebTestMixin to make all of its variables instance variables
-        not class variables; otherwise multiple django_app_factory fixtures contend
-        for the same class variables
-        """
-        app_class = APIDjangoTestApp
-
-        def __init__(self):
-            self.extra_environ = {}
-            self.csrf_checks = True
-            self.setup_auth = True
-
-        def _setup_auth_middleware(self):
-            self.settings_middleware.remove('django.contrib.auth.middleware.RemoteUserMiddleware')
-            webtest_auth_middleware = (
-                'django_webtest.middleware.WebtestUserMiddleware')
-            django_auth_middleware = (
-                'django.contrib.auth.middleware.AuthenticationMiddleware')
-
-            if django_auth_middleware not in self.settings_middleware:
-                self.settings_middleware.append(webtest_auth_middleware)
-            else:
-                index = self.settings_middleware.index(django_auth_middleware)
-                self.settings_middleware.insert(index + 1, webtest_auth_middleware)
-
-    app_mixin = MixinWithInstanceVariables()
-    return app_mixin
-
-
-@pytest.yield_fixture
-def __django_app(django_app_mixin):
-    django_app_mixin._patch_settings()
-    django_app_mixin.renew_app()
-    yield django_app_mixin.app
-    django_app_mixin._unpatch_settings()
-
-#
-# @pytest.yield_fixture
-# def django_app_factory():
-#     def factory(csrf_checks=True, extra_environ=None):
-#         app_mixin = MixinWithInstanceVariables()
-#         app_mixin.csrf_checks = csrf_checks
-#         if extra_environ:
-#             app_mixin.extra_environ = extra_environ
-#         app_mixin._patch_settings()
-#         app_mixin.renew_app()
-#         return app_mixin.app
-#
-#     yield factory

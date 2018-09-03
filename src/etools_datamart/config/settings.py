@@ -471,4 +471,5 @@ ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
-TEST_SCHEMAS = ['bolivia', 'chad', 'lebanon']
+SCHEMA_FILTER = {}
+SCHEMA_EXCLUDE = {'schema_name__in': ['public', 'uat', 'frg']}

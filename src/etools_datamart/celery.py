@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from time import time
 
 from celery import Celery
@@ -7,6 +6,7 @@ from celery.app.task import TaskType
 from celery.signals import task_postrun, task_prerun
 from celery.task import Task
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 
 from etools_datamart.apps.etl.lock import only_one
 
@@ -66,7 +66,7 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
     try:
         cost = time() - app.timers.pop(task_id)
-    except KeyError:
+    except KeyError:  # pragma: no cover
         cost = -1
 
     from etools_datamart.apps.etl.models import TaskLog
@@ -74,12 +74,12 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
             'result': state,
             }
     if state == 'SUCCESS':
-        defs['last_success'] = datetime.now()
+        defs['last_success'] = timezone.now()
     else:
-        defs['last_failure'] = datetime.now()
+        defs['last_failure'] = timezone.now()
 
     TaskLog.objects.update_or_create(task=task.name,
-                                     timestamp=datetime.now(),
+                                     timestamp=timezone.now(),
                                      content_type=ContentType.objects.get_for_model(task._model),
                                      table_name=task._model._meta.db_table,
                                      defaults=defs)

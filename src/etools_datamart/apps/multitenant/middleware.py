@@ -30,9 +30,11 @@ class MultiTenantMiddleware(object):
     def __call__(self, request):
         schemas = _get_schemas(request)
         if not schemas:
+            # TODO: this redirect make sense only in "HTML" mode
+            # it should be moved in AdminSite (and maybe BrowseableAPI)
             if request.path.startswith('/admin/'):
                 if request.user and request.user.is_authenticated:
-                    select_schema_url = reverse('multitenant:select-schema')
+                    select_schema_url = reverse('select-schema')
                     if request.path != select_schema_url:
                         return HttpResponseRedirect(select_schema_url)
             state.schemas = []

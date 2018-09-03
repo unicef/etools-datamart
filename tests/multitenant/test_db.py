@@ -92,3 +92,13 @@ def test_filtering(db, schema):
     qs = ReportsResult.objects.filter(id__gt=10).order_by('id', 'name')
     for obj in qs:
         assert obj.name
+
+
+@pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])
+def test_prefetch_related(db, schema):
+    state.schemas = schema
+    qs = ReportsResult.objects.only('id',
+                                    'name',
+                                    'result_type').prefetch_related('result_type')
+    for obj in qs:
+        assert obj.result_type.name

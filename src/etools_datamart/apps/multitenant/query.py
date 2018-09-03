@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
-import operator
 
 from django.db.models import QuerySet
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query import ModelIterable, Prefetch
+from django.db.models.query import ModelIterable, RelatedPopulator
 
 logger = logging.getLogger(__name__)
 
 
-class TenantRelatedPopulator:
+class TenantRelatedPopulator(RelatedPopulator):
     """
     RelatedPopulator is used for select_related() object instantiation.
 
@@ -25,28 +23,28 @@ class TenantRelatedPopulator:
     model instance.
     """
 
-    def __init__(self, klass_info, select, db):
-        self.db = db
-        select_fields = klass_info['select_fields']
-        from_parent = klass_info['from_parent']
-        if not from_parent:
-            self.cols_start = select_fields[0]
-            self.cols_end = select_fields[-1] + 1
-            self.init_list = [
-                f[0].target.attname for f in select[self.cols_start:self.cols_end]
-            ]
-            self.reorder_for_init = None
-        else:
-            attname_indexes = {select[idx][0].target.attname: idx for idx in select_fields}
-            model_init_attnames = (f.attname for f in klass_info['model']._meta.concrete_fields)
-            self.init_list = [attname for attname in model_init_attnames if attname in attname_indexes]
-            self.reorder_for_init = operator.itemgetter(*[attname_indexes[attname] for attname in self.init_list])
-
-        self.model_cls = klass_info['model']
-        self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
-        self.related_populators = get_related_populators(klass_info, select, self.db)
-        self.local_setter = klass_info['local_setter']
-        self.remote_setter = klass_info['remote_setter']
+    # def __init__(self, klass_info, select, db):
+    #     self.db = db
+    #     select_fields = klass_info['select_fields']
+    #     from_parent = klass_info['from_parent']
+    #     if not from_parent:
+    #         self.cols_start = select_fields[0]
+    #         self.cols_end = select_fields[-1] + 1
+    #         self.init_list = [
+    #             f[0].target.attname for f in select[self.cols_start:self.cols_end]
+    #         ]
+    #         self.reorder_for_init = None
+    #     else:
+    #         attname_indexes = {select[idx][0].target.attname: idx for idx in select_fields}
+    #         model_init_attnames = (f.attname for f in klass_info['model']._meta.concrete_fields)
+    #         self.init_list = [attname for attname in model_init_attnames if attname in attname_indexes]
+    #         self.reorder_for_init = operator.itemgetter(*[attname_indexes[attname] for attname in self.init_list])
+    #
+    #     self.model_cls = klass_info['model']
+    #     self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
+    #     self.related_populators = get_related_populators(klass_info, select, self.db)
+    #     self.local_setter = klass_info['local_setter']
+    #     self.remote_setter = klass_info['remote_setter']
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:
@@ -68,6 +66,7 @@ class TenantRelatedPopulator:
             self.remote_setter(obj, from_obj)
 
 
+# need to be overridden on because TenantRelatedPopulator()
 def get_related_populators(klass_info, select, db):
     iterators = []
     related_klass_infos = klass_info.get('related_klass_infos', [])
@@ -78,6 +77,8 @@ def get_related_populators(klass_info, select, db):
 
 
 class TenantModelIterable(ModelIterable):
+    # need to be overridden on because get_related_populators()
+
     def __iter__(self):
         queryset = self.queryset
         db = queryset.db
@@ -124,24 +125,24 @@ class TenantQuerySet(QuerySet):
         super().__init__(model, query, using, hints)
         self._iterable_class = TenantModelIterable
 
-    def prefetch_related(self, *lookups):
-        """
-        Return a new QuerySet instance that will prefetch the specified
-        Many-To-One and Many-To-Many related objects when the QuerySet is
-        evaluated.
-
-        When prefetch_related() is called more than once, append to the list of
-        prefetch lookups. If prefetch_related(None) is called, clear the list.
-        """
-        clone = self._chain()
-        if lookups == (None,):
-            clone._prefetch_related_lookups = ()
-        else:
-            for lookup in lookups:
-                if isinstance(lookup, Prefetch):
-                    lookup = lookup.prefetch_to
-                lookup = lookup.split(LOOKUP_SEP, 1)[0]
-                if lookup in self.query._filtered_relations:
-                    raise ValueError('prefetch_related() is not supported with FilteredRelation.')
-            clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
-        return clone
+    # def prefetch_related(self, *lookups):
+    #     """
+    #     Return a new QuerySet instance that will prefetch the specified
+    #     Many-To-One and Many-To-Many related objects when the QuerySet is
+    #     evaluated.
+    #
+    #     When prefetch_related() is called more than once, append to the list of
+    #     prefetch lookups. If prefetch_related(None) is called, clear the list.
+    #     """
+    #     clone = self._chain()
+    #     if lookups == (None,):
+    #         clone._prefetch_related_lookups = ()
+    #     else:
+    #         for lookup in lookups:
+    #             if isinstance(lookup, Prefetch):
+    #                 lookup = lookup.prefetch_to
+    #             lookup = lookup.split(LOOKUP_SEP, 1)[0]
+    #             if lookup in self.query._filtered_relations:
+    #                 raise ValueError('prefetch_related() is not supported with FilteredRelation.')
+    #         clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
+    #     return clone

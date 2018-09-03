@@ -23,8 +23,8 @@ class SchemaList(list):
         if schema:
             super(SchemaList, self).insert(index, schema)
 
-    def clean(self):
-        return SchemaList([e for e in self if e])
+    # def clean(self):
+    #     return SchemaList([e for e in self if e])
 
     def _clean(self, value):
         value = value.lower().strip()

@@ -32,7 +32,7 @@ def test_change_form(django_app, admin_user):
 
 
 def test_select_schema(django_app, admin_user):
-    url = reverse("multitenant:select-schema")
+    url = reverse("select-schema")
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': ""})

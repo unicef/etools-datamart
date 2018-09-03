@@ -28,7 +28,7 @@ def get_git_changeset():
     return timestamp.strftime('%Y%m%d%H%M%S')
 
 
-def get_full_version():
+def get_full_version():  # pragma: no cover
     from etools_datamart import VERSION
     commit = get_git_changeset()
     if commit:

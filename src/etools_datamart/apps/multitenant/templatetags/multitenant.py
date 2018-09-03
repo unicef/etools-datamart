@@ -7,6 +7,6 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def select_schema(context):
-    url = reverse("multitenant:select-schema")
+    url = reverse("select-schema")
     request = context['request']
     return f"{url}?from={request.path}"
