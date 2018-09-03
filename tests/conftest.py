@@ -37,15 +37,15 @@ def configure_test(settings, monkeypatch):
     # from etools_datamart.config.settings import env
     # settings.DATABASES['default'] = env.db()
     # settings.DATABASES['etools'] = env.db('DATABASE_URL_ETOOLS', engine='etools_datamart.apps.multitenant.postgresql')
-    # settings.CSRF_COOKIE_SECURE = False
-    # settings.SECURE_BROWSER_XSS_FILTER = False
-    # settings.SECURE_CONTENT_TYPE_NOSNIFF = False
-    # settings.SECURE_FRAME_DENY = False
-    # settings.SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    # settings.SECURE_HSTS_SECONDS = 1
-    # settings.SECURE_SSL_REDIRECT = False
-    # settings.SESSION_COOKIE_HTTPONLY = False
-    # settings.ALLOWED_HOSTS = ['*']
+    settings.CSRF_COOKIE_SECURE = False
+    settings.SECURE_BROWSER_XSS_FILTER = False
+    settings.SECURE_CONTENT_TYPE_NOSNIFF = False
+    settings.SECURE_FRAME_DENY = False
+    settings.SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    settings.SECURE_HSTS_SECONDS = 1
+    settings.SECURE_SSL_REDIRECT = False
+    settings.SESSION_COOKIE_HTTPONLY = False
+    settings.ALLOWED_HOSTS = ['*']
     settings.STATIC_ROOT = str(Path(__file__).parent)
     # settings.SESSION_COOKIE_SECURE = False
     settings.CACHES['api']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
