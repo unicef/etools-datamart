@@ -21,7 +21,7 @@ django-tenant-schemas = "*"
 django-regex = "*"
 sqlparse = "*"
 pyparsing = "*"
-admin-extra-urls = "*"
+admin-extra-urls = "==2.0"
 drf-yasg = {version = "*", extras = ["validation"]}
 django-strategy-field = "*"
 humanize = "*"
