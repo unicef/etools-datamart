@@ -23,6 +23,20 @@ def test_tasklog_change(django_app, admin_user, tasklog):
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
     assert res.status_code == 200
+    res = res.form.submit()
+    assert res.status_code == 302
+
+
+def test_tasklog_unlock(django_app, admin_user, tasklog):
+    url = reverse("admin:etl_tasklog_change", args=[tasklog.id])
+    res = django_app.get(url,
+                         user=admin_user,
+                         extra_environ={'HTTP_X_SCHEMA': "public"})
+    assert res.status_code == 200
+    res = res.click("Unlock")
+    assert res.status_code == 200
+    res = res.form.submit()
+    assert res.status_code == 302
 
 
 def test_tasklog_refresh(django_app, admin_user, tasklog):
