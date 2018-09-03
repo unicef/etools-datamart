@@ -1,5 +1,5 @@
 from django.contrib.admin import site
-from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from django_sysinfo.views import admin_sysinfo, http_basic_login, sysinfo, version
@@ -7,8 +7,8 @@ from django_sysinfo.views import admin_sysinfo, http_basic_login, sysinfo, versi
 import etools_datamart.api.urls
 
 urlpatterns = [
-    path(r'login/', auth_views.login, {'template_name': 'login.html'}, name='login'),
-    path(r'logout/', auth_views.logout, {'next_page': '/'}, name='logout'),
+    path(r'login/', LoginView.as_view(template_name='login.html'), name='login'),
+    path(r'logout/', LogoutView.as_view(next_page='/'), name='logout'),
 
     path(r'', include('etools_datamart.apps.multitenant.urls')),
     path(r'', TemplateView.as_view(template_name='index.html'), name='home'),
