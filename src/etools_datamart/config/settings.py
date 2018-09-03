@@ -143,7 +143,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.RemoteUserMiddleware',
+    # 'django.contrib.auth.middleware.RemoteUserMiddleware',
     'etools_datamart.api.middleware.ApiMiddleware',
     'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

@@ -44,7 +44,7 @@ def test_init_setup_debug_false(db, settings):
 @pytest.mark.django_db
 def test_db_is_ready(db, monkeypatch):
     monkeypatch.setattr("sys.exit", lambda v: v)
-    call_command("db-isready", stdout=StringIO())
+    call_command("db-isready", stdout=StringIO(), stderr=StringIO())
 
 
 @pytest.mark.django_db
@@ -52,7 +52,8 @@ def test_db_is_ready_error(db, monkeypatch):
     monkeypatch.setattr("sys.exit", lambda v: v)
     with mock.patch('etools_datamart.apps.init.management.commands.db-isready.Command._get_cursor',
                     side_effect=OperationalError()):
-        call_command("db-isready", wait=True, timeout=1, stdout=StringIO())
+        call_command("db-isready", wait=True, timeout=1,
+                     stdout=StringIO(), stderr=StringIO())
 
 
 @pytest.mark.django_db
@@ -60,4 +61,5 @@ def test_db_is_ready_debug(db, monkeypatch):
     monkeypatch.setattr("sys.exit", lambda v: v)
     with mock.patch('etools_datamart.apps.init.management.commands.db-isready.Command._get_cursor',
                     side_effect=OperationalError()):
-        call_command("db-isready", wait=True, timeout=1, debug=True, stdout=StringIO())
+        call_command("db-isready", wait=True, timeout=1, debug=True,
+                     stdout=StringIO(), stderr=StringIO())

@@ -1,6 +1,6 @@
 import factory
 from django.contrib.auth import models
-from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
+from unicef_rest_framework.models import SystemFilter, UserAccessControl
 
 from etools_datamart.apps.data.models import Intervention, PMPIndicators
 from etools_datamart.apps.etl.models import TaskLog
@@ -60,12 +60,6 @@ class UserAccessControlFactory(factory.DjangoModelFactory):
     class Meta:
         model = UserAccessControl
         django_get_or_create = ('user', 'service')
-
-
-class ServiceFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Service
-        django_get_or_create = ('name',)
 
 
 class SystemFilterFactory(factory.DjangoModelFactory):

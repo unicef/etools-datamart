@@ -15,7 +15,7 @@ from etools_datamart.state import state
 from ..sql import Parser
 from .creation import DatabaseCreation
 from .introspection import DatabaseSchemaIntrospection
-from .utils import clear_schemas, raw_sql, RawSql
+from .utils import raw_sql, RawSql
 
 EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
 
@@ -157,8 +157,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     def get_tenants(self):
         model = apps.get_model(settings.TENANT_MODEL)
-        with clear_schemas():
-            return model.objects.exclude(schema_name__in=['public', 'uat', 'frg']).order_by('name')
+        return model.objects.exclude(schema_name__in=['public', 'uat', 'frg']).order_by('name')
 
     # def rollback(self):
     #     super(DatabaseWrapper, self).rollback()

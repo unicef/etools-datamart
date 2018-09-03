@@ -1,7 +1,6 @@
-from django.conf.urls import include
 from django.contrib.admin import site
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from django_sysinfo.views import admin_sysinfo, http_basic_login, sysinfo, version
 
@@ -16,8 +15,8 @@ urlpatterns = [
     path(r'api/', include(etools_datamart.api.urls), name='api'),
     path('admin/', site.urls),
 
-    path('sys/info/$', http_basic_login(sysinfo), name='sys-info'),
-    path('sys/version/(?P<name>.*)/$', http_basic_login(version), name='sys-version'),
-    path("admin/sysinfo/$", admin_sysinfo, name="sys-admin-info"),
+    path('sys/info/', http_basic_login(sysinfo), name='sys-info'),
+    re_path('sys/version/(?P<name>.*)/', http_basic_login(version), name='sys-version'),
+    path("admin/sysinfo/", admin_sysinfo, name="sys-admin-info"),
 
 ]

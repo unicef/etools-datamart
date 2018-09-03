@@ -11,7 +11,7 @@ class SchemaList(list):
     def __init__(self, iterable=None):
         if iterable:
             iterable = [self._clean(i) for i in map(lambda x: x.lower().strip(), iterable) if i]
-        super(SchemaList, self).__init__(iterable or [])
+        super().__init__(iterable or [])
 
     def append(self, schema: str):
         schema = self._clean(schema)

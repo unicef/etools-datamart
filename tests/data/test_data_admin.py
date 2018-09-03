@@ -26,28 +26,39 @@ def test_pmpindicators_detail(django_app, admin_user, settings):
     assert res.status_code == 302
 
 
-@pytest.mark.django_db()
 def test_pmpindicators_refresh(django_app, admin_user):
-    url = reverse("admin:data_pmpindicators_refresh")
+    url = reverse("admin:data_pmpindicators_changelist")
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
+    assert res.status_code == 200
+    res = res.click("Refresh")
     assert res.status_code == 302
 
 
-@pytest.mark.django_db()
-def test_pmpindicators_queue(django_app, admin_user):
-    url = reverse("admin:data_pmpindicators_queue")
-    res = django_app.get(url,
-                         user=admin_user,
-                         extra_environ={'HTTP_X_SCHEMA': "public"})
-    assert res.status_code == 302
-
-
-@pytest.mark.django_db()
 def test_pmpindicators_truncate(django_app, admin_user):
-    url = reverse("admin:data_pmpindicators_truncate")
+    url = reverse("admin:data_pmpindicators_changelist")
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
+    assert res.status_code == 200
+    res = res.click("Truncate")
+    assert res.status_code == 200
+    res = res.form.submit()
+    assert res.status_code == 302
+
+
+def test_pmpindicators_queue(django_app, admin_user):
+    url = reverse("admin:data_pmpindicators_changelist")
+    res = django_app.get(url,
+                         user=admin_user,
+                         extra_environ={'HTTP_X_SCHEMA': "public"})
+    assert res.status_code == 200
+    res = res.click("Queue")
+    assert res.status_code == 302
+
+
+def test_pmpindicators_filterimng(django_app, admin_user):
+    url = reverse("admin:data_pmpindicators_changelist")
+    res = django_app.get(f"{url}?_schemas=public", user=admin_user)
     assert res.status_code == 200

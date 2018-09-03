@@ -46,8 +46,7 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        if obj:
-            self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
+        self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
         return self.readonly_fields
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
@@ -64,7 +63,7 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         try:
             self.model._etl_task.delay()
             self.message_user(request, "ETL task scheduled")
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             self.message_user(request, str(e), messages.ERROR)
         finally:
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
@@ -74,8 +73,6 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     def refresh(self, request):
         try:
             start = time()
-            # _etl_loader is set by DatamartCelery.etl()
-            # used to decorate any ETL task
             self.model._etl_task.apply()
             stop = time()
             duration = stop - start

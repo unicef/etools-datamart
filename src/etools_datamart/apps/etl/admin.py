@@ -53,13 +53,17 @@ class ExecutionAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return _confirm_action(self, request, _action, f"Continuing will unlock selected task. ({key})",
                                "Successfully executed", )
 
-    @link()
-    def truncate(self, request):
-        def _action(request):
+    def _truncate(self, request):
             from django.db import connection
 
             cursor = connection.cursor()
             cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
-        return _confirm_action(self, request, _action, "Continuing will erase the entire content of the table.",
+    @link()
+    def truncate(self, request):
+        return _confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
                                "Successfully executed", )
+
+    @link()
+    def inspect(self, request):
+        self.model.objects.inspect()

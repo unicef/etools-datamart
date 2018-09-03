@@ -10,6 +10,7 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from humanize import naturaldelta
 from strategy_field.utils import fqn
 
+from etools_datamart.apps.etl.models import TaskLog
 from etools_datamart.celery import app
 
 
@@ -104,6 +105,7 @@ class Command(BaseCommand):
                     task.delete()
                     counters[False] += 1
 
+            TaskLog.objects.inspect()
             self.stdout.write(
                 f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
 

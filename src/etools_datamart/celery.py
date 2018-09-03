@@ -79,6 +79,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['last_failure'] = datetime.now()
 
     TaskLog.objects.update_or_create(task=task.name,
+                                     timestamp=datetime.now(),
                                      content_type=ContentType.objects.get_for_model(task._model),
                                      table_name=task._model._meta.db_table,
                                      defaults=defs)
