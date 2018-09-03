@@ -3,7 +3,6 @@ import logging
 from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
-from admin_extra_urls.mixins import _confirm_action
 from adminfilters.filters import AllValuesComboFilter
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, register
@@ -14,6 +13,7 @@ from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
+from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
 
@@ -31,7 +31,7 @@ class DatamartChangeList(ChangeList):
         return ret
 
 
-class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
+class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
     actions = None
     load_handler = None
     list_filter = (('country_name', AllValuesComboFilter),)
@@ -83,17 +83,6 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         finally:
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
                                                               'changelist')))
-
-    @link()
-    def truncate(self, request):
-        def _action(request):
-            from django.db import connection
-
-            cursor = connection.cursor()
-            cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
-
-        return _confirm_action(self, request, _action, "Continuing will erase the entire content of the table.",
-                               "Successfully executed", )
 
 
 @register(models.PMPIndicators)

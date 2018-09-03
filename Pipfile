@@ -21,7 +21,7 @@ django-tenant-schemas = "*"
 django-regex = "*"
 sqlparse = "*"
 pyparsing = "*"
-admin-extra-urls = "==2.0"
+admin-extra-urls = "==2.1"
 drf-yasg = {version = "*", extras = ["validation"]}
 django-strategy-field = "*"
 humanize = "*"
@@ -36,6 +36,7 @@ djangorestframework-csv = "*"
 drf-extensions = "*"
 django-sysinfo = "*"
 pre-commit = "*"
+django-crashlog = "*"
 
 [dev-packages]
 pytest = "*"

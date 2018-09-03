@@ -9,9 +9,6 @@ logger = logging.getLogger(__name__)
 
 class DataMartManager(models.Manager):
     def truncate(self):
-        # from django.db import connection
-        # with connection.cursor() as cursor:
-        # cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
         self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
 

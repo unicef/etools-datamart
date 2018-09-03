@@ -8,12 +8,13 @@ from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.lock import cache
+from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
 
 
 @register(models.TaskLog)
-class ExecutionAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class ExecutionAdmin(ExtraUrlMixin, TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
                     'last_success', 'last_failure', 'running')
     readonly_fields = ('task', 'timestamp', 'result', 'elapsed', 'time',
@@ -51,17 +52,6 @@ class ExecutionAdmin(ExtraUrlMixin, admin.ModelAdmin):
             cache.delete(key)
 
         return _confirm_action(self, request, _action, f"Continuing will unlock selected task. ({key})",
-                               "Successfully executed", )
-
-    def _truncate(self, request):
-            from django.db import connection
-
-            cursor = connection.cursor()
-            cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
-
-    @link()
-    def truncate(self, request):
-        return _confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
                                "Successfully executed", )
 
     @link()

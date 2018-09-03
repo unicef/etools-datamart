@@ -144,6 +144,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
+    'crashlog.middleware.CrashLogMiddleware',
     'etools_datamart.api.middleware.ApiMiddleware',
     'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -232,6 +233,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'adminfilters',
     'django_sysinfo',
+    'crashlog',
 
     'django_celery_beat',
 
