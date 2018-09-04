@@ -8,29 +8,16 @@ DOCKER_IMAGE_NAME=unicef/datamart
 DOCKERFILE?=Dockerfile
 PYPI_INDEX?=https://pypi.org/simple/
 RUN_OPTIONS?=
-TARGET?=dev
+TARGET?=0.4
 
-dev:
-	cd .. && docker build ${BUILD_OPTIONS} \
-			--build-arg PYPI_INDEX=${PYPI_INDEX} \
-			-t ${DOCKER_IMAGE_NAME}:dev \
-			-f docker/Dockerfile.dev .
+help:
+	@echo "dev                  build dev image (based on local code)"
+	@echo "build                build production image (based on tag ${TARGET})"
+	@echo "release              release tag ${TARGET} on docker hub"
+	@echo "run                  run ${DOCKER_IMAGE} locally"
+	@echo "run-dev              run ${DOCKER_IMAGE_NAME}:dev locally"
 
-build:
-	cd .. && docker build ${BUILD_OPTIONS} \
-			--build-arg PYPI_INDEX=${PYPI_INDEX} \
-			--build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
-			--build-arg DATAMART_VERSION=${TARGET} \
-			-t ${DOCKER_IMAGE} \
-			-f docker/${DOCKERFILE} .
-
-release:
-	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
-	docker push ${DOCKER_IMAGE_NAME}:latest
-	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
-
-run:
+.run:
 	cd .. && docker run \
 	 		--rm \
 	 		--name=${CONTAINER_NAME} \
@@ -59,8 +46,33 @@ run:
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
 			-v $$PWD/~build/volumes/var/datamart:/var/datamart/ \
 			${RUN_OPTIONS} \
-			${DOCKER_IMAGE} \
+			${DOCKER_IMAGE_NAME}:${TARGET} \
 			${CMD}
+
+dev:
+	cd .. && docker build ${BUILD_OPTIONS} \
+			--build-arg PYPI_INDEX=${PYPI_INDEX} \
+			-t ${DOCKER_IMAGE_NAME}:dev \
+			-f docker/Dockerfile.dev .
+
+build:
+	cd .. && docker build ${BUILD_OPTIONS} \
+			--build-arg PYPI_INDEX=${PYPI_INDEX} \
+			--build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
+			--build-arg DATAMART_VERSION=${TARGET} \
+			-t ${DOCKER_IMAGE} \
+			-f docker/${DOCKERFILE} .
+
+release:
+	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
+	docker push ${DOCKER_IMAGE_NAME}:latest
+	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
+
+dev-run:
+	TARGET=dev \
+		RUN_OPTIONS=-it \
+		CMD=stack $(MAKE) .run
 
 test:
 	CMD='django-admin check --deploy' $(MAKE) run
