@@ -39,7 +39,7 @@ env = environ.Env(DEBUG=(bool, False),
                   STATIC_ROOT=(str, '/tmp/static'),
                   X_FRAME_OPTIONS=(str, 'DENY'),
                   )
-env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env2')
+env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
 environ.Env.read_env(str(env_file))
 
 MEDIA_ROOT = env('MEDIA_ROOT')

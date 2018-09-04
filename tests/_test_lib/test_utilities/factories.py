@@ -1,6 +1,6 @@
 import factory
 from django.contrib.auth import models
-from unicef_rest_framework.models import SystemFilter, UserAccessControl
+from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
 from etools_datamart.apps.data.models import Intervention, PMPIndicators
 from etools_datamart.apps.etl.models import TaskLog
@@ -18,8 +18,16 @@ class PMPIndicatorFactory(factory.DjangoModelFactory):
         model = PMPIndicators
 
 
+class ServiceFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Service
+        django_get_or_create = ('viewset',)
+
+
 class InterventionFactory(factory.DjangoModelFactory):
     metadata = {}
+    title = factory.Sequence(lambda n: "title%03d" % n)
+    number = factory.Sequence(lambda n: "#%03d" % n)
 
     class Meta:
         model = Intervention
