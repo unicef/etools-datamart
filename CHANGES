@@ -1,7 +1,10 @@
 0.4
 ---
 * SystemFilters. Ability to force per user/service filters
-
+* User ACL can grant/demy access to specific serializers
+* Internally log any exceptions (django-crashlog)
+* Improved endpoint documentation. (Filtering / Lookups )
+*
 
 0.3
 ---

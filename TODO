@@ -1,0 +1,11 @@
+Core:
+- Refactor MultiTenantMiddleware
+- Improves cache system (only use schema for multitenat models)
+- Add celery heathcheck feedback in admin
+-
+
+Endpoints:
+-
+
+DataMart:
+- agreement
