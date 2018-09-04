@@ -47,7 +47,7 @@ def configure_test(settings, monkeypatch):
     settings.SESSION_COOKIE_HTTPONLY = False
     settings.ALLOWED_HOSTS = ['*']
     settings.STATIC_ROOT = str(Path(__file__).parent)
-    # settings.SESSION_COOKIE_SECURE = False
+    settings.SESSION_COOKIE_SECURE = False
     settings.CACHES['api']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
     settings.CACHES['default']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
     #
