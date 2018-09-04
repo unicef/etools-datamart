@@ -26,10 +26,12 @@ def allow_std_serializer(user1):
     service = ServiceFactory(viewset=InterventionViewSet)
     InterventionFactory()
     from test_utilities.factories import UserAccessControlFactory
-    return UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
-                                    service=service,
-                                    serializers=["std"],
-                                    user=user1)
+    acl = UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
+                                   service=service,
+                                   serializers=["std"],
+                                   user=user1)
+    yield acl
+    acl.delete()
 
 
 @pytest.fixture()
@@ -37,10 +39,12 @@ def allow_any_serializer(user1):
     service = ServiceFactory(viewset=InterventionViewSet)
     InterventionFactory()
     from test_utilities.factories import UserAccessControlFactory
-    return UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
-                                    service=service,
-                                    serializers=["*"],
-                                    user=user1)
+    acl = UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
+                                   service=service,
+                                   serializers=["*"],
+                                   user=user1)
+    yield acl
+    acl.delete()
 
 
 @pytest.fixture()
@@ -48,18 +52,22 @@ def allow_many_serializer(user1):
     service = ServiceFactory(viewset=InterventionViewSet)
     InterventionFactory()
     from test_utilities.factories import UserAccessControlFactory
-    return UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
-                                    service=service,
-                                    serializers=["std", "short"],
-                                    user=user1)
+    acl = UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
+                                   service=service,
+                                   serializers=["std", "short"],
+                                   user=user1)
+    yield acl
+    acl.delete()
 
 
 @pytest.fixture()
 def deny(user1, service):
     from test_utilities.factories import UserAccessControlFactory
-    return UserAccessControlFactory(policy=UserAccessControl.POLICY_DENY,
-                                    service=service,
-                                    user=user1)
+    acl = UserAccessControlFactory(policy=UserAccessControl.POLICY_DENY,
+                                   service=service,
+                                   user=user1)
+    yield acl
+    acl.delete()
 
 
 def test_permission_deny(client, deny):
@@ -105,3 +113,12 @@ def test_permission_check_serializer_any(client, allow_any_serializer):
     res = client.get(f"{url}?%2bserializer=short",
                      HTTP_X_SCHEMA="bolivia")
     assert res.status_code == 200
+
+
+def test_permission_check_user(client, allow_any_serializer, user2):
+    url = allow_any_serializer.service.endpoint
+    client.force_authenticate(user2)
+
+    res = client.get(f"{url}?%2bserializer=short",
+                     HTTP_X_SCHEMA="bolivia")
+    assert res.status_code == 403

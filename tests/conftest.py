@@ -58,13 +58,20 @@ def django_db_setup(request,
                 django_db_createdb,
                 django_db_modify_db_settings)
 
-    from unicef_rest_framework.models import Service
+    from unicef_rest_framework.models import Service, UserAccessControl
     with django_db_blocker.unblock():
         Service.objects.load_services()
+        UserAccessControl.objects.all().delete()
 
 
 @pytest.fixture
 def user1(db):
+    from test_utilities.factories import UserFactory
+    return UserFactory()
+
+
+@pytest.fixture
+def user2(db):
     from test_utilities.factories import UserFactory
     return UserFactory()
 

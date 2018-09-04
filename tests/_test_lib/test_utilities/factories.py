@@ -65,6 +65,9 @@ class UserFactory(factory.DjangoModelFactory):
 
 
 class UserAccessControlFactory(factory.DjangoModelFactory):
+    policy = UserAccessControl.POLICY_ALLOW
+    serializers = ["std"]
+
     class Meta:
         model = UserAccessControl
         django_get_or_create = ('user', 'service')
