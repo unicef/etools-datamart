@@ -219,7 +219,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
         return ret
 
     def drf_ignore_filter(self, request, field):
-        return field in ['_schemas', 'serializer', 'cursor']
+        return field in ['_schemas', '+serializer', 'cursor', '+fields']
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
