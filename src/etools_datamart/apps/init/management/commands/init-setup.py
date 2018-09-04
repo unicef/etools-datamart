@@ -1,4 +1,5 @@
 import os
+import sys
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -122,4 +123,7 @@ class Command(BaseCommand):
                 else:
                     ret = etl.apply()
                     cost = naturaldelta(app.timers[task.name])
+                    if isinstance(ret.result, Exception):
+                        self.stderr.write(f"\n{ret.result}")
+                        sys.exit(1)
                     self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")

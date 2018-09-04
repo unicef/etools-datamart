@@ -16,7 +16,7 @@ class TaskLogManager(models.Manager):
 
 
 class TaskLog(models.Model):
-    task = models.CharField(max_length=200)
+    task = models.CharField(max_length=200, unique=True)
     timestamp = models.DateTimeField(null=True)
     result = models.CharField(max_length=200)
     elapsed = models.IntegerField(null=True)
@@ -28,4 +28,4 @@ class TaskLog(models.Model):
     objects = TaskLogManager()
 
     def __str__(self):
-        return self.task
+        return f"{self.task} {self.result}"

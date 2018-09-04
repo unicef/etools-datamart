@@ -68,18 +68,16 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         cost = time() - app.timers.pop(task_id)
     except KeyError:  # pragma: no cover
         cost = -1
-
     from etools_datamart.apps.etl.models import TaskLog
     defs = {'elapsed': cost,
             'result': state,
-            }
+            'timestamp': timezone.now()}
     if state == 'SUCCESS':
         defs['last_success'] = timezone.now()
     else:
         defs['last_failure'] = timezone.now()
 
     TaskLog.objects.update_or_create(task=task.name,
-                                     timestamp=timezone.now(),
                                      content_type=ContentType.objects.get_for_model(task._model),
                                      table_name=task._model._meta.db_table,
                                      defaults=defs)
