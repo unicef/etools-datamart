@@ -143,9 +143,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # 'django.contrib.auth.middleware.RemoteUserMiddleware',
     'crashlog.middleware.CrashLogMiddleware',
     'etools_datamart.api.middleware.ApiMiddleware',
+    'etools_datamart.apps.tracking.middleware.ThreadStatsMiddleware',
     'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -241,6 +241,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.etools',
     'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
+    'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.api',
 ]
 
