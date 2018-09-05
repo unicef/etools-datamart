@@ -4,6 +4,7 @@ from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
 from adminfilters.filters import AllValuesComboFilter
+from crashlog.middleware import process_exception
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -62,7 +63,7 @@ class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
     def queue(self, request):
         try:
             self.model._etl_task.delay()
-            self.message_user(request, "ETL task scheduled")
+            self.message_user(request, "ETL task scheduled", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             self.message_user(request, str(e), messages.ERROR)
         finally:
@@ -76,9 +77,9 @@ class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
             self.model._etl_task.apply()
             stop = time()
             duration = stop - start
-            self.message_user(request, "Data loaded in %f" % naturaldelta(duration))
-        except Exception as e:
-            logger.exception(e)
+            self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+        except Exception as e:  # pragma: no cover
+            process_exception(e)
             self.message_user(request, str(e), messages.ERROR)
         finally:
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,

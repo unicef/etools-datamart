@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -56,4 +56,6 @@ class ExecutionAdmin(ExtraUrlMixin, TruncateTableMixin, admin.ModelAdmin):
 
     @link()
     def inspect(self, request):
-        self.model.objects.inspect()
+        created, updated = self.model.objects.inspect()
+        self.message_user(request, f"{created} task created. {updated} have been updated",
+                          messages.SUCCESS)

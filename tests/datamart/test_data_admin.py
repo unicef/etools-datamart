@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
+from django.contrib import messages
 from django.urls import reverse
 from test_utilities.factories import PMPIndicatorFactory
 
@@ -22,8 +23,10 @@ def test_pmpindicators_detail(django_app, admin_user, settings):
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
     assert res.status_code == 200
-    res = res.form.submit()
-    assert res.status_code == 302
+    res = res.form.submit().follow()
+    assert res.status_code == 200
+    storage = res.context['messages']
+    assert [m.message for m in storage] == ['This admin is read-only. Record not saved.']
 
 
 def test_pmpindicators_refresh(django_app, admin_user):
@@ -32,8 +35,10 @@ def test_pmpindicators_refresh(django_app, admin_user):
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
     assert res.status_code == 200
-    res = res.click("Refresh")
-    assert res.status_code == 302
+    res = res.click("Refresh").follow()
+    assert res.status_code == 200
+    storage = res.context['messages']
+    assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
 
 
 def test_pmpindicators_truncate(django_app, admin_user):
@@ -44,8 +49,10 @@ def test_pmpindicators_truncate(django_app, admin_user):
     assert res.status_code == 200
     res = res.click("Truncate")
     assert res.status_code == 200
-    res = res.form.submit()
-    assert res.status_code == 302
+    res = res.form.submit().follow()
+    assert res.status_code == 200
+    storage = res.context['messages']
+    assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
 
 
 def test_pmpindicators_queue(django_app, admin_user):
@@ -54,8 +61,10 @@ def test_pmpindicators_queue(django_app, admin_user):
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
     assert res.status_code == 200
-    res = res.click("Queue")
-    assert res.status_code == 302
+    res = res.click("Queue").follow()
+    assert res.status_code == 200
+    storage = res.context['messages']
+    assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
 
 
 def test_pmpindicators_filterimng(django_app, admin_user):

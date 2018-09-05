@@ -1,18 +1,32 @@
 # -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import Model
 
-from etools_datamart.celery import app
+from etools_datamart.celery import app, ETLTask
 
 
 class TaskLogManager(models.Manager):
+    def get_for_model(self, model: Model):
+        return self.get(content_type=ContentType.objects.get_for_model(model))
+
+    def get_for_task(self, task: ETLTask):
+        return self.get_or_create(task=task.name,
+                                  defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
+                                                timestamp=None,
+                                                table_name=task.linked_model._meta.db_table))[0]
+
     def inspect(self):
         tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
+        results = {True: 0, False: 0}
         for task in tasks:
-            self.get_or_create(task=task.name,
-                               defaults=dict(content_type=ContentType.objects.get_for_model(task._model),
-                                             timestamp=None,
-                                             table_name=task._model._meta.db_table))
+            __, created = self.get_or_create(task=task.name,
+                                             defaults=dict(
+                                                 content_type=ContentType.objects.get_for_model(task.linked_model),
+                                                 timestamp=None,
+                                                 table_name=task.linked_model._meta.db_table))
+            results[created] += 1
+        return results[True], results[False]
 
 
 class TaskLog(models.Model):

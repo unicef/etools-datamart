@@ -382,7 +382,7 @@ LOGGING = {
         'root': file_handler('messages', 'DEBUG'),
         'application': file_handler('etools_datamart', 'DEBUG'),
         'console': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
@@ -454,7 +454,7 @@ LOGGING = {
             'propagate': False,
         },
         'sentry.errors': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'handlers': ['console'],
             'propagate': False,
         },

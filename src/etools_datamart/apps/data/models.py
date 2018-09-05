@@ -18,6 +18,14 @@ class DataMartModel(models.Model):
 
     objects = DataMartManager()
 
+    # @classproperty
+    # def task_log(cls):
+    #     from etools_datamart.apps.etl.models import TaskLog
+    #     return TaskLog.objects.get_or_create(task=cls._etl_loader,
+    #                                          defaults=dict(content_type=ContentType.objects.get_for_model(cls),
+    #                                                        timestamp=None,
+    #                                                        table_name=cls._meta.db_table))[0]
+
 
 class PMPIndicators(DataMartModel):
     country_name = models.CharField(max_length=50, null=True, db_index=True)

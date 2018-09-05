@@ -25,7 +25,7 @@ class TruncateTableMixin:
         cursor = connection.cursor()
         cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
-    @link(label='Truncate', css_class="btn btn-danger", permission=lambda request, obj: request.user.is_superuser)
+    @link(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
     def truncate(self, request):
         return _confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
                                "Successfully executed", )

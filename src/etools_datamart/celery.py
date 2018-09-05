@@ -12,8 +12,21 @@ from etools_datamart.apps.etl.lock import only_one
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
 
+# def get_task_log(name, model):
+#     if not name:
+#         return None
+#     from django.contrib.contenttypes.models import ContentType
+#     from etools_datamart.apps.etl.models import TaskLog
+#
+#     return TaskLog.objects.get_or_create(task=name,
+#                               defaults=dict(content_type=ContentType.objects.get_for_model(model),
+#                                             timestamp=None,
+#                                             table_name=model._meta.db_table))[0]
+#
+
 class ETLTask(Task, metaclass=TaskType):
     abstract = True
+    linked_model = None
 
 
 class DatamartCelery(Celery):
@@ -21,20 +34,22 @@ class DatamartCelery(Celery):
     _mapping = {}
 
     def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
-        model = None
-        if 'model' in options:
-            model = options.pop('model')
-            model._etl_loader = fun
+        linked_model = options.get('linked_model', None)
+        name = name or self.gen_task_name(fun.__name__, fun.__module__)
+        # options['task_log'] = SimpleLazyObject(lambda: get_task_log(name, options.get('linked_model')))
+
         fun = only_one(fun, f"{name}-lock")
-        task = super()._task_from_fun(fun, name=None, base=None, bind=False, **options)
-        if model:
-            task._model = model
-            model._etl_task = task
+        task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
+        if linked_model:
+            # task.linked_model = linked_model
+            linked_model._etl_task = task
+            linked_model._etl_loader = fun
+
         return task
 
     def etl(self, model, *args, **opts):
         opts['base'] = ETLTask
-        opts['model'] = model
+        opts['linked_model'] = model
         task = super().task(*args, **opts)
         return task
 
@@ -59,6 +74,15 @@ app.timers = {}
 @task_prerun.connect
 def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
     app.timers[task_id] = time()
+    from django.contrib.contenttypes.models import ContentType
+    from etools_datamart.apps.etl.models import TaskLog
+
+    defs = {'result': 'RUNNING',
+            'timestamp': timezone.now()}
+    TaskLog.objects.update_or_create(task=task.name,
+                                     content_type=ContentType.objects.get_for_model(task.linked_model),
+                                     table_name=task.linked_model._meta.db_table,
+                                     defaults=defs)
 
 
 @task_postrun.connect
@@ -74,11 +98,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['last_success'] = timezone.now()
     else:
         defs['last_failure'] = timezone.now()
-    from django.contrib.contenttypes.models import ContentType
     from etools_datamart.apps.etl.models import TaskLog
 
-    TaskLog.objects.update_or_create(task=task.name,
-                                     content_type=ContentType.objects.get_for_model(task._model),
-                                     table_name=task._model._meta.db_table,
-                                     defaults=defs)
+    TaskLog.objects.update_or_create(task=task.name, defaults=defs)
     app.timers[task.name] = cost
