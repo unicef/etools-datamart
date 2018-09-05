@@ -319,7 +319,6 @@ SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': env('API_URL'),
     'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
     'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
-    'DEFAULT_GENERATOR_CLASS': 'etools_datamart.api.swagger.generators.APISchemaGenerator',
     'SECURITY_DEFINITIONS': {
         'basic': {
             'type': 'basic'

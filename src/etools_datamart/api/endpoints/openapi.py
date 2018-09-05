@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from drf_yasg import openapi
+from drf_yasg.app_settings import swagger_settings
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
@@ -77,7 +78,7 @@ Example to retrieve entries in the second/third/fourth quarter (April 1 to June 
 - {HOST}datamart/interventions/?submission_date__quarter__gte=2
 
 
-"""
+""".format(HOST=swagger_settings.DEFAULT_API_URL)
 
 schema_view = get_schema_view(
     openapi.Info(

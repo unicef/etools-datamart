@@ -123,7 +123,7 @@ class Command(BaseCommand):
                 else:
                     ret = etl.apply()
                     cost = naturaldelta(app.timers[task.name])
-                    if isinstance(ret.result, Exception):
+                    if isinstance(ret.result, Exception):  # pragma: no cover
                         self.stderr.write(f"\n{ret.result}")
                         sys.exit(1)
                     self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")

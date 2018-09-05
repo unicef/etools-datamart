@@ -73,6 +73,9 @@ app.timers = {}
 
 @task_prerun.connect
 def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
+    if not hasattr(sender, 'linked_model'):
+        return
+
     app.timers[task_id] = time()
     from django.contrib.contenttypes.models import ContentType
     from etools_datamart.apps.etl.models import TaskLog
@@ -87,6 +90,8 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
 
 @task_postrun.connect
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
+    if not hasattr(sender, 'linked_model'):
+        return
     try:
         cost = time() - app.timers.pop(task_id)
     except KeyError:  # pragma: no cover
