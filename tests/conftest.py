@@ -1,7 +1,9 @@
 import warnings
+from unittest.mock import Mock
 
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
+from _pytest.fixtures import SubRequest
 
 
 def pytest_configure(config):
@@ -59,9 +61,15 @@ def django_db_setup(request,
                 django_db_modify_db_settings)
 
     from unicef_rest_framework.models import Service, UserAccessControl
+    from etools_datamart.apps.tracking.models import APIRequestLog
+
     with django_db_blocker.unblock():
         Service.objects.load_services()
         UserAccessControl.objects.all().delete()
+        APIRequestLog.objects.truncate()
+
+        assert Service.objects.exists()
+        assert not APIRequestLog.objects.exists()
 
 
 @pytest.fixture
@@ -87,3 +95,32 @@ def reset(monkeypatch):
     state.request = None
     conn = connections['etools']
     conn.search_path = None
+
+
+@pytest.fixture(autouse=True)
+def disable_stats(request: SubRequest, monkeypatch):
+    if 'enable_stats' not in request.funcargnames:
+        monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
+                            Mock())
+
+
+@pytest.fixture(autouse=True)
+def enable_stats(request):
+    pass
+
+
+@pytest.fixture()
+def service(db):
+    from unicef_rest_framework.models import Service
+    service = Service.objects.order_by('?').first()
+    if not service:
+        Service.objects.load_services()
+        service = Service.objects.order_by('?').first()
+    return service
+
+
+@pytest.fixture()
+def data_service(db):
+    from etools_datamart.api.endpoints import InterventionViewSet
+
+    return InterventionViewSet.get_service()

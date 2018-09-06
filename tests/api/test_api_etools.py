@@ -7,9 +7,6 @@ from etools_datamart.api.urls import router
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
 from etools_datamart.apps.multitenant.postgresql.utils import current_schema
 
-# def path_from_url(route):
-#     return "/%s" % str(route.pattern).replace('^', '').replace('$', '')
-
 
 def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:

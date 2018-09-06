@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 
-from django.conf import settings
-from django.db import models
-from django.db.models import SET_NULL
+from django.db import connection, models
 from strategy_field.fields import StrategyClassField
-# from .models import Service
-# from .utils import get_hostname
-from unicef_rest_framework.models import Service
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +14,15 @@ class APIRequestLogManager(models.Manager):
 
         return aggregate_log()
 
+    def truncate(self):
+        cursor = connection.cursor()
+        cursor.execute(f'TRUNCATE TABLE "{self.model._meta.db_table}"')
+
 
 class APIRequestLog(models.Model):
     """Logs API requests by time, user, etc"""
     # user or None for anon
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
-                             null=True, blank=True)
+    user = models.CharField(max_length=100, null=True, blank=True, db_index=True)
 
     # timestamp of request
     requested_at = models.DateTimeField(db_index=True)
@@ -47,7 +44,7 @@ class APIRequestLog(models.Model):
     method = models.CharField(max_length=10)
 
     # query params
-    query_params = models.TextField(db_index=True)
+    query_params = models.TextField()
 
     # POST body data
     data = models.TextField(null=True, blank=True)
@@ -55,15 +52,15 @@ class APIRequestLog(models.Model):
     cached = models.BooleanField(default=False)
 
     # extra
-    service = models.ForeignKey(Service,
-                                blank=True, null=True, on_delete=SET_NULL)
+    service = models.CharField(max_length=100, blank=True, null=True)
     viewset = StrategyClassField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'Log'
         verbose_name_plural = 'Logs'
+        ordering = ('-id', )
 
     objects = APIRequestLogManager()
 
-    def __unicode__(self):
-        return "{0.requested_at} {0.path}".format(self)
+    def __str__(self):
+        return f"{self.requested_at} {self.path}"

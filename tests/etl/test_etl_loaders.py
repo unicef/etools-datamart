@@ -3,6 +3,8 @@ from etools_datamart.apps.etl.tasks import Intervention, load_intervention, load
 
 
 def test_load_pmp_indicator(db):
+    # PMPIndicators.objects.truncate()
+    # assert PMPIndicators.objects.count() == 0
     assert load_pmp_indicator() == {'Bolivia': 7, 'Chad': 7, 'Lebanon': 7}
     assert PMPIndicators.objects.count() == 21
 

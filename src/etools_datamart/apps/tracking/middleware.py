@@ -9,8 +9,7 @@ from queue import Queue
 from time import sleep, time
 
 from django.utils.timezone import now
-from strategy_field.utils import import_by_name
-from unicef_rest_framework.utils import get_ident
+from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.tracking.models import APIRequestLog
 from etools_datamart.state import state
@@ -19,11 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 def _get_record(request, response):
-    user_id = None
-    app_id = None
+    user = None
 
-    if request.user and request.user.is_authenticated():
-        user_id = request.user.pk
+    if request.user and request.user.is_authenticated:
+        user = request.user.username
 
     # compute response time
     response_timedelta = now() - request.timestamp
@@ -41,12 +39,10 @@ def _get_record(request, response):
     except AttributeError:
         media_type = response['Content-Type'].split(';')[0]
 
-    viewset = ''
-
-    # save to log
+    viewset = fqn(getattr(request, 'viewset'))
+    service = get_attr(request, "service.name")
     from unicef_rest_framework.utils import get_ident
-    return dict(user_id=user_id,
-                application_id=app_id,
+    return dict(user=user,
                 requested_at=request.timestamp,
                 response_ms=response_ms,
                 response_length=response_length,
@@ -57,7 +53,8 @@ def _get_record(request, response):
                 query_params=json.dumps(request.GET.dict()),
                 data=data_dict,
                 viewset=viewset,
-                cached=state.get('cache-hit', False),  # see api.common.APICacheResponse
+                service=service,
+                cached=state.get('cache-hit'),  # see api.common.APICacheResponse
                 content_type=media_type)
 
 
@@ -154,17 +151,8 @@ class AsyncLogger(object):
                 if record is self._terminator:
                     break
                 try:
-
-                    # FIXME: remove me (print)
-                    print(f"111: middleware.py:117 (_target)- {record}")
-                    kwargs = _get_record(**record)
-                    kwargs['service'] = import_by_name(record['viewset']).get_service()
-                    APIRequestLog.objects.create(**kwargs)
-                except ValueError:
-                    # TODO: remove after fixing the missing 'viewset' in record[]
-                    record['service'] = None
-                    APIRequestLog.objects.create(**record)
-                except Exception:
+                    APIRequestLog.objects.create(**_get_record(**record))
+                except Exception as e:
                     logger.error('Failed processing job', exc_info=True)
             finally:
                 self._queue.task_done()
@@ -211,54 +199,9 @@ class StatsMiddleware(object):
 
     def log(self, request, response):
         try:
-            # kwargs['service'] = import_by_name(kwargs['viewset']).get_service()
-            kwargs = _get_record(request, response)
-            APIRequestLog.objects.create(**kwargs)
+            APIRequestLog.objects.create(**_get_record(request, response))
         except Exception as e:
             logger.exception(e)
-
-    def log2(self, request, response):
-        user_id = None
-        app_id = None
-
-        if request.user and request.user.is_authenticated():
-            user_id = request.user.pk
-
-        # compute response time
-        response_timedelta = now() - request.timestamp
-        response_ms = int(response_timedelta.total_seconds() * 1000)
-        response_length = len(response.content)
-
-        # get POST data
-        try:
-            data_dict = request.POST.dict()
-        except AttributeError:  # if already a dict, can't dictify
-            data_dict = request.data
-
-        try:
-            media_type = response.accepted_media_type
-        except AttributeError:
-            media_type = response['Content-Type'].split(';')[0]
-
-        viewset = ''
-
-        # save to log
-        self.log(user_id=user_id,
-                 application_id=app_id,
-                 requested_at=request.timestamp,
-                 response_ms=response_ms,
-                 response_length=response_length,
-                 path=request.path,
-                 remote_addr=get_ident(request),
-                 host=request.get_host(),
-                 method=request.method,
-                 query_params=json.dumps(request.GET.dict()),
-                 data=data_dict,
-                 viewset=viewset,
-                 cached=state.get('cache-hit', False),  # see api.common.APICacheResponse
-                 content_type=media_type)
-
-        request.tracked = True
 
     def __call__(self, request):
 
@@ -267,60 +210,15 @@ class StatsMiddleware(object):
 
         response = self.get_response(request)
 
-        if hasattr(request, 'timestamp') and response.status_code == 200:
+        if response.status_code == 200:
             self.log(request, response)
-            # user_id = None
-            # app_id = None
-            # requestor = None
-            #
-            # if request.user and request.user.is_authenticated():
-            #     user_id = request.user.pk
-            #
-            # # compute response time
-            # response_timedelta = now() - request.timestamp
-            # response_ms = int(response_timedelta.total_seconds() * 1000)
-            # response_length = len(response.content)
-            #
-            # # get POST data
-            # try:
-            #     data_dict = request.POST.dict()
-            # except AttributeError:  # if already a dict, can't dictify
-            #     data_dict = request.data
-            #
-            # try:
-            #     media_type = response.accepted_media_type
-            # except:
-            #     media_type = response['Content-Type'].split(';')[0]
-            #
-            # viewset = ''
-            #
-            # # save to log
-            # self.log(user_id=user_id,
-            #          application_id=app_id,
-            #          requested_at=request.timestamp,
-            #          response_ms=response_ms,
-            #          response_length=response_length,
-            #          path=request.path,
-            #          remote_addr=get_ident(request),
-            #          host=request.get_host(),
-            #          method=request.method,
-            #          query_params=json.dumps(request.GET.dict()),
-            #          data=data_dict,
-            #          viewset=viewset,
-            #          cached=state.get('cache-hit', False),  # see api.common.APICacheResponse
-            #          content_type=media_type)
-            #
-            # request.tracked = True
         return response
 
 
-class ThreadStatsMiddleware(StatsMiddleware):
+class ThreadedStatsMiddleware(StatsMiddleware):
     def __init__(self, get_response):
         self.get_response = get_response
         self.worker = AsyncLogger()
 
     def log(self, request, response):
         self.worker.queue(**{'request': request, 'response': response})
-    #
-    # def log2(self, request, response):
-    #     self.worker.queue(**{'request': request, 'response': response})
