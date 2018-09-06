@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from rest_framework.test import APIClient
-from test_utilities.factories import InterventionFactory, ServiceFactory
+from test_utilities.factories import InterventionFactory
 from unicef_rest_framework.models import UserAccessControl
 
 from etools_datamart.api.endpoints import InterventionViewSet
@@ -23,7 +23,7 @@ def allow(user1, service):
 
 @pytest.fixture()
 def allow_std_serializer(user1):
-    service = ServiceFactory(viewset=InterventionViewSet)
+    service = InterventionViewSet.get_service()
     InterventionFactory()
     from test_utilities.factories import UserAccessControlFactory
     acl = UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
@@ -36,7 +36,7 @@ def allow_std_serializer(user1):
 
 @pytest.fixture()
 def allow_any_serializer(user1):
-    service = ServiceFactory(viewset=InterventionViewSet)
+    service = InterventionViewSet.get_service()
     InterventionFactory()
     from test_utilities.factories import UserAccessControlFactory
     acl = UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
@@ -49,7 +49,7 @@ def allow_any_serializer(user1):
 
 @pytest.fixture()
 def allow_many_serializer(user1):
-    service = ServiceFactory(viewset=InterventionViewSet)
+    service = InterventionViewSet.get_service()
     InterventionFactory()
     from test_utilities.factories import UserAccessControlFactory
     acl = UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,

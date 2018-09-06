@@ -176,6 +176,10 @@ class APICacheResponse(CacheResponse):
                 cache.set(key, response, parse_ttl(view_instance.get_service().cache_ttl or '1y'))
         else:
             state.set('cache-hit', True)
+        request._request.service = view_instance.get_service()
+        request._request.viewset = view_instance
+        # state.set('service', view_instance.get_service().name)
+        # state.set('viewset', fqn(view_instance))
         state.set('cache-ttl', view_instance.get_service().cache_ttl)
 
         if not hasattr(response, '_closable_objects'):  # pragma: no cover
@@ -200,12 +204,6 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
                         r.CSVRenderer,
                         ]
     filter_backends = [SystemFilterBackend, TenantQueryStringFilterBackend]
-    # schema = DefaultSchema()
-
-    # def filter_queryset(self, queryset):
-    #     if not hasattr(self, '_filtered_queryset'):
-    #         self._filtered_queryset = super().filter_queryset(queryset)
-    #     return self._filtered_queryset
 
     def get_schema_fields(self):
         ret = []

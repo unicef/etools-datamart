@@ -23,12 +23,6 @@ class classproperty(object):
         return self.getter(owner)
 
 
-# class ApiMixin:
-# class DynamicSerializerViewSet(ApiMixin, DynamicSerializerMixin, viewsets.ModelViewSet):
-#     def get_serializer_class(self, target=None):
-#         return self.strategy._get_serializer_from_param()
-
-
 class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
     default_access = acl.ACL_ACCESS_LOGIN

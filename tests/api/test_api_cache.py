@@ -1,19 +1,4 @@
 # -*- coding: utf-8 -*-
-import logging
-
-import pytest
-from unicef_rest_framework.models import Service
-
-from etools_datamart.api.endpoints import InterventionViewSet
-
-logger = logging.getLogger(__name__)
-
-
-@pytest.fixture()
-def service(db):
-    service, __ = Service.objects.get_for_viewset(InterventionViewSet)
-    service.invalidate_cache()
-    return service
 
 
 def test_cache(client, admin_user, service, django_assert_num_queries,

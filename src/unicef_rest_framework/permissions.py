@@ -10,6 +10,9 @@ class URFPermission(BasePermission):
     def has_permission(self, request, view):
         if request.user.is_superuser:
             return True
+
+        if not request.user.is_authenticated:
+            return False
         try:
             acl = UserAccessControl.objects.get(service__viewset=fqn(view), user=request.user)
             requested_serializer = request.GET.get(self.serializer_field, "std")

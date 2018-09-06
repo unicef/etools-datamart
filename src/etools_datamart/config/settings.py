@@ -145,7 +145,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'crashlog.middleware.CrashLogMiddleware',
     'etools_datamart.api.middleware.ApiMiddleware',
-    'etools_datamart.apps.tracking.middleware.ThreadStatsMiddleware',
+    'etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware',
     'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
