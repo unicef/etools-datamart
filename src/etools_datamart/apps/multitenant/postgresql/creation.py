@@ -90,7 +90,7 @@ class DatabaseCreation(original_creation.DatabaseCreation):
             return
 
         cur = self.connection.cursor()
-        cur.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA pg_catalog;")
+        cur.execute(raw_sql("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA pg_catalog;"))
 
         header = """
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA {schema};
@@ -104,6 +104,9 @@ SET default_tablespace = '';
             raise ProgrammingError(f"'{public_dump}' not not found")
         if not tenant_dump.exists():
             raise ProgrammingError(f"'{tenant_dump}' not not found")
+
+        if verbosity >= 1:
+            print("Restoring %s" % public_dump)
 
         cmds = ["pg_restore",
                 "-U", self.connection.settings_dict['USER'],
@@ -122,7 +125,13 @@ SET default_tablespace = '';
         except Exception as e:
             raise Exception(f"Error creating schema 'public'") from e
 
+        if not settings.TEST_SCHEMAS:
+            raise ProgrammingError("settings.TEST_SCHEMAS must be a valid schema list")
+
         for schema in settings.TEST_SCHEMAS:
+            if verbosity >= 1:
+                print("Creating schema %s" % schema)
+
             try:
                 sql = tenant_dump.read_text()
                 sql = sql.replace("[[schema]]", schema).replace("SET default_tablespace = '';",
@@ -131,6 +140,7 @@ SET default_tablespace = '';
             except Exception as e:
                 raise Exception(f"Error creating schema {schema}") from e
 
+        self.connection.close()
         self.connection.ensure_connection()
 
         return test_database_name

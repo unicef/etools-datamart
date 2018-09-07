@@ -8,7 +8,6 @@ from strategy_field.utils import get_attr
 
 from etools_datamart.apps.data.models import Intervention, PMPIndicators
 from etools_datamart.apps.etools.models import PartnersIntervention, PartnersPartnerorganization
-from etools_datamart.apps.multitenant.postgresql.utils import clear_schemas
 from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)
@@ -17,15 +16,15 @@ logger = logging.getLogger(__name__)
 @app.etl(PMPIndicators)
 def load_pmp_indicator():
     connection = connections['etools']
-    with clear_schemas():
-        schemas = connection.get_tenants()
+    countries = connection.get_tenants()
     PMPIndicators.objects.truncate()
     base_url = 'https://etools.unicef.org'
     created = {}
 
-    for country in schemas:
+    for country in countries:
         created[country.name] = 0
-        connection.set_tenant(country)
+        connection.set_schemas([country.schema_name])
+
         logger.info(u'Running on %s' % country.name)
         for partner in PartnersPartnerorganization.objects.prefetch_related(
                 'partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
@@ -77,18 +76,19 @@ def load_pmp_indicator():
 @app.etl(Intervention)
 def load_intervention():
     connection = connections['etools']
-    schemas = connection.get_tenants()
+    countries = connection.get_tenants()
     Intervention.objects.truncate()
     created = {}
-    for schema in schemas:
-        connection.set_tenant(schema)
+    for country in countries:
+        connection.set_schemas([country.schema_name])
+
         qs = PartnersIntervention.objects.all().select_related('agreement',
                                                                'partner_authorized_officer_signatory',
                                                                'unicef_signatory',
                                                                'country_programme',
                                                                )
         for num, record in enumerate(qs, 1):
-            Intervention.objects.create(country_name=schema.name,
+            Intervention.objects.create(country_name=country.name,
                                         number=record.number,
                                         title=record.title,
                                         status=record.status,
@@ -146,6 +146,6 @@ def load_intervention():
                                         created=record.created,
 
                                         )
-        created[schema.name] = num
+        created[country.name] = num
 
     return created

@@ -146,7 +146,6 @@ MIDDLEWARE = [
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
     'crashlog.middleware.CrashLogMiddleware',
     'etools_datamart.api.middleware.ApiMiddleware',
-    'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -177,6 +176,8 @@ TEMPLATES = [
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'etools_datamart.apps.multitenant.context_processors.schemas',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',

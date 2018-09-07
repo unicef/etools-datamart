@@ -14,9 +14,9 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
         # in the real flow, this is added by the MultiTenant Middleware
         # but this function is called before the middleware system is involved
 
-        ctx['response_headers']['X-Schema'] = ",".join(state.schemas)
-        ctx['response_headers']['cache-version'] = str(state.get('cache-version'))
-        ctx['response_headers']['cache-key'] = str(state.get('cache-key'))
+        # ctx['response_headers']['X-Schema'] = ",".join(state.schemas)
+        # ctx['response_headers']['cache-version'] = str(state.get('cache-version'))
+        # ctx['response_headers']['cache-key'] = str(state.get('cache-key'))
         ctx['response_headers']['system-filters'] = getattr(state.request, '_system_filter', '')
 
         return ctx

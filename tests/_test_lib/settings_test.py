@@ -1,6 +1,17 @@
+import random
+
 from etools_datamart.config.settings import *  # noqa
 
+SEED = random.random()
+
+
+def cache_random_prefix(*args, **kwargs):
+    return str(SEED)
+
+
 CACHES['api']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
+CACHES['api']['KEY_FUNCTION'] = cache_random_prefix  # noqa
+CACHES['default']['KEY_FUNCTION'] = cache_random_prefix  # noqa
 
 # Use only one db during tests
 DATABASES['etools']['PORT'] = DATABASES['default']['PORT']  # noqa

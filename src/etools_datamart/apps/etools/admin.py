@@ -32,6 +32,7 @@ class PartnersAssessmentAdmin(TenantModelAdmin):
 class PartnersAgreementAdmin(TenantModelAdmin):
     search_fields = ('partner__name',)
     list_display = ('agreement_number', 'agreement_type', 'partner', 'schema')
+
     # list_filter = ('agreement_type', )
 
     def get_queryset(self, request):
