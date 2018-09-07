@@ -81,8 +81,8 @@ def reset(monkeypatch):
     from etools_datamart.state import state
     from django.db import connections
 
-    if 'valid' in state.schemas.__dict__:
-        del state.schemas.valid
+    # if 'valid' in state.schemas.__dict__:
+    #     del state.schemas.valid
 
     state.request = None
     conn = connections['etools']

@@ -69,5 +69,5 @@ def test_pmpindicators_queue(django_app, admin_user):
 
 def test_pmpindicators_filterimng(django_app, admin_user):
     url = reverse("admin:data_pmpindicators_changelist")
-    res = django_app.get(f"{url}?_schemas=public", user=admin_user)
+    res = django_app.get(f"{url}", user=admin_user)
     assert res.status_code == 200

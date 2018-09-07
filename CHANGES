@@ -4,7 +4,10 @@
 * User ACL can grant/demy access to specific serializers
 * Internally log any exceptions (django-crashlog)
 * Improved endpoint documentation. (Filtering / Lookups )
-*
+* removes MultiTenantMiddleware
+* everywhere use 'country_name' as schema/tenant selection
+* add tracking informations
+
 
 0.3
 ---

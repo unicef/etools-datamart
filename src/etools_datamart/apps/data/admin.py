@@ -22,14 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class DatamartChangeList(ChangeList):
-    IGNORED_PARAMS = ['_schemas', ]
-
-    def get_filters_params(self, params=None):
-        ret = super().get_filters_params(params)
-        for ignored in self.IGNORED_PARAMS:
-            if ignored in ret:
-                del ret[ignored]
-        return ret
+    pass
 
 
 class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):

@@ -9,5 +9,5 @@ def test_login(django_app, admin_user):
     res.form['password'] = 'password'
     res = res.form.submit()
     assert res.status_code == 302
-    res = res.follow().follow()
+    res = res.follow()
     assert res.context['user'].username == 'admin'

@@ -1,0 +1,6 @@
+{% load i18n multitenant %}
+{% get_state %}
+{% schemas %}
+{{ schemas|join:"," }}
+
+<a href="{% select_schema %}">Change</a>

@@ -6,11 +6,12 @@ import rest_framework_extensions.utils
 from babel._compat import force_text
 from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import models
+from django.db import connections, models
 from django.http import Http404
 from django.utils.http import quote_etag
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
+from rest_framework.filters import BaseFilterBackend
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_csv import renderers as r
@@ -62,8 +63,6 @@ class SchemaSerializerField(coreschema.Enum):
         return description
 
 
-# class TenantQueryStringFilterBackend(QueryStringFilterBackend):
-
 class TenantQueryStringFilterBackend(QueryStringFilterBackend):
 
     @lru_cache(100)
@@ -79,20 +78,24 @@ class TenantQueryStringFilterBackend(QueryStringFilterBackend):
                 location='query',
                 schema=coreapi_type(
                     title=force_text(field),
-                    description=f'{model_field.help_text} - django queryset synthax allowed'
+                    description=f'{model_field.help_text} - django queryset syntax allowed'
                 )
             ))
         return ret
 
-    @property
-    def query_params(self):
-        """
-        More semantically correct name for request.GET.
-        """
-        params = self.request._request.GET
-        if 'country_name' in params:
-            state.schemas = []
-        return params
+
+class SchemaFilterBackend(BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        value = request.GET.get('country_name', None)
+        assert queryset.model._meta.app_label == 'etools'
+        conn = connections['etools']
+        if not value:
+            conn.set_all_schemas()
+        else:
+            value = value.split(",")
+            conn.set_schemas(value)
+        return queryset
 
 
 #
@@ -116,7 +119,7 @@ class ListKeyConstructor(KeyConstructor):
 
     unique_method_id = bits.UniqueMethodIdKeyBit()
     format = bits.FormatKeyBit()
-    headers = bits.HeadersKeyBit(['Accept', 'X-Schema'])
+    headers = bits.HeadersKeyBit(['Accept'])
     # language = bits.LanguageKeyBit()
     list_sql_query = bits.ListSqlQueryKeyBit()
     querystring = bits.QueryParamsKeyBit()
@@ -200,6 +203,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
                         r.CSVRenderer,
                         ]
     filter_backends = [SystemFilterBackend, TenantQueryStringFilterBackend]
+
     # schema = DefaultSchema()
 
     # def filter_queryset(self, queryset):
@@ -219,7 +223,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
         return ret
 
     def drf_ignore_filter(self, request, field):
-        return field in ['_schemas', '+serializer', 'cursor', '+fields']
+        return field in ['+serializer', 'cursor', '+fields', 'country_name']
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
@@ -247,29 +251,39 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
         return super(APIReadOnlyModelViewSet, self).list(request, *args, **kwargs)
 
 
-def set_schema_header(func):
+def one_schema(func):
     @wraps(func)
-    def _inner(*args, **kwargs):
-        ret = func(*args, **kwargs)
-        ret['X-Schema'] = ','.join(state.schemas)
+    def _inner(self, request, *args, **kwargs):
+        if 'country_name' not in request.GET:
+            return Response({'error': 'country_name parameter is mandatory'}, status=400)
+        if ',' in request.GET['country_name']:
+            return Response({'error': 'only one country is allowed'}, status=400)
+        ret = func(self, request, *args, **kwargs)
+        ret['X-Schema'] = ','.join(connections['etools'].schemas)
+        return ret
+
+    return _inner
+
+
+def schema_header(func):
+    @wraps(func)
+    def _inner(self, request, *args, **kwargs):
+        ret = func(self, request, *args, **kwargs)
+        ret['X-Schema'] = ','.join(connections['etools'].schemas)
         return ret
 
     return _inner
 
 
 class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
-    @set_schema_header
+    filter_backends = [SystemFilterBackend, SchemaFilterBackend, TenantQueryStringFilterBackend]
+
+    @one_schema
     def retrieve(self, request, *args, **kwargs):
-        if not state.schemas:
-            return Response({'error': 'Please set X-Schema header with selected workspace'}, status=400)
-        if len(state.schemas) > 1:
-            return Response({'error': 'Please set X-Schema header with only one workspace'}, status=400)
         return super().retrieve(request, *args, **kwargs)
 
-    @set_schema_header
+    @schema_header
     def list(self, request, *args, **kwargs):
-        if not state.schemas:
-            return Response({'error': 'Please set X-Schema header with selected workspaces'}, status=400)
         return super().list(request, *args, **kwargs)
 
     def get_schema_fields(self):

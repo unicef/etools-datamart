@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
-from django.contrib.admin import ModelAdmin
+from django.contrib.admin import ListFilter, ModelAdmin
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
+from django.db import connections
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from etools_datamart.state import state
-
 
 class TenantChangeList(ChangeList):
-    IGNORED_PARAMS = ['_schemas', ]
+    IGNORED_PARAMS = ['country_name', ]
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
@@ -28,12 +27,52 @@ class TenantChangeList(ChangeList):
                 del ret[ignored]
         return ret
 
+    def get_filters(self, request):
+        conn = connections['etools']
+        conn.set_all_schemas()
+        return super().get_filters(request)
+
+
+class SchemaFilter(ListFilter):
+    template = 'adminfilters/combobox.html'
+    title = 'country_name'
+    parameter_name = 'country_name'
+
+    def __init__(self, request, params, model, model_admin):
+        super().__init__(request, params, model, model_admin)
+        self.request = request
+        self.conn = connections['etools']
+
+    def choices(self, changelist):
+        value = self.request.GET.get(self.parameter_name)
+        yield {
+            'selected': value is None,
+            'query_string': changelist.get_query_string({}, [self.parameter_name]),
+            'display': 'All',
+        }
+        for lookup in self.conn.get_tenants():
+            yield {
+                'selected': value == str(lookup.schema_name),
+                'query_string': changelist.get_query_string({self.parameter_name: lookup.schema_name}, []),
+                'display': lookup.schema_name,
+            }
+
+    def has_output(self):
+        return True
+
+    def queryset(self, request, queryset):
+        value = self.request.GET.get(self.parameter_name)
+        if value:
+            if "," in value:
+                self.conn.set_schemas(value.split(","))
+            else:
+                self.conn.set_schemas([value])
+        return queryset
+
 
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
-
-    def get_queryset(self, request):
-        return super().get_queryset(request)
+    list_filter = [SchemaFilter]
 
     def get_readonly_fields(self, request, obj=None):
         return [field.name for field in self.model._meta.fields]
@@ -51,7 +90,8 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
         field = model._meta.pk if from_field is None else model._meta.get_field(from_field)
         try:
             pk = field.to_python(pk)
-            state.schemas = [schema]
+            conn = connections['etools']
+            conn.set_schemas([schema])
             return queryset.get(**{field.name: pk})
         except MultipleObjectsReturned:  # pragma: no cover
             raise
