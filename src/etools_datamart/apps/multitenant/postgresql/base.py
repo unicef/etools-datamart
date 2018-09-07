@@ -28,8 +28,8 @@ SQL_SCHEMA_NAME_RESERVED_RE = re.compile(r'^pg_', re.IGNORECASE)
 dj_logger = logging.getLogger('django.db.backends')
 logger = logging.getLogger(__name__)
 
-SINGLE_TENANT = 1
-MULTI_TENANT = 2
+# SINGLE_TENANT = 1
+# MULTI_TENANT = 2
 
 
 # def _is_valid_identifier(identifier):
@@ -143,14 +143,18 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
         # Use a patched version of the DatabaseIntrospection that only returns the table list for the
         # currently selected schema.
-        self.schemas = []
+        self._schemas = []
         self.search_path_set = False
         # self.tenants = []
 
     def close(self):
         self.search_path_set = False
-        self.schemas = []
+        self._schemas = []
         super(DatabaseWrapper, self).close()
+
+    @property
+    def schemas(self):
+        return self._schemas
 
     @lru_cache()
     def get_tenants(self):
@@ -173,7 +177,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
                 raise InvalidSchema(n)
             return name
 
-        self.schemas = [_validate(s) for s in schemas]
+        self._schemas = [_validate(s) for s in schemas]
 
         self.search_path_set = False
 
@@ -182,7 +186,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         Main API method to current database schema,
         but it does not actually modify the db connection.
         """
-        self.schemas = [c.schema_name for c in self.get_tenants()]
+        self._schemas = [c.schema_name for c in self.get_tenants()]
         self.search_path_set = False
 
     # def set_schema(self, schema_name, include_public=True):
@@ -258,10 +262,11 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
         # optionally limit the number of executions - under load, the execution
         # of `set search_path` can be quite time consuming
-        if not self.search_path_set:
+
+        if not self.search_path_set and self._schemas:
 
             search_paths = ["public"]
-            search_paths.extend(self.schemas)
+            search_paths.extend(self._schemas)
             if name:  # pragma: no cover
                 # Named cursor can only be used once
                 cursor_for_search_path = self.connection.cursor()
@@ -274,6 +279,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
             # we do not have to worry that it's not the good one
             try:
                 # self.set_search_paths(cursor_for_search_path, *search_paths)
+                logger.debug(f"SET search_path: {search_paths}")
                 cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(search_paths))))
             except (django.db.utils.DatabaseError, psycopg2.InternalError):  # pragma: no cover
                 self.search_path_set = False

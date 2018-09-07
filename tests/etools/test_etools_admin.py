@@ -11,6 +11,8 @@ def test_changelist_all(django_app, admin_user):
     url = reverse("admin:etools_partnerspartnerorganization_changelist")
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
+    # schemaes = res.context['schemas']
+    # qs = res.context['queryset']
 
 
 def test_changelist_many(django_app, admin_user):
