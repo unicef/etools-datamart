@@ -28,3 +28,4 @@ db/db1.bz2
 .env
 .venv
 docker/cache
+src/etools_datamart/apps/core/static/api-doc.css.map
