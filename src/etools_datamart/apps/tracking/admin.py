@@ -27,7 +27,7 @@ class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     fieldsets = (
         ('', {
-            'fields': (('requested_at', 'user', 'application',),
+            'fields': (('requested_at', 'user', ),
                        )
         }),
         ('Response', {
@@ -71,7 +71,7 @@ class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
     url.allow_tags = True
 
     def requestor(self, obj):
-        return obj.user or obj.application
+        return obj.user
 
     def event(self, obj):
         return obj.requested_at.strftime("<nobr>%Y-%m-%d %H:%M:%S</nobr>")

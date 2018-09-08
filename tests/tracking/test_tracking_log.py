@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-from time import sleep
 
 import pytest
 from django.urls import reverse
@@ -17,32 +16,39 @@ def user(admin_user):
 
 
 @pytest.yield_fixture
-def django_app(django_app_mixin, user):
+def django_app(django_app_mixin, system_user):
     APIRequestLog.objects.truncate()
     django_app_mixin._patch_settings()
-    django_app_mixin.extra_environ = {'HTTP_X_SCHEMA': "bolivia,chad,lebanon",
-                                      'REMOTE_ADDR': '192.168.66.66'
-                                      }
+    django_app_mixin.extra_environ = {'REMOTE_ADDR': '192.168.66.66'}
     django_app_mixin.renew_app()
-    django_app_mixin.app.set_user(user)
+    django_app_mixin.app.set_user(system_user)
     yield django_app_mixin.app
     django_app_mixin._unpatch_settings()
 
 
-@pytest.mark.django_db(transaction=True)
-def test_log(enable_stats, django_app, admin_user):
+@pytest.mark.django_db
+def test_log(enable_stats, django_app, system_user):
     url = reverse("api:intervention-list")
+    url = f"{url}?country_name=bolivia,chad,lebanon"
+
     res = django_app.get(url)
     assert res.status_code == 200
-    sleep(10)
-    log = APIRequestLog.objects.get(path=url)
-
+    log = APIRequestLog.objects.first()
     assert log
     assert log.method == 'GET'
     assert log.content_type == 'application/json'
     assert log.remote_addr == '192.168.66.66'
     assert log.host == 'testserver'
-    assert log.user == admin_user.username
+    assert log.user == system_user
     assert log.viewset == InterventionViewSet
     assert log.service == 'Intervention'
     assert not log.cached
+
+
+@pytest.mark.django_db
+def test_threaedlog(enable_threadstats, django_app, admin_user):
+    url = reverse("api:intervention-list")
+    url = f"{url}?country_name=bolivia,chad,lebanon"
+
+    res = django_app.get(url)
+    assert res.status_code == 200

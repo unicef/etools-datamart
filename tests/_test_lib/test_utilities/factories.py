@@ -1,9 +1,11 @@
 import factory
 from django.contrib.auth import models
+from django.utils import timezone
 from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
 from etools_datamart.apps.data.models import Intervention, PMPIndicators
 from etools_datamart.apps.etl.models import TaskLog
+from etools_datamart.apps.tracking.models import APIRequestLog
 
 
 class TaskLogFactory(factory.DjangoModelFactory):
@@ -11,6 +13,14 @@ class TaskLogFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = TaskLog
+
+
+class APIRequestLogFactory(factory.DjangoModelFactory):
+    requested_at = timezone.now()
+    remote_addr = factory.Faker('ipv4_public')
+
+    class Meta:
+        model = APIRequestLog
 
 
 class PMPIndicatorFactory(factory.DjangoModelFactory):

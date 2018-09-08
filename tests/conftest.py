@@ -4,6 +4,7 @@ from unittest.mock import Mock
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
 from _pytest.fixtures import SubRequest
+from test_utilities.factories import UserFactory
 
 
 def pytest_configure(config):
@@ -67,7 +68,7 @@ def django_db_setup(request,
         Service.objects.load_services()
         UserAccessControl.objects.all().delete()
         APIRequestLog.objects.truncate()
-
+        UserFactory(username='system', is_superuser=True)
         assert Service.objects.exists()
         assert not APIRequestLog.objects.exists()
 
@@ -89,9 +90,6 @@ def reset(monkeypatch):
     from etools_datamart.state import state
     from django.db import connections
 
-    # if 'valid' in state.schemas.__dict__:
-    #     del state.schemas.valid
-
     state.request = None
     conn = connections['etools']
     conn.search_path = None
@@ -99,13 +97,26 @@ def reset(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def disable_stats(request: SubRequest, monkeypatch):
-    if 'enable_stats' not in request.funcargnames:
+    if 'enable_threadstats' in request.funcargnames:
+        pass
+    elif 'enable_stats' in request.funcargnames:
+        from etools_datamart.apps.tracking.middleware import StatsMiddleware
+        monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
+                            StatsMiddleware.log
+                            )
+
+    else:
         monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
                             Mock())
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def enable_stats(request):
+    pass
+
+
+@pytest.fixture()
+def enable_threadstats(request):
     pass
 
 

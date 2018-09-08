@@ -21,10 +21,12 @@ def service(db):
     Service.objects.load_services()
     return Service.objects.order_by('?').first()
 
+
 @pytest.fixture()
 def etools_service(db):
     Service.objects.load_services()
     return Service.objects.get(viewset=InterventionViewSet)
+
 
 @pytest.fixture()
 def data_service(db):

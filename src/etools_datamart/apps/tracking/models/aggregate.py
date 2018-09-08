@@ -22,7 +22,7 @@ def aggregate_log():
     today = timezone.now().date()
     last = DailyCounter.objects.first()
     if not last:  # first time
-        current = APIRequestLog.objects.first().requested_at.date()
+        current = APIRequestLog.objects.earliest().requested_at.date()
     else:
         current = last.day
 
@@ -32,13 +32,14 @@ def aggregate_log():
     else:
         last_month = None
 
+    print(111, "aggregate.py:35", current, today)
     processed = 0
     while current < today:
         qs = APIRequestLog.objects.filter(requested_at__day=current.day,
                                           requested_at__month=current.month,
                                           requested_at__year=current.year)
         found = qs.exists()
-        if found:
+        if qs.exists():
             qs1 = qs.aggregate(total=Count('id'),
                                max=Max('response_ms'),
                                min=Min('response_ms'),
@@ -51,7 +52,6 @@ def aggregate_log():
                     'total': qs1['total'],
                     'cached': qs.filter(cached=True).count(),
                     'user': qs.filter(user__isnull=False).count(),
-                    'application': qs.filter(application__isnull=False).count(),
                     'response_average': qs1['avg'],
                     'unique_ips': len(hosts),
                     }
@@ -63,20 +63,18 @@ def aggregate_log():
 
         current = current + timedelta(days=1)
         if found:
-            if current.month >= last_month:
+            if last_month and current.month >= last_month:
                 prev = current + timedelta(days=-1)
                 _aggregate_monthly(qs, prev)
                 last_month = MonthlyCounter.objects.first().day.month
 
-        if found:
-            processed += 1
+        processed += 1
 
     # Keep only last 90 days of logs
     target_limit = today - timedelta(days=90)
     deleted_logs = APIRequestLog.objects.filter(requested_at__date__lt=target_limit).delete()
-    logger.info("Requests log deleted: {}".format(deleted_logs))
 
-    return processed
+    return processed, deleted_logs
 
 
 def _aggregate_path(qs, current):
@@ -120,7 +118,6 @@ def _aggregate_monthly(qs, first_day_of_month):
     qsm = qsx.aggregate(total=Sum('total'),
                         cached=Sum('cached'),
                         users=Sum('user'),
-                        application=Sum('application'),
                         max=Max('response_max'),
                         min=Min('response_min'))
 
@@ -132,7 +129,6 @@ def _aggregate_monthly(qs, first_day_of_month):
             'total': qsm['total'],
             'cached': qsm['cached'],
             'user': qsm['users'],
-            'application': qsm['application'],
             'response_average': avg,
             'unique_ips': len(hosts),
             }

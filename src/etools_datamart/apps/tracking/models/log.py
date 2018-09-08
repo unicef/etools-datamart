@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
 import logging
 
+from django.conf import settings
 from django.db import connection, models
 from strategy_field.fields import StrategyClassField
 
@@ -22,7 +22,8 @@ class APIRequestLogManager(models.Manager):
 class APIRequestLog(models.Model):
     """Logs API requests by time, user, etc"""
     # user or None for anon
-    user = models.CharField(max_length=100, null=True, blank=True, db_index=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
+                             blank=True, null=True)
 
     # timestamp of request
     requested_at = models.DateTimeField(db_index=True)
@@ -59,8 +60,9 @@ class APIRequestLog(models.Model):
         verbose_name = 'Log'
         verbose_name_plural = 'Logs'
         ordering = ('-id', )
+        get_latest_by = 'requested_at'
 
     objects = APIRequestLogManager()
 
     def __str__(self):
-        return f"{self.requested_at} {self.path}"
+        return f"Request: {self.requested_at} {self.path}"

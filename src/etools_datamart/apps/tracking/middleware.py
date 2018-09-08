@@ -17,11 +17,11 @@ from etools_datamart.state import state
 logger = logging.getLogger(__name__)
 
 
-def _get_record(request, response):
+def record_to_kwargs(request, response):
     user = None
 
     if request.user and request.user.is_authenticated:
-        user = request.user.username
+        user = request.user
 
     # compute response time
     response_timedelta = now() - request.timestamp
@@ -54,7 +54,7 @@ def _get_record(request, response):
                 data=data_dict,
                 viewset=viewset,
                 service=service,
-                cached=state.get('cache-hit'),  # see api.common.APICacheResponse
+                cached=state.get('cache-hit') or False,  # see api.common.APICacheResponse
                 content_type=media_type)
 
 
@@ -144,6 +144,9 @@ class AsyncLogger(object):
         finally:
             self._lock.release()
 
+    def _process(self, record):
+        APIRequestLog.objects.create(**record_to_kwargs(**record))
+
     def _target(self):
         while True:
             record = self._queue.get()
@@ -151,7 +154,7 @@ class AsyncLogger(object):
                 if record is self._terminator:
                     break
                 try:
-                    APIRequestLog.objects.create(**_get_record(**record))
+                    self._process(record)
                 except Exception as e:
                     logger.error('Failed processing job', exc_info=True)
             finally:
@@ -199,14 +202,13 @@ class StatsMiddleware(object):
 
     def log(self, request, response):
         try:
-            APIRequestLog.objects.create(**_get_record(request, response))
+            APIRequestLog.objects.create(**record_to_kwargs(request, response))
         except Exception as e:
             logger.exception(e)
 
     def __call__(self, request):
 
-        if request.path.startswith('/api/'):
-            request.timestamp = now()
+        request.timestamp = now()
 
         response = self.get_response(request)
 
