@@ -73,12 +73,12 @@ class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def requestor(self, obj):
         return obj.user
 
-    def event(self, obj):
-        return obj.requested_at.strftime("<nobr>%Y-%m-%d %H:%M:%S</nobr>")
-
-    event.admin_order_field = 'requested_at'
-    event.short_description = 'DateTime'
-    event.allow_tags = True
+    # def event(self, obj):
+    #     return obj.requested_at.strftime("<nobr>%Y-%m-%d %H:%M:%S</nobr>")
+    #
+    # event.admin_order_field = 'requested_at'
+    # event.short_description = 'DateTime'
+    # event.allow_tags = True
 
     def size(self, obj):
         return "<nobr>{0}</nobr>".format(humanize_size(obj.response_length))

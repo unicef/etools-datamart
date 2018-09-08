@@ -12,11 +12,45 @@ def test_async(enable_threadstats, monkeypatch):
         TOTAL = 0
 
         def _process(self, record):
-            self.TOTAL += sum(record['data'])
+            self.TOTAL += sum(record)
 
     logger = Logger(shutdown_timeout=2)
-    logger.queue(data=[1, 1, 1])
-    logger.queue(data=Logger._terminator)
+    logger.queue([1, 1, 1])
+    logger.queue(Logger._terminator)
     logger.start()
     sleep(1)
+    logger.stop()
+    assert logger.TOTAL == 3
+
+
+def test_async_main_thread_terminated(enable_threadstats, monkeypatch):
+    class Logger(AsyncLogger):
+        TOTAL = 0
+
+        def _process(self, record):
+            self.TOTAL += sum(record)
+
+    logger = Logger(shutdown_timeout=2)
+    logger.queue([1, 1, 1])
+    logger.queue([1, 1, 1])
+    logger.queue([1, 1, 1])
+    logger.queue([1, 1, 1])
+    logger.start()
+    logger.main_thread_terminated()
+    assert logger.TOTAL == 12
+
+
+def test_async_timeout(enable_threadstats, monkeypatch):
+    class Logger(AsyncLogger):
+        TOTAL = 0
+
+        def _process(self, record):
+            self.TOTAL += sum(record)
+
+    logger = Logger(shutdown_timeout=1)
+    logger.queue([1, 1, 1])
+    sleep(2)
+    logger.queue([1, 1, 1])
+    logger.queue([1, 1, 1])
+    logger.queue([1, 1, 1])
     assert logger.TOTAL == 3

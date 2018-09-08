@@ -22,9 +22,6 @@ class DailyCounter(models.Model):
         unique_together = ('day',)
         ordering = ('-day',)
 
-    def __unicode__(self):
-        return self.day.strftime('%d %b %Y')
-
 
 class MonthlyCounter(models.Model):
     day = models.DateField(db_index=True)
@@ -39,9 +36,6 @@ class MonthlyCounter(models.Model):
     class Meta:
         unique_together = ('day',)
         ordering = ('-day',)
-
-    def __unicode__(self):
-        return self.day.strftime('%b %Y')
 
 
 class PathCounter(models.Model):
@@ -58,9 +52,6 @@ class PathCounter(models.Model):
         unique_together = ('day', 'path')
         ordering = ('-day',)
 
-    def __unicode__(self):
-        return self.path
-
 
 class UserCounter(models.Model):
     day = models.DateField(db_index=True)
@@ -73,6 +64,3 @@ class UserCounter(models.Model):
     class Meta:
         unique_together = ('day', 'user')
         ordering = ('-day',)
-
-    def __unicode__(self):
-        return self.day.strftime('%Y %m %d')

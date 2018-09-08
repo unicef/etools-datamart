@@ -31,12 +31,12 @@ def record_to_kwargs(request, response):
     # get POST data
     try:
         data_dict = request.POST.dict()
-    except AttributeError:  # if already a dict, can't dictify
+    except AttributeError:   # pragma: no cover # if already a dict, can't dictify
         data_dict = request.data
 
     try:
         media_type = response.accepted_media_type
-    except AttributeError:
+    except AttributeError:   # pragma: no cover
         media_type = response['Content-Type'].split(';')[0]
 
     viewset = fqn(getattr(request, 'viewset'))
@@ -108,7 +108,7 @@ class AsyncLogger(object):
     def main_thread_terminated(self):
         self._lock.acquire()
         try:
-            if not self.is_alive():
+            if not self.is_alive():  # pragma: no cover
                 # thread not started or already stopped - nothing to do
                 return
 
@@ -128,9 +128,8 @@ class AsyncLogger(object):
                 # add or remove items
                 size = self._queue.qsize()
 
-                print("Logging sub-system is attempting to send %i pending messages"
-                      % size)
-                print("Waiting up to %s seconds" % timeout)
+                print(f"Logging sub-system is attempting to send {size} pending messages")
+                print(f"Waiting up to {timeout} seconds")
 
                 if os.name == 'nt':
                     print("Press Ctrl-Break to quit")
@@ -155,7 +154,7 @@ class AsyncLogger(object):
                     break
                 try:
                     self._process(record)
-                except Exception as e:
+                except Exception:  # pragma: no cover
                     logger.error('Failed processing job', exc_info=True)
             finally:
                 self._queue.task_done()
@@ -177,9 +176,9 @@ class AsyncLogger(object):
             self._lock.release()
             atexit.register(self.main_thread_terminated)
 
-    def queue(self, **kwargs):
+    def queue(self, payload):
         self._ensure_thread()
-        self._queue.put_nowait(kwargs)
+        self._queue.put_nowait(payload)
 
     def stop(self, timeout=None):
         """
@@ -203,7 +202,7 @@ class StatsMiddleware(object):
     def log(self, request, response):
         try:
             APIRequestLog.objects.create(**record_to_kwargs(request, response))
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.exception(e)
 
     def __call__(self, request):
@@ -219,8 +218,8 @@ class StatsMiddleware(object):
 
 class ThreadedStatsMiddleware(StatsMiddleware):
     def __init__(self, get_response):
-        self.get_response = get_response
+        super(ThreadedStatsMiddleware, self).__init__(get_response)
         self.worker = AsyncLogger()
 
     def log(self, request, response):
-        self.worker.queue(**{'request': request, 'response': response})
+        self.worker.queue({'request': request, 'response': response})

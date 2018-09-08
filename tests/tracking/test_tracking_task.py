@@ -28,12 +28,8 @@ def test_aggregate_logs(db):
 
     user1 = UserFactory()
     user2 = UserFactory()
-    log1 = APIRequestLogFactory(user=user1, viewset=None, service=None, requested_at=previous_date)
-    log2 = APIRequestLogFactory(user=user2, viewset=None, service=None, requested_at=previous_date)
-
-    assert user1.pk
-    assert log1.pk
-    assert log2.pk
+    APIRequestLogFactory(user=user1, viewset=None, service=None, requested_at=previous_date)
+    APIRequestLogFactory(user=user2, viewset=None, service=None, requested_at=previous_date)
 
     APIRequestLog.objects.aggregate()
 
@@ -41,10 +37,11 @@ def test_aggregate_logs(db):
     assert DailyCounter.objects.count() == 1  # created counter
     assert DailyCounter.objects.first().day == previous_date
 
+    APIRequestLogFactory(user=None, viewset=None, service=None, requested_at=previous_date)
     [APIRequestLogFactory(user=None, viewset=None, service=None, requested_at=recent_date)
      for i in range(9)]
 
-    assert APIRequestLog.objects.count() == 9
+    assert APIRequestLog.objects.count() == 10
     assert DailyCounter.objects.count() == 1
 
     APIRequestLog.objects.aggregate()
@@ -53,6 +50,6 @@ def test_aggregate_logs(db):
     assert DailyCounter.objects.count() == 2  # created counter
 
 
-def test_task(data):
+def test_task(data, db):
     results = task_aggregate_log()
-    assert results[0]
+    assert results

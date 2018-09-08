@@ -32,14 +32,13 @@ def aggregate_log():
     else:
         last_month = None
 
-    print(111, "aggregate.py:35", current, today)
     processed = 0
     while current < today:
         qs = APIRequestLog.objects.filter(requested_at__day=current.day,
                                           requested_at__month=current.month,
                                           requested_at__year=current.year)
         found = qs.exists()
-        if qs.exists():
+        if found:
             qs1 = qs.aggregate(total=Count('id'),
                                max=Max('response_ms'),
                                min=Min('response_ms'),
@@ -60,9 +59,9 @@ def aggregate_log():
 
         _aggregate_path(qs, current)
         _aggregate_user(qs, current)
-
         current = current + timedelta(days=1)
         if found:
+            # process monthly stats if month is changed
             if last_month and current.month >= last_month:
                 prev = current + timedelta(days=-1)
                 _aggregate_monthly(qs, prev)
