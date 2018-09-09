@@ -22,6 +22,7 @@ env = environ.Env(DEBUG=(bool, False),
                   # CACHE_URL=(str, "dummycache://"),
                   # API_CACHE_URL=(str, "dummycache://"),
 
+                  ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
@@ -39,8 +40,10 @@ env = environ.Env(DEBUG=(bool, False),
                   STATIC_ROOT=(str, '/tmp/static'),
                   X_FRAME_OPTIONS=(str, 'DENY'),
                   )
-env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
-environ.Env.read_env(str(env_file))
+
+if os.environ['DEBUG']:  # pragma: no cover
+    env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
+    environ.Env.read_env(str(env_file))
 
 MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
@@ -475,3 +478,5 @@ UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 SCHEMA_FILTER = {}
 SCHEMA_EXCLUDE = {'schema_name__in': ['public', 'uat', 'frg']}
+
+ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')

@@ -1,20 +1,76 @@
 # -*- coding: utf-8 -*-
 
-import atexit
+import datetime
 import json
 import logging
-import os
-import threading
-from queue import Queue
-from time import sleep, time
 
+import pytest
+from django.conf import settings
+from django.db.models import F
 from django.utils.timezone import now
 from strategy_field.utils import fqn, get_attr
 
-from etools_datamart.apps.tracking.models import APIRequestLog
 from etools_datamart.state import state
 
+from .asyncqueue import AsyncQueue
+from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
+
 logger = logging.getLogger(__name__)
+
+pytestmarker = pytest.mark.django_db
+
+
+def log_request(**kwargs):
+    log = APIRequestLog.objects.create(**kwargs)
+    if settings.ENABLE_LIVE_STATS:
+        lastMonth = (log.requested_at.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+
+        def _update_stats(target, **overrides):
+            target.total = F('total') + target.total
+            target.response_max = max(target.response_max, log.response_ms)
+            target.response_min = min(target.response_min, log.response_ms)
+            target.response_avg = target.response_max / target.total
+            target.cached = F('cached') + int(log.cached)
+            for k, v in overrides.items():
+                setattr(target, k, v)
+
+            target.save()
+
+        defaults = {"total": 1,
+                    "cached": int(log.cached),
+                    "response_max": log.response_ms,
+                    "response_min": log.response_ms,
+                    "response_average": log.response_ms,
+                    }
+        # use get_or_create due https://code.djangoproject.com/ticket/25195
+        # UserCounter
+        userlog, isnew = UserCounter.objects.get_or_create(day=log.requested_at,
+                                                           user=log.user,
+                                                           defaults=defaults)
+        if not isnew:
+            _update_stats(userlog)
+
+        # PathCounter
+        pathlog, isnew = PathCounter.objects.get_or_create(day=log.requested_at,
+                                                           path=log.path,
+                                                           defaults=defaults)
+        if not isnew:
+            _update_stats(pathlog)
+
+        # MonthlyCounter
+        monthlog, isnew = MonthlyCounter.objects.get_or_create(day=lastMonth,
+                                                               user=log.user,
+                                                               defaults=defaults)
+        if not isnew:
+            _update_stats(monthlog)
+
+        # DailyCounter
+        defaults['user'] = 1
+        daylog, isnew = DailyCounter.objects.get_or_create(day=log.requested_at,
+                                                           defaults=defaults)
+        if not isnew:
+            _update_stats(daylog,
+                          user=UserCounter.objects.filter(day=log.requested_at).count())
 
 
 def record_to_kwargs(request, response):
@@ -31,12 +87,12 @@ def record_to_kwargs(request, response):
     # get POST data
     try:
         data_dict = request.POST.dict()
-    except AttributeError:   # pragma: no cover # if already a dict, can't dictify
+    except AttributeError:  # pragma: no cover # if already a dict, can't dictify
         data_dict = request.data
 
     try:
         media_type = response.accepted_media_type
-    except AttributeError:   # pragma: no cover
+    except AttributeError:  # pragma: no cover
         media_type = response['Content-Type'].split(';')[0]
 
     viewset = fqn(getattr(request, 'viewset'))
@@ -58,141 +114,9 @@ def record_to_kwargs(request, response):
                 content_type=media_type)
 
 
-class AsyncLogger(object):
-    _terminator = object()
-
-    def __init__(self, shutdown_timeout=10):
-        self._queue = Queue(-1)
-        self._lock = threading.Lock()
-        self._thread = None
-        self._thread_for_pid = None
-        self.options = {
-            'shutdown_timeout': shutdown_timeout,
-        }
-        self.start()
-
-    def is_alive(self):
-        if self._thread_for_pid != os.getpid():
-            return False
-        return self._thread and self._thread.is_alive()
-
-    def _ensure_thread(self):
-        if self.is_alive():
-            return
-        self.start()
-
-    def _timed_queue_join(self, timeout):
-        """
-        implementation of Queue.join which takes a 'timeout' argument
-
-        returns true on success, false on timeout
-        """
-        deadline = time() + timeout
-        queue = self._queue
-
-        queue.all_tasks_done.acquire()
-        try:
-            while queue.unfinished_tasks:
-                delay = deadline - time()
-                if delay <= 0:
-                    # timed out
-                    return False
-
-                queue.all_tasks_done.wait(timeout=delay)
-
-            return True
-
-        finally:
-            queue.all_tasks_done.release()
-
-    def main_thread_terminated(self):
-        self._lock.acquire()
-        try:
-            if not self.is_alive():  # pragma: no cover
-                # thread not started or already stopped - nothing to do
-                return
-
-            # wake the processing thread up
-            self._queue.put_nowait(self._terminator)
-
-            timeout = self.options['shutdown_timeout']
-
-            # wait briefly, initially
-            initial_timeout = 0.1
-            if timeout < initial_timeout:
-                initial_timeout = timeout
-
-            if not self._timed_queue_join(initial_timeout):
-                # if that didn't work, wait a bit longer
-                # NB that size is an approximation, because other threads may
-                # add or remove items
-                size = self._queue.qsize()
-
-                print(f"Logging sub-system is attempting to send {size} pending messages")
-                print(f"Waiting up to {timeout} seconds")
-
-                if os.name == 'nt':
-                    print("Press Ctrl-Break to quit")
-                else:
-                    print("Press Ctrl-C to quit")
-
-                self._timed_queue_join(timeout - initial_timeout)
-
-            self._thread = None
-
-        finally:
-            self._lock.release()
-
+class AsyncLogger(AsyncQueue):
     def _process(self, record):
-        APIRequestLog.objects.create(**record_to_kwargs(**record))
-
-    def _target(self):
-        while True:
-            record = self._queue.get()
-            try:
-                if record is self._terminator:
-                    break
-                try:
-                    self._process(record)
-                except Exception:  # pragma: no cover
-                    logger.error('Failed processing job', exc_info=True)
-            finally:
-                self._queue.task_done()
-
-            sleep(0)
-
-    def start(self):
-        """
-        Starts the task thread.
-        """
-        self._lock.acquire()
-        try:
-            if not self.is_alive():
-                self._thread = threading.Thread(target=self._target)
-                self._thread.setDaemon(True)
-                self._thread.start()
-                self._thread_for_pid = os.getpid()
-        finally:
-            self._lock.release()
-            atexit.register(self.main_thread_terminated)
-
-    def queue(self, payload):
-        self._ensure_thread()
-        self._queue.put_nowait(payload)
-
-    def stop(self, timeout=None):
-        """
-        Stops the task thread. Synchronous!
-        """
-        self._lock.acquire()
-        try:
-            if self._thread:
-                self._queue.put_nowait(self._terminator)
-                self._thread.join(timeout=timeout)
-                self._thread = None
-                self._thread_for_pid = None
-        finally:
-            self._lock.release()
+        log_request(**record_to_kwargs(**record))
 
 
 class StatsMiddleware(object):
@@ -201,7 +125,7 @@ class StatsMiddleware(object):
 
     def log(self, request, response):
         try:
-            APIRequestLog.objects.create(**record_to_kwargs(request, response))
+            log_request(**record_to_kwargs(request, response))
         except Exception as e:  # pragma: no cover
             logger.exception(e)
 

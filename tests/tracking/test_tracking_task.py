@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-
+import datetime
 from datetime import timedelta
 
 import pytest
 from django.utils import timezone
-from test_utilities.factories import APIRequestLogFactory, UserFactory
+from test_utilities.factories import APIRequestLogFactory
 
-from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter
-from etools_datamart.apps.tracking.tasks import task_aggregate_log
+from etools_datamart.apps.tracking.middleware import log_request
+from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
 
 
 @pytest.fixture
@@ -19,37 +19,36 @@ def data(db):
      for i in range(30)]
 
 
-def test_aggregate_logs(db):
-    APIRequestLog.objects.truncate()
-
+def test_stream_aggregation(reset_stats, admin_user):
     today = timezone.now().date()
-    previous_date = today - timedelta(days=140)
-    recent_date = today - timedelta(days=10)
+    lastMonth = (today.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+    data = dict(requested_at=today,
+                user=admin_user,
+                path='/a/b/',
+                remote_addr='192.168.10.10',
+                response_ms=2000,
+                cached=False,
+                )
+    log_request(**data)
 
-    user1 = UserFactory()
-    user2 = UserFactory()
-    APIRequestLogFactory(user=user1, viewset=None, service=None, requested_at=previous_date)
-    APIRequestLogFactory(user=user2, viewset=None, service=None, requested_at=previous_date)
+    assert APIRequestLog.objects.get(requested_at=data['requested_at'])
+    assert PathCounter.objects.get(day=data['requested_at'], path=data['path'])
+    assert UserCounter.objects.get(day=data['requested_at'], user=data['user'])
+    assert MonthlyCounter.objects.get(day=lastMonth)
+    assert DailyCounter.objects.get(day=data['requested_at'], cached=0)
+    assert UserCounter.objects.count() == 1
 
-    APIRequestLog.objects.aggregate()
+    data['cached'] = True
+    log_request(**data)
 
-    assert APIRequestLog.objects.count() == 0
-    assert DailyCounter.objects.count() == 1  # created counter
-    assert DailyCounter.objects.first().day == previous_date
+    assert APIRequestLog.objects.filter(requested_at=data['requested_at']).count() == 2
+    assert UserCounter.objects.count() == 1
 
-    APIRequestLogFactory(user=None, viewset=None, service=None, requested_at=previous_date)
-    [APIRequestLogFactory(user=None, viewset=None, service=None, requested_at=recent_date)
-     for i in range(9)]
+    assert PathCounter.objects.get(day=data['requested_at'], path=data['path'])
+    assert UserCounter.objects.get(day=data['requested_at'], user=data['user'])
+    assert MonthlyCounter.objects.get(day=lastMonth, user=data['user'])
 
-    assert APIRequestLog.objects.count() == 10
-    assert DailyCounter.objects.count() == 1
-
-    APIRequestLog.objects.aggregate()
-
-    assert APIRequestLog.objects.count() == 9  # keep recent logs
-    assert DailyCounter.objects.count() == 2  # created counter
-
-
-def test_task(data, db):
-    results = task_aggregate_log()
-    assert results
+    d = DailyCounter.objects.get(day=data['requested_at'])
+    assert d.total == 2
+    assert d.cached == 1
+    assert d.user == 1

@@ -2,20 +2,17 @@
 import logging
 
 from django.conf import settings
-from django.db import connection, models
+from django.db import connections, models
 from strategy_field.fields import StrategyClassField
 
 logger = logging.getLogger(__name__)
 
 
 class APIRequestLogManager(models.Manager):
-    def aggregate(self):
-        from .aggregate import aggregate_log
-
-        return aggregate_log()
 
     def truncate(self):
-        cursor = connection.cursor()
+        conn = connections['default']
+        cursor = conn.cursor()
         cursor.execute(f'TRUNCATE TABLE "{self.model._meta.db_table}"')
 
 

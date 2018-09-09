@@ -5,7 +5,7 @@ import pytest
 from django.urls import reverse
 
 from etools_datamart.api.endpoints import InterventionViewSet
-from etools_datamart.apps.tracking.models import APIRequestLog
+from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def django_app(django_app_mixin, system_user):
 
 
 @pytest.mark.django_db
-def test_log(enable_stats, django_app, system_user):
+def test_log(enable_stats, django_app, system_user, reset_stats):
     url = reverse("api:intervention-list")
     url = f"{url}?country_name=bolivia,chad,lebanon"
 
@@ -43,6 +43,12 @@ def test_log(enable_stats, django_app, system_user):
     assert log.viewset == InterventionViewSet
     assert log.service == 'Intervention'
     assert not log.cached
+
+    daily = DailyCounter.objects.get(day=log.requested_at)
+    assert daily.total == 1
+    assert daily.response_max == log.response_ms
+    assert daily.response_min == log.response_ms
+    assert daily.response_average == log.response_ms
 
 
 @pytest.mark.django_db

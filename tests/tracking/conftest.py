@@ -19,3 +19,13 @@ def log(db):
 @pytest.fixture
 def log_with_params(db):
     return APIRequestLogFactory(query_params=json.dumps({"a": 1}))
+
+
+@pytest.fixture
+def reset_stats(db):
+    from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter, UserCounter, MonthlyCounter, PathCounter
+    APIRequestLog.objects.truncate()
+    DailyCounter.objects.truncate()
+    MonthlyCounter.objects.truncate()
+    PathCounter.objects.truncate()
+    UserCounter.objects.truncate()
