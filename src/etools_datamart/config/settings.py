@@ -13,8 +13,7 @@ SETTINGS_DIR = Path(__file__).parent
 PACKAGE_DIR = SETTINGS_DIR.parent
 DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 
-env = environ.Env(DEBUG=(bool, False),
-                  API_URL=(str, 'http://localhost:8000/api/'),
+env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
 
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
@@ -41,14 +40,15 @@ env = environ.Env(DEBUG=(bool, False),
                   X_FRAME_OPTIONS=(str, 'DENY'),
                   )
 
-if os.environ['DEBUG']:  # pragma: no cover
+DEBUG = os.environ.get('DEBUG', False)
+if DEBUG:  # pragma: no cover
     env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
     environ.Env.read_env(str(env_file))
 
 MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
-DEBUG = env('DEBUG')  # False if not in os.environ
+
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 
