@@ -42,6 +42,7 @@ def disable_post_run():
 
 
 def test_load_pmp_indicator_running(db, disable_post_run):
-    assert load_pmp_indicator.apply()
-    assert TaskLog.objects.filter(task='etl_etools_datamart.apps.etl.load_pmp_indicator',
+    with mock.patch('etools_datamart.apps.etl.tasks.load_pmp_indicator.run'):
+        assert load_pmp_indicator.apply()
+        assert TaskLog.objects.filter(task='etl_etools_datamart.apps.etl.load_pmp_indicator',
                                   result='RUNNING')

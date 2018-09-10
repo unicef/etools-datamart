@@ -56,7 +56,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--async',
             action='store_true',
-            dest='async',
+            dest='_async',
             default=False,
             help='use celery to refresh datamart')
 
@@ -117,7 +117,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Running {task.name}...", ending='\r')
                 self.stdout.flush()
 
-                if options['async']:
+                if options['_async']:
                     etl.delay()
                     self.stdout.write(f"{task.name} scheduled")
                 else:

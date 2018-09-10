@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.urls import reverse
-from unicef_rest_framework.models import Service
-
-
-@pytest.fixture()
-def service(db):
-    Service.objects.load_services()
-    return Service.objects.order_by('?').first()
 
 
 def test_service_changelist(django_app, admin_user, service):

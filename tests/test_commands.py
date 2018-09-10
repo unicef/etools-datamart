@@ -18,7 +18,7 @@ def test_init_setup_all(db, settings):
 
 @pytest.mark.django_db
 def test_init_setup_refresh_async(db, settings):
-    call_command("init-setup", async=True, refresh=True, stdout=StringIO())
+    call_command("init-setup", _async=True, refresh=True, stdout=StringIO())
     ModelUser = get_user_model()
     assert ModelUser.objects.exists()
 
