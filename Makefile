@@ -50,3 +50,7 @@ docs: .mkbuilddir
 ifdef BROWSE
 	firefox ${BUILDDIR}/docs/index.html
 endif
+
+
+urf:
+	pipenv run pytest tests/urf --cov-config tests/urf/.coveragerc

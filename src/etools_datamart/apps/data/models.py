@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class DataMartQuerySet(QuerySet):
 
     def filter_schemas(self, *schemas):
-        if schemas:
+        if schemas and schemas[0]:
             return self.filter(schema_name__in=schemas)
         return self
 

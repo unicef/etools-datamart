@@ -127,9 +127,12 @@ class TenantQuerySet(QuerySet):
         self._iterable_class = TenantModelIterable
 
     def filter_schemas(self, *schemas):
-        if schemas:
-            conn = connections['etools']
+        conn = connections['etools']
+        if schemas and schemas[0]:
             conn.set_schemas(schemas)
+        else:
+            conn.set_all_schemas()
+
         return self
 
     # def prefetch_related(self, *lookups):

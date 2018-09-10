@@ -8,5 +8,5 @@
         {% for choice in choices %} {% if choice.selected %}{{ choice.display }}{% endif %} {% endfor %}</div>
 
     <!--{{ schemas|join:", " }}-->
-    <a style="border:none" href="{% select_schema %}">Change</a>
+    <a style="border:none" href="{% url 'select-schema' %}{{spec.all_filters}}">Change</a>
 </ul>

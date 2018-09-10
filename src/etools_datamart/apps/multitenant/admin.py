@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
-from django.contrib.admin import FieldListFilter, ModelAdmin
+from django.contrib.admin import ListFilter, ModelAdmin
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
@@ -27,37 +27,27 @@ class TenantChangeList(ChangeList):
                 del ret[ignored]
         return ret
 
-    def get_filters(self, request):
-        conn = connections['etools']
-        conn.set_all_schemas()
-        return super().get_filters(request)
 
-
-class SchemaFilter(FieldListFilter):
-    # this needs some extra infos
-    # tecnically SchemaFilter is a ListFilter,
-    # we must inherit from FieldListFilter so the `country_name` field is handled by this filter
-    #
+class SchemaFilter(ListFilter):
     template = 'schemafilter.html'
     title = 'country_name'
     parameter_name = 'country_name'
 
-    def __init__(self, field, request, params, model, model_admin, field_path):
-        super().__init__(field, request, params, model, model_admin, field_path)
+    def __init__(self, request, params, model, model_admin):
+        super().__init__(request, params, model, model_admin)
         self.request = request
+        self.model = model
+        self.model_admin = model_admin
         self.conn = connections['etools']
-        # self.lookup_choices = self.conn.get_tenants()
-
-    def expected_parameters(self):
-        return [self.parameter_name]
-
-    def lookups(self, request, model_admin):
-        return [(country.schema_name, country.country_name) for country in self.conn.get_tenants()]
+        if self.parameter_name in params:
+            value = params.pop(self.parameter_name)
+            self.used_parameters[self.parameter_name] = value
 
     def choices(self, changelist):
-        value = self.request.GET.get(self.parameter_name).split(",")
+        self.all_filters = changelist.get_query_string({"from": self.request.path}, [])
+        value = self.request.GET.get(self.parameter_name, "").split(",")
         yield {
-            'selected': value == ['_all'],
+            'selected': value == [''],
             'query_string': changelist.get_query_string({}, [self.parameter_name]),
             'display': 'All',
         }
@@ -72,18 +62,17 @@ class SchemaFilter(FieldListFilter):
         return True
 
     def queryset(self, request, queryset):
-        value = self.request.GET.get(self.parameter_name)
-        if value and value != '_all':
-            if "," in value:
-                queryset = queryset.filter_schemas(*value.split(","))
-            else:
-                queryset = queryset.filter_schemas(value)
+        value = request.GET.get(self.parameter_name, "")
+        if value:
+            queryset = queryset.filter_schemas(*value.split(","))
+        else:
+            queryset = queryset.filter_schemas(None)
         return queryset
 
 
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
-    list_filter = [('country_name', SchemaFilter)]
+    list_filter = [SchemaFilter, ]
 
     def get_readonly_fields(self, request, obj=None):
         return [field.name for field in self.model._meta.fields]
@@ -93,6 +82,9 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    # def get_queryset(self, request):
+    #     super(TenantModelAdmin, self).get_queryset(request)
 
     def get_object(self, request, object_id, from_field=None):
         pk, schema = object_id.split('-')
