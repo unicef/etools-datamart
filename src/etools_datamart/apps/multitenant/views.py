@@ -18,25 +18,28 @@ class SelectSchema(FormView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.selected = ""
+        self.selected = []
 
     # def get_form(self, form_class=None):
     #     return super().get_form(form_class)
 
     def get_initial(self):
-        self.selected = self.request.COOKIES.get('schemas', '')
-        return {k: True for k in self.selected.split(',')}
+        self.selected = self.request.COOKIES.get('schemas', '').split(",")
+        return {k: True for k in self.selected}
 
-    # def get_success_url(self):
-    #     if 'from' in self.request.GET:
-    #         return self.request.GET['from']
-    #     return super().get_success_url()
+    def get_success_url(self):
+        if 'from' in self.request.GET:
+            return f"{self.request.GET['from']}?country_name={','.join(self.selected)}"
+        return super().get_success_url()
 
     def form_valid(self, form):
-        self.selected = ",".join([k for (k, v) in form.cleaned_data.items() if v])
+        self.selected = [k for (k, v) in form.cleaned_data.items() if v]
+        if len(self.selected) == len(form.cleaned_data):
+            self.selected = ['_all']
+
         response = HttpResponseRedirect(self.get_success_url())
-        state.schemas = self.selected.split(',')
-        response.set_cookie('schemas', self.selected)
+        state.schemas = self.selected
+        response.set_cookie('schemas', ','.join(self.selected))
         return response
 
     # def render_to_response(self, context, **response_kwargs):

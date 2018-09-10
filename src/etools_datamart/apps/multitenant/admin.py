@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
-from django.contrib.admin import ListFilter, ModelAdmin
+from django.contrib.admin import FieldListFilter, ModelAdmin
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
@@ -33,28 +33,39 @@ class TenantChangeList(ChangeList):
         return super().get_filters(request)
 
 
-class SchemaFilter(ListFilter):
-    template = 'adminfilters/combobox.html'
+class SchemaFilter(FieldListFilter):
+    # this needs some extra infos
+    # tecnically SchemaFilter is a ListFilter,
+    # we must inherit from FieldListFilter so the `country_name` field is handled by this filter
+    #
+    template = 'schemafilter.html'
     title = 'country_name'
     parameter_name = 'country_name'
 
-    def __init__(self, request, params, model, model_admin):
-        super().__init__(request, params, model, model_admin)
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        super().__init__(field, request, params, model, model_admin, field_path)
         self.request = request
         self.conn = connections['etools']
+        # self.lookup_choices = self.conn.get_tenants()
+
+    def expected_parameters(self):
+        return [self.parameter_name]
+
+    def lookups(self, request, model_admin):
+        return [(country.schema_name, country.country_name) for country in self.conn.get_tenants()]
 
     def choices(self, changelist):
-        value = self.request.GET.get(self.parameter_name)
+        value = self.request.GET.get(self.parameter_name).split(",")
         yield {
-            'selected': value is None,
+            'selected': value == ['_all'],
             'query_string': changelist.get_query_string({}, [self.parameter_name]),
             'display': 'All',
         }
         for lookup in self.conn.get_tenants():
             yield {
-                'selected': value == str(lookup.schema_name),
+                'selected': str(lookup.schema_name) in value,
                 'query_string': changelist.get_query_string({self.parameter_name: lookup.schema_name}, []),
-                'display': lookup.schema_name,
+                'display': lookup.name,
             }
 
     def has_output(self):
@@ -62,17 +73,17 @@ class SchemaFilter(ListFilter):
 
     def queryset(self, request, queryset):
         value = self.request.GET.get(self.parameter_name)
-        if value:
+        if value and value != '_all':
             if "," in value:
-                self.conn.set_schemas(value.split(","))
+                queryset = queryset.filter_schemas(*value.split(","))
             else:
-                self.conn.set_schemas([value])
+                queryset = queryset.filter_schemas(value)
         return queryset
 
 
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
-    list_filter = [SchemaFilter]
+    list_filter = [('country_name', SchemaFilter)]
 
     def get_readonly_fields(self, request, obj=None):
         return [field.name for field in self.model._meta.fields]

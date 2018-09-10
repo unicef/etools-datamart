@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from django.db import connections
 from django.db.models import QuerySet
 from django.db.models.query import ModelIterable, RelatedPopulator
 
@@ -124,6 +125,12 @@ class TenantQuerySet(QuerySet):
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
         self._iterable_class = TenantModelIterable
+
+    def filter_schemas(self, *schemas):
+        if schemas:
+            conn = connections['etools']
+            conn.set_schemas(schemas)
+        return self
 
     # def prefetch_related(self, *lookups):
     #     """
