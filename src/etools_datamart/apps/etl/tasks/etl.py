@@ -40,6 +40,7 @@ def load_pmp_indicator():
                     intervention_id=intervention.pk,
                     **{
                         'country_name': country.name,
+                        'schema_name': country.schema_name,
                         'business_area_code': country.business_area_code,
                         'partner_name': partner.name,
                         'partner_type': partner.cso_type,
@@ -89,6 +90,7 @@ def load_intervention():
                                                                )
         for num, record in enumerate(qs, 1):
             Intervention.objects.create(country_name=country.name,
+                                        schema_name=country.schema_name,
                                         number=record.number,
                                         title=record.title,
                                         status=record.status,

@@ -14,6 +14,7 @@ from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
+from etools_datamart.apps.multitenant.admin import SchemaFilter
 from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
@@ -28,7 +29,7 @@ class DatamartChangeList(ChangeList):
 class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
     actions = None
     load_handler = None
-    list_filter = (('country_name', AllValuesComboFilter),)
+    list_filter = (SchemaFilter,)
 
     def get_changelist(self, request, **kwargs):
         return DatamartChangeList
@@ -82,7 +83,7 @@ class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
 @register(models.PMPIndicators)
 class PMPIndicatorsAdmin(DataModelAdmin):
     list_display = ('country_name', 'partner_name', 'partner_type', 'business_area_code')
-    list_filter = (('country_name', AllValuesComboFilter),
+    list_filter = (SchemaFilter,
                    ('partner_type', AllValuesComboFilter),
                    )
     search_fields = ('partner_name',)
@@ -92,8 +93,8 @@ class PMPIndicatorsAdmin(DataModelAdmin):
 
 @register(models.Intervention)
 class InterventionAdmin(DataModelAdmin):
-    list_display = ('country_name', 'title', 'document_type', 'number', 'status')
-    list_filter = (('country_name', AllValuesComboFilter),
+    list_display = ('country_name', 'schema_name', 'title', 'document_type', 'number', 'status')
+    list_filter = (SchemaFilter,
                    ('document_type', AllValuesComboFilter),
                    ('status', AllValuesComboFilter),
                    'start_date',

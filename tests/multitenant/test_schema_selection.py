@@ -33,6 +33,40 @@ def test_query_param(django_app, admin_user, url):
     assert conn.schemas == ['bolivia', 'lebanon']
 
 
+def test_select_schema_tenant(django_app, admin_user):
+    _from = reverse("admin:etools_partnerspartnerorganization_changelist")
+    url = f"{reverse('select-schema')}?from={_from}"
+    res = django_app.get(url, user=admin_user)
+    res.form['bolivia'] = True
+    res = res.form.submit().follow()
+    assert res.status_code == 200
+    qs = res.context['cl'].queryset
+    assert {e.schema for e in qs.all()} == {"bolivia"}
+    assert conn.schemas == ['bolivia', ]
+
+
+def test_select_schema_all_tenant(django_app, admin_user):
+    _from = reverse("admin:etools_partnerspartnerorganization_changelist")
+    url = f"{reverse('select-schema')}?from={_from}"
+    res = django_app.get(url, user=admin_user)
+    res.form['bolivia'] = True
+    res.form['lebanon'] = True
+    res.form['chad'] = True
+    res = res.form.submit()
+    assert res["Location"] == _from
+    res = res.follow()
+    assert res.status_code == 200
+
+
+def test_select_schema_data(django_app, admin_user):
+    _from = reverse("admin:data_intervention_changelist")
+    url = f"{reverse('select-schema')}?from={_from}"
+    res = django_app.get(url, user=admin_user)
+    res.form['bolivia'] = True
+    res = res.form.submit().follow()
+    assert res.status_code == 200
+
+
 #
 # def test_precendece_2(django_app, admin_user, url):
 #     # schema selectio order should be
