@@ -14,7 +14,7 @@ help:
 
 develop:
 	@pipenv install -d
-	pre-commit install
+	pipenv run pre-commit install
 	$(MAKE) .init-db
 
 
@@ -37,7 +37,7 @@ clean:
 	find src/concurrency/locale -name django.mo | xargs rm -f
 
 fullclean:
-	rm -fr .tox .cache
+	rm -fr .tox .cache .pytest_cache .venv
 	$(MAKE) clean
 
 
