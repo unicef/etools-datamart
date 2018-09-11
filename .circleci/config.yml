@@ -147,7 +147,7 @@ jobs:
           command: |
               if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
                 curl --user ${CIRCLE_TOKEN}: \
-                  --data build_parameters[BUILD_TAG]=$TAG \
+                  --data build_parameters[TAG]=$TAG \
                   --data build_parameters[JOB]=dockerize \
                   https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/develop
               else
@@ -170,7 +170,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
 
     environment:
-      DOCKER_IMAGE: unicef/etools-datamart
+      DOCKER_IMAGE: unicef/datamart
     steps:
       - checkout
       - add_ssh_keys:
@@ -178,11 +178,12 @@ jobs:
             - "70:aa:15:2a:d9:1c:74:f3:a1:f7:c4:cd:9b:d2:d1:f5"
       - setup_remote_docker
       - run:
+          name: Dump Environment
+          command: |
+            env | sort
+      - run:
           name: Build docker image
           command: |
-            if [ -z "$TAG" ];then
-              TAG="$BUILD_TAG"
-            fi
             if [ -z "$TAG" ];then
               echo "Tag not set. exit"
               exit 1
@@ -192,11 +193,13 @@ jobs:
                     --build-arg DATAMART_VERSION=${TAG} \
                     -t ${DOCKER_IMAGE}:${TAG} \
                     -f docker/Dockerfile .
-            docker images "unicef/etools-datamart*"
+            docker images "unicef/datamart*"
       - run:
           name: Test Backend docker image
           command: |
-              docker run -p 8000:8000 --rm \
+              echo "Testing ${DOCKER_IMAGE}:${TAG}"
+              docker run -p 8000:8000 \
+                      --rm \
                       -e DATABASE_URL=${DATABASE_URL} \
                       -e DEBUG=0 \
                       -e SECURE_SSL_REDIRECT=0 \
@@ -209,7 +212,9 @@ jobs:
       - deploy:
           name: Push Backend docker image
           command: |
+              echo "Pushing ${DOCKER_IMAGE}:${TAG} to Docker Hub"
               export TODAY=`date '+%d %B %Y at %H:%M'`
+
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
               docker push ${DOCKER_IMAGE}:latest
