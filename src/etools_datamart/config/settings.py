@@ -217,7 +217,7 @@ PASSWORD_HASHERS = [
 ]
 
 INSTALLED_APPS = [
-    'etools_datamart.apps.init',
+    'etools_datamart.apps.init.apps.Config',
     'etools_datamart.apps.multitenant',
 
     'constance',
