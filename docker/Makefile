@@ -8,7 +8,7 @@ DOCKER_IMAGE_NAME=unicef/datamart
 DOCKERFILE?=Dockerfile
 PYPI_INDEX?=https://pypi.org/simple/
 RUN_OPTIONS?=
-TARGET?=0.4
+TARGET?=
 
 help:
 	@echo "dev                  build dev image (based on local code)"
@@ -75,10 +75,10 @@ dev-run:
 		CMD=stack $(MAKE) .run
 
 test:
-	CMD='django-admin check --deploy' $(MAKE) run
+	CMD='bash -c "django-admin check --deploy"' $(MAKE) .run
 
 scratch:
-	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) run
+	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
 
 shell:
 	docker exec -it ${CONTAINER_NAME} /bin/bash

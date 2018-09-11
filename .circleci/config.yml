@@ -147,7 +147,7 @@ jobs:
           command: |
               if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
                 curl --user ${CIRCLE_TOKEN}: \
-                  --data build_parameters[TAG]=$TAG \
+                  --data build_parameters[BUILD_TAG]=$TAG \
                   --data build_parameters[JOB]=dockerize \
                   https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/develop
               else
@@ -181,6 +181,9 @@ jobs:
           name: Build docker image
           command: |
             if [ -z "$TAG" ];then
+              TAG="$BUILD_TAG"
+            fi
+            if [ -z "$TAG" ];then
               echo "Tag not set. exit"
               exit 1
             fi
@@ -188,8 +191,8 @@ jobs:
                     --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
                     --build-arg DATAMART_VERSION=${TAG} \
                     -t ${DOCKER_IMAGE}:${TAG} \
-                    -f Dockerfile .
-            docker images
+                    -f docker/Dockerfile .
+            docker images "unicef/etools-datamart*"
       - run:
           name: Test Backend docker image
           command: |
@@ -207,18 +210,7 @@ jobs:
           name: Push Backend docker image
           command: |
               export TODAY=`date '+%d %B %Y at %H:%M'`
-
-              git config --global user.email "s.apostolico@gmail.com"
-              git config --global user.name "CI"
-              echo "$TODAY Backend $TAG released" | cat - CHANGES > temp && mv temp CHANGES
-              git add CHANGES
-              git commit -m "Released Backend v$TAG"
-              git push
-              git tag -a -m "backend/$TAG" backend/$TAG
-              git push --tags
-
               docker login -u $DOCKER_USER -p $DOCKER_PASS
-
               docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
               docker push ${DOCKER_IMAGE}:latest
               docker push ${DOCKER_IMAGE}:${TAG}
