@@ -31,7 +31,7 @@ class SelectSchema(FormView):
 
     def get_success_url(self):
         self.params = dict(self.request.GET.items())
-        _from = self.request.GET['from']
+        _from = self.request.GET.getlist('from', ['/'])[0]
         if '_all' in self.selected:
             qs = self.get_query_string({}, ['from', 'country_name'])
         else:
