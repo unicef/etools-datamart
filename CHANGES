@@ -1,4 +1,4 @@
-0.4
+1.0
 ---
 * SystemFilters. Ability to force per user/service filters
 * User ACL can grant/demy access to specific serializers
@@ -7,6 +7,7 @@
 * removes MultiTenantMiddleware
 * everywhere use 'country_name' as schema/tenant selection
 * add tracking informations
+* allows selection multiple schemas in admin
 
 
 0.3
