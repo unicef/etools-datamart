@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
-from django.contrib.admin import ModelAdmin
+from django.contrib.admin import ListFilter, ModelAdmin
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
+from django.db import connections
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from etools_datamart.state import state
-
 
 class TenantChangeList(ChangeList):
-    IGNORED_PARAMS = ['_schemas', ]
+    IGNORED_PARAMS = ['country_name', ]
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
@@ -29,22 +28,63 @@ class TenantChangeList(ChangeList):
         return ret
 
 
+class SchemaFilter(ListFilter):
+    template = 'schemafilter.html'
+    title = 'country_name'
+    parameter_name = 'country_name'
+
+    def __init__(self, request, params, model, model_admin):
+        super().__init__(request, params, model, model_admin)
+        self.request = request
+        self.model = model
+        self.model_admin = model_admin
+        self.conn = connections['etools']
+        if self.parameter_name in params:
+            value = params.pop(self.parameter_name)
+            self.used_parameters[self.parameter_name] = value
+
+    def choices(self, changelist):
+        self.all_filters = changelist.get_query_string({"from": self.request.path}, [])
+        value = self.request.GET.get(self.parameter_name, "").split(",")
+        yield {
+            'selected': value == [''],
+            'query_string': changelist.get_query_string({}, [self.parameter_name]),
+            'display': 'All',
+        }
+        for lookup in self.conn.get_tenants():
+            yield {
+                'selected': str(lookup.schema_name) in value,
+                'query_string': changelist.get_query_string({self.parameter_name: lookup.schema_name}, []),
+                'display': lookup.name,
+            }
+
+    def has_output(self):
+        return True
+
+    def queryset(self, request, queryset):
+        value = request.GET.get(self.parameter_name, "")
+        if value:
+            queryset = queryset.filter_schemas(*value.split(","))
+        else:
+            queryset = queryset.filter_schemas(None)
+        return queryset
+
+
 class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
-
-    def get_queryset(self, request):
-        return super().get_queryset(request)
+    list_filter = [SchemaFilter, ]
 
     def get_readonly_fields(self, request, obj=None):
-        if obj:
-            self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
-        return self.readonly_fields
+        return [field.name for field in self.model._meta.fields]
 
     def has_add_permission(self, request):
         return False
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    # def get_queryset(self, request):
+    #     super(TenantModelAdmin, self).get_queryset(request)
 
     def get_object(self, request, object_id, from_field=None):
         pk, schema = object_id.split('-')
@@ -53,7 +93,8 @@ class TenantModelAdmin(ExtraUrlMixin, ModelAdmin):
         field = model._meta.pk if from_field is None else model._meta.get_field(from_field)
         try:
             pk = field.to_python(pk)
-            state.schemas = [schema]
+            conn = connections['etools']
+            conn.set_schemas([schema])
             return queryset.get(**{field.name: pk})
         except MultipleObjectsReturned:  # pragma: no cover
             raise

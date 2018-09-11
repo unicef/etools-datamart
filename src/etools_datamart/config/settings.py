@@ -9,8 +9,19 @@ import environ
 import etools_datamart
 from etools_datamart.libs.dbrouter import router_factory
 
-env = environ.Env(DEBUG=(bool, False),
+SETTINGS_DIR = Path(__file__).parent
+PACKAGE_DIR = SETTINGS_DIR.parent
+DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
+
+env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
+                  ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
+
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
+                  API_CACHE_URL=(str, "locmemcache://"),
+                  # CACHE_URL=(str, "dummycache://"),
+                  # API_CACHE_URL=(str, "dummycache://"),
+
+                  ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
@@ -29,18 +40,15 @@ env = environ.Env(DEBUG=(bool, False),
                   X_FRAME_OPTIONS=(str, 'DENY'),
                   )
 
-SETTINGS_DIR = Path(__file__).parent
-PACKAGE_DIR = SETTINGS_DIR.parent
-DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
-env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
-
-# if Path(str(env_file)).exists():  # pragma: no cover
-environ.Env.read_env(str(env_file))
+DEBUG = os.environ.get('DEBUG', False)
+if DEBUG:  # pragma: no cover
+    env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
+    environ.Env.read_env(str(env_file))
 
 MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
-DEBUG = env('DEBUG')  # False if not in os.environ
+
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 
@@ -138,9 +146,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.RemoteUserMiddleware',
+    # 'django.contrib.auth.middleware.RemoteUserMiddleware',
+    'crashlog.middleware.CrashLogMiddleware',
     'etools_datamart.api.middleware.ApiMiddleware',
-    'etools_datamart.apps.multitenant.middleware.MultiTenantMiddleware',
+    'etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -150,7 +159,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 CACHES = {
-    'default': env.cache()
+    'default': env.cache(),
+    'api': env.cache('API_CACHE_URL')
 }
 
 ROOT_URLCONF = 'etools_datamart.config.urls'
@@ -170,6 +180,8 @@ TEMPLATES = [
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'etools_datamart.apps.multitenant.context_processors.schemas',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -226,6 +238,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'adminfilters',
     'django_sysinfo',
+    'crashlog',
 
     'django_celery_beat',
 
@@ -233,6 +246,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.etools',
     'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
+    'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.api',
 ]
 
@@ -302,11 +316,32 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
     "PAGE_SIZE": 100,
-    "DEFAULT_PAGINATION_CLASS": None,
-    'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters'
+    "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
+    'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
+    # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
 
 }
+SWAGGER_SETTINGS = {
+    'DEFAULT_API_URL': env('API_URL'),
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
+    'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        },
+        'token': {
+            'type': 'basic'
+        }
 
+    }
+}
+
+REST_FRAMEWORK_EXTENSIONS = {
+    'DEFAULT_OBJECT_CACHE_KEY_FUNC':
+        'rest_framework_extensions.utils.default_object_cache_key_func',
+    'DEFAULT_LIST_CACHE_KEY_FUNC':
+        'rest_framework_extensions.utils.default_list_cache_key_func',
+}
 LOG_DIR = os.environ.get('SIR_LOG_DIR',
                          os.path.expanduser('~/logs'))
 
@@ -352,7 +387,7 @@ LOGGING = {
         'root': file_handler('messages', 'DEBUG'),
         'application': file_handler('etools_datamart', 'DEBUG'),
         'console': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
@@ -424,7 +459,7 @@ LOGGING = {
             'propagate': False,
         },
         'sentry.errors': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'handlers': ['console'],
             'propagate': False,
         },
@@ -437,12 +472,11 @@ LOGGING_DEBUG = {
 }
 
 TENANT_MODEL = 'etools.UsersCountry'
+ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
-TEST_SCHEMAS = ['bolivia', 'chad', 'lebanon']
+SCHEMA_FILTER = {}
+SCHEMA_EXCLUDE = {'schema_name__in': ['public', 'uat', 'frg']}
 
-SWAGGER_SETTINGS = {
-    # 'DEFAULT_FILTER_INSPECTORS': 'drf_yasg.inspectors.CoreAPICompatInspector',
-    # 'DEFAULT_FILTER_INSPECTORS': 'etools_datamart.api.swagger.FilterInspector',
-}
+ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')

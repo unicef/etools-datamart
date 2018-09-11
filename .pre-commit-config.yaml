@@ -21,13 +21,6 @@ repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     rev: v1.4.0
     hooks:
-#    -   id: autopep8-wrapper
-#        args:
-#        - -i
-#        - --ignore=E309,E501
-#    -   id: check-json
-#    -   id: check-yaml
-#    -   id: fix-encoding-pragma
     -   id: debug-statements
         exclude: manage.py
     -   id: end-of-file-fixer

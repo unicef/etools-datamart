@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg/style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'api-doc.css' %}"/>
+</head>
+<body>
+{#<div class="redoc-container">#}
+{#    <div>#}
+{#    <img src="{% static 'unicef_logo.png' %}" width="100">#}
+{##}
+{#    </div>#}
+    <script id="redoc-settings" type="application/json">{{ redoc_settings | safe }}</script>
+    <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
+    <script src="{% static 'drf-yasg/redoc-init.js' %}"></script>
+    <script src="{% static 'drf-yasg/redoc/redoc.min.js' %}"></script>
+</div>
+</body>
+</html>

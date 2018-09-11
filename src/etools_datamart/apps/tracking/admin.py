@@ -1,0 +1,117 @@
+# -*- coding: utf-8 -*-
+import json
+import logging
+
+from admin_extra_urls.extras import ExtraUrlMixin, link
+from django.contrib import admin
+from django.template.defaultfilters import pluralize, urlencode
+from unicef_rest_framework.admin import APIModelAdmin, TruncateTableMixin
+from unicef_rest_framework.utils import humanize_size
+
+from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
+
+logger = logging.getLogger(__name__)
+
+
+class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
+    date_hierarchy = 'requested_at'
+    search_fields = ('path',)
+    list_display = ('requested_at', 'response_ms', 'size',
+                    'requestor', 'method',
+                    'url', 'remote_addr', 'content_type', 'cached', 'is_filtered',
+                    'service', 'viewset', )
+    list_filter = ('user', 'remote_addr', 'cached', 'content_type')
+    readonly_fields = ('user', 'path', 'requested_at', 'response_ms',
+                       'size', 'method', 'cached', 'remote_addr', 'response_length',
+                       'query_params', 'data', 'content_type', 'viewset', 'service', )
+
+    fieldsets = (
+        ('', {
+            'fields': (('requested_at', 'user', ),
+                       )
+        }),
+        ('Response', {
+            'classes': ('grp-collapse grp-open',),
+            'fields': (('content_type', 'response_length', 'response_ms', 'cached'),
+                       ('viewset', 'service'),
+                       ),
+        }),
+        ('Request', {
+            'classes': ('grp-collapse grp-open',),
+            'fields': (('remote_addr', 'method', 'path'),
+                       'query_params', 'data',
+                       ),
+        }),
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    @link(icon="fa fa-compress icon-white")
+    def aggregate(self, request):
+        processed = APIRequestLog.objects.aggregate()
+        self.message_user(request, "{} {} aggregated".format(processed, pluralize(processed, 'day,days')))
+
+    def is_filtered(self, obj):
+        return obj.query_params != '{}'
+
+    is_filtered.boolean = True
+
+    def url(self, obj):
+        try:
+            params = json.loads(obj.query_params)
+        except ValueError:
+            params = {}
+        if params:
+            return "<a target='capi' href='{0.path}?{1}'>{0.path}</a>".format(obj, urlencode(params))
+
+        return "<a target='capi' href='{0.path}'>{0.path}</a>".format(obj)
+
+    url.admin_order_field = 'path'
+    url.allow_tags = True
+
+    def requestor(self, obj):
+        return obj.user
+
+    # def event(self, obj):
+    #     return obj.requested_at.strftime("<nobr>%Y-%m-%d %H:%M:%S</nobr>")
+    #
+    # event.admin_order_field = 'requested_at'
+    # event.short_description = 'DateTime'
+    # event.allow_tags = True
+
+    def size(self, obj):
+        return "<nobr>{0}</nobr>".format(humanize_size(obj.response_length))
+
+    size.admin_order_field = 'response_length'
+    size.allow_tags = True
+
+
+class DailyCounterAdmin(TruncateTableMixin, APIModelAdmin):
+    date_hierarchy = 'day'
+    editing = True
+
+
+class MonthlyCounterAdmin(TruncateTableMixin, APIModelAdmin):
+    date_hierarchy = 'day'
+    editing = True
+
+
+class PathCounterAdmin(TruncateTableMixin, APIModelAdmin):
+    date_hierarchy = 'day'
+    search_fields = ('path',)
+
+
+class UserCounterAdmin(TruncateTableMixin, APIModelAdmin):
+    date_hierarchy = 'day'
+
+
+class ApplicationCounterAdmin(TruncateTableMixin, APIModelAdmin):
+    date_hierarchy = 'day'
+
+
+admin.site.register(APIRequestLog, APIRequestLogAdmin)
+admin.site.register(MonthlyCounter, MonthlyCounterAdmin)
+admin.site.register(DailyCounter, DailyCounterAdmin)
+admin.site.register(PathCounter, PathCounterAdmin)
+admin.site.register(UserCounter, UserCounterAdmin)

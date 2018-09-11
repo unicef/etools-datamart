@@ -1,0 +1,12 @@
+{% load i18n multitenant %}
+{% get_state %}
+{% schemas %}
+
+<h3>{% blocktrans with title as filter_title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<ul>
+    <div style="overflow:auto;display:block;max-height:100px;border:none ">
+        {% for choice in choices %} {% if choice.selected %}{{ choice.display }}{% endif %} {% endfor %}</div>
+
+    <!--{{ schemas|join:", " }}-->
+    <a style="border:none" href="{% url 'select-schema' %}{{spec.all_filters}}">Change</a>
+</ul>

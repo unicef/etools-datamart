@@ -11,7 +11,7 @@ def router_factory(db_name, app_list, syncdb=True):  # noqa
             return None
 
         def db_for_write(self, model, **hints):
-            if model._meta.app_label in app_list:
+            if model._meta.app_label in app_list:  # pragma: no cover
                 return False
                 # return db_name
             return None
@@ -26,7 +26,7 @@ def router_factory(db_name, app_list, syncdb=True):  # noqa
         def allow_migrate(self, db, app_label, model_name=None, **hints):
             ret = None
 
-            if db == db_name:
+            if db == db_name:  # pragma: no cover
                 ret = (app_label in app_list) and syncdb
             elif app_label in app_list:
                 ret = False

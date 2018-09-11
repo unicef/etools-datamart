@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 import logging
+from functools import lru_cache
 
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -39,6 +39,16 @@ class SystemFilterHandler(object):
         return queryset
 
 
+class SystemFilterManager(models.Manager):
+    @lru_cache()
+    def match(self, request, view):
+        try:
+            return SystemFilter.objects.get(service=view.get_service(),
+                                            user=request.user)
+        except SystemFilter.DoesNotExist:
+            return None
+
+
 class SystemFilter(models.Model):
     """ Store 'hardcoded' filters per user
     @see AutoFilterRule
@@ -51,9 +61,14 @@ class SystemFilter(models.Model):
     handler = models.CharField(max_length=500,
                                default=fqn(SystemFilterHandler))
 
+    objects = SystemFilterManager()
+
     class Meta:
         unique_together = (('service', 'user'),
                            ('service', 'group'))
+
+    def __str__(self):
+        return f"{self.user}/{self.service}"
 
     def set_rule(self, **kwargs):
         for field, value in kwargs.items():
@@ -65,16 +80,18 @@ class SystemFilter(models.Model):
 
     def test(self, **kwargs):
         try:
-            self.service.view().get_queryset().filter(**kwargs)
+            self.service.viewset().get_queryset().filter(**kwargs)
         except (FieldError, TypeError) as e:
             raise InvalidField(e)
 
+    @lru_cache()
     def get_filters(self):
         f = {}
         for r in self.rules.all():
             f[r.field] = r.value
         return f
 
+    @lru_cache()
     def get_querystring(self):
         f = []
         for field, value in self.get_filters().items():
@@ -93,6 +110,9 @@ class SystemFilterFieldRule(models.Model):
 
     class Meta:
         unique_together = ('filter', 'field')
+
+    def __str__(self):
+        return f"{self.filter}: {self.field}={self.value}"
 
 
 class SystemFilterParam(models.Model):

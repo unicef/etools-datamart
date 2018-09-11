@@ -2,12 +2,9 @@
 
 import logging
 
-from admin_extra_urls.extras import ExtraUrlMixin, link
+from admin_extra_urls.extras import link
+from admin_extra_urls.mixins import _confirm_action
 from django.contrib import admin
-from django.contrib.admin.templatetags.admin_urls import admin_urlname
-from django.http import HttpResponseRedirect
-from django.template.response import TemplateResponse
-from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
@@ -21,33 +18,17 @@ class ReadOnlyModelAdmin(object):
         return [f.name for f in self.model._meta.fields]
 
 
-class TruncateTableMixin(ExtraUrlMixin):
-    truncate_cascade = False
+class TruncateTableMixin:
 
-    def has_delete_permission(self, request, obj=None):
-        return True
+    def _truncate(self, request):
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
-    @link(label='Empty Table', css_class="btn btn-danger", icon="fa fa-warning icon-white")
-    def empty_log(self, request):
-        opts = self.model._meta
-        context = dict(
-            self.admin_site.each_context(request),
-            opts=opts,
-            app_label=opts.app_label,
-        )
-        if request.method == 'POST':
-            from django.db import connection
-
-            cascade = {True: 'CASCADE', False: ''}
-            cursor = connection.cursor()
-            cursor.execute('TRUNCATE TABLE "{1}" {0}'.format(cascade[self.truncate_cascade],
-                                                             self.model._meta.db_table))
-            return HttpResponseRedirect(reverse(admin_urlname(opts,
-                                                              'changelist')))
-
-        return TemplateResponse(request,
-                                'admin/unicef_rest_framework/confirm_truncate.html',
-                                context)
+    @link(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
+    def truncate(self, request):
+        return _confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
+                               "Successfully executed", )
 
 
 class ListDisplayAllMixin(object):

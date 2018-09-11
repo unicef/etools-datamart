@@ -3,19 +3,29 @@ import logging
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet
 
 logger = logging.getLogger(__name__)
 
 
-class DataMartManager(models.Manager):
+class DataMartQuerySet(QuerySet):
+
+    def filter_schemas(self, *schemas):
+        if schemas and schemas[0]:
+            return self.filter(schema_name__in=schemas)
+        return self
+
+
+class DataMartManager(BaseManager.from_queryset(DataMartQuerySet)):
     def truncate(self):
-        # from django.db import connection
-        # with connection.cursor() as cursor:
-        # cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
         self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
 
 class DataMartModel(models.Model):
+    country_name = models.CharField(max_length=50, db_index=True)
+    schema_name = models.CharField(max_length=50, db_index=True)
+
     class Meta:
         abstract = True
 
@@ -23,7 +33,6 @@ class DataMartModel(models.Model):
 
 
 class PMPIndicators(DataMartModel):
-    country_name = models.CharField(max_length=50, null=True, db_index=True)
     vendor_number = models.CharField(max_length=255, null=True, db_index=True)
     business_area_code = models.CharField(max_length=100, null=True, db_index=True)
 
@@ -63,7 +72,6 @@ class PMPIndicators(DataMartModel):
 
 
 class Intervention(DataMartModel):
-    country_name = models.CharField(max_length=50, null=True, db_index=True)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
     document_type = models.CharField(max_length=255, null=True)

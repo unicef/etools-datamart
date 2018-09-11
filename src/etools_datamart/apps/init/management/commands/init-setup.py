@@ -1,4 +1,5 @@
 import os
+import sys
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -10,6 +11,7 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from humanize import naturaldelta
 from strategy_field.utils import fqn
 
+from etools_datamart.apps.etl.models import TaskLog
 from etools_datamart.celery import app
 
 
@@ -54,7 +56,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--async',
             action='store_true',
-            dest='async',
+            dest='_async',
             default=False,
             help='use celery to refresh datamart')
 
@@ -81,14 +83,14 @@ class Command(BaseCommand):
                                                                               "password": make_password(pwd)})
         if created:  # pragma: no cover
             self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
-        else:
+        else:  # pragma: no cover
             self.stdout.write(f"Superuser `{admin}` already exists`.")
 
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
         self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
 
-        if options['tasks'] or _all:
+        if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
 
             tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
@@ -104,21 +106,24 @@ class Command(BaseCommand):
                     task.delete()
                     counters[False] += 1
 
+            TaskLog.objects.inspect()
             self.stdout.write(
                 f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
 
         if options['refresh']:
-
             self.stdout.write("Refreshing datamart...")
             for task in PeriodicTask.objects.all()[1:]:
                 etl = import_string(task.task)
                 self.stdout.write(f"Running {task.name}...", ending='\r')
                 self.stdout.flush()
 
-                if options['async']:
+                if options['_async']:
                     etl.delay()
                     self.stdout.write(f"{task.name} scheduled")
                 else:
                     ret = etl.apply()
                     cost = naturaldelta(app.timers[task.name])
+                    if isinstance(ret.result, Exception):  # pragma: no cover
+                        self.stderr.write(f"\n{ret.result}")
+                        sys.exit(1)
                     self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")

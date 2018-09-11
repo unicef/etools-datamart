@@ -148,14 +148,12 @@ class Parser:
                     for identifier in token.get_identifiers():
                         target.append(str(identifier))
                 elif isinstance(token, Identifier):
-                    if 'COUNT(' in str(token):
-                        self.is_count = True
+                    self.is_count = self.is_count or 'COUNT(' in str(token)
                     target.append(str(token))
                 # elif isinstance(token, Comparison):
                 #     target.append(str(token))
                 elif isinstance(token, Function):
-                    if 'COUNT(' in str(token):
-                        self.is_count = True
+                    self.is_count = self.is_count or 'COUNT(' in str(token)
                     target.append(str(token))
                 elif isinstance(token, Where):
                     # target.append(str(token))
@@ -217,14 +215,14 @@ class Parser:
             ret += ") as __count"
             return ret
 
-        if self.clause == "SELECT":
-            ret = f"SELECT * FROM ("
-            ret += " UNION ALL ".join([self.set_schema(s) for s in schemas])
-            ret += ") as __query"
-            if self.parts.get('order'):
-                parts = self.parts.get('order').split(',')
-                parts = map(lambda p: p.replace('"', '').replace(".", "__"), parts)
-                ret += ",".join(parts)
-            if self.parts.get('limit'):
-                ret += f" {self.parts['limit']}"
-            return ret
+        assert self.clause == "SELECT"
+        ret = f"SELECT * FROM ("
+        ret += " UNION ALL ".join([self.set_schema(s) for s in schemas])
+        ret += ") as __query"
+        if self.parts.get('order'):
+            parts = self.parts.get('order').split(',')
+            parts = map(lambda p: p.replace('"', '').replace(".", "__"), parts)
+            ret += ",".join(parts)
+        if self.parts.get('limit'):
+            ret += f" {self.parts['limit']}"
+        return ret

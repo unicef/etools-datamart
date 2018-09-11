@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
+from django.db import connections
 from django.utils.functional import Promise
-
-from etools_datamart.state import state
 
 
 class RawSql(str):
@@ -42,20 +41,22 @@ def raw_sql(s):
 #     return getattr(settings, 'PUBLIC_SCHEMA_NAME', 'public')
 
 
-# @contextmanager
-# def current_schema(schema):
-#     _old = state.schemas
-#     state.schemas = [schema]
-#     yield
-#     state.schemas = _old
-
-
 @contextmanager
-def clear_schemas():
-    _old = state.schemas
-    state.schemas = ["public"]
+def current_schema(schema):
+    conn = connections['etools']
+    _old = conn.schemas
+    conn.set_schemas([schema])
     yield
-    state.schemas = _old
+    conn.set_schemas(_old)
+
+
+# @contextmanager
+# def clear_schemas():
+#     conn = connections['etools']
+#     _old = conn.schemas
+#     conn.set_schemas([])
+#     yield
+#     conn.set_schemas(_old)
 
 
 # @contextmanager

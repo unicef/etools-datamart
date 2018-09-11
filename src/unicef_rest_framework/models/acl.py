@@ -50,4 +50,8 @@ class UserAccessControl(AbstractAccessControl):
     class Meta:
         verbose_name = 'User ACL'
         verbose_name_plural = 'User ACLs'
-        ordering = ('user',)
+        ordering = ('user', 'service')
+        unique_together = ('user', 'service')
+
+    def __str__(self):
+        return f"{self.user}/{self.service}:{self.get_policy_display()}"

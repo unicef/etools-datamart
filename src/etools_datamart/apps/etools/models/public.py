@@ -75,9 +75,6 @@ class AuthUser(models.Model):
         managed = False
         db_table = 'auth_user'
 
-    def __str__(self):
-        return self.last_name
-
 
 class AuthUserGroups(models.Model):
     user_id = models.IntegerField()

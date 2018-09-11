@@ -10,7 +10,7 @@ omit =
         **/db_router.py
         **/api-builder.py
         **/queue.py
-
+        **/multitenant/postgresql/creation.py
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -29,7 +29,7 @@ exclude_lines =
     #if 0:
     if __name__ == .__main__.:
 
-fail_under = 90
+fail_under = 98
 
 ignore_errors = True
 

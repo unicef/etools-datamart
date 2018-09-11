@@ -3,8 +3,8 @@ import logging
 from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
-from admin_extra_urls.mixins import _confirm_action
 from adminfilters.filters import AllValuesComboFilter
+from crashlog.middleware import process_exception
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -14,6 +14,8 @@ from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
+from etools_datamart.apps.multitenant.admin import SchemaFilter
+from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
 
@@ -21,20 +23,13 @@ logger = logging.getLogger(__name__)
 
 
 class DatamartChangeList(ChangeList):
-    IGNORED_PARAMS = ['_schemas', ]
-
-    def get_filters_params(self, params=None):
-        ret = super().get_filters_params(params)
-        for ignored in self.IGNORED_PARAMS:
-            if ignored in ret:
-                del ret[ignored]
-        return ret
+    pass
 
 
-class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
+class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
     actions = None
     load_handler = None
-    list_filter = (('country_name', AllValuesComboFilter),)
+    list_filter = (SchemaFilter,)
 
     def get_changelist(self, request, **kwargs):
         return DatamartChangeList
@@ -46,8 +41,7 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        if obj:
-            self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
+        self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
         return self.readonly_fields
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
@@ -63,8 +57,8 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     def queue(self, request):
         try:
             self.model._etl_task.delay()
-            self.message_user(request, "ETL task scheduled")
-        except Exception as e:
+            self.message_user(request, "ETL task scheduled", messages.SUCCESS)
+        except Exception as e:  # pragma: no cover
             self.message_user(request, str(e), messages.ERROR)
         finally:
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
@@ -74,38 +68,22 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     def refresh(self, request):
         try:
             start = time()
-            # _etl_loader is set by DatamartCelery.etl()
-            # used to decorate any ETL task
             self.model._etl_task.apply()
             stop = time()
             duration = stop - start
-            self.message_user(request, "Data loaded in %f" % naturaldelta(duration))
-        except Exception as e:
-            raise
-            # FIXME: remove me (print)
-            print(f"111: admin.py:85 - {e}")
-            logger.exception(e)
+            self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+        except Exception as e:  # pragma: no cover
+            process_exception(e)
             self.message_user(request, str(e), messages.ERROR)
         finally:
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
                                                               'changelist')))
 
-    @link()
-    def truncate(self, request):
-        def _action(request):
-            from django.db import connection
-
-            cursor = connection.cursor()
-            cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
-
-        return _confirm_action(self, request, _action, "Continuing will erase the entire content of the table.",
-                               "Successfully executed", )
-
 
 @register(models.PMPIndicators)
 class PMPIndicatorsAdmin(DataModelAdmin):
     list_display = ('country_name', 'partner_name', 'partner_type', 'business_area_code')
-    list_filter = (('country_name', AllValuesComboFilter),
+    list_filter = (SchemaFilter,
                    ('partner_type', AllValuesComboFilter),
                    )
     search_fields = ('partner_name',)
@@ -115,8 +93,8 @@ class PMPIndicatorsAdmin(DataModelAdmin):
 
 @register(models.Intervention)
 class InterventionAdmin(DataModelAdmin):
-    list_display = ('country_name', 'title', 'document_type', 'number', 'status')
-    list_filter = (('country_name', AllValuesComboFilter),
+    list_display = ('country_name', 'schema_name', 'title', 'document_type', 'number', 'status')
+    list_filter = (SchemaFilter,
                    ('document_type', AllValuesComboFilter),
                    ('status', AllValuesComboFilter),
                    'start_date',

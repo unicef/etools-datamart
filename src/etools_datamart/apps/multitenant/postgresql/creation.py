@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 from django.conf import settings
+from django.db import ProgrammingError
 from django.db.backends.postgresql_psycopg2 import creation as original_creation
 
 from etools_datamart.apps.multitenant.postgresql.utils import raw_sql
@@ -89,7 +90,7 @@ class DatabaseCreation(original_creation.DatabaseCreation):
             return
 
         cur = self.connection.cursor()
-        cur.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA pg_catalog;")
+        cur.execute(raw_sql("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA pg_catalog;"))
 
         header = """
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA {schema};
@@ -97,6 +98,15 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA {schema};
 CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA {schema};
 SET default_tablespace = '';
 """
+        public_dump = Path(settings.ETOOLS_DUMP_LOCATION) / "public.sqldump"
+        tenant_dump = Path(settings.ETOOLS_DUMP_LOCATION) / "tenant.sql"
+        if not public_dump.exists():
+            raise ProgrammingError(f"'{public_dump}' not not found")
+        if not tenant_dump.exists():
+            raise ProgrammingError(f"'{tenant_dump}' not not found")
+
+        if verbosity >= 1:
+            print("Restoring %s" % public_dump)
 
         cmds = ["pg_restore",
                 "-U", self.connection.settings_dict['USER'],
@@ -106,7 +116,7 @@ SET default_tablespace = '';
                 "--no-owner",
                 "--disable-triggers",
                 "--exit-on-error",
-                str(Path(__file__).parent / "public.sqldump")]
+                str(public_dump)]
 
         subprocess.check_call(cmds)
 
@@ -115,15 +125,22 @@ SET default_tablespace = '';
         except Exception as e:
             raise Exception(f"Error creating schema 'public'") from e
 
+        if not settings.TEST_SCHEMAS:
+            raise ProgrammingError("settings.TEST_SCHEMAS must be a valid schema list")
+
         for schema in settings.TEST_SCHEMAS:
+            if verbosity >= 1:
+                print("Creating schema %s" % schema)
+
             try:
-                sql = (Path(__file__).parent / f'tenant.sql').read_text()
+                sql = tenant_dump.read_text()
                 sql = sql.replace("[[schema]]", schema).replace("SET default_tablespace = '';",
                                                                 header.format(schema=schema))
                 cur.execute(raw_sql(sql))
             except Exception as e:
                 raise Exception(f"Error creating schema {schema}") from e
 
+        self.connection.close()
         self.connection.ensure_connection()
 
         return test_database_name

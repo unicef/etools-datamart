@@ -1,37 +1,40 @@
-include README.md
-include CONTRIBUTING.md
 include CHANGES
+include CONTRIBUTING.md
 include MANIFEST.in
-include tox.ini
-include Pipfile.lock
 include Pipfile
+include Pipfile.lock
+include README.md
 include src
+include tox.ini
 
-exclude .tox
 exclude .dockerignore
-exclude .style.yapf
-exclude .jshintrc
-exclude Dockerfile.dev
-exclude Makefile
-exclude manage.py
-exclude tests
-exclude manage.py
-exclude entrypoint.sh
 exclude .env
 exclude .env.tpl
-exclude docker-compose.yml
+exclude .jshintrc
 exclude .pre-commit-config.yaml
 exclude .secrets.baseline
+exclude .style.yapf
+exclude .tox
+exclude docker-compose.yml
+exclude Dockerfile.dev
+exclude entrypoint.sh
+exclude Makefile
+exclude manage.py
+exclude manage.py
+exclude tests
+exclude TODO
 
 prune .circleci
-prune tests
 prune db
 prune docker
+prune tests
 
-recursive-include src/etools_datamart *.*
-recursive-include src/unicef_rest_framework *.*
 recursive-exclude tests *
 recursive-include docs *
+recursive-include src *.sql
+recursive-include src *.sqldump
+recursive-include src/etools_datamart *.*
+recursive-include src/unicef_rest_framework *.*
 
 exclude deploy
 exclude docker

@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.lock import cache
+from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
 
 
 @register(models.TaskLog)
-class ExecutionAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class ExecutionAdmin(ExtraUrlMixin, TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
                     'last_success', 'last_failure', 'running')
     readonly_fields = ('task', 'timestamp', 'result', 'elapsed', 'time',
@@ -54,12 +55,7 @@ class ExecutionAdmin(ExtraUrlMixin, admin.ModelAdmin):
                                "Successfully executed", )
 
     @link()
-    def truncate(self, request):
-        def _action(request):
-            from django.db import connection
-
-            cursor = connection.cursor()
-            cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
-
-        return _confirm_action(self, request, _action, "Continuing will erase the entire content of the table.",
-                               "Successfully executed", )
+    def inspect(self, request):
+        created, updated = self.model.objects.inspect()
+        self.message_user(request, f"{created} task created. {updated} have been updated",
+                          messages.SUCCESS)

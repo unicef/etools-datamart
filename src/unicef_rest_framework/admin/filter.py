@@ -10,7 +10,7 @@ from django.contrib.admin import TabularInline
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from ..models.filter import SystemFilter, SystemFilterFieldRule, SystemFilterParam
+from ..models.filter import SystemFilter, SystemFilterFieldRule
 
 logger = logging.getLogger(__name__)
 
@@ -20,9 +20,9 @@ class SystemFilterRuleInline(TabularInline):
     list_display = ('field', 'value', 'override_field')
 
 
-class SystemFilterParamInline(TabularInline):
-    model = SystemFilterParam
-    list_display = ('param', 'value')
+# class SystemFilterParamInline(TabularInline):
+#     model = SystemFilterParam
+#     list_display = ('param', 'value')
 
 
 class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
@@ -30,7 +30,7 @@ class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
     readonly_fields = ('handler',)
     list_filter = ('service', 'user')
     search_fields = ('service__name',)
-    inlines = [SystemFilterRuleInline, SystemFilterParamInline]
+    inlines = [SystemFilterRuleInline]
 
     @action()
     def test(self, request, pk):
