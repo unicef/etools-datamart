@@ -13,7 +13,7 @@ help:
 
 
 develop:
-	@pipenv install -d
+	@pipenv sync --dev
 	pipenv run pre-commit install
 	$(MAKE) .init-db
 
