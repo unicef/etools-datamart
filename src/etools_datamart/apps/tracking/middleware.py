@@ -4,7 +4,6 @@ import datetime
 import json
 import logging
 
-import pytest
 from django.conf import settings
 from django.db.models import F
 from django.utils.timezone import now
@@ -16,8 +15,6 @@ from .asyncqueue import AsyncQueue
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
 
 logger = logging.getLogger(__name__)
-
-pytestmarker = pytest.mark.django_db
 
 
 def log_request(**kwargs):
