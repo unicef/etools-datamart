@@ -37,7 +37,7 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install tox --user
-            tox -e py36-d20
+            tox -e py36-d20 deps
 
       - store_artifacts:
           path: ~build/coverage
@@ -153,6 +153,7 @@ jobs:
               else
                 echo "Skipped as '$CIRCLE_BRANCH' does not match '$RELEASE_MATCH' branch"
               fi
+
   dockerize:
     working_directory: ~/code
     docker:
@@ -170,13 +171,17 @@ jobs:
           POSTGRES_PASSWORD: postgres
 
     environment:
-      DOCKER_IMAGE: unicef/etools-datamart
+      DOCKER_IMAGE: unicef/datamart
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints:
             - "70:aa:15:2a:d9:1c:74:f3:a1:f7:c4:cd:9b:d2:d1:f5"
       - setup_remote_docker
+      - run:
+          name: Dump Environment
+          command: |
+            env | sort
       - run:
           name: Build docker image
           command: |
@@ -188,12 +193,14 @@ jobs:
                     --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
                     --build-arg DATAMART_VERSION=${TAG} \
                     -t ${DOCKER_IMAGE}:${TAG} \
-                    -f Dockerfile .
-            docker images
+                    -f docker/Dockerfile .
+            docker images "unicef/datamart*"
       - run:
           name: Test Backend docker image
           command: |
-              docker run -p 8000:8000 --rm \
+              echo "Testing ${DOCKER_IMAGE}:${TAG}"
+              docker run -p 8000:8000 \
+                      --rm \
                       -e DATABASE_URL=${DATABASE_URL} \
                       -e DEBUG=0 \
                       -e SECURE_SSL_REDIRECT=0 \
@@ -206,19 +213,10 @@ jobs:
       - deploy:
           name: Push Backend docker image
           command: |
+              echo "Pushing ${DOCKER_IMAGE}:${TAG} to Docker Hub"
               export TODAY=`date '+%d %B %Y at %H:%M'`
 
-              git config --global user.email "s.apostolico@gmail.com"
-              git config --global user.name "CI"
-              echo "$TODAY Backend $TAG released" | cat - CHANGES > temp && mv temp CHANGES
-              git add CHANGES
-              git commit -m "Released Backend v$TAG"
-              git push
-              git tag -a -m "backend/$TAG" backend/$TAG
-              git push --tags
-
               docker login -u $DOCKER_USER -p $DOCKER_PASS
-
               docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
               docker push ${DOCKER_IMAGE}:latest
               docker push ${DOCKER_IMAGE}:${TAG}

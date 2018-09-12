@@ -29,3 +29,4 @@ db/db1.bz2
 .venv
 docker/cache
 src/etools_datamart/apps/core/static/api-doc.css.map
+docker/superset.db

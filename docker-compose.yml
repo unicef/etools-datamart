@@ -2,8 +2,7 @@ version: '2'
 
 services:
   datamart:
-  # to use this docker file with local code, set env var TAG=dev and uncomment
-  # build section
+  # to use this docker file with local code, set env var TAG=dev
     build:
       context: .
       dockerfile: ./docker/$DOCKERFILE
@@ -32,6 +31,10 @@ services:
       - etools
       - db
       - redis
+    links:
+      - db:db
+      - etools:etools
+      - redis:redis
 
   db:
     image: mdillon/postgis:9.5
@@ -48,10 +51,10 @@ services:
   redis:
     image: redis:alpine
 
-#  superset:
-#    image: amancevice/superset
-#    volumes:
-#      - $PWD/docker:/etc/superset/
+  superset:
+    image: amancevice/superset
+    volumes:
+      - $PWD/docker:/etc/superset/
 
   celery:
     image: unicef/datamart:$TAG

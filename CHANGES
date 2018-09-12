@@ -1,3 +1,7 @@
+1.1
+---
+* Fixes wrong import in middleware
+
 1.0
 ---
 * SystemFilters. Ability to force per user/service filters
