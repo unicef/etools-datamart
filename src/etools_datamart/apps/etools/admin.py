@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
 from django.contrib.admin import register
 
-from etools_datamart.apps.multitenant.admin import TenantModelAdmin
+from etools_datamart.apps.multitenant.admin import EToolsModelAdmin, TenantModelAdmin
 
 from . import models
+
+
+@register(models.AuthUser)
+class AuthUserAdmin(EToolsModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    ordering = ('username',)
 
 
 @register(models.ActionPointsActionpoint)

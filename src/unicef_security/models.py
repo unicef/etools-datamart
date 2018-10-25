@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.translation import ugettext as _
+from django_countries.fields import CountryField
 
 app_label = 'unicef_security'
 
@@ -51,6 +52,7 @@ class AbstractBusinessArea(models.Model, TimeStampedModel):
     name = models.CharField(_('name'), max_length=50, unique=True)
     long_name = models.CharField(_('long name'), max_length=150)
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    country = CountryField()
 
     class Meta:
         app_label = 'unicef_security'
@@ -69,9 +71,9 @@ class BusinessArea(AbstractBusinessArea, TimeStampedModel):
 
 
 class User(AbstractUser, TimeStampedModel):
-    business_area = models.ForeignKey(settings.BUSINESSAREA_MODEL,
-                                      null=True, blank=True,
-                                      on_delete=models.CASCADE)
+    # business_area = models.ForeignKey(settings.BUSINESSAREA_MODEL,
+    #                                   null=True, blank=True,
+    #                                   on_delete=models.CASCADE)
     azure_id = models.UUIDField(blank=True, unique=True, null=True)
     job_title = models.CharField(max_length=100, null=True, blank=True)
     display_name = models.CharField(max_length=100, null=True, blank=True)
@@ -81,7 +83,7 @@ class User(AbstractUser, TimeStampedModel):
 
 
 class Role(models.Model, TimeStampedModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     class Meta:

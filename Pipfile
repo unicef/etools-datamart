@@ -43,6 +43,7 @@ django-db-logging = "*"
 cryptography = "*"
 #rest-social-auth = "*"
 "django-rest-framework-social-oauth2" = "*"
+django-countries = "*"
 
 [dev-packages]
 "flake8" = "*"
