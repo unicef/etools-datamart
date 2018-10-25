@@ -1,14 +1,35 @@
-FROM python:3.6-slim as builder
+FROM pstauffer/curl:latest as builder
+ARG DEVELOP
+ARG GITHUB_CREDENTIALS
+ARG VERSION
 
-ARG PYPI_INDEX="https://pypi.org/simple/"
-ARG DATAMART_VERSION
-ARG GITHUB_TOKEN
+RUN mkdir /code
+ADD . /code
 
-ENV PYPI_INDEX ${PYPI_INDEX}
-ENV GITHUB_TOKEN ${GITHUB_TOKEN}
-ENV DATAMART_VERSION ${DATAMART_VERSION}
+RUN if [ "${DEVELOP}" = "1" ]; then \
+    echo "${VERSION}-develop"; \
+    else \
+    echo "Download package: https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" \
+    && curl ${GITHUB_CREDENTIALS}: -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
+    fi
 
-ENV HOME /root/
+FROM python:3.6.4
+COPY --from=builder /code /code
+LABEL org.label-schema.name="" \
+      org.label-schema.description="" \
+      org.label-schema.url="" \
+      org.label-schema.vcs-url="https://github.com/unicef/etools-datamart" \
+      org.label-schema.version=$VERSION \
+      org.label-schema.schema-version="1.0"
+
+ARG BUILD_DATE
+ARG PIPENV_PYPI_MIRROR
+ARG PIPENV_ARGS
+ARG VERSION
+
+ENV VERSION ${VERSION}
+
+ENV PIPENV_PYPI_MIRROR ${PIPENV_PYPI_MIRROR}
 ENV HOME /root/
 ENV PIPSI_HOME=/usr/local/pipsi/environments
 ENV PIPSI_BIN_DIR=/usr/local/bin
@@ -57,24 +78,18 @@ RUN apt-get update && apt-get install -y \
     redis-server \
     gcc
 
-RUN mkdir -p /code /root/.local/bin \
-    && pip install -U pip \
-    && pip install pipenv
+RUN mkdir -p \
+    /code \
+    /root/.local/bin \
+    /var/datamart/{static,log,conf,run} \
+    && pip install pip==18.0 pipenv --upgrade
 
 WORKDIR /code
 
-RUN curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1 \
-    && pipenv install --system --deploy --ignore-pipfile \
-    && pip install . \
-    && rm -fr /code/*
-
-
-#ADD . /code
-#
-#RUN pipenv install -v --system --ignore-pipfile --deploy --pypi-mirror $PYPI_INDEX \
-#    && pip install -e .
-
-RUN mkdir -p /var/datamart/{static,log,conf,run}
+RUN set -ex \
+    ls -al /code \
+    && pipenv install --system --deploy --ignore-pipfile $PIPENV_ARGS \
+    && pip install -e .
 
 ADD docker/redis.conf /etc/redis.conf
 ADD docker/supervisord.conf /etc/supervisord.conf

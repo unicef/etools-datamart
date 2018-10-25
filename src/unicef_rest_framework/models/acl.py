@@ -3,6 +3,7 @@
 import logging
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
@@ -55,3 +56,16 @@ class UserAccessControl(AbstractAccessControl):
 
     def __str__(self):
         return f"{self.user}/{self.service}:{self.get_policy_display()}"
+
+
+class GroupAccessControl(AbstractAccessControl):
+    group = models.ForeignKey(Group, models.CASCADE, related_name='acl')
+
+    class Meta:
+        verbose_name = 'Group ACL'
+        verbose_name_plural = 'Group ACLs'
+        ordering = ('group', 'service')
+        unique_together = ('group', 'service')
+
+    def __str__(self):
+        return f"{self.group}/{self.service}:{self.get_policy_display()}"

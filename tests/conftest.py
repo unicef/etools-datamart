@@ -135,3 +135,16 @@ def data_service(db):
     from etools_datamart.api.endpoints import InterventionViewSet
 
     return InterventionViewSet.get_service()
+
+
+# Change below numbers each time etools dump is updated
+
+@pytest.fixture()
+def number_of_partnerorganization(db):
+    # number of partners.PartnerOrganization records in each tenant
+    return 193
+
+
+@pytest.fixture()
+def number_of_intervention(db):
+    return 3

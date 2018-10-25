@@ -5,6 +5,7 @@ import logging
 from admin_extra_urls.extras import ExtraUrlMixin, link
 from django.contrib import admin
 from django.template.defaultfilters import pluralize, urlencode
+from django.utils.safestring import mark_safe
 from unicef_rest_framework.admin import APIModelAdmin, TruncateTableMixin
 from unicef_rest_framework.utils import humanize_size
 
@@ -19,15 +20,15 @@ class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('requested_at', 'response_ms', 'size',
                     'requestor', 'method',
                     'url', 'remote_addr', 'content_type', 'cached', 'is_filtered',
-                    'service', 'viewset', )
+                    'service', 'viewset',)
     list_filter = ('user', 'remote_addr', 'cached', 'content_type')
     readonly_fields = ('user', 'path', 'requested_at', 'response_ms',
                        'size', 'method', 'cached', 'remote_addr', 'response_length',
-                       'query_params', 'data', 'content_type', 'viewset', 'service', )
+                       'query_params', 'data', 'content_type', 'viewset', 'service',)
 
     fieldsets = (
         ('', {
-            'fields': (('requested_at', 'user', ),
+            'fields': (('requested_at', 'user',),
                        )
         }),
         ('Response', {
@@ -63,9 +64,10 @@ class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
         except ValueError:
             params = {}
         if params:
-            return "<a target='capi' href='{0.path}?{1}'>{0.path}</a>".format(obj, urlencode(params))
-
-        return "<a target='capi' href='{0.path}'>{0.path}</a>".format(obj)
+            html = "<a target='capi' href='{0.path}?{1}'>{0.path}</a>".format(obj, urlencode(params))
+        else:
+            html = "<a target='capi' href='{0.path}'>{0.path}</a>".format(obj)
+        return mark_safe(html)
 
     url.admin_order_field = 'path'
     url.allow_tags = True
@@ -81,7 +83,7 @@ class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
     # event.allow_tags = True
 
     def size(self, obj):
-        return "<nobr>{0}</nobr>".format(humanize_size(obj.response_length))
+        mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
 
     size.admin_order_field = 'response_length'
     size.allow_tags = True

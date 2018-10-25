@@ -2,8 +2,8 @@
 import json
 
 import pytest
-from django.contrib.auth.models import User
 from test_utilities.factories import APIRequestLogFactory
+from unicef_security.models import User
 
 
 @pytest.fixture

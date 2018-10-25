@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from datetime import date
 
 from django.db import connections
 from django.db.models import Sum
@@ -7,7 +8,9 @@ from django.db.models.functions import Coalesce
 from strategy_field.utils import get_attr
 
 from etools_datamart.apps.data.models import Intervention, PMPIndicators
-from etools_datamart.apps.etools.models import PartnersIntervention, PartnersPartnerorganization
+from etools_datamart.apps.data.models.fam import FAMIndicator
+from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment, AuditSpecialaudit,
+                                                AuditSpotcheck, PartnersIntervention, PartnersPartnerorganization,)
 from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)
@@ -28,8 +31,8 @@ def load_pmp_indicator():
         logger.info(u'Running on %s' % country.name)
         for partner in PartnersPartnerorganization.objects.prefetch_related(
                 'partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
-            for intervention in PartnersIntervention.objects.filter(
-                    agreement__partner=partner).select_related('partnersintervention_partners_interventionbudget_intervention_id'):
+            # .select_related('partnersintervention_partners_interventionbudget_intervention_id')
+            for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
                                          'partnersintervention_partners_interventionbudget_intervention_id', None)
                 fr_currencies = intervention.frs.all().values_list('currency', flat=True).distinct()
@@ -88,6 +91,7 @@ def load_intervention():
                                                                'unicef_signatory',
                                                                'country_programme',
                                                                )
+        num = 0
         for num, record in enumerate(qs, 1):
             Intervention.objects.create(country_name=country.name,
                                         schema_name=country.schema_name,
@@ -149,5 +153,45 @@ def load_intervention():
 
                                         )
         created[country.name] = num
+
+    return created
+
+
+@app.etl(FAMIndicator)
+def load_fam_indicator():
+    connection = connections['etools']
+    countries = connection.get_tenants()
+    FAMIndicator.objects.truncate()
+
+    engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
+    start_date = date.today()  # + relativedelta(months=-1)
+    created = {}
+    for country in countries:
+        created[country.name] = 0
+
+        connection.set_schemas([country.schema_name])
+        for model in engagements:
+            indicator, __ = FAMIndicator.objects.get_or_create(month=start_date,
+                                                               country_name=country.name,
+                                                               schema_name=country.schema_name)
+
+            realname = "_".join(model._meta.db_table.split('_')[1:])
+            for status, status_display in AuditEngagement.STATUSES:
+                filter_dict = {
+                    'engagement_ptr__status': status,
+                    'engagement_ptr__start_date__month': start_date.month,
+                    'engagement_ptr__start_date__year': start_date.year,
+                }
+                try:
+                    field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
+                    value = model.objects.filter(**filter_dict).count()
+                    if not hasattr(indicator, field_name):
+                        raise ValueError(field_name)
+                    setattr(indicator, field_name, value)
+                except Exception as e:
+                    logger.error(e)
+                    raise
+            indicator.save()
+            created[country.name] += 1
 
     return created

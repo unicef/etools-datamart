@@ -35,6 +35,7 @@ recursive-include src *.sql
 recursive-include src *.sqldump
 recursive-include src/etools_datamart *.*
 recursive-include src/unicef_rest_framework *.*
+recursive-include src/unicef_security *.*
 
 exclude deploy
 exclude docker

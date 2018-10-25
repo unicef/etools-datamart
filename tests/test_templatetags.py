@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from unittest.mock import Mock
 
-from etools_datamart.apps.core.templatetags.datamart import server_ip
+from etools_datamart.apps.web.templatetags.datamart import server_ip
 
 
 def test_server_ip():

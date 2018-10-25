@@ -12,7 +12,7 @@ class AccountEmailaddress(models.Model):
     email = models.CharField(unique=True, max_length=254)
     verified = models.BooleanField()
     primary = models.BooleanField()
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='+')
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_account_emailaddress_user_id')
 
     class Meta:
         managed = False
@@ -23,7 +23,7 @@ class AccountEmailconfirmation(models.Model):
     created = models.DateTimeField()
     sent = models.DateTimeField(blank=True, null=True)
     key = models.CharField(unique=True, max_length=64)
-    email_address = models.ForeignKey(AccountEmailaddress, models.DO_NOTHING, related_name='+')
+    email_address = models.ForeignKey(AccountEmailaddress, models.DO_NOTHING, related_name='accountemailaddress_account_emailconfirmation_email_address_id')
 
     class Meta:
         managed = False
@@ -39,8 +39,8 @@ class AuthGroup(models.Model):
 
 
 class AuthGroupPermissions(models.Model):
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='+')
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING, related_name='+')
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='authgroup_auth_group_permissions_group_id')
+    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING, related_name='authpermission_auth_group_permissions_permission_id')
 
     class Meta:
         managed = False
@@ -50,7 +50,7 @@ class AuthGroupPermissions(models.Model):
 
 class AuthPermission(models.Model):
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+')
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='djangocontenttype_auth_permission_content_type_id')
     codename = models.CharField(max_length=100)
 
     class Meta:
@@ -78,7 +78,7 @@ class AuthUser(models.Model):
 
 class AuthUserGroups(models.Model):
     user_id = models.IntegerField()
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='+')
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='authgroup_auth_user_groups_group_id')
 
     class Meta:
         managed = False
@@ -87,8 +87,8 @@ class AuthUserGroups(models.Model):
 
 
 class AuthUserUserPermissions(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='+')
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING, related_name='+')
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_auth_user_user_permissions_user_id')
+    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING, related_name='authpermission_auth_user_user_permissions_permission_id')
 
     class Meta:
         managed = False
@@ -133,8 +133,8 @@ class DjangoAdminLog(models.Model):
     object_repr = models.CharField(max_length=200)
     action_flag = models.SmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='+', blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='+')
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='djangocontenttype_django_admin_log_content_type_id', blank=True, null=True)
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_django_admin_log_user_id')
 
     class Meta:
         managed = False
@@ -176,12 +176,9 @@ class DjangoCeleryBeatPeriodictask(models.Model):
     total_run_count = models.IntegerField()
     date_changed = models.DateTimeField()
     description = models.TextField()
-    crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.DO_NOTHING, related_name='+', blank=True,
-                                null=True)
-    interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.DO_NOTHING, related_name='+', blank=True,
-                                 null=True)
-    solar = models.ForeignKey('DjangoCeleryBeatSolarschedule', models.DO_NOTHING, related_name='+', blank=True,
-                              null=True)
+    crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.DO_NOTHING, related_name='djangocelerybeatcrontabschedule_django_celery_beat_periodictask_crontab_id', blank=True, null=True)
+    interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.DO_NOTHING, related_name='djangocelerybeatintervalschedule_django_celery_beat_periodictask_interval_id', blank=True, null=True)
+    solar = models.ForeignKey('DjangoCeleryBeatSolarschedule', models.DO_NOTHING, related_name='djangocelerybeatsolarschedule_django_celery_beat_periodictask_solar_id', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -260,7 +257,7 @@ class DrfpasswordlessCallbacktoken(models.Model):
     to_alias = models.CharField(max_length=40)
     to_alias_type = models.CharField(max_length=20)
     key = models.CharField(unique=True, max_length=6)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='+')
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_drfpasswordless_callbacktoken_user_id')
 
     class Meta:
         managed = False
@@ -283,7 +280,7 @@ class EasyThumbnailsThumbnail(models.Model):
     storage_hash = models.CharField(max_length=40)
     name = models.CharField(max_length=255)
     modified = models.DateTimeField()
-    source = models.ForeignKey(EasyThumbnailsSource, models.DO_NOTHING, related_name='+')
+    source = models.ForeignKey(EasyThumbnailsSource, models.DO_NOTHING, related_name='easythumbnailssource_easy_thumbnails_thumbnail_source_id')
 
     class Meta:
         managed = False
@@ -292,7 +289,7 @@ class EasyThumbnailsThumbnail(models.Model):
 
 
 class EasyThumbnailsThumbnaildimensions(models.Model):
-    thumbnail = models.OneToOneField(EasyThumbnailsThumbnail, models.DO_NOTHING, related_name='+')
+    thumbnail = models.OneToOneField(EasyThumbnailsThumbnail, models.DO_NOTHING, related_name='easythumbnailsthumbnail_easy_thumbnails_thumbnaildimensions_thumbnail_id')
     width = models.IntegerField(blank=True, null=True)
     height = models.IntegerField(blank=True, null=True)
 
@@ -330,8 +327,8 @@ class EnvironmentTenantflag(models.Model):
 
 
 class EnvironmentTenantflagCountries(models.Model):
-    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='+')
-    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='+')
+    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='environmenttenantflag_environment_tenantflag_countries_tenantflag_id')
+    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='userscountry_environment_tenantflag_countries_country_id')
 
     class Meta:
         managed = False
@@ -340,8 +337,8 @@ class EnvironmentTenantflagCountries(models.Model):
 
 
 class EnvironmentTenantflagGroups(models.Model):
-    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='+')
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='+')
+    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='environmenttenantflag_environment_tenantflag_groups_tenantflag_id')
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='authgroup_environment_tenantflag_groups_group_id')
 
     class Meta:
         managed = False
@@ -350,8 +347,8 @@ class EnvironmentTenantflagGroups(models.Model):
 
 
 class EnvironmentTenantflagUsers(models.Model):
-    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='+')
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='+')
+    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='environmenttenantflag_environment_tenantflag_users_tenantflag_id')
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_environment_tenantflag_users_user_id')
 
     class Meta:
         managed = False
@@ -372,8 +369,8 @@ class EnvironmentTenantswitch(models.Model):
 
 
 class EnvironmentTenantswitchCountries(models.Model):
-    tenantswitch = models.ForeignKey(EnvironmentTenantswitch, models.DO_NOTHING, related_name='+')
-    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='+')
+    tenantswitch = models.ForeignKey(EnvironmentTenantswitch, models.DO_NOTHING, related_name='environmenttenantswitch_environment_tenantswitch_countries_tenantswitch_id')
+    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='userscountry_environment_tenantswitch_countries_country_id')
 
     class Meta:
         managed = False
@@ -403,11 +400,11 @@ class NotificationNotification(models.Model):
     sent_recipients = models.TextField()  # This field type is a guess.
     template_name = models.CharField(max_length=255)
     template_data = models.TextField(blank=True, null=True)  # This field type is a guess.
-    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING, related_name='djangocontenttype_notification_notification_content_type_id', blank=True, null=True)
     cc = models.TextField()  # This field type is a guess.
     from_address = models.CharField(max_length=255, blank=True, null=True)
     html_message = models.TextField()
-    sent_email = models.ForeignKey('PostOfficeEmail', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    sent_email = models.ForeignKey('PostOfficeEmail', models.DO_NOTHING, related_name='postofficeemail_notification_notification_sent_email_id', blank=True, null=True)
     subject = models.TextField()
     text_message = models.TextField()
 
@@ -438,8 +435,8 @@ class PostOfficeAttachment(models.Model):
 
 
 class PostOfficeAttachmentEmails(models.Model):
-    attachment = models.ForeignKey(PostOfficeAttachment, models.DO_NOTHING, related_name='+')
-    email = models.ForeignKey('PostOfficeEmail', models.DO_NOTHING, related_name='+')
+    attachment = models.ForeignKey(PostOfficeAttachment, models.DO_NOTHING, related_name='postofficeattachment_post_office_attachment_emails_attachment_id')
+    email = models.ForeignKey('PostOfficeEmail', models.DO_NOTHING, related_name='postofficeemail_post_office_attachment_emails_email_id')
 
     class Meta:
         managed = False
@@ -462,7 +459,7 @@ class PostOfficeEmail(models.Model):
     scheduled_time = models.DateTimeField(blank=True, null=True)
     headers = models.TextField(blank=True, null=True)
     context = models.TextField(blank=True, null=True)
-    template = models.ForeignKey('PostOfficeEmailtemplate', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    template = models.ForeignKey('PostOfficeEmailtemplate', models.DO_NOTHING, related_name='postofficeemailtemplate_post_office_email_template_id', blank=True, null=True)
     backend_alias = models.CharField(max_length=64)
 
     class Meta:
@@ -478,7 +475,7 @@ class PostOfficeEmailtemplate(models.Model):
     html_content = models.TextField()
     created = models.DateTimeField()
     last_updated = models.DateTimeField()
-    default_template = models.ForeignKey('self', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    default_template = models.ForeignKey('self', models.DO_NOTHING, related_name='postofficeemailtemplate_post_office_emailtemplate_default_template_id', blank=True, null=True)
     language = models.CharField(max_length=12)
 
     class Meta:
@@ -492,7 +489,7 @@ class PostOfficeLog(models.Model):
     status = models.SmallIntegerField()
     exception_type = models.CharField(max_length=255)
     message = models.TextField()
-    email = models.ForeignKey(PostOfficeEmail, models.DO_NOTHING, related_name='+')
+    email = models.ForeignKey(PostOfficeEmail, models.DO_NOTHING, related_name='postofficeemail_post_office_log_email_id')
 
     class Meta:
         managed = False
@@ -515,8 +512,8 @@ class PublicsAirlinecompany(models.Model):
 class PublicsBusinessarea(models.Model):
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=32)
-    region = models.ForeignKey('PublicsBusinessregion', models.DO_NOTHING, related_name='+')
-    default_currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    region = models.ForeignKey('PublicsBusinessregion', models.DO_NOTHING, related_name='publicsbusinessregion_publics_businessarea_region_id')
+    default_currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='publicscurrency_publics_businessarea_default_currency_id', blank=True, null=True)
     deleted_at = models.DateTimeField()
 
     class Meta:
@@ -542,8 +539,8 @@ class PublicsCountry(models.Model):
     iso_3 = models.CharField(max_length=3)
     valid_from = models.DateField(blank=True, null=True)
     valid_to = models.DateField(blank=True, null=True)
-    business_area = models.ForeignKey(PublicsBusinessarea, models.DO_NOTHING, related_name='+', blank=True, null=True)
-    currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='+', blank=True, null=True)
+    business_area = models.ForeignKey(PublicsBusinessarea, models.DO_NOTHING, related_name='publicsbusinessarea_publics_country_business_area_id', blank=True, null=True)
+    currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='publicscurrency_publics_country_currency_id', blank=True, null=True)
     deleted_at = models.DateTimeField()
     dsa_code = models.CharField(max_length=3)
 
@@ -572,7 +569,7 @@ class PublicsDsarate(models.Model):
     room_rate = models.DecimalField(max_digits=20, decimal_places=4)
     finalization_date = models.DateField()
     effective_from_date = models.DateField()
-    region = models.ForeignKey('PublicsDsaregion', models.DO_NOTHING, related_name='+')
+    region = models.ForeignKey('PublicsDsaregion', models.DO_NOTHING, related_name='publicsdsaregion_publics_dsarate_region_id')
 
     class Meta:
         managed = False
@@ -594,7 +591,7 @@ class PublicsDsarateupload(models.Model):
 class PublicsDsaregion(models.Model):
     area_name = models.CharField(max_length=120)
     area_code = models.CharField(max_length=3)
-    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name='+')
+    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name='publicscountry_publics_dsaregion_country_id')
     deleted_at = models.DateTimeField()
     user_defined = models.BooleanField()
 
@@ -607,7 +604,7 @@ class PublicsExchangerate(models.Model):
     valid_from = models.DateField()
     valid_to = models.DateField()
     x_rate = models.DecimalField(max_digits=10, decimal_places=5)
-    currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='+')
+    currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='publicscurrency_publics_exchangerate_currency_id')
     deleted_at = models.DateTimeField()
 
     class Meta:
@@ -634,8 +631,8 @@ class PublicsGrant(models.Model):
 
 
 class PublicsGrantFunds(models.Model):
-    grant = models.ForeignKey(PublicsGrant, models.DO_NOTHING, related_name='+')
-    fund = models.ForeignKey(PublicsFund, models.DO_NOTHING, related_name='+')
+    grant = models.ForeignKey(PublicsGrant, models.DO_NOTHING, related_name='publicsgrant_publics_grant_funds_grant_id')
+    fund = models.ForeignKey(PublicsFund, models.DO_NOTHING, related_name='publicsfund_publics_grant_funds_fund_id')
 
     class Meta:
         managed = False
@@ -647,8 +644,8 @@ class PublicsTravelagent(models.Model):
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=128)
     city = models.CharField(max_length=128)
-    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name='+')
-    expense_type = models.OneToOneField('PublicsTravelexpensetype', models.DO_NOTHING, related_name='+')
+    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name='publicscountry_publics_travelagent_country_id')
+    expense_type = models.OneToOneField('PublicsTravelexpensetype', models.DO_NOTHING, related_name='publicstravelexpensetype_publics_travelagent_expense_type_id')
     deleted_at = models.DateTimeField()
 
     class Meta:
@@ -669,7 +666,7 @@ class PublicsTravelexpensetype(models.Model):
 
 class PublicsWbs(models.Model):
     name = models.CharField(max_length=25)
-    business_area = models.ForeignKey(PublicsBusinessarea, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    business_area = models.ForeignKey(PublicsBusinessarea, models.DO_NOTHING, related_name='publicsbusinessarea_publics_wbs_business_area_id', blank=True, null=True)
     deleted_at = models.DateTimeField()
 
     class Meta:
@@ -678,8 +675,8 @@ class PublicsWbs(models.Model):
 
 
 class PublicsWbsGrants(models.Model):
-    wbs = models.ForeignKey(PublicsWbs, models.DO_NOTHING, related_name='+')
-    grant = models.ForeignKey(PublicsGrant, models.DO_NOTHING, related_name='+')
+    wbs = models.ForeignKey(PublicsWbs, models.DO_NOTHING, related_name='publicswbs_publics_wbs_grants_wbs_id')
+    grant = models.ForeignKey(PublicsGrant, models.DO_NOTHING, related_name='publicsgrant_publics_wbs_grants_grant_id')
 
     class Meta:
         managed = False
@@ -710,8 +707,8 @@ class PurchaseOrderAuditorfirm(models.Model):
 
 
 class PurchaseOrderAuditorstaffmember(models.Model):
-    auditor_firm = models.ForeignKey(PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name='+')
-    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='+')
+    auditor_firm = models.ForeignKey(PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name='purchaseorderauditorfirm_purchase_order_auditorstaffmember_auditor_firm_id')
+    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='authuser_purchase_order_auditorstaffmember_user_id')
     hidden = models.BooleanField()
 
     class Meta:
@@ -725,7 +722,7 @@ class PurchaseOrderPurchaseorder(models.Model):
     order_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
     contract_start_date = models.DateField(blank=True, null=True)
     contract_end_date = models.DateField(blank=True, null=True)
-    auditor_firm = models.ForeignKey(PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name='+')
+    auditor_firm = models.ForeignKey(PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name='purchaseorderauditorfirm_purchase_order_purchaseorder_auditor_firm_id')
 
     class Meta:
         managed = False
@@ -734,7 +731,7 @@ class PurchaseOrderPurchaseorder(models.Model):
 
 class PurchaseOrderPurchaseorderitem(models.Model):
     number = models.IntegerField()
-    purchase_order = models.ForeignKey(PurchaseOrderPurchaseorder, models.DO_NOTHING, related_name='+')
+    purchase_order = models.ForeignKey(PurchaseOrderPurchaseorder, models.DO_NOTHING, related_name='purchaseorderpurchaseorder_purchase_order_purchaseorderitem_purchase_order_id')
 
     class Meta:
         managed = False
@@ -778,8 +775,8 @@ class SocialaccountSocialapp(models.Model):
 
 
 class SocialaccountSocialappSites(models.Model):
-    socialapp = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name='+')
-    site = models.ForeignKey(DjangoSite, models.DO_NOTHING, related_name='+')
+    socialapp = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name='socialaccountsocialapp_socialaccount_socialapp_sites_socialapp_id')
+    site = models.ForeignKey(DjangoSite, models.DO_NOTHING, related_name='djangosite_socialaccount_socialapp_sites_site_id')
 
     class Meta:
         managed = False
@@ -791,8 +788,8 @@ class SocialaccountSocialtoken(models.Model):
     token = models.TextField()
     token_secret = models.TextField()
     expires_at = models.DateTimeField(blank=True, null=True)
-    account = models.ForeignKey(SocialaccountSocialaccount, models.DO_NOTHING, related_name='+')
-    app = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name='+')
+    account = models.ForeignKey(SocialaccountSocialaccount, models.DO_NOTHING, related_name='socialaccountsocialaccount_socialaccount_socialtoken_account_id')
+    app = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name='socialaccountsocialapp_socialaccount_socialtoken_app_id')
 
     class Meta:
         managed = False
@@ -834,8 +831,8 @@ class TpmpartnersTpmpartner(models.Model):
 
 
 class TpmpartnersTpmpartnerCountries(models.Model):
-    tpmpartner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='+')
-    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='+')
+    tpmpartner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='tpmpartnerstpmpartner_tpmpartners_tpmpartner_countries_tpmpartner_id')
+    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='userscountry_tpmpartners_tpmpartner_countries_country_id')
 
     class Meta:
         managed = False
@@ -845,8 +842,8 @@ class TpmpartnersTpmpartnerCountries(models.Model):
 
 class TpmpartnersTpmpartnerstaffmember(models.Model):
     receive_tpm_notifications = models.BooleanField()
-    tpm_partner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='+')
-    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='+')
+    tpm_partner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='tpmpartnerstpmpartner_tpmpartners_tpmpartnerstaffmember_tpm_partner_id')
+    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='authuser_tpmpartners_tpmpartnerstaffmember_user_id')
 
     class Meta:
         managed = False
@@ -865,8 +862,8 @@ class UnicefNotificationNotification(models.Model):
     subject = models.TextField()
     text_message = models.TextField()
     html_message = models.TextField()
-    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING, related_name='+', blank=True, null=True)
-    sent_email = models.ForeignKey(PostOfficeEmail, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING, related_name='djangocontenttype_unicef_notification_notification_content_type_id', blank=True, null=True)
+    sent_email = models.ForeignKey(PostOfficeEmail, models.DO_NOTHING, related_name='postofficeemail_unicef_notification_notification_sent_email_id', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -886,7 +883,7 @@ class UsersCountry(models.Model):
     vision_last_synced = models.DateTimeField(blank=True, null=True)
     threshold_tae_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     threshold_tre_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
-    local_currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    local_currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='publicscurrency_users_country_local_currency_id', blank=True, null=True)
     long_name = models.CharField(max_length=255)
 
     class Meta:
@@ -895,8 +892,8 @@ class UsersCountry(models.Model):
 
 
 class UsersCountryOffices(models.Model):
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='+')
-    office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='+')
+    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_country_offices_country_id')
+    office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='usersoffice_users_country_offices_office_id')
 
     class Meta:
         managed = False
@@ -906,7 +903,7 @@ class UsersCountryOffices(models.Model):
 
 class UsersOffice(models.Model):
     name = models.CharField(max_length=254)
-    zonal_chief = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    zonal_chief = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_users_office_zonal_chief_id', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -925,10 +922,10 @@ class UsersSection(models.Model):
 class UsersUserprofile(models.Model):
     job_title = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='+', blank=True, null=True)
-    office = models.ForeignKey(UsersOffice, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_userprofile_country_id', blank=True, null=True)
+    office = models.ForeignKey(UsersOffice, models.DO_NOTHING, related_name='usersoffice_users_userprofile_office_id', blank=True, null=True)
     user_id = models.IntegerField(unique=True)
-    country_override = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    country_override = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_userprofile_country_override_id', blank=True, null=True)
     partner_staff_member = models.IntegerField(blank=True, null=True)
     guid = models.CharField(unique=True, max_length=40, blank=True, null=True)
     org_unit_code = models.CharField(max_length=32, blank=True, null=True)
@@ -937,8 +934,8 @@ class UsersUserprofile(models.Model):
     post_title = models.CharField(max_length=64, blank=True, null=True)
     staff_id = models.CharField(max_length=32, blank=True, null=True)
     vendor_number = models.CharField(unique=True, max_length=32, blank=True, null=True)
-    oic = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='+', blank=True, null=True)
-    supervisor = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='+', blank=True, null=True)
+    oic = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_users_userprofile_oic_id', blank=True, null=True)
+    supervisor = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_users_userprofile_supervisor_id', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -946,8 +943,8 @@ class UsersUserprofile(models.Model):
 
 
 class UsersUserprofileCountriesAvailable(models.Model):
-    userprofile = models.ForeignKey(UsersUserprofile, models.DO_NOTHING, related_name='+')
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='+')
+    userprofile = models.ForeignKey(UsersUserprofile, models.DO_NOTHING, related_name='usersuserprofile_users_userprofile_countries_available_userprofile_id')
+    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_userprofile_countries_available_country_id')
 
     class Meta:
         managed = False
@@ -958,7 +955,7 @@ class UsersUserprofileCountriesAvailable(models.Model):
 class UsersWorkspacecounter(models.Model):
     travel_reference_number_counter = models.IntegerField()
     travel_invoice_reference_number_counter = models.IntegerField()
-    workspace = models.OneToOneField(UsersCountry, models.DO_NOTHING, related_name='+')
+    workspace = models.OneToOneField(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_workspacecounter_workspace_id')
 
     class Meta:
         managed = False
@@ -972,7 +969,7 @@ class VisionVisionsynclog(models.Model):
     successful = models.BooleanField()
     exception_message = models.TextField()
     date_processed = models.DateTimeField()
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='+')
+    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_vision_visionsynclog_country_id')
     details = models.CharField(max_length=2048)
 
     class Meta:
