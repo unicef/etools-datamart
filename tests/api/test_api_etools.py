@@ -41,7 +41,6 @@ def test_list_with_no_schema_search_all_schemas(client):
 @pytest.mark.parametrize('format', ['json', 'html', 'csv'])
 def test_retrieve(client, url, format, schema):
     url = f"{url}?country_name=bolivia"
-
     res = client.get(url, format=format)
     assert res.status_code in [200, 404], res
     assert res.json()

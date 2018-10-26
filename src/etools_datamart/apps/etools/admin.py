@@ -14,6 +14,11 @@ class AuthUserAdmin(EToolsModelAdmin):
     ordering = ('username',)
 
 
+@register(models.UsersUserprofile)
+class UsersUserprofileAdmin(EToolsModelAdmin):
+    list_display = ('user', 'country', 'office')
+
+
 @register(models.ActionPointsActionpoint)
 class ActionPoint(TenantModelAdmin):
     pass

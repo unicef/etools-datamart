@@ -24,8 +24,8 @@ SET name = CONCAT('Report', id);
 UPDATE _SCHEMA_.reports_result
 SET name = CONCAT('Result', id);
 
-UPDATE _SCHEMA_.funds_fundsreservationitem
-SET
-  donor             = CONCAT('Donor', id),
-  overall_amount    = id,
-  overall_amount_dc = id;
+-- UPDATE _SCHEMA_.funds_fundsreservationitem
+-- SET
+--   donor             = CONCAT('Donor', id),
+--   overall_amount    = id,
+--   overall_amount_dc = id;

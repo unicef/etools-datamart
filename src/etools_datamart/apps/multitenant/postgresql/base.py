@@ -1,5 +1,6 @@
 import logging
 import re
+from contextlib import contextmanager
 from functools import lru_cache
 from time import time
 
@@ -27,6 +28,7 @@ SQL_SCHEMA_NAME_RESERVED_RE = re.compile(r'^pg_', re.IGNORECASE)
 
 dj_logger = logging.getLogger('django.db.backends')
 logger = logging.getLogger(__name__)
+
 
 # SINGLE_TENANT = 1
 # MULTI_TENANT = 2
@@ -155,6 +157,13 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     @property
     def schemas(self):
         return self._schemas
+
+    @contextmanager
+    def noschema(self):
+        old = self.schemas
+        self.set_schemas([])
+        yield
+        self.set_schemas(old)
 
     @lru_cache()
     def get_tenants(self):

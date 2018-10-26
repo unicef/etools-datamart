@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.utils.functional import cached_property
 
+from unicef_security.models import User
 from .public import *  # noqa
 from .tenant import *  # noqa
 
@@ -36,16 +37,25 @@ PartnersIntervention.total_partner_contribution = cached_property(
 PartnersIntervention.total_unicef_budget = cached_property(
     lambda self: self.total_unicef_cash + self.total_in_kind_amount)
 
+# Fix User OneToOneField
+for model in [AuthUserGroups, UsersUserprofile]:
+    f = [f for f in model._meta.local_fields if f.name != 'user_id']
+    model._meta.local_fields = f
+    model._meta.unique_together = []
+    models.OneToOneField(AuthUser, on_delete=models.PROTECT).contribute_to_class(model, 'user')
 
-# AuthUser.groups = property(lambda self: AuthGroup.objects.filter(users=self))
-f = [f for f in AuthUserGroups._meta.local_fields if f.name != 'user_id']
-AuthUserGroups._meta.local_fields = f
-AuthUserGroups._meta.unique_together = []
-models.ForeignKey(AuthUser, on_delete=models.PROTECT).contribute_to_class(AuthUserGroups, 'user')
-models.ManyToManyField(AuthGroup,
-                       through=AuthUserGroups,
-                       ).contribute_to_class(AuthUser, 'groups')
+# Fix User ManyToManyField
+fld = models.ManyToManyField(AuthGroup,
+                             through=AuthUserGroups,
+                             ).contribute_to_class(AuthUser, 'groups')
 
+# Fix UsersUserprofile ManyToManyField
+models.ManyToManyField(UsersCountry,
+                       through=UsersUserprofileCountriesAvailable,
+                       ).contribute_to_class(UsersUserprofile, 'countries_available')
+
+AuthUser.is_authenticated = True
+AuthUser.set_password = User.set_password
 
 # groups = models.ManyToManyField(
 #     Group,

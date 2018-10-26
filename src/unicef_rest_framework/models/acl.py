@@ -35,7 +35,7 @@ class AbstractAccessControl(MasterDataModel):
                 (POLICY_DEFAULT, "Default"),
                 )
     service = models.ForeignKey(Service, models.CASCADE)
-    rate = models.CharField(max_length=50)
+    rate = models.CharField(max_length=50, default="*")
     serializers = ArrayField(SerializerField(),
                              default=default_serializer,
                              blank=True)

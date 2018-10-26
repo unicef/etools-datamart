@@ -45,7 +45,6 @@ class InterventionFactory(factory.DjangoModelFactory):
 
 class UserFactory(factory.DjangoModelFactory):
     class Meta:
-        # model = models.User
         model = unicef_security.models.User
         django_get_or_create = ('username',)
 
