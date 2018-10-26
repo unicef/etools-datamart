@@ -40,7 +40,7 @@ def test_async_timeout(enable_threadstats, monkeypatch):
     monkeypatch.setattr(AsyncQueue, '_timed_queue_join', lambda *args: False)
     # monkeypatch.setattr(AsyncQueue, '_async_timeout', lambda *args: True)
 
-    logger = Logger(shutdown_timeout=0.001)
+    logger = Logger(shutdown_timeout=10)
     logger.queue([1, 1, 1])
     sleep(2)
     logger.queue([1, 1, 1])

@@ -18,10 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 def log_request(**kwargs):
-    if not kwargs:
-        return
     log = APIRequestLog.objects.create(**kwargs)
-    if settings.ENABLE_LIVE_STATS:
+    if settings.ENABLE_LIVE_STATS:  # pragma: no cover
         lastMonth = (log.requested_at.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
 
         def _update_stats(target, **overrides):
@@ -94,7 +92,7 @@ def record_to_kwargs(request, response):
     except AttributeError:  # pragma: no cover
         media_type = response['Content-Type'].split(';')[0]
     viewset = getattr(request, 'viewset', None)
-    if not viewset:
+    if not viewset:  # pragma: no cover
         return {}
     viewset = fqn(viewset)
     service = get_attr(request, "service.name")

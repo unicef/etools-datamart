@@ -108,12 +108,12 @@ class TenantModelIterable(ModelIterable):
             if queryset._known_related_objects:
                 for field, rel_objs in queryset._known_related_objects.items():
                     # Avoid overwriting objects loaded e.g. by select_related
-                    if field.is_cached(obj):
+                    if field.is_cached(obj):  # pragma: no cover
                         continue
                     pk = getattr(obj, field.get_attname())
                     try:
                         rel_obj = rel_objs[pk]
-                    except KeyError:
+                    except KeyError:  # pragma: no cover
                         pass  # may happen in qs1 | qs2 scenarios
                     else:
                         setattr(obj, field.name, rel_obj)

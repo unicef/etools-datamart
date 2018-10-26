@@ -14,7 +14,9 @@ def client(admin_user):
 
 
 @pytest.fixture()
-def allow(user1, service):
+def allow(user1):
+    service = InterventionViewSet.get_service()
+
     from test_utilities.factories import UserAccessControlFactory
     return UserAccessControlFactory(policy=UserAccessControl.POLICY_ALLOW,
                                     service=service,

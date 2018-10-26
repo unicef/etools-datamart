@@ -129,8 +129,5 @@ class Command(BaseCommand):
                     if isinstance(ret.result, Exception):  # pragma: no cover
                         self.stderr.write(f"\n{ret.result}")
                         sys.exit(1)
-                    elif not ret.result:
-                        self.stderr.write(f"\n{ret}")
-                        sys.exit(1)
 
                     self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")

@@ -186,7 +186,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
                 raise InvalidSchema(n)
             return name
 
-        self._schemas = [_validate(s) for s in schemas]
+        self._schemas = sorted([_validate(s) for s in schemas])
 
         self.search_path_set = False
 

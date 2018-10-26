@@ -92,6 +92,7 @@ def reset(monkeypatch):
 
     state.request = None
     conn = connections['etools']
+    conn.set_schemas([])
     conn.search_path = None
 
 
