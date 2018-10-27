@@ -7,7 +7,7 @@ def get_etools_allowed_schemas(user):
     # returns all allowed schemas as per eTools configuration
     # if `user` is also an eTools user.
     # matching is performed per email mnatching
-
+    # TODO: manage non etools user permissions
     conn = connections['etools']
     with conn.noschema():
         etools_user = UsersUserprofile.objects.filter(user__email=user.email).first()

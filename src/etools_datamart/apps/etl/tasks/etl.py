@@ -185,10 +185,11 @@ def load_fam_indicator():
                 try:
                     field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
                     value = model.objects.filter(**filter_dict).count()
-                    if not hasattr(indicator, field_name):
+                    # just a safety check
+                    if not hasattr(indicator, field_name):  # pragma: no cover
                         raise ValueError(field_name)
                     setattr(indicator, field_name, value)
-                except Exception as e:
+                except Exception as e:  # pragma: no cover
                     logger.error(e)
                     raise
             indicator.save()

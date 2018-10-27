@@ -92,18 +92,20 @@ class SchemaFilterBackend(BaseFilterBackend):
         value = request.GET.get('country_name', None)
         assert queryset.model._meta.app_label == 'etools'
         conn = connections['etools']
-        # TODO: Apply here user based schema filter
         if not value:
             if request.user.is_superuser:
                 conn.set_all_schemas()
             else:
+                allowed = get_etools_allowed_schemas(request.user)
+                if not allowed:
+                    raise PermissionDenied("You don't have enbled schemas")
                 conn.set_schemas(get_etools_allowed_schemas(request.user))
         else:
             value = set(value.split(","))
             if not request.user.is_superuser:
                 user_schemas = get_etools_allowed_schemas(request.user)
                 if not value.issubset(user_schemas):
-                    raise NotAuthorizedSchema(",".join(value - user_schemas))
+                    raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             conn.set_schemas(value)
         return queryset
 

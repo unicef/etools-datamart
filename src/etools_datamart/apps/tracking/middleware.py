@@ -73,7 +73,7 @@ def log_request(**kwargs):
 def record_to_kwargs(request, response):
     user = None
 
-    if request.user and request.user.is_authenticated:
+    if request.user and request.user.is_authenticated:  # pragma: no cover
         user = request.user
 
     # compute response time
