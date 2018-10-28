@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from rest_framework.exceptions import PermissionDenied
+
+
 class InvalidSchema(Exception):
     def __init__(self, schema, *args, **kwargs):  # real signature unknown
         self.schema = schema
@@ -7,7 +10,7 @@ class InvalidSchema(Exception):
         return f"Invalid schema: '{self.schema}'"
 
 
-class NotAuthorizedSchema(InvalidSchema):
+class NotAuthorizedSchema(PermissionDenied):
     def __init__(self, schema, *args, **kwargs):  # real signature unknown
         self.schema = schema
 

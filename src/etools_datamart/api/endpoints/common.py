@@ -26,7 +26,7 @@ from unicef_rest_framework.cache import parse_ttl
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 
-from etools_datamart.apps.etools.utils import get_etools_allowed_schemas
+from etools_datamart.apps.etools.utils import get_etools_allowed_schemas, validate_schemas
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
 from etools_datamart.state import state
 
@@ -98,29 +98,17 @@ class SchemaFilterBackend(BaseFilterBackend):
             else:
                 allowed = get_etools_allowed_schemas(request.user)
                 if not allowed:
-                    raise PermissionDenied("You don't have enbled schemas")
+                    raise PermissionDenied("You don't have enabled schemas")
                 conn.set_schemas(get_etools_allowed_schemas(request.user))
         else:
             value = set(value.split(","))
+            validate_schemas(*value)
             if not request.user.is_superuser:
                 user_schemas = get_etools_allowed_schemas(request.user)
-                if not value.issubset(user_schemas):
+                if not user_schemas.issuperset(value):
                     raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             conn.set_schemas(value)
         return queryset
-
-    # def filter_queryset(self, request, queryset, view):
-    #     value = request.GET.get('country_name', None)
-    #     assert queryset.model._meta.app_label == 'etools'
-    #     conn = connections['etools']
-    #     # TODO: Apply here user based schema filter
-    #     if not value:
-    #         conn.set_all_schemas()
-    #     else:
-    #         value = value.split(",")
-    #         conn.set_schemas(value)
-    #     return queryset
-
 
 #
 # class SystemFilterKeyBit(KeyBitBase):
@@ -318,7 +306,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
         elif isinstance(exc, InvalidSchema):
             return Response({"error": str(exc),
                              "hint": "Removes wrong schema from selection",
-                             "valid": conn.all_schemas
+                             "valid": sorted(conn.all_schemas)
                              }, status=400)
         return super().handle_exception(self)
 

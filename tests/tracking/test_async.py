@@ -42,10 +42,11 @@ def test_async_timeout(enable_threadstats, monkeypatch):
 
     logger = Logger(shutdown_timeout=0.1)
     logger.queue([1, 1, 1])
+    sleep(1)
+    logger.queue([1, 1, 1])
+    logger.queue([1, 1, 1])
+    logger.queue([1, 1, 1])
     sleep(2)
-    logger.queue([1, 1, 1])
-    logger.queue([1, 1, 1])
-    logger.queue([1, 1, 1])
     logger.main_thread_terminated()
     assert logger.TOTAL == 12
 

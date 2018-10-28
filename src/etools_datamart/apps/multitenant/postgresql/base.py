@@ -172,7 +172,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     @cached_property
     def all_schemas(self):
-        return [c.schema_name for c in self.get_tenants()]
+        return set([c.schema_name for c in self.get_tenants()])
 
     def set_schemas(self, schemas):
         """
@@ -195,7 +195,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         Main API method to current database schema,
         but it does not actually modify the db connection.
         """
-        self._schemas = [c.schema_name for c in self.get_tenants()]
+        self._schemas = self.all_schemas
         self.search_path_set = False
 
     # def set_schema(self, schema_name, include_public=True):

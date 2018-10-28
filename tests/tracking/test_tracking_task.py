@@ -20,7 +20,7 @@ def data(db):
 
 
 def test_stream_aggregation(reset_stats, admin_user):
-    today = timezone.now().date()
+    today = timezone.now()
     lastMonth = (today.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
     data = dict(requested_at=today,
                 user=admin_user,
