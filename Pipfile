@@ -46,7 +46,7 @@ cryptography = "*"
 django-countries = "*"
 
 [dev-packages]
-"flake8" = "*"
+"flake8" = ">=3.6.0"
 check-manifest= "*"
 django-extensions = "*"
 django-webtest = "*"
@@ -62,7 +62,7 @@ pytest-coverage = "*"
 pytest-django = "*"
 pytest-echo = "*"
 pytest-pythonpath = "*"
-tox-pipenv = "==1.6.0"
+#tox-pipenv = "==1.6.0"
 yapf = "*"
 vcrpy = "*"
 

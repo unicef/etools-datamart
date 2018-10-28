@@ -26,9 +26,10 @@ test:
 	pipenv run py.test -v --create-db
 
 lint:
-	pipenv run flake8 src/ tests/
-	pipenv run isort -rc src/ --check-only
-	pipenv run check-manifest
+	pipenv run pre-commit run --all-files
+#	pipenv run flake8 src/ tests/
+#	pipenv run isort -rc src/ --check-only
+#	pipenv run check-manifest
 
 clean:
 	rm -fr ${BUILDDIR} dist *.egg-info .coverage coverage.xml .eggs

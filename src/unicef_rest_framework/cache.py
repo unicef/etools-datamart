@@ -23,7 +23,7 @@ def parse_ttl(ttl):
                  'd': 86400,  # day
                  'w': 604800,  # week
                  'y': 31536000}  # year
-    rex = re.compile('((\d+)([smhdwy]))')
+    rex = re.compile(r'((\d+)([smhdwy]))')
     try:
         groups = rex.findall(ttl)
         if not groups:

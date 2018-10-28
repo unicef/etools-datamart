@@ -17,7 +17,7 @@ class ServicePermission(BasePermission):
         try:
             return UserAccessControl.objects.get(service__viewset=fqn(view),
                                                  user=request.user)
-        except GroupAccessControl.DoesNotExist as e:
+        except GroupAccessControl.DoesNotExist:
             return GroupAccessControl.objects.get(service__viewset=fqn(view),
                                                   group__user=request.user)
 
@@ -42,6 +42,6 @@ class ServicePermission(BasePermission):
                 raise PermissionDenied(f"Forbidden serializer '{requested_serializer}'")
 
             return True
-        except (UserAccessControl.DoesNotExist) as e:
+        except (UserAccessControl.DoesNotExist):
             logger.error(f"User '{request.user}' does not have grants for '{fqn(view)}'")
             return False

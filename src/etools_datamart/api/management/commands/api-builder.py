@@ -90,25 +90,25 @@ class Command(LabelCommand):
             try:
                 serializer_package = import_module(f"{options['serializers']}")
                 serializer_module_path = Path(serializer_package.__file__).parent / f'{app_label}.py'.lower()
-            except ImportError as e:
+            except ImportError:
                 raise BuildException(f"Cannot import {options['serializers']}")
 
             try:
                 view_package = import_module(f"{options['views']}")
                 view_module_path = Path(view_package.__file__).parent / f'{app_label}.py'.lower()
-            except ImportError as e:
+            except ImportError:
                 raise BuildException(f"Cannot import {options['views']}")
 
             try:
                 urls_module = import_module(f"{options['urls']}")
                 urls_module_path = Path(urls_module.__file__)
-            except ImportError as e:
+            except ImportError:
                 raise BuildException(f"Cannot import {options['urls']}")
 
             try:
                 admin_module = import_module(f"{options['admin']}")
                 admin_module_path = Path(admin_module.__file__)
-            except ImportError as e:
+            except ImportError:
                 raise BuildException(f"Cannot import {options['admin']}")
 
         except BuildException as e:

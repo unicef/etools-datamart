@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# flake8: noqa F405
 from django.utils.functional import cached_property
 
 from unicef_security.models import User

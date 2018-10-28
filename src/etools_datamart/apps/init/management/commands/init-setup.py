@@ -105,7 +105,7 @@ class Command(BaseCommand):
             for task in PeriodicTask.objects.all():
                 try:
                     import_string(task.task)
-                except ImportError as e:
+                except ImportError:
                     task.delete()
                     counters[False] += 1
 

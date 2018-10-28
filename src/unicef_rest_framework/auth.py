@@ -48,13 +48,13 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
                     user_info = s.get_user(username)
                     pk, values = s.get_record(user_info)
                     user, created = User.objects.update_or_create(**pk,
-                                                         defaults=values)
+                                                                  defaults=values)
                 except Exception as e:
                     process_exception(e)
                     raise exceptions.AuthenticationFailed("Unable to retrieve user data")
             else:
                 user, created = User.objects.update_or_create(username=username,
-                                                         email=username)
+                                                              email=username)
             if created:
                 default_group(user=user, is_new=created)
         except Exception as e:
