@@ -67,7 +67,14 @@ run:
 	$(MAKE) .run
 
 test:
-	CMD='bash -c "django-admin check --deploy"' $(MAKE) .run
+	RUN_OPTIONS="-e DEBUG=0 \
+				 -e X_FRAME_OPTIONS=DENY \
+				 -e SESSION_COOKIE_SECURE=1 \
+				 -e CSRF_COOKIE_SECURE=1 \
+				 -e SECURE_HSTS_PRELOAD=1 \
+				 -e SECURE_SSL_REDIRECT=1" \
+	CMD='bash -c "django-admin check --deploy"' \
+	$(MAKE) .run
 
 scratch:
 	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
