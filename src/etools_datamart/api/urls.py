@@ -17,7 +17,7 @@ router.register(r'etools/funds/fundsreservationitem', endpoints.Fundsreservation
 router.register(r'etools/funds/grant', endpoints.GrantViewSet)
 router.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
 router.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
-router.register(r'etools/partners/partner-organization', endpoints.PartnerViewSet, base_name='partners')
+router.register(r'etools/partners/partner-organization', endpoints.PartnerViewSet, basename='partners')
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)

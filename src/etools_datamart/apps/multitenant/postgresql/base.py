@@ -8,7 +8,7 @@ import django.db.utils
 import psycopg2
 from django.apps import apps
 from django.conf import settings
-from django.db.backends.postgresql_psycopg2 import base as original_backend
+from django.db.backends.postgresql import base as original_backend
 from django.db.backends.utils import CursorWrapper
 from django.utils.functional import cached_property
 
