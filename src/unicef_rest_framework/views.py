@@ -7,8 +7,9 @@ from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.pagination import CursorPagination
 from unicef_rest_framework import acl
+from unicef_rest_framework.auth import JWTAuthentication
 from unicef_rest_framework.filtering import SystemFilterBackend
-from unicef_rest_framework.permissions import URFPermission
+from unicef_rest_framework.permissions import ServicePermission
 
 
 def paginator(ordering='-created'):
@@ -24,14 +25,17 @@ class classproperty(object):
 
 
 class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
-    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    authentication_classes = (SessionAuthentication,
+                              JWTAuthentication,
+                              BasicAuthentication,
+                              TokenAuthentication)
     default_access = acl.ACL_ACCESS_LOGIN
     filter_backends = [SystemFilterBackend, QueryStringFilterBackend]
     filter_blacklist = []
     filter_fields = []
     ordering_fields = []
     pagination_class = paginator()
-    permission_classes = [URFPermission, ]
+    permission_classes = [ServicePermission, ]
     serializers_fieldsets = {}
 
     @classproperty

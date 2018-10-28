@@ -1,46 +1,14 @@
-import warnings
 from unittest.mock import Mock
 
 import pytest
-from _pytest.deprecated import RemovedInPytest4Warning
 from _pytest.fixtures import SubRequest
-from test_utilities.factories import UserFactory
 
-
-def pytest_configure(config):
-    # enable this to remove deprecations
-    warnings.simplefilter('once', DeprecationWarning)
-    warnings.simplefilter('ignore', RemovedInPytest4Warning)
-
-
-#
-# @pytest.fixture(autouse=True)
-# def configure_test(settings, monkeypatch):
-#
-#     from etools_datamart.config.settings import env
-#     settings.DATABASES['default'] = env.db()
-#     settings.DATABASES['etools'] = env.db('DATABASE_URL_ETOOLS', engine='etools_datamart.apps.multitenant.postgresql')
-#     settings.CSRF_COOKIE_SECURE = False
-#     settings.SECURE_BROWSER_XSS_FILTER = False
-#     settings.SECURE_CONTENT_TYPE_NOSNIFF = False
-#     settings.SECURE_FRAME_DENY = False
-#     settings.SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-#     settings.SECURE_HSTS_SECONDS = 1
-#     settings.SECURE_SSL_REDIRECT = False
-#     settings.SESSION_COOKIE_HTTPONLY = False
-#     settings.ALLOWED_HOSTS = ['*']
-#     settings.STATIC_ROOT = str(Path(__file__).parent)
-#     settings.SESSION_COOKIE_SECURE = False
-#     settings.CACHES['api']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
-#     # settings.CACHES['default']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
-#     settings.TEST_SCHEMAS = ['bolivia', 'chad', 'lebanon']
-#     settings.SCHEMA_FILTER = {'schema_name__in': settings.TEST_SCHEMAS}
-#     settings.SCHEMA_EXCLUDE = {}
-
-
-#
-#
-#
+# def pytest_configure(config):
+# enable this to remove deprecations
+# warnings.simplefilter('once', DeprecationWarning)
+# warnings.simplefilter('ignore', RemovedInPytest4Warning)
+# warnings.simplefilter('ignore', PendingDeprecationWarning)
+# warnings.simplefilter('ignore', RemovedInDjango30Warning)
 
 
 @pytest.yield_fixture(scope='session')
@@ -63,6 +31,7 @@ def django_db_setup(request,
 
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
+    from test_utilities.factories import UserFactory
 
     with django_db_blocker.unblock():
         Service.objects.load_services()
@@ -92,6 +61,7 @@ def reset(monkeypatch):
 
     state.request = None
     conn = connections['etools']
+    conn.set_schemas([])
     conn.search_path = None
 
 
@@ -135,3 +105,16 @@ def data_service(db):
     from etools_datamart.api.endpoints import InterventionViewSet
 
     return InterventionViewSet.get_service()
+
+
+# Change below numbers each time etools dump is updated
+
+@pytest.fixture()
+def number_of_partnerorganization(db):
+    # number of partners.PartnerOrganization records in each tenant
+    return 193
+
+
+@pytest.fixture()
+def number_of_intervention(db):
+    return 3

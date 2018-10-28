@@ -10,7 +10,7 @@ from setuptools import find_packages, setup
 ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 init = os.path.join(ROOT, 'src', 'etools_datamart', '__init__.py')
 
-rel = lambda *args: os.path.join(ROOT, 'src', 'requirements', *args)  # npqa
+rel = lambda *args: os.path.join(ROOT, 'src', 'requirements', *args)  # noqa
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 _name_re = re.compile(r'NAME\s+=\s+(.*)')
@@ -33,7 +33,7 @@ setup(name=name,
       long_description=readme,
       author='',
       author_email='',
-      url='https://github.com/saxix/etools-datamart',
+      url='https://github.com/unicef/etools-datamart',
       package_dir={'': 'src'},
       packages=find_packages('src'),
       include_package_data=True,

@@ -20,7 +20,7 @@ def data(db):
 
 
 def test_stream_aggregation(reset_stats, admin_user):
-    today = timezone.now().date()
+    today = timezone.now()
     lastMonth = (today.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
     data = dict(requested_at=today,
                 user=admin_user,
@@ -36,6 +36,8 @@ def test_stream_aggregation(reset_stats, admin_user):
     assert UserCounter.objects.get(day=data['requested_at'], user=data['user'])
     assert MonthlyCounter.objects.get(day=lastMonth)
     assert DailyCounter.objects.get(day=data['requested_at'], cached=0)
+    dc = DailyCounter.objects.get(day=data['requested_at'], cached=0)
+    assert str(dc)
     assert UserCounter.objects.count() == 1
 
     data['cached'] = True

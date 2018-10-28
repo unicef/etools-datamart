@@ -3,6 +3,7 @@ import logging
 from functools import wraps
 
 from django.core.cache import caches
+from redis.exceptions import LockError
 
 cache = caches['default']
 
@@ -30,7 +31,10 @@ def only_one(function=None, key="", timeout=None):
 
             finally:
                 if have_lock:
-                    lock.release()
+                    try:
+                        lock.release()
+                    except LockError as e:
+                        logger.warning(e)
 
             return ret_value
 

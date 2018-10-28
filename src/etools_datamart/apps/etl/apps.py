@@ -12,7 +12,6 @@ class Config(AppConfig):
     name = 'etools_datamart.apps.etl'
 
     def ready(self):
-        pass
         from etools_datamart.apps.etools.models import (PartnersPartnerorganization,
                                                         PartnersIntervention)
 

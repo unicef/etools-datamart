@@ -5,20 +5,6 @@ from django.db import connections
 from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuthGroup,
                                                 PartnersPartnerorganization, ReportsResult,)
 
-#
-# from django.db.backends.signals import connection_created
-#
-# def set_search_path(sender, **kwargs):
-#     conn = kwargs.get('connection')
-#     schema = "public"
-#     if conn is not None:
-#         cursor = conn.cursor()
-#         cursor.execute(f"SET search_path={schema},bolivia")
-#
-# connection_created.connect(set_search_path)
-
-RECORDS = 324  # Change this number each time etools dump is updated
-
 conn = connections['etools']
 
 
@@ -27,29 +13,29 @@ def test_query_public(db):
     assert AuthGroup.objects.all()
 
 
-def test_query_single_tenant(db):
+def test_query_single_tenant(number_of_partnerorganization):
     conn.set_schemas(['bolivia'])
-    assert len(PartnersPartnerorganization.objects.all()) == RECORDS
+    assert len(PartnersPartnerorganization.objects.all()) == number_of_partnerorganization
 
 
-def test_query_multi_tenant(db):
+def test_query_multi_tenant(number_of_partnerorganization):
     conn.set_schemas(['bolivia', 'chad'])
-    assert len(PartnersPartnerorganization.objects.all()) == RECORDS * 2
+    assert len(PartnersPartnerorganization.objects.all()) == number_of_partnerorganization * 2
 
 
-def test_count_single_tenant(db):
+def test_count_single_tenant(number_of_partnerorganization):
     conn.set_schemas(['bolivia'])
-    assert PartnersPartnerorganization.objects.count() == RECORDS
+    assert PartnersPartnerorganization.objects.count() == number_of_partnerorganization
 
 
-def test_count_multi_tenant1(db):
+def test_count_multi_tenant1(number_of_partnerorganization):
     conn.set_schemas(['bolivia', 'chad'])
-    assert PartnersPartnerorganization.objects.count() == RECORDS * 2
+    assert PartnersPartnerorganization.objects.count() == number_of_partnerorganization * 2
 
 
-def test_count_multi_tenant2(db):
+def test_count_multi_tenant2(number_of_partnerorganization):
     conn.set_schemas(['bolivia', 'chad'])
-    assert PartnersPartnerorganization.objects.count() == RECORDS * 2
+    assert PartnersPartnerorganization.objects.count() == number_of_partnerorganization * 2
 
 
 @pytest.mark.parametrize("schema", [['bolivia'], ['bolivia', 'chad']])

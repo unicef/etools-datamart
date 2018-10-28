@@ -68,9 +68,10 @@ class AsyncQueue(object):
             timeout = self.options['shutdown_timeout']
 
             # wait briefly, initially
-            initial_timeout = 0.1
-            if timeout < initial_timeout:
-                initial_timeout = timeout
+            # initial_timeout = 0.1
+            # if timeout < initial_timeout:
+            #     initial_timeout = timeout
+            initial_timeout = min(timeout, 0.1)
 
             if not self._timed_queue_join(initial_timeout):
                 # if that didn't work, wait a bit longer

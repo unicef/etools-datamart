@@ -28,9 +28,9 @@ if __name__ == '__main__':
 
     try:
         execute_from_command_line(args)
-    except Exception as e:
+    except Exception:
         if debug_on_error:
-            import pdb, traceback
+            import pdb, traceback  # noqa
 
             __, __, tb = sys.exc_info()
             traceback.print_exc()

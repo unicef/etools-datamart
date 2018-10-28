@@ -6,7 +6,11 @@ services:
     build:
       context: .
       dockerfile: ./docker/$DOCKERFILE
-    image: unicef/datamart:$TAG
+      args:
+        - DEVELOP=1
+    image: unicef/datamart:dev
+    volumes:
+      - $PWD:/code
     environment:
       CACHE_URL: redis://redis:6379/1
       CELERY_BROKER_URL: redis://redis:6379/2
@@ -51,10 +55,6 @@ services:
   redis:
     image: redis:alpine
 
-  superset:
-    image: amancevice/superset
-    volumes:
-      - $PWD/docker:/etc/superset/
 
   celery:
     image: unicef/datamart:$TAG
@@ -82,3 +82,8 @@ services:
       - redis
       - db
       - etools
+
+  uniset:
+    image: amancevice/superset
+    volumes:
+      - $PWD/docker:/etc/superset/

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-
-import logging
+import datetime
 import os
 from pathlib import Path
 
 import environ
 
-import etools_datamart
 from etools_datamart.libs.dbrouter import router_factory
 
 SETTINGS_DIR = Path(__file__).parent
@@ -27,6 +25,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   CSRF_COOKIE_SECURE=(bool, True),
                   DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
+                  DEBUG=(bool, False),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   SECRET_KEY=(str, 'secret'),
                   SECURE_HSTS_PRELOAD=(bool, 'True'),
@@ -34,13 +33,17 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   SECURE_BROWSER_XSS_FILTER=(bool, True),
                   SECURE_CONTENT_TYPE_NOSNIFF=(bool, True),
                   SECURE_FRAME_DENY=(bool, True),
-                  SENTRY_DSN=(str, ''),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
                   X_FRAME_OPTIONS=(str, 'DENY'),
+
+                  AZURE_CLIENT_ID=(str, ''),
+                  AZURE_CLIENT_SECRET=(str, ''),
+                  AZURE_TENANT=(str, ''),
+
                   )
 
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = env.bool('DEBUG')
 if DEBUG:  # pragma: no cover
     env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
     environ.Env.read_env(str(env_file))
@@ -48,11 +51,13 @@ if DEBUG:  # pragma: no cover
 MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
-
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 
 ADMINS = (
+    ('', 'saxix@saxix.onmicrosoft.com'),
+    ('', 'sapostolico@unicef.org'),
+    ('', 'sapostolico@nikunicef.onmicrosoft.org'),
 
 )
 
@@ -155,6 +160,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
+    'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -185,6 +191,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
             'libraries': {
                 'staticfiles': 'django.templatetags.static',
@@ -193,7 +201,6 @@ TEMPLATES = [
         },
     },
 ]
-AUTH_USER_MODEL = 'auth.User'
 AUTH_PASSWORD_VALIDATORS = [
     # {
     #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -217,8 +224,10 @@ PASSWORD_HASHERS = [
 ]
 
 INSTALLED_APPS = [
+    'etools_datamart.apps.web.apps.Config',
     'etools_datamart.apps.init.apps.Config',
     'etools_datamart.apps.multitenant',
+    'etools_datamart.apps.security',
 
     'constance',
     'constance.backends.database',
@@ -229,14 +238,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'raven.contrib.django.raven_compat',
 
     'admin_extra_urls',
     'unicef_rest_framework',
     'rest_framework',
-    'rest_framework.authtoken',
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
+    'unicef_security',
+
     'drf_yasg',
     'adminfilters',
+    'django_db_logging',
     'django_sysinfo',
     'crashlog',
 
@@ -288,15 +301,30 @@ X_FRAME_OPTIONS = env('X_FRAME_OPTIONS')
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
 
-RAVEN_CONFIG = {
-    'CELERY_LOGLEVEL': logging.INFO,
-    'dsn': env('SENTRY_DSN'),
-    'release': etools_datamart.VERSION,
-}
-
 # django-constance
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_ADDITIONAL_FIELDS = {
+    # 'read_only_text': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.ObfuscatedInput',
+    # }],
+    # 'write_only_text': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.WriteOnlyTextarea',
+    # }],
+    # 'write_only_input': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.WriteOnlyInput',
+    # }],
+    'select_group': ['etools_datamart.libs.constance.GroupChoiceField', {
+        'required': False,
+        'widget': 'etools_datamart.libs.constance.GroupChoice',
+    }],
+}
+
 CONSTANCE_CONFIG = {
+    'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
+    'DEFAULT_GROUP': ('Guests', 'Use MS Graph API to fetch user data', 'select_group'),
 }
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
@@ -319,8 +347,68 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
     # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
+    # 'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
 
 }
+
+AZURE_SSL = True
+AZURE_URL_EXPIRATION_SECS = 10800
+AZURE_ACCESS_POLICY_EXPIRY = 10800  # length of time before signature expires in seconds
+AZURE_ACCESS_POLICY_PERMISSION = 'r'
+AZURE_TOKEN_URL = 'https://login.microsoftonline.com/unicef.org/oauth2/token'
+AZURE_GRAPH_API_BASE_URL = 'https://graph.microsoft.com'
+AZURE_GRAPH_API_VERSION = 'v1.0'
+AZURE_GRAPH_API_PAGE_SIZE = 300
+
+JWT_AUTH = {
+    'JWT_VERIFY': False,  # this requires private key
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_LEEWAY': 60,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=30000),
+    'JWT_AUDIENCE': None,
+    'JWT_ISSUER': None,
+    'JWT_ALLOW_REFRESH': False,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    'JWT_SECRET_KEY': SECRET_KEY,
+    'JWT_DECODE_HANDLER': 'rest_framework_jwt.utils.jwt_decode_handler',
+
+    # Keys will be set in core.apps.Config.ready()
+    'JWT_PUBLIC_KEY': os.environ,
+    # 'JWT_PRIVATE_KEY': wallet.get_private(),
+    # 'JWT_PRIVATE_KEY': None,
+    'JWT_ALGORITHM': 'RS256',
+
+}
+
+# social auth
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
+SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
+SOCIAL_AUTH_SANITIZE_REDIRECTS = False
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'unicef_security.azure.default_group',
+)
+
+SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_KEY = env.str('AZURE_CLIENT_ID')
+SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_SECRET = env.str('AZURE_CLIENT_SECRET')
+SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_TENANT_ID = env.str('AZURE_TENANT')
+SOCIAL_AUTH_AZUREAD_OAUTH2_KEY = env.str('AZURE_CLIENT_ID')
+# POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
+SCOPE = ['openid', 'email']
+IGNORE_DEFAULT_SCOPE = True
+
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': env('API_URL'),
     'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
@@ -342,20 +430,6 @@ REST_FRAMEWORK_EXTENSIONS = {
     'DEFAULT_LIST_CACHE_KEY_FUNC':
         'rest_framework_extensions.utils.default_list_cache_key_func',
 }
-LOG_DIR = os.environ.get('SIR_LOG_DIR',
-                         os.path.expanduser('~/logs'))
-
-os.makedirs(LOG_DIR, exist_ok=True)
-
-
-def file_handler(name, level):
-    return {
-        'level': level,
-        'class': 'logging.handlers.RotatingFileHandler',
-        'formatter': 'full',
-        'filename': os.path.join(LOG_DIR, '%s.log' % name),
-    }
-
 
 LOGGING = {
     'version': 1,
@@ -381,14 +455,16 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.NullHandler'
         },
-        'errors': file_handler('errors', 'DEBUG'),
-        'security': file_handler('security', 'DEBUG'),
-        'business': file_handler('business', 'DEBUG'),
-        'root': file_handler('messages', 'DEBUG'),
-        'application': file_handler('etools_datamart', 'DEBUG'),
         'console': {
             'level': 'ERROR',
             'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+
+        'db': {
+            'level': 'DEBUG',
+            # 'class': 'django_db_logging.handlers.AsyncDBHandler',
+            'class': 'django_db_logging.handlers.DBHandler',
             'formatter': 'simple'
         },
         'mail_admins': {
@@ -397,71 +473,37 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler',
             'include_html': True
         },
-        'sentry': {
-            'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-        },
     },
     'loggers': {
         '': {
-            'handlers': ['root'],
+            'handlers': ['console'],
             'propagate': True,
             'level': 'ERROR'
         },
         'django.request': {
-            'handlers': ['root'],
+            'handlers': ['console'],
             'level': 'ERROR',
             'propagate': True
         },
         'django.db.backends': {
-            'handlers': ['root'],
+            'handlers': ['console'],
             'level': 'ERROR',
             'propagate': True
         },
-        'errors': {
-            'handlers': ['errors'],
-            'level': 'ERROR',
-            'propagate': True
-        },
-        'exceptions': {
-            'handlers': ['errors'],
-            'level': 'ERROR',
-            'propagate': True
-        },
-        'security': {
-            'handlers': ['security'],
-            'level': 'INFO',
+        'django_db_logging': {
+            'handlers': ['console'],
+            'level': {True: 'DEBUG', False: 'ERROR'}[DEBUG],
             'propagate': False
         },
-        'testing': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True
+        'unicef_rest_framework': {
+            'handlers': ['console', 'db'],
+            'level': 'ERROR',
+            'propagate': False
         },
         'etools_datamart': {
-            'handlers': ['application'],
+            'handlers': ['console', 'db'],
             'level': 'ERROR',
-            'propagate': True
-        },
-        'etools_datamart.apps.multitenat': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': True
-        },
-        'etools_datamart.settings': {
-            'handlers': ['application'],
-            'level': 'ERROR',
-            'propagate': True
-        },
-        'raven': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'sentry.errors': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
+            'propagate': False
         },
     },
 }
@@ -480,3 +522,6 @@ SCHEMA_FILTER = {}
 SCHEMA_EXCLUDE = {'schema_name__in': ['public', 'uat', 'frg']}
 
 ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')
+
+BUSINESSAREA_MODEL = 'unicef_security.BusinessArea'
+AUTH_USER_MODEL = 'unicef_security.User'

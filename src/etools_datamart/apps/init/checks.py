@@ -1,12 +1,10 @@
 import importlib
 import pkgutil
 
-from django.core.checks import Error, register
+import etools_datamart
 
 
-def check_imports():
-    import etools_datamart as package
-    ""
+def check_imports(package=etools_datamart):
     for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
         current_module = '{}.{}'.format(package.__name__, modname)
         m = importlib.import_module(current_module)
@@ -19,24 +17,7 @@ def check_imports():
                         s_sub_mod = '{}.{}.{}'.format(current_module, sub_mod, s_sub_mod)
                         try:
                             importlib.import_module(s_sub_mod)
-                        except Exception as e:
+                        except Exception as e:  # pragma: no cover
                             raise Exception(f"""Error importing '{s_sub_mod}'.
     {e}
     """)
-
-
-@register(deploy=True)
-def check_importable(app_configs, **kwargs):
-    errors = []
-    try:
-        check_imports()
-    except Exception as e:
-        errors.append(
-            Error(
-                str(e),
-                hint='A hint.',
-                obj=None,
-                id='datamart.E001',
-            )
-        )
-    return errors

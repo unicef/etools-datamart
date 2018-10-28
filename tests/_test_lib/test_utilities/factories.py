@@ -1,5 +1,5 @@
 import factory
-from django.contrib.auth import models
+import unicef_security.models
 from django.utils import timezone
 from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
@@ -45,7 +45,7 @@ class InterventionFactory(factory.DjangoModelFactory):
 
 class UserFactory(factory.DjangoModelFactory):
     class Meta:
-        model = models.User
+        model = unicef_security.models.User
         django_get_or_create = ('username',)
 
     username = factory.Sequence(lambda n: "user%03d" % n)

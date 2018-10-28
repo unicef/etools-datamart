@@ -1,21 +1,29 @@
 BUILD_OPTIONS?=
 CMD?=datamart
+TARGET?=dev
+DEVELOP?=0
 CONTAINER_NAME?=datamart-${TARGET}
 DATABASE_URL?=postgres://postgres:@192.168.66.66:5432/etools_datamart
 DATABASE_URL_ETOOLS?=postgis://postgres:@192.168.66.66:15432/etools
-DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKER_IMAGE_NAME=unicef/datamart
+DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=Dockerfile
-PYPI_INDEX?=https://pypi.org/simple/
 RUN_OPTIONS?=
-TARGET?=
 
 help:
 	@echo "dev                  build dev image (based on local code)"
 	@echo "build                build production image (based on tag ${TARGET})"
 	@echo "release              release tag ${TARGET} on docker hub"
 	@echo "run                  run ${DOCKER_IMAGE} locally"
-	@echo "run-dev              run ${DOCKER_IMAGE_NAME}:dev locally"
+
+
+build:
+	cd .. && docker build ${BUILD_OPTIONS} \
+			--build-arg DEVELOP=${DEVELOP} \
+			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
+			--build-arg VERSION=${TARGET} \
+			-t ${DOCKER_IMAGE} \
+			-f docker/${DOCKERFILE} .
 
 .run:
 	cd .. && docker run \
@@ -46,22 +54,8 @@ help:
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
 			-v $$PWD/~build/volumes/var/datamart:/var/datamart/ \
 			${RUN_OPTIONS} \
-			${DOCKER_IMAGE_NAME}:${TARGET} \
+			${DOCKER_IMAGE} \
 			${CMD}
-
-dev:
-	cd .. && docker build ${BUILD_OPTIONS} \
-			--build-arg PYPI_INDEX=${PYPI_INDEX} \
-			-t ${DOCKER_IMAGE_NAME}:dev \
-			-f docker/Dockerfile.dev .
-
-build:
-	cd .. && docker build ${BUILD_OPTIONS} \
-			--build-arg PYPI_INDEX=${PYPI_INDEX} \
-			--build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
-			--build-arg DATAMART_VERSION=${TARGET} \
-			-t ${DOCKER_IMAGE} \
-			-f docker/${DOCKERFILE} .
 
 release:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
@@ -69,16 +63,22 @@ release:
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 
-dev-run:
-	TARGET=dev \
-		RUN_OPTIONS=-it \
-		CMD=stack $(MAKE) .run
+run:
+	$(MAKE) .run
 
 test:
-	CMD='bash -c "django-admin check --deploy"' $(MAKE) .run
+	RUN_OPTIONS="-e DEBUG=0 \
+				 -e X_FRAME_OPTIONS=DENY \
+				 -e SESSION_COOKIE_SECURE=1 \
+				 -e CSRF_COOKIE_SECURE=1 \
+				 -e SECURE_HSTS_PRELOAD=1 \
+				 -e SECURE_SSL_REDIRECT=1" \
+	CMD='bash -c "django-admin check --deploy"' \
+	$(MAKE) .run
 
 scratch:
 	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
 
 shell:
-	docker exec -it ${CONTAINER_NAME} /bin/bash
+#	docker exec -it ${CONTAINER_NAME} /bin/bash
+	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run

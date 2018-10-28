@@ -1,5 +1,6 @@
 import logging
 import re
+from contextlib import contextmanager
 from functools import lru_cache
 from time import time
 
@@ -7,7 +8,7 @@ import django.db.utils
 import psycopg2
 from django.apps import apps
 from django.conf import settings
-from django.db.backends.postgresql_psycopg2 import base as original_backend
+from django.db.backends.postgresql import base as original_backend
 from django.db.backends.utils import CursorWrapper
 from django.utils.functional import cached_property
 
@@ -27,6 +28,7 @@ SQL_SCHEMA_NAME_RESERVED_RE = re.compile(r'^pg_', re.IGNORECASE)
 
 dj_logger = logging.getLogger('django.db.backends')
 logger = logging.getLogger(__name__)
+
 
 # SINGLE_TENANT = 1
 # MULTI_TENANT = 2
@@ -84,10 +86,10 @@ tenant: {tenant_sql}
             logger.debug(msg)
             return super(TenantCursor, self).execute(tenant_sql, params * len(self.db.schemas))
         except django.db.utils.ProgrammingError as e:  # pragma: no cover
-            logger.error(msg)
+            logger.error(f"{e} {msg}")
             raise django.db.utils.ProgrammingError(f"{e} {msg}") from e
         except Exception as e:  # pragma: no cover
-            logger.error(msg)
+            logger.error(f"{e} {msg}")
             raise Exception(msg) from e
 
 
@@ -156,6 +158,13 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     def schemas(self):
         return self._schemas
 
+    @contextmanager
+    def noschema(self):
+        old = self.schemas
+        self.set_schemas([])
+        yield
+        self.set_schemas(old)
+
     @lru_cache()
     def get_tenants(self):
         model = apps.get_model(settings.TENANT_MODEL)
@@ -163,7 +172,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
     @cached_property
     def all_schemas(self):
-        return [c.schema_name for c in self.get_tenants()]
+        return set([c.schema_name for c in self.get_tenants()])
 
     def set_schemas(self, schemas):
         """
@@ -177,7 +186,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
                 raise InvalidSchema(n)
             return name
 
-        self._schemas = [_validate(s) for s in schemas]
+        self._schemas = sorted([_validate(s) for s in schemas])
 
         self.search_path_set = False
 
@@ -186,7 +195,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         Main API method to current database schema,
         but it does not actually modify the db connection.
         """
-        self._schemas = [c.schema_name for c in self.get_tenants()]
+        self._schemas = self.all_schemas
         self.search_path_set = False
 
     # def set_schema(self, schema_name, include_public=True):

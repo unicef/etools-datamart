@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-from raven import Client
 from rest_framework import status
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.response import Response
@@ -99,6 +97,3 @@ def handler(exc, context):
         response.data['status_code'] = response.status_code
 
     return response
-
-
-sentry = Client(settings.RAVEN_CONFIG['dsn'])

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
+from unicef_rest_framework.models.acl import GroupAccessControl
 from .base import APIModelAdmin  # noqa
 from .filter import SystemFilterAdmin
 from ..models import (Application,
@@ -12,13 +13,12 @@ from .base import ListDisplayAllMixin, ReadOnlyModelAdmin, TruncateTableMixin  #
 from .application import ApplicationAdmin
 from .service import ServiceAdmin
 from .cache import CacheVersionAdmin
-from .acl import UserAccessControlAdmin
+from .acl import UserAccessControlAdmin, GroupAccessControlAdmin
 
 __all__ = ['ApplicationAdmin',
-           'CacheVersionAdmin'
-           'GroupACLAdmin',
+           'GroupAccessControlAdmin',
            'ServiceAdmin',
-           'UserACLAdmin',
+           'UserAccessControlAdmin',
            'ListDisplayAllMixin',
            'ReadOnlyModelAdmin']
 
@@ -27,3 +27,4 @@ admin.site.register(CacheVersion, CacheVersionAdmin)
 admin.site.register(Service, ServiceAdmin)
 admin.site.register(UserAccessControl, UserAccessControlAdmin)
 admin.site.register(SystemFilter, SystemFilterAdmin)
+admin.site.register(GroupAccessControl, GroupAccessControlAdmin)

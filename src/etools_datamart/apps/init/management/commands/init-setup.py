@@ -4,6 +4,7 @@ import sys
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
@@ -81,6 +82,8 @@ class Command(BaseCommand):
                                                                     defaults={"is_superuser": True,
                                                                               "is_staff": True,
                                                                               "password": make_password(pwd)})
+        Group.objects.get_or_create(name='Guests')
+
         if created:  # pragma: no cover
             self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
         else:  # pragma: no cover
@@ -102,7 +105,7 @@ class Command(BaseCommand):
             for task in PeriodicTask.objects.all():
                 try:
                     import_string(task.task)
-                except ImportError as e:
+                except ImportError:
                     task.delete()
                     counters[False] += 1
 
@@ -126,4 +129,5 @@ class Command(BaseCommand):
                     if isinstance(ret.result, Exception):  # pragma: no cover
                         self.stderr.write(f"\n{ret.result}")
                         sys.exit(1)
+
                     self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")

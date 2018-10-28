@@ -11,6 +11,7 @@ from django.http import Http404
 from django.utils.http import quote_etag
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -25,6 +26,8 @@ from unicef_rest_framework.cache import parse_ttl
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 
+from etools_datamart.apps.etools.utils import get_etools_allowed_schemas, validate_schemas
+from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
 from etools_datamart.state import state
 
 from ..renderers import APIBrowsableAPIRenderer
@@ -85,18 +88,27 @@ class TenantQueryStringFilterBackend(QueryStringFilterBackend):
 
 
 class SchemaFilterBackend(BaseFilterBackend):
-
     def filter_queryset(self, request, queryset, view):
         value = request.GET.get('country_name', None)
         assert queryset.model._meta.app_label == 'etools'
         conn = connections['etools']
         if not value:
-            conn.set_all_schemas()
+            if request.user.is_superuser:
+                conn.set_all_schemas()
+            else:
+                allowed = get_etools_allowed_schemas(request.user)
+                if not allowed:
+                    raise PermissionDenied("You don't have enabled schemas")
+                conn.set_schemas(get_etools_allowed_schemas(request.user))
         else:
-            value = value.split(",")
+            value = set(value.split(","))
+            validate_schemas(*value)
+            if not request.user.is_superuser:
+                user_schemas = get_etools_allowed_schemas(request.user)
+                if not user_schemas.issuperset(value):
+                    raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             conn.set_schemas(value)
         return queryset
-
 
 #
 # class SystemFilterKeyBit(KeyBitBase):
@@ -282,6 +294,21 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
     @schema_header
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+    def handle_exception(self, exc):
+        conn = connections['etools']
+        if isinstance(exc, Http404):
+            return Response({"error": "object not found"}, status=404)
+        elif isinstance(exc, NotAuthorizedSchema):
+            return Response({"error": str(exc)}, status=403)
+        elif isinstance(exc, PermissionDenied):
+            return Response({"error": str(exc)}, status=403)
+        elif isinstance(exc, InvalidSchema):
+            return Response({"error": str(exc),
+                             "hint": "Removes wrong schema from selection",
+                             "valid": sorted(conn.all_schemas)
+                             }, status=400)
+        return super().handle_exception(self)
 
     def get_schema_fields(self):
         ret = super(APIMultiTenantReadOnlyModelViewSet, self).get_schema_fields()

@@ -68,6 +68,7 @@ class Command(BaseCommand):
         connection.schema_name = schema
         with connection.cursor() as cursor:
             # cursor.execute(raw_sql(f"SET search_path={schema}"))
+            yield "# flake8: noqa F405."
             yield "# This is an auto-generated Django model module."
             yield "# You'll have to do the following manually to clean this up:"
             yield "#   * Rearrange models' order"
