@@ -24,6 +24,7 @@ build:
 			--build-arg VERSION=${TARGET} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
+	docker images | grep ${DOCKER_IMAGE_NAME}
 
 .run:
 	cd .. && docker run \
@@ -56,6 +57,11 @@ build:
 			${RUN_OPTIONS} \
 			${DOCKER_IMAGE} \
 			${CMD}
+
+local:
+	RUN_OPTIONS="-v ${PWD}/..:/code -e PYTHONPATH=/code -it" \
+	CMD="/bin/bash" \
+	$(MAKE) .run
 
 release:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}

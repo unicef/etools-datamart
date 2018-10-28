@@ -9,6 +9,7 @@ from django.db.models import F
 from django.utils.timezone import now
 from strategy_field.utils import fqn, get_attr
 
+from etools_datamart.apps.tracking import config
 from etools_datamart.state import state
 
 from .asyncqueue import AsyncQueue
@@ -62,12 +63,12 @@ def log_request(**kwargs):
             _update_stats(monthlog)
 
         # DailyCounter
-        defaults['user'] = 1
+        defaults['users'] = 1
         daylog, isnew = DailyCounter.objects.get_or_create(day=log.requested_at,
                                                            defaults=defaults)
         if not isnew:
             _update_stats(daylog,
-                          user=UserCounter.objects.filter(day=log.requested_at).count())
+                          users=UserCounter.objects.filter(day=log.requested_at).count())
 
 
 def record_to_kwargs(request, response):
@@ -133,9 +134,9 @@ class StatsMiddleware(object):
         request.timestamp = now()
 
         response = self.get_response(request)
-
-        if response.status_code == 200:
-            self.log(request, response)
+        if response.status_code == 200 and config.TRACK_PATH.match(request.path):
+            if config.TRACK_ANONYMOUS or request.user.is_authenticated:
+                self.log(request, response)
         return response
 
 

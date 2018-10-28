@@ -6,7 +6,7 @@ ARG VERSION
 RUN mkdir /code
 ADD . /code
 
-RUN if [ "${DEVELOP}" = "1" ]; then \
+RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
     echo "${VERSION}-develop"; \
     else \
     echo "Download package: https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" \
@@ -72,15 +72,13 @@ ENV START_DATAMART "true"
 ENV START_REDIS "true"
 ENV START_CELERY "true"
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --force-yes \
     curl \
     supervisor \
     redis-server \
     gcc
 
 RUN mkdir -p \
-    /code \
-    /root/.local/bin \
     /var/datamart/{static,log,conf,run} \
     && pip install pip==18.0 pipenv --upgrade
 
@@ -89,7 +87,14 @@ WORKDIR /code
 RUN set -ex \
     ls -al /code \
     && pipenv install --system --deploy --ignore-pipfile $PIPENV_ARGS \
-    && pip install -e .
+    && pip install . \
+    && rm -fr /code
+
+RUN apt-get autoremove --yes --force-yes \
+    gcc \
+    && rm -fr /var/lib/apt/lists/* \
+    && rm -fr /var/cache/apt/*
+
 
 ADD docker/redis.conf /etc/redis.conf
 ADD docker/supervisord.conf /etc/supervisord.conf

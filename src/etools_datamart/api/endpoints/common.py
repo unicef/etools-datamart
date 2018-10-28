@@ -11,7 +11,7 @@ from django.http import Http404
 from django.utils.http import quote_etag
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -233,6 +233,23 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
 
     def drf_ignore_filter(self, request, field):
         return field in ['+serializer', 'cursor', '+fields', 'country_name']
+
+    def handle_exception(self, exc):
+        conn = connections['etools']
+        if isinstance(exc, NotAuthenticated):
+            return Response({"error": "Authentication credentials were not provided."}, status=401)
+        elif isinstance(exc, Http404):
+            return Response({"error": "object not found"}, status=404)
+        elif isinstance(exc, NotAuthorizedSchema):
+            return Response({"error": str(exc)}, status=403)
+        elif isinstance(exc, PermissionDenied):
+            return Response({"error": str(exc)}, status=403)
+        elif isinstance(exc, InvalidSchema):
+            return Response({"error": str(exc),
+                             "hint": "Removes wrong schema from selection",
+                             "valid": sorted(conn.all_schemas)
+                             }, status=400)
+        return super().handle_exception(self)
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
