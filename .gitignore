@@ -30,3 +30,7 @@ db/db1.bz2
 docker/cache
 src/etools_datamart/apps/core/static/api-doc.css.map
 docker/superset.db
+db/clean.sql
+db/etools.dump
+db/public.sqldump
+db/tenant.sql

@@ -12,7 +12,7 @@ from django.utils.http import quote_etag
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
-from rest_framework.filters import BaseFilterBackend
+from rest_framework.filters import BaseFilterBackend, OrderingFilter
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_csv import renderers as r
@@ -109,6 +109,7 @@ class SchemaFilterBackend(BaseFilterBackend):
                     raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             conn.set_schemas(value)
         return queryset
+
 
 #
 # class SystemFilterKeyBit(KeyBitBase):
@@ -218,7 +219,11 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
                         APIBrowsableAPIRenderer,
                         r.CSVRenderer,
                         ]
-    filter_backends = [SystemFilterBackend, TenantQueryStringFilterBackend]
+    filter_backends = [SystemFilterBackend,
+                       TenantQueryStringFilterBackend,
+                       OrderingFilter]
+    ordering_fields = ('id',)
+    ordering = 'id'
 
     def get_schema_fields(self):
         ret = []
@@ -249,7 +254,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
                              "hint": "Removes wrong schema from selection",
                              "valid": sorted(conn.all_schemas)
                              }, status=400)
-        return super().handle_exception(self)
+        return super().handle_exception(exc)
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
@@ -302,7 +307,12 @@ def schema_header(func):
 
 
 class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
-    filter_backends = [SystemFilterBackend, SchemaFilterBackend, TenantQueryStringFilterBackend]
+    filter_backends = [SystemFilterBackend,
+                       SchemaFilterBackend,
+                       TenantQueryStringFilterBackend,
+                       OrderingFilter]
+    ordering_fields = ('id',)
+    ordering = 'id'
 
     @one_schema
     def retrieve(self, request, *args, **kwargs):
@@ -325,7 +335,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
                              "hint": "Removes wrong schema from selection",
                              "valid": sorted(conn.all_schemas)
                              }, status=400)
-        return super().handle_exception(self)
+        return super().handle_exception(exc)
 
     def get_schema_fields(self):
         ret = super(APIMultiTenantReadOnlyModelViewSet, self).get_schema_fields()

@@ -29,8 +29,9 @@ def load_pmp_indicator():
         connection.set_schemas([country.schema_name])
 
         logger.info(u'Running on %s' % country.name)
-        for partner in PartnersPartnerorganization.objects.prefetch_related(
-                'partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
+        for partner in PartnersPartnerorganization.objects.all():
+                # .prefetch_related(
+                # 'partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
             # .select_related('partnersintervention_partners_interventionbudget_intervention_id')
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
@@ -85,7 +86,6 @@ def load_intervention():
     created = {}
     for country in countries:
         connection.set_schemas([country.schema_name])
-
         qs = PartnersIntervention.objects.all().select_related('agreement',
                                                                'partner_authorized_officer_signatory',
                                                                'unicef_signatory',

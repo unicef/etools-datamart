@@ -112,9 +112,9 @@ def data_service(db):
 @pytest.fixture()
 def number_of_partnerorganization(db):
     # number of partners.PartnerOrganization records in each tenant
-    return 193
+    return 335
 
 
 @pytest.fixture()
 def number_of_intervention(db):
-    return 3
+    return 18

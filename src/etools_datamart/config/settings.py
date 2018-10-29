@@ -345,11 +345,13 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
     "PAGE_SIZE": 100,
-    "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
+    # "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
+    'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
     # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
     # 'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
-
+    'SEARCH_PARAM': 'search',
+    'ORDERING_PARAM': 'ordering',
 }
 
 AZURE_SSL = True

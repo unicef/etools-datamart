@@ -25,21 +25,12 @@ repos:
         exclude: manage.py
     -   id: end-of-file-fixer
     -   id: flake8
-#        exclude: docs/,docker/
         args:
         - src/
         - tests/
         - --config=setup.cfg
     -   id: check-merge-conflict
     -   id: check-case-conflict
-#    -   id: name-tests-test
-#    -   id: trailing-whitespace
-#    -   id: requirements-txt-fixer
-#        files: requirements-dev.txt
-#-   repo: git://github.com/asottile/reorder_python_imports
-#    rev: v1.0.1
-#    hooks:
-#    -   id: reorder-python-imports
 -   repo: git://github.com/Yelp/detect-secrets
     rev: 0.9.1
     hooks:

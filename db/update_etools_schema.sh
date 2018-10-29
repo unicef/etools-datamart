@@ -6,8 +6,6 @@
 #
 # NOTE: for safety reasosn etools database MUST listn on 15432
 
-set -e
-
 CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DUMP_DIRECTORY="$CURDIR/../src/etools_datamart/apps/multitenant/postgresql"
 
@@ -15,35 +13,41 @@ export PGHOST=127.0.0.1
 export PGPORT=15432
 export DATABASE_NAME=etools
 export DATABASE_USER=etoolusr
-export BASE_SCHEMA=zambia
+export BASE_SCHEMA=kenya
 
 help (){
     echo "$0"
     echo " "
-    echo "  -o,--only           r=RESTORE, c=CLEAN, m=MOVE, d=DUMP,x=RESET"
+    echo "  -o,--only           r=RESTORE, c=OBFUSCATE, p=PASSWORD, d=DUMP, m=MOVE, i=INFO, c=CLEAN"
     echo "  -nr,--no-restore    do not recreate database"
-    echo "  -nc,--no-clean      do not clean sensitive data"
+    echo "  -no,--no-obfuscate  do not obfuscate sensitive data"
+    echo "  -np,--no-password   do not reset user passwords"
     echo "  -nd,--no-dump       do not create tests dump data files"
     echo "  -nm,--no-move       do not move testing data files to source code dir"
-    echo "  -nx,--noreset       do not reset user passwords"
+    echo "  -ni,--no-info       do not display summary info"
+    echo "  -nc,--no-clean      do not clean temporary files"
     echo "  -h,--help           this help screen"
     exit 1
 }
 
 RESTORE=1
-CLEAN=1
+OBFUSCATE=1
 DUMP=1
 MOVE=1
-RESET=1
+PASSWORD=1
+INFO=1
+CLEAN=1
 
 while [ "$1" != "" ]; do
 case $1 in
     -o|--only)
         [[ "$2" =~ r ]] && RESTORE=1 || RESTORE=0
-        [[ "$2" =~ c ]] && CLEAN=1 || CLEAN=0
+        [[ "$2" =~ c ]] && OBFUSCATE=1 || OBFUSCATE=0
         [[ "$2" =~ d ]] && DUMP=1 || DUMP=0
         [[ "$2" =~ m ]] && MOVE=1 || MOVE=0
-        [[ "$2" =~ x ]] && RESET=1 || RESET=0
+        [[ "$2" =~ p ]] && PASSWORD=1 || PASSWORD=0
+        [[ "$2" =~ i ]] && INFO=1 || INFO=0
+        [[ "$2" =~ c ]] && CLEAN=1 || CLEAN=0
         shift
         shift
         ;;
@@ -51,8 +55,8 @@ case $1 in
         RESTORE=0
         shift
         ;;
-    -nc|--no-clean)
-        CLEAN=0
+    -no|--no-obfuscate)
+        OBFUSCATE=0
         shift
         ;;
     -nd|--no-dump)
@@ -63,8 +67,16 @@ case $1 in
         MOVE=0
         shift
         ;;
-    -nx|--no-reset)
-        RESET=0
+    -np|--no-password)
+        PASSWORD=0
+        shift
+        ;;
+    -ni|--no-info)
+        INFO=0
+        shift
+        ;;
+    -nc|--no-clean)
+        CLEAN=0
         shift
         ;;
     -h|--help)
@@ -76,44 +88,64 @@ case $1 in
 esac
 done
 
-echo "recreate database       $RESTORE"
-echo "clean sensitive data    $CLEAN"
-echo "create tests data files $DUMP"
-echo "move testing data files $MOVE"
-echo "reset user passwords    $RESET"
+echo "recreate database        $RESTORE"
+echo "obfuscate sensitive data $OBFUSCATE"
+echo "reset user passwords     $PASSWORD"
+echo "create tests data files  $DUMP"
+echo "move testing data files  $MOVE"
+echo "clean temporary files    $CLEAN"
 
 # 1 - restore from database dump
 
 if [ "$RESTORE" == "1" ]; then
     echo "1.1 Dropping ans recreating database ${DATABASE_NAME}"
-    dropdb ${DATABASE_NAME}
-    createdb ${DATABASE_NAME}
+    dropdb -h ${PGHOST} -p ${PGPORT} --if-exists ${DATABASE_NAME}
+    createdb -h ${PGHOST} -p ${PGPORT} ${DATABASE_NAME}
 
     if [ ! -e "$CURDIR/etools.dump" ];then
         echo "1.2 Unpack database dump"
         bzcat db1.bz2 > etools.dump
     else
-        echo "1.2 etools.dump exists"
+        echo "1.2 datafile not unpacked: 'etools.dump' exists"
     fi
 
     echo "1.3 Restoring database"
-    pg_restore --username=${DATABASE_USER} --format=tar --dbname=${DATABASE_NAME} etools.dump
+
+    pg_restore -h ${PGHOST} -p ${PGPORT} \
+            --no-owner --role=postgresql \
+            --username=${DATABASE_USER} --format=tar --dbname=${DATABASE_NAME} etools.dump
 
     rm -f etools.dump etools.dump.list _etools.dump.list
+else
+    echo "1.x SKIP Dropping ans recreating database (RESTORE)"
 fi
 
 
-if [ "$CLEAN" == "1" ]; then
+if [ "$OBFUSCATE" == "1" ]; then
     # 2 - remove sensitive data
-    echo "2.1 remove sensitive data"
+    echo "2.1 remove sensitive data (OBFUSCATE)"
     cat  clean.tpl.sql | sed "s/_SCHEMA_/${BASE_SCHEMA}/" > $CURDIR/clean.sql
-    psql -d ${DATABASE_NAME} -f $CURDIR/clean.sql
+else
+    echo "2.1 SKIP remove sensitive data (OBFUSCATE)"
 fi
+
+
+if [ "$PASSWORD" == "1" ]; then
+    # 3 - reset all passwords
+    echo "3.1 - Reset user passwords (PASSWORD)"
+    DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \
+    PYTHONPATH=$CURDIR/../src  \
+    django-admin shell -c \
+        "from etools_datamart.apps.etools.models import AuthUser; \
+        [u.set_password('password') for u in AuthUser.objects.filter(id__lt=50)]"
+else
+    echo "3.x SKIP Reset user passwords (PASSWORD)"
+fi
+
 
 if [ "$DUMP" == "1" ]; then
-
-    # 3 - Dump data
-    echo "3.1 Dump public schema"
+    # 4 - Dump data
+    echo "4.1 Dump public schema (DUMP)"
     pg_dump --inserts -O \
             -d ${DATABASE_NAME} \
             -n public \
@@ -147,28 +179,56 @@ if [ "$DUMP" == "1" ]; then
             --exclude-table-data waffle_* \
             -f $CURDIR/public.sqldump
 
-    echo "3.2 Dump tenant schema"
+    echo "4.2 Dump tenant schema"
 
     pg_dump --inserts -O  -d ${DATABASE_NAME} \
         -n ${BASE_SCHEMA} | sed "s/${BASE_SCHEMA}/[[schema]]/g" >$CURDIR/tenant.sql
-
+else
+    echo "4.x SKIP Dump schemas (DUMP)"
 fi
+
 
 if [ "$MOVE" == "1" ]; then
-    # 4 - MOVE dump files to code
-    echo "4.1 - MOVE 'tenant.sql' to ${DUMP_DIRECTORY}"
+    # 5 - MOVE dump files to code
+    echo "5.1 - MOVE 'tenant.sql' to ${DUMP_DIRECTORY}"
     cp $CURDIR/tenant.sql ${DUMP_DIRECTORY}
-    echo "4.2 - MOVE 'public.sqldump' to ${DUMP_DIRECTORY}"
+    echo "5.2 - MOVE 'public.sqldump' to ${DUMP_DIRECTORY}"
     cp $CURDIR/public.sqldump ${DUMP_DIRECTORY}
+else
+    echo "5.x SKIP Move schemas (MOVE)"
 fi
 
-if [ "$RESET" == "1" ]; then
-    # 6 - reset all passwords
-    DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \
-    PYTHONPATH=$CURDIR/../src  \
-    django-admin shell -c \
-        "from etools_datamart.apps.etools.models import AuthUser; \
-        [u.set_password('password') for u in AuthUser.objects.filter(id__lt=50)]"
+
+if [ "$INFO" == "1" ]; then
+    echo "6.x Summary info (INFO)"
+    echo "================================================================"
+    echo "Update your conftest.py fixtures with following values:"
+    v=`psql -h ${PGHOST} -p ${PGPORT} \
+            -qtAX \
+            -d ${DATABASE_NAME} \
+            -c "SET search_path=${BASE_SCHEMA};SELECT COUNT(*) FROM partners_partnerorganization;"`
+    echo "number_of_partnerorganization = $v"
+
+    v=`psql -h ${PGHOST} -p ${PGPORT} \
+        -qtAX \
+        -d ${DATABASE_NAME} \
+        -c "SET search_path=${BASE_SCHEMA};SELECT COUNT(*) FROM partners_intervention;"`
+    echo "number_of_intervention = $v"
+    echo ""
+    echo "Remember to update eTools ORM running"
+    echo ""
+    echo "./manage.py inspectschema --database etools  > src/etools_datamart/apps/etools/models/public_new.py"
+    echo "./manage.py inspectschema --database etools --schema=bolivia > src/etools_datamart/apps/etools/models/tenant_new.py"
+    echo "================================================================"
+else
+    echo "6.x SKIP Summary info (INFO)"
+fi
+
+if [ "$CLEAN" == "1" ]; then
+    echo "7.x Clean temporary files"
+    rm -f etools.dump
+else
+    echo "7.x SKIP Clean temporary files"
 fi
 
 echo "Done!!!"

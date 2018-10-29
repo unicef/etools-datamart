@@ -106,8 +106,7 @@ def test_permission_check_serializer_deny(client, allow_std_serializer):
     res = client.get(f"{url}?%2bserializer=short",
                      HTTP_X_SCHEMA="bolivia")
     assert res.status_code == 403
-    # assert res.json()['detail'] == "You do not have permission to perform this action."
-    assert res.json()['detail'] == "Forbidden serializer 'short'"
+    assert res.json()['error'] == "Forbidden serializer 'short'"
 
 
 def test_permission_check_serializer_any(client, allow_any_serializer):

@@ -37,9 +37,9 @@ def test_list_with_no_schema_search_all_schemas(client):
     # assert res.json()['error'] == "country_name parameter is mandatory"
 
 
-@pytest.mark.parametrize('schema', ['bolivia'])
+# @pytest.mark.parametrize('schema', ['bolivia'])
 @pytest.mark.parametrize('format', ['json', 'html', 'csv'])
-def test_retrieve(client, url, format, schema):
+def test_retrieve(client, url, format):
     url = f"{url}?country_name=bolivia"
     res = client.get(url, format=format)
     assert res.status_code in [200, 404], res

@@ -1,6 +1,21 @@
+1.3
+---
+* WARNINGS: migration reset
+* add ordering support
+* updates redoc version
+* improves support to handle eTools database changes
+
+
+1.2
+---
+* add db logging
+* new namespace unicef_security
+
+
 1.1
 ---
 * Fixes wrong import in middleware
+
 
 1.0
 ---

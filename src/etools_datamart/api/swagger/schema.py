@@ -9,6 +9,11 @@ from drf_yasg.utils import force_real_str
 logger = logging.getLogger(__name__)
 
 
+# class CustomSchemaView(SchemaView):
+#     generator_class = CustomSchemaGenerator
+#     renderer_classes = (CustomRenderer1, CustomRenderer2,)
+#
+
 class APIAutoSchema(SwaggerAutoSchema):
     def coreapi_field_to_parameter(self, field):
         """Convert an instance of `coreapi.Field` to a swagger :class:`.Parameter` object.
