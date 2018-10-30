@@ -10,20 +10,20 @@ repos:
         entry: isort
         language: system
         types: [python]
-      - id: check-manifest
-        name: check-manifest
-        entry: check-manifest
-        language: system
-        types: [python]
-        files: '^$'
-        always_run: true
+#      - id: check-manifest
+#        name: check-manifest
+#        entry: check-manifest
+#        language: system
+#        types: [python]
+#        files: '^$'
+#        always_run: true
 
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     rev: v2.0.0
     hooks:
     -   id: debug-statements
         exclude: manage.py
-    -   id: end-of-file-fixer
+#    -   id: end-of-file-fixer
     -   id: flake8
         args:
         - src/
@@ -31,9 +31,16 @@ repos:
         - --config=setup.cfg
     -   id: check-merge-conflict
     -   id: check-case-conflict
--   repo: git://github.com/Yelp/detect-secrets
-    rev: 0.9.1
+#-   repo: git://github.com/Yelp/detect-secrets
+#    rev: 0.9.1
+#    hooks:
+#    -   id: detect-secrets
+#        args: ['--baseline', '.secrets.baseline']
+#        exclude: (tests/.*|.*/tenant.sql|Pipfile.lock)
+-   repo: https://github.com/saxix/pch
+    rev: 5c9a8e2
     hooks:
-    -   id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
-        exclude: (tests/.*|.*/tenant.sql|Pipfile.lock)
+    -   id: check-version-release-match
+        args:
+        - --pythonpath=src
+        - --package=etools_datamart
