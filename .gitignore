@@ -34,3 +34,5 @@ db/clean.sql
 db/etools.dump
 db/public.sqldump
 db/tenant.sql
+src/etools_datamart/apps/etools/models/public_old.py
+src/etools_datamart/apps/etools/models/tenant_old.py

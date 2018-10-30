@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from datetime import date
+from datetime import date, datetime
 
 from django.db import connections
 from django.db.models import Sum
@@ -203,22 +203,23 @@ def load_fam_indicator():
 def load_user_report():
     connection = connections['etools']
     countries = connection.get_tenants()
-    start_date = date.today()  # + relativedelta(months=-1)
+    today = date.today()
+    first_of_month = datetime(today.year, today.month, 1)
     created = {}
     for country in countries:
         created[country.name] = 0
         connection.set_schemas([country.schema_name])
         base = AuthUser.objects.filter(profile__country=country)
-        UserStats.objects.update_or_create(month=start_date,
+        UserStats.objects.update_or_create(month=first_of_month,
                                            country_name=country.name,
                                            schema_name=country.schema_name,
                                            defaults={
                                                'total': base.count(),
                                                'unicef': base.filter(email__endswith='@unicef.org').count(),
                                                'logins': base.filter(
-                                                   last_login__month=start_date.month).count(),
+                                                   last_login__month=first_of_month.month).count(),
                                                'unicef_logins': base.filter(
-                                                   last_login__month=start_date.month,
+                                                   last_login__month=first_of_month.month,
                                                    email__endswith='@unicef.org').count(),
                                            })
         created[country.name] += 1

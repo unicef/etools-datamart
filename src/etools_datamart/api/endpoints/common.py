@@ -110,16 +110,17 @@ class MonthFilterBackend(BaseFilterBackend):
                 if m in months:
                     m = months.index(m)+1
                 elif m in list(map(str, range(12))):
-                    m = value
-                elif value == 'latest':
+                    m = m
+                elif value == 'current':
                     m = datetime.now().month
                     y = datetime.now().year
-                if m:
-                    return queryset.filter(month__month=m,
-                                           month__year=y)
+                # elif value == 'latest':
+                #     m = datetime.now().month
+                #     y = datetime.now().year
+                return queryset.filter(month__month=int(m),
+                                       month__year=int(y))
             except ValueError:
-                raise InvalidQueryValueError('month', value,
-                                             hint=self.HINT)
+                raise InvalidQueryValueError('month', value)
         return queryset
 
 

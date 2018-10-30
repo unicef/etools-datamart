@@ -113,10 +113,11 @@ class AttachmentsAttachmentflat(models.TenantModel):
     file_link = models.CharField(max_length=1024)
     uploaded_by = models.CharField(max_length=255)
     created = models.CharField(max_length=50)
-    attachment = models.ForeignKey(AttachmentsAttachment, models.DO_NOTHING, related_name='attachmentsattachment_attachments_attachmentflat_attachment_id')
+    attachment = models.ForeignKey('UnicefAttachmentsAttachment', models.DO_NOTHING, related_name='unicefattachmentsattachment_attachments_attachmentflat_attachment_id')
     filename = models.CharField(max_length=1024)
     agreement_reference_number = models.CharField(max_length=100)
     object_link = models.CharField(max_length=200)
+    source = models.CharField(max_length=150)
 
     class Meta:
         managed = False
@@ -137,8 +138,8 @@ class AttachmentsFiletype(models.TenantModel):
 
 class AuditAudit(models.TenantModel):
     engagement_ptr = models.OneToOneField('AuditEngagement', models.DO_NOTHING, related_name='auditengagement_audit_audit_engagement_ptr_id')
-    audited_expenditure = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    financial_findings = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    audited_expenditure = models.DecimalField(max_digits=20, decimal_places=2)
+    financial_findings = models.DecimalField(max_digits=20, decimal_places=2)
     audit_opinion = models.CharField(max_length=20)
 
     class Meta:
@@ -164,7 +165,7 @@ class AuditEngagement(models.TenantModel):
     engagement_type = models.CharField(max_length=10)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    total_value = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    total_value = models.DecimalField(max_digits=20, decimal_places=2)
     date_of_field_visit = models.DateField(blank=True, null=True)
     date_of_draft_report_to_ip = models.DateField(blank=True, null=True)
     date_of_comments_by_ip = models.DateField(blank=True, null=True)
@@ -173,10 +174,10 @@ class AuditEngagement(models.TenantModel):
     date_of_report_submit = models.DateField(blank=True, null=True)
     date_of_final_report = models.DateField(blank=True, null=True)
     date_of_cancel = models.DateField(blank=True, null=True)
-    amount_refunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    write_off_required = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    amount_refunded = models.DecimalField(max_digits=20, decimal_places=2)
+    additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2)
+    justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2)
+    write_off_required = models.DecimalField(max_digits=20, decimal_places=2)
     cancel_comment = models.TextField()
     explanation_for_additional_information = models.TextField()
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='partnerspartnerorganization_audit_engagement_partner_id')
@@ -184,7 +185,7 @@ class AuditEngagement(models.TenantModel):
     agreement = models.ForeignKey('PurchaseOrderPurchaseorder', models.DO_NOTHING, related_name='purchaseorderpurchaseorder_audit_engagement_agreement_id')
     po_item = models.ForeignKey('PurchaseOrderPurchaseorderitem', models.DO_NOTHING, related_name='purchaseorderpurchaseorderitem_audit_engagement_po_item_id', blank=True, null=True)
     shared_ip_with = models.TextField()  # This field type is a guess.
-    exchange_rate = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    exchange_rate = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -332,8 +333,8 @@ class AuditSpecificprocedure(models.TenantModel):
 
 class AuditSpotcheck(models.TenantModel):
     engagement_ptr = models.OneToOneField(AuditEngagement, models.DO_NOTHING, related_name='auditengagement_audit_spotcheck_engagement_ptr_id')
-    total_amount_tested = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    total_amount_of_ineligible_expenditure = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    total_amount_tested = models.DecimalField(max_digits=20, decimal_places=2)
+    total_amount_of_ineligible_expenditure = models.DecimalField(max_digits=20, decimal_places=2)
     internal_controls = models.TextField()
 
     class Meta:
@@ -523,6 +524,7 @@ class LocationsCartodbtable(models.TenantModel):
     parent = models.ForeignKey('self', models.DO_NOTHING, related_name='locationscartodbtable_locations_cartodbtable_parent_id', blank=True, null=True)
     rght = models.IntegerField()
     tree_id = models.IntegerField()
+    remap_table_name = models.CharField(max_length=254, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -553,11 +555,23 @@ class LocationsLocation(models.TenantModel):
     tree_id = models.IntegerField()
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    is_active = models.BooleanField()
 
     class Meta:
         managed = False
         db_table = 'locations_location'
         unique_together = (('gateway', 'name', 'p_code'),)
+
+
+class LocationsLocationremaphistory(models.TenantModel):
+    comments = models.TextField(blank=True, null=True)
+    created = models.DateTimeField()
+    new_location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='locationslocation_locations_locationremaphistory_new_location_id')
+    old_location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='locationslocation_locations_locationremaphistory_old_location_id')
+
+    class Meta:
+        managed = False
+        db_table = 'locations_locationremaphistory'
 
 
 class ManagementFlaggedissue(models.TenantModel):
@@ -680,24 +694,6 @@ class PartnersFiletype(models.TenantModel):
         db_table = 'partners_filetype'
 
 
-class PartnersFundingcommitment(models.TenantModel):
-    fr_number = models.CharField(max_length=50)
-    wbs = models.CharField(max_length=50)
-    fc_type = models.CharField(max_length=50)
-    fc_ref = models.CharField(unique=True, max_length=50, blank=True, null=True)
-    fr_item_amount_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    agreement_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    commitment_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    expenditure_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    grant = models.ForeignKey(FundsGrant, models.DO_NOTHING, related_name='fundsgrant_partners_fundingcommitment_grant_id', blank=True, null=True)
-    end = models.DateTimeField(blank=True, null=True)
-    start = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'partners_fundingcommitment'
-
-
 class PartnersIntervention(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -723,7 +719,8 @@ class PartnersIntervention(models.TenantModel):
     metadata = models.TextField(blank=True, null=True)  # This field type is a guess.
     in_amendment = models.BooleanField()
     reference_number_year = models.IntegerField(blank=True, null=True)
-    signed_by_unicef = models.BooleanField()
+    activation_letter = models.CharField(max_length=1024, blank=True, null=True)
+    termination_doc = models.CharField(max_length=1024, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -910,7 +907,6 @@ class PartnersPartnerorganization(models.TenantModel):
     alternate_name = models.CharField(max_length=255, blank=True, null=True)
     rating = models.CharField(max_length=50, blank=True, null=True)
     core_values_assessment_date = models.DateField(blank=True, null=True)
-    core_values_assessment = models.CharField(max_length=1024, blank=True, null=True)
     cso_type = models.CharField(max_length=50, blank=True, null=True)
     vision_synced = models.BooleanField()
     type_of_assessment = models.CharField(max_length=50, blank=True, null=True)
@@ -933,6 +929,8 @@ class PartnersPartnerorganization(models.TenantModel):
     total_ct_ytd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     basis_for_risk_rating = models.CharField(max_length=50)
     manually_blocked = models.BooleanField()
+    outstanding_dct_amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    outstanding_dct_amount_more_than_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1253,25 +1251,6 @@ class SnapshotActivity(models.TenantModel):
         db_table = 'snapshot_activity'
 
 
-class T2FActionpoint(models.TenantModel):
-    action_point_number = models.CharField(unique=True, max_length=11)
-    description = models.CharField(max_length=254)
-    due_date = models.DateTimeField()
-    status = models.CharField(max_length=254)
-    completed_at = models.DateTimeField(blank=True, null=True)
-    actions_taken = models.TextField()
-    follow_up = models.BooleanField()
-    comments = models.TextField()
-    created_at = models.DateTimeField()
-    assigned_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_actionpoint_assigned_by_id')
-    person_responsible = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_actionpoint_person_responsible_id')
-    travel = models.ForeignKey('T2FTravel', models.DO_NOTHING, related_name='t2ftravel_t2f_actionpoint_travel_id')
-
-    class Meta:
-        managed = False
-        db_table = 't2f_actionpoint'
-
-
 class T2FClearances(models.TenantModel):
     medical_clearance = models.CharField(max_length=14)
     security_clearance = models.CharField(max_length=14)
@@ -1534,6 +1513,58 @@ class TpmTpmvisitreportrejectcomment(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'tpm_tpmvisitreportrejectcomment'
+
+
+class UnicefAttachmentsAttachment(models.TenantModel):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    file = models.CharField(max_length=1024, blank=True, null=True)
+    hyperlink = models.CharField(max_length=255)
+    object_id = models.IntegerField(blank=True, null=True)
+    code = models.CharField(max_length=64)
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='djangocontenttype_unicef_attachments_attachment_content_type_id', blank=True, null=True)
+    file_type = models.ForeignKey('UnicefAttachmentsFiletype', models.DO_NOTHING, related_name='unicefattachmentsfiletype_unicef_attachments_attachment_file_type_id', blank=True, null=True)
+    uploaded_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_unicef_attachments_attachment_uploaded_by_id', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_attachments_attachment'
+
+
+class UnicefAttachmentsAttachmentflat(models.TenantModel):
+    object_link = models.CharField(max_length=200)
+    file_type = models.CharField(max_length=100)
+    file_link = models.CharField(max_length=1024)
+    filename = models.CharField(max_length=1024)
+    uploaded_by = models.CharField(max_length=255)
+    created = models.CharField(max_length=50)
+    attachment = models.ForeignKey(UnicefAttachmentsAttachment, models.DO_NOTHING, related_name='unicefattachmentsattachment_unicef_attachments_attachmentflat_attachment_id')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_attachments_attachmentflat'
+
+
+class UnicefAttachmentsAttachmentlink(models.TenantModel):
+    object_id = models.IntegerField(blank=True, null=True)
+    attachment = models.ForeignKey(UnicefAttachmentsAttachment, models.DO_NOTHING, related_name='unicefattachmentsattachment_unicef_attachments_attachmentlink_attachment_id')
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='djangocontenttype_unicef_attachments_attachmentlink_content_type_id', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_attachments_attachmentlink'
+
+
+class UnicefAttachmentsFiletype(models.TenantModel):
+    order = models.IntegerField()
+    name = models.CharField(max_length=64)
+    label = models.CharField(max_length=64)
+    code = models.CharField(max_length=64)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_attachments_filetype'
+        unique_together = (('code', 'name'),)
 
 
 class UnicefSnapshotActivity(models.TenantModel):

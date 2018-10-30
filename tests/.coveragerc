@@ -11,6 +11,8 @@ omit =
         **/api-builder.py
         **/queue.py
         **/multitenant/postgresql/creation.py
+        **/apps/etools/models/public_old.py
+        **/apps/etools/models/tenant_old.py
 
 [report]
 # Regexes for lines to exclude from consideration

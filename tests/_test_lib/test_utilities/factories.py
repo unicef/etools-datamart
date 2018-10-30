@@ -1,11 +1,17 @@
+import random
+from datetime import datetime
+
 import factory
 import unicef_security.models
+from django.db import connections
 from django.utils import timezone
 from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
-from etools_datamart.apps.data.models import Intervention, PMPIndicators
+from etools_datamart.apps.data.models import Intervention, PMPIndicators, UserStats
 from etools_datamart.apps.etl.models import TaskLog
 from etools_datamart.apps.tracking.models import APIRequestLog
+
+today = timezone.now()
 
 
 class TaskLogFactory(factory.DjangoModelFactory):
@@ -81,6 +87,15 @@ class UserAccessControlFactory(factory.DjangoModelFactory):
     class Meta:
         model = UserAccessControl
         django_get_or_create = ('user', 'service')
+
+
+class UserStatsFactory(factory.DjangoModelFactory):
+    month = lambda: datetime(today.year, random.choice([1, 2, 3]), 1)  # noqa
+    country_name = lambda: random.choice(connections['etools'].get_tenants())  # noqa
+
+    class Meta:
+        model = UserStats
+        django_get_or_create = ('month', 'country_name')
 
 
 class SystemFilterFactory(factory.DjangoModelFactory):
