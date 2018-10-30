@@ -5,7 +5,7 @@ from test_utilities.factories import UserStatsFactory
 from unicef_rest_framework.exceptions import InvalidQueryValueError
 
 from etools_datamart.api.endpoints import UserStatsViewSet
-from etools_datamart.api.endpoints.common import MonthFilterBackend
+from etools_datamart.api.filtering import MonthFilterBackend
 
 
 @pytest.fixture()

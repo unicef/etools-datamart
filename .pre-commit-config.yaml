@@ -19,7 +19,8 @@ repos:
         types: [python]
         files: '^$'
         always_run: true
-        stages: [push]
+        stages: [manual]
+
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     rev: v2.0.0
     hooks:
@@ -55,7 +56,7 @@ repos:
         - --pythonpath=src
         - --package=etools_datamart
         stages: [push]
-        
+
     -   id: check-untracked
         args:
         - src

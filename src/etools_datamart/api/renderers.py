@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from rest_framework_csv import renderers as r
 from unicef_rest_framework.renderers import APIBrowsableAPIRenderer as _BrowsableAPIRenderer
 
 from etools_datamart.state import state
@@ -20,3 +21,10 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
         ctx['response_headers']['system-filters'] = getattr(state.request, '_system_filter', '')
 
         return ctx
+
+
+class CSVRenderer(r.CSVRenderer):
+
+    def render(self, data, media_type=None, renderer_context={}, writer_opts=None):
+        data = dict(data)['results']
+        return super().render(data, media_type, renderer_context, writer_opts)

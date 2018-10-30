@@ -26,7 +26,7 @@ class FAMIndicatorSerializer(serializers.ModelSerializer):
 
 
 class UserStatsSerializer(serializers.ModelSerializer):
-    month = SerializerMethodField()
+    month = SerializerMethodField(help_text="---")
 
     class Meta:
         model = models.UserStats

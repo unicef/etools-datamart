@@ -28,6 +28,8 @@ test:
 
 lint:
 	pipenv run pre-commit run --all-files
+	pipenv run pre-commit run --all-files --hook-stage push
+	pipenv run pre-commit run --all-files --hook-stage manual
 #	pipenv run flake8 src/ tests/
 #	pipenv run isort -rc src/ --check-only
 #	pipenv run check-manifest

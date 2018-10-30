@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from etools_datamart.api.endpoints.common import MonthFilterBackend
+from etools_datamart.api.filtering import MonthFilterBackend
 from etools_datamart.apps.data import models
 
 from . import serializers
