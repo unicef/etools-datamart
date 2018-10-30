@@ -10,6 +10,8 @@ repos:
         entry: isort
         language: system
         types: [python]
+        stages: [commit]
+
       - id: check-manifest
         name: check-manifest
         entry: check-manifest
@@ -23,13 +25,19 @@ repos:
     hooks:
     -   id: debug-statements
         exclude: manage.py
+        stages: [commit]
+
 #    -   id: end-of-file-fixer
     -   id: flake8
         args:
         - src/
         - tests/
         - --config=setup.cfg
+        stages: [commit]
+
     -   id: check-merge-conflict
+        stages: [commit]
+
 #    -   id: check-case-conflict
 -   repo: git://github.com/Yelp/detect-secrets
     rev: 0.9.1
@@ -47,6 +55,7 @@ repos:
         - --pythonpath=src
         - --package=etools_datamart
         stages: [push]
+        
     -   id: check-untracked
         args:
         - src
