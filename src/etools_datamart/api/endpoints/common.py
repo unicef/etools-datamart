@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import lru_cache, wraps
 
 import coreapi
@@ -11,8 +12,8 @@ from django.http import Http404
 from django.utils.http import quote_etag
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.filters import BaseFilterBackend
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied
+from rest_framework.filters import BaseFilterBackend, OrderingFilter
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_csv import renderers as r
@@ -23,6 +24,7 @@ from rest_framework_extensions.key_constructor.bits import KeyBitBase
 from rest_framework_extensions.key_constructor.constructors import KeyConstructor
 from rest_framework_extensions.settings import extensions_api_settings
 from unicef_rest_framework.cache import parse_ttl
+from unicef_rest_framework.exceptions import InvalidQueryValueError
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 
@@ -87,6 +89,41 @@ class TenantQueryStringFilterBackend(QueryStringFilterBackend):
         return ret
 
 
+months = ['jan', 'feb', 'mar',
+          'apr', 'may', 'jun',
+          'jul', 'aug', 'sep',
+          'oct', 'nov', 'dec']
+
+
+class MonthFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        value = request.GET.get('month', "").lower()
+        m = y = None
+        if value:
+            try:
+                if '-' in value:
+                    m, y = value.split('-')
+                else:
+                    m = value
+                    y = datetime.now().year
+
+                if m in months:
+                    m = months.index(m)+1
+                elif m in list(map(str, range(12))):
+                    m = m
+                elif value == 'current':
+                    m = datetime.now().month
+                    y = datetime.now().year
+                # elif value == 'latest':
+                #     m = datetime.now().month
+                #     y = datetime.now().year
+                return queryset.filter(month__month=int(m),
+                                       month__year=int(y))
+            except ValueError:
+                raise InvalidQueryValueError('month', value)
+        return queryset
+
+
 class SchemaFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         value = request.GET.get('country_name', None)
@@ -109,6 +146,7 @@ class SchemaFilterBackend(BaseFilterBackend):
                     raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             conn.set_schemas(value)
         return queryset
+
 
 #
 # class SystemFilterKeyBit(KeyBitBase):
@@ -207,6 +245,13 @@ etag = APIETAGProcessor
 cache_response = APICacheResponse
 
 
+class CSVRenderer(r.CSVRenderer):
+
+    def render(self, data, media_type=None, renderer_context={}, writer_opts=None):
+        data = dict(data)['results']
+        return super().render(data, media_type, renderer_context, writer_opts)
+
+
 class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
     object_cache_key_func = rest_framework_extensions.utils.default_object_cache_key_func
     list_cache_key_func = ListKeyConstructor()
@@ -216,9 +261,13 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
 
     renderer_classes = [JSONRenderer,
                         APIBrowsableAPIRenderer,
-                        r.CSVRenderer,
+                        CSVRenderer,
                         ]
-    filter_backends = [SystemFilterBackend, TenantQueryStringFilterBackend]
+    filter_backends = [SystemFilterBackend,
+                       TenantQueryStringFilterBackend,
+                       OrderingFilter]
+    ordering_fields = ('id',)
+    ordering = 'id'
 
     def get_schema_fields(self):
         ret = []
@@ -232,7 +281,27 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
         return ret
 
     def drf_ignore_filter(self, request, field):
-        return field in ['+serializer', 'cursor', '+fields', 'country_name']
+        return field in ['+serializer', 'cursor', '+fields', 'country_name',
+                         'ordering', 'page_size', 'format', 'month']
+
+    def handle_exception(self, exc):
+        conn = connections['etools']
+        if isinstance(exc, InvalidQueryValueError):
+            return Response({"error": str(exc)}, status=400)
+        elif isinstance(exc, NotAuthenticated):
+            return Response({"error": "Authentication credentials were not provided."}, status=401)
+        elif isinstance(exc, Http404):
+            return Response({"error": "object not found"}, status=404)
+        elif isinstance(exc, NotAuthorizedSchema):
+            return Response({"error": str(exc)}, status=403)
+        elif isinstance(exc, PermissionDenied):
+            return Response({"error": str(exc)}, status=403)
+        elif isinstance(exc, InvalidSchema):
+            return Response({"error": str(exc),
+                             "hint": "Removes wrong schema from selection",
+                             "valid": sorted(conn.all_schemas)
+                             }, status=400)
+        return super().handle_exception(exc)
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
@@ -285,7 +354,12 @@ def schema_header(func):
 
 
 class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
-    filter_backends = [SystemFilterBackend, SchemaFilterBackend, TenantQueryStringFilterBackend]
+    filter_backends = [SystemFilterBackend,
+                       SchemaFilterBackend,
+                       TenantQueryStringFilterBackend,
+                       OrderingFilter]
+    ordering_fields = ('id',)
+    ordering = 'id'
 
     @one_schema
     def retrieve(self, request, *args, **kwargs):
@@ -295,20 +369,20 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    def handle_exception(self, exc):
-        conn = connections['etools']
-        if isinstance(exc, Http404):
-            return Response({"error": "object not found"}, status=404)
-        elif isinstance(exc, NotAuthorizedSchema):
-            return Response({"error": str(exc)}, status=403)
-        elif isinstance(exc, PermissionDenied):
-            return Response({"error": str(exc)}, status=403)
-        elif isinstance(exc, InvalidSchema):
-            return Response({"error": str(exc),
-                             "hint": "Removes wrong schema from selection",
-                             "valid": sorted(conn.all_schemas)
-                             }, status=400)
-        return super().handle_exception(self)
+    # def handle_exception(self, exc):
+    #     conn = connections['etools']
+    #     # if isinstance(exc, Http404):
+    #     #     return Response({"error": "object not found"}, status=404)
+    #     if isinstance(exc, NotAuthorizedSchema):
+    #         return Response({"error": str(exc)}, status=403)
+    #     # elif isinstance(exc, PermissionDenied):
+    #     #     return Response({"error": str(exc)}, status=403)
+    #     elif isinstance(exc, InvalidSchema):
+    #         return Response({"error": str(exc),
+    #                          "hint": "Removes wrong schema from selection",
+    #                          "valid": sorted(conn.all_schemas)
+    #                          }, status=400)
+    #     return super().handle_exception(exc)
 
     def get_schema_fields(self):
         ret = super(APIMultiTenantReadOnlyModelViewSet, self).get_schema_fields()

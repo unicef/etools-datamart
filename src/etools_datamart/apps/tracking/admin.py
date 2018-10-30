@@ -20,7 +20,7 @@ class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('requested_at', 'response_ms', 'size',
                     'requestor', 'method',
                     'url', 'remote_addr', 'content_type', 'cached', 'is_filtered',
-                    'service', 'viewset',)
+                    'service')
     list_filter = ('user', 'remote_addr', 'cached', 'content_type')
     readonly_fields = ('user', 'path', 'requested_at', 'response_ms',
                        'size', 'method', 'cached', 'remote_addr', 'response_length',
@@ -102,10 +102,14 @@ class MonthlyCounterAdmin(TruncateTableMixin, APIModelAdmin):
 class PathCounterAdmin(TruncateTableMixin, APIModelAdmin):
     date_hierarchy = 'day'
     search_fields = ('path',)
+    list_display = ('day', 'path', 'total', 'cached',
+                    'response_max', 'response_min', 'response_average')
 
 
 class UserCounterAdmin(TruncateTableMixin, APIModelAdmin):
     date_hierarchy = 'day'
+    list_display = ('day', 'user', 'total', 'cached',
+                    'response_max', 'response_min', 'response_average')
 
 
 class ApplicationCounterAdmin(TruncateTableMixin, APIModelAdmin):

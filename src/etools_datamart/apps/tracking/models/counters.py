@@ -25,7 +25,6 @@ class AbstractCounter(models.Model):
 
     class Meta:
         abstract = True
-        unique_together = ('day',)
         ordering = ('-day',)
         get_latest_by = 'day'
 
@@ -36,11 +35,12 @@ class AbstractCounter(models.Model):
 
 
 class DailyCounter(AbstractCounter):
-    user = models.IntegerField(db_index=True)
+    users = models.IntegerField(db_index=True)
 
 
 class MonthlyCounter(AbstractCounter):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
+                             blank=True, null=True)
 
     class Meta:
         unique_together = ('day', 'user')
@@ -57,7 +57,8 @@ class PathCounter(AbstractCounter):
 
 
 class UserCounter(AbstractCounter):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
+                             blank=True, null=True)
 
     class Meta:
         unique_together = ('day', 'user')

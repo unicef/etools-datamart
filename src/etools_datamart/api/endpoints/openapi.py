@@ -9,9 +9,9 @@ from rest_framework import permissions
 description = """
 # Welcome to eTools Datamart API
 
+Each API endpoint allows filtering and/or ordering results.
 
-Here wou can find us...
-
+Fiel
 ## Query lookups
 
 Any field where query functions are enabled allow to....
@@ -90,7 +90,6 @@ schema_view = get_schema_view(
         # contact=openapi.Contact(email="contact@snippets.local"),
         # license=openapi.License(name="BSD License"),
         # aaaaaaa="aaaaaa",
-
     ),
     # validators=['flex', 'ssv'],
     public=True,

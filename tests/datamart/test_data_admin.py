@@ -43,6 +43,12 @@ def test_pmpindicators_refresh(django_app, admin_user):
     assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
 
 
+def test_pmpindicators_api(django_app, admin_user, service):
+    url = reverse("admin:data_pmpindicators_api")
+    res = django_app.get(url, user=admin_user)
+    assert res.status_code == 302
+
+
 def test_pmpindicators_truncate(django_app, admin_user):
     url = reverse("admin:data_pmpindicators_changelist")
     res = django_app.get(url, user=admin_user)

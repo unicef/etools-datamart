@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
@@ -107,14 +108,15 @@ def data_service(db):
     return InterventionViewSet.get_service()
 
 
-# Change below numbers each time etools dump is updated
-
+# Check below numbers each time etools dump is updated
+# Should be automatically updated by 'db/update_etools_schema.sh'
 @pytest.fixture()
 def number_of_partnerorganization(db):
     # number of partners.PartnerOrganization records in each tenant
-    return 193
+    return int((Path(__file__).parent / 'PARTNERORGANIZATION').read_text())
 
 
 @pytest.fixture()
 def number_of_intervention(db):
-    return 3
+    # number of partners.Intervention
+    return int((Path(__file__).parent / 'INTERVENTION').read_text())

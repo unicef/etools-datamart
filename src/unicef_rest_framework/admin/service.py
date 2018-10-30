@@ -110,7 +110,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def refresh(self, request):
         msgs = {False: 'No new services found',
                 True: 'Found {} new services. Removed {}'}
-        created, deleted = Service.objects.load_services()
+        created, deleted, total = Service.objects.load_services()
         self.message_user(request, msgs[bool(created | deleted)].format(created, deleted))
         info = self.model._meta.app_label, self.model._meta.model_name
         return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % info))

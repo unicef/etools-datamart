@@ -24,9 +24,12 @@ router.register(r'etools/partners/plannedengagement', endpoints.Plannedengagemen
 router.register(r'etools/reports/appliedindicator', endpoints.AppliedindicatorViewSet)
 router.register(r'etools/reports/results', endpoints.ReportsResultViewSet)
 router.register(r'etools/t2/ftravel', endpoints.FTravelViewSet)
+router.register(r'etools/tpm/tpmvisit', endpoints.TpmTpmvisitViewSet)
 
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/interventions', endpoints.InterventionViewSet)
+router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
+router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
 
 router.register(r'system/tasks-log', endpoints.TaskLogViewSet)
 

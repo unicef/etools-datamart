@@ -53,4 +53,4 @@ def test_stream_aggregation(reset_stats, admin_user):
     d = DailyCounter.objects.get(day=data['requested_at'])
     assert d.total == 2
     assert d.cached == 1
-    assert d.user == 1
+    assert d.users == 1

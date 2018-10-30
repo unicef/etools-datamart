@@ -37,14 +37,15 @@ class InvalidQueryArgumentError(ApiException):
 
 
 class InvalidQueryValueError(ApiException):
-    argument = ''
 
-    def __init__(self, field, *args, **kwargs):
+    def __init__(self, field, value, hint=None, *args, **kwargs):
         self.field = field
+        self.value = value
+        self.hint = hint
         super(InvalidQueryValueError, self).__init__(*args, **kwargs)
 
     def __str__(self):
-        return "Invalid value '{}' for parameter {}".format(self.field, self.argument)
+        return "Invalid value '{}' for parameter {}".format(self.value, self.field)
 
 
 class InvalidSerializerError(InvalidQueryValueError):

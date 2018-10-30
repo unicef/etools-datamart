@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 from django.db import connections, models
+from django.utils.timezone import now
 from strategy_field.fields import StrategyClassField
 
 logger = logging.getLogger(__name__)
@@ -23,17 +24,18 @@ class APIRequestLog(models.Model):
                              blank=True, null=True)
 
     # timestamp of request
-    requested_at = models.DateTimeField(db_index=True)
+    requested_at = models.DateTimeField(db_index=True,
+                                        default=now)
 
     # number of milliseconds to respond
     response_ms = models.PositiveIntegerField('ms', default=0)
-    response_length = models.PositiveIntegerField('length', default=0)
+    response_length = models.BigIntegerField('length', default=0)
 
     # request path
     path = models.CharField(max_length=255, db_index=True)
 
     # remote IP address of request
-    remote_addr = models.GenericIPAddressField()
+    remote_addr = models.GenericIPAddressField(blank=True, null=True)
 
     # originating host of request
     host = models.URLField()

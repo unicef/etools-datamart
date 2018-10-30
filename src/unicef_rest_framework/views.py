@@ -5,15 +5,11 @@ from drf_querystringfilter.backend import QueryStringFilterBackend
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
-from rest_framework.pagination import CursorPagination
+from rest_framework.filters import OrderingFilter
 from unicef_rest_framework import acl
 from unicef_rest_framework.auth import JWTAuthentication
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.permissions import ServicePermission
-
-
-def paginator(ordering='-created'):
-    return type("TenantPaginator", (CursorPagination,), {'ordering': ordering})
 
 
 class classproperty(object):
@@ -30,13 +26,17 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
                               BasicAuthentication,
                               TokenAuthentication)
     default_access = acl.ACL_ACCESS_LOGIN
-    filter_backends = [SystemFilterBackend, QueryStringFilterBackend]
+    filter_backends = [SystemFilterBackend,
+                       QueryStringFilterBackend,
+                       OrderingFilter]
+    ordering_fields = ('id',)
+    ordering = 'id'
     filter_blacklist = []
     filter_fields = []
-    ordering_fields = []
-    pagination_class = paginator()
+    # pagination_class = paginator()
     permission_classes = [ServicePermission, ]
     serializers_fieldsets = {}
+    # paginate_by = 100
 
     @classproperty
     def label(cls):

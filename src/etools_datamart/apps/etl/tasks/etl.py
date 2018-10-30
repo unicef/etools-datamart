@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from datetime import date
+from datetime import date, datetime
 
 from django.db import connections
 from django.db.models import Sum
@@ -9,8 +9,10 @@ from strategy_field.utils import get_attr
 
 from etools_datamart.apps.data.models import Intervention, PMPIndicators
 from etools_datamart.apps.data.models.fam import FAMIndicator
-from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment, AuditSpecialaudit,
-                                                AuditSpotcheck, PartnersIntervention, PartnersPartnerorganization,)
+from etools_datamart.apps.data.models.user import UserStats
+from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
+                                                AuditSpecialaudit, AuditSpotcheck, AuthUser, PartnersIntervention,
+                                                PartnersPartnerorganization,)
 from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)
@@ -29,8 +31,9 @@ def load_pmp_indicator():
         connection.set_schemas([country.schema_name])
 
         logger.info(u'Running on %s' % country.name)
-        for partner in PartnersPartnerorganization.objects.prefetch_related(
-                'partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
+        for partner in PartnersPartnerorganization.objects.all():
+            # .prefetch_related(
+            # 'partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
             # .select_related('partnersintervention_partners_interventionbudget_intervention_id')
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
@@ -85,7 +88,6 @@ def load_intervention():
     created = {}
     for country in countries:
         connection.set_schemas([country.schema_name])
-
         qs = PartnersIntervention.objects.all().select_related('agreement',
                                                                'partner_authorized_officer_signatory',
                                                                'unicef_signatory',
@@ -161,7 +163,6 @@ def load_intervention():
 def load_fam_indicator():
     connection = connections['etools']
     countries = connection.get_tenants()
-    FAMIndicator.objects.truncate()
 
     engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
     start_date = date.today()  # + relativedelta(months=-1)
@@ -196,3 +197,64 @@ def load_fam_indicator():
             created[country.name] += 1
 
     return created
+
+
+@app.etl(UserStats)
+def load_user_report():
+    connection = connections['etools']
+    countries = connection.get_tenants()
+    today = date.today()
+    first_of_month = datetime(today.year, today.month, 1)
+    created = {}
+    for country in countries:
+        created[country.name] = 0
+        connection.set_schemas([country.schema_name])
+        base = AuthUser.objects.filter(profile__country=country)
+        UserStats.objects.update_or_create(month=first_of_month,
+                                           country_name=country.name,
+                                           schema_name=country.schema_name,
+                                           defaults={
+                                               'total': base.count(),
+                                               'unicef': base.filter(email__endswith='@unicef.org').count(),
+                                               'logins': base.filter(
+                                                   last_login__month=first_of_month.month).count(),
+                                               'unicef_logins': base.filter(
+                                                   last_login__month=first_of_month.month,
+                                                   email__endswith='@unicef.org').count(),
+                                           })
+        created[country.name] += 1
+
+    return created
+
+    # start_date = kwargs.get('start_date', None)
+    # if start_date:
+    #     start_date = datetime.strptime(start_date.pop(), '%Y-%m-%d')
+    # else:
+    #     start_date = date.today() + relativedelta(months=-1)
+    #
+    # countries = kwargs.get('countries', None)
+    # qs = Country.objects.exclude(schema_name__in=['public', 'uat', 'frg'])
+    # if countries:
+    #     qs = qs.filter(schema_name__in=countries.pop().split(','))
+    # fieldnames = ['Country', 'Total Users', 'Unicef Users', 'Last month Users', 'Last month Unicef Users']
+    # dict_writer = writer(fieldnames=fieldnames)
+    # dict_writer.writeheader()
+    #
+    # for country in qs:
+    #     dict_writer.writerow({
+    #         'Country': country,
+    #         'Total Users': get_user_model().objects.filter(profile__country=country).count(),
+    #         'Unicef Users': get_user_model().objects.filter(
+    #             profile__country=country,
+    #             email__endswith='@unicef.org'
+    #         ).count(),
+    #         'Last month Users': get_user_model().objects.filter(
+    #             profile__country=country,
+    #             last_login__gte=start_date
+    #         ).count(),
+    #         'Last month Unicef Users': get_user_model().objects.filter(
+    #             profile__country=country,
+    #             email__endswith='@unicef.org',
+    #             last_login__gte=start_date
+    #         ).count(),
+    #     })
