@@ -133,3 +133,24 @@ class SchemaFilterBackend(BaseFilterBackend):
                     raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             conn.set_schemas(value)
         return queryset
+
+
+class CountryFilterBackend(SchemaFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        value = request.GET.get('country_name', None)
+        assert queryset.model._meta.app_label != 'etools'
+        if not value:
+            if not request.user.is_superuser:
+                allowed = get_etools_allowed_schemas(request.user)
+                if not allowed:
+                    raise PermissionDenied("You don't have enabled schemas")
+                queryset.filter(country_name__in=allowed)
+        else:
+            value = set(value.split(","))
+            validate_schemas(*value)
+            if not request.user.is_superuser:
+                user_schemas = get_etools_allowed_schemas(request.user)
+                if not user_schemas.issuperset(value):
+                    raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
+            queryset.filter(country_name__in=value)
+        return queryset

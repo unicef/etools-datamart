@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
+from etools_datamart.api import serializers
+from etools_datamart.api.endpoints import common
 from etools_datamart.apps.etools import models
-
-from . import common
-from .. import serializers
 
 
 class GrantViewSet(common.APIMultiTenantReadOnlyModelViewSet):

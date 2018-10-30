@@ -1,5 +1,6 @@
 from functools import wraps
 
+import coreapi
 import coreschema
 import rest_framework_extensions.utils
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -65,16 +66,16 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
     ordering_fields = ('id',)
     ordering = 'id'
 
-    # def get_schema_fields(self):
-    #     ret = []
-    #     if self.serializers_fieldsets:
-    #         ret.append(coreapi.Field(
-    #             name=self.serializer_field_param,
-    #             required=False,
-    #             location='query',
-    #             schema=SchemaSerializerField(self)
-    #         ))
-    #     return ret
+    def get_schema_fields(self):
+        ret = []
+        if self.serializers_fieldsets:
+            ret.append(coreapi.Field(
+                name=self.serializer_field_param,
+                required=False,
+                location='query',
+                schema=SchemaSerializerField(self)
+            ))
+        return ret
 
     def drf_ignore_filter(self, request, field):
         return field in ['+serializer', 'cursor', '+fields', 'country_name',
@@ -165,13 +166,12 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    #
-    # def get_schema_fields(self):
-    #     ret = super(APIMultiTenantReadOnlyModelViewSet, self).get_schema_fields()
-    #     ret.append(coreapi.Field(
-    #         name='_schema',
-    #         required=False,
-    #         location='query',
-    #         schema=coreschema.String(description="comma separated list of schemas")
-    #     ))
-    #     return ret
+    def get_schema_fields(self):
+        ret = super(APIMultiTenantReadOnlyModelViewSet, self).get_schema_fields()
+        ret.append(coreapi.Field(
+            name='_schema',
+            required=False,
+            location='query',
+            schema=coreschema.String(description="comma separated list of schemas")
+        ))
+        return ret
