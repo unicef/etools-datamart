@@ -12,8 +12,9 @@ from django.contrib.admin.views.main import ChangeList
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from humanize import naturaldelta
+from unicef_rest_framework.models import Service
 
-from etools_datamart.apps.etl.tasks import load_intervention, load_pmp_indicator
+from etools_datamart.apps.etl.tasks import load_fam_indicator, load_intervention, load_pmp_indicator, load_user_report
 from etools_datamart.apps.multitenant.admin import SchemaFilter
 from etools_datamart.libs.truncate import TruncateTableMixin
 
@@ -52,6 +53,13 @@ class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
             self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
             return HttpResponseRedirect(redirect_url)
         return self._changeform_view(request, object_id, form_url, extra_context)
+
+    @link()
+    def api(self, request):
+        for s in Service.objects.all():
+            if s.managed_model == self.model:
+                return HttpResponseRedirect(s.endpoint)
+        return ""
 
     @link()
     def queue(self, request):
@@ -102,3 +110,18 @@ class InterventionAdmin(DataModelAdmin):
     search_fields = ('number', 'title')
     date_hierarchy = 'start_date'
     load_handler = load_intervention
+
+
+@register(models.FAMIndicator)
+class FAMIndicatorAdmin(DataModelAdmin):
+    list_display = ('country_name', 'schema_name', 'month',)
+    list_filter = (SchemaFilter, 'month',)
+    load_handler = load_fam_indicator
+
+
+@register(models.UserStats)
+class UserStatsAdmin(DataModelAdmin):
+    list_display = ('country_name', 'schema_name', 'month', 'total', 'unicef', 'logins', 'unicef_logins')
+    list_filter = (SchemaFilter, 'month',)
+    load_handler = load_user_report
+    date_hierarchy = 'month'

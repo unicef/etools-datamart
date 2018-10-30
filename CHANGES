@@ -4,7 +4,10 @@
 * add ordering support
 * updates redoc version
 * improves support to handle eTools database changes
-
+* fixes wrog data format in CSV export
+* new endpoint FAMIndicator
+* new endpoint Tpmvisit
+* new endpoint UserStats
 
 1.2
 ---

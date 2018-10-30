@@ -1,6 +1,8 @@
 eTools DataMart Docker images
 =============================
 
+[![](https://images.microbadger.com/badges/version/unicef/datamart.svg)](https://microbadger.com/images/unicef/datamart)
+
 To build docker image simply cd in `docker` directory and run 
 
     make build

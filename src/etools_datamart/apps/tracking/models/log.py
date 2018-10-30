@@ -29,7 +29,7 @@ class APIRequestLog(models.Model):
 
     # number of milliseconds to respond
     response_ms = models.PositiveIntegerField('ms', default=0)
-    response_length = models.PositiveIntegerField('length', default=0)
+    response_length = models.BigIntegerField('length', default=0)
 
     # request path
     path = models.CharField(max_length=255, db_index=True)

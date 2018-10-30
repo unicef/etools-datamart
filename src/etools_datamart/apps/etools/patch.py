@@ -55,16 +55,32 @@ def patch():
         lambda self: self.total_unicef_cash + self.total_in_kind_amount)
 
     # Fix User OneToOneField
-    for model in [AuthUserGroups, UsersUserprofile]:
-        f = [f for f in model._meta.local_fields if f.name != 'user_id']
-        model._meta.local_fields = f
-        model._meta.unique_together = []
-        models.OneToOneField(AuthUser, on_delete=models.PROTECT).contribute_to_class(model, 'user')
+    # for model in [AuthUserGroups, UsersUserprofile]:
+
+
+    f = [f for f in AuthUserGroups._meta.local_fields if f.name != 'user_id']
+    AuthUserGroups._meta.local_fields = f
+    AuthUserGroups._meta.unique_together = []
+    models.OneToOneField(AuthUser,
+                         on_delete=models.PROTECT).contribute_to_class(AuthUserGroups, 'user')
+
+    f = [f for f in UsersUserprofile._meta.local_fields if f.name != 'user_id']
+    UsersUserprofile._meta.local_fields = f
+    UsersUserprofile._meta.unique_together = []
+    models.OneToOneField(AuthUser,
+                         related_name='profile',
+                         on_delete=models.PROTECT).contribute_to_class(UsersUserprofile, 'user')
 
     # Fix User ManyToManyField
     fld = models.ManyToManyField(AuthGroup,
                                  through=AuthUserGroups,
                                  ).contribute_to_class(AuthUser, 'groups')
+
+
+    # models.OneToOneField(UsersUserprofile,
+    #                      on_delete=models.PROTECT,
+    #                      ).contribute_to_class(AuthUser, 'profile')
+    #
 
     # Fix UsersUserprofile ManyToManyField
     models.ManyToManyField(UsersCountry,
@@ -73,6 +89,9 @@ def patch():
 
     AuthUser.is_authenticated = True
     AuthUser.set_password = User.set_password
+
+
+    AuthUser.profile = cached_property(lambda self: UsersUserprofile.objects.get(user_id=self.id))
 
     # groups = models.ManyToManyField(
     #     Group,

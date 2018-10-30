@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # This script should be used everytime eTools ORM changes
 #
-# It will re-align Datamart ORM to Etools ORM and produce
-# sql files used by Datamart tests
+# It loads local eTools database with provided data,
+# re-align Datamart ORM to Etools ORM and produce
+# sql files used by Datamart tests.
 #
 # NOTE: for safety reasosn etools database MUST listn on 15432
 
@@ -10,9 +11,9 @@ CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DUMP_DIRECTORY="$CURDIR/../src/etools_datamart/apps/multitenant/postgresql"
 
 export PGHOST=127.0.0.1
-export PGPORT=15432
+export PGPORT=5432
 export DATABASE_NAME=etools
-export DATABASE_USER=etoolusr
+export DATABASE_USER=postgres
 export BASE_SCHEMA=kenya
 
 help (){
@@ -99,8 +100,8 @@ echo "clean temporary files    $CLEAN"
 
 if [ "$RESTORE" == "1" ]; then
     echo "1.1 Dropping ans recreating database ${DATABASE_NAME}"
-    dropdb -h ${PGHOST} -p ${PGPORT} --if-exists ${DATABASE_NAME}
-    createdb -h ${PGHOST} -p ${PGPORT} ${DATABASE_NAME}
+    dropdb -h ${PGHOST} -p ${PGPORT} --if-exists ${DATABASE_NAME} || exit 1
+    createdb -h ${PGHOST} -p ${PGPORT} ${DATABASE_NAME} || exit 1
 
     if [ ! -e "$CURDIR/etools.dump" ];then
         echo "1.2 Unpack database dump"
@@ -112,8 +113,9 @@ if [ "$RESTORE" == "1" ]; then
     echo "1.3 Restoring database"
 
     pg_restore -h ${PGHOST} -p ${PGPORT} \
-            --no-owner --role=postgresql \
-            --username=${DATABASE_USER} --format=tar --dbname=${DATABASE_NAME} etools.dump
+            --no-owner --role=${DATABASE_USER} \
+            --username=${DATABASE_USER} \
+            --format=tar --dbname=${DATABASE_NAME} etools.dump || exit 1
 
     rm -f etools.dump etools.dump.list _etools.dump.list
 else

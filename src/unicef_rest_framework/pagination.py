@@ -46,27 +46,13 @@ class APIPagination(PageNumberPagination):
             ('results', data)
         ]))
 
-    def _handle_backwards_compat(self, view):
-        """
-        Prior to DRF 3.1, pagination was handled in the view, and the
-        attributes were set there. The attributes should now be set on
-        the pagination class. The old style continues to work but is deprecated
-        and will be fully removed in version 3.3.
-
-        CAPI keeps this behaviour
-        """
-        for (view_attr, attr_name) in (
-                ('paginate_by', 'page_size'),
-                ('page_query_param', 'page_query_param'),
-                ('paginate_by_param', 'page_size_query_param'),
-                ('max_paginate_by', 'max_page_size')
-        ):
-            value = getattr(view, view_attr, None)
-            if value is not None:
-                setattr(self, attr_name, value)
+    def get_page_size(self, request):
+        if request._request.GET.get('format') == 'csv':
+            return 999999999
+        return super().get_page_size(request)
 
     def paginate_queryset(self, queryset, request, view=None):
-        self._handle_backwards_compat(view)
+        # self._handle_backwards_compat(view)
         return super(APIPagination, self).paginate_queryset(queryset, request, view)
 
     def get_next_link(self):
