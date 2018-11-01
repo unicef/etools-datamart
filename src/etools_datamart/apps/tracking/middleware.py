@@ -31,8 +31,10 @@ def log_request(**kwargs):
             target.cached = F('cached') + int(log.cached)
             for k, v in overrides.items():
                 setattr(target, k, v)
-
-            target.save()
+            try:
+                target.save()
+            except Exception as e:
+                logger.error(f"Error updating {target}: {e}")
 
         defaults = {"total": 1,
                     "cached": int(log.cached),

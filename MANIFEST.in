@@ -22,7 +22,6 @@ exclude Makefile
 exclude manage.py
 exclude manage.py
 exclude tests
-exclude TODO
 
 prune .circleci
 prune db
@@ -36,6 +35,7 @@ recursive-include src *.sqldump
 recursive-include src/etools_datamart *.*
 recursive-include src/unicef_rest_framework *.*
 recursive-include src/unicef_security *.*
+recursive-include src/month_field *.*
 
 exclude deploy
 exclude docker

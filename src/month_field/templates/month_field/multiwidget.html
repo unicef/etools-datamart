@@ -1,0 +1,5 @@
+{% spaceless %}<nobr>
+    {% for widget in widget.subwidgets %}
+        {% include widget.template_name %}&nbsp;
+    {% endfor %}</nobr>
+{% endspaceless %}

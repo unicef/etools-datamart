@@ -1,5 +1,5 @@
 from django.db import models
-from month.models import MonthField
+from month_field.models import MonthField
 
 from etools_datamart.apps.data.models.base import DataMartModel
 
@@ -23,3 +23,6 @@ class FAMIndicator(DataMartModel):
     microassessment_report_submitted = models.IntegerField(verbose_name='Micro Assessment-Report Submitted', default=0)
     microassessment_final_report = models.IntegerField(verbose_name='Micro Assessment-Final Report', default=0)
     microassessment_cancelled = models.IntegerField(verbose_name='Micro Assessment-Cancelled', default=0)
+
+    class Meta:
+        ordering = ('month', 'country_name')

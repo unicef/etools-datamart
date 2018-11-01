@@ -1,3 +1,5 @@
+import logging
+
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from django import forms
 from django.contrib import admin, messages
@@ -7,6 +9,8 @@ from django.template.response import TemplateResponse
 from unicef_security.azure import Synchronizer, SyncResult
 from unicef_security.models import BusinessArea, Region, Role, User
 from unicef_security.sync import load_business_area, load_region
+
+logger = logging.getLogger(__name__)
 
 
 @admin.register(Region)
@@ -26,7 +30,11 @@ class BusinessAreaAdmin(ExtraUrlMixin, ModelAdmin):
 
     @link()
     def sync(self, request):
-        load_business_area()
+        try:
+            load_business_area()
+        except Exception as e:
+            logger.error(e)
+            self.message_user(request, str(e), messages.ERROR)
 
 
 class LoadUsersForm(forms.Form):

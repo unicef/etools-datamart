@@ -1,8 +1,10 @@
 1.4 (dev)
 ---------
+* WARNINGS: migration reset
 * updates corepai documentation
 * refactor api endpoints
 * updates dependencies
+* improved filtering on country (multi-tenant/etools)
 
 
 1.3

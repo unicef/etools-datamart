@@ -17,10 +17,10 @@ class CounterManager(models.Manager):
 
 class AbstractCounter(models.Model):
     day = models.DateField(db_index=True)
-    total = models.IntegerField(db_index=True)
-    cached = models.IntegerField(db_index=True)
-    response_max = models.IntegerField(db_index=True)
-    response_min = models.IntegerField(db_index=True)
+    total = models.BigIntegerField(db_index=True)
+    cached = models.BigIntegerField(db_index=True)
+    response_max = models.BigIntegerField(db_index=True)
+    response_min = models.BigIntegerField(db_index=True)
     response_average = models.FloatField(db_index=True)
 
     class Meta:

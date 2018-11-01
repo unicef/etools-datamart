@@ -16,7 +16,7 @@ from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 
 from etools_datamart.api.cache import cache_response, etag, ListKeyConstructor
-from etools_datamart.api.filtering import SchemaFilterBackend, TenantQueryStringFilterBackend
+from etools_datamart.api.filtering import DatamartQueryStringFilterBackend, TenantQueryStringFilterBackend
 from etools_datamart.api.renderers import CSVRenderer
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
 
@@ -61,7 +61,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
                         CSVRenderer,
                         ]
     filter_backends = [SystemFilterBackend,
-                       TenantQueryStringFilterBackend,
+                       DatamartQueryStringFilterBackend,
                        OrderingFilter]
     ordering_fields = ('id',)
     ordering = 'id'
@@ -78,8 +78,8 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
         return ret
 
     def drf_ignore_filter(self, request, field):
-        return field in ['+serializer', 'cursor', '+fields', 'country_name',
-                         'ordering', 'page_size', 'format', 'month']
+        return field in ['+serializer', 'cursor', '+fields',
+                         'ordering', 'page_size', 'format', ]
 
     def handle_exception(self, exc):
         conn = connections['etools']
@@ -152,7 +152,6 @@ def schema_header(func):
 
 class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
     filter_backends = [SystemFilterBackend,
-                       SchemaFilterBackend,
                        TenantQueryStringFilterBackend,
                        OrderingFilter]
     ordering_fields = ('id',)

@@ -14,7 +14,7 @@ class Intervention(DataMartModel):
     updated = models.DateTimeField(null=True)
     document_type = models.CharField(max_length=255, null=True)
     number = models.CharField(max_length=64, null=True)
-    title = models.CharField(max_length=256, null=True)
+    title = models.CharField(max_length=256, null=True, db_index=True)
     status = models.CharField(max_length=32, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -54,3 +54,6 @@ class Intervention(DataMartModel):
     agreement_id = models.IntegerField(null=True)
     country_programme_id = models.IntegerField(null=True)
     unicef_signatory_id = models.IntegerField(null=True)
+
+    class Meta:
+        ordering = ('country_name', 'title')

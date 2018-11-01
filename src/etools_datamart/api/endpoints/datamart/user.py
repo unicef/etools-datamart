@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from rest_framework.filters import OrderingFilter
-
-from etools_datamart.api.filtering import CountryFilterBackend, MonthFilterBackend
 from etools_datamart.apps.data import models
 
 from . import serializers
@@ -11,8 +8,7 @@ from .. import common
 class UserStatsViewSet(common.APIReadOnlyModelViewSet):
     serializer_class = serializers.UserStatsSerializer
     queryset = models.UserStats.objects.all()
-    filter_backends = [MonthFilterBackend, CountryFilterBackend, OrderingFilter]
-    # filter_fields = ('country_name', )
+    filter_fields = ('country_name', 'month')
 
     def drf_ignore_filter(self, request, field):
         return super().drf_ignore_filter(request, field)

@@ -1,5 +1,5 @@
 from django.db import models
-from month.models import MonthField
+from month_field.models import MonthField
 
 from etools_datamart.apps.data.models.base import DataMartModel
 
