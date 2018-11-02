@@ -7,9 +7,9 @@ from coreapi.compat import force_text
 from django.forms import forms
 from django.template import loader
 from django.utils.dates import MONTHS_3
+from drf_querystringfilter.exceptions import InvalidQueryValueError
 from month_field.forms import MonthField
 from rest_framework.filters import BaseFilterBackend
-from unicef_rest_framework.exceptions import InvalidQueryValueError
 
 
 class MonthForm(forms.Form):

@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.db import connections
+from drf_querystringfilter.exceptions import InvalidQueryValueError
 from rest_framework.exceptions import PermissionDenied
-from unicef_rest_framework.exceptions import InvalidQueryValueError
 from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
 from etools_datamart.apps.etools.utils import get_etools_allowed_schemas, validate_schemas
@@ -80,7 +80,7 @@ class CountryNameProcessor:
                     raise PermissionDenied("You don't have enabled schemas")
                 filters['country_name__iregex'] = r'(' + '|'.join(allowed) + ')'
         else:
-            value = set(value.split(","))
+            value = set(value.lower().split(","))
             validate_schemas(*value)
             if not request.user.is_superuser:
                 user_schemas = get_etools_allowed_schemas(request.user)

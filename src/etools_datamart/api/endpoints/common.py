@@ -6,12 +6,12 @@ import rest_framework_extensions.utils
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
 from django.http import Http404
+from drf_querystringfilter.exceptions import QueryFilterException
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
-from unicef_rest_framework.exceptions import InvalidQueryValueError
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 
@@ -83,7 +83,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
 
     def handle_exception(self, exc):
         conn = connections['etools']
-        if isinstance(exc, InvalidQueryValueError):
+        if isinstance(exc, QueryFilterException):
             return Response({"error": str(exc)}, status=400)
         elif isinstance(exc, NotAuthenticated):
             return Response({"error": "Authentication credentials were not provided."}, status=401)

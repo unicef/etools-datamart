@@ -60,9 +60,9 @@ Any field where query functions are enabled allow to....
 
 ## Query Examples
 
-- {HOST}datamart/interventions/?country_name__inlist=Bolivia,Chad
+- {HOST}datamart/interventions/?country_name__in=Bolivia,Chad
 
-- {HOST}datamart/interventions/?country_name__not_inlist=Bolivia,Zimbabwe
+- {HOST}datamart/interventions/?country_name__in!=Bolivia,Zimbabwe
 
 - {HOST}datamart/interventions/?submission_date__year=2017
 

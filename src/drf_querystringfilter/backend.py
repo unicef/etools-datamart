@@ -164,14 +164,13 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         else:
                             value = raw_value
                         TARGET[f] = value
-
-                except ValueError as e:
-                    raise InvalidQueryValueError(e)
+                except ValueError:
+                    raise InvalidQueryValueError(fieldname_arg, raw_value)
                 except QueryFilterException:
                     raise
                 except Exception as e:
                     logger.exception(e)
-                    raise InvalidFilterError(fieldname_arg)
+                    raise
         return filters, exclude
 
     def filter_queryset(self, request, queryset, view):

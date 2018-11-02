@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import re
 
-from .exceptions import InvalidPattern
+from .exceptions import InvalidPattern, InvalidQueryValueError
 
 
 def parse_bool(value):
@@ -12,7 +12,7 @@ def parse_bool(value):
     elif str(value).lower() in ['false', '0', 'no', 'f', 'n']:
         return False
     else:
-        raise ValueError(value)
+        raise InvalidQueryValueError(value)
 
 
 class RexList(list):
