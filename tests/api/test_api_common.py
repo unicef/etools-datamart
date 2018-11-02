@@ -9,7 +9,8 @@ from etools_datamart.api.urls import router
 
 def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:
-        urls = [reverse("api:%s" % url.name) for url in router.urls if url.name.endswith('-list')]
+        urls = [reverse("api:%s" % url.name) for url in router.urls
+                if url.name.endswith('-list')]
         metafunc.parametrize("url", urls)
 
 

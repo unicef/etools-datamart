@@ -56,8 +56,8 @@ class APIRequestLog(models.Model):
     viewset = StrategyClassField(blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Log'
-        verbose_name_plural = 'Logs'
+        verbose_name = 'Access Log'
+        verbose_name_plural = 'Access Log'
         ordering = ('-id', )
         get_latest_by = 'requested_at'
 

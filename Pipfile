@@ -26,7 +26,6 @@ djangorestframework-csv = "*"
 djangorestframework-jwt = "*"
 drf-dynamic-serializer = ">=1.2.0"
 drf-extensions = "*"
-drf-querystringfilter = ">=1.0.0"
 drf-yasg = {version = "*", extras = ["validation"]}
 flower = "*"
 gunicorn = "*"
@@ -44,6 +43,7 @@ cryptography = "*"
 #rest-social-auth = "*"
 "django-rest-framework-social-oauth2" = "*"
 django-countries = "*"
+django-filter = "*"
 
 [dev-packages]
 "flake8" = ">=3.6.0"

@@ -27,7 +27,7 @@ class DatamartChangeList(ChangeList):
     pass
 
 
-class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
+class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
     load_handler = None
     list_filter = (SchemaFilter,)
@@ -89,7 +89,7 @@ class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
 
 
 @register(models.PMPIndicators)
-class PMPIndicatorsAdmin(DataModelAdmin):
+class PMPIndicatorsAdmin(DataModelAdmin, TruncateTableMixin):
     list_display = ('country_name', 'partner_name', 'partner_type', 'business_area_code')
     list_filter = (SchemaFilter,
                    ('partner_type', AllValuesComboFilter),
@@ -100,8 +100,8 @@ class PMPIndicatorsAdmin(DataModelAdmin):
 
 
 @register(models.Intervention)
-class InterventionAdmin(DataModelAdmin):
-    list_display = ('country_name', 'schema_name', 'title', 'document_type', 'number', 'status')
+class InterventionAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'title', 'document_type', 'number', 'status')
     list_filter = (SchemaFilter,
                    ('document_type', AllValuesComboFilter),
                    ('status', AllValuesComboFilter),
@@ -117,6 +117,7 @@ class FAMIndicatorAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month',)
     list_filter = (SchemaFilter, 'month',)
     load_handler = load_fam_indicator
+    date_hierarchy = 'month'
 
 
 @register(models.UserStats)

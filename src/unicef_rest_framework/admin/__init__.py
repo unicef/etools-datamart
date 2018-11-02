@@ -9,7 +9,7 @@ from ..models import (Application,
                       CacheVersion,
                       UserAccessControl,
                       SystemFilter)
-from .base import ListDisplayAllMixin, ReadOnlyModelAdmin, TruncateTableMixin  # noqa
+from .base import ListDisplayAllMixin, ReadOnlyAdminMixin, TruncateTableMixin  # noqa
 from .application import ApplicationAdmin
 from .service import ServiceAdmin
 from .cache import CacheVersionAdmin
@@ -20,7 +20,7 @@ __all__ = ['ApplicationAdmin',
            'ServiceAdmin',
            'UserAccessControlAdmin',
            'ListDisplayAllMixin',
-           'ReadOnlyModelAdmin']
+           'ReadOnlyAdminMixin']
 
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(CacheVersion, CacheVersionAdmin)

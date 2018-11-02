@@ -36,7 +36,6 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     # pagination_class = paginator()
     permission_classes = [ServicePermission, ]
     serializers_fieldsets = {}
-    # paginate_by = 100
 
     @classproperty
     def label(cls):

@@ -45,3 +45,6 @@ class PMPIndicators(DataMartModel):
     intervention_id = models.IntegerField(null=True)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
+
+    class Meta:
+        ordering = ('country_name', 'partner_name')

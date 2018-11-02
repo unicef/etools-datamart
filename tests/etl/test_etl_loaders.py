@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from etools_datamart.apps.etl.tasks import (FAMIndicator, Intervention, load_fam_indicator,
-                                            load_intervention, load_pmp_indicator, PMPIndicators,)
+from etools_datamart.apps.etl.tasks import (FAMIndicator, Intervention, load_fam_indicator, load_intervention,
+                                            load_pmp_indicator, load_user_report, PMPIndicators, UserStats,)
 
 
 def test_load_pmp_indicator(number_of_intervention):
@@ -18,3 +18,8 @@ def test_load_intervention(number_of_intervention, settings, monkeypatch):
 def test_load_fam_indicator(db, settings, monkeypatch):
     load_fam_indicator()
     assert FAMIndicator.objects.count() == 3
+
+
+def test_load_user_stats(db, settings, monkeypatch):
+    load_user_report()
+    assert UserStats.objects.count() == 3

@@ -26,11 +26,11 @@ class AgreementSerializer(serializers.ModelSerializer):
         model = models.PartnersAgreement
         exclude = ()
 
-
-class InterventionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.PartnersIntervention
-        exclude = ()
+#
+# class PartnersInterventionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = models.PartnersIntervention
+#         exclude = ()
 
 
 class PlannedengagementSerializer(serializers.ModelSerializer):

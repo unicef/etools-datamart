@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework.filters import BaseFilterBackend
 from unicef_rest_framework.models import SystemFilter
 
@@ -23,3 +24,7 @@ class SystemFilterBackend(BaseFilterBackend):
             queryset = filter.filter_queryset(queryset)
             request._request._system_filter = filter.get_querystring()
         return queryset
+
+
+class CoreAPIQueryStringFilterBackend(QueryStringFilterBackend):
+    pass

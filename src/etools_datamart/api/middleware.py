@@ -21,7 +21,9 @@ class ApiMiddleware(object):
 
         # Code to be executed for each request/response after
         # the view is called.
-        response['system-filter'] = getattr(state.request, '_system_filter', '')
+        response['filters'] = state.get('filters')
+        response['excludes'] = state.get('excludes')
+        response['system-filters'] = getattr(state.request, '_system_filter', '')
         response['cache-key'] = state.get('cache-key')
         response['cache-hit'] = state.get('cache-hit')
         response['cache-ttl'] = state.get('cache-ttl')

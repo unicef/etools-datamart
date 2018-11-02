@@ -145,6 +145,7 @@ jobs:
       - deploy:
           name: dockerize
           command: |
+              export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
               curl --user ${CIRCLE_TOKEN}: \
                 --data build_parameters[TAG]=$TAG \
                 --data build_parameters[JOB]=dockerize \

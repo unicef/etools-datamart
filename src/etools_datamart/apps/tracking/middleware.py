@@ -23,16 +23,21 @@ def log_request(**kwargs):
     if settings.ENABLE_LIVE_STATS:  # pragma: no cover
         lastMonth = (log.requested_at.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
 
-        def _update_stats(target, **overrides):
-            target.total = F('total') + target.total
-            target.response_max = max(target.response_max, log.response_ms)
-            target.response_min = min(target.response_min, log.response_ms)
-            target.response_avg = target.response_max / target.total
-            target.cached = F('cached') + int(log.cached)
-            for k, v in overrides.items():
-                setattr(target, k, v)
+        def _update_stats(target, **extra):
 
-            target.save()
+            extra['total'] = F('total') + target.total
+            extra['response_max'] = max(target.response_max, log.response_ms)
+            extra['response_min'] = min(target.response_min, log.response_ms)
+            extra['response_avg'] = target.response_max / target.total
+            extra['cached'] = F('cached') + int(log.cached)
+            for k, v in extra.items():
+                setattr(target, k, v)
+            try:
+                target.save()
+            except Exception as e:
+                logger.error(f"""Error updating {target.__class__.__name__}: {e}
+{extra}
+""")
 
         defaults = {"total": 1,
                     "cached": int(log.cached),

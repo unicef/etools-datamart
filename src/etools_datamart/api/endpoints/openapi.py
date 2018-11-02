@@ -22,13 +22,13 @@ Any field where query functions are enabled allow to....
 - iexact: Case-insensitive exact match.
 - contains: Case-sensitive containment test.
 - icontains: Case-insensitive containment test.
-- inlist: In a given list.
+- in: In a given list.
 - gt: Greater than.
 - gte: Greater than or equal to.
 - lt: Less than.
 - lte: Less than or equal to.
 
-### String lookups
+### Strings lookups
 
 - startswith: Case-sensitive starts-with.
 - istartswith: Case-insensitive starts-with.
@@ -45,36 +45,33 @@ Any field where query functions are enabled allow to....
 - week_day: ‘day of the week’ match. Allows chaining additional field lookups. Takes an integer value representing the day of week from 1 (Sunday) to 7 (Saturday).
 - quarter: ‘quarter of the year’ match. Allows chaining additional field lookups. Takes an integer value between 1 and 4 representing the quarter of the year.
 
-- time
-- hour
-- minute
-
-
-- regex
-- iregex
-
 ### Negate
 
-- not
-- not_inlist
+- use `!=` operator to negate each value
 
 ## Query Examples
 
-- {HOST}datamart/interventions/?country_name__inlist=Bolivia,Chad
+Select all interventions in Bolivia and Chad
 
-- {HOST}datamart/interventions/?country_name__not_inlist=Bolivia,Zimbabwe
+- {HOST}datamart/interventions/?country_name__in=Bolivia,Chad
+
+Select all interventions in all countries except Bolivia and Zimbabwe
+
+- {HOST}datamart/interventions/?country_name__in!=Bolivia,Zimbabwe (note `!=` instead of `=`)
+
+Select all interventions submitted in 2017
 
 - {HOST}datamart/interventions/?submission_date__year=2017
 
-- {HOST}datamart/interventions/?submission_date__year__gt=2017
+Select all interventions submitted after 2017 (ie starting 2018)
 
 - {HOST}datamart/interventions/?submission_date__year__gt=2017
 
-Example to retrieve entries in the second quarter (April 1 to June 30):
+Retrieve entries in the second quarter (April 1 to June 30):
 
 - {HOST}datamart/interventions/?submission_date__quarter=2
 
-Example to retrieve entries in the second/third/fourth quarter (April 1 to June 30):
+Retrieve entries in the second/third/fourth quarter (April 1 to June 30):
 
 - {HOST}datamart/interventions/?submission_date__quarter__gte=2
 

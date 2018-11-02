@@ -11,7 +11,8 @@ from etools_datamart.api.urls import router
 def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:
         urls = filter(lambda url: 'datamart' in url,
-                      [reverse("api:%s" % url.name) for url in router.urls if url.name.endswith('-list')])
+                      [reverse("api:%s" % url.name) for url in router.urls
+                       if url.name.endswith('-list')])
         metafunc.parametrize("url", urls)
 
 

@@ -2,14 +2,14 @@
 
 import logging
 
-from admin_extra_urls.extras import link
+from admin_extra_urls.extras import ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
 from django.contrib import admin
 
 logger = logging.getLogger(__name__)
 
 
-class ReadOnlyModelAdmin(object):
+class ReadOnlyAdminMixin:
     editing = False
 
     def get_readonly_fields(self, request, obj=None):
@@ -18,7 +18,7 @@ class ReadOnlyModelAdmin(object):
         return [f.name for f in self.model._meta.fields]
 
 
-class TruncateTableMixin:
+class TruncateTableMixin(ExtraUrlMixin):
 
     def _truncate(self, request):
         from django.db import connection
@@ -31,7 +31,7 @@ class TruncateTableMixin:
                                "Successfully executed", )
 
 
-class ListDisplayAllMixin(object):
+class ListDisplayAllMixin:
     list_display = ()
     list_display_exclude = ('id', 'uuid', 'version',
                             'last_modified_user', 'last_modified_date')
@@ -43,13 +43,12 @@ class ListDisplayAllMixin(object):
         return self.list_display
 
 
-class APIModelAdmin(ListDisplayAllMixin, ReadOnlyModelAdmin,
-                    admin.ModelAdmin):
+class APIModelAdmin(ListDisplayAllMixin, ReadOnlyAdminMixin, admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
         # def has_change_permission(self, request, obj=None):
         # return obj is None

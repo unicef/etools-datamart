@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from admin_extra_urls.extras import action, link
 from admin_extra_urls.mixins import _confirm_action
 from django.contrib import admin, messages
 from django.contrib.admin import register
@@ -14,7 +14,7 @@ from . import models
 
 
 @register(models.TaskLog)
-class ExecutionAdmin(ExtraUrlMixin, TruncateTableMixin, admin.ModelAdmin):
+class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
                     'last_success', 'last_failure', 'running')
     readonly_fields = ('task', 'timestamp', 'result', 'elapsed', 'time',

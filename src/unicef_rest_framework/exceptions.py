@@ -36,22 +36,6 @@ class InvalidQueryArgumentError(ApiException):
         return "Invalid parameter '{}'".format(self.field)
 
 
-class InvalidQueryValueError(ApiException):
-
-    def __init__(self, field, value, hint=None, *args, **kwargs):
-        self.field = field
-        self.value = value
-        self.hint = hint
-        super(InvalidQueryValueError, self).__init__(*args, **kwargs)
-
-    def __str__(self):
-        return "Invalid value '{}' for parameter {}".format(self.value, self.field)
-
-
-class InvalidSerializerError(InvalidQueryValueError):
-    argument = 'serializer'
-
-
 class InvalidFilterError(ApiException):
     def __init__(self, field, *args, **kwargs):
         self.field = field

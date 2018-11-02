@@ -238,7 +238,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
+    # 'django.contrib.admin',
+    'etools_datamart.config.admin.AdminConfig',
 
     'admin_extra_urls',
     'unicef_rest_framework',
@@ -247,6 +248,9 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'unicef_security',
+    'django_filters',
+    'month_field',
+    'drf_querystringfilter',
 
     'drf_yasg',
     'adminfilters',
@@ -465,8 +469,7 @@ LOGGING = {
         },
 
         'db': {
-            'level': 'DEBUG',
-            # 'class': 'django_db_logging.handlers.AsyncDBHandler',
+            'level': 'ERROR',
             'class': 'django_db_logging.handlers.DBHandler',
             'formatter': 'simple'
         },
@@ -480,22 +483,27 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['console'],
-            'propagate': True,
+            'propagate': False,
             'level': 'ERROR'
         },
         'django.request': {
             'handlers': ['console'],
             'level': 'ERROR',
-            'propagate': True
+            'propagate': False
         },
         'django.db.backends': {
             'handlers': ['console'],
             'level': 'ERROR',
-            'propagate': True
+            'propagate': False
         },
         'django_db_logging': {
             'handlers': ['console'],
             'level': {True: 'DEBUG', False: 'ERROR'}[DEBUG],
+            'propagate': False
+        },
+        'drf_querystringfilter': {
+            'handlers': ['console', 'db'],
+            'level': 'DEBUG',
             'propagate': False
         },
         'unicef_rest_framework': {
