@@ -24,9 +24,8 @@ def local_user(db):
     return UserFactory()
 
 
-def test_etools_user_access_allowed_countries(user):
+def test_datamart_user_access_allowed_countries(user):
     load_user_report()
-    # etools user has access same countries as in eTools app
     client = APIClient()
     client.force_authenticate(user)
     url = UserStatsViewSet.get_service().endpoint
@@ -36,9 +35,17 @@ def test_etools_user_access_allowed_countries(user):
         assert res.status_code == 200, res
         assert len(res.json()['results']) == 3
 
+        res = client.get(f"{url}?country_name=")
+        assert res.status_code == 200, res
+        assert len(res.json()['results']) == 1
+
         res = client.get(f"{url}?country_name=lebanon")
         assert res.status_code == 200, res
         assert len(res.json()['results']) == 1
+
+        res = client.get(f"{url}?country_name!=lebanon")
+        assert res.status_code == 200, res
+        assert len(res.json()['results']) == 2
 
         res = client.get(f"{url}?country_name=lebanon,chad")
         assert res.status_code == 403, res
