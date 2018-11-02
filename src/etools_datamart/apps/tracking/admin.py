@@ -2,7 +2,7 @@
 import json
 import logging
 
-from admin_extra_urls.extras import ExtraUrlMixin, link
+from admin_extra_urls.extras import link
 from django.contrib import admin
 from django.template.defaultfilters import pluralize, urlencode
 from django.utils.safestring import mark_safe
@@ -14,7 +14,7 @@ from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, Us
 logger = logging.getLogger(__name__)
 
 
-class APIRequestLogAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class APIRequestLogAdmin(TruncateTableMixin, admin.ModelAdmin):
     date_hierarchy = 'requested_at'
     search_fields = ('path',)
     list_display = ('requested_at', 'response_ms', 'size',

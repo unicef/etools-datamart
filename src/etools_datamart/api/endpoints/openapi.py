@@ -22,13 +22,13 @@ Any field where query functions are enabled allow to....
 - iexact: Case-insensitive exact match.
 - contains: Case-sensitive containment test.
 - icontains: Case-insensitive containment test.
-- inlist: In a given list.
+- in: In a given list.
 - gt: Greater than.
 - gte: Greater than or equal to.
 - lt: Less than.
 - lte: Less than or equal to.
 
-### String lookups
+### Strings lookups
 
 - startswith: Case-sensitive starts-with.
 - istartswith: Case-insensitive starts-with.
@@ -45,18 +45,9 @@ Any field where query functions are enabled allow to....
 - week_day: ‘day of the week’ match. Allows chaining additional field lookups. Takes an integer value representing the day of week from 1 (Sunday) to 7 (Saturday).
 - quarter: ‘quarter of the year’ match. Allows chaining additional field lookups. Takes an integer value between 1 and 4 representing the quarter of the year.
 
-- time
-- hour
-- minute
-
-
-- regex
-- iregex
-
 ### Negate
 
-- not
-- not_inlist
+- use `!=` operator to negate each value
 
 ## Query Examples
 

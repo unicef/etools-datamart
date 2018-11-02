@@ -29,7 +29,7 @@ def test_user_system_filter(client: APIClient, data_service: Service, user1: Use
         res = client.get(data_service.endpoint, HTTP_X_SCHEMA="public")
     assert res.status_code == 200
     results = res.json()['results']
-    assert res['system-filter'] == "country_name=a"
+    assert res['system-filters'] == "country_name=a"
     assert res['cache-hit'] == "False"
     assert len(results) == 1
     assert [r['country_name'] for r in results] == ['a']

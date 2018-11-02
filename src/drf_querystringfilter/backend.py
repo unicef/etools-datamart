@@ -56,21 +56,38 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
     @lru_cache(100)
     def get_schema_fields(self, view):
+        model = view.serializer_class.Meta.model
+        self.opts = model._meta
+
         ret = []
         for field in view.filter_fields:
-            model = view.serializer_class.Meta.model
-            model_field = model._meta.get_field(field)
-            coreapi_type = SCHEMAMAP.get(type(model_field), coreschema.String)
+            try:
+                model_field = model._meta.get_field(field)
+                description = model_field.help_text
+                coreapi_type = SCHEMAMAP.get(type(model_field), coreschema.String)
+            except FieldDoesNotExist:
+                description = ""
+                coreapi_type = coreschema.String
             ret.append(coreapi.Field(
                 name=field,
                 required=False,
                 location='query',
                 schema=coreapi_type(
                     title=force_text(field),
-                    description=f'{model_field.help_text} - django queryset syntax allowed'
-                )
-            ))
+                    description=description
+
+                ),
+                description='--',
+                example='example'))
         return ret
+
+    def field_type(self, field_name):
+        try:
+            field_object = self.opts.get_field(field_name)
+            if isinstance(field_object, BooleanField):
+                return bool
+        except FieldDoesNotExist:
+            return self.field_casting.get(field_name, str)
 
     @property
     def query_params(self):
@@ -108,15 +125,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
         - exclude values in list: &country__id__not_in=176,20
 
         """
-
-        def field_type(field_name):
-            try:
-                field_object = opts.get_field(field_name)
-                if isinstance(field_object, BooleanField):
-                    return bool
-            except FieldDoesNotExist:
-                return self.field_casting.get(field_name, str)
-
+        self.opts = queryset.model._meta
         filter_fields = getattr(view, 'filter_fields', None)
         exclude = {}
         filters = {}
@@ -125,7 +134,6 @@ class QueryStringFilterBackend(BaseFilterBackend):
             blacklist = RexList(getattr(view, 'filter_blacklist', []))
             mapping = self._get_mapping(view)
 
-            opts = queryset.model._meta
             for fieldname_arg in self.query_params:
                 raw_value = self.query_params.get(fieldname_arg)
                 negate = fieldname_arg[-1] == "!"
@@ -182,7 +190,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         exclude.update(**_e)
                     else:
                         # field_object = opts.get_field(real_field_name)
-                        value_type = field_type(real_field_name)
+                        value_type = self.field_type(real_field_name)
                         if parts:
                             f = "{}__{}".format(real_field_name, "__".join(parts[1:]))
                         else:

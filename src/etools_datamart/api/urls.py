@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from unicef_rest_framework.routers import APIReadOnlyRouter
 
 from . import endpoints
@@ -36,7 +36,7 @@ router.register(r'system/tasks-log', endpoints.TaskLogViewSet)
 urlpatterns = router.urls
 
 urlpatterns += [
-    url(r'^swagger(?P<format>\.json|\.yaml)$', endpoints.schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', endpoints.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^redoc/$', endpoints.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    # url(r'^+swagger(?P<format>\.json|\.yaml)$', endpoints.schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path(r'+swagger/', endpoints.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path(r'+redoc/', endpoints.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
