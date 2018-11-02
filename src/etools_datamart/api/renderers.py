@@ -16,9 +16,11 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
         # but this function is called before the middleware system is involved
 
         # ctx['response_headers']['X-Schema'] = ",".join(state.schemas)
-        # ctx['response_headers']['cache-version'] = str(state.get('cache-version'))
-        # ctx['response_headers']['cache-key'] = str(state.get('cache-key'))
+        ctx['response_headers']['cache-version'] = str(state.get('cache-version'))
+        ctx['response_headers']['cache-key'] = str(state.get('cache-key'))
         ctx['response_headers']['system-filters'] = getattr(state.request, '_system_filter', '')
+        ctx['response_headers']['filters'] = state.get('filters')
+        ctx['response_headers']['excludes'] = state.get('excludes')
 
         return ctx
 

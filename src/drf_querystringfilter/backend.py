@@ -98,8 +98,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
             opts = queryset.model._meta
             for fieldname_arg in self.query_params:
                 raw_value = self.query_params.get(fieldname_arg)
+                negate = fieldname_arg[-1] == "!"
 
-                if fieldname_arg[-1] == "!":
+                if negate:
                     filter_field_name = fieldname_arg[:-1]
                     TARGET = exclude
                 else:
@@ -119,7 +120,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         filter_field_name = parts[0]
                         op = parts[-1]
                     else:
-                        op = 'exact'
+                        op = ''
 
                     #     parts = [field_name]
 
@@ -140,6 +141,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         payload = {'field': filter_field_name,
                                    'request': request,
                                    'param': fieldname_arg,
+                                   'negate': negate,
                                    'op': op,
                                    'field_name': real_field_name,
                                    'parts': parts,

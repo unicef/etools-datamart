@@ -1,12 +1,13 @@
 from datetime import datetime
 
 from django.db import connections
-from drf_querystringfilter.exceptions import InvalidQueryValueError
+from drf_querystringfilter.exceptions import InvalidQueryArgumentError, InvalidQueryValueError
 from rest_framework.exceptions import PermissionDenied
 from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
 from etools_datamart.apps.etools.utils import get_etools_allowed_schemas, validate_schemas
 from etools_datamart.apps.multitenant.exceptions import NotAuthorizedSchema
+from etools_datamart.state import state
 
 months = ['jan', 'feb', 'mar',
           'apr', 'may', 'jun',
@@ -72,7 +73,11 @@ months = ['jan', 'feb', 'mar',
 
 
 class CountryNameProcessor:
-    def process_country_name(self, filters, exclude, field, value, request, **payload):
+    def process_country_name(self, efilters, eexclude, field, value, request,
+                             op, param, negate, **payload):
+        if op:
+            raise InvalidQueryArgumentError(param)
+        filters = {}
         if not value:
             if not request.user.is_superuser:
                 allowed = get_etools_allowed_schemas(request.user)
@@ -87,7 +92,11 @@ class CountryNameProcessor:
                 if not user_schemas.issuperset(value):
                     raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             filters['country_name__iregex'] = r'(' + '|'.join(value) + ')'
-        return filters, exclude
+
+        if negate:
+            return {}, filters
+        else:
+            return filters, {}
 
 
 class CountryNameProcessorTenantModel(CountryNameProcessor):
@@ -129,15 +138,28 @@ class MonthProcessor:
         return filters, exclude
 
 
-class DatamartQueryStringFilterBackend(CoreAPIQueryStringFilterBackend,
+class SetHeaderMixin:
+    # must be the first one
+    def filter_queryset(self, request, queryset, view):
+        ret = super().filter_queryset(request, queryset, view)
+        state.set('filters', self.filters)
+        state.set('excludes', self.exclude)
+        return ret
+
+
+class DatamartQueryStringFilterBackend(SetHeaderMixin,
+                                       CoreAPIQueryStringFilterBackend,
                                        MonthProcessor,
-                                       CountryNameProcessor):
+                                       CountryNameProcessor,
+                                       ):
     pass
 
 
-class TenantQueryStringFilterBackend(CoreAPIQueryStringFilterBackend,
+class TenantQueryStringFilterBackend(SetHeaderMixin,
+                                     CoreAPIQueryStringFilterBackend,
                                      MonthProcessor,
-                                     CountryNameProcessorTenantModel):
+                                     CountryNameProcessorTenantModel,
+                                     ):
     def filter_queryset(self, request, queryset, view):
         value = request.GET.get('country_name', None)
         assert queryset.model._meta.app_label == 'etools'
