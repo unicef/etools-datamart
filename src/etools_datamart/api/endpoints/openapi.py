@@ -60,21 +60,27 @@ Any field where query functions are enabled allow to....
 
 ## Query Examples
 
+Select all interventions in Bolivia and Chad
+
 - {HOST}datamart/interventions/?country_name__in=Bolivia,Chad
 
-- {HOST}datamart/interventions/?country_name__in!=Bolivia,Zimbabwe
+Select all interventions in all countries except Bolivia and Zimbabwe
+
+- {HOST}datamart/interventions/?country_name__in!=Bolivia,Zimbabwe (note `!=` instead of `=`)
+
+Select all interventions submitted in 2017
 
 - {HOST}datamart/interventions/?submission_date__year=2017
 
-- {HOST}datamart/interventions/?submission_date__year__gt=2017
+Select all interventions submitted after 2017 (ie starting 2018)
 
 - {HOST}datamart/interventions/?submission_date__year__gt=2017
 
-Example to retrieve entries in the second quarter (April 1 to June 30):
+Retrieve entries in the second quarter (April 1 to June 30):
 
 - {HOST}datamart/interventions/?submission_date__quarter=2
 
-Example to retrieve entries in the second/third/fourth quarter (April 1 to June 30):
+Retrieve entries in the second/third/fourth quarter (April 1 to June 30):
 
 - {HOST}datamart/interventions/?submission_date__quarter__gte=2
 

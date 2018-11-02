@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db import connections
-from drf_querystringfilter.exceptions import InvalidQueryArgumentError, InvalidQueryValueError
+from drf_querystringfilter.exceptions import InvalidQueryValueError
 from rest_framework.exceptions import PermissionDenied
 from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
@@ -75,8 +75,6 @@ months = ['jan', 'feb', 'mar',
 class CountryNameProcessor:
     def process_country_name(self, efilters, eexclude, field, value, request,
                              op, param, negate, **payload):
-        if op:
-            raise InvalidQueryArgumentError(param)
         filters = {}
         if not value:
             if not request.user.is_superuser:
