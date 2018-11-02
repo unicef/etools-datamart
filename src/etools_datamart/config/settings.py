@@ -238,7 +238,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
+    # 'django.contrib.admin',
+    'etools_datamart.config.admin.AdminConfig',
 
     'admin_extra_urls',
     'unicef_rest_framework',

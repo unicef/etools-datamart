@@ -1,0 +1,16 @@
+{% extends 'admin/app_index.html' %}
+
+
+
+{% block sidebar %}
+    <div>
+        {% for e, c in numbers.items %}
+            <div>{{ e }}: {{ c }}</div>
+        {% endfor %}
+    </div>
+    <br/>
+    <div>
+        <a href="{% url "admin:tracking-refresh" %}">Refresh counters</a> -
+        <a href="{% url "admin:tracking-reset" %}">Drop all counters</a>
+    </div>
+{% endblock %}
