@@ -98,17 +98,17 @@ class CountryNameProcessor:
 
 
 class CountryNameProcessorTenantModel(CountryNameProcessor):
-
-    def process_country_name(self, filters, exclude, field, value, request, **payload):
-        _f, _e = super().process_country_name({}, {}, field, value, request, **payload)
-        # assert queryset.model._meta.app_label == 'etools'
-        conn = connections['etools']
-        if 'country_name__iregex' in _f:
-            conn.set_schemas(_f['country_name__iregex'])
-        else:
-            conn.set_all_schemas()
-
-        return filters, exclude
+    pass
+    # def process_country_name(self, filters, exclude, field, value, request, **payload):
+    #     _f, _e = super().process_country_name({}, {}, field, value, request, **payload)
+    #     # assert queryset.model._meta.app_label == 'etools'
+    #     conn = connections['etools']
+    #     if 'country_name__iregex' in _f:
+    #         conn.set_schemas(_f['country_name__iregex'])
+    #     else:
+    #         conn.set_all_schemas()
+    #
+    #     return filters, exclude
 
 
 class MonthProcessor:
