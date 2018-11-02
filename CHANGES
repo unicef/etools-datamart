@@ -4,7 +4,9 @@
 * updates corepai documentation
 * refactor api endpoints
 * updates dependencies
-* improved filtering on country (multi-tenant/etools)
+* improved schema/country permission checks (multi-tenant/etools)
+* improved filtering
+* dependencies updates
 
 
 1.3

@@ -36,6 +36,7 @@ recursive-include src/etools_datamart *.*
 recursive-include src/unicef_rest_framework *.*
 recursive-include src/unicef_security *.*
 recursive-include src/month_field *.*
+recursive-include src/drf_querystringfilter *.*
 
 exclude deploy
 exclude docker

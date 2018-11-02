@@ -26,7 +26,6 @@ djangorestframework-csv = "*"
 djangorestframework-jwt = "*"
 drf-dynamic-serializer = ">=1.2.0"
 drf-extensions = "*"
-drf-querystringfilter = ">=1.0.0"
 drf-yasg = {version = "*", extras = ["validation"]}
 flower = "*"
 gunicorn = "*"
