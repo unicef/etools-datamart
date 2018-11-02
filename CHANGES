@@ -1,5 +1,5 @@
-1.4 (dev)
----------
+1.4
+---
 * WARNINGS: migration reset
 * updates corepai documentation
 * refactor api endpoints
