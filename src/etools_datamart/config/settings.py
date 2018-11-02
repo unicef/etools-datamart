@@ -249,6 +249,7 @@ INSTALLED_APPS = [
     'unicef_security',
     'django_filters',
     'month_field',
+    'drf_querystringfilter',
 
     'drf_yasg',
     'adminfilters',

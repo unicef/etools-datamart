@@ -63,6 +63,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
     filter_backends = [SystemFilterBackend,
                        DatamartQueryStringFilterBackend,
                        OrderingFilter]
+    filter_fields = ['country_name']
     ordering_fields = ('id',)
     ordering = 'id'
 

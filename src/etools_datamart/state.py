@@ -14,8 +14,8 @@ class State(local):
     def set(self, key, value):
         self.data[key] = value
 
-    def get(self, key):
-        return self.data.get(key, None)
+    def get(self, key, default=None):
+        return self.data.get(key, default)
 
 
 state: State = State()
