@@ -1,10 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% load i18n %}
+<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<ul>
+    <form method="get" action="" id="a">
+        <input value="{{ choices.0.query_string }}" name="base" type="hidden">
+        <select name="month" onchange="javascript: submitform()">
+            {% for choice in choices %}
+                <option
+                        {% if choice.selected %}selected="selected" {% endif %}
+                        value="{{ choice.value }}">{{ choice.label }}</option>
+            {% endfor %}
+        </select>
 
-</body>
-</html>
+        / <input type="number"
+            onkeyup="javascript: year_change()"
+            onchange="javascript: year_change()"
+                 maxlength="4"
+                 min="1"
+                 max="{{ choices.0.this_year }}"
+            name="year" size="4" value="{{ choices.0.year }}">
+        <a href="javascript: submitform()">Change month</a>
+    </form>
+
+    <script type="text/javascript">
+        var base = document.querySelector('#a input[name=base]').value;
+        var $year = document.querySelector('#a input[name=year]');
+        var $month = document.querySelector('#a select[name=month]');
+        function year_change(e, ) {
+            console.log($year.value.length);
+            if ($year.value.length === 4){
+                submitform()
+            }
+        };
+        function submitform() {
+            var year = $year.value;
+            var month = $month.value;
+            var url = base + "&{{ choices.0.param_year_name }}=" + year + "&{{ choices.0.param_month_name }}=" + month;
+            console.log(url);
+            location.href = url;
+        }
+    </script>
+
+
+</ul>

@@ -123,6 +123,6 @@ class FAMIndicatorAdmin(DataModelAdmin):
 @register(models.UserStats)
 class UserStatsAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month', 'total', 'unicef', 'logins', 'unicef_logins')
-    list_filter = (SchemaFilter, 'month',)
+    list_filter = (SchemaFilter, 'month')
     load_handler = load_user_report
     date_hierarchy = 'month'
