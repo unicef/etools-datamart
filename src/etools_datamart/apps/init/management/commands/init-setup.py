@@ -92,6 +92,8 @@ class Command(BaseCommand):
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
         self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
+        if os.environ.get('INVALIDATE_CACHE'):
+            Service.objects.invalidate_cache()
 
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)

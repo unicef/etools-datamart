@@ -21,6 +21,11 @@ cluster_cache = caches[conf.API_CACHE]
 
 
 class ServiceManager(models.Manager):
+    def invalidate_cache(self, **kwargs):
+        Service.objects.filter(**kwargs).update(cache_version=F("cache_version") + 1)
+        for service in Service.objects.filter(**kwargs):
+            service.viewset.get_service.cache_clear()
+            cluster_cache.set('{}{}'.format(service.pk, service.name), True)
 
     def get_for_viewset(self, viewset):
         name = getattr(viewset, 'label', viewset.__name__)
@@ -111,10 +116,8 @@ class Service(MasterDataModel):
     objects = ServiceManager()
 
     def invalidate_cache(self):
-        Service.objects.filter(id=self.pk).update(cache_version=F("cache_version") + 1)
+        Service.objects.invalidate_cache(id=self.pk)
         self.refresh_from_db()
-        self.viewset.get_service.cache_clear()
-        cluster_cache.set('{}{}'.format(self.pk, self.name), True)
 
     def reset_cache(self, value=0):
         Service.objects.filter(id=self.pk).update(cache_version=value)

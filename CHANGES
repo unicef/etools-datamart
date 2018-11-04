@@ -1,3 +1,9 @@
+1.5 (dev)
+---------
+* add .xlsx format support
+* add ability to invalide all cache at startup (set `INVALIDATE_CACHE` env variable)
+*
+
 1.4.1
 -----
 * fixes dependencies

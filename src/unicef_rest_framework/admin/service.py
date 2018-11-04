@@ -115,6 +115,10 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
         return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % info))
 
+    @link(label='Invalidate Cache')
+    def invalidate_all_cache(self, request):
+        Service.objects.invalidate_cache()
+
     @action()
     def invalidate_cache(self, request, pk):
         service = Service.objects.get(pk=pk)
