@@ -79,7 +79,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     def json(self, obj):
         if obj.endpoint:
-            return mark_safe("<a href='{}' target='a'>call</a>".format(obj.endpoint))
+            return mark_safe("<a href='{}' target='a'>api</a>".format(obj.endpoint))
         else:
             return ''
 
@@ -114,6 +114,10 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         self.message_user(request, msgs[bool(created | deleted)].format(created, deleted))
         info = self.model._meta.app_label, self.model._meta.model_name
         return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % info))
+
+    @link(label='Invalidate Cache')
+    def invalidate_all_cache(self, request):
+        Service.objects.invalidate_cache()
 
     @action()
     def invalidate_cache(self, request, pk):

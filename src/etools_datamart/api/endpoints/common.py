@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
 from django.http import Http404
 from drf_querystringfilter.exceptions import QueryFilterException
+from drf_renderer_xlsx.renderers import XLSXRenderer
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.filters import OrderingFilter
@@ -59,6 +60,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
     renderer_classes = [JSONRenderer,
                         APIBrowsableAPIRenderer,
                         CSVRenderer,
+                        XLSXRenderer,
                         ]
     filter_backends = [SystemFilterBackend,
                        DatamartQueryStringFilterBackend,

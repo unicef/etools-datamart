@@ -1,3 +1,11 @@
+1.5
+---
+* add .xlsx format support
+* add ability to invalide all cache at startup (set `INVALIDATE_CACHE` env variable)
+* add ability to create default users at startup (set `AUTOCREATE_USERS` env variable)
+* enable Azure login without email
+* add partner.name to Intervention endpoint
+
 1.4.1
 -----
 * fixes dependencies

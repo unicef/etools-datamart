@@ -1,11 +1,13 @@
 import logging
 
 import requests
+from constance import config as constance
 from crashlog.middleware import process_exception
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.cache import cache
+from social_django.models import UserSocialAuth
 
 from . import config
 
@@ -35,9 +37,31 @@ def default_group(**kwargs):
             user.is_superuser = True
             user.save()
         else:
-            g = Group.objects.filter(name=config.DEFAULT_GROUP).first()
+            g = Group.objects.filter(name=constance.DEFAULT_GROUP).first()
             if g:
-                g.add(user)
+                user.groups.add(g)
+
+
+def get_unicef_user(backend, details, response, *args, **kwargs):
+    from .models import User
+    user, created = User.objects.get_or_create(
+        username=details['username'],
+        defaults={'first_name': details['first_name'],
+                  'last_name': details['last_name'],
+                  }
+    )
+    # FIXME: use MSGRAPH to get user email
+    # if created:
+    #     sync = Synchronizer()
+    #     data = sync.get_user(user.username)
+
+    social, __ = UserSocialAuth.objects.get_or_create(user=user,
+                                                      provider=backend.name,
+                                                      uid=user.username
+                                                      )
+    return {'user': user,
+            'social': social,
+            'is_new': created}
 
 
 class SyncResult:

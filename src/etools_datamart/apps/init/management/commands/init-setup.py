@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -11,6 +12,7 @@ from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from humanize import naturaldelta
 from strategy_field.utils import fqn
+from unicef_rest_framework.models.acl import GroupAccessControl
 
 from etools_datamart.apps.etl.models import TaskLog
 from etools_datamart.celery import app
@@ -83,6 +85,7 @@ class Command(BaseCommand):
                                                                               "is_staff": True,
                                                                               "password": make_password(pwd)})
         Group.objects.get_or_create(name='Guests')
+        all_access, __ = Group.objects.get_or_create(name='Endpoints all access')
 
         if created:  # pragma: no cover
             self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
@@ -92,6 +95,35 @@ class Command(BaseCommand):
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
         self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
+        if os.environ.get('INVALIDATE_CACHE'):
+            Service.objects.invalidate_cache()
+
+        for service in Service.objects.all():
+            GroupAccessControl.objects.get_or_create(
+                group=all_access,
+                service=service,
+                serializers=['*'],
+                policy=GroupAccessControl.POLICY_ALLOW
+            )
+
+        if os.environ.get('AUTOCREATE_USERS'):
+            self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
+            self.stdout.write("Going to create new users")
+            try:
+                for entry in os.environ.get('AUTOCREATE_USERS').split(','):
+                    user, pwd = entry.split('|')
+                    User = get_user_model()
+                    u, created = User.objects.get_or_create(username=user)
+                    if created:
+                        self.stdout.write(f"Created user {u}")
+                        u.set_password(pwd)
+                        u.save()
+                        u.groups.add(all_access)
+                    else:
+                        self.stdout.write(f"User {u} already exists.")
+
+            except Exception as e:
+                warnings.warn(f"Unable to create default users. {e}")
 
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)

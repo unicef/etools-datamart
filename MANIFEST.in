@@ -22,6 +22,7 @@ exclude Makefile
 exclude manage.py
 exclude manage.py
 exclude tests
+exclude ROADMAP
 
 prune .circleci
 prune db
