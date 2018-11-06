@@ -34,6 +34,7 @@ class Intervention(DataMartModel):
     unicef_signatory_last_name = models.CharField(max_length=30, null=True)
     unicef_signatory_email = models.CharField(max_length=254, null=True)
 
+    partner_name = models.CharField(max_length=200, null=True)
     partner_signatory_title = models.CharField(max_length=64, null=True)
     partner_signatory_first_name = models.CharField(max_length=64, null=True)
     partner_signatory_last_name = models.CharField(max_length=64, null=True)

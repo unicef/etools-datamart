@@ -104,7 +104,7 @@ def load_intervention():
                                         end_date=record.end,
                                         review_date_prc=record.review_date_prc,
                                         prc_review_document=record.prc_review_document,
-
+                                        partner_name=record.agreement.partner.name,
                                         agreement_id=record.agreement.pk,
                                         partner_authorized_officer_signatory_id=get_attr(record,
                                                                                          'partner_authorized_officer_signatory.pk'),
