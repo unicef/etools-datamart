@@ -23,8 +23,8 @@ class GroupACLAdminForm(forms.ModelForm):
 
 
 class UserAccessControlAdmin(admin.ModelAdmin):
-    list_display = ('user', 'service', 'rate', 'serializers')
-    list_filter = ('user', 'service',)
+    list_display = ('user', 'service', 'rate', 'serializers', 'policy')
+    list_filter = ('user', 'policy', 'service')
     search_fields = ('user', 'service',)
     form = UserACLAdminForm
 
@@ -33,8 +33,8 @@ class UserAccessControlAdmin(admin.ModelAdmin):
 
 
 class GroupAccessControlAdmin(admin.ModelAdmin):
-    list_display = ('group', 'service', 'rate', 'serializers')
-    list_filter = ('group', 'service',)
+    list_display = ('group', 'service', 'rate', 'serializers', 'policy')
+    list_filter = ('group', 'policy', 'service')
     search_fields = ('group', 'service',)
     form = GroupACLAdminForm
 

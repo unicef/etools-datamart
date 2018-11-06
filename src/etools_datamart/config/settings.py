@@ -362,7 +362,7 @@ AZURE_SSL = True
 AZURE_URL_EXPIRATION_SECS = 10800
 AZURE_ACCESS_POLICY_EXPIRY = 10800  # length of time before signature expires in seconds
 AZURE_ACCESS_POLICY_PERMISSION = 'r'
-AZURE_TOKEN_URL = 'https://login.microsoftonline.com/unicef.org/oauth2/token'
+AZURE_TOKEN_URL = 'https://login.microsoftonline.com/saxix.onmicrosoft.com/oauth2/token'
 AZURE_GRAPH_API_BASE_URL = 'https://graph.microsoft.com'
 AZURE_GRAPH_API_VERSION = 'v1.0'
 AZURE_GRAPH_API_PAGE_SIZE = 300
@@ -389,22 +389,29 @@ JWT_AUTH = {
 }
 
 # social auth
+# WARNINGS: UNICEF pipeline does not work if other provider
+# are added to UNICEF AD. Dio not change below settings
+#
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
-SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
-SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = False
+SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['username']
 SOCIAL_AUTH_SANITIZE_REDIRECTS = False
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
+SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', ]
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
-    'social_core.pipeline.social_auth.social_uid',
-    'social_core.pipeline.social_auth.social_user',
-    'social_core.pipeline.user.get_username',
-    'social_core.pipeline.user.create_user',
-    'social_core.pipeline.social_auth.associate_user',
-    'social_core.pipeline.social_auth.load_extra_data',
-    'social_core.pipeline.user.user_details',
-    'social_core.pipeline.social_auth.associate_by_email',
+    'unicef_security.azure.get_unicef_user',
+    # 'unicef_security.azure.social_uid',
+    # 'social_core.pipeline.social_auth.social_uid',
+    # 'social_core.pipeline.social_auth.social_user',
+    # 'social_core.pipeline.user.get_username',
+    # 'social_core.pipeline.user.create_user',
+    # 'unicef_security.azure.get_username',
+    # 'unicef_security.azure.create_user',
+    # 'social_core.pipeline.social_auth.associate_user',
+    # 'social_core.pipeline.social_auth.load_extra_data',
+    # 'social_core.pipeline.user.user_details',
+    # 'social_core.pipeline.social_auth.associate_by_email',
     'unicef_security.azure.default_group',
 )
 

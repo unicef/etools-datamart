@@ -79,7 +79,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     def json(self, obj):
         if obj.endpoint:
-            return mark_safe("<a href='{}' target='a'>call</a>".format(obj.endpoint))
+            return mark_safe("<a href='{}' target='a'>api</a>".format(obj.endpoint))
         else:
             return ''
 
