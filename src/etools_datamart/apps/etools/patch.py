@@ -91,7 +91,7 @@ def patch():
     AuthUser.set_password = User.set_password
 
 
-    AuthUser.profile = cached_property(lambda self: UsersUserprofile.objects.get(user_id=self.id))
+    # AuthUser.profile = cached_property(lambda self: UsersUserprofile.objects.get(user_id=self.id))
 
     # groups = models.ManyToManyField(
     #     Group,

@@ -8,6 +8,7 @@ from django.urls import reverse
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.lock import cache
+from etools_datamart.celery import app
 from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
@@ -16,7 +17,7 @@ from . import models
 @register(models.TaskLog)
 class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
-                    'last_success', 'last_failure', 'running')
+                    'last_success', 'last_failure', 'lock')
     readonly_fields = ('task', 'timestamp', 'result', 'elapsed', 'time',
                        'last_success', 'last_failure', 'table_name', 'content_type')
     date_hierarchy = 'timestamp'
@@ -31,10 +32,10 @@ class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
     def time(self, obj):
         return naturaldelta(obj.elapsed)
 
-    def running(self, obj):
+    def lock(self, obj):
         return f"{obj.task}-lock" in cache
 
-    running.boolean = True
+    lock.boolean = True
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         if request.method == 'POST':
@@ -42,6 +43,16 @@ class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
                                                                self.opts.model_name))
             return HttpResponseRedirect(redirect_url)
         return self._changeform_view(request, object_id, form_url, extra_context)
+
+    @action()
+    def queue(self, request, pk):
+        obj = self.get_object(request, pk)
+        try:
+            task = app.tasks[obj.task]
+            task.delay()
+            self.message_user(request, f"task queued", messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, str(e), messages.ERROR)
 
     @action()
     def unlock(self, request, pk):

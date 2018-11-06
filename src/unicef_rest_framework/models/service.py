@@ -111,7 +111,6 @@ class Service(MasterDataModel):
 
     class Meta:
         ordering = ('name',)
-        permissions = (("do_not_scramble", "Can read any service unscrambled"),)
 
     objects = ServiceManager()
 
@@ -154,12 +153,19 @@ class Service(MasterDataModel):
             return None
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        v = self.viewset()
+        model = v.get_queryset().model
+        ct = ContentType.objects.get_for_model(model)
+        self.linked_models.add(ct)
+        # TODO: remove me
+        print(111, "service.py:160", ct)
         if self.pk:
             try:
                 self.viewset._service = None
             except Exception as e:
                 logger.exception(e)
         super(Service, self).save(force_insert, force_update, using, update_fields)
+
         # self.invalidate_cache()
 
     def __str__(self):

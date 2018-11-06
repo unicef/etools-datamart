@@ -1,10 +1,12 @@
+import datetime
+
 import pytest
 from rest_framework.test import APIClient
 from test_utilities.factories import UserFactory
+from tests._test_lib.test_utilities.factories import UserStatsFactory
 from unicef_rest_framework.test_utils import user_allow_service
 
 from etools_datamart.api.endpoints import PartnerViewSet, UserStatsViewSet
-from etools_datamart.apps.etl.tasks import load_user_report
 from etools_datamart.apps.etools.models import AuthUser
 
 
@@ -24,34 +26,52 @@ def local_user(db):
     return UserFactory()
 
 
-def test_datamart_user_access_allowed_countries(user):
-    load_user_report()
+@pytest.fixture(autouse=True)
+def user_data(db):
+    UserStatsFactory(country_name='lebanon', month=datetime.datetime(2000, 1, 1))
+    UserStatsFactory(country_name='chad', month=datetime.datetime(2000, 1, 1))
+    UserStatsFactory(country_name='bolivia', month=datetime.datetime(2000, 1, 1))
+
+
+PARAMS = [("", 200, 3),
+          ("country_name=", 200, 1),
+          ("country_name=lebanon", 200, 1),
+          ("country_name!=lebanon", 200, 2),
+          ("country_name!=lebanon", 200, 2),
+          ]
+
+
+@pytest.mark.parametrize("url,code,expected",
+                         PARAMS,
+                         ids=[p[0] for p in PARAMS]
+                         )
+def test_datamart_user_access_allowed_countries(user, url, code, expected):
     client = APIClient()
     client.force_authenticate(user)
-    url = UserStatsViewSet.get_service().endpoint
+    base = UserStatsViewSet.get_service().endpoint
 
     with user_allow_service(user, UserStatsViewSet):
-        res = client.get(f"{url}")
-        assert res.status_code == 200, res
-        assert len(res.json()['results']) == 3
+        res = client.get(f"{base}?{url}")
+        assert res.status_code == code, res
+        assert len(res.json()['results']) == expected
 
-        res = client.get(f"{url}?country_name=")
-        assert res.status_code == 200, res
-        assert len(res.json()['results']) == 1
 
-        res = client.get(f"{url}?country_name=lebanon")
-        assert res.status_code == 200, res
-        assert len(res.json()['results']) == 1
-
-        res = client.get(f"{url}?country_name!=lebanon")
-        assert res.status_code == 200, res
-        assert len(res.json()['results']) == 2
-
-        res = client.get(f"{url}?country_name=lebanon,chad")
+def test_datamart_user_access_forbidden_countries(user):
+    client = APIClient()
+    client.force_authenticate(user)
+    base = UserStatsViewSet.get_service().endpoint
+    with user_allow_service(user, UserStatsViewSet):
+        res = client.get(f"{base}?country_name=lebanon,chad")
         assert res.status_code == 403, res
         assert res.json() == {'error': "You are not allowed to access schema: 'chad'"}
 
-        res = client.get(f"{url}?country_name=lebanon,xxx")
+
+def test_datamart_user_access_wrong_countries(user):
+    client = APIClient()
+    client.force_authenticate(user)
+    base = UserStatsViewSet.get_service().endpoint
+    with user_allow_service(user, UserStatsViewSet):
+        res = client.get(f"{base}?country_name=lebanon,xxx")
         assert res.status_code == 400, res
         assert res.json() == {'error': "Invalid schema: 'xxx'",
                               'hint': 'Removes wrong schema from selection',

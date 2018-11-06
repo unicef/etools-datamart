@@ -22,6 +22,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
+                  CELERY_ALWAYS_EAGER=(bool, False),
                   CSRF_COOKIE_SECURE=(bool, True),
                   DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
@@ -260,7 +261,7 @@ INSTALLED_APPS = [
 
     'django_celery_beat',
 
-    'etools_datamart.apps.core',
+    'etools_datamart.apps.core.apps.Config',
     'etools_datamart.apps.etools',
     'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
@@ -340,7 +341,8 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {}
-
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', False)
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
 CONCURRENCY_IGNORE_DEFAULT = False
 
 REST_FRAMEWORK = {

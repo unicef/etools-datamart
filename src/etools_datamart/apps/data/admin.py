@@ -4,7 +4,6 @@ from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
 from adminfilters.filters import AllValuesComboFilter
-from crashlog.middleware import process_exception
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -16,6 +15,7 @@ from unicef_rest_framework.models import Service
 
 from etools_datamart.apps.etl.tasks import load_fam_indicator, load_intervention, load_pmp_indicator, load_user_report
 from etools_datamart.apps.multitenant.admin import SchemaFilter
+from etools_datamart.config import settings
 from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
@@ -55,6 +55,12 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         return self._changeform_view(request, object_id, form_url, extra_context)
 
     @link()
+    def invalidate_cache(self, request):
+        for s in Service.objects.all():
+            if s.managed_model == self.model:
+                s.invalidate_cache()
+
+    @link()
     def api(self, request):
         for s in Service.objects.all():
             if s.managed_model == self.model:
@@ -64,28 +70,34 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     @link()
     def queue(self, request):
         try:
+            start = time()
             self.model._etl_task.delay()
-            self.message_user(request, "ETL task scheduled", messages.SUCCESS)
+            if settings.CELERY_TASK_ALWAYS_EAGER:
+                stop = time()
+                duration = stop - start
+                self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+            else:
+                self.message_user(request, "ETL task scheduled", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             self.message_user(request, str(e), messages.ERROR)
         finally:
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
                                                               'changelist')))
 
-    @link()
-    def refresh(self, request):
-        try:
-            start = time()
-            self.model._etl_task.apply()
-            stop = time()
-            duration = stop - start
-            self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
-        except Exception as e:  # pragma: no cover
-            process_exception(e)
-            self.message_user(request, str(e), messages.ERROR)
-        finally:
-            return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
-                                                              'changelist')))
+    # @link()
+    # def refresh(self, request):
+    #     try:
+    #         start = time()
+    #         self.model._etl_task.apply()
+    #         stop = time()
+    #         duration = stop - start
+    #         self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+    #     except Exception as e:  # pragma: no cover
+    #         process_exception(e)
+    #         self.message_user(request, str(e), messages.ERROR)
+    #     finally:
+    #         return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
+    #                                                           'changelist')))
 
 
 @register(models.PMPIndicators)

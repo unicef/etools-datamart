@@ -1,11 +1,16 @@
+import os
 from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
 from _pytest.fixtures import SubRequest
 
-# def pytest_configure(config):
-# enable this to remove deprecations
+
+def pytest_configure(config):
+    # enable this to remove deprecations
+    os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
+
+
 # warnings.simplefilter('once', DeprecationWarning)
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)

@@ -1,5 +1,4 @@
 import os
-import sys
 import warnings
 
 from django.conf import settings
@@ -110,8 +109,8 @@ class Command(BaseCommand):
             self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
             self.stdout.write("Going to create new users")
             try:
-                for entry in os.environ.get('AUTOCREATE_USERS').split(','):
-                    user, pwd = entry.split('|')
+                for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
+                    user, pwd = entry.split(',')
                     User = get_user_model()
                     u, created = User.objects.get_or_create(username=user)
                     if created:
@@ -156,10 +155,6 @@ class Command(BaseCommand):
                     etl.delay()
                     self.stdout.write(f"{task.name} scheduled")
                 else:
-                    ret = etl.apply()
+                    etl.apply()
                     cost = naturaldelta(app.timers[task.name])
-                    if isinstance(ret.result, Exception):  # pragma: no cover
-                        self.stderr.write(f"\n{ret.result}")
-                        sys.exit(1)
-
-                    self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")
+                    self.stdout.write(f"{task.name} excuted in {cost}")

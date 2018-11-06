@@ -1,6 +1,9 @@
 1.6 (dev)
 ---------
-* 
+* add ability to invalidate cache directly from admin endpoint
+* add ability to queue task from task log
+* invalidate cache on dataset refresh
+
 
 1.5
 ---
@@ -10,9 +13,11 @@
 * enable Azure login without email
 * add partner.name to Intervention endpoint
 
+
 1.4.1
 -----
 * fixes dependencies
+
 
 1.4
 ---

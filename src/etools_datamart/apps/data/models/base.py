@@ -1,3 +1,4 @@
+from celery.local import class_property
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
@@ -25,3 +26,8 @@ class DataMartModel(models.Model, TimeStampedModel):
         abstract = True
 
     objects = DataMartManager()
+
+    @class_property
+    def linked_services(self):
+        from unicef_rest_framework.models import Service
+        return [s for s in Service.objects.all() if s.managed_model == self]
