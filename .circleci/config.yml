@@ -188,7 +188,7 @@ jobs:
             fi
             docker build  \
                     --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
-                    --build-arg DATAMART_VERSION=${TAG} \
+                    --build-arg VERSION=${TAG} \
                     -t ${DOCKER_IMAGE}:${TAG} \
                     -f docker/Dockerfile .
             docker images "unicef/datamart*"

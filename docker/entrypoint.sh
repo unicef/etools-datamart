@@ -5,7 +5,7 @@ mkdir -p /var/datamart/{static,log,conf,run,redis}
 rm -f /var/datamart/run/*
 
 
-if [ "$@" == "celery" ];then
+if [ "$*" == "celery" ];then
     export START_REDIS="false"
     export START_DATAMART="false"
     export START_CELERY="true"
@@ -16,7 +16,7 @@ if [ "$@" == "celery" ];then
     cd /var/datamart
 
     exec supervisord --nodaemon
-elif [ "$@" == "datamart" ];then
+elif [ "$*" == "datamart" ];then
 
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
@@ -28,7 +28,7 @@ elif [ "$@" == "datamart" ];then
     else
         gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi
     fi
-elif [ "$@" == "stack" ];then
+elif [ "$*" == "stack" ];then
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
     django-admin init-setup --all --verbosity 1
