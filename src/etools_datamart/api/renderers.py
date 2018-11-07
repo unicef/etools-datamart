@@ -22,6 +22,7 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
         ctx['response_headers']['system-filters'] = getattr(state.request, '_system_filter', '')
         ctx['response_headers']['filters'] = state.get('filters', '')
         ctx['response_headers']['excludes'] = state.get('excludes', '')
+
         request = ctx['request']
         if request.user.is_staff:
             try:
