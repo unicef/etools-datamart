@@ -107,7 +107,6 @@
               <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">OPTIONS</button>
             </form>
           {% endif %}
-
           {% if delete_form %}
             <button class="btn btn-danger button-form js-tooltip" title="Make a DELETE request on the {{ name }} resource" data-toggle="modal" data-target="#deleteModal">DELETE</button>
 
@@ -146,6 +145,12 @@
                   {{ description }}
                 {% endblock %}
               </div>
+
+              {% if admin_url %}
+                  <a href="{{ admin_url }}"
+                     style="float: right; color:black; background-color: #ffd600; margin-right: 0;margin-top:5px; margin-left: 10px;"
+                     class="btn btn-primary">Admin</a>
+              {% endif %}
 
               {% if paginator %}
                 <nav style="float: right">
