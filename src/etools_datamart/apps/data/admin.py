@@ -65,14 +65,14 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         for s in Service.objects.all():
             if s.managed_model == self.model:
                 return HttpResponseRedirect(s.endpoint)
-        return ""
+        return ""  # pragma: no cover
 
     @link()
     def queue(self, request):
         try:
             start = time()
             self.model._etl_task.delay()
-            if settings.CELERY_TASK_ALWAYS_EAGER:
+            if settings.CELERY_TASK_ALWAYS_EAGER:  # pragma: no cover
                 stop = time()
                 duration = stop - start
                 self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)

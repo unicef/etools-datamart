@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from unittest.mock import Mock
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -73,17 +72,18 @@ def reset(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def disable_stats(request: SubRequest, monkeypatch):
-    if 'enable_threadstats' in request.funcargnames:
-        pass
-    elif 'enable_stats' in request.funcargnames:
-        from etools_datamart.apps.tracking.middleware import StatsMiddleware
-        monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
-                            StatsMiddleware.log
-                            )
-
-    else:
-        monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
-                            Mock())
+    pass  # FIXME: ThreadedStatsMiddleware has some side effects in test..
+    # if 'enable_threadstats' in request.funcargnames:
+    #     pass
+    # elif 'enable_stats' in request.funcargnames:
+    #     from etools_datamart.apps.tracking.middleware import StatsMiddleware
+    #     monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
+    #                         StatsMiddleware.log
+    #                         )
+    #
+    # else:
+    #     monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
+    #                         Mock())
 
 
 @pytest.fixture()

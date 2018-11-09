@@ -2,12 +2,14 @@
 import pytest
 from django.contrib import messages
 from django.urls import reverse
-from test_utilities.factories import TaskLogFactory
+
+from etools_datamart.apps.etl.models import TaskLog
 
 
 @pytest.fixture
 def tasklog():
-    return TaskLogFactory()
+    TaskLog.objects.inspect()
+    return TaskLog.objects.first()
 
 
 def test_tasklog_changelist(django_app, admin_user, tasklog):
@@ -30,14 +32,22 @@ def test_tasklog_change(django_app, admin_user, tasklog):
 
 def test_tasklog_unlock(django_app, admin_user, tasklog):
     url = reverse("admin:etl_tasklog_change", args=[tasklog.id])
-    res = django_app.get(url,
-                         user=admin_user,
-                         extra_environ={'HTTP_X_SCHEMA': "public"})
+    res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
     res = res.click("Unlock")
     res = res.form.submit().follow()
     storage = res.context['messages']
     assert [m.message for m in storage] == ['Successfully executed']
+
+
+def test_tasklog_queue(django_app, admin_user, tasklog):
+    url = reverse("admin:etl_tasklog_change", args=[tasklog.id])
+    res = django_app.get(url, user=admin_user)
+    assert res.status_code == 200
+    res = res.click("Queue")
+    res = res.follow()
+    storage = res.context['messages']
+    assert [m.message for m in storage] == [f"Task '{tasklog.task}' queued"]
 
 
 def test_tasklog_refresh(django_app, admin_user, tasklog):

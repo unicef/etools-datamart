@@ -1,7 +1,7 @@
 from rest_framework.metadata import SimpleMetadata
 
 
-def get_create_model(editor, model):
+def get_create_model(editor, model):  # pragma: no cover
     """
     Create a table and any accompanying indexes or unique constraints for
     the given `model`.

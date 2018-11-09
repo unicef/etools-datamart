@@ -50,9 +50,9 @@ class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
         try:
             task = app.tasks[obj.task]
             task.delay()
-            self.message_user(request, f"task queued", messages.SUCCESS)
-        except Exception as e:
-            self.message_user(request, str(e), messages.ERROR)
+            self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
+        except Exception as e:  # pragma: no cover
+            self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
 
     @action()
     def unlock(self, request, pk):

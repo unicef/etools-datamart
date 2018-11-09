@@ -18,9 +18,9 @@ def get_etools_allowed_schemas(user):
         else:
             return set()
 
-
-def schema_is_valid(*schema):
-    return schema in conn.all_schemas
+#
+# def schema_is_valid(*schema):
+#     return schema in conn.all_schemas
 
 
 def validate_schemas(*schemas):

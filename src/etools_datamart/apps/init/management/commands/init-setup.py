@@ -127,10 +127,10 @@ class Command(BaseCommand):
                         u.set_password(pwd)
                         u.save()
                         u.groups.add(all_access)
-                    else:
+                    else:  # pragma: no cover
                         self.stdout.write(f"User {u} already exists.")
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 warnings.warn(f"Unable to create default users. {e}")
 
         if options['tasks'] or _all or options['refresh']:

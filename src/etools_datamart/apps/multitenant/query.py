@@ -48,7 +48,7 @@ class TenantRelatedPopulator(RelatedPopulator):
     #     self.remote_setter = klass_info['remote_setter']
 
     def populate(self, row, from_obj):
-        if self.reorder_for_init:
+        if self.reorder_for_init:  # pragma: no cover
             obj_data = self.reorder_for_init(row)
         else:
             obj_data = row[self.cols_start:self.cols_end]
@@ -59,7 +59,7 @@ class TenantRelatedPopulator(RelatedPopulator):
             if 'schema' in init_list:
                 init_list.remove('schema')
             obj = self.model_cls.from_db(self.db, init_list, obj_data)
-            if self.related_populators:
+            if self.related_populators:  # pragma: no cover
                 for rel_iter in self.related_populators:
                     rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
@@ -100,7 +100,7 @@ class TenantModelIterable(ModelIterable):
             if related_populators:
                 for rel_populator in related_populators:
                     rel_populator.populate(row, obj)
-            if annotation_col_map:
+            if annotation_col_map:  # pragma: no cover
                 for attr_name, col_pos in annotation_col_map.items():
                     setattr(obj, attr_name, row[col_pos])
 

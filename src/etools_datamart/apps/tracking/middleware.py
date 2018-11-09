@@ -12,7 +12,6 @@ from strategy_field.utils import fqn, get_attr
 from etools_datamart.apps.tracking import config
 from etools_datamart.state import state
 
-from .asyncqueue import AsyncQueue
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
 
 logger = logging.getLogger(__name__)
@@ -118,10 +117,10 @@ def record_to_kwargs(request, response):
                 cached=state.get('cache-hit') or False,  # see api.common.APICacheResponse
                 content_type=media_type)
 
-
-class AsyncLogger(AsyncQueue):
-    def _process(self, record):
-        log_request(**record_to_kwargs(**record))
+#
+# class AsyncLogger(AsyncQueue):
+#     def _process(self, record):
+#         log_request(**record_to_kwargs(**record))
 
 
 class StatsMiddleware(object):
@@ -140,15 +139,14 @@ class StatsMiddleware(object):
 
         response = self.get_response(request)
         if response.status_code == 200 and config.TRACK_PATH.match(request.path):
-            if config.TRACK_ANONYMOUS or request.user.is_authenticated:
-                self.log(request, response)
+            self.log(request, response)
         return response
 
-
-class ThreadedStatsMiddleware(StatsMiddleware):
-    def __init__(self, get_response):
-        super(ThreadedStatsMiddleware, self).__init__(get_response)
-        self.worker = AsyncLogger()
-
-    def log(self, request, response):
-        self.worker.queue({'request': request, 'response': response})
+#
+# class ThreadedStatsMiddleware(StatsMiddleware):
+#     def __init__(self, get_response):
+#         super(ThreadedStatsMiddleware, self).__init__(get_response)
+#         self.worker = AsyncLogger()
+#
+#     def log(self, request, response):
+#         self.worker.queue({'request': request, 'response': response})

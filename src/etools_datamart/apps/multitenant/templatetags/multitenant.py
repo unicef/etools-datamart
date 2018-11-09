@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from django import template
 from django.db import connections
-from django.urls import reverse
 
 from etools_datamart.state import state
 
 register = template.Library()
 
-
-@register.simple_tag(takes_context=True)
-def select_schema(context):
-    url = reverse("select-schema")
-    request = context['request']
-    return f"{url}?from={request.path}"
+#
+# @register.simple_tag(takes_context=True)
+# def select_schema(context):
+#     url = reverse("select-schema")
+#     request = context['request']
+#     return f"{url}?from={request.path}"
 
 
 @register.simple_tag(takes_context=True)

@@ -22,7 +22,7 @@ class CountryNameProcessor:
         if not value:
             if not request.user.is_superuser:
                 allowed = get_etools_allowed_schemas(request.user)
-                if not allowed:
+                if not allowed:  # pragma: no cover
                     raise PermissionDenied("You don't have enabled schemas")
                 filters['country_name__iregex'] = r'(' + '|'.join(allowed) + ')'
         else:
@@ -61,10 +61,12 @@ class MonthProcessor:
                 elif value == 'current':
                     m = datetime.now().month
                     y = datetime.now().year
+                else:  # pragma: no cover
+                    raise InvalidQueryValueError('month', value)
 
                 filters['month__month'] = int(m)
                 filters['month__year'] = int(y)
-            except ValueError:
+            except ValueError:  # pragma: no cover
                 raise InvalidQueryValueError('month', value)
         return filters, exclude
 

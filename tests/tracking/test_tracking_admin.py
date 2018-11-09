@@ -1,5 +1,7 @@
 from django.urls import reverse
 
+from etools_datamart.apps.tracking.utils import refresh_all_counters
+
 
 def test_changelist(django_app, admin_user, log):
     url = reverse("admin:tracking_apirequestlog_changelist")
@@ -28,6 +30,7 @@ def test_aggregate(django_app, admin_user, log):
 
 def test_tracking_index(django_app, admin_user):
     url = reverse("admin:app_list", args=['tracking'])
+    refresh_all_counters()
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
 

@@ -33,7 +33,7 @@ def only_one(function=None, key="", timeout=None):
                 if have_lock:
                     try:
                         lock.release()
-                    except LockError as e:
+                    except LockError as e:  # pragma: no cover
                         logger.warning(e)
 
             return ret_value

@@ -28,17 +28,6 @@ class ETLTask(Task, metaclass=TaskType):
     abstract = True
     linked_model = None
 
-    def run(self, *args, **kwargs):
-        pass
-
-    def delay(self, *args, **kwargs):
-        return super().delay(*args, **kwargs)
-
-    def apply(self, args=None, kwargs=None, link=None, link_error=None, task_id=None, retries=None, throw=None,
-              logfile=None, loglevel=None, headers=None, **options):
-        return super().apply(args, kwargs, link, link_error, task_id, retries, throw, logfile, loglevel, headers,
-                             **options)
-
 
 class DatamartCelery(Celery):
     etl_cls = ETLTask
