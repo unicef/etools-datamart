@@ -15,9 +15,9 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
 
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
-                  API_CACHE_URL=(str, "locmemcache://"),
+                  # API_CACHE_URL=(str, "locmemcache://"),
                   # CACHE_URL=(str, "dummycache://"),
-                  # API_CACHE_URL=(str, "dummycache://"),
+                  API_CACHE_URL=(str, "dummycache://"),
 
                   ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
@@ -361,14 +361,6 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'ordering',
 }
 
-AZURE_SSL = True
-AZURE_URL_EXPIRATION_SECS = 10800
-AZURE_ACCESS_POLICY_EXPIRY = 10800  # length of time before signature expires in seconds
-AZURE_ACCESS_POLICY_PERMISSION = 'r'
-AZURE_TOKEN_URL = 'https://login.microsoftonline.com/saxix.onmicrosoft.com/oauth2/token'
-AZURE_GRAPH_API_BASE_URL = 'https://graph.microsoft.com'
-AZURE_GRAPH_API_VERSION = 'v1.0'
-AZURE_GRAPH_API_PAGE_SIZE = 300
 
 JWT_AUTH = {
     'JWT_VERIFY': False,  # this requires private key

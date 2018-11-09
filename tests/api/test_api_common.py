@@ -11,10 +11,10 @@ def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:
         urls = [reverse("api:%s" % url.name) for url in router.urls
                 if url.name.endswith('-list')]
-        metafunc.parametrize("url", urls)
+        metafunc.parametrize("url", urls, ids=urls)
 
 
 def test_options(client, url):
-    res = client.options(url, HTTP_X_SCHEMA="public")
+    res = client.options(url)
     assert res.status_code == 200, res
     assert res.json()

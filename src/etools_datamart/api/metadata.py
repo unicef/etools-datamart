@@ -70,10 +70,10 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         metadata['filters'] = view.filter_fields
         metadata['filter_blacklist'] = view.filter_blacklist
         metadata['ordering'] = view.ordering_fields
-        from django.db import connection
 
-        with connection.schema_editor() as editor:
-            sql = get_create_model(editor, view.queryset.model)
-        metadata['sql'] = sql
+        # from django.db import connection
+        # with connection.schema_editor() as editor:
+        #     sql = get_create_model(editor, view.queryset.model)
+        # metadata['sql'] = sql
 
         return metadata
