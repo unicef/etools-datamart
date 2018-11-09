@@ -249,6 +249,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'unicef_security',
+    'redisboard',
     'django_filters',
     'month_field',
     'drf_querystringfilter',

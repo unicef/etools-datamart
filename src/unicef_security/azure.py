@@ -123,7 +123,7 @@ class Synchronizer:
         self.echo = echo or (lambda l: True)
 
     def get_token(self):
-        if not config.AZURE_CLIENT_ID and config.AZURE_CLIENT_SECRET:
+        if not config.UNICEF_AZURE_CLIENT_ID and config.UNICEF_AZURE_CLIENT_SECRET:
             raise ValueError("Configure AZURE_CLIENT_ID and/or AZURE_CLIENT_SECRET")
         token = cache.get(AZURE_GRAPH_API_TOKEN_CACHE_KEY)
         if not token:

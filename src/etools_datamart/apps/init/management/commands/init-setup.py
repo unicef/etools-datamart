@@ -1,5 +1,6 @@
 import os
 import warnings
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -10,6 +11,7 @@ from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from humanize import naturaldelta
+from redisboard.models import RedisServer
 from strategy_field.utils import fqn
 from unicef_rest_framework.models.acl import GroupAccessControl
 
@@ -104,6 +106,13 @@ class Command(BaseCommand):
                 serializers=['*'],
                 policy=GroupAccessControl.POLICY_ALLOW
             )
+        # hostname
+        for entry, values in settings.CACHES.items():
+            loc = values.get('LOCATION', '')
+            spec = urlparse(loc)
+            if spec.scheme == 'redis':
+                RedisServer.objects.get_or_create(hostname=spec.netloc,
+                                                  port=int(spec.port))
 
         if os.environ.get('AUTOCREATE_USERS'):
             self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
