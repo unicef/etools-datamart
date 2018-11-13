@@ -56,10 +56,14 @@ SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 
 ADMINS = (
-    ('', 'saxix@saxix.onmicrosoft.com'),
-    ('', 'sapostolico@unicef.org'),
-    ('', 'sapostolico@nikunicef.onmicrosoft.org'),
-
+    ('Stefano', 'saxix@saxix.onmicrosoft.com'),
+    ('Stefano', 'sapostolico@unicef.org'),
+    ('Nik', 'ntrncic@unicef.org'),
+    ('Greg', 'greinbach@unicef.org'),
+    ('Zack', 'zadams@unicef.org'),
+    ('Robert', 'ravram@unicef.org'),
+    ('Domenico', 'ddinicola@unicef.org'),
+    ('Evan', 'ewheeler@unicef.org')
 )
 
 DATABASES = {
@@ -360,7 +364,6 @@ REST_FRAMEWORK = {
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
 }
-
 
 JWT_AUTH = {
     'JWT_VERIFY': False,  # this requires private key
