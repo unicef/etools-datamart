@@ -17,3 +17,7 @@ class HACT(DataMartModel):
                                                 help_text="Total number of completed scheduled audits for the workspace.")
     completed_special_audits = models.IntegerField(default=0,
                                                    help_text="Total number of completed special audits for the workspace. ")
+
+    class Meta:
+        ordering = ('year', 'country_name')
+        unique_together = ('year', 'country_name')

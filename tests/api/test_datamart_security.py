@@ -26,11 +26,13 @@ def local_user(db):
     return UserFactory()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def user_data(db):
-    UserStatsFactory(country_name='lebanon', month=datetime.datetime(2000, 1, 1))
-    UserStatsFactory(country_name='chad', month=datetime.datetime(2000, 1, 1))
-    UserStatsFactory(country_name='bolivia', month=datetime.datetime(2000, 1, 1))
+    data = [UserStatsFactory(country_name='lebanon', month=datetime.datetime(2000, 1, 1)),
+            UserStatsFactory(country_name='chad', month=datetime.datetime(2000, 1, 1)),
+            UserStatsFactory(country_name='bolivia', month=datetime.datetime(2000, 1, 1))]
+    yield
+    [r.delete() for r in data]
 
 
 PARAMS = [("", 200, 3),
@@ -45,7 +47,7 @@ PARAMS = [("", 200, 3),
                          PARAMS,
                          ids=[p[0] for p in PARAMS]
                          )
-def test_datamart_user_access_allowed_countries(user, url, code, expected):
+def test_datamart_user_access_allowed_countries(user, url, code, expected, user_data):
     client = APIClient()
     client.force_authenticate(user)
     base = UserStatsViewSet.get_service().endpoint
@@ -56,7 +58,7 @@ def test_datamart_user_access_allowed_countries(user, url, code, expected):
         assert len(res.json()['results']) == expected
 
 
-def test_datamart_user_access_forbidden_countries(user):
+def test_datamart_user_access_forbidden_countries(user, user_data):
     client = APIClient()
     client.force_authenticate(user)
     base = UserStatsViewSet.get_service().endpoint
@@ -66,7 +68,7 @@ def test_datamart_user_access_forbidden_countries(user):
         assert res.json() == {'error': "You are not allowed to access schema: 'chad'"}
 
 
-def test_datamart_user_access_wrong_countries(user):
+def test_datamart_user_access_wrong_countries(user, user_data):
     client = APIClient()
     client.force_authenticate(user)
     base = UserStatsViewSet.get_service().endpoint
@@ -78,7 +80,7 @@ def test_datamart_user_access_wrong_countries(user):
                               'valid': ['bolivia', 'chad', 'lebanon']}
 
 
-def test_loacl_user_access(local_user):
+def test_local_user_access(local_user, user_data):
     # etools user has access same countries as in eTools app
     client = APIClient()
     client.force_authenticate(local_user)

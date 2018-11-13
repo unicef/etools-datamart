@@ -7,7 +7,7 @@ from django.db import connections
 from django.utils import timezone
 from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
-from etools_datamart.apps.data.models import Intervention, PMPIndicators, UserStats
+from etools_datamart.apps.data.models import FAMIndicator, HACT, Intervention, PMPIndicators, UserStats
 from etools_datamart.apps.etl.models import TaskLog
 from etools_datamart.apps.tracking.models import APIRequestLog
 
@@ -29,9 +29,25 @@ class APIRequestLogFactory(factory.DjangoModelFactory):
         model = APIRequestLog
 
 
+class HACTFactory(factory.DjangoModelFactory):
+    year = today.year
+    country_name = lambda: random.choice(connections['etools'].get_tenants())  # noqa
+
+    class Meta:
+        model = HACT
+
+
 class PMPIndicatorFactory(factory.DjangoModelFactory):
+    # country_name = lambda: random.choice(connections['etools'].get_tenants())  # noqa
     class Meta:
         model = PMPIndicators
+
+
+class FAMIndicatoFactory(factory.DjangoModelFactory):
+    month = today
+
+    class Meta:
+        model = FAMIndicator
 
 
 class ServiceFactory(factory.DjangoModelFactory):
@@ -60,9 +76,9 @@ class UserFactory(factory.DjangoModelFactory):
     first_name = factory.Faker('first_name')
 
     email = factory.Sequence(lambda n: "m%03d@mailinator.com" % n)
-    password = '123'
+    password = 'password'
 
-    # is_active = True
+    is_active = True
 
     @classmethod
     def _prepare(cls, create, **kwargs):

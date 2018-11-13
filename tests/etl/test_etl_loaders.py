@@ -5,6 +5,7 @@ from etools_datamart.apps.etl.tasks import (FAMIndicator, HACT, Intervention, lo
 
 
 def test_load_pmp_indicator(number_of_intervention):
+    load_pmp_indicator.unlock()
     assert load_pmp_indicator() == {'Bolivia': number_of_intervention,
                                     'Chad': number_of_intervention,
                                     'Lebanon': number_of_intervention}
@@ -12,21 +13,25 @@ def test_load_pmp_indicator(number_of_intervention):
 
 
 def test_load_intervention(number_of_intervention, settings, monkeypatch):
+    load_intervention.unlock()
     load_intervention()
     assert Intervention.objects.count() == number_of_intervention * 3
 
 
 def test_load_fam_indicator(db, settings, monkeypatch):
+    load_fam_indicator.unlock()
     load_fam_indicator()
     assert FAMIndicator.objects.count() == 3
 
 
 def test_load_user_stats(db, settings, monkeypatch):
+    load_user_report.unlock()
     load_user_report()
     assert UserStats.objects.count() == 3
 
 
 def test_load_hact(db, settings, monkeypatch):
+    load_hact.unlock()
     load_hact()
     assert HACT.objects.count() == 3
     bolivia = HACT.objects.get(country_name='Bolivia')

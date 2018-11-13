@@ -31,7 +31,7 @@ def load_hact():
         connection.set_schemas([country.schema_name])
 
         logger.info(u'Running on %s' % country.name)
-        aggregate = HactAggregatehact.objects.get(year=2018)
+        aggregate = HactAggregatehact.objects.get(year=today.year)
         data = json.loads(aggregate.partner_values)
 
         # PartnersPartnerorganization.objects.hact_active()

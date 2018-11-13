@@ -2,7 +2,6 @@ import os
 from time import time
 
 from celery import Celery
-from celery.app.task import TaskType
 from celery.signals import task_postrun, task_prerun
 from celery.task import Task
 from django.utils import timezone
@@ -12,19 +11,7 @@ from etools_datamart.apps.etl.lock import only_one
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
 
-# def get_task_log(name, model):
-#     if not name:
-#         return None
-#     from django.contrib.contenttypes.models import ContentType
-#     from etools_datamart.apps.etl.models import TaskLog
-#
-#     return TaskLog.objects.get_or_create(task=name,
-#                               defaults=dict(content_type=ContentType.objects.get_for_model(model),
-#                                             timestamp=None,
-#                                             table_name=model._meta.db_table))[0]
-#
-
-class ETLTask(Task, metaclass=TaskType):
+class ETLTask(Task):
     abstract = True
     linked_model = None
 
@@ -37,8 +24,11 @@ class DatamartCelery(Celery):
         linked_model = options.get('linked_model', None)
         name = name or self.gen_task_name(fun.__name__, fun.__module__)
         # options['task_log'] = SimpleLazyObject(lambda: get_task_log(name, options.get('linked_model')))
+        options['lock_key'] = f"{name}-lock"
 
-        fun = only_one(fun, f"{name}-lock")
+        fun = only_one(fun, options['lock_key'])
+        options['unlock'] = fun.unlock
+
         task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
         if linked_model:
             linked_model._etl_task = task
