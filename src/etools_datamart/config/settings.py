@@ -335,7 +335,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
 
 CONSTANCE_CONFIG = {
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
-    'DEFAULT_GROUP': ('Guests', 'Use MS Graph API to fetch user data', 'select_group'),
+    'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
 }
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'

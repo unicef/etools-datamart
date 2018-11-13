@@ -2,7 +2,7 @@ import logging
 
 from constance import config
 from crashlog.middleware import process_exception
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from django.utils.translation import ugettext as _
 from rest_framework import exceptions
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
@@ -13,7 +13,7 @@ logger = logging.getLogger()
 
 
 def jwt_get_username_from_payload(payload):
-    return payload.get('preferred_username')
+    return payload.get('preferred_username', payload.get('unique_name'))
 
 
 class JWTAuthentication(authentication.JSONWebTokenAuthentication):
@@ -26,6 +26,8 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
 
         try:
             user, jwt_value = super(JWTAuthentication, self).authenticate(request)
+            request.user = user
+            login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
         except TypeError:  # pragma: no cover
             raise PermissionDenied(detail='No valid authentication provided')
         except AuthenticationFailed as e:  # pragma: no cover
@@ -65,5 +67,7 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
         if not user.is_active:
             msg = _('User account is disabled.')
             raise exceptions.AuthenticationFailed(msg)
-
         return user
+
+
+# AQABAAIAAAC5una0EUFgTIF8ElaxtWjTE8f9OcsbHLLnobNloaTfC--E_fRoUrtiw2jul5yBV9rN3CO2C1BJ2IB99esAhsuRrzEowH3COPLFe5hkhovi4zfceFjwu6iSXpfgAFVGuo_fmep0osVwr0WkFzhWI5QEgNNnrf7d7gFm4iVC4gFE24R_JymglPADBvJIUMGAPHYg-IEyK1GKSkzpNSjJNZz6Pad_uVlDMrssFcrRqxKOJzqIhggLq7XQpJnmfUF5dJNdriDMkUjHBhDqlNpKTJZpnJg0jfIn7843kmKH0WXbJL0ss-tfgc_d8Q0240bdYXX6YSBV20NPx7MHy5V9i1RAtmr11cHBCw3uDuRriomgOhtIxTKYLox8iKYHbELA9Opvd-zLJm9krxoxlEHVO-PKl11No1mT8ZC83Ox37yxG5vrE7U7UxaLml9PmrjRZQoD1HvJ354IxZyP2pytYq2XhvIG_NDSDfuO5hwzPKb9F7G4Hytu96plKlu_yvdZ4Gghbp7z2sryeAiCnpYNlskGVUrQwF7BSHT73XuuOWeFelp-jn3tR4LQwqEGkg3zLqswcjbsRykSvS3cY6xTdBsCb7H70nygnhOgr_WlT9oY9KS2ElBVU-Q8OE8mkJ1rDV42hRb-haC7yzyUgtofbSQdVMIUgJRpuxYCrHNJ5oRsXmrWI0EVTdWFN25kwOMYPwOI8rzVf1oHikTQiHm3AN5wz0ill40IfjLB9niMEn4kntLDGJU1rIeALxv1s4lHxMZHpc1YEgLTf_3LnGtrsca3bIAA

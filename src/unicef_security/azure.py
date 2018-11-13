@@ -53,9 +53,10 @@ def get_unicef_user(backend, details, response, *args, **kwargs):
 
     try:
         user = User.objects.get(**filters)
-        social = user.social_auth
+        social = user.social_auth.get()
+        user.social_user = social
         created = False
-    except User.DoesNotExist:
+    except (User.DoesNotExist, UserSocialAuth.DoesNotExist):
         for k, v in response.items():
             if k in ['email', 'family_name', 'unique_name']:
                 details[k] = v
@@ -66,9 +67,6 @@ def get_unicef_user(backend, details, response, *args, **kwargs):
             for k, v in data.items():
                 details[k] = v
 
-            for k, v in response.items():
-                # TODO: remove me
-                print(111, f"{k} : {v}")
         except Exception as e:
             process_exception(e)
 
@@ -86,8 +84,10 @@ def get_unicef_user(backend, details, response, *args, **kwargs):
                                                           provider=backend.name,
                                                           uid=user.username
                                                           )
+        user.social_user = social
     return {'user': user,
             'social': social,
+            'uid': details.get('id'),
             'is_new': created}
 
 
