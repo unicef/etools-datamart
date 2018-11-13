@@ -1,21 +1,75 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 from datetime import date, datetime
 
 from django.db import connections
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 from strategy_field.utils import get_attr
 
-from etools_datamart.apps.data.models import Intervention, PMPIndicators
+from etools_datamart.apps.data.models import HACT, Intervention, PMPIndicators
 from etools_datamart.apps.data.models.fam import FAMIndicator
 from etools_datamart.apps.data.models.user import UserStats
 from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
-                                                AuditSpecialaudit, AuditSpotcheck, AuthUser, PartnersIntervention,
-                                                PartnersPartnerorganization,)
+                                                AuditSpecialaudit, AuditSpotcheck, AuthUser, HactAggregatehact,
+                                                PartnersIntervention, PartnersPartnerorganization,)
 from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)
+
+
+@app.etl(HACT)
+def load_hact():
+    connection = connections['etools']
+    countries = connection.get_tenants()
+    today = timezone.now()
+    created = {}
+    for country in countries:
+        created[country.name] = 0
+        connection.set_schemas([country.schema_name])
+
+        logger.info(u'Running on %s' % country.name)
+        aggregate = HactAggregatehact.objects.get(year=2018)
+        data = json.loads(aggregate.partner_values)
+
+        # PartnersPartnerorganization.objects.hact_active()
+        # qs = PartnersPartnerorganization.objects.filter(Q(reported_cy__gt=0) | Q(total_ct_cy__gt=0), hidden=False)
+        # values = dict(microassessments_total=0,
+        #               programmaticvisits_total=0,
+        #               followup_spotcheck=0,
+        #               completed_hact_audits=0,
+        #               completed_special_audits=0,
+        #               )
+        # for partner in qs.all():
+        #     values['microassessments_total'] += AuditEngagement.objects.filter(
+        #         engagement_type=AuditEngagement.TYPE_MICRO_ASSESSMENT,
+        #         status=AuditEngagement.FINAL, date_of_draft_report_to_unicef__year=datetime.now().year).count()
+        #
+        #     values['programmaticvisits_total'] += partner.hact_values['programmatic_visits']['completed']['total']
+        #     values['followup_spotcheck'] = qs.aggregate(total=Coalesce(Sum(
+        #         'planned_engagement__spot_check_follow_up'), 0))['total']
+        #
+        #     # completed_hact_audits = ?
+        #     values['completed_special_audits'] += AuditEngagement.objects.filter(
+        #         engagement_type=AuditEngagement.TYPE_SPECIAL_AUDIT,
+        #         status=AuditEngagement.FINAL, date_of_draft_report_to_unicef__year=datetime.now().year).count()
+
+        # # Total number of completed Microassessments in the business area in the past year
+        values = dict(microassessments_total=data['assurance_activities']['micro_assessment'],
+                      programmaticvisits_total=data['assurance_activities']['programmatic_visits']['completed'],
+                      followup_spotcheck=data['assurance_activities']['spot_checks']['follow_up'],
+                      completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
+                      completed_hact_audits=data['assurance_activities']['scheduled_audit'],
+                      completed_special_audits=data['assurance_activities']['special_audit'],
+                      )
+        HACT.objects.update_or_create(year=today.year,
+                                      country_name=country.name,
+                                      schema_name=country.schema_name,
+                                      defaults=values)
+
+    return created
 
 
 @app.etl(PMPIndicators)
