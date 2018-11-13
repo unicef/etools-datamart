@@ -4,6 +4,7 @@
 * add ability to queue task from task log
 * invalidate cache on dataset refresh
 * add RedisBoard to monitor cache entries
+* new HACT endpoint
 
 
 1.5

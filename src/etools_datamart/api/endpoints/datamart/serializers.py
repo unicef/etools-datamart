@@ -34,3 +34,10 @@ class UserStatsSerializer(serializers.ModelSerializer):
 
     def get_month(self, obj):
         return datetime.strftime(obj.month._date, '%b %Y')
+
+
+class HACTSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.HACT
+        exclude = ()

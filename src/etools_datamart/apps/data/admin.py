@@ -4,6 +4,7 @@ from time import time
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
 from adminfilters.filters import AllValuesComboFilter
+from crashlog.middleware import process_exception
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -13,7 +14,6 @@ from django.urls import reverse
 from humanize import naturaldelta
 from unicef_rest_framework.models import Service
 
-from etools_datamart.apps.etl.tasks import load_fam_indicator, load_intervention, load_pmp_indicator, load_user_report
 from etools_datamart.apps.multitenant.admin import SchemaFilter
 from etools_datamart.config import settings
 from etools_datamart.libs.truncate import TruncateTableMixin
@@ -29,8 +29,14 @@ class DatamartChangeList(ChangeList):
 
 class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = None
-    load_handler = None
+    # load_handler = None
     list_filter = (SchemaFilter,)
+
+    def __init__(self, model, admin_site):
+        import etools_datamart.apps.etl.tasks.etl as mod
+        # we ned to force celery task initialization
+        self.loaders = [v for v in mod.__dict__.values() if hasattr(v, 'apply_async')]
+        super().__init__(model, admin_site)
 
     def get_changelist(self, request, **kwargs):
         return DatamartChangeList
@@ -84,20 +90,20 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
                                                               'changelist')))
 
-    # @link()
-    # def refresh(self, request):
-    #     try:
-    #         start = time()
-    #         self.model._etl_task.apply()
-    #         stop = time()
-    #         duration = stop - start
-    #         self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
-    #     except Exception as e:  # pragma: no cover
-    #         process_exception(e)
-    #         self.message_user(request, str(e), messages.ERROR)
-    #     finally:
-    #         return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
-    #                                                           'changelist')))
+    @link()
+    def refresh(self, request):
+        try:
+            start = time()
+            self.model._etl_task.apply()
+            stop = time()
+            duration = stop - start
+            self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+        except Exception as e:  # pragma: no cover
+            process_exception(e)
+            self.message_user(request, str(e), messages.ERROR)
+        finally:
+            return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
+                                                              'changelist')))
 
 
 @register(models.PMPIndicators)
@@ -108,7 +114,7 @@ class PMPIndicatorsAdmin(DataModelAdmin, TruncateTableMixin):
                    )
     search_fields = ('partner_name',)
     date_hierarchy = 'pd_ssfa_creation_date'
-    load_handler = load_pmp_indicator
+    # load_handler = load_pmp_indicator
 
 
 @register(models.Intervention)
@@ -121,14 +127,14 @@ class InterventionAdmin(DataModelAdmin, TruncateTableMixin):
                    )
     search_fields = ('number', 'title')
     date_hierarchy = 'start_date'
-    load_handler = load_intervention
+    # load_handler = load_intervention
 
 
 @register(models.FAMIndicator)
 class FAMIndicatorAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month',)
     list_filter = (SchemaFilter, 'month',)
-    load_handler = load_fam_indicator
+    # load_handler = load_fam_indicator
     date_hierarchy = 'month'
 
 
@@ -136,5 +142,16 @@ class FAMIndicatorAdmin(DataModelAdmin):
 class UserStatsAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month', 'total', 'unicef', 'logins', 'unicef_logins')
     list_filter = (SchemaFilter, 'month')
-    load_handler = load_user_report
+    # load_handler = load_user_report
     date_hierarchy = 'month'
+
+
+@register(models.HACT)
+class HACTAdmin(DataModelAdmin):
+    list_display = ('country_name', 'schema_name', 'year',
+                    'microassessments_total',
+                    'programmaticvisits_total',
+                    'followup_spotcheck', 'completed_spotcheck',
+                    'completed_hact_audits', 'completed_special_audits')
+    list_filter = (SchemaFilter, 'year')
+    # load_handler = load_hact

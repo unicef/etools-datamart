@@ -30,6 +30,7 @@ router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/interventions', endpoints.InterventionViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
+router.register(r'datamart/hact', endpoints.HACTViewSet)
 
 router.register(r'system/tasks-log', endpoints.TaskLogViewSet)
 

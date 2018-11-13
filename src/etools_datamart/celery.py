@@ -23,9 +23,7 @@ class DatamartCelery(Celery):
     def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
         linked_model = options.get('linked_model', None)
         name = name or self.gen_task_name(fun.__name__, fun.__module__)
-        # options['task_log'] = SimpleLazyObject(lambda: get_task_log(name, options.get('linked_model')))
         options['lock_key'] = f"{name}-lock"
-
         fun = only_one(fun, options['lock_key'])
         options['unlock'] = fun.unlock
 

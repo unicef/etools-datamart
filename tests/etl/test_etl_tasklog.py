@@ -3,8 +3,9 @@ from unittest import mock
 import pytest
 from celery.signals import task_postrun
 
+from etools_datamart.apps.data.models import PMPIndicators
 from etools_datamart.apps.etl.models import TaskLog
-from etools_datamart.apps.etl.tasks import load_pmp_indicator, PMPIndicators
+from etools_datamart.apps.etl.tasks import load_pmp_indicator
 from etools_datamart.celery import task_postrun_handler
 
 pytestmarker = pytest.mark.django_db

@@ -19,6 +19,9 @@ from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)
 
+__all__ = ["load_hact", "load_user_report", "load_fam_indicator",
+           "load_pmp_indicator", "load_intervention"]
+
 
 @app.etl(HACT)
 def load_hact():

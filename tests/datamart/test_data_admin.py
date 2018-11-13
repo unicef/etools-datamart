@@ -40,14 +40,14 @@ def test_pmpindicators_detail(django_app, admin_user, settings):
     assert [m.message for m in storage] == ['This admin is read-only. Record not saved.']
 
 
-# def test_pmpindicators_refresh(django_app, admin_user):
-#     url = reverse("admin:data_pmpindicators_changelist")
-#     res = django_app.get(url, user=admin_user)
-#     assert res.status_code == 200
-#     res = res.click("Refresh").follow()
-#     assert res.status_code == 200
-#     storage = res.context['messages']
-#     assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
+def test_pmpindicators_refresh(django_app, admin_user):
+    url = reverse("admin:data_pmpindicators_changelist")
+    res = django_app.get(url, user=admin_user)
+    assert res.status_code == 200
+    res = res.click("Refresh").follow()
+    assert res.status_code == 200
+    storage = res.context['messages']
+    assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
 
 
 def test_pmpindicators_invalidate_cache(django_app, admin_user, service):
