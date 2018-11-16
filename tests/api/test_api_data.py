@@ -32,3 +32,25 @@ def test_list_csv(client, viewset, data):
     res = client.get(f"{viewset.get_service().endpoint}?format=csv", format='csv')
     assert res.status_code == 200, res
     assert res['Content-Type'] == "text/csv; charset=utf-8"
+
+
+@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
+                                     FAMIndicatorViewSet, UserStatsViewSet])
+def test_list_xml(client, viewset):
+    res = client.get(f"{viewset.get_service().endpoint}?format=xml", format='xml')
+    assert res.status_code == 200, res
+
+
+@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
+                                     FAMIndicatorViewSet, UserStatsViewSet])
+def test_list_msxml(client, viewset):
+    res = client.get(f"{viewset.get_service().endpoint}?format=ms-xml", format='ms-xml')
+    assert res.status_code == 200, res
+
+
+@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
+                                     FAMIndicatorViewSet, UserStatsViewSet])
+def test_list_msjson(client, viewset):
+    res = client.get(f"{viewset.get_service().endpoint}?format=ms-json", format='ms-json')
+    assert res.status_code == 200, res
+    assert res.json()

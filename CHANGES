@@ -6,6 +6,8 @@
 * add RedisBoard to monitor cache entries
 * new HACT endpoint
 * add Microsoft style JSON output
+* add Microsoft style XML output
+
 
 1.5
 ---

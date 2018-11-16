@@ -9,6 +9,8 @@ from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.filters import OrderingFilter
 from rest_framework.renderers import JSONRenderer
+from rest_framework_xml.renderers import XMLRenderer
+from strategy_field.utils import fqn
 from unicef_rest_framework import acl
 from unicef_rest_framework.auth import JWTAuthentication
 from unicef_rest_framework.cache import cache_response, etag, ListKeyConstructor
@@ -46,6 +48,7 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
                         CSVRenderer,
                         XLSXRenderer,
                         MSJSONRenderer,
+                        XMLRenderer,
                         MSXmlRenderer,
                         ]
     ordering_fields = ('id',)
@@ -60,7 +63,7 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
         self.request._request.api_info[key] = value
 
     def dispatch(self, request, *args, **kwargs):
-        request.api_info["view"] = self
+        request.api_info["view"] = fqn(self)
         request.api_info["service"] = self.get_service()
 
         return super().dispatch(request, *args, **kwargs)
