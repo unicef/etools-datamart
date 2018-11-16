@@ -7,12 +7,14 @@ import logging
 from django.conf import settings
 from django.db.models import F
 from django.utils.timezone import now
-from strategy_field.utils import fqn, get_attr
+from strategy_field.utils import fqn
 
 from etools_datamart.apps.tracking import config
-from etools_datamart.state import state
 
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
+
+# from unicef_rest_framework.state import state
+
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +87,6 @@ def record_to_kwargs(request, response):
     response_timedelta = now() - request.timestamp
     response_ms = int(response_timedelta.total_seconds() * 1000)
     response_length = len(response.content)
-
     # get POST data
     try:
         data_dict = request.POST.dict()
@@ -96,11 +97,11 @@ def record_to_kwargs(request, response):
         media_type = response.accepted_media_type
     except AttributeError:  # pragma: no cover
         media_type = response['Content-Type'].split(';')[0]
-    viewset = getattr(request, 'viewset', None)
-    if not viewset:  # pragma: no cover
+    view = request.api_info.get('view', None)
+    if not view:  # pragma: no cover
         return {}
-    viewset = fqn(viewset)
-    service = get_attr(request, "service.name")
+    viewset = fqn(view)
+    service = request.api_info.get("service")
     from unicef_rest_framework.utils import get_ident
     return dict(user=user,
                 requested_at=request.timestamp,
@@ -113,8 +114,8 @@ def record_to_kwargs(request, response):
                 query_params=json.dumps(request.GET.dict()),
                 data=data_dict,
                 viewset=viewset,
-                service=service,
-                cached=state.get('cache-hit') or False,  # see api.common.APICacheResponse
+                service=service.name,
+                cached=request.api_info.get('cache-hit', False),  # see api.common.APICacheResponse
                 content_type=media_type)
 
 #

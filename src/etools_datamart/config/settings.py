@@ -159,7 +159,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
     'crashlog.middleware.CrashLogMiddleware',
-    'etools_datamart.api.middleware.ApiMiddleware',
+    'unicef_rest_framework.middleware.ApiMiddleware',
     # 'etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware',
     'etools_datamart.apps.tracking.middleware.StatsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

@@ -2,7 +2,7 @@
 from django import template
 from django.db import connections
 
-from etools_datamart.state import state
+# from unicef_rest_framework.state import state
 
 register = template.Library()
 
@@ -20,9 +20,9 @@ def schemas(context):
     context['schemas'] = conn.schemas
     return ""
 
-
-@register.simple_tag(takes_context=True)
-def get_state(context):
-    context['state'] = state
-    context['request'] = state.request
-    return ""
+#
+# @register.simple_tag(takes_context=True)
+# def get_state(context):
+#     context['state'] = state
+#     context['request'] = state.request
+#     return ""

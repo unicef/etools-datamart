@@ -61,10 +61,10 @@ def user2(db):
 
 @pytest.fixture(autouse=True)
 def reset(monkeypatch):
-    from etools_datamart.state import state
+    # from etools_datamart.state import state
     from django.db import connections
 
-    state.request = None
+    # state.request = None
     conn = connections['etools']
     conn.set_schemas([])
     conn.search_path = None

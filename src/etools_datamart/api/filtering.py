@@ -7,7 +7,8 @@ from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
 from etools_datamart.apps.etools.utils import get_etools_allowed_schemas, validate_schemas
 from etools_datamart.apps.multitenant.exceptions import NotAuthorizedSchema
-from etools_datamart.state import state
+
+# from unicef_rest_framework.state import state
 
 months = ['jan', 'feb', 'mar',
           'apr', 'may', 'jun',
@@ -75,8 +76,10 @@ class SetHeaderMixin:
     # must be the first one
     def filter_queryset(self, request, queryset, view):
         ret = super().filter_queryset(request, queryset, view)
-        state.set('filters', self.filters)
-        state.set('excludes', self.exclude)
+        request._filters = self.filters
+        request._exclude = self.exclude
+        # state.set('filters', self.filters)
+        # state.set('excludes', self.exclude)
         return ret
 
 

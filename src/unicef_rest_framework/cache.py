@@ -12,8 +12,6 @@ from rest_framework_extensions.key_constructor.bits import KeyBitBase
 from rest_framework_extensions.key_constructor.constructors import KeyConstructor
 from rest_framework_extensions.settings import extensions_api_settings
 
-from etools_datamart.state import state
-
 cache = caches['default']
 
 
@@ -110,7 +108,7 @@ def humanize_ttl(value, months=True):  # noqa
 class CacheVersionKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         version = view_instance.get_service().cache_version
-        state.set('cache-version', version)
+        view_instance.request._request.api_info['cache-version'] = version
         return {'cache_version': str(version)}
 
 
@@ -128,7 +126,7 @@ class ListKeyConstructor(KeyConstructor):
 
     def get_key(self, view_instance, view_method, request, args, kwargs):
         key = super().get_key(view_instance, view_method, request, args, kwargs)
-        state.set('cache-key', key)
+        view_instance.request._request.api_info['cache-key'] = key
         return key
 
 
@@ -166,7 +164,7 @@ class APICacheResponse(CacheResponse):
         cache = caches[self.cache_name]
         response = cache.get(key)
         if not response:
-            state.set('cache-hit', False)
+            view_instance.request._request.api_info['cache-hit'] = False
             response = view_method(view_instance, request, *args, **kwargs)
             response = view_instance.finalize_response(request, response, *args, **kwargs)
             response.render()  # should be rendered, before picklining while storing to cache
@@ -174,12 +172,14 @@ class APICacheResponse(CacheResponse):
             if not response.status_code >= 400 or self.cache_errors:  # pragma: no cover
                 cache.set(key, response, parse_ttl(view_instance.get_service().cache_ttl or '1y'))
         else:
-            state.set('cache-hit', True)
-        request._request.service = view_instance.get_service()
-        request._request.viewset = view_instance
-        # state.set('service', view_instance.get_service().name)
-        # state.set('viewset', fqn(view_instance))
-        state.set('cache-ttl', view_instance.get_service().cache_ttl)
+            view_instance.request._request.api_info['cache-hit'] = True
+
+        view_instance.store('cache-ttl', view_instance.get_service().cache_ttl)
+        view_instance.store('service', view_instance.get_service())
+        view_instance.store('view', view_instance)
+        # view_instance.request._request.api_info['cache-ttl'] = view_instance.get_service().cache_ttl
+        # view_instance.request._request.api_info['service'] = view_instance.get_service()
+        # view_instance.request._request.api_info['view'] = fqn(view_instance)
 
         if not hasattr(response, '_closable_objects'):  # pragma: no cover
             response._closable_objects = []

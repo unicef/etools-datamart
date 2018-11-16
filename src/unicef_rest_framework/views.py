@@ -56,6 +56,9 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     permission_classes = [ServicePermission, ]
     serializers_fieldsets = {}
 
+    def store(self, key, value):
+        self.request._request.api_info[key] = value
+
     @classproperty
     def label(cls):
         return cls.__name__.replace("ViewSet", "")
