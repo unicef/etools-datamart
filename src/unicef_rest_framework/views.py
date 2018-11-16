@@ -59,6 +59,12 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     def store(self, key, value):
         self.request._request.api_info[key] = value
 
+    def dispatch(self, request, *args, **kwargs):
+        request.api_info["view"] = self
+        request.api_info["service"] = self.get_service()
+
+        return super().dispatch(request, *args, **kwargs)
+
     @classproperty
     def label(cls):
         return cls.__name__.replace("ViewSet", "")

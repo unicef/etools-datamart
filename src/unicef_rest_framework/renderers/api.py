@@ -15,13 +15,8 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
         # in the real flow, this is added by the MultiTenant Middleware
         # but this function is called before the middleware system is involved
         request = ctx['request']
-
-        # ctx['response_headers']['X-Schema'] = ",".join(state.schemas)
-        ctx['response_headers']['cache-version'] = getattr(request, 'cache-version', '')
-        ctx['response_headers']['cache-key'] = getattr(request, 'cache-key', '')
-        ctx['response_headers']['system-filters'] = getattr(request, '_system_filter', '')
-        ctx['response_headers']['filters'] = getattr(request, 'filters', '')
-        ctx['response_headers']['excludes'] = getattr(request, 'excludes', '')
+        for key, value in request.api_info.items():
+            ctx['response_headers'][key] = request.api_info.str(key)
 
         if request.user.is_staff:
             try:
