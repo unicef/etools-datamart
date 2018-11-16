@@ -5,7 +5,7 @@
 * invalidate cache on dataset refresh
 * add RedisBoard to monitor cache entries
 * new HACT endpoint
-
+* add Microsoft style JSON output
 
 1.5
 ---

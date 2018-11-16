@@ -2,26 +2,19 @@ from functools import wraps
 
 import coreapi
 import coreschema
-import rest_framework_extensions.utils
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
 from django.http import Http404
 from drf_querystringfilter.exceptions import QueryFilterException
-from drf_renderer_xlsx.renderers import XLSXRenderer
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.filters import OrderingFilter
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 
-from etools_datamart.api.cache import cache_response, etag, ListKeyConstructor
 from etools_datamart.api.filtering import DatamartQueryStringFilterBackend, TenantQueryStringFilterBackend
-from etools_datamart.api.renderers import CSVRenderer
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
-
-from ..renderers import APIBrowsableAPIRenderer
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
 
@@ -51,17 +44,6 @@ class SchemaSerializerField(coreschema.Enum):
 
 
 class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
-    object_cache_key_func = rest_framework_extensions.utils.default_object_cache_key_func
-    list_cache_key_func = ListKeyConstructor()
-
-    object_etag_func = rest_framework_extensions.utils.default_object_etag_func
-    list_etag_func = ListKeyConstructor()
-
-    renderer_classes = [JSONRenderer,
-                        APIBrowsableAPIRenderer,
-                        CSVRenderer,
-                        XLSXRenderer,
-                        ]
     filter_backends = [SystemFilterBackend,
                        DatamartQueryStringFilterBackend,
                        OrderingFilter]
@@ -117,16 +99,6 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
                 return obj
 
         return super().get_object()
-
-    @etag(etag_func='object_etag_func')
-    @cache_response(key_func='object_cache_key_func', cache='api')
-    def retrieve(self, request, *args, **kwargs):
-        return super(APIReadOnlyModelViewSet, self).retrieve(request, *args, **kwargs)
-
-    @etag(etag_func='list_etag_func')
-    @cache_response(key_func='list_cache_key_func', cache='api')
-    def list(self, request, *args, **kwargs):
-        return super(APIReadOnlyModelViewSet, self).list(request, *args, **kwargs)
 
 
 def one_schema(func):

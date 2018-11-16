@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
 from functools import lru_cache
 
+import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
+from drf_renderer_xlsx.renderers import XLSXRenderer
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.filters import OrderingFilter
+from rest_framework.renderers import JSONRenderer
 from unicef_rest_framework import acl
 from unicef_rest_framework.auth import JWTAuthentication
+from unicef_rest_framework.cache import cache_response, etag, ListKeyConstructor
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.permissions import ServicePermission
+from unicef_rest_framework.renderers import APIBrowsableAPIRenderer, MSJSONRenderer, MSXmlRenderer
+from unicef_rest_framework.renderers.csv import CSVRenderer
 
 
 class classproperty(object):
@@ -21,6 +27,12 @@ class classproperty(object):
 
 
 class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
+    object_cache_key_func = rest_framework_extensions.utils.default_object_cache_key_func
+    list_cache_key_func = ListKeyConstructor()
+
+    object_etag_func = rest_framework_extensions.utils.default_object_etag_func
+    list_etag_func = ListKeyConstructor()
+
     authentication_classes = (SessionAuthentication,
                               JWTAuthentication,
                               BasicAuthentication,
@@ -29,6 +41,13 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     filter_backends = [SystemFilterBackend,
                        QueryStringFilterBackend,
                        OrderingFilter]
+    renderer_classes = [JSONRenderer,
+                        APIBrowsableAPIRenderer,
+                        CSVRenderer,
+                        XLSXRenderer,
+                        MSJSONRenderer,
+                        MSXmlRenderer,
+                        ]
     ordering_fields = ('id',)
     ordering = 'id'
     filter_blacklist = []
@@ -46,3 +65,34 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     def get_service(cls):
         from unicef_rest_framework.models import Service
         return Service.objects.get_for_viewset(cls)[0]
+
+    @etag(etag_func='object_etag_func')
+    @cache_response(key_func='object_cache_key_func', cache='api')
+    def retrieve(self, request, *args, **kwargs):
+        return super(ReadOnlyModelViewSet, self).retrieve(request, *args, **kwargs)
+
+    @etag(etag_func='list_etag_func')
+    @cache_response(key_func='list_cache_key_func', cache='api')
+    def list(self, request, *args, **kwargs):
+        return super(ReadOnlyModelViewSet, self).list(request, *args, **kwargs)
+
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if hasattr(self.request.accepted_renderer, 'disable_pagination'):
+            return None
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        return super().paginate_queryset(queryset)
+
+    def get_paginated_response(self, data):
+        return super().get_paginated_response(data)

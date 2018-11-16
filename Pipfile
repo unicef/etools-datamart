@@ -45,6 +45,8 @@ django-countries = "*"
 django-filter = "*"
 drf-renderer-xlsx = "*"
 django-redisboard = "*"
+djangorestframework-xml = "*"
+redsettis = "<3"
 
 [dev-packages]
 "flake8" = ">=3.6.0"

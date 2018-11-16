@@ -70,8 +70,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         metadata['filters'] = getattr(view, 'filter_fields')
         metadata['filter_blacklist'] = getattr(view, 'filter_blacklist')
         metadata['ordering'] = getattr(view, 'ordering_fields')
-        if hasattr(view, 'serializers_fieldsets'):
-            metadata['serializers'] = view.serializers_fieldsets
+        metadata['serializers'] = getattr(view, 'serializers_fieldsets')
         # from django.db import connection
         # with connection.schema_editor() as editor:
         #     sql = get_create_model(editor, view.queryset.model)

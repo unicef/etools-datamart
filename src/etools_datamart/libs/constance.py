@@ -17,14 +17,14 @@ class GroupChoice(Select):
     pass
 
 
-class LabelInput(HiddenInput):
-
-    def render(self, name, value, attrs=None, renderer=None):
-        context = self.get_context(name, value, attrs)
-        context['value'] = str(value)
-        tpl = Template('<input type="hidden" name="{{ widget.name }}" value="{{ value }}">{{ value }}')
-        return mark_safe(tpl.render(Context(context)))
-
+# class LabelInput(HiddenInput):
+#
+#     def render(self, name, value, attrs=None, renderer=None):
+#         context = self.get_context(name, value, attrs)
+#         context['value'] = str(value)
+#         tpl = Template('<input type="hidden" name="{{ widget.name }}" value="{{ value }}">{{ value }}')
+#         return mark_safe(tpl.render(Context(context)))
+#
 
 class ObfuscatedInput(HiddenInput):
 
