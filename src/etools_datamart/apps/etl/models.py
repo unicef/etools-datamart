@@ -2,6 +2,8 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Model
+from django.utils.functional import cached_property
+from django_celery_beat.models import PeriodicTask
 
 from etools_datamart.celery import app, ETLTask
 
@@ -19,13 +21,16 @@ class TaskLogManager(models.Manager):
     def inspect(self):
         tasks = [cls for (name, cls) in app.tasks.items() if hasattr(cls, 'linked_model')]
         results = {True: 0, False: 0}
+        new = []
         for task in tasks:
-            __, created = self.get_or_create(task=task.name,
-                                             defaults=dict(
-                                                 content_type=ContentType.objects.get_for_model(task.linked_model),
-                                                 timestamp=None,
-                                                 table_name=task.linked_model._meta.db_table))
+            t, created = self.get_or_create(task=task.name,
+                                            defaults=dict(
+                                                content_type=ContentType.objects.get_for_model(task.linked_model),
+                                                timestamp=None,
+                                                table_name=task.linked_model._meta.db_table))
             results[created] += 1
+            new.append(t.id)
+        self.exclude(id__in=new).delete()
         return results[True], results[False]
 
 
@@ -43,3 +48,17 @@ class TaskLog(models.Model):
 
     def __str__(self):
         return f"{self.task} {self.result}"
+
+    @cached_property
+    def periodic_task(self):
+        try:
+            return PeriodicTask.objects.get(task=self.task)
+        except PeriodicTask.DoesNotExist:
+            pass
+    #
+    # @cached_property
+    # def scheduling(self):
+    #     try:
+    #         return self.periodic_task.crontab or self.periodic_task.solar or self.periodic_task.interval
+    #     except AttributeError:
+    #         return ''

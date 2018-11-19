@@ -5,6 +5,8 @@ from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.html import format_html
+from django_celery_beat.models import PeriodicTask
 from humanize import naturaldelta
 
 from etools_datamart.apps.etl.lock import cache
@@ -17,11 +19,32 @@ from . import models
 @register(models.TaskLog)
 class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
-                    'last_success', 'last_failure', 'lock')
+                    'last_success', 'last_failure', 'lock', 'scheduling', 'queue_task')
+
     readonly_fields = ('task', 'timestamp', 'result', 'elapsed', 'time',
                        'last_success', 'last_failure', 'table_name', 'content_type')
     date_hierarchy = 'timestamp'
     actions = None
+
+    def scheduling(self, obj):
+        opts = PeriodicTask._meta
+        if obj.periodic_task:
+            pt = obj.periodic_task
+            url = reverse('admin:%s_%s_change' % (opts.app_label,
+                                                  opts.model_name), args=[pt.id])
+            label = (pt.crontab or pt.solar or pt.interval)
+        else:
+            url = reverse('admin:%s_%s_add' % (opts.app_label, opts.model_name))
+            label = 'Schedule'
+
+        return format_html(f'<a href="{url}?name={obj.task}&task={obj.task}">{label}</a>')
+
+    def queue_task(self, obj):
+        opts = self.model._meta
+        url = reverse('admin:%s_%s_queue' % (opts.app_label,
+                                             opts.model_name), args=[obj.id])
+        return format_html(f'<a href="{url}">queue</a>')
+    queue_task.verbse_name = 'queue'
 
     def has_add_permission(self, request):
         return False
