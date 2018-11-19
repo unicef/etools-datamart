@@ -1,11 +1,17 @@
+# envs to set before use this script
+DATABASE_URL?=
+DATABASE_URL_ETOOLS?=
+DEVELOP?=0
+DOCKER_PASS?=${DOCKER_PASS}
+DOCKER_USER?=${DOCKER_USER}
+TARGET?=dev
+# below var are used internally
 BUILD_OPTIONS?=
 CMD?=datamart
-TARGET?=dev
-DEVELOP?=0
 CONTAINER_NAME?=datamart-${TARGET}
-DATABASE_URL?=postgres://postgres:@192.168.66.66:5432/etools_datamart
-DATABASE_URL_ETOOLS?=postgis://postgres:@192.168.66.66:15432/etools
-DOCKER_IMAGE_NAME=unicef/datamart
+ORGANIZATION=unicef
+IMAGE_NAME=datamart
+DOCKER_IMAGE_NAME=${ORGANIZATION}/${IMAGE_NAME}
 DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
@@ -18,7 +24,8 @@ help:
 
 
 build:
-	cd .. && docker build ${BUILD_OPTIONS} \
+	cd .. && docker build \
+			${BUILD_OPTIONS} \
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
 			--build-arg VERSION=${TARGET} \
@@ -88,3 +95,7 @@ scratch:
 shell:
 #	docker exec -it ${CONTAINER_NAME} /bin/bash
 	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
+
+docker-remove:
+	docker-remove.sh ${IMAGE_NAME} -o ${ORGANIZATION}
+
