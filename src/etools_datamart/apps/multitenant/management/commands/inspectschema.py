@@ -7,7 +7,7 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.constants import LOOKUP_SEP
 from django_regex.utils import RegexList
 
-from etools_datamart import state
+# from etools_datamart import state
 
 INGNORED_TABLES = RegexList([
     # Both
@@ -64,7 +64,7 @@ class Command(BaseCommand):
             return s[1:] if s.startswith("u'") else s
 
         # connection.mode = SINGLE_TENANT
-        state.schemas = [schema, "public"]
+        # state.schemas = [schema, "public"]
         connection.schema_name = schema
         with connection.cursor() as cursor:
             # cursor.execute(raw_sql(f"SET search_path={schema}"))

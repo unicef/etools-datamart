@@ -16,8 +16,8 @@ from etools_datamart.libs.truncate import TruncateTableMixin
 from . import models
 
 
-@register(models.TaskLog)
-class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
+@register(models.EtlTask)
+class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'result', 'time',
                     'last_success', 'last_failure', 'lock', 'scheduling', 'queue_task')
 
@@ -32,12 +32,13 @@ class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
             pt = obj.periodic_task
             url = reverse('admin:%s_%s_change' % (opts.app_label,
                                                   opts.model_name), args=[pt.id])
+            url = f"{url}?name={obj.task}&task={obj.task}"
             label = (pt.crontab or pt.solar or pt.interval)
         else:
             url = reverse('admin:%s_%s_add' % (opts.app_label, opts.model_name))
             label = 'Schedule'
 
-        return format_html(f'<a href="{url}?name={obj.task}&task={obj.task}">{label}</a>')
+        return format_html(f'<a href="{url}">{label}</a>')
 
     def queue_task(self, obj):
         opts = self.model._meta
@@ -77,7 +78,7 @@ class ExecutionAdmin(TruncateTableMixin, admin.ModelAdmin):
         except Exception as e:  # pragma: no cover
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
 
-    @action()
+    @action(visible=lambda obj: f"{obj.task}-lock" in cache)
     def unlock(self, request, pk):
         obj = self.get_object(request, pk)
         key = f"{obj.task}-lock"

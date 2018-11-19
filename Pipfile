@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-"psycopg2-binary" = "*"
+psycopg2 = "*"
 admin-extra-urls = ">=2.1"
 celery = "*"
 coreapi = "*"
@@ -27,7 +27,6 @@ djangorestframework-jwt = "*"
 drf-dynamic-serializer = ">=1.2.0"
 drf-extensions = "*"
 drf-yasg = {version = "*", extras = ["validation"]}
-flower = "*"
 gunicorn = "*"
 humanize = "*"
 pyparsing = "*"
@@ -46,7 +45,6 @@ django-filter = "*"
 drf-renderer-xlsx = "*"
 django-redisboard = "*"
 djangorestframework-xml = "*"
-redsettis = "<3"
 
 [dev-packages]
 "flake8" = ">=3.6.0"

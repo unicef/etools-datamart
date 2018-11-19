@@ -34,7 +34,7 @@ class TaskLogManager(models.Manager):
         return results[True], results[False]
 
 
-class TaskLog(models.Model):
+class EtlTask(models.Model):
     task = models.CharField(max_length=200, unique=True)
     timestamp = models.DateTimeField(null=True)
     result = models.CharField(max_length=200)
@@ -55,10 +55,3 @@ class TaskLog(models.Model):
             return PeriodicTask.objects.get(task=self.task)
         except PeriodicTask.DoesNotExist:
             pass
-    #
-    # @cached_property
-    # def scheduling(self):
-    #     try:
-    #         return self.periodic_task.crontab or self.periodic_task.solar or self.periodic_task.interval
-    #     except AttributeError:
-    #         return ''

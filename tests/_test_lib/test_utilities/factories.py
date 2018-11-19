@@ -8,7 +8,7 @@ from django.utils import timezone
 from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
 from etools_datamart.apps.data.models import FAMIndicator, HACT, Intervention, PMPIndicators, UserStats
-from etools_datamart.apps.etl.models import TaskLog
+from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.tracking.models import APIRequestLog
 
 today = timezone.now()
@@ -18,7 +18,7 @@ class TaskLogFactory(factory.DjangoModelFactory):
     elapsed = 10
 
     class Meta:
-        model = TaskLog
+        model = EtlTask
 
 
 class APIRequestLogFactory(factory.DjangoModelFactory):

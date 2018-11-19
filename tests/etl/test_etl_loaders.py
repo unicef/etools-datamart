@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from etools_datamart.apps.data.models import FAMIndicator, HACT, Intervention, PMPIndicators, UserStats
-from etools_datamart.apps.etl.tasks import (load_fam_indicator, load_hact, load_intervention,
-                                            load_pmp_indicator, load_user_report,)
+from etools_datamart.apps.etl.tasks.etl import (load_fam_indicator, load_hact, load_intervention,
+                                                load_pmp_indicator, load_user_report,)
 
 
 def test_load_pmp_indicator(number_of_intervention):

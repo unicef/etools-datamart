@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django_countries.fields import CountryField
 
@@ -80,6 +81,22 @@ class User(AbstractUser, TimeStampedModel):
 
     class Meta:
         app_label = 'unicef_security'
+
+    @cached_property
+    def label(self):
+        if self.display_name:
+            return
+        elif self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}:"
+        elif self.first_name:
+            return self.first_name
+        else:
+            return self.username
+
+    def save(self, *args, **kwargs):
+        if not self.display_name:
+            self.display_name = self.label
+        super().save(*args, **kwargs)
 
 
 class Role(models.Model, TimeStampedModel):

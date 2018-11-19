@@ -15,6 +15,7 @@ DOCKER_IMAGE_NAME=${ORGANIZATION}/${IMAGE_NAME}
 DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
+PIPENV_ARGS?=
 
 help:
 	@echo "dev                  build dev image (based on local code)"

@@ -1,4 +1,5 @@
 import os
+import warnings
 from pathlib import Path
 
 import pytest
@@ -8,12 +9,13 @@ from _pytest.fixtures import SubRequest
 def pytest_configure(config):
     # enable this to remove deprecations
     os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
+    os.environ['STATIC_URL'] = "."
 
 
 # warnings.simplefilter('once', DeprecationWarning)
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
-# warnings.simplefilter('ignore', RemovedInDjango30Warning)
+warnings.simplefilter('ignore', UserWarning)
 
 
 @pytest.yield_fixture(scope='session')

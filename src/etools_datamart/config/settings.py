@@ -520,7 +520,7 @@ LOGGING = {
             'propagate': False
         },
         'etools_datamart': {
-            'handlers': ['console', 'db'],
+            'handlers': ['null', 'db'],
             'level': 'ERROR',
             'propagate': False
         },

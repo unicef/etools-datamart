@@ -68,11 +68,11 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
 
     app.timers[task_id] = time()
     from django.contrib.contenttypes.models import ContentType
-    from etools_datamart.apps.etl.models import TaskLog
+    from etools_datamart.apps.etl.models import EtlTask
 
     defs = {'result': 'RUNNING',
             'timestamp': timezone.now()}
-    TaskLog.objects.update_or_create(task=task.name,
+    EtlTask.objects.update_or_create(task=task.name,
                                      content_type=ContentType.objects.get_for_model(task.linked_model),
                                      table_name=task.linked_model._meta.db_table,
                                      defaults=defs)
@@ -93,7 +93,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['last_success'] = timezone.now()
     else:
         defs['last_failure'] = timezone.now()
-    from etools_datamart.apps.etl.models import TaskLog
+    from etools_datamart.apps.etl.models import EtlTask
 
-    TaskLog.objects.update_or_create(task=task.name, defaults=defs)
+    EtlTask.objects.update_or_create(task=task.name, defaults=defs)
     app.timers[task.name] = cost

@@ -3,13 +3,13 @@ import pytest
 from django.contrib import messages
 from django.urls import reverse
 
-from etools_datamart.apps.etl.models import TaskLog
+from etools_datamart.apps.etl.models import EtlTask
 
 
 @pytest.fixture
 def tasklog():
-    TaskLog.objects.inspect()
-    return TaskLog.objects.first()
+    EtlTask.objects.inspect()
+    return EtlTask.objects.first()
 
 
 def test_tasklog_changelist(django_app, admin_user, tasklog):
