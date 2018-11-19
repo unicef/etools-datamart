@@ -37,6 +37,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   SECURE_FRAME_DENY=(bool, True),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
+                  STATIC_URL=(str, '/dm-static/'),
                   X_FRAME_OPTIONS=(str, 'DENY'),
 
                   AZURE_CLIENT_ID=(str, ''),
@@ -132,7 +133,7 @@ MEDIA_URL = '/dm-media/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/dm-static/'
+STATIC_URL = env('STATIC_URL')
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -346,6 +347,7 @@ CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+# CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks", ]
 CELERY_BEAT_SCHEDULE = {}
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', False)
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
