@@ -40,20 +40,23 @@ class DatamartCelery(Celery):
         task = super().task(*args, **opts)
         return task
 
-    def gen_task_name(self, name, module):
-        prefix = ""
-        if module.endswith('.tasks.etl'):
-            module = module[:-10]
-            prefix = 'etl_'
-        if module.endswith('.tasks'):
-            module = module[:-6]
-        return prefix + super(DatamartCelery, self).gen_task_name(name, module)
+    # def gen_task_name(self, name, module):
+    #     prefix = ""
+    #     if module.endswith('.tasks.etl'):
+    #         module = module[:-10]
+    #         prefix = 'etl_'
+    #     if module.endswith('.tasks'):
+    #         module = module[:-6]
+    #     return prefix + super(DatamartCelery, self).gen_task_name(name, module)
 
 
 app = DatamartCelery('datamart')
 app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks(related_name='tasks')
-app.autodiscover_tasks(related_name='etl')
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
+#                        related_name='tasks')
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
+#                        related_name='etl')
 
 app.timers = {}
 

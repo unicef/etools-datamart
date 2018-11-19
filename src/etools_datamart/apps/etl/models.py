@@ -17,7 +17,7 @@ class TaskLogManager(models.Manager):
                                                 table_name=task.linked_model._meta.db_table))[0]
 
     def inspect(self):
-        tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
+        tasks = [cls for (name, cls) in app.tasks.items() if hasattr(cls, 'linked_model')]
         results = {True: 0, False: 0}
         for task in tasks:
             __, created = self.get_or_create(task=task.name,
