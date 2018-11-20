@@ -347,10 +347,16 @@ CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
-# CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks", ]
+CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
+                       "etools_datamart.apps.etl.tasks.tasks", ]
 CELERY_BEAT_SCHEDULE = {}
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', False)
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
+CELERY_TASK_ROUTES = {
+    'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
+    'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
+}
+
 CONCURRENCY_IGNORE_DEFAULT = False
 
 REST_FRAMEWORK = {
