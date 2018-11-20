@@ -45,6 +45,7 @@ django-filter = "*"
 drf-renderer-xlsx = "*"
 django-redisboard = "*"
 djangorestframework-xml = "*"
+redis = "==2.10.6"
 
 [dev-packages]
 "flake8" = ">=3.6.0"
