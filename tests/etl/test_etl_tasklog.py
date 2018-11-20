@@ -22,16 +22,16 @@ def test_check_extra_attributes(db):
 
 
 def test_load_pmp_indicator(db):
-    with mock.patch('etools_datamart.apps.etl.tasks.load_pmp_indicator.run'):
+    with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run'):
         assert load_pmp_indicator.apply()
-        assert EtlTask.objects.filter(task='etl_etools_datamart.apps.etl.load_pmp_indicator',
+        assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
                                       result='SUCCESS').exists()
 
 
 def test_load_pmp_indicator_fail(db):
-    with mock.patch('etools_datamart.apps.etl.tasks.load_pmp_indicator.run', side_effect=Exception):
+    with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run', side_effect=Exception):
         assert load_pmp_indicator.apply()
-        assert EtlTask.objects.filter(task='etl_etools_datamart.apps.etl.load_pmp_indicator',
+        assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
                                       result='FAILURE')
 
 
@@ -43,7 +43,7 @@ def disable_post_run():
 
 
 def test_load_pmp_indicator_running(db, disable_post_run):
-    with mock.patch('etools_datamart.apps.etl.tasks.load_pmp_indicator.run'):
+    with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run'):
         assert load_pmp_indicator.apply()
-        assert EtlTask.objects.filter(task='etl_etools_datamart.apps.etl.load_pmp_indicator',
+        assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
                                       result='RUNNING')

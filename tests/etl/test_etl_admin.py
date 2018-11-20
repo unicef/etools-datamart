@@ -13,7 +13,7 @@ def tasklog():
 
 
 def test_tasklog_changelist(django_app, admin_user, tasklog):
-    url = reverse("admin:etl_tasklog_changelist")
+    url = reverse("admin:etl_etltask_changelist")
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
@@ -21,7 +21,7 @@ def test_tasklog_changelist(django_app, admin_user, tasklog):
 
 
 def test_tasklog_change(django_app, admin_user, tasklog):
-    url = reverse("admin:etl_tasklog_change", args=[tasklog.id])
+    url = reverse("admin:etl_etltask_change", args=[tasklog.id])
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
@@ -31,7 +31,7 @@ def test_tasklog_change(django_app, admin_user, tasklog):
 
 
 def test_tasklog_unlock(django_app, admin_user, tasklog):
-    url = reverse("admin:etl_tasklog_change", args=[tasklog.id])
+    url = reverse("admin:etl_etltask_change", args=[tasklog.id])
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
     res = res.click("Unlock")
@@ -41,7 +41,7 @@ def test_tasklog_unlock(django_app, admin_user, tasklog):
 
 
 def test_tasklog_queue(django_app, admin_user, tasklog):
-    url = reverse("admin:etl_tasklog_change", args=[tasklog.id])
+    url = reverse("admin:etl_etltask_change", args=[tasklog.id])
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
     res = res.click("Queue")
@@ -51,7 +51,7 @@ def test_tasklog_queue(django_app, admin_user, tasklog):
 
 
 def test_tasklog_refresh(django_app, admin_user, tasklog):
-    url = reverse("admin:etl_tasklog_change", args=[tasklog.id])
+    url = reverse("admin:etl_etltask_change", args=[tasklog.id])
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
@@ -59,7 +59,7 @@ def test_tasklog_refresh(django_app, admin_user, tasklog):
 
 
 def test_tasklog_truncate(django_app, admin_user, tasklog):
-    url = reverse("admin:etl_tasklog_changelist")
+    url = reverse("admin:etl_etltask_changelist")
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})
@@ -72,7 +72,7 @@ def test_tasklog_truncate(django_app, admin_user, tasklog):
 
 
 def test_tasklog_inspect(django_app, admin_user, tasklog):
-    url = reverse("admin:etl_tasklog_changelist")
+    url = reverse("admin:etl_etltask_changelist")
     res = django_app.get(url,
                          user=admin_user,
                          extra_environ={'HTTP_X_SCHEMA': "public"})

@@ -78,7 +78,7 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
         except Exception as e:  # pragma: no cover
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
 
-    @action(visible=lambda obj: f"{obj.task}-lock" in cache)
+    @action()
     def unlock(self, request, pk):
         obj = self.get_object(request, pk)
         key = f"{obj.task}-lock"
