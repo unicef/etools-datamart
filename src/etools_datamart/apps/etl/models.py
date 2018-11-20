@@ -19,7 +19,7 @@ class TaskLogManager(models.Manager):
                                                 table_name=task.linked_model._meta.db_table))[0]
 
     def inspect(self):
-        tasks = [cls for (name, cls) in app.tasks.items() if hasattr(cls, 'linked_model')]
+        tasks = app.get_all_etls()
         results = {True: 0, False: 0}
         new = []
         for task in tasks:
@@ -45,6 +45,9 @@ class EtlTask(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
 
     objects = TaskLogManager()
+
+    class Meta:
+        get_latest_by = 'timestamp'
 
     def __str__(self):
         return f"{self.task} {self.result}"

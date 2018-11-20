@@ -2,6 +2,7 @@
 import pytest
 from django.contrib import messages
 from django.urls import reverse
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from etools_datamart.apps.etl.models import EtlTask
 
@@ -12,7 +13,16 @@ def tasklog():
     return EtlTask.objects.first()
 
 
-def test_tasklog_changelist(django_app, admin_user, tasklog):
+@pytest.fixture
+def tasklog_scheduled(tasklog):
+    midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
+    task = EtlTask.objects.latest()
+    PeriodicTask.objects.get_or_create(task=task.task,
+                                       defaults={'name': task.task,
+                                                 'crontab': midnight})
+
+
+def test_tasklog_changelist(django_app, admin_user, tasklog_scheduled):
     url = reverse("admin:etl_etltask_changelist")
     res = django_app.get(url,
                          user=admin_user,

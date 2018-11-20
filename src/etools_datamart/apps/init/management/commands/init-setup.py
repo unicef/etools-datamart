@@ -136,7 +136,7 @@ class Command(BaseCommand):
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
 
-            tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
+            tasks = app.get_all_etls()
             counters = {True: 0, False: 0}
             for task in tasks:
                 __, is_new = PeriodicTask.objects.get_or_create(task=fqn(task),

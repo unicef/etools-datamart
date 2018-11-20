@@ -40,6 +40,9 @@ class DatamartCelery(Celery):
         task = super().task(*args, **opts)
         return task
 
+    def get_all_etls(self):
+        return [cls for (name, cls) in self.tasks.items() if hasattr(cls, 'linked_model')]
+
     # def gen_task_name(self, name, module):
     #     prefix = ""
     #     if module.endswith('.tasks.etl'):

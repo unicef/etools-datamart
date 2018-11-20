@@ -110,7 +110,8 @@ RUN pip install . \
 #    && rm -fr /var/cache/apt/*
 
 RUN apk del .build-deps \
-    rm -rf /var/cache/apk/*
+    rm -rf /var/cache/apk/* \
+    rm -fr /root/.cache/
 
 WORKDIR /var/datamart
 
