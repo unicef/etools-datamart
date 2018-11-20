@@ -1,5 +1,5 @@
-1.6 (dev)
----------
+1.6
+---
 * add ability to invalidate cache directly from admin endpoint
 * add ability to queue task from task log
 * invalidate cache on dataset refresh
