@@ -111,7 +111,8 @@ RUN pip install . \
 
 RUN apk del .build-deps \
     rm -rf /var/cache/apk/* \
-    rm -fr /root/.cache/
+    rm -fr /root/.cache/ \
+    find /usr/local/lib/python3.6 -name __pycache__ -prune | xargs rm -rf
 
 WORKDIR /var/datamart
 

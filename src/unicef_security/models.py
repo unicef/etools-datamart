@@ -85,7 +85,7 @@ class User(AbstractUser, TimeStampedModel):
     @cached_property
     def label(self):
         if self.display_name:
-            return
+            return self.display_name
         elif self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}:"
         elif self.first_name:
