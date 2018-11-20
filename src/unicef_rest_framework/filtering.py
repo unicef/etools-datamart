@@ -22,7 +22,7 @@ class SystemFilterBackend(BaseFilterBackend):
         filter = SystemFilter.objects.match(request, view)
         if filter:
             queryset = filter.filter_queryset(queryset)
-            request._request._system_filter = filter.get_querystring()
+            view.store('system-filters', filter.get_querystring())
         return queryset
 
 

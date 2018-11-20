@@ -13,3 +13,4 @@ class UserStats(DataMartModel):
 
     class Meta:
         ordering = ('-month', 'country_name')
+        unique_together = ('country_name', 'month')

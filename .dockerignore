@@ -1,7 +1,5 @@
-.git
-.tox
-.venv
-~build
-.pytest_cache
-.circleci
+.*
+~*
 db
+docs
+tests

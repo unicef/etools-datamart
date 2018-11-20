@@ -34,3 +34,8 @@ SESSION_COOKIE_HTTPONLY = False
 ALLOWED_HOSTS = ['*']
 STATIC_ROOT = os.path.dirname(__file__)  # noqa
 SESSION_COOKIE_SECURE = False
+
+LOGGING['loggers']['etools_datamart']['handlers'] = ['null']  # noqa
+LOGGING['loggers']['']['handlers'] = ['null']  # noqa
+LOGGING['loggers']['django_db_logging']['handlers'] = ['null']  # noqa
+LOGGING['loggers']['unicef_rest_framework']['handlers'] = ['null']  # noqa

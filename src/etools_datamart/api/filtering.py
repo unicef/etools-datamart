@@ -7,7 +7,8 @@ from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
 from etools_datamart.apps.etools.utils import get_etools_allowed_schemas, validate_schemas
 from etools_datamart.apps.multitenant.exceptions import NotAuthorizedSchema
-from etools_datamart.state import state
+
+# from unicef_rest_framework.state import state
 
 months = ['jan', 'feb', 'mar',
           'apr', 'may', 'jun',
@@ -22,7 +23,7 @@ class CountryNameProcessor:
         if not value:
             if not request.user.is_superuser:
                 allowed = get_etools_allowed_schemas(request.user)
-                if not allowed:
+                if not allowed:  # pragma: no cover
                     raise PermissionDenied("You don't have enabled schemas")
                 filters['country_name__iregex'] = r'(' + '|'.join(allowed) + ')'
         else:
@@ -61,10 +62,12 @@ class MonthProcessor:
                 elif value == 'current':
                     m = datetime.now().month
                     y = datetime.now().year
+                else:  # pragma: no cover
+                    raise InvalidQueryValueError('month', value)
 
                 filters['month__month'] = int(m)
                 filters['month__year'] = int(y)
-            except ValueError:
+            except ValueError:  # pragma: no cover
                 raise InvalidQueryValueError('month', value)
         return filters, exclude
 
@@ -73,8 +76,10 @@ class SetHeaderMixin:
     # must be the first one
     def filter_queryset(self, request, queryset, view):
         ret = super().filter_queryset(request, queryset, view)
-        state.set('filters', self.filters)
-        state.set('excludes', self.exclude)
+        request._filters = self.filters
+        request._exclude = self.exclude
+        # state.set('filters', self.filters)
+        # state.set('excludes', self.exclude)
         return ret
 
 

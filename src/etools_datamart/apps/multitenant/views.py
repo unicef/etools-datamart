@@ -7,7 +7,8 @@ from django.utils.http import urlencode
 from django.views.generic.edit import FormView
 
 from etools_datamart.apps.multitenant.forms import SchemasForm
-from etools_datamart.state import state
+
+# from unicef_rest_framework.state import state
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,7 @@ class SelectSchema(FormView):
             self.selected = ['_all']
 
         response = HttpResponseRedirect(self.get_success_url())
-        state.schemas = self.selected
+        # state.schemas = self.selected
         # response.set_cookie('schemas', ','.join(self.selected))
         return response
 

@@ -6,6 +6,13 @@ from test_utilities.factories import PMPIndicatorFactory
 
 
 @pytest.mark.django_db()
+def test_data_index(django_app, admin_user):
+    url = reverse("admin:app_list", args=['data'])
+    res = django_app.get(url, user=admin_user)
+    assert res.status_code == 200
+
+
+@pytest.mark.django_db()
 def test_pmpindicators_list(django_app, admin_user):
     url = reverse("admin:data_pmpindicators_changelist")
     res = django_app.get(url, user=admin_user)
@@ -41,6 +48,12 @@ def test_pmpindicators_refresh(django_app, admin_user):
     assert res.status_code == 200
     storage = res.context['messages']
     assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
+
+
+def test_pmpindicators_invalidate_cache(django_app, admin_user, service):
+    url = reverse("admin:data_pmpindicators_invalidate_cache")
+    res = django_app.get(url, user=admin_user)
+    assert res.status_code == 302
 
 
 def test_pmpindicators_api(django_app, admin_user, service):

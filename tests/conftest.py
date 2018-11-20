@@ -1,15 +1,21 @@
+import os
+import warnings
 from pathlib import Path
-from unittest.mock import Mock
 
 import pytest
 from _pytest.fixtures import SubRequest
 
-# def pytest_configure(config):
-# enable this to remove deprecations
+
+def pytest_configure(config):
+    # enable this to remove deprecations
+    os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
+    os.environ['STATIC_URL'] = "."
+
+
 # warnings.simplefilter('once', DeprecationWarning)
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
-# warnings.simplefilter('ignore', RemovedInDjango30Warning)
+warnings.simplefilter('ignore', UserWarning)
 
 
 @pytest.yield_fixture(scope='session')
@@ -57,10 +63,10 @@ def user2(db):
 
 @pytest.fixture(autouse=True)
 def reset(monkeypatch):
-    from etools_datamart.state import state
+    # from etools_datamart.state import state
     from django.db import connections
 
-    state.request = None
+    # state.request = None
     conn = connections['etools']
     conn.set_schemas([])
     conn.search_path = None
@@ -68,17 +74,18 @@ def reset(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def disable_stats(request: SubRequest, monkeypatch):
-    if 'enable_threadstats' in request.funcargnames:
-        pass
-    elif 'enable_stats' in request.funcargnames:
-        from etools_datamart.apps.tracking.middleware import StatsMiddleware
-        monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
-                            StatsMiddleware.log
-                            )
-
-    else:
-        monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
-                            Mock())
+    pass  # FIXME: ThreadedStatsMiddleware has some side effects in test..
+    # if 'enable_threadstats' in request.funcargnames:
+    #     pass
+    # elif 'enable_stats' in request.funcargnames:
+    #     from etools_datamart.apps.tracking.middleware import StatsMiddleware
+    #     monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
+    #                         StatsMiddleware.log
+    #                         )
+    #
+    # else:
+    #     monkeypatch.setattr('etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware.log',
+    #                         Mock())
 
 
 @pytest.fixture()

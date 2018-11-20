@@ -2,7 +2,6 @@ import os
 from time import time
 
 from celery import Celery
-from celery.app.task import TaskType
 from celery.signals import task_postrun, task_prerun
 from celery.task import Task
 from django.utils import timezone
@@ -12,19 +11,7 @@ from etools_datamart.apps.etl.lock import only_one
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
 
-# def get_task_log(name, model):
-#     if not name:
-#         return None
-#     from django.contrib.contenttypes.models import ContentType
-#     from etools_datamart.apps.etl.models import TaskLog
-#
-#     return TaskLog.objects.get_or_create(task=name,
-#                               defaults=dict(content_type=ContentType.objects.get_for_model(model),
-#                                             timestamp=None,
-#                                             table_name=model._meta.db_table))[0]
-#
-
-class ETLTask(Task, metaclass=TaskType):
+class ETLTask(Task):
     abstract = True
     linked_model = None
 
@@ -36,12 +23,12 @@ class DatamartCelery(Celery):
     def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
         linked_model = options.get('linked_model', None)
         name = name or self.gen_task_name(fun.__name__, fun.__module__)
-        # options['task_log'] = SimpleLazyObject(lambda: get_task_log(name, options.get('linked_model')))
+        options['lock_key'] = f"{name}-lock"
+        fun = only_one(fun, options['lock_key'])
+        options['unlock'] = fun.unlock
 
-        fun = only_one(fun, f"{name}-lock")
         task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
         if linked_model:
-            # task.linked_model = linked_model
             linked_model._etl_task = task
             linked_model._etl_loader = fun
 
@@ -53,20 +40,26 @@ class DatamartCelery(Celery):
         task = super().task(*args, **opts)
         return task
 
-    def gen_task_name(self, name, module):
-        prefix = ""
-        if module.endswith('.tasks.etl'):
-            module = module[:-10]
-            prefix = 'etl_'
-        if module.endswith('.tasks'):
-            module = module[:-6]
-        return prefix + super(DatamartCelery, self).gen_task_name(name, module)
+    def get_all_etls(self):
+        return [cls for (name, cls) in self.tasks.items() if hasattr(cls, 'linked_model')]
+
+    # def gen_task_name(self, name, module):
+    #     prefix = ""
+    #     if module.endswith('.tasks.etl'):
+    #         module = module[:-10]
+    #         prefix = 'etl_'
+    #     if module.endswith('.tasks'):
+    #         module = module[:-6]
+    #     return prefix + super(DatamartCelery, self).gen_task_name(name, module)
 
 
 app = DatamartCelery('datamart')
 app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks(related_name='tasks')
-app.autodiscover_tasks(related_name='etl')
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
+#                        related_name='tasks')
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
+#                        related_name='etl')
 
 app.timers = {}
 
@@ -78,11 +71,11 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
 
     app.timers[task_id] = time()
     from django.contrib.contenttypes.models import ContentType
-    from etools_datamart.apps.etl.models import TaskLog
+    from etools_datamart.apps.etl.models import EtlTask
 
     defs = {'result': 'RUNNING',
             'timestamp': timezone.now()}
-    TaskLog.objects.update_or_create(task=task.name,
+    EtlTask.objects.update_or_create(task=task.name,
                                      content_type=ContentType.objects.get_for_model(task.linked_model),
                                      table_name=task.linked_model._meta.db_table,
                                      defaults=defs)
@@ -103,7 +96,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['last_success'] = timezone.now()
     else:
         defs['last_failure'] = timezone.now()
-    from etools_datamart.apps.etl.models import TaskLog
+    from etools_datamart.apps.etl.models import EtlTask
 
-    TaskLog.objects.update_or_create(task=task.name, defaults=defs)
+    EtlTask.objects.update_or_create(task=task.name, defaults=defs)
     app.timers[task.name] = cost

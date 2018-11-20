@@ -1,6 +1,6 @@
 import os
-import sys
 import warnings
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -11,10 +11,11 @@ from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from humanize import naturaldelta
+from redisboard.models import RedisServer
 from strategy_field.utils import fqn
 from unicef_rest_framework.models.acl import GroupAccessControl
 
-from etools_datamart.apps.etl.models import TaskLog
+from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.celery import app
 
 
@@ -105,13 +106,20 @@ class Command(BaseCommand):
                 serializers=['*'],
                 policy=GroupAccessControl.POLICY_ALLOW
             )
+        # hostname
+        for entry, values in settings.CACHES.items():
+            loc = values.get('LOCATION', '')
+            spec = urlparse(loc)
+            if spec.scheme == 'redis':
+                RedisServer.objects.get_or_create(hostname=spec.netloc,
+                                                  port=int(spec.port))
 
         if os.environ.get('AUTOCREATE_USERS'):
             self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
             self.stdout.write("Going to create new users")
             try:
-                for entry in os.environ.get('AUTOCREATE_USERS').split(','):
-                    user, pwd = entry.split('|')
+                for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
+                    user, pwd = entry.split(',')
                     User = get_user_model()
                     u, created = User.objects.get_or_create(username=user)
                     if created:
@@ -119,16 +127,16 @@ class Command(BaseCommand):
                         u.set_password(pwd)
                         u.save()
                         u.groups.add(all_access)
-                    else:
+                    else:  # pragma: no cover
                         self.stdout.write(f"User {u} already exists.")
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 warnings.warn(f"Unable to create default users. {e}")
 
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
 
-            tasks = [cls for (name, cls) in app.tasks.items() if name.startswith('etl_')]
+            tasks = app.get_all_etls()
             counters = {True: 0, False: 0}
             for task in tasks:
                 __, is_new = PeriodicTask.objects.get_or_create(task=fqn(task),
@@ -141,7 +149,7 @@ class Command(BaseCommand):
                     task.delete()
                     counters[False] += 1
 
-            TaskLog.objects.inspect()
+            EtlTask.objects.inspect()
             self.stdout.write(
                 f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
 
@@ -156,10 +164,6 @@ class Command(BaseCommand):
                     etl.delay()
                     self.stdout.write(f"{task.name} scheduled")
                 else:
-                    ret = etl.apply()
+                    etl.apply()
                     cost = naturaldelta(app.timers[task.name])
-                    if isinstance(ret.result, Exception):  # pragma: no cover
-                        self.stderr.write(f"\n{ret.result}")
-                        sys.exit(1)
-
-                    self.stdout.write(f"{task.name} created {sum(ret.result.values())} records in {cost}")
+                    self.stdout.write(f"{task.name} excuted in {cost}")

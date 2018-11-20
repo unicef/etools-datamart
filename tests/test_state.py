@@ -52,11 +52,11 @@
 #     with pytest.raises(InvalidSchema):
 #         s.schemas.append('--')
 #
+# #
+# from etools_datamart.state import State
 #
-from etools_datamart.state import State
-
-
-def test_clear():
-    s = State()
-    s.clear()
-    assert not s.data
+#
+# def test_clear():
+#     s = State()
+#     s.clear()
+#     assert not s.data

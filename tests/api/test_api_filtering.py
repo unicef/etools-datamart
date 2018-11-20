@@ -17,7 +17,7 @@ def test_filter_datamart_country_name(db, client, flt):
     assert res.json()
 
 
-@pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current'])
+@pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', ''])
 def test_filter_datamart_month(db, client, flt):
     url = f"/api/datamart/user-stats/?month=%s" % flt
     res = client.get(url)

@@ -44,23 +44,50 @@ def default_group(**kwargs):
 
 def get_unicef_user(backend, details, response, *args, **kwargs):
     from .models import User
-    user, created = User.objects.get_or_create(
-        username=details['username'],
-        defaults={'first_name': details['first_name'],
-                  'last_name': details['last_name'],
-                  }
-    )
-    # FIXME: use MSGRAPH to get user email
-    # if created:
-    #     sync = Synchronizer()
-    #     data = sync.get_user(user.username)
+    if details.get('email'):
+        filters = {'email': details['email']}
+    elif details.get('unique_name'):
+        filters = {'username': details['unique_name']}
+    elif details.get('username'):
+        filters = {'username': details['username']}
 
-    social, __ = UserSocialAuth.objects.get_or_create(user=user,
-                                                      provider=backend.name,
-                                                      uid=user.username
-                                                      )
+    try:
+        user = User.objects.get(**filters)
+        social = user.social_auth.get()
+        user.social_user = social
+        created = False
+    except (User.DoesNotExist, UserSocialAuth.DoesNotExist):
+        for k, v in response.items():
+            if k in ['email', 'family_name', 'unique_name']:
+                details[k] = v
+        try:
+            sync = Synchronizer()
+            data = sync.get_user(details['email'])
+
+            for k, v in data.items():
+                details[k] = v
+
+        except Exception as e:
+            process_exception(e)
+
+        user, created = User.objects.get_or_create(
+            username=details['unique_name'],
+            defaults={'first_name': details.get('givenName', ''),
+                      'last_name': details.get('surname', ''),
+                      'job_title': details.get('jobTitle', ''),
+                      'display_name': details.get('displayName', details['unique_name']),
+                      'email': details.get('email', ''),
+                      'azure_id': details.get('id'),
+                      }
+        )
+        social, __ = UserSocialAuth.objects.get_or_create(user=user,
+                                                          provider=backend.name,
+                                                          uid=user.username
+                                                          )
+        user.social_user = social
     return {'user': user,
             'social': social,
+            'uid': details.get('id'),
             'is_new': created}
 
 
@@ -114,8 +141,8 @@ class Synchronizer:
         self.user_model = user_model or get_user_model()
         self.field_map = dict(mapping or DJANGOUSERMAP)
         self.user_pk_fields = self.field_map.pop('_pk')
-        self._baseurl = '{}/{}/users'.format(settings.AZURE_GRAPH_API_BASE_URL,
-                                             settings.AZURE_GRAPH_API_VERSION)
+        self._baseurl = '{}/{}/users'.format(config.AZURE_GRAPH_API_BASE_URL,
+                                             config.AZURE_GRAPH_API_VERSION)
         self.startUrl = "%s/delta" % self._baseurl
         self.access_token = self.get_token()
         self.next_link = None
@@ -123,15 +150,15 @@ class Synchronizer:
         self.echo = echo or (lambda l: True)
 
     def get_token(self):
-        if not config.AZURE_CLIENT_ID and config.AZURE_CLIENT_SECRET:
+        if not config.UNICEF_AZURE_CLIENT_ID and config.UNICEF_AZURE_CLIENT_SECRET:
             raise ValueError("Configure AZURE_CLIENT_ID and/or AZURE_CLIENT_SECRET")
         token = cache.get(AZURE_GRAPH_API_TOKEN_CACHE_KEY)
         if not token:
             post_dict = {'grant_type': 'client_credentials',
-                         'client_id': config.AZURE_CLIENT_ID,
-                         'client_secret': config.AZURE_CLIENT_SECRET,
-                         'resource': settings.AZURE_GRAPH_API_BASE_URL}
-            response = requests.post(settings.AZURE_TOKEN_URL, post_dict)
+                         'client_id': config.UNICEF_AZURE_CLIENT_ID,
+                         'client_secret': config.UNICEF_AZURE_CLIENT_SECRET,
+                         'resource': config.AZURE_GRAPH_API_BASE_URL}
+            response = requests.post(config.AZURE_TOKEN_URL, post_dict)
             if response.status_code != 200:  # pragma: no cover
                 logger.error(f"Unable to fetch token from Azure. {response.status_code} {response.content}")
                 raise Exception(f'Error during token retrieval: {response.status_code} {response.content}')

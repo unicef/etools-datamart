@@ -6,6 +6,7 @@ from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.template.response import TemplateResponse
+from django.utils.translation import gettext_lazy as _
 from unicef_security.azure import Synchronizer, SyncResult
 from unicef_security.models import BusinessArea, Region, Role, User
 from unicef_security.sync import load_business_area, load_region
@@ -46,6 +47,22 @@ class UserAdmin2(ExtraUrlMixin, UserAdmin):
     list_display = ['username', 'email', 'is_staff', 'is_superuser']
     list_filter = ['is_superuser', 'is_staff']
     search_fields = ['username', ]
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': (('first_name', 'last_name',),
+                                         ('email', 'display_name'),
+                                         ('job_title',),
+                                         )}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+        }),
+    )
 
     # @link()
     # def sync(self, request):

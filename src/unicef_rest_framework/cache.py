@@ -1,9 +1,16 @@
 import re
 
 from django.core.cache import caches
+from django.utils.http import quote_etag
 from django.utils.translation import ugettext as _
 from humanize.i18n import ngettext
 from humanize.time import date_and_delta
+from rest_framework_extensions.cache.decorators import CacheResponse
+from rest_framework_extensions.etag.decorators import ETAGProcessor
+from rest_framework_extensions.key_constructor import bits
+from rest_framework_extensions.key_constructor.bits import KeyBitBase
+from rest_framework_extensions.key_constructor.constructors import KeyConstructor
+from rest_framework_extensions.settings import extensions_api_settings
 
 cache = caches['default']
 
@@ -97,130 +104,88 @@ def humanize_ttl(value, months=True):  # noqa
     else:
         return ngettext("%d year", "%d years", years) % years
 
-#
-# def method_cache(ttl=0, cache_key=None):
-#     """
-#     A `seconds` value of `0` means that we will not memcache it.
-#
-#     If a result is cached on instance, return that first.  If that fails, check
-#     memcached. If all else fails, hit the db and cache on instance and in memcache.
-#
-#     ** NOTES:
-#     1) Methods that return None are always "recached".
-#     2) `instance` can either instance or class (if applied to a @classmethod)
-#     """
-#     seconds = parse_ttl(ttl)
-#
-#     def inner_cache(method):
-#
-#         def x(instance, *args, **kwargs):
-#             key = cache_key or sha224("".join((str(id(instance)),
-#                                               str(method.__name__),
-#                                               str(args),
-#                                               str(kwargs)).hexdigest()))
-#             if hasattr(instance, key):
-#                 # has on class cache, return that
-#                 result = getattr(instance, key)
-#             else:
-#                 result = cache.get(key)
-#
-#                 if result is None:
-#                     # all caches failed, call the actual method
-#                     result = method(instance, *args, **kwargs)
-#
-#                     # save to memcache and class attr
-#                 if seconds and isinstance(seconds, int):
-#                     cache.set(key, result, seconds)
-#                 setattr(instance, key, result)
-#             return result
-#
-#         return x
-#
-#     return inner_cache
-#
-#
-# def func_cache(ttl):
-#     """
-#     A `seconds` value of `0` means that we will not memcache it.
-#
-#     If a result is cached on instance, return that first.  If that fails, check
-#     memcached. If all else fails, hit the db and cache on instance and in memcache.
-#
-#     ** NOTE: Methods that return None are always "recached".
-#     """
-#     seconds = parse_ttl(ttl)
-#
-#     def inner_cache(method):
-#         @wraps(method)
-#         def x(*args, **kwargs):
-#             key = sha224(str(method.__module__) + str(method.__name__) + str(args) + str(kwargs)).hexdigest()
-#             result = cache.get(key)
-#             if result is None:
-#                 # all caches failed, call the actual method
-#                 result = method(*args, **kwargs)
-#
-#                 # save to memcache and class attr
-#                 if seconds and isinstance(seconds, int):
-#                     cache.set(key, result, seconds)
-#             return result
-#
-#         return x
-#
-#     return inner_cache
-#
-#
-# def inline_cache(callable, seconds=0, key=None, *args, **kwargs):  # pragma: no cover
-#     key = key or sha224(str(callable.__module__) + str(callable.__name__) + str(args) + str(kwargs)).hexdigest()
-#
-#     def x(*args, **kwargs):
-#         result = cache.get(key)
-#         if result is None:
-#             # all caches failed, call the actual method
-#             result = callable(*args, **kwargs)
-#
-#             # save to memcache and class attr
-#             if seconds and isinstance(seconds, int):
-#                 cache.set(key, result, seconds)
-#         return result
-#
-#     return x
-#
 
-# backport of Python's 3.3 lru_cache, written by Raymond Hettinger and
-# licensed under MIT license, from:
-# <http://code.activestate.com/recipes/578078-py26-and-py30-backport-of-python-33s-lru-cache/>
-# Should be removed when Django only supports Python 3.2 and above.
+class CacheVersionKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        version = view_instance.get_service().cache_version
+        view_instance.request._request.api_info['cache-version'] = version
+        return {'cache_version': str(version)}
 
-#
-# _CacheInfo = namedtuple("CacheInfo", ["hits", "misses", "maxsize", "currsize"])
-#
-#
-# class _HashedSeq(list):
-#     __slots__ = 'hashvalue'
-#
-#     def __init__(self, tup, hash=hash):
-#         self[:] = tup
-#         self.hashvalue = hash(tup)
-#
-#     def __hash__(self):
-#         return self.hashvalue
-#
-#
-# def _make_key(args, kwds, typed,
-#               kwd_mark=(object(),),
-#               fasttypes={int, str, frozenset, type(None)},
-#               sorted=sorted, tuple=tuple, type=type, len=len):
-#     'Make a cache key from optionally typed positional and keyword arguments'
-#     key = args
-#     if kwds:
-#         sorted_items = sorted(kwds.items())
-#         key += kwd_mark
-#         for item in sorted_items:
-#             key += item
-#     if typed:
-#         key += tuple(type(v) for v in args)
-#         if kwds:
-#             key += tuple(type(v) for k, v in sorted_items)
-#     elif len(key) == 1 and type(key[0]) in fasttypes:
-#         return key[0]
-#     return _HashedSeq(key)
+
+class ListKeyConstructor(KeyConstructor):
+    cache_version = CacheVersionKeyBit()
+    # system_filter = SystemFilterKeyBit()
+
+    unique_method_id = bits.UniqueMethodIdKeyBit()
+    format = bits.FormatKeyBit()
+    headers = bits.HeadersKeyBit(['Accept'])
+    # language = bits.LanguageKeyBit()
+    list_sql_query = bits.ListSqlQueryKeyBit()
+    querystring = bits.QueryParamsKeyBit()
+    pagination = bits.PaginationKeyBit()
+
+    def get_key(self, view_instance, view_method, request, args, kwargs):
+        key = super().get_key(view_instance, view_method, request, args, kwargs)
+        view_instance.request._request.api_info['cache-key'] = key
+        return key
+
+
+class APIETAGProcessor(ETAGProcessor):
+    def is_if_none_match_failed(self, res_etag, etags, if_none_match):
+        if res_etag and if_none_match:
+            return quote_etag(res_etag) in etags or '*' in etags
+        else:
+            return False
+
+
+class APICacheResponse(CacheResponse):
+    def __init__(self,
+                 timeout=None,
+                 key_func=None,
+                 cache=None,
+                 cache_errors=None):
+        self.cache_name = cache or extensions_api_settings.DEFAULT_USE_CACHE
+        super(APICacheResponse, self).__init__(timeout=timeout, key_func=key_func,
+                                               cache=cache, cache_errors=cache_errors)
+
+    def process_cache_response(self,
+                               view_instance,
+                               view_method,
+                               request,
+                               args,
+                               kwargs):
+        key = self.calculate_key(
+            view_instance=view_instance,
+            view_method=view_method,
+            request=request,
+            args=args,
+            kwargs=kwargs
+        )
+        cache = caches[self.cache_name]
+        response = cache.get(key)
+        if not response:
+            view_instance.request._request.api_info['cache-hit'] = False
+            response = view_method(view_instance, request, *args, **kwargs)
+            response = view_instance.finalize_response(request, response, *args, **kwargs)
+            response.render()  # should be rendered, before picklining while storing to cache
+
+            if not response.status_code >= 400 or self.cache_errors:  # pragma: no cover
+                cache.set(key, response, parse_ttl(view_instance.get_service().cache_ttl or '1y'))
+        else:
+            view_instance.request._request.api_info['cache-hit'] = True
+
+        view_instance.store('cache-ttl', view_instance.get_service().cache_ttl)
+        view_instance.store('service', view_instance.get_service())
+        view_instance.store('view', view_instance)
+        # view_instance.request._request.api_info['cache-ttl'] = view_instance.get_service().cache_ttl
+        # view_instance.request._request.api_info['service'] = view_instance.get_service()
+        # view_instance.request._request.api_info['view'] = fqn(view_instance)
+
+        if not hasattr(response, '_closable_objects'):  # pragma: no cover
+            response._closable_objects = []
+
+        return response
+
+
+etag = APIETAGProcessor
+cache_response = APICacheResponse

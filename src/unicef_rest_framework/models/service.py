@@ -3,7 +3,6 @@
 import logging
 
 from django.contrib.contenttypes.models import ContentType
-from django.core.cache import caches
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F
@@ -17,15 +16,12 @@ from .base import MasterDataModel
 
 logger = logging.getLogger(__name__)
 
-cluster_cache = caches[conf.API_CACHE]
-
 
 class ServiceManager(models.Manager):
     def invalidate_cache(self, **kwargs):
         Service.objects.filter(**kwargs).update(cache_version=F("cache_version") + 1)
         for service in Service.objects.filter(**kwargs):
             service.viewset.get_service.cache_clear()
-            cluster_cache.set('{}{}'.format(service.pk, service.name), True)
 
     def get_for_viewset(self, viewset):
         name = getattr(viewset, 'label', viewset.__name__)
@@ -42,14 +38,6 @@ class ServiceManager(models.Manager):
         return service, isnew
 
     def load_services(self):
-        """
-            create a row in the Service table for each known service.
-        Note: do not update existing entries.
-
-        :param request:
-        :param code:
-        :return:
-        """
         router = conf.ROUTER
         created = deleted = 0
         for prefix, viewset, basename in router.registry:
@@ -111,7 +99,6 @@ class Service(MasterDataModel):
 
     class Meta:
         ordering = ('name',)
-        permissions = (("do_not_scramble", "Can read any service unscrambled"),)
 
     objects = ServiceManager()
 
@@ -122,10 +109,6 @@ class Service(MasterDataModel):
     def reset_cache(self, value=0):
         Service.objects.filter(id=self.pk).update(cache_version=value)
         self.refresh_from_db()
-        cluster_cache.set('{}{}'.format(self.pk, self.name), True)
-
-    def cache_is_invalid(self):
-        return cluster_cache.get('{}{}'.format(self.pk, self.name), True)
 
     def get_access_level(self):
         # administrators cannot go lower than coded value
@@ -156,10 +139,15 @@ class Service(MasterDataModel):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.pk:
             try:
+                v = self.viewset()
+                model = v.get_queryset().model
+                ct = ContentType.objects.get_for_model(model)
+                self.linked_models.add(ct)
                 self.viewset._service = None
             except Exception as e:
                 logger.exception(e)
         super(Service, self).save(force_insert, force_update, using, update_fields)
+
         # self.invalidate_cache()
 
     def __str__(self):

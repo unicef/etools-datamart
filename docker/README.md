@@ -10,13 +10,11 @@ To build docker image simply cd in `docker` directory and run
 default settings are for production ready environment, check `run` target in 
 the `Makefile` to see how to run the container with debug/less secure configuration
 
-Image launches following components:
+Image provides following services:
 
-    - supervisord
-    - datamart (API/GUI/ETL)   
-    - redis server
-    - celery (workers/beat)
-    - flower
+    - datamart   
+    - celery workers
+    - celery beat
 
 to configure which services should be started, set `SERVICES` appropriately, ie:
 

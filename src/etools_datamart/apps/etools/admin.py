@@ -96,3 +96,8 @@ class FundsReservationHeaderAdmin(TenantModelAdmin):
 @register(models.FundsFundsreservationitem)
 class FundsreservationitemAdmin(TenantModelAdmin):
     pass
+
+
+@register(models.HactAggregatehact)
+class HactAggregatehactAdmin(TenantModelAdmin):
+    list_display = ('schema', 'year',)

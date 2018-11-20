@@ -27,13 +27,13 @@ def test_cache(client, admin_user, django_assert_num_queries,
     assert res['cache-hit'] == str(True)
 
 
-def test_etag(client, admin_user, service, django_assert_num_queries):
-    url = f"{service.endpoint}?country_name=bolivia"
+def test_etag(client, admin_user, data_service, django_assert_num_queries):
+    url = f"{data_service.endpoint}?country_name=bolivia"
     client.force_authenticate(admin_user)
 
     res = client.get(url, HTTP_X_SCHEMA="bolivia", HTTP_IF_NONE_MATCH='Not Set')
     assert res.status_code == 200
-    assert res['cache-version'] == str(service.cache_version)
+    assert res['cache-version'] == str(data_service.cache_version)
     assert res['etag']
 
     etag = res['etag']

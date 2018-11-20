@@ -15,13 +15,15 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
 
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
+                  # API_CACHE_URL=(str, "redis://127.0.0.1:6379/2"),
                   API_CACHE_URL=(str, "locmemcache://"),
                   # CACHE_URL=(str, "dummycache://"),
                   # API_CACHE_URL=(str, "dummycache://"),
-
+                  DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
                   ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
+                  CELERY_ALWAYS_EAGER=(bool, False),
                   CSRF_COOKIE_SECURE=(bool, True),
                   DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
@@ -35,6 +37,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   SECURE_FRAME_DENY=(bool, True),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
+                  STATIC_URL=(str, '/dm-static/'),
                   X_FRAME_OPTIONS=(str, 'DENY'),
 
                   AZURE_CLIENT_ID=(str, ''),
@@ -55,10 +58,14 @@ SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 
 ADMINS = (
-    ('', 'saxix@saxix.onmicrosoft.com'),
-    ('', 'sapostolico@unicef.org'),
-    ('', 'sapostolico@nikunicef.onmicrosoft.org'),
-
+    ('Stefano', 'saxix@saxix.onmicrosoft.com'),
+    ('Stefano', 'sapostolico@unicef.org'),
+    ('Nik', 'ntrncic@unicef.org'),
+    ('Greg', 'greinbach@unicef.org'),
+    ('Zack', 'zadams@unicef.org'),
+    ('Robert', 'ravram@unicef.org'),
+    ('Domenico', 'ddinicola@unicef.org'),
+    ('Evan', 'ewheeler@unicef.org')
 )
 
 DATABASES = {
@@ -116,7 +123,7 @@ USE_TZ = True
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = '/media/'
+MEDIA_URL = '/dm-media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -126,7 +133,7 @@ MEDIA_URL = '/media/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = env('STATIC_URL')
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -153,7 +160,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
     'crashlog.middleware.CrashLogMiddleware',
-    'etools_datamart.api.middleware.ApiMiddleware',
+    'unicef_rest_framework.middleware.ApiMiddleware',
     # 'etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware',
     'etools_datamart.apps.tracking.middleware.StatsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -248,6 +255,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'unicef_security',
+    'redisboard',
     'django_filters',
     'month_field',
     'drf_querystringfilter',
@@ -260,7 +268,7 @@ INSTALLED_APPS = [
 
     'django_celery_beat',
 
-    'etools_datamart.apps.core',
+    'etools_datamart.apps.core.apps.Config',
     'etools_datamart.apps.etools',
     'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
@@ -329,7 +337,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
 
 CONSTANCE_CONFIG = {
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
-    'DEFAULT_GROUP': ('Guests', 'Use MS Graph API to fetch user data', 'select_group'),
+    'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
 }
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
@@ -339,7 +347,15 @@ CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
+                       "etools_datamart.apps.etl.tasks.tasks", ]
 CELERY_BEAT_SCHEDULE = {}
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', False)
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
+CELERY_TASK_ROUTES = {
+    'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
+    'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
+}
 
 CONCURRENCY_IGNORE_DEFAULT = False
 
@@ -357,15 +373,6 @@ REST_FRAMEWORK = {
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
 }
-
-AZURE_SSL = True
-AZURE_URL_EXPIRATION_SECS = 10800
-AZURE_ACCESS_POLICY_EXPIRY = 10800  # length of time before signature expires in seconds
-AZURE_ACCESS_POLICY_PERMISSION = 'r'
-AZURE_TOKEN_URL = 'https://login.microsoftonline.com/saxix.onmicrosoft.com/oauth2/token'
-AZURE_GRAPH_API_BASE_URL = 'https://graph.microsoft.com'
-AZURE_GRAPH_API_VERSION = 'v1.0'
-AZURE_GRAPH_API_PAGE_SIZE = 300
 
 JWT_AUTH = {
     'JWT_VERIFY': False,  # this requires private key
@@ -519,7 +526,7 @@ LOGGING = {
             'propagate': False
         },
         'etools_datamart': {
-            'handlers': ['console', 'db'],
+            'handlers': ['null', 'db'],
             'level': 'ERROR',
             'propagate': False
         },

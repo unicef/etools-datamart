@@ -16,6 +16,7 @@ export PGHOST=127.0.0.1
 export PGPORT=5432
 export DATABASE_NAME=etools
 export DATABASE_USER=postgres
+export DATABASE_PASS=
 export BASE_SCHEMA=kenya
 
 help (){
@@ -30,6 +31,11 @@ help (){
     echo "  -ni,--no-inspect    do not inspect schema"
     echo "  -ns,--no-summary    do not display summary infos"
     echo "  -nc,--no-clean      do not clean temporary files"
+    echo "  --host              database host"
+    echo "  --port              database port"
+    echo "  --db-name           database name"
+    echo "  --db-user           database username"
+    echo "  --db-pass           database password"
     echo "  -h,--help           this help screen"
     exit 1
 }
@@ -55,6 +61,31 @@ case $1 in
         [[ "$2" =~ c ]] && CLEAN=1 || CLEAN=0
         [[ "$2" =~ i ]] && INSPECT=1 || INSPECT=0
         shift
+        shift
+        ;;
+    --host)
+        shift
+        PGHOST=$1
+        shift
+        ;;
+    --port)
+        shift
+        PGPORT=$1
+        shift
+        ;;
+    --db-name)
+        shift
+        DATABASE_NAME=$1
+        shift
+        ;;
+    --db-user)
+        shift
+        DATABASE_USER=$1
+        shift
+        ;;
+    --db-pass)
+        shift
+        DATABASE_PASS=$1
         shift
         ;;
     -nr|--no-restore)
@@ -101,6 +132,7 @@ echo "create tests data files    $DUMP"
 echo "move testing data files    $MOVE"
 echo "inspect db and update ORM  $INSPECT"
 echo "clean temporary files      $CLEAN"
+echo "Connection                 http://${DATABASE_USER}:${DATABASE_PASS}@${PGHOST}:${PGPORT}/${DATABASE_NAME}"
 echo
 echo "Running..."
 # 1 - restore from database dump

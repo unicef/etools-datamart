@@ -231,7 +231,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     #                   category=DeprecationWarning)
     #     return self.tenant
 
-    def make_debug_cursor(self, cursor):
+    def make_debug_cursor(self, cursor):  # pragma: no cover
         """Create a cursor that logs all queries in self.queries_log."""
         return TenantDebugCursor(cursor, self)
 

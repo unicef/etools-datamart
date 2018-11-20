@@ -11,6 +11,6 @@ class TaskLogViewSet(common.APIReadOnlyModelViewSet):
     """
     pagination_class = None
     serializer_class = serializers.TaskLogSerializer
-    queryset = models.TaskLog.objects.all()
+    queryset = models.EtlTask.objects.all()
     filter_fields = ('task', 'table_name', 'result',
                      'last_success', 'last_failure')

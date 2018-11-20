@@ -13,14 +13,29 @@ RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
     && curl ${GITHUB_CREDENTIALS}: -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
-FROM python:3.6.4
+FROM python:3.6.7-alpine as base
 COPY --from=builder /code /code
-LABEL org.label-schema.name="" \
-      org.label-schema.description="" \
-      org.label-schema.url="" \
-      org.label-schema.vcs-url="https://github.com/unicef/etools-datamart" \
-      org.label-schema.version=$VERSION \
-      org.label-schema.schema-version="1.0"
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    libffi-dev \
+    linux-headers \
+    musl-dev \
+    postgresql-dev \
+    python3-dev
+
+
+RUN apk add --no-cache --virtual .deps \
+    bash
+
+FROM base
+
+LABEL org.label.name="eTools Datamart" \
+      org.label.maintainer="sapostolico@unicef.org" \
+      org.label.description="" \
+      org.label.url="https://datamart.unicef.io/" \
+      org.label.vcs-url="https://github.com/unicef/etools-datamart" \
+      org.label.version=$VERSION
+
 
 ARG BUILD_DATE
 ARG PIPENV_PYPI_MIRROR
@@ -30,6 +45,7 @@ ARG VERSION
 ENV VERSION ${VERSION}
 
 ENV PIPENV_PYPI_MIRROR ${PIPENV_PYPI_MIRROR}
+ENV PIPENV_ARGS ${PIPENV_ARGS}
 ENV HOME /root/
 ENV PIPSI_HOME=/usr/local/pipsi/environments
 ENV PIPSI_BIN_DIR=/usr/local/bin
@@ -63,20 +79,17 @@ ENV SENTRY_DSN ""
 ENV SESSION_COOKIE_HTTPONLY True
 ENV SESSION_COOKIE_SECURE True
 ENV STATIC_ROOT /tmp/static
-ENV SUPERVISOR_USER admin
-ENV SUPERVISOR_PWD ""
-ENV FLOWER_USER admin
-ENV FLOWER_PWD ""
-ENV X_FRAME_OPTIONS "DENY"
-ENV START_DATAMART "true"
-ENV START_REDIS "true"
-ENV START_CELERY "true"
+#ENV SUPERVISOR_USER admin
+#ENV SUPERVISOR_PWD ""
+#ENV FLOWER_USER admin
+#ENV FLOWER_PWD ""
+#ENV X_FRAME_OPTIONS "DENY"
+#ENV START_DATAMART "true"
+#ENV START_REDIS "true"
+#ENV START_CELERY "true"
 
-RUN apt-get update && apt-get install -y --force-yes \
-    curl \
-    supervisor \
-    redis-server \
-    gcc
+#RUN apt-get update && apt-get install -y --force-yes \
+#    gcc
 
 RUN mkdir -p \
     /var/datamart/{static,log,conf,run} \
@@ -86,25 +99,23 @@ WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
-    && pipenv install --system --deploy --ignore-pipfile $PIPENV_ARGS \
-    && pip install . \
+    && pipenv install --system --deploy --ignore-pipfile $PIPENV_ARGS
+
+RUN pip install . \
     && rm -fr /code
 
-RUN apt-get autoremove --yes --force-yes \
-    gcc \
-    && rm -fr /var/lib/apt/lists/* \
-    && rm -fr /var/cache/apt/*
+#RUN apt-get autoremove --yes --force-yes \
+#    gcc \
+#    && rm -fr /var/lib/apt/lists/* \
+#    && rm -fr /var/cache/apt/*
 
-
-ADD docker/redis.conf /etc/redis.conf
-ADD docker/supervisord.conf /etc/supervisord.conf
+#RUN apk del .build-deps \
+#    && rm -rf /var/cache/apk/* \
+#    && rm -fr /root/.cache/
 
 WORKDIR /var/datamart
 
 EXPOSE 8000
-EXPOSE 15000
-EXPOSE 5555
-EXPOSE 6379
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
