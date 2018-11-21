@@ -32,6 +32,7 @@ build:
 			--build-arg VERSION=${TARGET} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
+	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
 .run:

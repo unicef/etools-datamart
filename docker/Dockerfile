@@ -13,7 +13,7 @@ RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
     && curl ${GITHUB_CREDENTIALS}: -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
-FROM python:3.6.7-alpine as base
+FROM python:3.7-alpine as base
 COPY --from=builder /code /code
 RUN apk add --no-cache --virtual .build-deps \
     gcc \
