@@ -63,8 +63,10 @@ demo:
 	pipenv run celery worker -A etools_datamart --loglevel=DEBUG --concurrency=4 --purge --pidfile celery.pid &
 	pipenv run celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile beat.pid &
 	pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
+	pipenv run docker run  -d -p 5555:5555 --name datamart-flower --rm saxix/flower
 
-demo-stop:
+stop-demo:
 	- kill `cat gunicorn.pid`
 	- kill `cat beat.pid`
 	- kill `cat celery.pid`
+	- docker stop datamart-flower
