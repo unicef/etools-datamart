@@ -4,9 +4,6 @@ from time import time
 from celery import Celery
 from celery.signals import task_postrun, task_prerun
 from celery.task import Task
-from django.utils import timezone
-
-from etools_datamart.apps.etl.lock import only_one
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
@@ -21,6 +18,7 @@ class DatamartCelery(Celery):
     _mapping = {}
 
     def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
+        from etools_datamart.apps.etl.lock import only_one
         linked_model = options.get('linked_model', None)
         name = name or self.gen_task_name(fun.__name__, fun.__module__)
         options['lock_key'] = f"{name}-lock"
@@ -72,6 +70,7 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
     app.timers[task_id] = time()
     from django.contrib.contenttypes.models import ContentType
     from etools_datamart.apps.etl.models import EtlTask
+    from django.utils import timezone
 
     defs = {'result': 'RUNNING',
             'timestamp': timezone.now()}
@@ -83,6 +82,8 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
 
 @task_postrun.connect
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
+    from django.utils import timezone
+
     if not hasattr(sender, 'linked_model'):
         return
     try:

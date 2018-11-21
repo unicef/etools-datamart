@@ -45,7 +45,6 @@ fullclean:
 	rm -fr .tox .cache .pytest_cache .venv
 	$(MAKE) clean
 
-
 sync-etools:
 	sh src/etools_datamart/apps/multitenant/postgresql/dump.sh ${PG_ETOOLS_PARAMS}
 
@@ -56,6 +55,16 @@ ifdef BROWSE
 	firefox ${BUILDDIR}/docs/index.html
 endif
 
-
 urf:
 	pipenv run pytest tests/urf --cov-config tests/urf/.coveragerc
+
+
+demo:
+	pipenv run celery worker -A etools_datamart --loglevel=DEBUG --concurrency=4 --purge --pidfile celery.pid &
+	pipenv run celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile beat.pid &
+	pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
+
+demo-stop:
+	- kill `cat gunicorn.pid`
+	- kill `cat beat.pid`
+	- kill `cat celery.pid`
