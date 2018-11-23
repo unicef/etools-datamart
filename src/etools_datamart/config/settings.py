@@ -44,6 +44,12 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   AZURE_CLIENT_SECRET=(str, ''),
                   AZURE_TENANT=(str, ''),
 
+                  AZURE_ACCOUNT_NAME=(str, ''),
+                  AZURE_ACCOUNT_KEY=(str, ''),
+                  AZURE_CONTAINER=(str, ''),
+                  AZURE_OVERWRITE_FILES=(bool, True),
+                  AZURE_LOCATION=(str, ''),
+
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -334,6 +340,12 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         'widget': 'etools_datamart.libs.constance.GroupChoice',
     }],
 }
+
+AZURE_ACCOUNT_NAME = env('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = env('AZURE_ACCOUNT_KEY')
+AZURE_CONTAINER = env('AZURE_CONTAINER')
+AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
+AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
