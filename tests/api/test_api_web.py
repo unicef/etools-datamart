@@ -1,7 +1,7 @@
 # test BrowsableAPI
 import pytest
 from rest_framework.test import APIClient
-from tests._test_lib.test_utilities.factories import UserFactory
+from test_utilities.factories import UserFactory
 from unicef_rest_framework.test_utils import user_allow_service
 from unicef_security.models import User
 

@@ -1,8 +1,10 @@
 1.7 (dev)
 ---------
+* WARNINGS: migration reset
 * add YAML format
 * new 'Monitor' page to check dataset last update date
-*
+* add ability to intercept changed/unchanged datamart records
+* Azure storage support
 
 
 1.6

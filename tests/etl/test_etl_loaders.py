@@ -41,3 +41,5 @@ def test_load_hact(db, settings, monkeypatch):
     assert bolivia.completed_spotcheck == 0
     assert bolivia.completed_hact_audits == 0
     assert bolivia.completed_special_audits == 0
+    res = load_hact()
+    assert res == {'created': 0, 'updated': 0, 'unchanged': 3}

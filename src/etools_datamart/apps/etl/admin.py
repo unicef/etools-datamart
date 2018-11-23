@@ -18,10 +18,10 @@ from . import models
 
 @register(models.EtlTask)
 class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
-    list_display = ('task', 'timestamp', 'result', 'time',
+    list_display = ('task', 'timestamp', 'status', 'time',
                     'last_success', 'last_failure', 'lock', 'scheduling', 'queue_task')
 
-    readonly_fields = ('task', 'timestamp', 'result', 'elapsed', 'time',
+    readonly_fields = ('task', 'timestamp', 'results', 'elapsed', 'time', 'status',
                        'last_success', 'last_failure', 'table_name', 'content_type')
     date_hierarchy = 'timestamp'
     actions = None

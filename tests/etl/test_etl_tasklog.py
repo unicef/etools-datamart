@@ -25,14 +25,14 @@ def test_load_pmp_indicator(db):
     with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run'):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
-                                      result='SUCCESS').exists()
+                                      status='SUCCESS').exists()
 
 
 def test_load_pmp_indicator_fail(db):
     with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run', side_effect=Exception):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
-                                      result='FAILURE')
+                                      status='FAILURE')
 
 
 @pytest.fixture()
@@ -46,4 +46,4 @@ def test_load_pmp_indicator_running(db, disable_post_run):
     with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run'):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
-                                      result='RUNNING')
+                                      status='RUNNING')

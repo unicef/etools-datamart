@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import Model
 from django.utils.functional import cached_property
@@ -37,12 +38,14 @@ class TaskLogManager(models.Manager):
 class EtlTask(models.Model):
     task = models.CharField(max_length=200, unique=True)
     timestamp = models.DateTimeField(null=True)
-    result = models.CharField(max_length=200)
+    status = models.CharField(max_length=200)
     elapsed = models.IntegerField(null=True)
     last_success = models.DateTimeField(null=True)
     last_failure = models.DateTimeField(null=True)
     table_name = models.CharField(max_length=200, null=True)
     content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
+
+    results = JSONField(blank=True, null=True)
 
     objects = TaskLogManager()
 
@@ -50,14 +53,11 @@ class EtlTask(models.Model):
         get_latest_by = 'timestamp'
 
     def __str__(self):
-        return f"{self.task} {self.result}"
+        return f"{self.task} {self.status}"
 
     @cached_property
     def verbose_name(self):
         return self.content_type.model_class()._meta.verbose_name
-
-    def model(self):
-        return ""
 
     @cached_property
     def periodic_task(self):

@@ -72,7 +72,7 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
     from etools_datamart.apps.etl.models import EtlTask
     from django.utils import timezone
 
-    defs = {'result': 'RUNNING',
+    defs = {'status': 'RUNNING',
             'timestamp': timezone.now()}
     EtlTask.objects.update_or_create(task=task.name,
                                      content_type=ContentType.objects.get_for_model(task.linked_model),
@@ -90,8 +90,11 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         cost = time() - app.timers.pop(task_id)
     except KeyError:  # pragma: no cover
         cost = -1
+    if not isinstance(retval, dict):
+        retval = {'error': str(retval)}
     defs = {'elapsed': cost,
-            'result': state,
+            'status': state,
+            'results': retval,
             'timestamp': timezone.now()}
     if state == 'SUCCESS':
         defs['last_success'] = timezone.now()

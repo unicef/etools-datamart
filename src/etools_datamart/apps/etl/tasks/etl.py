@@ -23,14 +23,21 @@ __all__ = ["load_hact", "load_user_report", "load_fam_indicator",
            "load_pmp_indicator", "load_intervention"]
 
 
+def equal(record, values):
+    other = type(record)(**values)
+    for field_name, field_value in values.items():
+        if getattr(record, field_name) != getattr(other, field_name):
+            return False
+    return True
+
+
 @app.etl(HACT)
 def load_hact():
     connection = connections['etools']
     countries = connection.get_tenants()
     today = timezone.now()
-    created = {}
+    results = {'created': 0, 'updated': 0, 'unchanged': 0}
     for country in countries:
-        created[country.name] = 0
         connection.set_schemas([country.schema_name])
 
         logger.info(u'Running on %s' % country.name)
@@ -67,12 +74,23 @@ def load_hact():
                       completed_hact_audits=data['assurance_activities']['scheduled_audit'],
                       completed_special_audits=data['assurance_activities']['special_audit'],
                       )
-        HACT.objects.update_or_create(year=today.year,
-                                      country_name=country.name,
-                                      schema_name=country.schema_name,
-                                      defaults=values)
+        existing, created = HACT.objects.get_or_create(year=today.year,
+                                                       country_name=country.name,
+                                                       schema_name=country.schema_name,
+                                                       defaults=values)
+        if created:
+            results['created'] += 1
+        else:
+            if equal(existing, values):
+                results['unchanged'] += 1
+            else:
+                results['updated'] += 1
+                HACT.objects.update_or_create(year=today.year,
+                                              country_name=country.name,
+                                              schema_name=country.schema_name,
+                                              defaults=values)
 
-    return created
+    return results
 
 
 @app.etl(PMPIndicators)
@@ -89,9 +107,6 @@ def load_pmp_indicator():
 
         logger.info(u'Running on %s' % country.name)
         for partner in PartnersPartnerorganization.objects.all():
-            # .prefetch_related(
-            # 'partnerspartnerorganization_partners_corevaluesassessment_partner_id'):
-            # .select_related('partnersintervention_partners_interventionbudget_intervention_id')
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
                                          'partnersintervention_partners_interventionbudget_intervention_id', None)
