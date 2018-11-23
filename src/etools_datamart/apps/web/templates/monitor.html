@@ -1,0 +1,28 @@
+{% extends 'base.html' %}{% load static %}
+
+{% block title %}Monitor{% endblock %}
+
+{% block content %}
+    <div id="header">
+        <img src="{% static 'unicef_logo.png' %}" width="100">
+    </div>
+    <div class="menubar">
+        <span><a href="{% url "home" %}">Home</a></span>
+        <span><a href="{% url "api:api-root" %}">API</a></span>
+        <span><a href="{% url "api:schema-redoc" %}">Documentation</a></span>
+    </div>
+    <div id="monitor">
+            <div class="row header">
+                <span class="col task">Data</span>
+                <span class="col timestamp">Last update</span>
+                <span class="col result">Result</span>
+            </div>
+        {% for t in tasks %}
+            <div class="row {% cycle 'odd' 'even' %}">
+                <span class="col task">{{ t.verbose_name }}</span>
+                <span class="col timestamp">{{ t.timestamp|default_if_none:"" }}</span>
+                <span class="col result {{ t.result }}">{{ t.result }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

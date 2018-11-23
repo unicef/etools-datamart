@@ -10,6 +10,7 @@ from rest_framework.authentication import BasicAuthentication, SessionAuthentica
 from rest_framework.filters import OrderingFilter
 from rest_framework.renderers import JSONRenderer
 from rest_framework_xml.renderers import XMLRenderer
+from rest_framework_yaml.renderers import YAMLRenderer
 from strategy_field.utils import fqn
 from unicef_rest_framework import acl
 from unicef_rest_framework.auth import JWTAuthentication
@@ -46,6 +47,7 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     renderer_classes = [JSONRenderer,
                         APIBrowsableAPIRenderer,
                         CSVRenderer,
+                        YAMLRenderer,
                         XLSXRenderer,
                         MSJSONRenderer,
                         XMLRenderer,

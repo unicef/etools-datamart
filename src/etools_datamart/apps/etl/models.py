@@ -53,6 +53,13 @@ class EtlTask(models.Model):
         return f"{self.task} {self.result}"
 
     @cached_property
+    def verbose_name(self):
+        return self.content_type.model_class()._meta.verbose_name
+
+    def model(self):
+        return ""
+
+    @cached_property
     def periodic_task(self):
         try:
             return PeriodicTask.objects.get(task=self.task)

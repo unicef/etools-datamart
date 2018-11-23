@@ -46,7 +46,7 @@ drf-renderer-xlsx = "*"
 django-redisboard = "*"
 djangorestframework-xml = "*"
 redis = "==2.10.6"
-importlib-resources = "==1.0.1"
+djangorestframework-yaml = "*"
 
 [dev-packages]
 "flake8" = ">=3.6.0"
@@ -67,10 +67,9 @@ pytest-pythonpath = "*"
 yapf = "*"
 vcrpy = "*"
 pre-commit = "*"
-importlib-resources = "==1.0.1"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
 
 [scripts]
 test = "pytest tests"

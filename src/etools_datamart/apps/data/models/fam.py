@@ -27,3 +27,4 @@ class FAMIndicator(DataMartModel):
     class Meta:
         ordering = ('month', 'country_name')
         unique_together = ('month', 'country_name')
+        verbose_name = "FAM Indicator"

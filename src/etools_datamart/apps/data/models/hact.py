@@ -21,3 +21,4 @@ class HACT(DataMartModel):
     class Meta:
         ordering = ('year', 'country_name')
         unique_together = ('year', 'country_name')
+        verbose_name = "HACT"
