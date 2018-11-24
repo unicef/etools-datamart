@@ -1,4 +1,5 @@
 import io
+import os
 
 import pytest
 from django.urls import reverse
@@ -15,7 +16,9 @@ def client(admin_user):
     return client
 
 
-def test_1(db, client, settings):
+@pytest.mark.skipif("CIRCLECI" in os.environ,
+                    reason="Skip in CirlceCI")
+def test_export_azure_data(db, client, settings):
     load_user_report.unlock()
     load_user_report()
     assert UserStats.objects.count()

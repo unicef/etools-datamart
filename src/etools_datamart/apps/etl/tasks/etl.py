@@ -23,12 +23,37 @@ __all__ = ["load_hact", "load_user_report", "load_fam_indicator",
            "load_pmp_indicator", "load_intervention"]
 
 
-def equal(record, values):
+class EtlResult:
+    def __init__(self, updated=0, created=0, unchanged=0):
+        self.created = created
+        self.updated = updated
+        self.unchanged = unchanged
+
+    def __repr__(self):
+        return repr(self.as_dict())
+
+    def as_dict(self):
+        return {'created': self.created,
+                'updated': self.updated,
+                'unchanged': self.unchanged}
+
+    def __eq__(self, other):
+        if isinstance(other, EtlResult):
+            return (self.created == other.created and
+                    self.updated == other.updated and
+                    self.unchanged == other.unchanged)
+        elif isinstance(other, dict):
+            return (self.created == other['created'] and
+                    self.updated == other['updated'] and
+                    self.unchanged == other['unchanged'])
+
+
+def is_record_changed(record, values):
     other = type(record)(**values)
     for field_name, field_value in values.items():
         if getattr(record, field_name) != getattr(other, field_name):
-            return False
-    return True
+            return True
+    return False
 
 
 @app.etl(HACT)
@@ -36,7 +61,7 @@ def load_hact():
     connection = connections['etools']
     countries = connection.get_tenants()
     today = timezone.now()
-    results = {'created': 0, 'updated': 0, 'unchanged': 0}
+    results = EtlResult()
     for country in countries:
         connection.set_schemas([country.schema_name])
 
@@ -79,30 +104,28 @@ def load_hact():
                                                        schema_name=country.schema_name,
                                                        defaults=values)
         if created:
-            results['created'] += 1
+            results.created += 1
         else:
-            if equal(existing, values):
-                results['unchanged'] += 1
-            else:
-                results['updated'] += 1
+            if is_record_changed(existing, values):
+                results.updated += 1
                 HACT.objects.update_or_create(year=today.year,
                                               country_name=country.name,
                                               schema_name=country.schema_name,
                                               defaults=values)
+            else:
+                results.unchanged += 1
 
-    return results
+    return results.as_dict()
 
 
 @app.etl(PMPIndicators)
 def load_pmp_indicator():
     connection = connections['etools']
     countries = connection.get_tenants()
-    PMPIndicators.objects.truncate()
     base_url = 'https://etools.unicef.org'
-    created = {}
+    results = EtlResult()
 
     for country in countries:
-        created[country.name] = 0
         connection.set_schemas([country.schema_name])
 
         logger.info(u'Running on %s' % country.name)
@@ -112,52 +135,73 @@ def load_pmp_indicator():
                                          'partnersintervention_partners_interventionbudget_intervention_id', None)
                 fr_currencies = intervention.frs.all().values_list('currency', flat=True).distinct()
                 has_assessment = bool(getattr(partner.current_core_value_assessment, 'assessment', False))
-                PMPIndicators.objects.create(
-                    country_id=country.pk,
-                    partner_id=partner.pk,
-                    intervention_id=intervention.pk,
-                    **{
-                        'country_name': country.name,
-                        'schema_name': country.schema_name,
-                        'business_area_code': country.business_area_code,
-                        'partner_name': partner.name,
-                        'partner_type': partner.cso_type,
-                        'vendor_number': partner.vendor_number,
+                values = {'country_name': country.name,
+                          'schema_name': country.schema_name,
+                          'business_area_code': country.business_area_code,
+                          'partner_name': partner.name,
+                          'partner_type': partner.cso_type,
+                          'vendor_number': partner.vendor_number,
 
-                        'pd_ssfa_ref': intervention.number.replace(',', '-'),
-                        'pd_ssfa_status': intervention.status.title(),
-                        'pd_ssfa_start_date': intervention.start,
-                        'pd_ssfa_creation_date': intervention.created,
-                        'pd_ssfa_end_date': intervention.end,
+                          'pd_ssfa_ref': intervention.number.replace(',', '-'),
+                          'pd_ssfa_status': intervention.status.title(),
+                          'pd_ssfa_start_date': intervention.start,
+                          'pd_ssfa_creation_date': intervention.created,
+                          'pd_ssfa_end_date': intervention.end,
 
-                        'cash_contribution': intervention.total_unicef_cash or 0,
-                        'supply_contribution': intervention.total_in_kind_amount or 0,
-                        'total_budget': intervention.total_budget or 0,
-                        'unicef_budget': intervention.total_unicef_budget or 0,
+                          'cash_contribution': intervention.total_unicef_cash or 0,
+                          'supply_contribution': intervention.total_in_kind_amount or 0,
+                          'total_budget': intervention.total_budget or 0,
+                          'unicef_budget': intervention.total_unicef_budget or 0,
 
-                        'currency': intervention.planned_budget.currency if planned_budget else '-',
-                        'partner_contribution': intervention.planned_budget.partner_contribution if planned_budget else '-',
-                        'unicef_cash': intervention.planned_budget.unicef_cash if planned_budget else '-',
-                        'in_kind_amount': intervention.planned_budget.in_kind_amount if planned_budget else '-',
-                        'total': intervention.planned_budget.total if planned_budget else '-',
-                        'fr_numbers_against_pd_ssfa': ' - '.join([fh.fr_number for fh in intervention.frs.all()]),
-                        'fr_currencies': ', '.join(fr for fr in fr_currencies),
-                        'sum_of_all_fr_planned_amount': intervention.frs.aggregate(
-                            total=Coalesce(Sum('intervention_amt'), 0))['total'] if fr_currencies.count() <= 1 else '-',
-                        'core_value_attached': has_assessment,
-                        'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
-                        'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
-                    })
-                created[country.name] += 1
-    return created
+                          'currency': intervention.planned_budget.currency if planned_budget else '-',
+                          'partner_contribution': intervention.planned_budget.partner_contribution if planned_budget else '-',
+                          'unicef_cash': intervention.planned_budget.unicef_cash if planned_budget else '-',
+                          'in_kind_amount': intervention.planned_budget.in_kind_amount if planned_budget else '-',
+                          'total': intervention.planned_budget.total if planned_budget else '-',
+                          'fr_numbers_against_pd_ssfa': ' - '.join([fh.fr_number for fh in intervention.frs.all()]),
+                          'fr_currencies': ', '.join(fr for fr in fr_currencies),
+                          'sum_of_all_fr_planned_amount': intervention.frs.aggregate(
+                              total=Coalesce(Sum('intervention_amt'), 0))[
+                              'total'] if fr_currencies.count() <= 1 else '-',
+                          'core_value_attached': has_assessment,
+                          'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
+                          'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
+                          }
+                existing, created = PMPIndicators.objects.get_or_create(country_name=country.name,
+                                                                        schema_name=country.schema_name,
+                                                                        country_id=partner.id,
+                                                                        partner_id=partner.pk,
+                                                                        intervention_id=intervention.pk,
+                                                                        defaults=values)
+                if created:
+                    results.created += 1
+                else:
+                    if is_record_changed(existing, values):
+                        results.updated += 1
+                        PMPIndicators.objects.update_or_create(country_name=country.name,
+                                                               schema_name=country.schema_name,
+                                                               country_id=partner.id,
+                                                               partner_id=partner.pk,
+                                                               intervention_id=intervention.pk,
+                                                               defaults=values)
+                    else:
+                        results.unchanged += 1
+
+    return results.as_dict()
+    #             PMPIndicators.objects.create(
+    #                 country_id=country.pk,
+    #                 partner_id=partner.pk,
+    #                 intervention_id=intervention.pk)
+    #             created[country.name] += 1
+    #
+    # return created
 
 
 @app.etl(Intervention)
 def load_intervention():
     connection = connections['etools']
     countries = connection.get_tenants()
-    Intervention.objects.truncate()
-    created = {}
+    results = EtlResult()
     for country in countries:
         connection.set_schemas([country.schema_name])
         qs = PartnersIntervention.objects.all().select_related('agreement',
@@ -167,68 +211,79 @@ def load_intervention():
                                                                )
         num = 0
         for num, record in enumerate(qs, 1):
-            Intervention.objects.create(country_name=country.name,
-                                        schema_name=country.schema_name,
-                                        number=record.number,
-                                        title=record.title,
-                                        status=record.status,
-                                        start_date=record.start,
-                                        end_date=record.end,
-                                        review_date_prc=record.review_date_prc,
-                                        prc_review_document=record.prc_review_document,
-                                        partner_name=record.agreement.partner.name,
-                                        agreement_id=record.agreement.pk,
-                                        partner_authorized_officer_signatory_id=get_attr(record,
-                                                                                         'partner_authorized_officer_signatory.pk'),
-                                        country_programme_id=get_attr(record, 'country_programme.pk'),
-                                        intervention_id=record.pk,
-                                        unicef_signatory_id=get_attr(record, 'unicef_signatory.pk'),
+            values = dict(number=record.number,
+                          title=record.title,
+                          status=record.status,
+                          start_date=record.start,
+                          end_date=record.end,
+                          review_date_prc=record.review_date_prc,
+                          prc_review_document=record.prc_review_document,
+                          partner_name=record.agreement.partner.name,
+                          agreement_id=record.agreement.pk,
+                          partner_authorized_officer_signatory_id=get_attr(record,
+                                                                           'partner_authorized_officer_signatory.pk'),
+                          country_programme_id=get_attr(record, 'country_programme.pk'),
+                          intervention_id=record.pk,
+                          unicef_signatory_id=get_attr(record, 'unicef_signatory.pk'),
 
-                                        signed_by_unicef_date=record.signed_by_unicef_date,
-                                        signed_by_partner_date=record.signed_by_partner_date,
-                                        population_focus=record.population_focus,
-                                        signed_pd_document=record.signed_pd_document,
+                          signed_by_unicef_date=record.signed_by_unicef_date,
+                          signed_by_partner_date=record.signed_by_partner_date,
+                          population_focus=record.population_focus,
+                          signed_pd_document=record.signed_pd_document,
 
-                                        submission_date=record.submission_date,
-                                        submission_date_prc=record.submission_date_prc,
+                          submission_date=record.submission_date,
+                          submission_date_prc=record.submission_date_prc,
 
-                                        unicef_signatory_first_name=get_attr(record,
-                                                                             'unicef_signatory.first_name'),
-                                        unicef_signatory_last_name=get_attr(record,
-                                                                            'unicef_signatory.last_name'),
-                                        unicef_signatory_email=get_attr(record, 'unicef_signatory.email'),
+                          unicef_signatory_first_name=get_attr(record,
+                                                               'unicef_signatory.first_name'),
+                          unicef_signatory_last_name=get_attr(record,
+                                                              'unicef_signatory.last_name'),
+                          unicef_signatory_email=get_attr(record, 'unicef_signatory.email'),
 
-                                        partner_signatory_title=get_attr(record,
-                                                                         'partner_authorized_officer_signatory.title'),
-                                        partner_signatory_first_name=get_attr(record,
-                                                                              'partner_authorized_officer_signatory.first_name'),
-                                        partner_signatory_last_name=get_attr(record,
-                                                                             'partner_authorized_officer_signatory.last_name'),
-                                        partner_signatory_email=get_attr(record,
-                                                                         'partner_authorized_officer_signatory.email'),
-                                        partner_signatory_phone=get_attr(record,
-                                                                         'partner_authorized_officer_signatory.phone'),
+                          partner_signatory_title=get_attr(record,
+                                                           'partner_authorized_officer_signatory.title'),
+                          partner_signatory_first_name=get_attr(record,
+                                                                'partner_authorized_officer_signatory.first_name'),
+                          partner_signatory_last_name=get_attr(record,
+                                                               'partner_authorized_officer_signatory.last_name'),
+                          partner_signatory_email=get_attr(record,
+                                                           'partner_authorized_officer_signatory.email'),
+                          partner_signatory_phone=get_attr(record,
+                                                           'partner_authorized_officer_signatory.phone'),
 
-                                        partner_focal_point_title=get_attr(record,
-                                                                           'partner_focal_point.title'),
-                                        partner_focal_point_first_name=get_attr(record,
-                                                                                'partner_focal_point.first_name'),
-                                        partner_focal_point_last_name=get_attr(record,
-                                                                               'partner_focal_point.last_name'),
-                                        partner_focal_point_email=get_attr(record,
-                                                                           'partner_focal_point.email'),
-                                        partner_focal_point_phone=get_attr(record,
-                                                                           'partner_focal_point.phone'),
+                          partner_focal_point_title=get_attr(record,
+                                                             'partner_focal_point.title'),
+                          partner_focal_point_first_name=get_attr(record,
+                                                                  'partner_focal_point.first_name'),
+                          partner_focal_point_last_name=get_attr(record,
+                                                                 'partner_focal_point.last_name'),
+                          partner_focal_point_email=get_attr(record,
+                                                             'partner_focal_point.email'),
+                          partner_focal_point_phone=get_attr(record,
+                                                             'partner_focal_point.phone'),
 
-                                        metadata=record.metadata,
-                                        document_type=record.document_type,
-                                        updated=record.modified,
-                                        created=record.created,
+                          metadata=record.metadata,
+                          document_type=record.document_type,
+                          updated=record.modified,
+                          created=record.created,
+                          )
+            existing, created = Intervention.objects.get_or_create(country_name=country.name,
+                                                                   schema_name=country.schema_name,
+                                                                   intervention_id=record.pk,
+                                                                   defaults=values)
+            if created:
+                results.created += 1
+            else:
+                if is_record_changed(existing, values):
+                    results.updated += 1
+                    Intervention.objects.update_or_create(country_name=country.name,
+                                                          schema_name=country.schema_name,
+                                                          intervention_id=record.pk,
+                                                          defaults=values)
+                else:
+                    results.unchanged += 1
 
-                                        )
-        created[country.name] = num
-
-    return created
+    return results.as_dict()
 
 
 @app.etl(FAMIndicator)
@@ -238,16 +293,16 @@ def load_fam_indicator():
 
     engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
     start_date = date.today()  # + relativedelta(months=-1)
-    created = {}
+    results = EtlResult()
     for country in countries:
-        created[country.name] = 0
-
         connection.set_schemas([country.schema_name])
         for model in engagements:
-            indicator, __ = FAMIndicator.objects.get_or_create(month=start_date,
-                                                               country_name=country.name,
-                                                               schema_name=country.schema_name)
-
+            indicator, created = FAMIndicator.objects.get_or_create(month=start_date,
+                                                                    country_name=country.name,
+                                                                    schema_name=country.schema_name)
+            if created:
+                results.created += 1
+            changed = created
             realname = "_".join(model._meta.db_table.split('_')[1:])
             for status, status_display in AuditEngagement.STATUSES:
                 filter_dict = {
@@ -261,14 +316,18 @@ def load_fam_indicator():
                     # just a safety check
                     if not hasattr(indicator, field_name):  # pragma: no cover
                         raise ValueError(field_name)
-                    setattr(indicator, field_name, value)
+                    if getattr(indicator, field_name) == value:
+                        changed = False
+                    else:
+                        changed = changed and True
+                        setattr(indicator, field_name, value)
                 except Exception as e:  # pragma: no cover
                     logger.error(e)
                     raise
-            indicator.save()
-            created[country.name] += 1
+            if changed:
+                indicator.save()
 
-    return created
+    return results.as_dict()
 
 
 @app.etl(UserStats)
@@ -277,23 +336,40 @@ def load_user_report():
     countries = connection.get_tenants()
     today = date.today()
     first_of_month = datetime(today.year, today.month, 1)
-    created = {}
+    results = EtlResult()
     for country in countries:
-        created[country.name] = 0
         connection.set_schemas([country.schema_name])
         base = AuthUser.objects.filter(profile__country=country)
-        UserStats.objects.update_or_create(month=first_of_month,
-                                           country_name=country.name,
-                                           schema_name=country.schema_name,
-                                           defaults={
-                                               'total': base.count(),
-                                               'unicef': base.filter(email__endswith='@unicef.org').count(),
-                                               'logins': base.filter(
-                                                   last_login__month=first_of_month.month).count(),
-                                               'unicef_logins': base.filter(
-                                                   last_login__month=first_of_month.month,
-                                                   email__endswith='@unicef.org').count(),
-                                           })
-        created[country.name] += 1
+        values = {
+            'total': base.count(),
+            'unicef': base.filter(email__endswith='@unicef.org').count(),
+            'logins': base.filter(
+                last_login__month=first_of_month.month).count(),
+            'unicef_logins': base.filter(
+                last_login__month=first_of_month.month,
+                email__endswith='@unicef.org').count(),
+        }
+        existing, created = UserStats.objects.get_or_create(month=first_of_month,
+                                                            country_name=country.name,
+                                                            schema_name=country.schema_name,
+                                                            defaults=values)
+        if created:
+            results.created += 1
+        else:
+            if is_record_changed(existing, values):
+                results.updated += 1
+                UserStats.objects.update_or_create(month=first_of_month,
+                                                   country_name=country.name,
+                                                   schema_name=country.schema_name,
+                                                   defaults=values)
+            else:
+                results.unchanged += 1
 
-    return created
+    return results.as_dict()
+    # UserStats.objects.update_or_create(month=first_of_month,
+    #                                    country_name=country.name,
+    #                                    schema_name=country.schema_name,
+    #                                    defaults=values)
+    # created[country.name] += 1
+    #
+    # return created

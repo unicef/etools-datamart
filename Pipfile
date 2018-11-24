@@ -69,6 +69,8 @@ pytest-pythonpath = "*"
 yapf = "*"
 vcrpy = "*"
 pre-commit = "*"
+freezegun = "*"
+pytest-ignore-flaky = "*"
 
 [requires]
 python_version = "3.6"
