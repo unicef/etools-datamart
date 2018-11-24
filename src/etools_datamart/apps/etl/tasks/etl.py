@@ -22,8 +22,14 @@ logger = logging.getLogger(__name__)
 __all__ = ["load_hact", "load_user_report", "load_fam_indicator",
            "load_pmp_indicator", "load_intervention"]
 
+CREATED = 'created'
+UPDATED = 'updated'
+UNCHANGED = 'unchanged'
+
 
 class EtlResult:
+    __slots__ = [CREATED, UPDATED, UNCHANGED]
+
     def __init__(self, updated=0, created=0, unchanged=0):
         self.created = created
         self.updated = updated
@@ -32,6 +38,9 @@ class EtlResult:
     def __repr__(self):
         return repr(self.as_dict())
 
+    def incr(self, counter):
+        setattr(self, counter, getattr(self, counter) + 1)
+
     def as_dict(self):
         return {'created': self.created,
                 'updated': self.updated,
@@ -39,13 +48,13 @@ class EtlResult:
 
     def __eq__(self, other):
         if isinstance(other, EtlResult):
-            return (self.created == other.created and
-                    self.updated == other.updated and
-                    self.unchanged == other.unchanged)
-        elif isinstance(other, dict):
+            other = other.as_dict()
+
+        if isinstance(other, dict):
             return (self.created == other['created'] and
                     self.updated == other['updated'] and
                     self.unchanged == other['unchanged'])
+        return False
 
 
 def is_record_changed(record, values):
@@ -54,6 +63,21 @@ def is_record_changed(record, values):
         if getattr(record, field_name) != getattr(other, field_name):
             return True
     return False
+
+
+def process(Model, filters, values):
+    existing, created = Model.objects.get_or_create(**filters,
+                                                    defaults=values)
+    if created:
+        op = CREATED
+    else:
+        if is_record_changed(existing, values):
+            op = UPDATED
+            Model.objects.update_or_create(**filters,
+                                           defaults=values)
+        else:
+            op = UNCHANGED
+    return op
 
 
 @app.etl(HACT)
@@ -99,21 +123,26 @@ def load_hact():
                       completed_hact_audits=data['assurance_activities']['scheduled_audit'],
                       completed_special_audits=data['assurance_activities']['special_audit'],
                       )
-        existing, created = HACT.objects.get_or_create(year=today.year,
-                                                       country_name=country.name,
-                                                       schema_name=country.schema_name,
-                                                       defaults=values)
-        if created:
-            results.created += 1
-        else:
-            if is_record_changed(existing, values):
-                results.updated += 1
-                HACT.objects.update_or_create(year=today.year,
-                                              country_name=country.name,
-                                              schema_name=country.schema_name,
-                                              defaults=values)
-            else:
-                results.unchanged += 1
+        op = process(HACT, filters=dict(year=today.year,
+                                        country_name=country.name,
+                                        schema_name=country.schema_name),
+                     values=values)
+        results.incr(op)
+        # existing, created = HACT.objects.get_or_create(year=today.year,
+        #                                                country_name=country.name,
+        #                                                schema_name=country.schema_name,
+        #                                                defaults=values)
+        # if created:
+        #     results.created += 1
+        # else:
+        #     if is_record_changed(existing, values):
+        #         results.updated += 1
+        #         HACT.objects.update_or_create(year=today.year,
+        #                                       country_name=country.name,
+        #                                       schema_name=country.schema_name,
+        #                                       defaults=values)
+        #     else:
+        #         results.unchanged += 1
 
     return results.as_dict()
 
@@ -167,25 +196,32 @@ def load_pmp_indicator():
                           'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
                           'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
                           }
-                existing, created = PMPIndicators.objects.get_or_create(country_name=country.name,
-                                                                        schema_name=country.schema_name,
-                                                                        country_id=partner.id,
-                                                                        partner_id=partner.pk,
-                                                                        intervention_id=intervention.pk,
-                                                                        defaults=values)
-                if created:
-                    results.created += 1
-                else:
-                    if is_record_changed(existing, values):
-                        results.updated += 1
-                        PMPIndicators.objects.update_or_create(country_name=country.name,
-                                                               schema_name=country.schema_name,
-                                                               country_id=partner.id,
-                                                               partner_id=partner.pk,
-                                                               intervention_id=intervention.pk,
-                                                               defaults=values)
-                    else:
-                        results.unchanged += 1
+                op = process(PMPIndicators, filters=dict(country_name=country.name,
+                                                         schema_name=country.schema_name,
+                                                         country_id=partner.id,
+                                                         partner_id=partner.pk,
+                                                         intervention_id=intervention.pk),
+                             values=values)
+                results.incr(op)
+                # existing, created = PMPIndicators.objects.get_or_create(country_name=country.name,
+                #                                                         schema_name=country.schema_name,
+                #                                                         country_id=partner.id,
+                #                                                         partner_id=partner.pk,
+                #                                                         intervention_id=intervention.pk,
+                #                                                         defaults=values)
+                # if created:
+                #     results.created += 1
+                # else:
+                #     if is_record_changed(existing, values):
+                #         results.updated += 1
+                #         PMPIndicators.objects.update_or_create(country_name=country.name,
+                #                                                schema_name=country.schema_name,
+                #                                                country_id=partner.id,
+                #                                                partner_id=partner.pk,
+                #                                                intervention_id=intervention.pk,
+                #                                                defaults=values)
+                #     else:
+                #         results.unchanged += 1
 
     return results.as_dict()
     #             PMPIndicators.objects.create(
@@ -267,21 +303,27 @@ def load_intervention():
                           updated=record.modified,
                           created=record.created,
                           )
-            existing, created = Intervention.objects.get_or_create(country_name=country.name,
-                                                                   schema_name=country.schema_name,
-                                                                   intervention_id=record.pk,
-                                                                   defaults=values)
-            if created:
-                results.created += 1
-            else:
-                if is_record_changed(existing, values):
-                    results.updated += 1
-                    Intervention.objects.update_or_create(country_name=country.name,
-                                                          schema_name=country.schema_name,
-                                                          intervention_id=record.pk,
-                                                          defaults=values)
-                else:
-                    results.unchanged += 1
+            op = process(Intervention, filters=dict(country_name=country.name,
+                                                    schema_name=country.schema_name,
+                                                    intervention_id=record.pk),
+                         values=values)
+            results.incr(op)
+
+            # existing, created = Intervention.objects.get_or_create(country_name=country.name,
+            #                                                        schema_name=country.schema_name,
+            #                                                        intervention_id=record.pk,
+            #                                                        defaults=values)
+            # if created:
+            #     results.created += 1
+            # else:
+            #     if is_record_changed(existing, values):
+            #         results.updated += 1
+            #         Intervention.objects.update_or_create(country_name=country.name,
+            #                                               schema_name=country.schema_name,
+            #                                               intervention_id=record.pk,
+            #                                               defaults=values)
+            #     else:
+            #         results.unchanged += 1
 
     return results.as_dict()
 
@@ -297,36 +339,42 @@ def load_fam_indicator():
     for country in countries:
         connection.set_schemas([country.schema_name])
         for model in engagements:
-            indicator, created = FAMIndicator.objects.get_or_create(month=start_date,
-                                                                    country_name=country.name,
-                                                                    schema_name=country.schema_name)
-            if created:
-                results.created += 1
-            changed = created
+            # indicator, created = FAMIndicator.objects.get_or_create(month=start_date,
+            #                                                         country_name=country.name,
+            #                                                         schema_name=country.schema_name)
+            # if created:
+            #     results.created += 1
+            # changed = created
             realname = "_".join(model._meta.db_table.split('_')[1:])
+            values = {}
             for status, status_display in AuditEngagement.STATUSES:
                 filter_dict = {
                     'engagement_ptr__status': status,
                     'engagement_ptr__start_date__month': start_date.month,
                     'engagement_ptr__start_date__year': start_date.year,
                 }
-                try:
-                    field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
-                    value = model.objects.filter(**filter_dict).count()
-                    # just a safety check
-                    if not hasattr(indicator, field_name):  # pragma: no cover
-                        raise ValueError(field_name)
-                    if getattr(indicator, field_name) == value:
-                        changed = False
-                    else:
-                        changed = changed and True
-                        setattr(indicator, field_name, value)
-                except Exception as e:  # pragma: no cover
-                    logger.error(e)
-                    raise
-            if changed:
-                indicator.save()
-
+                field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
+                value = model.objects.filter(**filter_dict).count()
+                values[field_name] = value
+                # try:
+                #     field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
+                #     value = model.objects.filter(**filter_dict).count()
+                #     # just a safety check
+                #     if not hasattr(indicator, field_name):  # pragma: no cover
+                #         raise ValueError(field_name)
+                #     if getattr(indicator, field_name) == value:
+                #         changed = False
+                #     else:
+                #         changed = changed and True
+                #         setattr(indicator, field_name, value)
+                # except Exception as e:  # pragma: no cover
+                #     logger.error(e)
+                #     raise
+            op = process(FAMIndicator, filters=dict(month=start_date,
+                                                    country_name=country.name,
+                                                    schema_name=country.schema_name),
+                         values=values)
+            results.incr(op)
     return results.as_dict()
 
 
@@ -349,22 +397,28 @@ def load_user_report():
                 last_login__month=first_of_month.month,
                 email__endswith='@unicef.org').count(),
         }
-        existing, created = UserStats.objects.get_or_create(month=first_of_month,
-                                                            country_name=country.name,
-                                                            schema_name=country.schema_name,
-                                                            defaults=values)
-        if created:
-            results.created += 1
-        else:
-            if is_record_changed(existing, values):
-                results.updated += 1
-                UserStats.objects.update_or_create(month=first_of_month,
-                                                   country_name=country.name,
-                                                   schema_name=country.schema_name,
-                                                   defaults=values)
-            else:
-                results.unchanged += 1
+        op = process(UserStats, filters=dict(month=first_of_month,
+                                             country_name=country.name,
+                                             schema_name=country.schema_name, ),
+                     values=values)
+        results.incr(op)
 
+        # existing, created = UserStats.objects.get_or_create(month=first_of_month,
+        #                                                     country_name=country.name,
+        #                                                     schema_name=country.schema_name,
+        #                                                     defaults=values)
+        # if created:
+        #     results.created += 1
+        # else:
+        #     if is_record_changed(existing, values):
+        #         results.updated += 1
+        #         UserStats.objects.update_or_create(month=first_of_month,
+        #                                            country_name=country.name,
+        #                                            schema_name=country.schema_name,
+        #                                            defaults=values)
+        #     else:
+        #         results.unchanged += 1
+    #
     return results.as_dict()
     # UserStats.objects.update_or_create(month=first_of_month,
     #                                    country_name=country.name,

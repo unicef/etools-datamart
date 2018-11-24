@@ -14,7 +14,7 @@ def test_load_pmp_indicator(number_of_intervention):
 
 def test_load_intervention(number_of_intervention, settings, monkeypatch):
     load_intervention.unlock()
-    load_intervention()
+    assert load_intervention() == EtlResult(created=number_of_intervention*3)
     assert Intervention.objects.count() == number_of_intervention * 3
 
 
