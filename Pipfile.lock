@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7d626fa15c7a7f09cdf0a17442e74c6f763c9f72000c26cd055bd7381d8def21"
+            "sha256": "8f86868b9753fa670c7c91c6a2eecc06abeb689cd5475fe1baf332d13dbe8ebc"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -594,6 +594,14 @@
             ],
             "version": "==0.20.6"
         },
+        "azure-storage": {
+            "hashes": [
+                "sha256:4c406422e3edd41920bb1f0c3930c34fee3eb0d55258ef7ec7308ccbb9385ad5",
+                "sha256:fb6212dcbed91b49d9637aa5e8888eafdfcd523b7e560c8044d2d838bbd3ca5f"
+            ],
+            "index": "pypi",
+            "version": "==0.36.0"
+        },
         "azure-storage-blob": {
             "hashes": [
                 "sha256:65ebe2e54460566c2077c6b3773a2a0623eabc7b95602010cb51b84077087fda",
@@ -850,11 +858,11 @@
         },
         "django-picklefield": {
             "hashes": [
-                "sha256:8d1de6be099044ae61e55998b35de18a57499b946fe45781077f5cec4f73f0e0",
-                "sha256:ce7fee5c6558fe5dc8924993d994ccde75bb75b91cd82787cbd4c92b95a69f9c"
+                "sha256:9052f2dcf4882c683ce87b4356f29b4d014c0dad645b6906baf9f09571f52bc8",
+                "sha256:f1733a8db1b6046c0d7d738e785f9875aa3c198215de11993463a9339aa4ea24"
             ],
             "index": "pypi",
-            "version": "==1.1.0"
+            "version": "==2.0"
         },
         "django-redis": {
             "hashes": [
@@ -1821,10 +1829,10 @@
         },
         "pygments": {
             "hashes": [
-                "sha256:78f3f434bcc5d6ee09020f92ba487f95ba50f1e3ef83ae96b9d5ffa1bab25c5d",
-                "sha256:dbae1046def0efb574852fab9e90209b23f556367b5a320c0bcb871c77c3e8cc"
+                "sha256:6301ecb0997a52d2d31385e62d0a4a4cf18d2f2da7054a5ddad5c366cd39cee7",
+                "sha256:82666aac15622bd7bb685a4ee7f6625dd716da3ef7473620c192c0168aae64fc"
             ],
-            "version": "==2.2.0"
+            "version": "==2.3.0"
         },
         "pytest": {
             "hashes": [
@@ -2021,11 +2029,11 @@
         },
         "yapf": {
             "hashes": [
-                "sha256:b96815bd0bbd2ab290f2ae9e610756940b17a0523ef2f6b2d31da749fc395137",
-                "sha256:cebb6faf35c9027c08996c07831b8971f3d67c0eb615269f66dfd7e6815fdc2a"
+                "sha256:8aa7f9abdb97b4da4d3227306b88477982daafef0a96cc41639754ca31f46d55",
+                "sha256:f2df5891481f94ddadfbf8ae8ae499080752cfb06005a31bbb102f3012f8b944"
             ],
             "index": "pypi",
-            "version": "==0.24.0"
+            "version": "==0.25.0"
         },
         "yarl": {
             "hashes": [
