@@ -42,6 +42,6 @@ class ServicePermission(BasePermission):
                 raise PermissionDenied(f"Forbidden serializer '{requested_serializer}'")
 
             return True
-        except (UserAccessControl.DoesNotExist):
+        except (GroupAccessControl.DoesNotExist):
             logger.error(f"User '{request.user}' does not have grants for '{fqn(view)}'")
             return False

@@ -106,8 +106,8 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['results'] = retval.as_dict()
         if retval.created > 0 or retval.updated > 0:
             defs['last_changes'] = timezone.now()
-            service = sender.linked_model.get_service()
-            service.invalidate_cache()
+            for service in sender.linked_model.linked_services:
+                service.invalidate_cache()
 
         defs['last_success'] = timezone.now()
     else:
