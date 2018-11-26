@@ -47,15 +47,18 @@ class AzureADTenantOAuth2Ext(AzureADTenantOAuth2):
         # get key id and algorithm
         key_id = jwt_header['kid']
         algorithm = jwt_header['alg']
-
+        verify = os.environ.get('OAUTH2_VERIFY', False)
+        key = ''
         try:
             # retrieve certificate for key_id
-            certificate = self.get_certificate(key_id)
+            if verify:
+                certificate = self.get_certificate(key_id)
+                key = certificate.public_key()
 
             return jwt_decode(
                 id_token,
-                verify=os.environ.get('OAUTH2_VERIFY'),
-                key=certificate.public_key(),
+                verify=verify,
+                key=key,
                 algorithms=algorithm,
                 audience=self.setting('KEY')
             )

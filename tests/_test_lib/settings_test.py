@@ -1,3 +1,4 @@
+import os
 import random
 
 from etools_datamart.config.settings import *  # noqa
