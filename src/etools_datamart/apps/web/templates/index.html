@@ -3,7 +3,7 @@
     <h1>eTools Datamart</h1>
     <ul>
         {% if request.user.is_anonymous %}
-            <li><a href="{% url "api:api-root" %}">API (needs token)</a></li>
+            <li><a href="{% url "api:api-root" version="latest" %}">API (needs token)</a></li>
             <li><a href="{% url "login" %}">Login</a></li>
         {% else %}
             <li><a href="{% url "api:api-root" version="latest" %}">API</a></li>
