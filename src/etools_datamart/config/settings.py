@@ -364,6 +364,7 @@ CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
 CELERY_BEAT_SCHEDULE = {}
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', False)
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
+
 CELERY_TASK_ROUTES = {
     'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
     'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
@@ -384,6 +385,7 @@ REST_FRAMEWORK = {
     # "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
     'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
     # 'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
     'SEARCH_PARAM': 'search',
