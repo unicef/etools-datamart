@@ -12,6 +12,7 @@ from strategy_field.utils import get_attr
 from etools_datamart.apps.data.models import HACT, Intervention, PMPIndicators
 from etools_datamart.apps.data.models.fam import FAMIndicator
 from etools_datamart.apps.data.models.user import UserStats
+from etools_datamart.apps.etl.results import CREATED, EtlResult, UNCHANGED, UPDATED
 from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
                                                 AuditSpecialaudit, AuditSpotcheck, AuthUser, HactAggregatehact,
                                                 PartnersIntervention, PartnersPartnerorganization,)
@@ -21,40 +22,6 @@ logger = logging.getLogger(__name__)
 
 __all__ = ["load_hact", "load_user_report", "load_fam_indicator",
            "load_pmp_indicator", "load_intervention"]
-
-CREATED = 'created'
-UPDATED = 'updated'
-UNCHANGED = 'unchanged'
-
-
-class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED]
-
-    def __init__(self, updated=0, created=0, unchanged=0):
-        self.created = created
-        self.updated = updated
-        self.unchanged = unchanged
-
-    def __repr__(self):
-        return repr(self.as_dict())
-
-    def incr(self, counter):
-        setattr(self, counter, getattr(self, counter) + 1)
-
-    def as_dict(self):
-        return {'created': self.created,
-                'updated': self.updated,
-                'unchanged': self.unchanged}
-
-    def __eq__(self, other):
-        if isinstance(other, EtlResult):
-            other = other.as_dict()
-
-        if isinstance(other, dict):
-            return (self.created == other['created'] and
-                    self.updated == other['updated'] and
-                    self.unchanged == other['unchanged'])
-        return False
 
 
 def is_record_changed(record, values):
@@ -144,11 +111,11 @@ def load_hact():
         #     else:
         #         results.unchanged += 1
 
-    return results.as_dict()
+    return results
 
 
 @app.etl(PMPIndicators)
-def load_pmp_indicator():
+def load_pmp_indicator() -> EtlResult:
     connection = connections['etools']
     countries = connection.get_tenants()
     base_url = 'https://etools.unicef.org'
@@ -223,7 +190,7 @@ def load_pmp_indicator():
                 #     else:
                 #         results.unchanged += 1
 
-    return results.as_dict()
+    return results
     #             PMPIndicators.objects.create(
     #                 country_id=country.pk,
     #                 partner_id=partner.pk,
@@ -234,7 +201,7 @@ def load_pmp_indicator():
 
 
 @app.etl(Intervention)
-def load_intervention():
+def load_intervention() -> EtlResult:
     connection = connections['etools']
     countries = connection.get_tenants()
     results = EtlResult()
@@ -325,11 +292,11 @@ def load_intervention():
             #     else:
             #         results.unchanged += 1
 
-    return results.as_dict()
+    return results
 
 
 @app.etl(FAMIndicator)
-def load_fam_indicator():
+def load_fam_indicator() -> EtlResult:
     connection = connections['etools']
     countries = connection.get_tenants()
 
@@ -375,11 +342,11 @@ def load_fam_indicator():
                                                     schema_name=country.schema_name),
                          values=values)
             results.incr(op)
-    return results.as_dict()
+    return results
 
 
 @app.etl(UserStats)
-def load_user_report():
+def load_user_report() -> EtlResult:
     connection = connections['etools']
     countries = connection.get_tenants()
     today = date.today()
@@ -419,7 +386,7 @@ def load_user_report():
         #     else:
         #         results.unchanged += 1
     #
-    return results.as_dict()
+    return results
     # UserStats.objects.update_or_create(month=first_of_month,
     #                                    country_name=country.name,
     #                                    schema_name=country.schema_name,

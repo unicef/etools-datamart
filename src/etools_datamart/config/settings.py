@@ -356,9 +356,9 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
+# CELERY_ACCEPT_CONTENT = ['application/json']
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
                        "etools_datamart.apps.etl.tasks.tasks", ]
 CELERY_BEAT_SCHEDULE = {}
@@ -368,6 +368,10 @@ CELERY_TASK_ROUTES = {
     'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
     'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
 }
+
+CELERY_ACCEPT_CONTENT = ['etljson']
+CELERY_TASK_SERIALIZER = 'etljson'
+CELERY_RESULT_SERIALIZER = 'etljson'
 
 CONCURRENCY_IGNORE_DEFAULT = False
 

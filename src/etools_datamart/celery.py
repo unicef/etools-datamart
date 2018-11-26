@@ -4,6 +4,9 @@ from time import time
 from celery import Celery
 from celery.signals import task_postrun, task_prerun
 from celery.task import Task
+from kombu.serialization import register
+
+from etools_datamart.apps.etl.results import etl_dumps, etl_loads
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
@@ -73,33 +76,41 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
     from django.utils import timezone
 
     defs = {'status': 'RUNNING',
-            'timestamp': timezone.now()}
+            'last_run': timezone.now()}
     EtlTask.objects.update_or_create(task=task.name,
                                      content_type=ContentType.objects.get_for_model(task.linked_model),
                                      table_name=task.linked_model._meta.db_table,
                                      defaults=defs)
 
 
+register('etljson', etl_dumps, etl_loads,
+         content_type='application/x-myjson', content_encoding='utf-8')
+
+
 @task_postrun.connect
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
     from django.utils import timezone
-
     if not hasattr(sender, 'linked_model'):
         return
     try:
         cost = time() - app.timers.pop(task_id)
     except KeyError:  # pragma: no cover
         cost = -1
-    if not isinstance(retval, dict):
-        retval = {'error': str(retval)}
     defs = {'elapsed': cost,
             'status': state,
-            'results': retval,
-            'timestamp': timezone.now()}
+            'last_run': timezone.now()}
+
     if state == 'SUCCESS':
+        defs['results'] = retval.as_dict()
+        if retval.created > 0 or retval.updated > 0:
+            defs['last_changes'] = timezone.now()
+        # if defs.
         defs['last_success'] = timezone.now()
     else:
+        if not isinstance(retval, dict):
+            defs['results'] = str(retval)
         defs['last_failure'] = timezone.now()
+
     from etools_datamart.apps.etl.models import EtlTask
 
     EtlTask.objects.update_or_create(task=task.name, defaults=defs)

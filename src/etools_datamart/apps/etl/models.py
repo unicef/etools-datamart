@@ -16,7 +16,7 @@ class TaskLogManager(models.Manager):
     def get_for_task(self, task: ETLTask):
         return self.get_or_create(task=task.name,
                                   defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
-                                                timestamp=None,
+                                                last_run=None,
                                                 table_name=task.linked_model._meta.db_table))[0]
 
     def inspect(self):
@@ -27,7 +27,7 @@ class TaskLogManager(models.Manager):
             t, created = self.get_or_create(task=task.name,
                                             defaults=dict(
                                                 content_type=ContentType.objects.get_for_model(task.linked_model),
-                                                timestamp=None,
+                                                last_run=None,
                                                 table_name=task.linked_model._meta.db_table))
             results[created] += 1
             new.append(t.id)
@@ -37,11 +37,12 @@ class TaskLogManager(models.Manager):
 
 class EtlTask(models.Model):
     task = models.CharField(max_length=200, unique=True)
-    timestamp = models.DateTimeField(null=True)
+    last_run = models.DateTimeField(null=True)
     status = models.CharField(max_length=200)
     elapsed = models.IntegerField(null=True)
     last_success = models.DateTimeField(null=True)
     last_failure = models.DateTimeField(null=True)
+    last_changes = models.DateTimeField(null=True)
     table_name = models.CharField(max_length=200, null=True)
     content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
 
@@ -50,7 +51,7 @@ class EtlTask(models.Model):
     objects = TaskLogManager()
 
     class Meta:
-        get_latest_by = 'timestamp'
+        get_latest_by = 'last_run'
 
     def __str__(self):
         return f"{self.task} {self.status}"
