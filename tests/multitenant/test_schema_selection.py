@@ -81,7 +81,7 @@ def test_select_schema_data(django_app, admin_user):
 def test_api_call_queryparam(client, admin_user):
     client.login(username='admin', password='password')
 
-    url = f'{reverse("api:partners-list")}?country_name=bolivia,lebanon'
+    url = f'{reverse("api:partners-list", args=["v1"])}?country_name=bolivia,lebanon'
     res = client.get(url)
     assert res.status_code == 200
     assert conn.schemas == ['bolivia', 'lebanon']

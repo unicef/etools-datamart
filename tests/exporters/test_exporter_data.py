@@ -23,7 +23,7 @@ def test_export_azure_data(db, client, settings):
     load_user_report()
     assert UserStats.objects.count()
 
-    url = reverse("api:userstats-list")
+    url = reverse("api:userstats-list", args=['v1'])
     res = client.get(f"{url}?format=xlsx")
 
     from storages.backends.azure_storage import AzureStorage

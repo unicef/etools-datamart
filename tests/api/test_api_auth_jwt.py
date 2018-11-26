@@ -27,7 +27,7 @@ def user(db):
 
 
 def test_token(user, client):
-    url = reverse('api:partners-list')
+    url = reverse('api:partners-list', args=['v1'])
     client.credentials(HTTP_AUTHORIZATION='jwt ' + TOKEN)
     with mock.patch('unicef_security.azure.Synchronizer.get_user',
                     return_value={'@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#users/$entity',
@@ -43,7 +43,7 @@ def test_token(user, client):
 
 @override_config(AZURE_USE_GRAPH=False)
 def test_token2(user, client):
-    url = reverse('api:partners-list')
+    url = reverse('api:partners-list', args=['v1'])
     client.credentials(HTTP_AUTHORIZATION='jwt ' + TOKEN)
     with mock.patch('rest_framework_jwt.settings.api_settings.JWT_VERIFY_EXPIRATION', False):
         ret = client.get(url)

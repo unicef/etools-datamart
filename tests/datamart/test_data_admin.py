@@ -3,6 +3,7 @@ import pytest
 from django.contrib import messages
 from django.urls import reverse
 from test_utilities.factories import PMPIndicatorFactory
+from test_utilities.perms import user_grant_permissions
 
 
 @pytest.mark.django_db()
@@ -28,16 +29,28 @@ def test_pmpindicators_filter(django_app, admin_user):
 
 
 @pytest.mark.django_db()
-def test_pmpindicators_detail(django_app, admin_user, settings):
+def test_pmpindicators_detail(django_app, staff_user, settings):
+    i = PMPIndicatorFactory()
+    url = reverse("admin:data_pmpindicators_change", args=[i.pk])
+    assert staff_user.is_authenticated
+    with user_grant_permissions(staff_user, ['data.change_pmpindicators']):
+        res = django_app.get(url, user=staff_user)
+        assert res.status_code == 200
+        res = res.form.submit().follow()
+        assert res.status_code == 200
+        storage = res.context['messages']
+        assert [m.message for m in storage] == ['This admin is read-only. Record not saved.']
+
+
+@pytest.mark.django_db()
+def test_pmpindicators_detail_supersuser(django_app, admin_user, settings):
     i = PMPIndicatorFactory()
     url = reverse("admin:data_pmpindicators_change", args=[i.pk])
     assert admin_user.is_authenticated
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
     res = res.form.submit().follow()
-    assert res.status_code == 200
-    storage = res.context['messages']
-    assert [m.message for m in storage] == ['This admin is read-only. Record not saved.']
+    assert res.status_code == 302
 
 
 def test_pmpindicators_refresh(django_app, admin_user):

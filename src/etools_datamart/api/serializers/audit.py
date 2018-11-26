@@ -8,6 +8,3 @@ class EngagementSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AuditEngagement
         exclude = ()
-
-    def fail(self, key, **kwargs):
-        return super().fail(key, **kwargs)

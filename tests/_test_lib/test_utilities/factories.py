@@ -3,6 +3,7 @@ from datetime import datetime
 
 import factory
 import unicef_security.models
+from django.contrib.auth.models import Group
 from django.db import connections
 from django.utils import timezone
 from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
@@ -63,6 +64,12 @@ class InterventionFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Intervention
+
+
+class GroupFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Group
+        django_get_or_create = ('name',)
 
 
 class UserFactory(factory.DjangoModelFactory):

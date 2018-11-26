@@ -19,7 +19,7 @@ def users(db):
 def test_api_web_index(user):
     client = APIClient()
     client.force_authenticate(user)
-    res = client.get('/api/')
+    res = client.get('/api/latest/')
     assert res.status_code == 200
 
 

@@ -127,3 +127,17 @@ def number_of_partnerorganization(db):
 def number_of_intervention(db):
     # number of partners.Intervention
     return int((Path(__file__).parent / 'INTERVENTION').read_text())
+
+
+@pytest.fixture()
+def etools_user(db):
+    from etools_datamart.apps.etools.models import AuthUser
+    return AuthUser.objects.get(id=1)
+
+
+@pytest.fixture()
+def staff_user(etools_user):
+    from test_utilities.factories import UserFactory
+    return UserFactory(username=etools_user.username,
+                       email=etools_user.email,
+                       is_staff=True)
