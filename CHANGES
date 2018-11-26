@@ -5,7 +5,7 @@
 * new 'Monitor' page to check dataset last update date
 * add ability to intercept changed/unchanged datamart records
 * Azure storage support
-
+* use versioning in API urls
 
 1.6
 ---
