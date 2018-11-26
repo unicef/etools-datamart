@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import os
 from pathlib import Path
 
 import environ
@@ -406,7 +405,7 @@ JWT_AUTH = {
     'JWT_DECODE_HANDLER': 'rest_framework_jwt.utils.jwt_decode_handler',
 
     # Keys will be set in core.apps.Config.ready()
-    'JWT_PUBLIC_KEY': os.environ,
+    'JWT_PUBLIC_KEY': '?',
     # 'JWT_PRIVATE_KEY': wallet.get_private(),
     # 'JWT_PRIVATE_KEY': None,
     'JWT_ALGORITHM': 'RS256',

@@ -106,7 +106,9 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['results'] = retval.as_dict()
         if retval.created > 0 or retval.updated > 0:
             defs['last_changes'] = timezone.now()
-        # if defs.
+            service = sender.linked_model.get_service()
+            service.invalidate_cache()
+
         defs['last_success'] = timezone.now()
     else:
         if not isinstance(retval, dict):
@@ -116,6 +118,5 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     from etools_datamart.apps.etl.models import EtlTask
 
     EtlTask.objects.update_or_create(task=task.name, defaults=defs)
-
     # Service.objects.invalidate_cache()
     app.timers[task.name] = cost
