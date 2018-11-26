@@ -45,10 +45,11 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return request.user.is_superuser
 
     def get_readonly_fields(self, request, obj=None):
-        self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
+        if not request.user.is_superuser:
+            self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
         return self.readonly_fields
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
