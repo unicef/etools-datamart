@@ -17,7 +17,7 @@ class ServicePermission(BasePermission):
         try:
             return UserAccessControl.objects.get(service__viewset=fqn(view),
                                                  user=request.user)
-        except GroupAccessControl.DoesNotExist:
+        except UserAccessControl.DoesNotExist:
             return GroupAccessControl.objects.get(service__viewset=fqn(view),
                                                   group__user=request.user)
 

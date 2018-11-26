@@ -90,6 +90,8 @@ register('etljson', etl_dumps, etl_loads,
 @task_postrun.connect
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
     from django.utils import timezone
+    # from unicef_rest_framework.models import Service
+
     if not hasattr(sender, 'linked_model'):
         return
     try:
@@ -114,4 +116,6 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     from etools_datamart.apps.etl.models import EtlTask
 
     EtlTask.objects.update_or_create(task=task.name, defaults=defs)
+
+    # Service.objects.invalidate_cache()
     app.timers[task.name] = cost
