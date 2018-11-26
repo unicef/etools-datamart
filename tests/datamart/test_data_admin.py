@@ -50,7 +50,7 @@ def test_pmpindicators_detail_supersuser(django_app, admin_user, settings):
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
     res = res.form.submit().follow()
-    assert res.status_code == 302
+    assert res.status_code == 200
 
 
 def test_pmpindicators_refresh(django_app, admin_user):
