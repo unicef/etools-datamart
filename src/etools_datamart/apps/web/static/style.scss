@@ -268,10 +268,13 @@ input.input100 {
       &.task {
         width: 30%;
       }
-      &.timestamp {
+      &.last_run{
         width: 300px;
       }
-      &.result {
+      &.last_changes {
+        width: 300px;
+      }
+      &.status {
         width: 100px;
       }
     }

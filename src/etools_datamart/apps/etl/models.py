@@ -37,12 +37,12 @@ class TaskLogManager(models.Manager):
 
 class EtlTask(models.Model):
     task = models.CharField(max_length=200, unique=True)
-    last_run = models.DateTimeField(null=True)
+    last_run = models.DateTimeField(null=True, help_text="last execution time")
     status = models.CharField(max_length=200)
     elapsed = models.IntegerField(null=True)
-    last_success = models.DateTimeField(null=True)
-    last_failure = models.DateTimeField(null=True)
-    last_changes = models.DateTimeField(null=True)
+    last_success = models.DateTimeField(null=True, help_text="last successully execution time")
+    last_failure = models.DateTimeField(null=True, help_text="last failure execution time")
+    last_changes = models.DateTimeField(null=True, help_text="last time data have been changed")
     table_name = models.CharField(max_length=200, null=True)
     content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
 
