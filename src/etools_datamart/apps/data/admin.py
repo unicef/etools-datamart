@@ -53,7 +53,7 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
         return self.readonly_fields
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        if request.method == 'POST':
+        if request.method == 'POST' and not request.user.is_superuser:
             redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
                                                                self.opts.model_name))
 
