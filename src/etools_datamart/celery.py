@@ -4,6 +4,7 @@ from time import time
 from celery import Celery
 from celery.signals import task_postrun, task_prerun
 from celery.task import Task
+from django.apps import apps
 from kombu.serialization import register
 
 from etools_datamart.apps.etl.results import etl_dumps, etl_loads
@@ -23,16 +24,16 @@ class DatamartCelery(Celery):
     def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
         from etools_datamart.apps.etl.lock import only_one
         linked_model = options.get('linked_model', None)
-        name = name or self.gen_task_name(fun.__name__, fun.__module__)
-        options['lock_key'] = f"{name}-lock"
-        fun = only_one(fun, options['lock_key'])
-        options['unlock'] = fun.unlock
-
-        task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
         if linked_model:
+            name = name or self.gen_task_name(fun.__name__, fun.__module__)
+            options['lock_key'] = f"{name}-lock"
+            fun = only_one(fun, options['lock_key'])
+            options['unlock'] = fun.unlock
+            task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
             linked_model._etl_task = task
             linked_model._etl_loader = fun
-
+        else:
+            task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
         return task
 
     def etl(self, model, *args, **opts):
@@ -56,7 +57,8 @@ class DatamartCelery(Celery):
 
 app = DatamartCelery('datamart')
 app.config_from_object('django.conf:settings', namespace='CELERY')
-# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])
+# app.autodiscover_tasks()
+app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])
 # app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
 #                        related_name='tasks')
 # app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
@@ -90,6 +92,8 @@ register('etljson', etl_dumps, etl_loads,
 @task_postrun.connect
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
     from django.utils import timezone
+    from etools_datamart.apps.subscriptions.models import Subscription
+
     # from unicef_rest_framework.models import Service
 
     if not hasattr(sender, 'linked_model'):
@@ -108,6 +112,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
             defs['last_changes'] = timezone.now()
             for service in sender.linked_model.linked_services:
                 service.invalidate_cache()
+                Subscription.objects.notify(sender.linked_model)
 
         defs['last_success'] = timezone.now()
     else:

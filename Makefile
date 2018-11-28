@@ -60,10 +60,10 @@ urf:
 
 
 demo:
-	pipenv run celery worker -A etools_datamart --loglevel=DEBUG --concurrency=4 --purge --pidfile celery.pid &
-	pipenv run celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile beat.pid &
-	pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
-	pipenv run docker run  -d -p 5555:5555 --name datamart-flower --rm saxix/flower
+	PYTHONPATH=./src pipenv run celery worker -A etools_datamart --loglevel=DEBUG --concurrency=4 --purge --pidfile celery.pid &
+	PYTHONPATH=./src pipenv run celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile beat.pid &
+	PYTHONPATH=./src pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
+	pipenv run docker run  -d -p 5555:5555 -e CELERY_BROKER_URL=$CELERY_BROKER_URL --name datamart-flower --rm saxix/flower
 
 stop-demo:
 	- kill `cat gunicorn.pid`

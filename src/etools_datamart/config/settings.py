@@ -18,6 +18,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   API_CACHE_URL=(str, "locmemcache://"),
                   # CACHE_URL=(str, "dummycache://"),
                   # API_CACHE_URL=(str, "dummycache://"),
+                  ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
                   ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
@@ -49,6 +50,12 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   AZURE_OVERWRITE_FILES=(bool, True),
                   AZURE_LOCATION=(str, ''),
 
+                  EMAIL_USE_TLS=(bool, True),
+                  EMAIL_HOST=(str, ''),
+                  EMAIL_HOST_USER=(str, ''),
+                  EMAIL_HOST_PASSWORD=(str, ''),
+                  EMAIL_PORT=(int, 587),
+
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -61,6 +68,7 @@ STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
+ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 
 ADMINS = (
     ('Stefano', 'saxix@saxix.onmicrosoft.com'),
@@ -176,6 +184,7 @@ AUTHENTICATION_BACKENDS = [
     # 'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
     'unicef_security.azure.AzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.RemoteUserBackend',
 ]
 
 CACHES = {
@@ -271,6 +280,8 @@ INSTALLED_APPS = [
     'django_db_logging',
     'django_sysinfo',
     'crashlog',
+    'post_office',
+    'djcelery_email',
 
     'django_celery_beat',
 
@@ -279,6 +290,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
     'etools_datamart.apps.tracking.apps.Config',
+    'etools_datamart.apps.subscriptions',
     'etools_datamart.api',
 ]
 
@@ -304,7 +316,21 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M',  # '10/25/06 14:30'
     '%m/%d/%y',  # '10/25/06'
 ]
-
+EMAIL_BACKEND = 'post_office.EmailBackend'
+EMAIL_POST_OFFICE_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env.int('EMAIL_PORT')
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
+EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
+POST_OFFICE = {
+    'DEFAULT_PRIORITY': 'now',
+    'BACKENDS': {
+        'default': 'djcelery_email.backends.CeleryEmailBackend'
+    }
+}
+CELERY_EMAIL_CHUNK_SIZE = 10
 # django-secure
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE')
 SECURE_BROWSER_XSS_FILTER = True
@@ -318,7 +344,6 @@ SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
 X_FRAME_OPTIONS = env('X_FRAME_OPTIONS')
 
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
-EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
 
 # django-constance
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'

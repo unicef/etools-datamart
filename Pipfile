@@ -50,6 +50,9 @@ djangorestframework-yaml = "*"
 django-storages = {extras = ["azure"], version = "*"}
 onedrivesdk = "*"
 azure-storage = "*"
+django-basicauth = "*"
+django-post-office = "*"
+django-celery-email = "*"
 
 [dev-packages]
 "flake8" = ">=3.6.0"

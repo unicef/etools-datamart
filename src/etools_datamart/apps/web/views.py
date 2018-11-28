@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LogoutView
 from django.template.response import TemplateResponse
 
@@ -10,8 +11,11 @@ def index(request):
     return TemplateResponse(request, 'index.html', context)
 
 
+@login_required
 def monitor(request):
-    context = {'tasks': EtlTask.objects.all(), 'page': 'monitor'}
+    context = {'tasks': EtlTask.objects.all(),
+               'subscriptions': request.user.subscriptions,
+               'page': 'monitor'}
     return TemplateResponse(request, 'monitor.html', context)
 
 

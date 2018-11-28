@@ -269,12 +269,15 @@ input.input100 {
         width: 30%;
       }
       &.last_run{
-        width: 300px;
+        width: 200px;
       }
       &.last_changes {
-        width: 300px;
+        width: 200px;
       }
       &.status {
+        width: 120px;
+      }
+      &.subscription {
         width: 100px;
       }
     }

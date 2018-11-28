@@ -163,10 +163,12 @@ input.input100 {
     .monitor #monitor .col.task {
       width: 30%; }
     .monitor #monitor .col.last_run {
-      width: 300px; }
+      width: 200px; }
     .monitor #monitor .col.last_changes {
-      width: 300px; }
+      width: 200px; }
     .monitor #monitor .col.status {
+      width: 120px; }
+    .monitor #monitor .col.subscription {
       width: 100px; }
 
 /*# sourceMappingURL=style.css.map */

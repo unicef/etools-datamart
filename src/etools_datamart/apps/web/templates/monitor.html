@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% load static %}
+{% extends 'base.html' %}{% load static subscriptions %}
 
 {% block title %}Monitor{% endblock %}
 
@@ -12,19 +12,43 @@
         <span><a href="{% url "api:schema-redoc" %}">Documentation</a></span>
     </div>
     <div id="monitor">
-            <div class="row header">
-                <span class="col task">Data</span>
-                <span class="col last_run">Last run</span>
-                <span class="col last_changes">Last change</span>
-                <span class="col result">Result</span>
-            </div>
+        <div class="row header">
+            <span class="col task">Data</span>
+            <span class="col last_run">Last run</span>
+            <span class="col last_changes">Last change</span>
+            <span class="col status">Status</span>
+            <span class="col subscription">Subscribe</span>
+        </div>
         {% for t in tasks %}
             <div class="row {% cycle 'odd' 'even' %}">
                 <span class="col task">{{ t.verbose_name }}</span>
                 <span class="col last_run">{{ t.last_run|default_if_none:"" }}</span>
                 <span class="col last_changes">{{ t.last_changes|default_if_none:"" }}</span>
                 <span class="col status {{ t.status }}">{{ t.status }}</span>
+                <span class="col subscription">
+                    {% subscription_select t %}
+                </span>
             </div>
         {% endfor %}
     </div>
+{% endblock %}
+{% block bottom_scripts %}
+    <script src="{% static 'jquery-3.3.1.min.js' %}"></script>
+    <script>
+        $('select').on('change', function (e) {
+            console.log(e);
+            console.log(e.target.id);
+
+            $.post("{% url "subscribe" "000" %}".replace("000", e.target.id),
+                JSON.stringify({"type": e.target.selectedIndex})
+            ).done(function (e) {
+
+            }).fail(function (e) {
+
+            }).always(function (e) {
+
+            });
+
+        })
+    </script>
 {% endblock %}

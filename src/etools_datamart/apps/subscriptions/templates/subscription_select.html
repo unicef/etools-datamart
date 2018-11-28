@@ -1,0 +1,6 @@
+<select class="notification" id="{{ task.id }}">
+    {% for option in options %}
+        <option {% if option.0  == subscription.type %}selected="selected"{% endif %}
+                value="{{ option.0 }}">{{ option.1 }}</option>
+    {% endfor %}
+</select>
