@@ -6,6 +6,7 @@
 * add ability to intercept changed/unchanged datamart records
 * Azure storage support
 * use versioning in API urls
+* add email notifications on dataset changes
 
 1.6
 ---
