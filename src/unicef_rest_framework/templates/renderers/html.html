@@ -1,0 +1,29 @@
+{% load static datamart %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ opts.verbose_name }}</title>
+    <style>
+        table {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h1>{{ opts.verbose_name }}</h1>
+<table>
+    <tr>
+        {% for v in headers %}
+            <th>{{ v }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in data.results %}
+        <tr>
+            {% for k,v in row.items %}
+                <td>{{ v }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
