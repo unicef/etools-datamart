@@ -21,6 +21,7 @@ RUN apk add --no-cache --virtual .build-deps \
     linux-headers \
     musl-dev \
     postgresql-dev \
+    libjpeg-dev \
     python3-dev
 
 

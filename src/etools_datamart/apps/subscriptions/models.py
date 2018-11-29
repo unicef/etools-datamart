@@ -24,9 +24,12 @@ class SubscriptionManager(models.Manager):
         for subscription in self.filter(content_type=ct).exclude(type=Subscription.NONE):
             logger.info(f"Process subscription {subscription}")
             try:
-                if subscription.type == Subscription.EXCEL:
+                if subscription.type in (Subscription.EXCEL, Subscription.PDF):
+                    format = {Subscription.EXCEL: 'xlsx',
+                              Subscription.PDF: 'pdf',
+                              }[subscription.type]
                     rf = APIRequestFactory()
-                    request = rf.get(f"{service.endpoint}?format=xlsx")
+                    request = rf.get(f"{service.endpoint}?format={format}")
                     request.user = subscription.user
                     request.api_info = {}  # this is set my the middleware, so we must set manually here
                     response = service.viewset.as_view({'get': 'list'})(request)
@@ -36,7 +39,7 @@ class SubscriptionManager(models.Manager):
                     request.api_info.update(dict(response.items()))
 
                     attachments = {
-                        f'{model._meta.verbose_name}.xlsx': BytesIO(response.content),
+                        f'{model._meta.verbose_name}.{format}': BytesIO(response.content),
                     }
                     template = 'dataset_changed_attachment'
                 else:
@@ -67,10 +70,12 @@ class Subscription(models.Model):
     NONE = 0
     MESSAGE = 1
     EXCEL = 2
+    PDF = 3
 
     TYPES = ((NONE, 'None'),
              (MESSAGE, 'Email'),
              (EXCEL, 'Email+Excel'),
+             (PDF, 'Email+Pdf'),
              )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
                              related_name='subscriptions')
