@@ -93,8 +93,11 @@ register('etljson', etl_dumps, etl_loads,
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
     from django.utils import timezone
     from etools_datamart.apps.subscriptions.models import Subscription
+    from etools_datamart.apps.etl.models import EtlTask
 
     # from unicef_rest_framework.models import Service
+    if state != 'SUCCESS':
+        EtlTask.objects.filter(task=task.name).update(status=state)
 
     if not hasattr(sender, 'linked_model'):
         return
@@ -118,8 +121,6 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         if not isinstance(retval, dict):
             defs['results'] = str(retval)
         defs['last_failure'] = timezone.now()
-
-    from etools_datamart.apps.etl.models import EtlTask
 
     EtlTask.objects.update_or_create(task=task.name, defaults=defs)
     # Service.objects.invalidate_cache()

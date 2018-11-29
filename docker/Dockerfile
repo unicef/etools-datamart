@@ -16,13 +16,20 @@ RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
 FROM python:3.6-alpine as base
 COPY --from=builder /code /code
 RUN apk add --no-cache --virtual .build-deps \
+    freetype-dev \
     gcc \
+    jpeg-dev \
+    lcms2-dev \
     libffi-dev \
     linux-headers \
     musl-dev \
+    openjpeg-dev \
     postgresql-dev \
-    libjpeg-dev \
-    python3-dev
+    python3-dev \
+    tcl-dev \
+    tiff-dev \
+    tk-dev \
+    zlib-dev
 
 
 RUN apk add --no-cache --virtual .deps \

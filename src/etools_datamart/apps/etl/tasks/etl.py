@@ -3,6 +3,7 @@ import json
 import logging
 from datetime import date, datetime
 
+from crashlog.middleware import process_exception
 from django.db import connections
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
@@ -33,18 +34,23 @@ def is_record_changed(record, values):
 
 
 def process(Model, filters, values):
-    existing, created = Model.objects.get_or_create(**filters,
-                                                    defaults=values)
-    if created:
-        op = CREATED
-    else:
-        if is_record_changed(existing, values):
-            op = UPDATED
-            Model.objects.update_or_create(**filters,
-                                           defaults=values)
+    try:
+        existing, created = Model.objects.get_or_create(**filters,
+                                                        defaults=values)
+        if created:
+            op = CREATED
         else:
-            op = UNCHANGED
-    return op
+            if is_record_changed(existing, values):
+                op = UPDATED
+                Model.objects.update_or_create(**filters,
+                                               defaults=values)
+            else:
+                op = UNCHANGED
+        return op
+    except Exception as e:
+        logging.exception(e)
+        process_exception(e)
+        raise
 
 
 @app.etl(HACT)
@@ -165,7 +171,6 @@ def load_pmp_indicator() -> EtlResult:
                           }
                 op = process(PMPIndicators, filters=dict(country_name=country.name,
                                                          schema_name=country.schema_name,
-                                                         country_id=partner.id,
                                                          partner_id=partner.pk,
                                                          intervention_id=intervention.pk),
                              values=values)
@@ -222,7 +227,6 @@ def load_intervention() -> EtlResult:
                           review_date_prc=record.review_date_prc,
                           prc_review_document=record.prc_review_document,
                           partner_name=record.agreement.partner.name,
-                          agreement_id=record.agreement.pk,
                           partner_authorized_officer_signatory_id=get_attr(record,
                                                                            'partner_authorized_officer_signatory.pk'),
                           country_programme_id=get_attr(record, 'country_programme.pk'),
@@ -272,6 +276,7 @@ def load_intervention() -> EtlResult:
                           )
             op = process(Intervention, filters=dict(country_name=country.name,
                                                     schema_name=country.schema_name,
+                                                    agreement_id=record.agreement.pk,
                                                     intervention_id=record.pk),
                          values=values)
             results.incr(op)

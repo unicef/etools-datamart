@@ -45,7 +45,7 @@ MAIL_HTML = r"""<div>Dear {{user.label}},</div>
 MAIL_ATTACHMENT = r"""Dear {{user.label}},
 
 On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.
-You can find here in attachment a excel file with new data
+You can find here in attachment a excel file with updated data
 
 —
 You are receiving this because you are subscribed to this thread.
@@ -55,7 +55,7 @@ To unsubscribe, change your preferences in {{base_url}}{% url 'monitor' %}
 MAIL_ATTACHMENT_HTML = r"""<div>Dear {{user.label}},</div>
 <div>&nbsp;</div>
 <div>On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.</div>
-<div>Attached to this email you can find excel file with new data</div>
+<div>Attached to this email you can find excel file with updated data</div>
 <div>&nbsp;</div>
 <div>&nbsp;</div>
 <div>&nbsp;</div>
