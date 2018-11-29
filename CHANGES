@@ -7,6 +7,8 @@
 * Azure storage support
 * use versioning in API urls
 * add email notifications on dataset changes
+* add filter by 'lat_modify_date'
+
 
 1.6
 ---

@@ -8,6 +8,7 @@ from functools import lru_cache
 import coreapi
 import coreschema
 from django import forms
+from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models import BooleanField, FieldDoesNotExist
 from django.template import loader
@@ -127,8 +128,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
         """
         self.opts = queryset.model._meta
         filter_fields = getattr(view, 'filter_fields', None)
-        exclude = {}
-        filters = {}
+        self.exclude = {}
+        self.filters = {}
 
         if filter_fields:
             blacklist = RexList(getattr(view, 'filter_blacklist', []))
@@ -140,9 +141,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
                 if negate:
                     filter_field_name = fieldname_arg[:-1]
-                    TARGET = exclude
+                    TARGET = self.exclude
                 else:
-                    TARGET = filters
+                    TARGET = self.filters
                     filter_field_name = fieldname_arg
 
                 if filter_field_name in self.excluded_query_params:
@@ -163,8 +164,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
                     #     parts = [field_name]
 
                     processor = getattr(self, 'process_{}'.format(filter_field_name), None)
-                    # if (field_name not in filter_fields) and (not processor):
-                    #     raise InvalidQueryArgumentError(fieldname_arg)
+                    if (filter_field_name not in filter_fields) and (not processor):
+                        raise InvalidQueryArgumentError(filter_field_name)
                     # field is configured in Serializer
                     # so we use 'source' attribute
                     if filter_field_name in mapping:
@@ -185,9 +186,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
                                    'parts': parts,
                                    'value': raw_value,
                                    'real_field_name': real_field_name}
-                        _f, _e = processor(dict(filters), dict(exclude), **payload)
-                        filters.update(**_f)
-                        exclude.update(**_e)
+                        _f, _e = processor(dict(self.filters), dict(self.exclude), **payload)
+                        self.filters.update(**_f)
+                        self.exclude.update(**_e)
                     else:
                         # field_object = opts.get_field(real_field_name)
                         value_type = self.field_type(real_field_name)
@@ -211,20 +212,22 @@ class QueryStringFilterBackend(BaseFilterBackend):
                 except Exception as e:
                     logger.exception(e)
                     raise
-        return filters, exclude
+        return self.filters, self.exclude
 
     def filter_queryset(self, request, queryset, view):
         self.request = request
         try:
-            self.filters, self.exclude = self._get_filters(request, queryset, view)
-            qs = queryset.filter(**self.filters).exclude(**self.exclude)
+            filters, exclude = self._get_filters(request, queryset, view)
+            qs = queryset.filter(**filters).exclude(**exclude)
             logger.debug("""Filtering using:
 {}
-{}""".format(self.filters, self.exclude))
+{}""".format(filters, exclude))
             # if '_distinct' in self.query_params:
             #     f = self.get_param_value('_distinct')
             #     qs = qs.order_by(*f).distinct(*f)
             return qs
+        except FieldError as e:
+            raise QueryFilterException(str(e))
         except (InvalidFilterError, QueryFilterException) as e:
             logger.exception(e)
             raise
