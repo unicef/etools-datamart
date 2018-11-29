@@ -27,6 +27,7 @@
 <body>
 <h1>{{ opts.verbose_name }}</h1>
 <div class="page">
+{% if headers %}
 <table>
     <tr>
         {% for v in headers %}
@@ -41,6 +42,7 @@
         </tr>
     {% endfor %}
 </table>
+{% endif %}
 </div>
 </body>
 </html>

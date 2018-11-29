@@ -21,8 +21,14 @@ class HTMLRenderer(BaseRenderer):
         model = renderer_context['view'].queryset.model
         opts = model._meta
         template = self.get_template(opts)
-        c = {'data': data,
-             'model': model,
-             'opts': opts,
-             'headers': [labelize(v) for v in data['results'][0].keys()]}
+        if data['results']:
+            c = {'data': data,
+                 'model': model,
+                 'opts': opts,
+                 'headers': [labelize(v) for v in data['results'][0].keys()]}
+        else:
+            c = {'data': {},
+                 'model': model,
+                 'opts': opts,
+                 'headers': []}
         return template.render(c)

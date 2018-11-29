@@ -48,6 +48,7 @@ class PDFRenderer(HTMLRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         html = super(PDFRenderer, self).render(data, accepted_media_type, renderer_context)
+
         # create a pdf
         buffer = io.BytesIO()
         pisaStatus = pisa.CreatePDF(html, dest=buffer, link_callback=link_callback)
