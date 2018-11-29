@@ -103,8 +103,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     except KeyError:  # pragma: no cover
         cost = -1
     defs = {'elapsed': cost,
-            'status': state,
-            'last_run': timezone.now()}
+            'status': state}
 
     if state == 'SUCCESS':
         defs['results'] = retval.as_dict()

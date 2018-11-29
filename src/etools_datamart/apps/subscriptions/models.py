@@ -38,12 +38,15 @@ class SubscriptionManager(models.Manager):
                     attachments = {
                         f'{model._meta.verbose_name}.xlsx': BytesIO(response.content),
                     }
+                    template = 'dataset_changed_attachment'
                 else:
                     attachments = None
+                    template = 'dataset_changed'
+
                 ret.append(mail.send(
                     subscription.user.email,  # List of email addresses also accepted
                     'notification@datamart.unicef.io',
-                    template='dataset_changed',  # Could be an EmailTemplate instance or name
+                    template=template,
                     context={'subscription': subscription,
                              'user': subscription.user,
                              'base_url': settings.ABSOLUTE_BASE_URL,

@@ -30,8 +30,9 @@ def subscription_attachment(etltask):
 
 
 @pytest.fixture()
-def email_template():
-    return EmailTemplateFactory()
+def email_templates():
+    return (EmailTemplateFactory(name='dataset_changed'),
+            EmailTemplateFactory(name='dataset_changed_attachment'))
 
 
 @pytest.mark.django_db
@@ -85,7 +86,7 @@ def test_subscribe_error(rf, etltask):
 
 
 @pytest.mark.django_db
-def test_notification_email(subscription: Subscription, email_template):
+def test_notification_email(subscription: Subscription, email_templates):
     with user_allow_service(subscription.user, subscription.viewset):
         emails = Subscription.objects.notify(subscription.content_type.model_class())
     assert len(emails) == 1
@@ -94,7 +95,7 @@ def test_notification_email(subscription: Subscription, email_template):
 
 
 @pytest.mark.django_db
-def test_notification_email_attachment(subscription_attachment: Subscription, email_template):
+def test_notification_email_attachment(subscription_attachment: Subscription, email_templates):
     with user_allow_service(subscription_attachment.user, subscription_attachment.viewset):
         emails = Subscription.objects.notify(subscription_attachment.content_type.model_class())
     assert len(emails) == 1

@@ -46,17 +46,17 @@ class SchemaSerializerField(coreschema.Enum):
 
 
 class UpdatesMixin:
-    pass
-    # @action(methods=['get'], detail=False)
-    # def updates(self, request, version):
-    #     """ Returns only records changed from last ETL task"""
-    #     task = EtlTask.objects.get_for_model(self.queryset.model)
-    #     queryset = self.queryset.filter(last_modify_date__gte=task.last_changes.date())
-    #
-    #     serializer = self.get_serializer(queryset, many=True)
-    #     return Response(serializer.data,
-    #                     headers={'update-date': task.last_changes.strftime('%Y %B %d')})
-    #
+
+    @action(methods=['get'], detail=False)
+    def updates(self, request, version):
+        """ Returns only records changed from last ETL task"""
+        task = EtlTask.objects.get_for_model(self.queryset.model)
+        offset = task.last_changes.strftime('%Y-%m-%d %H:%M')
+        queryset = self.queryset.filter(last_modify_date__gte=offset)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data,
+                        headers={'update-date': offset})
 
 
 class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
