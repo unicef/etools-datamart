@@ -2,15 +2,15 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models import Model
 from django.utils.functional import cached_property
 from django_celery_beat.models import PeriodicTask
 
+from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.celery import app, ETLTask
 
 
 class TaskLogManager(models.Manager):
-    def get_for_model(self, model: Model):
+    def get_for_model(self, model: DataMartModel):
         return self.get(content_type=ContentType.objects.get_for_model(model))
 
     def get_for_task(self, task: ETLTask):

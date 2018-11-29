@@ -42,6 +42,28 @@ MAIL_HTML = r"""<div>Dear {{user.label}},</div>
 <div>To unsubscribe, change your preferences in <a href="{{base_url}}{% url 'monitor' %}">Datamart Monitor</a></div>
 """
 
+MAIL_ATTACHMENT = r"""Dear {{user.label}},
+
+On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.
+You can find here in attachment a excel file with new data
+
+—
+You are receiving this because you are subscribed to this thread.
+To unsubscribe, change your preferences in {{base_url}}{% url 'monitor' %}
+"""
+
+MAIL_ATTACHMENT_HTML = r"""<div>Dear {{user.label}},</div>
+<div>&nbsp;</div>
+<div>On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.</div>
+<div>Attached to this email you can find excel file with new data</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>-</div>
+<div>You are receiving this because you are subscribed to this thread.</div>
+<div>To unsubscribe, change your preferences in <a href="{{base_url}}{% url 'monitor' %}">Datamart Monitor</a></div>
+"""
+
 
 class Command(BaseCommand):
     help = "My shiny new management command."
@@ -181,6 +203,11 @@ class Command(BaseCommand):
             PeriodicTask.objects.get_or_create(task='send_queued_mail',
                                                defaults={'name': 'process mail queue',
                                                          'interval': every_minute})
+
+        EmailTemplate.objects.get_or_create(name='dataset_changed_attachment',
+                                            defaults=dict(subject='Dataset changed',
+                                                          content=MAIL_ATTACHMENT,
+                                                          html_content=MAIL_ATTACHMENT_HTML))
 
         EmailTemplate.objects.get_or_create(name='dataset_changed',
                                             defaults=dict(subject='Dataset changed',

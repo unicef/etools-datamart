@@ -1,4 +1,5 @@
 from celery.local import class_property
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
@@ -27,6 +28,11 @@ class DataMartModel(models.Model, TimeStampedModel):
         abstract = True
 
     objects = DataMartManager()
+
+    @class_property
+    def service(self):
+        from unicef_rest_framework.models import Service
+        return Service.objects.get(source_model=ContentType.objects.get_for_model(self))
 
     @class_property
     def linked_services(self):

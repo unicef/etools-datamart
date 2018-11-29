@@ -5,11 +5,6 @@ from etools_datamart.apps.subscriptions.models import Subscription
 register = template.Library()
 
 
-@register.filter
-def get_for_task(subscriptions):
-    return 1
-
-
 @register.inclusion_tag('subscription_select.html', takes_context=True)
 def subscription_select(context, task):
     user = context['user']

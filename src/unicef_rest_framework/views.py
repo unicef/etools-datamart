@@ -3,7 +3,6 @@ from functools import lru_cache
 
 import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
-from drf_renderer_xlsx.renderers import XLSXRenderer
 from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
@@ -17,7 +16,7 @@ from unicef_rest_framework.auth import JWTAuthentication
 from unicef_rest_framework.cache import cache_response, etag, ListKeyConstructor
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.permissions import ServicePermission
-from unicef_rest_framework.renderers import APIBrowsableAPIRenderer, MSJSONRenderer, MSXmlRenderer
+from unicef_rest_framework.renderers import APIBrowsableAPIRenderer, MSJSONRenderer, MSXmlRenderer, XLSXRenderer
 from unicef_rest_framework.renderers.csv import CSVRenderer
 
 
@@ -65,8 +64,9 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
         self.request._request.api_info[key] = value
 
     def dispatch(self, request, *args, **kwargs):
-        request.api_info["view"] = fqn(self)
-        request.api_info["service"] = self.get_service()
+        if hasattr(request, 'api_info'):
+            request.api_info["view"] = fqn(self)
+            request.api_info["service"] = self.get_service()
 
         return super().dispatch(request, *args, **kwargs)
 
