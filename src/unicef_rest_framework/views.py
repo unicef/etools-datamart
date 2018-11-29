@@ -16,8 +16,8 @@ from unicef_rest_framework.auth import JWTAuthentication
 from unicef_rest_framework.cache import cache_response, etag, ListKeyConstructor
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.permissions import ServicePermission
-from unicef_rest_framework.renderers import (APIBrowsableAPIRenderer, HTMLRenderer,
-                                             MSJSONRenderer, MSXmlRenderer, XLSXRenderer,)
+from unicef_rest_framework.renderers import (APIBrowsableAPIRenderer, HTMLRenderer, MSJSONRenderer,
+                                             MSXmlRenderer, PDFRenderer, XLSXRenderer,)
 from unicef_rest_framework.renderers.csv import CSVRenderer
 
 
@@ -50,6 +50,7 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
                         YAMLRenderer,
                         XLSXRenderer,
                         HTMLRenderer,
+                        PDFRenderer,
                         MSJSONRenderer,
                         XMLRenderer,
                         MSXmlRenderer,

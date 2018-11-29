@@ -9,6 +9,8 @@
 * add email notifications on dataset changes
 * add filter by 'last_modify_date'
 * add 'updates/' endpoint to fetch only changes from last ETL
+* add XHTML renderer
+* add PDF renderer
 
 
 1.6
