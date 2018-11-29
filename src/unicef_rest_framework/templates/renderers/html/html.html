@@ -4,13 +4,29 @@
     <meta charset="UTF-8">
     <title>{{ opts.verbose_name }}</title>
     <style>
+        .page{
+            padding: 10px;
+        }
         table {
             width: 100%;
+        }
+        td{
+            padding: 10px;
+        }
+        .odd{
+            background-color: rgba(151,151,151,0.09);
+        }
+        .even{
+
+        }
+        @page {
+            size: A4 landscape;
         }
     </style>
 </head>
 <body>
 <h1>{{ opts.verbose_name }}</h1>
+<div class="page">
 <table>
     <tr>
         {% for v in headers %}
@@ -18,12 +34,13 @@
         {% endfor %}
     </tr>
     {% for row in data.results %}
-        <tr>
+        <tr class="{% cycle "odd" "even" %}">
             {% for k,v in row.items %}
-                <td>{{ v }}</td>
+                <td class="{% cycle "odd" "even" %}">{{ v }}</td>
             {% endfor %}
         </tr>
     {% endfor %}
 </table>
+</div>
 </body>
 </html>

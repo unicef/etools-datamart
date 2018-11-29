@@ -230,6 +230,11 @@ input.input100 {
     color: white;
   }
 }
+.rounded {
+   -webkit-border-radius: 20px;
+   -moz-border-radius: 20px;
+   border-radius: 20px;
+}
 
 .monitor {
   .menubar {
@@ -278,7 +283,7 @@ input.input100 {
         width: 120px;
       }
       &.subscription {
-        width: 100px;
+        width: 180px;
       }
     }
   }

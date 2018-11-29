@@ -5,7 +5,7 @@ DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
 TARGET?=dev
-# below var are used internally
+# below vars are used internally
 BUILD_OPTIONS?=
 CMD?=datamart
 CONTAINER_NAME?=datamart-${TARGET}
@@ -13,7 +13,7 @@ ORGANIZATION=unicef
 IMAGE_NAME=datamart
 DOCKER_IMAGE_NAME=${ORGANIZATION}/${IMAGE_NAME}
 DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
-DOCKERFILE?=Dockerfile
+DOCKERFILE?=Dockerfile.2
 RUN_OPTIONS?=
 PIPENV_ARGS?=
 
@@ -24,12 +24,26 @@ help:
 	@echo "run                  run ${DOCKER_IMAGE} locally"
 
 
-build:
+build-base:
+	if [[ "`docker images -q ${DOCKER_IMAGE_NAME}:base 2> /dev/null`" == "" ]]; then \
+		cd .. && docker build \
+			--build-arg DEVELOP=${DEVELOP} \
+			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
+			--build-arg VERSION=${TARGET} \
+			--squash \
+			-t ${DOCKER_IMAGE_NAME}:base \
+			-f docker/${DOCKERFILE}.base . ; \
+		docker push ${DOCKER_IMAGE_NAME}:base
+	fi
+
+
+build: build-base
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
 			--build-arg VERSION=${TARGET} \
+			--squash \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev

@@ -55,6 +55,7 @@ django-post-office = "*"
 django-celery-email = "*"
 "xhtml2pdf" = "*"
 pisa = "*"
+django-crispy-forms = "*"
 
 [dev-packages]
 "flake8" = ">=3.6.0"

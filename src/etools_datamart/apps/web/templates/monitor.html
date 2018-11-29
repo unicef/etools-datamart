@@ -3,6 +3,20 @@
 {% block title %}Monitor{% endblock %}
 
 {% block content %}
+    <style>
+        select {
+            {#background: transparent;#}
+            border: none;
+            font-size: 14px;
+            height: 29px;
+            padding: 5px; /* If you add too much padding here, the options won't show in IE */
+            width: 150px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+        }
+
+    </style>
     <div id="header">
         <img src="{% static 'unicef_logo.png' %}" width="100">
     </div>
@@ -10,6 +24,9 @@
         <span><a href="{% url "home" %}">Home</a></span>
         <span><a href="{% url "api:api-root" version="latest" %}">API</a></span>
         <span><a href="{% url "api:schema-redoc" %}">Documentation</a></span>
+        {% if user.is_staff %}
+            <span><a href="{% url "admin:index" %}">Admin</a></span>
+        {% endif %}
     </div>
     <div id="monitor">
         <div class="row header">
@@ -28,6 +45,10 @@
                 <span class="col subscription">
                     {% subscription_select t %}
                 </span>
+                {% if user.is_staff %}
+                    <span><a href="{% url "admin:etl_etltask_change" t.pk %}">Admin</a></span>
+                {% endif %}
+
             </div>
         {% endfor %}
     </div>

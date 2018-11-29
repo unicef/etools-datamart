@@ -274,6 +274,7 @@ INSTALLED_APPS = [
     'django_filters',
     'month_field',
     'drf_querystringfilter',
+    'crispy_forms',
 
     'drf_yasg',
     'adminfilters',
@@ -293,7 +294,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.subscriptions',
     'etools_datamart.api',
 ]
-
+DATE_FORMAT = '%d %b %Y'
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
     '%b %d %Y', '%b %d, %Y',  # 'Oct 25 2006', 'Oct 25, 2006'
@@ -301,6 +302,8 @@ DATE_INPUT_FORMATS = [
     '%B %d %Y', '%B %d, %Y',  # 'October 25 2006', 'October 25, 2006'
     '%d %B %Y', '%d %B, %Y',  # '25 October 2006', '25 October, 2006'
 ]
+
+DATETIME_FORMAT = '%d %b %Y %H:%M:%S'
 
 DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',  # '2006-10-25 14:30:59'
@@ -415,6 +418,7 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
+    'DATETIME_FORMAT': DATETIME_FORMAT
 }
 
 JWT_AUTH = {

@@ -70,7 +70,7 @@ def test_subscribe_404(rf, admin_user, etltask):
 @pytest.mark.django_db
 def test_subscribe_invalid(rf, admin_user, etltask):
     request = rf.post(reverse("subscribe", args=[etltask.pk]),
-                      {"type": 3}, content_type='application/json')
+                      {"type": 99}, content_type='application/json')
     request.user = admin_user
     res = subscribe(request, etltask.pk)
     assert res.status_code == 400

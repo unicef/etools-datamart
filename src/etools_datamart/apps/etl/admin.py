@@ -21,8 +21,11 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'last_run', 'status', 'time',
                     'last_success', 'last_failure', 'lock', 'scheduling', 'queue_task')
 
-    readonly_fields = ('task', 'last_run', 'results', 'elapsed', 'time', 'status',
-                       'last_success', 'last_failure', 'table_name', 'content_type')
+    readonly_fields = ('task', 'last_run',
+                       'last_success', 'last_failure', 'last_changes',
+                       'results', 'elapsed', 'time', 'status',
+                       'table_name', 'content_type',
+                       )
     date_hierarchy = 'last_run'
     actions = None
 
@@ -45,6 +48,7 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
         url = reverse('admin:%s_%s_queue' % (opts.app_label,
                                              opts.model_name), args=[obj.id])
         return format_html(f'<a href="{url}">queue</a>')
+
     queue_task.verbse_name = 'queue'
 
     def has_add_permission(self, request):
@@ -77,6 +81,7 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
             self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
+        return HttpResponseRedirect(reverse("admin:etl_etltask_changelist"))
 
     @action()
     def unlock(self, request, pk):

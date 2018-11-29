@@ -138,6 +138,11 @@ input.input100 {
   .navbar a.navbar-brand {
     color: white; }
 
+.rounded {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px; }
+
 .monitor .menubar {
   padding: 10px; }
   .monitor .menubar a {
@@ -169,6 +174,6 @@ input.input100 {
     .monitor #monitor .col.status {
       width: 120px; }
     .monitor #monitor .col.subscription {
-      width: 100px; }
+      width: 180px; }
 
 /*# sourceMappingURL=style.css.map */

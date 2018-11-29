@@ -2,6 +2,7 @@ import io
 import os
 
 from django.conf import settings
+from django.template import loader
 from xhtml2pdf import pisa
 
 from .html import HTMLRenderer
@@ -39,6 +40,11 @@ class PDFRenderer(HTMLRenderer):
     format = 'pdf'
     charset = 'utf-8'
     render_style = 'text'
+
+    def get_template(self, meta):
+        return loader.select_template([
+            f'renderers/pdf/{meta.app_label}/{meta.model_name}.html',
+            'renderers/pdf/pdf.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         html = super(PDFRenderer, self).render(data, accepted_media_type, renderer_context)
