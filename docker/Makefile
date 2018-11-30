@@ -38,9 +38,9 @@ build:
 			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 #	flatten image
-	docker create ${DOCKER_IMAGE_NAME}:${TARGET} foo
-	docker export foo | docker import - unicef/datamart:${TARGET}
-	docker rm foo
+#	docker create --name foo ${DOCKER_IMAGE_NAME}:${TARGET}
+#	docker export foo | docker import - unicef/datamart:${TARGET}
+#	docker rm foo
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
 
