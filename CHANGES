@@ -1,5 +1,5 @@
-1.7 (dev)
----------
+1.7
+---
 * WARNINGS: migration reset
 * add YAML format
 * new 'Monitor' page to check dataset last update date
