@@ -7,8 +7,8 @@ from . import serializers
 from .. import common
 
 
-class FAMIndicatorViewSet(common.APIReadOnlyModelViewSet):
+class FAMIndicatorViewSet(common.DataMartViewSet):
     serializer_class = serializers.FAMIndicatorSerializer
     queryset = models.FAMIndicator.objects.all()
-    filter_fields = ('country_name', )
+    filter_fields = ('country_name', 'last_modify_date')
     filter_backends = [MonthFilterBackend] + common.APIReadOnlyModelViewSet.filter_backends

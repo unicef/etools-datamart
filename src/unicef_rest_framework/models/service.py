@@ -25,16 +25,20 @@ class ServiceManager(models.Manager):
 
     def get_for_viewset(self, viewset):
         name = getattr(viewset, 'label', viewset.__name__)
-
+        source_model = ContentType.objects.get_for_model(viewset().get_queryset().model)
         service, isnew = self.model.objects.get_or_create(viewset=viewset,
                                                           defaults={
                                                               'name': name,
                                                               'cache_ttl': '1y',
                                                               'access': getattr(viewset, 'default_access',
                                                                                 conf.DEFAULT_ACCESS),
-                                                              'description': getattr(viewset, '__doc__', "")})
-
-        viewset.get_service.cache_clear()
+                                                              'description': getattr(viewset, '__doc__', ""),
+                                                              'source_model': source_model
+                                                          })
+        if not isnew:
+            service.source_model = source_model
+            service.save()
+            viewset.get_service.cache_clear()
         return service, isnew
 
     def load_services(self):
@@ -93,7 +97,13 @@ class Service(MasterDataModel):
                                  null=True, blank=True,
                                  help_text='Key used to invalidate service cache')
 
+    source_model = models.ForeignKey(ContentType,
+                                     models.CASCADE,
+                                     blank=True,
+                                     help_text="model used as primary datasource")
+
     linked_models = models.ManyToManyField(ContentType,
+                                           related_name='+',
                                            blank=True,
                                            help_text="models that the service depends on")
 
@@ -118,7 +128,7 @@ class Service(MasterDataModel):
     def endpoint(self):
         for __, viewset, base_name in conf.ROUTER.registry:
             if viewset == self.viewset:
-                return reverse(f'api:{base_name}-list')
+                return reverse(f'api:{base_name}-list', args=['v1'])
         else:
             return None
 

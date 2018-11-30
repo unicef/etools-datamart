@@ -7,37 +7,38 @@ from rest_framework.fields import SerializerMethodField
 from etools_datamart.apps.data import models
 
 
-class PMPIndicatorsSerializer(serializers.ModelSerializer):
+class DataMartSerializer(serializers.ModelSerializer):
     class Meta:
+        exclude = ('schema_name',)
+
+
+class PMPIndicatorsSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
         model = models.PMPIndicators
-        exclude = ()
 
 
-class InterventionSerializer(serializers.ModelSerializer):
-    class Meta:
+class InterventionSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
         model = models.Intervention
-        exclude = ()
 
 
-class FAMIndicatorSerializer(serializers.ModelSerializer):
-    class Meta:
+class FAMIndicatorSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
         model = models.FAMIndicator
-        exclude = ()
 
 
-class UserStatsSerializer(serializers.ModelSerializer):
+class UserStatsSerializer(DataMartSerializer):
     month = SerializerMethodField(help_text="---")
 
-    class Meta:
+    class Meta(DataMartSerializer.Meta):
         model = models.UserStats
-        exclude = ()
+        read_only = ['last_modify_date', ]
 
     def get_month(self, obj):
         return datetime.strftime(obj.month._date, '%b %Y')
 
 
-class HACTSerializer(serializers.ModelSerializer):
-
-    class Meta:
+class HACTSerializer(DataMartSerializer):
+    # last_modify_date = serializers.DateTimeField(format=settings.DATETIME_FORMAT)
+    class Meta(DataMartSerializer.Meta):
         model = models.HACT
-        exclude = ()

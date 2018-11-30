@@ -5,13 +5,13 @@ mkdir -p /var/datamart/{static,log,conf,run}
 rm -f /var/datamart/run/*
 
 
-if [ "$*" == "workers" ];then
+if [[ "$*" == "workers" ]];then
     django-admin db-isready --wait --timeout 60 --sleep 5
     django-admin db-isready --wait --timeout 300  --sleep 5 --connection etools
     celery worker -A etools_datamart --loglevel=DEBUG --concurrency=4 --purge --pidfile run/celery.pid
-elif [ "$*" == "beat" ];then
+elif [[ "$*" == "beat" ]];then
     celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile run/celerybeat.pid
-elif [ "$*" == "datamart" ];then
+elif [[ "$*" == "datamart" ]];then
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
     django-admin init-setup --all --verbosity 1

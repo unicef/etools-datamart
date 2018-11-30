@@ -13,21 +13,38 @@ RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
     && curl ${GITHUB_CREDENTIALS}: -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
-FROM python:3.6.7-alpine as base
-COPY --from=builder /code /code
-RUN apk add --no-cache --virtual .build-deps \
+FROM python:3.6-alpine as base
+
+RUN apk add --no-cache \
+    bash \
+    freetype \
+    lcms2 \
+    libjpeg-turbo \
+    libpng \
+    libpq \
+    openjpeg \
+    postgresql-libs \
+    tiff \
+    && apk add --no-cache --virtual .build-deps \
+    freetype-dev \
     gcc \
+    jpeg-dev \
+    lcms2-dev \
     libffi-dev \
     linux-headers \
     musl-dev \
+    openjpeg-dev \
     postgresql-dev \
-    python3-dev
-
-
-RUN apk add --no-cache --virtual .deps \
-    bash
+    python3-dev \
+    tcl-dev \
+    tiff-dev \
+    tk-dev \
+    zlib-dev \
+    && pip install pip==18.0 pipenv --upgrade \
+    && adduser -S datamart
 
 FROM base
+COPY --from=builder /code /code
 
 LABEL org.label.name="eTools Datamart" \
       org.label.maintainer="sapostolico@unicef.org" \
@@ -92,7 +109,8 @@ ENV STATIC_ROOT /tmp/static
 #    gcc
 
 RUN mkdir -p \
-    /var/datamart/{static,log,conf,run} \
+    /var/datamart/ \
+    && chown datamart /var/datamart/ \
     && pip install pip==18.0 pipenv --upgrade
 
 WORKDIR /code
@@ -104,18 +122,16 @@ RUN set -ex \
 RUN pip install . \
     && rm -fr /code
 
-#RUN apt-get autoremove --yes --force-yes \
-#    gcc \
-#    && rm -fr /var/lib/apt/lists/* \
-#    && rm -fr /var/cache/apt/*
 
-#RUN apk del .build-deps \
-#    && rm -rf /var/cache/apk/* \
-#    && rm -fr /root/.cache/
+RUN apk del .build-deps \
+    && rm -rf /var/cache/apk/* \
+    && rm -fr /root/.cache/
 
 WORKDIR /var/datamart
 
 EXPOSE 8000
+
+USER datamart
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]

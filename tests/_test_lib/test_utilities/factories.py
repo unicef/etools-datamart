@@ -3,12 +3,17 @@ from datetime import datetime
 
 import factory
 import unicef_security.models
+from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.utils import timezone
+from factory import SubFactory
+from post_office.models import EmailTemplate
 from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
 from etools_datamart.apps.data.models import FAMIndicator, HACT, Intervention, PMPIndicators, UserStats
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.apps.subscriptions.models import Subscription
 from etools_datamart.apps.tracking.models import APIRequestLog
 
 today = timezone.now()
@@ -63,6 +68,12 @@ class InterventionFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Intervention
+
+
+class GroupFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Group
+        django_get_or_create = ('name',)
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -130,3 +141,22 @@ class SystemFilterFactory(factory.DjangoModelFactory):
             for field, value in extracted.items():
                 rule = self.rules.create(field=field, value=value)
                 rule.save()
+
+
+class SubscriptionFactory(factory.DjangoModelFactory):
+    kwargs = ''
+    user = SubFactory(UserFactory)
+    type = Subscription.MESSAGE
+    content_type = lambda x: ContentType.objects.get_for_model(HACT)  # noqa: E731
+
+    class Meta:
+        model = Subscription
+        django_get_or_create = ('user', 'content_type')
+
+
+class EmailTemplateFactory(factory.DjangoModelFactory):
+    name = 'dataset_changed'
+
+    class Meta:
+        model = EmailTemplate
+        django_get_or_create = ('name',)

@@ -9,14 +9,60 @@ from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
-from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
 from humanize import naturaldelta
+from post_office.models import EmailTemplate
 from redisboard.models import RedisServer
 from strategy_field.utils import fqn
 from unicef_rest_framework.models.acl import GroupAccessControl
 
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.celery import app
+
+MAIL = r"""Dear {{user.label}},
+
+On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.
+Please visit {{base_url}}{{service.endpoint}}
+
+—
+You are receiving this because you are subscribed to this thread.
+To unsubscribe, change your preferences in {{base_url}}{% url 'monitor' %}
+"""
+
+MAIL_HTML = r"""<div>Dear {{user.label}},</div>
+<div>&nbsp;</div>
+<div>On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.</div>
+<div>You can view data following this <a href="{{base_url}}{{service.endpoint}}">link</a>
+ or download the as <a href="{{base_url}}{{service.endpoint}}?format=xlsx">excel</a></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>-</div>
+<div>You are receiving this because you are subscribed to this thread.</div>
+<div>To unsubscribe, change your preferences in <a href="{{base_url}}{% url 'monitor' %}">Datamart Monitor</a></div>
+"""
+
+MAIL_ATTACHMENT = r"""Dear {{user.label}},
+
+On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.
+You can find here in attachment a excel file with updated data
+
+—
+You are receiving this because you are subscribed to this thread.
+To unsubscribe, change your preferences in {{base_url}}{% url 'monitor' %}
+"""
+
+MAIL_ATTACHMENT_HTML = r"""<div>Dear {{user.label}},</div>
+<div>&nbsp;</div>
+<div>On {{etl.last_changes|date:"M d, Y"}}, datamart has detected changes in dataset `{{verbose_name}}`.</div>
+<div>Attached to this email you can find excel file with updated data</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>-</div>
+<div>You are receiving this because you are subscribed to this thread.</div>
+<div>To unsubscribe, change your preferences in <a href="{{base_url}}{% url 'monitor' %}">Datamart Monitor</a></div>
+"""
 
 
 class Command(BaseCommand):
@@ -135,6 +181,7 @@ class Command(BaseCommand):
 
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
+            every_minute, __ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
 
             tasks = app.get_all_etls()
             counters = {True: 0, False: 0}
@@ -153,10 +200,27 @@ class Command(BaseCommand):
             self.stdout.write(
                 f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
 
+            PeriodicTask.objects.get_or_create(task='send_queued_mail',
+                                               defaults={'name': 'process mail queue',
+                                                         'interval': every_minute})
+
+        EmailTemplate.objects.get_or_create(name='dataset_changed_attachment',
+                                            defaults=dict(subject='Dataset changed',
+                                                          content=MAIL_ATTACHMENT,
+                                                          html_content=MAIL_ATTACHMENT_HTML))
+
+        EmailTemplate.objects.get_or_create(name='dataset_changed',
+                                            defaults=dict(subject='Dataset changed',
+                                                          content=MAIL,
+                                                          html_content=MAIL_HTML))
+
         if options['refresh']:
             self.stdout.write("Refreshing datamart...")
             for task in PeriodicTask.objects.all()[1:]:
-                etl = import_string(task.task)
+                try:
+                    etl = import_string(task.task)
+                except ImportError:
+                    continue
                 self.stdout.write(f"Running {task.name}...", ending='\r')
                 self.stdout.flush()
 

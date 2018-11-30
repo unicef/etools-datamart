@@ -2,11 +2,11 @@
 DATABASE_URL?=
 DATABASE_URL_ETOOLS?=
 DEVELOP?=0
-DOCKER_PASS?=${DOCKER_PASS}
-DOCKER_USER?=${DOCKER_USER}
+DOCKER_PASS?=
+DOCKER_USER?=
 TARGET?=dev
-# below var are used internally
-BUILD_OPTIONS?=
+# below vars are used internally
+BUILD_OPTIONS?=--squash
 CMD?=datamart
 CONTAINER_NAME?=datamart-${TARGET}
 ORGANIZATION=unicef
@@ -23,6 +23,10 @@ help:
 	@echo "release              release tag ${TARGET} on docker hub"
 	@echo "run                  run ${DOCKER_IMAGE} locally"
 
+build-base:
+	docker build --target base \
+			-t ${DOCKER_IMAGE_NAME}:base \
+			-f docker/${DOCKERFILE} .
 
 build:
 	cd .. && docker build \
@@ -32,7 +36,13 @@ build:
 			--build-arg VERSION=${TARGET} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
+	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
+#	flatten image
+	docker create ${DOCKER_IMAGE_NAME}:${TARGET} foo
+	docker export foo | docker import - unicef/datamart:${TARGET}
+	docker rm foo
 	docker images | grep ${DOCKER_IMAGE_NAME}
+
 
 .run:
 	cd .. && docker run \
@@ -85,7 +95,7 @@ test:
 				 -e CSRF_COOKIE_SECURE=1 \
 				 -e SECURE_HSTS_PRELOAD=1 \
 				 -e SECURE_SSL_REDIRECT=1" \
-	CMD='bash -c "django-admin check --deploy"' \
+	CMD='bash -c "touch /var/datamart/.touch && django-admin check --deploy "' \
 	$(MAKE) .run
 
 scratch:

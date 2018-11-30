@@ -2,17 +2,10 @@ import datetime
 
 import pytest
 from rest_framework.test import APIClient
-from test_utilities.factories import UserFactory
-from tests._test_lib.test_utilities.factories import UserStatsFactory
+from test_utilities.factories import UserFactory, UserStatsFactory
 from unicef_rest_framework.test_utils import user_allow_service
 
 from etools_datamart.api.endpoints import PartnerViewSet, UserStatsViewSet
-from etools_datamart.apps.etools.models import AuthUser
-
-
-@pytest.fixture()
-def etools_user(db):
-    return AuthUser.objects.get(id=1)
 
 
 @pytest.fixture()

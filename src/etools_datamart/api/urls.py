@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path, re_path
 from unicef_rest_framework.routers import APIReadOnlyRouter
 
 from . import endpoints
@@ -34,10 +34,10 @@ router.register(r'datamart/hact', endpoints.HACTViewSet)
 
 router.register(r'system/tasks-log', endpoints.TaskLogViewSet)
 
-urlpatterns = router.urls
+# urlpatterns = router.urls
 
-urlpatterns += [
-    # url(r'^+swagger(?P<format>\.json|\.yaml)$', endpoints.schema_view.without_ui(cache_timeout=0), name='schema-json'),
+urlpatterns = [
+    re_path(r'(?P<version>(v1|latest))/', include(router.urls)),
     path(r'+swagger/', endpoints.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path(r'+redoc/', endpoints.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

@@ -12,10 +12,11 @@ def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:
         if metafunc.function.__name__ == 'test_list':
             urls = filter(lambda url: 'etools/' in url,
-                          [reverse("api:%s" % url.name) for url in router.urls if url.name.endswith('-list')])
+                          [reverse("api:%s" % url.name, args=['latest'])
+                           for url in router.urls if url.name.endswith('-list')])
         elif metafunc.function.__name__ == 'test_retrieve':
             urls = filter(lambda url: 'etools/' in url,
-                          [reverse("api:%s" % url.name, args=['_lastest_']) for url in router.urls if
+                          [reverse("api:%s" % url.name, args=['latest', '_lastest_']) for url in router.urls if
                            url.name.endswith('-detail')])
         metafunc.parametrize("url", list(urls))
 
@@ -31,7 +32,7 @@ def test_list(client, url, format, schema):
 
 
 def test_list_with_no_schema_search_all_schemas(client):
-    url = reverse("api:partners-list")
+    url = reverse("api:partners-list", args=['latest'])
     res = client.get(url)
     assert res.status_code == 200, res.content
 
@@ -45,7 +46,7 @@ def test_retrieve(client, url, format):
 
 
 def test_retrieve_requires_only_one_schema(client):
-    url = reverse("api:partners-detail", args=['_lastest_'])
+    url = reverse("api:partners-detail", args=['latest', '_lastest_'])
     url = f"{url}?country_name=bolivia,chad"
     res = client.get(url)
     assert res.status_code == 400, res.content
@@ -53,7 +54,7 @@ def test_retrieve_requires_only_one_schema(client):
 
 
 def test_retrieve_requires_one_schema(client):
-    url = reverse("api:partners-detail", args=['_lastest_'])
+    url = reverse("api:partners-detail", args=['latest', '_lastest_'])
     res = client.get(url)
     assert res.status_code == 400
     assert res.json()['error'] == "country_name parameter is mandatory"

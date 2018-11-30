@@ -45,7 +45,6 @@ fullclean:
 	rm -fr .tox .cache .pytest_cache .venv
 	$(MAKE) clean
 
-
 sync-etools:
 	sh src/etools_datamart/apps/multitenant/postgresql/dump.sh ${PG_ETOOLS_PARAMS}
 
@@ -56,6 +55,18 @@ ifdef BROWSE
 	firefox ${BUILDDIR}/docs/index.html
 endif
 
-
 urf:
 	pipenv run pytest tests/urf --cov-config tests/urf/.coveragerc
+
+
+demo:
+	PYTHONPATH=./src pipenv run celery worker -A etools_datamart --loglevel=DEBUG --concurrency=4 --purge --pidfile celery.pid &
+	PYTHONPATH=./src pipenv run celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile beat.pid &
+	PYTHONPATH=./src pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
+	pipenv run docker run  -d -p 5555:5555 -e CELERY_BROKER_URL=$CELERY_BROKER_URL --name datamart-flower --rm saxix/flower
+
+stop-demo:
+	- kill `cat gunicorn.pid`
+	- kill `cat beat.pid`
+	- kill `cat celery.pid`
+	- docker stop datamart-flower

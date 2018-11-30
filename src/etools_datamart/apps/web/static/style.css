@@ -138,4 +138,42 @@ input.input100 {
   .navbar a.navbar-brand {
     color: white; }
 
+.rounded {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px; }
+
+.monitor .menubar {
+  padding: 10px; }
+  .monitor .menubar a {
+    text-transform: none;
+    color: #2090F8; }
+    .monitor .menubar a:visited {
+      text-transform: none; }
+.monitor #monitor {
+  width: 100%;
+  padding: 30px; }
+  .monitor #monitor .SUCCESS {
+    color: #00b200;
+    font-weight: bold; }
+  .monitor #monitor .row {
+    width: 100%;
+    padding: 5px; }
+    .monitor #monitor .row.header {
+      font-weight: bold; }
+    .monitor #monitor .row.odd {
+      background-color: #eeeeee; }
+  .monitor #monitor .col {
+    display: inline-block; }
+    .monitor #monitor .col.task {
+      width: 30%; }
+    .monitor #monitor .col.last_run {
+      width: 200px; }
+    .monitor #monitor .col.last_changes {
+      width: 200px; }
+    .monitor #monitor .col.status {
+      width: 120px; }
+    .monitor #monitor .col.subscription {
+      width: 180px; }
+
 /*# sourceMappingURL=style.css.map */

@@ -48,3 +48,4 @@ class PMPIndicators(DataMartModel):
 
     class Meta:
         ordering = ('country_name', 'partner_name')
+        verbose_name = "PMP Indicator"

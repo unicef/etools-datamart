@@ -64,7 +64,7 @@ body, html {
   form {
     padding: 100px 0 0 65px;
   }
-  .center{
+  .center {
     width: 100%;
     text-align: center;
   }
@@ -87,9 +87,9 @@ body, html {
     list-style: none;
     font-size: 18pt;
   }
-a {
-  color: #2090F8;
-}
+  a {
+    color: #2090F8;
+  }
 
 }
 
@@ -228,5 +228,63 @@ input.input100 {
 
   a.navbar-brand {
     color: white;
+  }
+}
+.rounded {
+   -webkit-border-radius: 20px;
+   -moz-border-radius: 20px;
+   border-radius: 20px;
+}
+
+.monitor {
+  .menubar {
+    padding: 10px;
+    a {
+      &:visited {
+        text-transform: none;
+      }
+      text-transform: none;
+      color: #2090F8;
+    }
+  }
+  #monitor {
+    width: 100%;
+    padding: 30px;
+    .SUCCESS {
+      color: #00b200;
+      font-weight: bold;
+    }
+    .row {
+      width: 100%;
+      padding: 5px;
+      &.header{
+        font-weight: bold;
+      }
+      &.odd{
+        background-color: #eeeeee;
+      }
+      &.even{
+
+      }
+    }
+
+    .col {
+      display: inline-block;
+      &.task {
+        width: 30%;
+      }
+      &.last_run{
+        width: 200px;
+      }
+      &.last_changes {
+        width: 200px;
+      }
+      &.status {
+        width: 120px;
+      }
+      &.subscription {
+        width: 180px;
+      }
+    }
   }
 }

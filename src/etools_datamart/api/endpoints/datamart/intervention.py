@@ -35,13 +35,13 @@ class InterventionFilter(filters.FilterSet):
         # }
 
 
-class InterventionViewSet(common.APIReadOnlyModelViewSet):
+class InterventionViewSet(common.DataMartViewSet):
     """
 
     """
     serializer_class = serializers.InterventionSerializer
     queryset = models.Intervention.objects.all()
-    filter_fields = ('country_name', 'title', 'status',
+    filter_fields = ('country_name', 'title', 'status', 'last_modify_date',
                      'start_date', 'submission_date', 'document_type')
     serializers_fieldsets = {'std': None,
                              'short': ["title", "number"]}

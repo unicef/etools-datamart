@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import os
 from pathlib import Path
 
 import environ
@@ -19,6 +18,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   API_CACHE_URL=(str, "locmemcache://"),
                   # CACHE_URL=(str, "dummycache://"),
                   # API_CACHE_URL=(str, "dummycache://"),
+                  ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
                   ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
@@ -44,6 +44,18 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   AZURE_CLIENT_SECRET=(str, ''),
                   AZURE_TENANT=(str, ''),
 
+                  AZURE_ACCOUNT_NAME=(str, ''),
+                  AZURE_ACCOUNT_KEY=(str, ''),
+                  AZURE_CONTAINER=(str, ''),
+                  AZURE_OVERWRITE_FILES=(bool, True),
+                  AZURE_LOCATION=(str, ''),
+
+                  EMAIL_USE_TLS=(bool, True),
+                  EMAIL_HOST=(str, ''),
+                  EMAIL_HOST_USER=(str, ''),
+                  EMAIL_HOST_PASSWORD=(str, ''),
+                  EMAIL_PORT=(int, 587),
+
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -56,6 +68,7 @@ STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
+ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 
 ADMINS = (
     ('Stefano', 'saxix@saxix.onmicrosoft.com'),
@@ -168,8 +181,10 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
+    # 'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
+    'unicef_security.azure.AzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.RemoteUserBackend',
 ]
 
 CACHES = {
@@ -259,12 +274,15 @@ INSTALLED_APPS = [
     'django_filters',
     'month_field',
     'drf_querystringfilter',
+    'crispy_forms',
 
     'drf_yasg',
     'adminfilters',
     'django_db_logging',
     'django_sysinfo',
     'crashlog',
+    'post_office',
+    'djcelery_email',
 
     'django_celery_beat',
 
@@ -273,9 +291,10 @@ INSTALLED_APPS = [
     'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
     'etools_datamart.apps.tracking.apps.Config',
+    'etools_datamart.apps.subscriptions',
     'etools_datamart.api',
 ]
-
+DATE_FORMAT = '%d %b %Y'
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
     '%b %d %Y', '%b %d, %Y',  # 'Oct 25 2006', 'Oct 25, 2006'
@@ -283,6 +302,8 @@ DATE_INPUT_FORMATS = [
     '%B %d %Y', '%B %d, %Y',  # 'October 25 2006', 'October 25, 2006'
     '%d %B %Y', '%d %B, %Y',  # '25 October 2006', '25 October, 2006'
 ]
+
+DATETIME_FORMAT = '%d %b %Y %H:%M:%S'
 
 DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',  # '2006-10-25 14:30:59'
@@ -298,7 +319,21 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M',  # '10/25/06 14:30'
     '%m/%d/%y',  # '10/25/06'
 ]
-
+EMAIL_BACKEND = 'post_office.EmailBackend'
+EMAIL_POST_OFFICE_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env.int('EMAIL_PORT')
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
+EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
+POST_OFFICE = {
+    'DEFAULT_PRIORITY': 'now',
+    'BACKENDS': {
+        'default': 'djcelery_email.backends.CeleryEmailBackend'
+    }
+}
+CELERY_EMAIL_CHUNK_SIZE = 10
 # django-secure
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE')
 SECURE_BROWSER_XSS_FILTER = True
@@ -312,7 +347,6 @@ SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
 X_FRAME_OPTIONS = env('X_FRAME_OPTIONS')
 
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
-EMAIL_SUBJECT_PREFIX = "[ETOOLS-DATAMART]"
 
 # django-constance
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
@@ -335,6 +369,12 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     }],
 }
 
+AZURE_ACCOUNT_NAME = env('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = env('AZURE_ACCOUNT_KEY')
+AZURE_CONTAINER = env('AZURE_CONTAINER')
+AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
+AZURE_LOCATION = env('AZURE_LOCATION')
+
 CONSTANCE_CONFIG = {
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
     'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
@@ -344,18 +384,23 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
+# CELERY_ACCEPT_CONTENT = ['application/json']
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
                        "etools_datamart.apps.etl.tasks.tasks", ]
 CELERY_BEAT_SCHEDULE = {}
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', False)
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
+
 CELERY_TASK_ROUTES = {
     'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
     'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
 }
+
+CELERY_ACCEPT_CONTENT = ['etljson']
+CELERY_TASK_SERIALIZER = 'etljson'
+CELERY_RESULT_SERIALIZER = 'etljson'
 
 CONCURRENCY_IGNORE_DEFAULT = False
 
@@ -368,10 +413,12 @@ REST_FRAMEWORK = {
     # "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
     'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
     # 'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
+    'DATETIME_FORMAT': DATETIME_FORMAT
 }
 
 JWT_AUTH = {
@@ -388,7 +435,7 @@ JWT_AUTH = {
     'JWT_DECODE_HANDLER': 'rest_framework_jwt.utils.jwt_decode_handler',
 
     # Keys will be set in core.apps.Config.ready()
-    'JWT_PUBLIC_KEY': os.environ,
+    'JWT_PUBLIC_KEY': '?',
     # 'JWT_PRIVATE_KEY': wallet.get_private(),
     # 'JWT_PRIVATE_KEY': None,
     'JWT_ALGORITHM': 'RS256',
@@ -405,6 +452,7 @@ SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['username']
 SOCIAL_AUTH_SANITIZE_REDIRECTS = False
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', ]
+SOCIAL_AUTH_REVOKE_TOKENS_ON_DISCONNECT = True
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'unicef_security.azure.get_unicef_user',
@@ -426,6 +474,9 @@ SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_KEY = env.str('AZURE_CLIENT_ID')
 SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_SECRET = env.str('AZURE_CLIENT_SECRET')
 SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_TENANT_ID = env.str('AZURE_TENANT')
 SOCIAL_AUTH_AZUREAD_OAUTH2_KEY = env.str('AZURE_CLIENT_ID')
+SOCIAL_AUTH_AZUREAD_OAUTH2_RESOURCE = 'https://graph.microsoft.com/'
+SOCIAL_AUTH_USER_MODEL = 'unicef_security.User'
+
 # POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
 SCOPE = ['openid', 'email']
 IGNORE_DEFAULT_SCOPE = True

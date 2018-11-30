@@ -7,6 +7,7 @@ from django.db import connections
 from django.http import Http404
 from drf_querystringfilter.exceptions import QueryFilterException
 from dynamic_serializer.core import DynamicSerializerMixin
+from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -14,6 +15,7 @@ from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 
 from etools_datamart.api.filtering import DatamartQueryStringFilterBackend, TenantQueryStringFilterBackend
+from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
@@ -43,6 +45,20 @@ class SchemaSerializerField(coreschema.Enum):
         return description
 
 
+class UpdatesMixin:
+
+    @action(methods=['get'], detail=False)
+    def updates(self, request, version):
+        """ Returns only records changed from last ETL task"""
+        task = EtlTask.objects.get_for_model(self.queryset.model)
+        offset = task.last_changes.strftime('%Y-%m-%d %H:%M')
+        queryset = self.queryset.filter(last_modify_date__gte=offset)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data,
+                        headers={'update-date': offset})
+
+
 class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
     filter_backends = [SystemFilterBackend,
                        DatamartQueryStringFilterBackend,
@@ -68,7 +84,8 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
 
     def handle_exception(self, exc):
         conn = connections['etools']
-        if isinstance(exc, QueryFilterException):
+        if isinstance(exc, (QueryFilterException,)):
+            # FieldError can happen due cache attempt to create
             return Response({"error": str(exc)}, status=400)
         elif isinstance(exc, NotAuthenticated):
             return Response({"error": "Authentication credentials were not provided."}, status=401)
@@ -149,3 +166,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
             schema=coreschema.String(description="comma separated list of schemas")
         ))
         return ret
+
+
+class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
+    pass

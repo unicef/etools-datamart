@@ -5,12 +5,12 @@ from . import serializers
 from .. import common
 
 
-class PMPIndicatorsViewSet(common.APIReadOnlyModelViewSet):
+class PMPIndicatorsViewSet(common.DataMartViewSet):
     """
 
     """
     serializer_class = serializers.PMPIndicatorsSerializer
     queryset = models.PMPIndicators.objects.all()
     filter_fields = ('country_name', 'business_area_code', 'vendor_number',
-                     'partner_name', 'partner_type',
+                     'partner_name', 'partner_type', 'last_modify_date',
                      'pd_ssfa_ref', )

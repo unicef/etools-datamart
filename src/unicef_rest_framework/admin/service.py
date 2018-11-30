@@ -39,7 +39,7 @@ def get_stash_url(obj, label=None, **kwargs):
 
 
 class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('name', 'visible', 'security', 'cache_version',
+    list_display = ('name', 'visible', 'security', 'cache_version', 'source_model',
                     'json', 'admin')
     list_filter = ('hidden', 'access')
 

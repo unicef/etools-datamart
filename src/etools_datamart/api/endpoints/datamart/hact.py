@@ -5,7 +5,7 @@ from . import serializers
 from .. import common
 
 
-class HACTViewSet(common.APIReadOnlyModelViewSet):
+class HACTViewSet(common.DataMartViewSet):
     serializer_class = serializers.HACTSerializer
     queryset = models.HACT.objects.all()
-    filter_fields = ('country_name', 'month')
+    filter_fields = ('country_name', 'year', 'last_modify_date')

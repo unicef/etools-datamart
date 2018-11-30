@@ -58,3 +58,4 @@ class Intervention(DataMartModel):
 
     class Meta:
         ordering = ('country_name', 'title')
+        verbose_name = "Intervention"

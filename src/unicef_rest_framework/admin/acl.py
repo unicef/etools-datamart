@@ -2,10 +2,16 @@
 
 import logging
 
+from admin_extra_urls.extras import ExtraUrlMixin, link
 from django import forms
 from django.contrib import admin
-from unicef_rest_framework.models import UserAccessControl
-from unicef_rest_framework.models.acl import GroupAccessControl
+from django.contrib.admin import widgets
+from django.contrib.admin.helpers import AdminForm
+from django.contrib.auth.models import Group
+from django.contrib.postgres.forms import SimpleArrayField
+from django.template.response import TemplateResponse
+from unicef_rest_framework.models import Service, UserAccessControl
+from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +38,64 @@ class UserAccessControlAdmin(admin.ModelAdmin):
         return super(UserAccessControlAdmin, self).get_queryset(request).select_related(*self.raw_id_fields)
 
 
-class GroupAccessControlAdmin(admin.ModelAdmin):
+class GroupAccessControlForm(forms.Form):
+    group = forms.ModelChoiceField(queryset=Group.objects.all())
+    policy = forms.ChoiceField(choices=AbstractAccessControl.POLICIES)
+    services = forms.ModelMultipleChoiceField(queryset=Service.objects.all(),
+                                              widget=widgets.FilteredSelectMultiple('Services', False)
+                                              )
+    rate = forms.CharField(max_length=100)
+    serializers = SimpleArrayField(forms.CharField(),
+                                   max_length=255)
+
+
+class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('group', 'service', 'rate', 'serializers', 'policy')
     list_filter = ('group', 'policy', 'service')
     search_fields = ('group', 'service',)
     form = GroupACLAdminForm
+    autocomplete_fields = ('group',)
+
+    # filter_horizontal = ('services',)
 
     def get_queryset(self, request):
         return super(GroupAccessControlAdmin, self).get_queryset(request).select_related(*self.raw_id_fields)
+
+    @link()
+    def add_acl(self, request):
+        opts = self.model._meta
+        ctx = {
+            'opts': opts,
+            'add': False,
+            'has_view_permission': True,
+            'has_editable_inline_admin_formsets': True,
+            'app_label': opts.app_label,
+            'change': True,
+            'is_popup': False,
+            'save_as': False,
+            'media': self.media,
+            'has_delete_permission': False,
+            'has_add_permission': False,
+            'has_change_permission': True,
+        }
+        if request.method == 'POST':
+            form = GroupAccessControlForm(request.POST)
+            if form.is_valid():
+                services = form.cleaned_data.pop('services')
+                for service in services:
+                    GroupAccessControl.objects.get_or_create(service=service,
+                                                             **form.cleaned_data)
+                self.message_user(request, 'ACLs created')
+
+        else:
+            form = GroupAccessControlForm(initial={'rate': '*',
+                                                   'policy': AbstractAccessControl.POLICY_ALLOW,
+                                                   'serializers': 'std'})
+        ctx['adminform'] = AdminForm(form,
+                                     [(None, {'fields': [['group',
+                                                          'policy'],
+                                                         'services',
+                                                         ['rate', 'serializers']]})],
+                                     {})
+        ctx['media'] = self.media + form.media
+        return TemplateResponse(request, 'admin/unicef_rest_framework/groupaccesscontrol/add.html', ctx)

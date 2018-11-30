@@ -28,7 +28,7 @@ def django_app(django_app_mixin, system_user):
 
 @pytest.mark.django_db
 def test_log(enable_stats, django_app, system_user, reset_stats):
-    url = reverse("api:intervention-list")
+    url = reverse("api:intervention-list", args=['v1'])
     url = f"{url}?country_name=bolivia,chad,lebanon"
 
     res = django_app.get(url)
@@ -53,7 +53,7 @@ def test_log(enable_stats, django_app, system_user, reset_stats):
 
 @pytest.mark.django_db
 def test_threaedlog(enable_threadstats, django_app, admin_user):
-    url = reverse("api:intervention-list")
+    url = reverse("api:intervention-list", args=['v1'])
     url = f"{url}?country_name=bolivia,chad,lebanon"
 
     res = django_app.get(url)

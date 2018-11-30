@@ -5,6 +5,7 @@ from celery.signals import task_postrun
 
 from etools_datamart.apps.data.models import PMPIndicators
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.apps.etl.results import EtlResult
 from etools_datamart.apps.etl.tasks.etl import load_pmp_indicator
 from etools_datamart.celery import task_postrun_handler
 
@@ -22,17 +23,19 @@ def test_check_extra_attributes(db):
 
 
 def test_load_pmp_indicator(db):
-    with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run'):
+    with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run',
+                    return_value=EtlResult(created=11)):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
-                                      result='SUCCESS').exists()
+                                      results__created=11,
+                                      status='SUCCESS').exists()
 
 
 def test_load_pmp_indicator_fail(db):
     with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run', side_effect=Exception):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
-                                      result='FAILURE')
+                                      status='FAILURE')
 
 
 @pytest.fixture()
@@ -46,4 +49,4 @@ def test_load_pmp_indicator_running(db, disable_post_run):
     with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run'):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
-                                      result='RUNNING')
+                                      status='RUNNING')

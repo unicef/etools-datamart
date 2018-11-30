@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
-from tests._test_lib.test_utilities.factories import (FAMIndicatoFactory, HACTFactory, InterventionFactory,
-                                                      PMPIndicatorFactory, UserStatsFactory,)
+from test_utilities.factories import (FAMIndicatoFactory, HACTFactory, InterventionFactory,
+                                      PMPIndicatorFactory, UserStatsFactory,)
 
 from etools_datamart.api.endpoints import (FAMIndicatorViewSet, InterventionViewSet,
                                            PMPIndicatorsViewSet, UserStatsViewSet,)

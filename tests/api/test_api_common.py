@@ -14,7 +14,7 @@ from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthor
 
 def pytest_generate_tests(metafunc):
     if 'url' in metafunc.fixturenames:
-        urls = [reverse("api:%s" % url.name) for url in router.urls
+        urls = [reverse("api:%s" % url.name, args=['v1']) for url in router.urls
                 if url.name.endswith('-list')]
         metafunc.parametrize("url", urls, ids=urls)
 
