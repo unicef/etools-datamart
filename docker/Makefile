@@ -6,14 +6,14 @@ DOCKER_PASS?=
 DOCKER_USER?=
 TARGET?=dev
 # below vars are used internally
-BUILD_OPTIONS?=
+BUILD_OPTIONS?=--squash
 CMD?=datamart
 CONTAINER_NAME?=datamart-${TARGET}
 ORGANIZATION=unicef
 IMAGE_NAME=datamart
 DOCKER_IMAGE_NAME=${ORGANIZATION}/${IMAGE_NAME}
 DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
-DOCKERFILE?=Dockerfile.2
+DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
 
@@ -23,31 +23,26 @@ help:
 	@echo "release              release tag ${TARGET} on docker hub"
 	@echo "run                  run ${DOCKER_IMAGE} locally"
 
-
 build-base:
-	if [[ "`docker images -q ${DOCKER_IMAGE_NAME}:base 2> /dev/null`" == "" ]]; then \
-		cd .. && docker build \
-			--build-arg DEVELOP=${DEVELOP} \
-			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
-			--build-arg VERSION=${TARGET} \
-			--squash \
+	docker build --target base \
 			-t ${DOCKER_IMAGE_NAME}:base \
-			-f docker/${DOCKERFILE}.base . ; \
-		docker push ${DOCKER_IMAGE_NAME}:base
-	fi
+			-f docker/${DOCKERFILE} .
 
-
-build: build-base
+build:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
 			--build-arg VERSION=${TARGET} \
-			--squash \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
+#	flatten image
+	docker create ${DOCKER_IMAGE_NAME}:dev foo
+	docker export foo | docker import - unicef/datamart:flat
+	docker rm foo
+
 
 .run:
 	cd .. && docker run \
@@ -100,7 +95,7 @@ test:
 				 -e CSRF_COOKIE_SECURE=1 \
 				 -e SECURE_HSTS_PRELOAD=1 \
 				 -e SECURE_SSL_REDIRECT=1" \
-	CMD='bash -c "django-admin check --deploy"' \
+	CMD='bash -c "touch /var/datamart/.touch && django-admin check --deploy "' \
 	$(MAKE) .run
 
 scratch:

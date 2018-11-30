@@ -1,11 +1,15 @@
 import io
+import logging
 import os
 
+from crashlog.middleware import process_exception
 from django.conf import settings
 from django.template import loader
 from xhtml2pdf import pisa
 
 from .html import HTMLRenderer
+
+logger = logging.getLogger(__name__)
 
 
 def link_callback(uri, rel):
@@ -47,13 +51,18 @@ class PDFRenderer(HTMLRenderer):
             'renderers/pdf/pdf.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        html = super(PDFRenderer, self).render(data, accepted_media_type, renderer_context)
+        try:
+            html = super(PDFRenderer, self).render(data, accepted_media_type, renderer_context)
 
-        # create a pdf
-        buffer = io.BytesIO()
-        pisaStatus = pisa.CreatePDF(html, dest=buffer, link_callback=link_callback)
-        # if error then show some funy view
-        if pisaStatus.err:
-            raise Exception('We had some errors <pre>' + html + '</pre>')
-        buffer.seek(0)
-        return buffer.read()
+            # create a pdf
+            buffer = io.BytesIO()
+            pisaStatus = pisa.CreatePDF(html, dest=buffer, link_callback=link_callback)
+            # if error then show some funy view
+            if pisaStatus.err:
+                raise Exception('We had some errors <pre>' + html + '</pre>')
+            buffer.seek(0)
+            return buffer.read()
+        except Exception as e:
+            process_exception(e)
+            logger.exception(e)
+            raise Exception('Error processing request')

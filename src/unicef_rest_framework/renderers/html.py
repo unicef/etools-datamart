@@ -1,5 +1,10 @@
+import logging
+
+from crashlog.middleware import process_exception
 from django.template import loader
 from rest_framework.renderers import BaseRenderer
+
+logger = logging.getLogger(__name__)
 
 
 def labelize(v):
@@ -18,17 +23,22 @@ class HTMLRenderer(BaseRenderer):
             'renderers/html/html.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        model = renderer_context['view'].queryset.model
-        opts = model._meta
-        template = self.get_template(opts)
-        if data['results']:
-            c = {'data': data,
-                 'model': model,
-                 'opts': opts,
-                 'headers': [labelize(v) for v in data['results'][0].keys()]}
-        else:
-            c = {'data': {},
-                 'model': model,
-                 'opts': opts,
-                 'headers': []}
-        return template.render(c)
+        try:
+            model = renderer_context['view'].queryset.model
+            opts = model._meta
+            template = self.get_template(opts)
+            if data['results']:
+                c = {'data': data,
+                     'model': model,
+                     'opts': opts,
+                     'headers': [labelize(v) for v in data['results'][0].keys()]}
+            else:
+                c = {'data': {},
+                     'model': model,
+                     'opts': opts,
+                     'headers': []}
+            return template.render(c)
+        except Exception as e:
+            process_exception(e)
+            logger.exception(e)
+            raise Exception('Error processing request')
