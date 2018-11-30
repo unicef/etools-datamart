@@ -20,6 +20,7 @@ class HTMLRenderer(BaseRenderer):
     def get_template(self, meta):
         return loader.select_template([
             f'renderers/html/{meta.app_label}/{meta.model_name}.html',
+            f'renderers/html/{meta.app_label}/html.html',
             'renderers/html/html.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):

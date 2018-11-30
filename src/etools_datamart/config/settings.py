@@ -14,8 +14,8 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
 
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
-                  # API_CACHE_URL=(str, "redis://127.0.0.1:6379/2"),
-                  API_CACHE_URL=(str, "locmemcache://"),
+                  API_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
+                  TEMPLATE_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
                   # CACHE_URL=(str, "dummycache://"),
                   # API_CACHE_URL=(str, "dummycache://"),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
@@ -189,7 +189,8 @@ AUTHENTICATION_BACKENDS = [
 
 CACHES = {
     'default': env.cache(),
-    'api': env.cache('API_CACHE_URL')
+    'api': env.cache('API_CACHE_URL'),
+    'dbtemplates': env.cache('TEMPLATE_CACHE_URL')
 }
 
 ROOT_URLCONF = 'etools_datamart.config.urls'
@@ -206,6 +207,7 @@ TEMPLATES = [
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
+                'dbtemplates.loader.Loader',
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -275,6 +277,7 @@ INSTALLED_APPS = [
     'month_field',
     'drf_querystringfilter',
     'crispy_forms',
+    'dbtemplates',
 
     'drf_yasg',
     'adminfilters',

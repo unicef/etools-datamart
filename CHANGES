@@ -1,6 +1,7 @@
 1.8 (dev)
 ---------
-* 
+* add ability to create 'per model' custom templates for html/pdf renderers
+    new `TEMPLATE_CACHE_URL` enironment variable
 
 1.7
 ---

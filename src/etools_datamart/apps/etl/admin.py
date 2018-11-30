@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from admin_extra_urls.extras import action, link
 from admin_extra_urls.mixins import _confirm_action
+from adminactions.mass_update import mass_update
 from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
@@ -27,7 +28,7 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
                        'table_name', 'content_type',
                        )
     date_hierarchy = 'last_run'
-    actions = None
+    actions = [mass_update, ]
 
     def scheduling(self, obj):
         opts = PeriodicTask._meta

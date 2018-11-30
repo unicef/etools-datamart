@@ -48,6 +48,7 @@ class PDFRenderer(HTMLRenderer):
     def get_template(self, meta):
         return loader.select_template([
             f'renderers/pdf/{meta.app_label}/{meta.model_name}.html',
+            f'renderers/pdf/{meta.app_label}/pdf.html',
             'renderers/pdf/pdf.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
