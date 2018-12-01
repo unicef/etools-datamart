@@ -77,21 +77,44 @@ body, html {
   h2 {
     font-size: 14pt;
   }
-  //h1 {
-  //  width: 100%;
-  //  font-size: 24pt;
-  //  text-align: center;
-  //}
-  ul {
-    padding: 20px 0 0 65px;
-    list-style: none;
-    font-size: 18pt;
-  }
+}
+
+ul.index-menu {
+  padding: 20px 0 0 65px;
+  list-style: none;
+  font-size: 18pt;
   a {
     color: #2090F8;
+    text-transform: none;
+    text-decoration: none;
   }
-
+  li.menu-sep {
+    width: 100%;
+    font-size: 2px;
+    //border: 1px solid black;
+  }
 }
+
+.h10 {
+  display: block;
+  height: 10px;
+}
+
+.h30 {
+  display: block;
+  height: 30px;
+}
+
+//.pad4 {
+//  padding: 4px;
+//}
+//
+//.pad6 {
+//  padding: 6px;
+//}
+//.pad10 {
+//  padding: 10px;
+//}
 
 /* [ login more ]*/
 
@@ -230,10 +253,11 @@ input.input100 {
     color: white;
   }
 }
+
 .rounded {
-   -webkit-border-radius: 20px;
-   -moz-border-radius: 20px;
-   border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
 }
 
 .monitor {
@@ -257,13 +281,13 @@ input.input100 {
     .row {
       width: 100%;
       padding: 5px;
-      &.header{
+      &.header {
         font-weight: bold;
       }
-      &.odd{
+      &.odd {
         background-color: #eeeeee;
       }
-      &.even{
+      &.even {
 
       }
     }
@@ -273,7 +297,7 @@ input.input100 {
       &.task {
         width: 30%;
       }
-      &.last_run{
+      &.last_run {
         width: 200px;
       }
       &.last_changes {

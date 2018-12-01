@@ -57,12 +57,26 @@ body, html {
     text-align: center; }
   .right h2 {
     font-size: 14pt; }
-  .right ul {
-    padding: 20px 0 0 65px;
-    list-style: none;
-    font-size: 18pt; }
-  .right a {
-    color: #2090F8; }
+
+ul.index-menu {
+  padding: 20px 0 0 65px;
+  list-style: none;
+  font-size: 18pt; }
+  ul.index-menu a {
+    color: #2090F8;
+    text-transform: none;
+    text-decoration: none; }
+  ul.index-menu li.menu-sep {
+    width: 100%;
+    font-size: 2px; }
+
+.h10 {
+  display: block;
+  height: 10px; }
+
+.h30 {
+  display: block;
+  height: 30px; }
 
 /* [ login more ]*/
 .left {
