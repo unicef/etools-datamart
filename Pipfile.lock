@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e7ddab109d76e6e54b7c5fe951f72be61e8d0dfb8788995ffd384a763aa535a9"
+            "sha256": "81eac07ad1f97c779e00281dd19958dd2bb27a51bda821d288bf0d6174b1e6ee"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -865,12 +865,7 @@
             "version": "==0.5.0"
         },
         "django-dbtemplates": {
-            "hashes": [
-                "sha256:9f63208bde2b3395b1adf8dfbf8f405a2cc3b082652faa16d32ecebc0e20d72b",
-                "sha256:d17d01264277c6a744604e1fae52678c238d0695c47f67a6982f49b65cd117d6"
-            ],
-            "index": "pypi",
-            "version": "==2.0"
+            "file": "https://github.com/jazzband/django-dbtemplates/archive/2.0.1.tar.gz"
         },
         "django-environ": {
             "hashes": [
@@ -1257,14 +1252,6 @@
                 "sha256:ff8cff01582fa1a7e533cb97f628531c4014af4b5f38e33cdcfe5eec29b6d888"
             ],
             "version": "==5.3.0"
-        },
-        "pisa": {
-            "hashes": [
-                "sha256:94c4ae0995c84bb0588ece4480486464612ed1526f0987fb1016b9c50e5d3327",
-                "sha256:a7164ac81ab5ea01fbae4f29d2c00183a31142ca30ad527f6ac96635819cbd12"
-            ],
-            "index": "pypi",
-            "version": "==3.0.33"
         },
         "psutil": {
             "hashes": [

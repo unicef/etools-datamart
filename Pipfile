@@ -54,10 +54,9 @@ django-basicauth = "*"
 django-post-office = "*"
 django-celery-email = "*"
 "xhtml2pdf" = "*"
-pisa = "*"
 django-crispy-forms = "*"
 django-adminactions = "*"
-django-dbtemplates = "*"
+django-dbtemplates = {file = "https://github.com/jazzband/django-dbtemplates/archive/2.0.1.tar.gz"}
 
 [dev-packages]
 "flake8" = ">=3.6.0"
