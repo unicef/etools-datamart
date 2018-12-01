@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 class XLSXRenderer(_XLSXRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
+        response = renderer_context['response']
+        if response.status_code != 200:
+            return ''
         try:
             if not data['results']:
                 return ''

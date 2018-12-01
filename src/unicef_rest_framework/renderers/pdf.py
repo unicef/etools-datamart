@@ -52,6 +52,9 @@ class PDFRenderer(HTMLRenderer):
             'renderers/pdf/pdf.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
+        response = renderer_context['response']
+        if response.status_code != 200:
+            return ''
         try:
             html = super(PDFRenderer, self).render(data, accepted_media_type, renderer_context)
 

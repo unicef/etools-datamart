@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytest
+
 from etools_datamart.api.endpoints import PartnerViewSet
 
 
@@ -32,6 +34,22 @@ def test_etag(client, admin_user, data_service, django_assert_num_queries):
     client.force_authenticate(admin_user)
 
     res = client.get(url, HTTP_X_SCHEMA="bolivia", HTTP_IF_NONE_MATCH='Not Set')
+    assert res.status_code == 200
+    assert res['cache-version'] == str(data_service.cache_version)
+    assert res['etag']
+
+    etag = res['etag']
+    res = client.get(url, HTTP_X_SCHEMA="bolivia", HTTP_IF_NONE_MATCH=etag)
+    assert res.status_code == 304
+    assert res['etag'] == etag
+
+
+@pytest.mark.parametrize("fmt", ["pdf", "csv", "xlsx", "xhtml", "json", "ms-xml", "xml", "ms-json"])
+def test_cache_renderers(fmt, client, admin_user, data_service, django_assert_num_queries):
+    url = f"{data_service.endpoint}?country_name=bolivia&format={fmt}"
+    client.force_authenticate(admin_user)
+
+    res = client.get(url, HTTP_IF_NONE_MATCH='Not Set')
     assert res.status_code == 200
     assert res['cache-version'] == str(data_service.cache_version)
     assert res['etag']

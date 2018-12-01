@@ -24,6 +24,9 @@ class HTMLRenderer(BaseRenderer):
             'renderers/html/html.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
+        response = renderer_context['response']
+        if response.status_code != 200:
+            return ''
         try:
             model = renderer_context['view'].queryset.model
             opts = model._meta
