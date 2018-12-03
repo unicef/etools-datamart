@@ -15,6 +15,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
 
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   API_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
+                  LOCK_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
                   TEMPLATE_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
                   # CACHE_URL=(str, "dummycache://"),
                   # API_CACHE_URL=(str, "dummycache://"),
