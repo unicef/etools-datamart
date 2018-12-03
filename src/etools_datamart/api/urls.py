@@ -32,7 +32,7 @@ router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
 router.register(r'datamart/hact', endpoints.HACTViewSet)
 
-router.register(r'system/tasks-log', endpoints.TaskLogViewSet)
+router.register(r'system/monitor', endpoints.MonitorViewSet)
 
 # urlpatterns = router.urls
 

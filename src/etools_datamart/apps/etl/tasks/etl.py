@@ -47,7 +47,7 @@ def process(Model, filters, values):
             else:
                 op = UNCHANGED
         return op
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         logging.exception(e)
         process_exception(e)
         raise
@@ -350,8 +350,8 @@ def load_fam_indicator() -> EtlResult:
     return results
 
 
-@app.etl(UserStats)
-def load_user_report() -> EtlResult:
+@app.etl(UserStats, bind=True)
+def load_user_report():
     connection = connections['etools']
     countries = connection.get_tenants()
     today = date.today()

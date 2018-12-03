@@ -1,56 +1,91 @@
 # -*- coding: utf-8 -*-
 import pytest
-from test_utilities.factories import (FAMIndicatoFactory, HACTFactory, InterventionFactory,
+from test_utilities.factories import (FAMIndicatorFactory, HACTFactory, InterventionFactory,
                                       PMPIndicatorFactory, UserStatsFactory,)
 
-from etools_datamart.api.endpoints import (FAMIndicatorViewSet, InterventionViewSet,
+from etools_datamart.api.endpoints import (FAMIndicatorViewSet, HACTViewSet, InterventionViewSet,
                                            PMPIndicatorsViewSet, UserStatsViewSet,)
+from etools_datamart.apps.etl.models import EtlTask
+
+VIEWSETS = [
+    FAMIndicatorViewSet,
+    HACTViewSet,
+    InterventionViewSet,
+    PMPIndicatorsViewSet,
+    UserStatsViewSet,
+]
+
+FORMATS = (('', 'application/json'),
+           ('csv', 'text/csv; charset=utf-8'),
+           ('xml', 'application/xml; charset=utf-8'),
+           # ('html', 'text/html; charset=utf-8'),
+           ('json', 'application/json'),
+           ('ms-xml', 'application/xml; charset=utf-8'),
+           ('ms-json', 'application/json'),
+           ('csv', 'text/csv; charset=utf-8'),
+           ('pdf', 'application/pdf; charset=utf-8'),
+           ('xlsx', 'application/xlsx; charset=utf-8'),
+           )
 
 
 @pytest.fixture()
 def data(db):
-    data = [HACTFactory(),
-            PMPIndicatorFactory(),
-            FAMIndicatoFactory(),
-            InterventionFactory(),
-            UserStatsFactory()]
+    EtlTask.objects.inspect()
+    data = [
+        FAMIndicatorFactory(),
+        HACTFactory(),
+        InterventionFactory(),
+        PMPIndicatorFactory(),
+        UserStatsFactory(),
+    ]
     yield
     [r.delete() for r in data]
 
 
-@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
-                                     FAMIndicatorViewSet, UserStatsViewSet])
-def test_list_json(client, viewset):
-    res = client.get(viewset.get_service().endpoint)
+@pytest.mark.parametrize("action", ['', 'updates/'])
+@pytest.mark.parametrize("format,ct", FORMATS)
+@pytest.mark.parametrize("viewset", VIEWSETS)
+def test_list(client, action, viewset, format, ct, data):
+    res = client.get(f"{viewset.get_service().endpoint}{action}?format={format}")
     assert res.status_code == 200, res
-    assert res.json()
+    assert res.content
+    assert res['Content-Type'] == ct
 
-
-@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
-                                     FAMIndicatorViewSet, UserStatsViewSet])
-def test_list_csv(client, viewset, data):
-    res = client.get(f"{viewset.get_service().endpoint}?format=csv", format='csv')
-    assert res.status_code == 200, res
-    assert res['Content-Type'] == "text/csv; charset=utf-8"
-
-
-@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
-                                     FAMIndicatorViewSet, UserStatsViewSet])
-def test_list_xml(client, viewset):
-    res = client.get(f"{viewset.get_service().endpoint}?format=xml", format='xml')
-    assert res.status_code == 200, res
-
-
-@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
-                                     FAMIndicatorViewSet, UserStatsViewSet])
-def test_list_msxml(client, viewset):
-    res = client.get(f"{viewset.get_service().endpoint}?format=ms-xml", format='ms-xml')
-    assert res.status_code == 200, res
-
-
-@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
-                                     FAMIndicatorViewSet, UserStatsViewSet])
-def test_list_msjson(client, viewset):
-    res = client.get(f"{viewset.get_service().endpoint}?format=ms-json", format='ms-json')
-    assert res.status_code == 200, res
-    assert res.json()
+# @pytest.mark.parametrize("viewset", VIEWSETS)
+# def test_list_json(client, viewset):
+#     res = client.get(viewset.get_service().endpoint)
+#     assert res.status_code == 200, res
+#     assert res.json()
+#
+#
+# @pytest.mark.parametrize("viewset", VIEWSETS)
+# def test_list_csv(client, viewset, data):
+#     res = client.get(f"{viewset.get_service().endpoint}?format=csv", format='csv')
+#     assert res.status_code == 200, res
+#     assert res['Content-Type'] == "text/csv; charset=utf-8"
+#
+#
+# @pytest.mark.parametrize("viewset", VIEWSETS)
+# def test_list_xml(client, viewset):
+#     res = client.get(f"{viewset.get_service().endpoint}?format=xml", format='xml')
+#     assert res.status_code == 200, res
+#
+#
+# @pytest.mark.parametrize("viewset", VIEWSETS)
+# def test_list_msxml(client, viewset):
+#     res = client.get(f"{viewset.get_service().endpoint}?format=ms-xml", format='ms-xml')
+#     assert res.status_code == 200, res
+#
+#
+# @pytest.mark.parametrize("viewset", VIEWSETS)
+# def test_list_msjson(client, viewset):
+#     res = client.get(f"{viewset.get_service().endpoint}?format=ms-json", format='ms-json')
+#     assert res.status_code == 200, res
+#     assert res.json()
+#
+#
+# @pytest.mark.parametrize("viewset", VIEWSETS)
+# def test_updates(client, viewset):
+#     res = client.get(f"{viewset.get_service().endpoint}/updates/?format=ms-json", format='ms-json')
+#     assert res.status_code == 200, res
+#     assert res.json()

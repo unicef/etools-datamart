@@ -51,8 +51,12 @@ class UpdatesMixin:
     def updates(self, request, version):
         """ Returns only records changed from last ETL task"""
         task = EtlTask.objects.get_for_model(self.queryset.model)
-        offset = task.last_changes.strftime('%Y-%m-%d %H:%M')
-        queryset = self.queryset.filter(last_modify_date__gte=offset)
+        if task.last_changes:
+            offset = task.last_changes.strftime('%Y-%m-%d %H:%M')
+            queryset = self.queryset.filter(last_modify_date__gte=offset)
+        else:
+            offset = 'none'
+            queryset = self.queryset.all()
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data,
@@ -79,7 +83,9 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
         return ret
 
     def drf_ignore_filter(self, request, field):
-        return field in ['+serializer', 'cursor', '+fields',
+        return field in [self.serializer_field_param,
+                         self.dynamic_fields_param,
+                         'cursor',
                          'ordering', 'page_size', 'format', ]
 
     def handle_exception(self, exc):

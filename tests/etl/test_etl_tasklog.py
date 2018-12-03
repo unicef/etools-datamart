@@ -50,3 +50,11 @@ def test_load_pmp_indicator_running(db, disable_post_run):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
                                       status='RUNNING')
+
+
+def test_no_changes(db):
+    with mock.patch('etools_datamart.apps.etl.tasks.etl.load_pmp_indicator.run',
+                    return_value=EtlResult()):
+        assert load_pmp_indicator.apply()
+        assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
+                                      status='SUCCESS').exists()

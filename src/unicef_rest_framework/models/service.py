@@ -3,7 +3,6 @@
 import logging
 
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F
 from django.urls import reverse
@@ -68,7 +67,7 @@ class ServiceManager(models.Manager):
         for service in self.model.objects.all():
             try:
                 assert service.viewset
-            except ValidationError:
+            except AssertionError:
                 service.delete()
                 deleted += 1
 

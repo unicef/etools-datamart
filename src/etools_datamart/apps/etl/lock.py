@@ -5,7 +5,7 @@ from functools import partial, wraps
 from django.core.cache import caches
 from redis.exceptions import LockError
 
-cache = caches['default']
+cache = caches['lock']
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class TaskExecutionOverlap(Exception):
     pass
 
 
-def only_one(function=None, key="", timeout=None):
+def only_one(function, key, timeout=None):
     """Enforce only one celery task at a time."""
 
     def _unlock(key):
@@ -40,8 +40,7 @@ def only_one(function=None, key="", timeout=None):
                 have_lock = lock.acquire(blocking=False)
                 if have_lock:
                     ret_value = run_func(*args, **kwargs)
-                # else:
-                #     raise TaskExecutionOverlap(key)
+
             finally:
                 if have_lock:
                     try:
@@ -52,5 +51,6 @@ def only_one(function=None, key="", timeout=None):
             return ret_value
 
         return _caller
+
     function.unlock = partial(_unlock, key)
     return _dec(function) if function is not None else _dec

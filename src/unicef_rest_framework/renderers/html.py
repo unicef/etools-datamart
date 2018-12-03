@@ -12,7 +12,7 @@ def labelize(v):
 
 
 class HTMLRenderer(BaseRenderer):
-    media_type = 'text/html'
+    media_type = 'text/xhtml'
     format = 'xhtml'
     charset = 'utf-8'
     render_style = 'text'
@@ -31,11 +31,13 @@ class HTMLRenderer(BaseRenderer):
             model = renderer_context['view'].queryset.model
             opts = model._meta
             template = self.get_template(opts)
-            if data['results']:
+            if data and 'results' in data:
+                data = data['results']
+            if data:
                 c = {'data': data,
                      'model': model,
                      'opts': opts,
-                     'headers': [labelize(v) for v in data['results'][0].keys()]}
+                     'headers': [labelize(v) for v in data[0].keys()]}
             else:
                 c = {'data': {},
                      'model': model,
@@ -45,4 +47,4 @@ class HTMLRenderer(BaseRenderer):
         except Exception as e:
             process_exception(e)
             logger.exception(e)
-            raise Exception('Error processing request')
+            raise Exception('Error processing request') from e

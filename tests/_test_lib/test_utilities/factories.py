@@ -48,7 +48,7 @@ class PMPIndicatorFactory(factory.DjangoModelFactory):
         model = PMPIndicators
 
 
-class FAMIndicatoFactory(factory.DjangoModelFactory):
+class FAMIndicatorFactory(factory.DjangoModelFactory):
     month = today
 
     class Meta:

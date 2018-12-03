@@ -3,9 +3,10 @@ import json
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
-from test_utilities.factories import EmailTemplateFactory, SubscriptionFactory
+from test_utilities.factories import EmailTemplateFactory, HACTFactory, SubscriptionFactory
 from unicef_rest_framework.test_utils import user_allow_service
 
+from etools_datamart.apps.data.models import HACT
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.subscriptions.models import Subscription
 from etools_datamart.apps.subscriptions.views import subscribe
@@ -13,8 +14,9 @@ from etools_datamart.apps.subscriptions.views import subscribe
 
 @pytest.fixture()
 def etltask(db):
+    HACTFactory()
     EtlTask.objects.inspect()
-    return EtlTask.objects.first()
+    return EtlTask.objects.get_for_model(HACT)
 
 
 @pytest.fixture()

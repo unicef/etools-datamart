@@ -2,6 +2,7 @@
 from admin_extra_urls.extras import action, link
 from admin_extra_urls.mixins import _confirm_action
 from adminactions.mass_update import mass_update
+from crashlog.middleware import process_exception
 from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
@@ -20,13 +21,15 @@ from . import models
 @register(models.EtlTask)
 class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
     list_display = ('task', 'last_run', 'status', 'time',
-                    'last_success', 'last_failure', 'lock', 'scheduling', 'queue_task')
+                    'last_success', 'last_failure', 'locked', 'scheduling',
+                    'unlock_task',
+                    'queue_task')
 
-    readonly_fields = ('task', 'last_run',
-                       'last_success', 'last_failure', 'last_changes',
-                       'results', 'elapsed', 'time', 'status',
-                       'table_name', 'content_type',
-                       )
+    # readonly_fields = ('task', 'last_run',
+    #                    'last_success', 'last_failure', 'last_changes',
+    #                    'results', 'elapsed', 'time', 'status',
+    #                    'table_name', 'content_type',
+    #                    )
     date_hierarchy = 'last_run'
     actions = [mass_update, ]
 
@@ -52,6 +55,14 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
 
     queue_task.verbse_name = 'queue'
 
+    def unlock_task(self, obj):
+        opts = self.model._meta
+        url = reverse('admin:%s_%s_unlock' % (opts.app_label,
+                                              opts.model_name), args=[obj.id])
+        return format_html(f'<a href="{url}">unlock</a>')
+
+    queue_task.verbse_name = 'unlock'
+
     def has_add_permission(self, request):
         return False
 
@@ -61,10 +72,10 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
     def time(self, obj):
         return naturaldelta(obj.elapsed)
 
-    def lock(self, obj):
-        return f"{obj.task}-lock" in cache
+    def locked(self, obj):
+        return obj.lock_key not in cache
 
-    lock.boolean = True
+    locked.boolean = True
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         if request.method == 'POST':
@@ -77,22 +88,22 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
     def queue(self, request, pk):
         obj = self.get_object(request, pk)
         try:
-            task = app.tasks[obj.task]
+            task = app.tasks.get(obj.task)
             task.delay()
             self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
+            process_exception(e)
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
         return HttpResponseRedirect(reverse("admin:etl_etltask_changelist"))
 
     @action()
     def unlock(self, request, pk):
         obj = self.get_object(request, pk)
-        key = f"{obj.task}-lock"
 
         def _action(request):
-            cache.delete(key)
+            cache.delete(obj.lock_key)
 
-        return _confirm_action(self, request, _action, f"Continuing will unlock selected task. ({key})",
+        return _confirm_action(self, request, _action, f"Continuing will unlock selected task. ({obj.task})",
                                "Successfully executed", )
 
     @link()

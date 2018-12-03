@@ -2,9 +2,14 @@ import os
 from time import time
 
 from celery import Celery
+from celery.contrib.abortable import AbortableTask
 from celery.signals import task_postrun, task_prerun
-from celery.task import Task
 from django.apps import apps
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
+#                        related_name='tasks')
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
+#                        related_name='etl')
+from kombu import Exchange, Queue
 from kombu.serialization import register
 
 from etools_datamart.apps.etl.results import etl_dumps, etl_loads
@@ -12,7 +17,7 @@ from etools_datamart.apps.etl.results import etl_dumps, etl_loads
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
 
-class ETLTask(Task):
+class ETLTask(AbortableTask):
     abstract = True
     linked_model = None
 
@@ -59,12 +64,20 @@ app = DatamartCelery('datamart')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 # app.autodiscover_tasks()
 app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])
-# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
-#                        related_name='tasks')
-# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
-#                        related_name='etl')
 
 app.timers = {}
+app.conf.task_queues = (
+    Queue('default', Exchange('default'), routing_key='default'),
+    Queue('etl', Exchange('etl'), routing_key='etl.#'),
+    Queue('mail', Exchange('mail'), routing_key='mail.#'),
+    Queue('subscription', Exchange('subscription'), routing_key='subscription.#'),
+)
+app.conf.task_default_queue = 'default'
+app.conf.task_default_exchange_type = 'direct'
+app.conf.task_default_routing_key = 'default'
+app.conf.task_routes = {'etools_datamart.apps.etl.tasks.etl.*': {'queue': 'etl'}}
+app.conf.task_routes = {'send_queued_mail': {'queue': 'mail'}}
+app.conf.task_routes = {'etools_datamart.apps.etl.subscriptions.tasks.*': {'queue': 'subscription'}}
 
 
 @task_prerun.connect
@@ -76,7 +89,6 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
     from django.contrib.contenttypes.models import ContentType
     from etools_datamart.apps.etl.models import EtlTask
     from django.utils import timezone
-
     defs = {'status': 'RUNNING',
             'last_run': timezone.now()}
     EtlTask.objects.update_or_create(task=task.name,
@@ -89,16 +101,24 @@ register('etljson', etl_dumps, etl_loads,
          content_type='application/x-myjson', content_encoding='utf-8')
 
 
+# @task_success.connect
+# def task_success_handler(signal, sender, result, **kw):
+#     # TODO: remove me
+#     print(22222222222, sender)
+#     print(22222222222, result)
+#
+#
+# @task_failure.connect
+# def task_failure_handler(signal, sender, task_id, exception, args, kwargs, tarceback, einfo, **kw):
+#     # TODO: remove me
+#     print(33333333333)
+
+
 @task_postrun.connect
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
     from django.utils import timezone
     from etools_datamart.apps.subscriptions.models import Subscription
     from etools_datamart.apps.etl.models import EtlTask
-
-    # from unicef_rest_framework.models import Service
-    if state != 'SUCCESS':
-        EtlTask.objects.filter(task=task.name).update(status=state)
-
     if not hasattr(sender, 'linked_model'):
         return
     try:
@@ -123,5 +143,4 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         defs['last_failure'] = timezone.now()
 
     EtlTask.objects.update_or_create(task=task.name, defaults=defs)
-    # Service.objects.invalidate_cache()
     app.timers[task.name] = cost

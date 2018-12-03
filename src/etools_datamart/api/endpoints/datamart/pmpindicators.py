@@ -13,4 +13,4 @@ class PMPIndicatorsViewSet(common.DataMartViewSet):
     queryset = models.PMPIndicators.objects.all()
     filter_fields = ('country_name', 'business_area_code', 'vendor_number',
                      'partner_name', 'partner_type', 'last_modify_date',
-                     'pd_ssfa_ref', )
+                     'cash_contribution', 'pd_ssfa_status', 'pd_ssfa_ref', )

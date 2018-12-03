@@ -189,6 +189,7 @@ AUTHENTICATION_BACKENDS = [
 
 CACHES = {
     'default': env.cache(),
+    'lock': env.cache('LOCK_CACHE_URL'),
     'api': env.cache('API_CACHE_URL'),
     'dbtemplates': env.cache('TEMPLATE_CACHE_URL')
 }

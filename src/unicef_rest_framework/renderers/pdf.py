@@ -69,4 +69,4 @@ class PDFRenderer(HTMLRenderer):
         except Exception as e:
             process_exception(e)
             logger.exception(e)
-            raise Exception('Error processing request')
+            raise Exception('Error processing request') from e

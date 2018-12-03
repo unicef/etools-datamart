@@ -30,6 +30,9 @@ class classproperty(object):
 
 
 class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
+    serializer_field_param = '+serializer'
+    dynamic_fields_param = '+fields'
+
     object_cache_key_func = rest_framework_extensions.utils.default_object_cache_key_func
     list_cache_key_func = ListKeyConstructor()
 

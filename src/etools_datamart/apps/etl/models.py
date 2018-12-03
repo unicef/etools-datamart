@@ -11,7 +11,10 @@ from etools_datamart.celery import app, ETLTask
 
 class TaskLogManager(models.Manager):
     def get_for_model(self, model: DataMartModel):
-        return self.get(content_type=ContentType.objects.get_for_model(model))
+        try:
+            return self.get(content_type=ContentType.objects.get_for_model(model))
+        except EtlTask.DoesNotExist:
+            raise EtlTask.DoesNotExist(f"EtlTask for model '{model.__name__}' does not exists")
 
     def get_for_task(self, task: ETLTask):
         return self.get_or_create(task=task.name,
@@ -55,6 +58,10 @@ class EtlTask(models.Model):
 
     def __str__(self):
         return f"{self.task} {self.status}"
+
+    @cached_property
+    def lock_key(self):
+        return f"{self.task}-lock"
 
     @cached_property
     def verbose_name(self):

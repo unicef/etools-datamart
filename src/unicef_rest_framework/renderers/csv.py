@@ -13,8 +13,9 @@ class CSVRenderer(r.CSVRenderer):
         if response.status_code != 200:
             return ''
         try:
-            data = dict(data)['results']
-            return super().render(data, media_type, renderer_context or {}, writer_opts)
+            if data and 'results' in data:
+                data = dict(data)['results']
+            return super().render(data, media_type, renderer_context, writer_opts)
         except Exception as e:
             process_exception(e)
             logger.exception(e)

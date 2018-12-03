@@ -8,7 +8,7 @@ UNCHANGED = 'unchanged'
 class EtlResult:
     __slots__ = [CREATED, UPDATED, UNCHANGED]
 
-    def __init__(self, updated=0, created=0, unchanged=0):
+    def __init__(self, updated=0, created=0, unchanged=0, **kwargs):
         self.created = created
         self.updated = updated
         self.unchanged = unchanged

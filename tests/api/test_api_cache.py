@@ -44,7 +44,7 @@ def test_etag(client, admin_user, data_service, django_assert_num_queries):
     assert res['etag'] == etag
 
 
-@pytest.mark.parametrize("fmt", ["pdf", "csv", "xlsx", "xhtml", "json", "ms-xml", "xml", "ms-json"])
+@pytest.mark.parametrize("fmt", ["pdf", "csv", "xlsx", "json", "ms-xml", "xml", "ms-json"])
 def test_cache_renderers(fmt, client, admin_user, data_service, django_assert_num_queries):
     url = f"{data_service.endpoint}?country_name=bolivia&format={fmt}"
     client.force_authenticate(admin_user)

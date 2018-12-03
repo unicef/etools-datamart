@@ -3,6 +3,7 @@
 * add ability to create 'per model' custom templates for html/pdf renderers
     new `TEMPLATE_CACHE_URL` enironment variable
 * fixes error in some renderers with cached response
+* Adopting of RabbitMQ to prevent message loss
 
 
 1.7
