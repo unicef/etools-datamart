@@ -299,7 +299,7 @@ class Synchronizer:
         return user_info
 
     def sync_user(self, user, azure_id=None):
-        if not azure_id or user.azure_id:
+        if not (azure_id or user.azure_id):
             raise ValueError("Cannot sync user without azure_id")
         url = "%s/%s" % (self._baseurl, azure_id or user.azure_id)
         user_info = self.get_page(url, single=True)
