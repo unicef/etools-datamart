@@ -29,7 +29,7 @@ def user(db):
 def test_token(user, client):
     url = reverse('api:partners-list', args=['v1'])
     client.credentials(HTTP_AUTHORIZATION='jwt ' + TOKEN)
-    with mock.patch('unicef_security.azure.Synchronizer.get_user',
+    with mock.patch('unicef_security.graph.Synchronizer.get_user',
                     return_value={'@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#users/$entity',
                                   'id': '21d2ecba-83e4-4e81-a93c-d44f55dd222e', 'businessPhones': [],
                                   'displayName': 'Stefano Apostolico', 'givenName': 'Stefano', 'jobTitle': None,
