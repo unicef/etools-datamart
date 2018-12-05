@@ -14,6 +14,7 @@ from jwt import decode as jwt_decode, DecodeError, ExpiredSignature
 from social_core.backends.azuread_tenant import AzureADTenantOAuth2
 from social_core.exceptions import AuthTokenError
 from social_django.models import UserSocialAuth
+from unicef_security.config import GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET
 
 from . import config
 
@@ -175,7 +176,10 @@ NotSet = object()
 
 
 class Synchronizer:
-    def __init__(self, user_model=None, mapping=None, echo=None):
+    def __init__(self, user_model=None, mapping=None, echo=None, id=None, secret=None):
+        self.id = id or GRAPH_CLIENT_ID
+        self.secret = secret or GRAPH_CLIENT_SECRET
+
         self.user_model = user_model or get_user_model()
         self.field_map = dict(mapping or DJANGOUSERMAP)
         self.user_pk_fields = self.field_map.pop('_pk')
@@ -188,13 +192,13 @@ class Synchronizer:
         self.echo = echo or (lambda l: True)
 
     def get_token(self):
-        if not config.UNICEF_AZURE_CLIENT_ID and config.UNICEF_AZURE_CLIENT_SECRET:
+        if not self.id and self.secret:
             raise ValueError("Configure AZURE_CLIENT_ID and/or AZURE_CLIENT_SECRET")
         token = cache.get(AZURE_GRAPH_API_TOKEN_CACHE_KEY)
         if not token:
             post_dict = {'grant_type': 'client_credentials',
-                         'client_id': config.UNICEF_AZURE_CLIENT_ID,
-                         'client_secret': config.UNICEF_AZURE_CLIENT_SECRET,
+                         'client_id': self.id,
+                         'client_secret': self.secret,
                          'resource': config.AZURE_GRAPH_API_BASE_URL}
             response = requests.post(config.AZURE_TOKEN_URL, post_dict)
             if response.status_code != 200:  # pragma: no cover
@@ -266,19 +270,38 @@ class Synchronizer:
         pk = {fieldname: data.pop(fieldname) for fieldname in self.user_pk_fields}
         return pk, data
 
-    def fetch_users(self, filter):
+    def fetch_users(self, filter, callback=None):
         self.startUrl = "%s?$filter=%s" % (self._baseurl, filter)
-        return self.syncronize()
+        return self.syncronize(callback=callback)
+
+    def search_users(self, record):
+        url = "%s?$filter=" % self._baseurl
+        filters = []
+        if record.email:
+            filters.append("mail eq '%s'" % record.email)
+        if record.last_name:
+            filters.append("surname eq '%s'" % record.last_name)
+        if record.first_name:
+            filters.append("givenName eq '%s'" % record.first_name)
+
+        page = self.get_page(url + " or ".join(filters), single=True)
+        return page['value']
+
+    def filter_users_by_email(self, email):
+        """https://graph.microsoft.com/v1.0/users?$filter=mail eq 'sapostolico@unicef.org'"""
+        url = "%s?$filter=mail eq '%s'" % (self._baseurl, email)
+        page = self.get_page(url, single=True)
+        return page['value']
 
     def get_user(self, username):
         url = "%s/%s" % (self._baseurl, username)
         user_info = self.get_page(url, single=True)
         return user_info
 
-    def sync_user(self, user):
-        if not user.azure_id:
+    def sync_user(self, user, azure_id=None):
+        if not azure_id or user.azure_id:
             raise ValueError("Cannot sync user without azure_id")
-        url = "%s/%s" % (self._baseurl, user.azure_id)
+        url = "%s/%s" % (self._baseurl, azure_id or user.azure_id)
         user_info = self.get_page(url, single=True)
         pk, values = self.get_record(user_info)
         user, __ = self.user_model.objects.update_or_create(**pk,
@@ -291,22 +314,21 @@ class Synchronizer:
         return self.syncronize(max_records)
 
     def is_valid(self, user_info):
-        return (user_info.get('email') and
-                user_info.get('first_name') and
-                user_info.get('last_name') and
-                'noreply' not in user_info.get('email'))
+        return user_info.get('email')
 
-    def syncronize(self, max_records=None):
+    def syncronize(self, max_records=None, callback=None):
         logger.debug("Start Azure user synchronization")
         results = SyncResult()
         try:
             for i, user_info in enumerate(iter(self)):
                 pk, values = self.get_record(user_info)
                 if self.is_valid(values):
-                    user_data = self.user_model.objects.update_or_create(**pk,
-                                                                         defaults=values)
-                    self.echo(user_data)
-                    results.log(user_data)
+                    user, created = self.user_model.objects.update_or_create(**pk,
+                                                                             defaults=values)
+                    if callback:
+                        callback(user=user, is_new=created)
+                    self.echo([user, created])
+                    results.log(user, created)
                 else:
                     results.log(user_info)
                 if max_records and i > max_records:

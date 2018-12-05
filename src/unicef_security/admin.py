@@ -5,9 +5,10 @@ from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
+from django.forms import Form
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
-from unicef_security.azure import Synchronizer, SyncResult
+from unicef_security.graph import default_group, Synchronizer, SyncResult
 from unicef_security.models import BusinessArea, Region, Role, User
 from unicef_security.sync import load_business_area, load_region
 
@@ -42,13 +43,17 @@ class LoadUsersForm(forms.Form):
     emails = forms.CharField(widget=forms.Textarea)
 
 
+class FF(Form):
+    selection = forms.CharField()
+
+
 @admin.register(User)
 class UserAdmin2(ExtraUrlMixin, UserAdmin):
     list_display = ['username', 'email', 'is_staff', 'is_superuser']
     list_filter = ['is_superuser', 'is_staff']
     search_fields = ['username', ]
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': (('username', 'azure_id'), 'password')}),
         (_('Personal info'), {'fields': (('first_name', 'last_name',),
                                          ('email', 'display_name'),
                                          ('job_title',),
@@ -81,6 +86,38 @@ class UserAdmin2(ExtraUrlMixin, UserAdmin):
 
         self.message_user(request, "User synchronized")
 
+    @action(label='Link user')
+    def link_user_data(self, request, pk):
+        opts = self.model._meta
+        ctx = {
+            'opts': opts,
+            'app_label': 'security',
+            'change': True,
+            'is_popup': False,
+            'save_as': False,
+            'has_delete_permission': False,
+            'has_add_permission': False,
+            'has_change_permission': True,
+        }
+        obj = self.get_object(request, pk)
+        syncronizer = Synchronizer()
+        try:
+            if request.method == 'POST':
+                if request.POST.get('selection'):
+                    data = syncronizer.get_user(request.POST.get('selection'))
+                    syncronizer.sync_user(obj, data['id'])
+                    self.message_user(request, "User linked")
+                    return None
+                else:
+                    ctx['message'] = 'Select one entry to link'
+
+            data = syncronizer.search_users(obj)
+            ctx['data'] = data
+            return TemplateResponse(request, 'admin/link_user.html', ctx)
+
+        except Exception as e:
+            self.message_user(request, str(e), messages.ERROR)
+
     @link()
     def load(self, request):
         opts = self.model._meta
@@ -101,7 +138,8 @@ class UserAdmin2(ExtraUrlMixin, UserAdmin):
                 emails = form.cleaned_data['emails'].split()
                 total_results = SyncResult()
                 for email in emails:
-                    result = synchronizer.fetch_users("startswith(mail,'%s')" % email)
+                    result = synchronizer.fetch_users("startswith(mail,'%s')" % email,
+                                                      callback=default_group)
                     total_results += result
                 self.message_user(request, f"{len(total_results.created)} users have been created,"
                                            f"{len(total_results.updated)} updated."

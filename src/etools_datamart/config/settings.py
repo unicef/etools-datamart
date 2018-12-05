@@ -183,7 +183,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     # 'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
-    'unicef_security.azure.AzureADTenantOAuth2Ext',
+    'unicef_security.graph.AzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 ]
@@ -460,7 +460,7 @@ SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', ]
 SOCIAL_AUTH_REVOKE_TOKENS_ON_DISCONNECT = True
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
-    'unicef_security.azure.get_unicef_user',
+    'unicef_security.graph.get_unicef_user',
     # 'unicef_security.azure.social_uid',
     # 'social_core.pipeline.social_auth.social_uid',
     # 'social_core.pipeline.social_auth.social_user',
@@ -472,7 +472,7 @@ SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.social_auth.load_extra_data',
     # 'social_core.pipeline.user.user_details',
     # 'social_core.pipeline.social_auth.associate_by_email',
-    'unicef_security.azure.default_group',
+    'unicef_security.graph.default_group',
 )
 
 SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_KEY = env.str('AZURE_CLIENT_ID')

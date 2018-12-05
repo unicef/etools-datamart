@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import exceptions
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework_jwt import authentication
-from unicef_security.azure import default_group, Synchronizer
+from unicef_security.graph import default_group, Synchronizer
 
 logger = logging.getLogger()
 

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import vcr
-from unicef_security.azure import Synchronizer
+from unicef_security.graph import Synchronizer
 
 
 def test_token():

@@ -5,7 +5,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from . import config
-from .azure import SyncResult
+from .graph import SyncResult
 from .models import BusinessArea, Region
 
 logger = logging.getLogger(__name__)
