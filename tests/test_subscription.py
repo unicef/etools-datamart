@@ -65,7 +65,7 @@ def test_subscribe_404(rf, admin_user, etltask):
     request = rf.post(reverse("subscribe", args=[etltask.pk]),
                       {"type": 1}, content_type='application/json')
     request.user = admin_user
-    res = subscribe(request, 21)
+    res = subscribe(request, -99)
     assert res.status_code == 404
 
 

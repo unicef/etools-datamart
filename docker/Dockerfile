@@ -55,7 +55,6 @@ LABEL org.label.name="eTools Datamart" \
 
 
 ARG BUILD_DATE
-ARG PIPENV_PYPI_MIRROR
 ARG PIPENV_ARGS
 ARG VERSION
 
@@ -117,7 +116,7 @@ WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
-    && pipenv install --system --deploy --ignore-pipfile $PIPENV_ARGS
+    && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
 
 RUN pip install . \
     && rm -fr /code

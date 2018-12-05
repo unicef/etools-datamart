@@ -11,7 +11,6 @@ description = """
 
 Each API endpoint allows filtering and/or ordering results.
 
-Fiel
 ## Query lookups
 
 Any field where query functions are enabled allow to....

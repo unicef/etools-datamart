@@ -14,11 +14,11 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
 
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
-                  API_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
-                  LOCK_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
-                  TEMPLATE_CACHE_URL=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
+                  CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
+                  CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
+                  CACHE_URL_TEMPLATE=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
                   # CACHE_URL=(str, "dummycache://"),
-                  # API_CACHE_URL=(str, "dummycache://"),
+                  # CACHE_URL_API=(str, "dummycache://"),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
                   ENABLE_LIVE_STATS=(bool, True),
@@ -190,9 +190,9 @@ AUTHENTICATION_BACKENDS = [
 
 CACHES = {
     'default': env.cache(),
-    'lock': env.cache('LOCK_CACHE_URL'),
-    'api': env.cache('API_CACHE_URL'),
-    'dbtemplates': env.cache('TEMPLATE_CACHE_URL')
+    'lock': env.cache('CACHE_URL_LOCK'),
+    'api': env.cache('CACHE_URL_API'),
+    'dbtemplates': env.cache('CACHE_URL_TEMPLATE')
 }
 
 ROOT_URLCONF = 'etools_datamart.config.urls'

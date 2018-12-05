@@ -10,6 +10,7 @@ from django.utils.timezone import now
 from strategy_field.utils import fqn
 
 from etools_datamart.apps.tracking import config
+from etools_datamart.apps.tracking.asyncqueue import AsyncQueue
 
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
 
@@ -118,10 +119,14 @@ def record_to_kwargs(request, response):
                 cached=request.api_info.get('cache-hit', False),  # see api.common.APICacheResponse
                 content_type=media_type)
 
+
 #
-# class AsyncLogger(AsyncQueue):
-#     def _process(self, record):
-#         log_request(**record_to_kwargs(**record))
+class AsyncLogger(AsyncQueue):
+    def _process(self, record):
+        # import requests
+        # payload = 'v=1&t=event&tid=UA-XXXXXY&cid=555&ec=video&ea=play&el=holiday&ev=300'
+        # r = requests.post('http://www.google-analytics.com/collect', data=payload)
+        log_request(**record_to_kwargs(**record))
 
 
 class StatsMiddleware(object):
@@ -143,11 +148,11 @@ class StatsMiddleware(object):
             self.log(request, response)
         return response
 
-#
-# class ThreadedStatsMiddleware(StatsMiddleware):
-#     def __init__(self, get_response):
-#         super(ThreadedStatsMiddleware, self).__init__(get_response)
-#         self.worker = AsyncLogger()
-#
-#     def log(self, request, response):
-#         self.worker.queue({'request': request, 'response': response})
+
+class ThreadedStatsMiddleware(StatsMiddleware):
+    def __init__(self, get_response):
+        super(ThreadedStatsMiddleware, self).__init__(get_response)
+        self.worker = AsyncLogger()
+
+    def log(self, request, response):
+        self.worker.queue({'request': request, 'response': response})

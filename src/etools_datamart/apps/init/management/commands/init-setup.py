@@ -103,13 +103,6 @@ class Command(BaseCommand):
             default=False,
             help='refresh datamart tables')
 
-        parser.add_argument(
-            '--async',
-            action='store_true',
-            dest='_async',
-            default=False,
-            help='use celery to refresh datamart')
-
     def handle(self, *args, **options):
         verbosity = options['verbosity']
         migrate = options['migrate']
@@ -228,10 +221,6 @@ class Command(BaseCommand):
                 self.stdout.write(f"Running {task.name}...", ending='\r')
                 self.stdout.flush()
 
-                if options['_async']:
-                    etl.delay()
-                    self.stdout.write(f"{task.name} scheduled")
-                else:
-                    etl.apply()
-                    cost = naturaldelta(app.timers[task.name])
-                    self.stdout.write(f"{task.name} excuted in {cost}")
+                etl.apply()
+                cost = naturaldelta(app.timers[task.name])
+                self.stdout.write(f"{task.name} excuted in {cost}")
