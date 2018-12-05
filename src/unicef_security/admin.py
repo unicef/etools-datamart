@@ -49,7 +49,7 @@ class FF(Form):
 
 @admin.register(User)
 class UserAdmin2(ExtraUrlMixin, UserAdmin):
-    list_display = ['username', 'email', 'is_staff', 'is_superuser']
+    list_display = ['username', 'email', 'is_staff', 'is_superuser', 'is_linked']
     list_filter = ['is_superuser', 'is_staff']
     search_fields = ['username', ]
     fieldsets = (
@@ -68,12 +68,12 @@ class UserAdmin2(ExtraUrlMixin, UserAdmin):
             'fields': ('username', 'password1', 'password2'),
         }),
     )
+    readonly_fields = ('azure_id', 'job_title', 'display_name')
 
-    # @link()
-    # def sync(self, request):
-    #     from .tasks import sync_users
-    #     sync_users.delay()
-    #     self.message_user(request, "User synchronization scheduled")
+    def is_linked(self, obj):
+        return bool(obj.azure_id)
+
+    is_linked.boolean = True
 
     @action(label='Sync')
     def sync_user(self, request, pk):

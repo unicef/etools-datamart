@@ -150,7 +150,7 @@ class Command(BaseCommand):
             loc = values.get('LOCATION', '')
             spec = urlparse(loc)
             if spec.scheme == 'redis':
-                RedisServer.objects.get_or_create(hostname=spec.netloc,
+                RedisServer.objects.get_or_create(hostname=spec.hostname,
                                                   port=int(spec.port))
 
         if os.environ.get('AUTOCREATE_USERS'):
