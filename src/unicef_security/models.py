@@ -102,6 +102,7 @@ class User(AbstractUser, TimeStampedModel):
 class Role(models.Model, TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    business_area = models.ForeignKey(BusinessArea, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'unicef_security'

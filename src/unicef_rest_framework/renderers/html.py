@@ -12,7 +12,7 @@ def labelize(v):
 
 
 class HTMLRenderer(BaseRenderer):
-    media_type = 'text/xhtml'
+    media_type = 'text/html'
     format = 'xhtml'
     charset = 'utf-8'
     render_style = 'text'

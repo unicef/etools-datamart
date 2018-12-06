@@ -80,7 +80,7 @@ local:
 	$(MAKE) .run
 
 release:
-	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+	echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}

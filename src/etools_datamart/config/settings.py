@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import os
 from pathlib import Path
 
 import environ
@@ -207,11 +208,12 @@ TEMPLATES = [
         'APP_DIRS': False,
         'OPTIONS': {
             'loaders': [
+                'dbtemplates.loader.Loader',
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
-                # 'dbtemplates.loader.Loader',
             ],
             'context_processors': [
+                'constance.context_processors.config',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'etools_datamart.apps.multitenant.context_processors.schemas',
@@ -383,6 +385,7 @@ AZURE_LOCATION = env('AZURE_LOCATION')
 CONSTANCE_CONFIG = {
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
     'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
+    'ANALYTICS_CODE': (env('ANALYTICS_CODE'), 'Google analytics code'),
 }
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
@@ -606,3 +609,12 @@ ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')
 
 BUSINESSAREA_MODEL = 'unicef_security.BusinessArea'
 AUTH_USER_MODEL = 'unicef_security.User'
+
+
+def extra(r):
+    return {'AZURE_CLIENT_ID': os.environ['AZURE_CLIENT_ID'],
+            'GRAPH_CLIENT_ID': os.environ['GRAPH_CLIENT_ID'],
+            'AZURE_TENANT': os.environ['AZURE_TENANT']}
+
+
+SYSINFO = {"extra": {'Azure': extra}}

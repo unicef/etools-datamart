@@ -137,6 +137,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
             for fieldname_arg in self.query_params:
                 raw_value = self.query_params.get(fieldname_arg)
+                if not raw_value:
+                    continue
                 negate = fieldname_arg[-1] == "!"
 
                 if negate:

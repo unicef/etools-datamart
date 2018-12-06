@@ -33,7 +33,7 @@
             <th>{{ v }}</th>
         {% endfor %}
     </tr>
-    {% for row in data.results %}
+    {% for row in data %}
         <tr class="{% cycle "odd" "even" %}">
             {% for k,v in row.items %}
                 <td class="{% cycle "odd" "even" %}">{{ v }}</td>
