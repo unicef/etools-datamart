@@ -268,7 +268,7 @@ INSTALLED_APPS = [
     'etools_datamart.config.admin.AdminConfig',
 
     'admin_extra_urls',
-    'unicef_rest_framework',
+    'unicef_rest_framework.apps.Config',
     'rest_framework',
     'oauth2_provider',
     'social_django',

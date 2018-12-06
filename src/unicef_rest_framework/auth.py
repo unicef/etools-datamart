@@ -40,7 +40,6 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
         if not username:
             msg = _('Invalid payload.')
             raise exceptions.AuthenticationFailed(msg)
-        created = False
         try:
             user = User.objects.get_by_natural_key(username)
         except User.DoesNotExist:

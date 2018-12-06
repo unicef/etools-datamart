@@ -49,9 +49,10 @@ class FF(Form):
 
 @admin.register(User)
 class UserAdmin2(ExtraUrlMixin, UserAdmin):
-    list_display = ['username', 'email', 'is_staff', 'is_superuser', 'is_linked']
+    list_display = ['username', 'display_name', 'email', 'is_staff',
+                    'is_superuser', 'is_linked', 'last_login']
     list_filter = ['is_superuser', 'is_staff']
-    search_fields = ['username', ]
+    search_fields = ['username', 'display_name']
     fieldsets = (
         (None, {'fields': (('username', 'azure_id'), 'password')}),
         (_('Personal info'), {'fields': (('first_name', 'last_name',),
