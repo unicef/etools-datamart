@@ -13,7 +13,7 @@ DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 
 env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
-
+                  ANALYTICS_CODE=(str, ""),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
                   CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
