@@ -28,9 +28,10 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('name', 'cache_version', 'get_cache_ttl', 'cache_key')
     search_fields = ('name', 'viewset')
     actions = ['incr_version', 'reset_version', 'generate_cache_token']
-    readonly_fields = ('cache_key', )
+    readonly_fields = ('cache_key', 'name')
     list_filter = ('hidden',)
     form = CacheVersionForm
+    fieldsets = [("", {"fields": ('name', 'cache_version', 'cache_ttl', 'cache_key')})]
 
     def get_queryset(self, request):
         return super(CacheVersionAdmin, self).get_queryset(request). \
@@ -54,7 +55,7 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     @action(label='View Service')
     def goto_service(self, request, pk):
-        url = reverse("admin:core_service_change", args=[pk])
+        url = reverse("admin:unicef_rest_framework_service_change", args=[pk])
         return HttpResponseRedirect(url)
 
     @link(label='Reset cache', css_class="btn btn-danger", icon="fa fa-warning icon-white")

@@ -15,8 +15,13 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
         # in the real flow, this is added by the MultiTenant Middleware
         # but this function is called before the middleware system is involved
         request = ctx['request']
-        for key, value in request.api_info.items():
-            ctx['response_headers'][key] = request.api_info.str(key)
+        view = ctx['view']
+        for key, value in sorted(request.api_info.items()):
+            if key not in ['cache-hit']:
+                ctx['response_headers'][key] = request.api_info.str(key)
+
+        ctx['extra_actions'] = view.get_extra_action_url_map()
+        ctx['base_action'] = reverse(f'api:{view.basename}-list', args=['latest'])
 
         if request.user.is_staff:
             try:
@@ -25,4 +30,9 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
                 ctx['admin_url'] = admin_url
             except Exception:  # pragma: no cover
                 pass
+
+        try:
+            ctx['iqy_url'] = ctx['extra_actions'].pop('Iqy')
+        except Exception:  # pragma: no cover
+            pass
         return ctx

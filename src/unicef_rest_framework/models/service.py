@@ -127,9 +127,8 @@ class Service(MasterDataModel):
     def endpoint(self):
         for __, viewset, base_name in conf.ROUTER.registry:
             if viewset == self.viewset:
-                return reverse(f'api:{base_name}-list', args=['v1'])
-        else:
-            return None
+                return reverse(f'api:{base_name}-list', args=['latest'])
+        return None
 
     @cached_property
     def display_name(self):
@@ -152,7 +151,6 @@ class Service(MasterDataModel):
                 model = v.get_queryset().model
                 ct = ContentType.objects.get_for_model(model)
                 self.linked_models.add(ct)
-                self.viewset._service = None
             except Exception as e:
                 logger.exception(e)
         super(Service, self).save(force_insert, force_update, using, update_fields)
