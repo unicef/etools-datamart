@@ -91,13 +91,13 @@ class Subscription(models.Model):
     def __str__(self):
         return f"#{self.pk} {self.user} {self.get_type_display()} {self.content_type}"
 
-    @cached_property
-    def endpoint(self):
-        return self.content_type.model_class().service.endpoint
-
-    @cached_property
-    def service(self):
-        return self.content_type.model_class().service
+    # @cached_property
+    # def endpoint(self):
+    #     return self.content_type.model_class().service.endpoint
+    #
+    # @cached_property
+    # def service(self):
+    #     return self.content_type.model_class().service
 
     @cached_property
     def viewset(self):

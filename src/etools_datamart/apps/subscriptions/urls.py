@@ -21,8 +21,12 @@ def http_basic_auth(func):
                 if user:
                     login(request, user, backend='django.contrib.auth.backends.RemoteUserBackend')
                 else:
-                    return HttpResponse(status=401)
-        return func(request, *args, **kwargs)
+                    return HttpResponse(status=403)
+
+        if request.user.is_authenticated:
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponse(status=401)
 
     return _decorator
 

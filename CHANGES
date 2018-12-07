@@ -6,6 +6,7 @@
 * fixes error in some renderers with cached response
 * Adopting of RabbitMQ to prevent message loss
 * new admin index page
+* Excel IQY support (beta)
 
 
 1.7

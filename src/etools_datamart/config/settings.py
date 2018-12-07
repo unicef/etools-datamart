@@ -418,6 +418,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
     "PAGE_SIZE": 100,
+    'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'unicef_rest_framework.negotiation.CT',
     # "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
     'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',

@@ -11,14 +11,16 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework_xml.renderers import XMLRenderer
 from rest_framework_yaml.renderers import YAMLRenderer
 from strategy_field.utils import fqn
-from unicef_rest_framework import acl
-from unicef_rest_framework.auth import JWTAuthentication
-from unicef_rest_framework.cache import cache_response, etag, ListKeyConstructor
-from unicef_rest_framework.filtering import SystemFilterBackend
-from unicef_rest_framework.permissions import ServicePermission
-from unicef_rest_framework.renderers import (APIBrowsableAPIRenderer, HTMLRenderer, MSJSONRenderer,
-                                             MSXmlRenderer, PDFRenderer, XLSXRenderer,)
-from unicef_rest_framework.renderers.csv import CSVRenderer
+
+from . import acl
+from .auth import IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
+from .cache import cache_response, etag, ListKeyConstructor
+from .filtering import SystemFilterBackend
+from .negotiation import CT
+from .permissions import ServicePermission
+from .renderers import (APIBrowsableAPIRenderer, HTMLRenderer, IQYRenderer, MSJSONRenderer,
+                        MSXmlRenderer, PDFRenderer, TextRenderer, XLSXRenderer,)
+from .renderers.csv import CSVRenderer
 
 
 class classproperty(object):
@@ -40,10 +42,15 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     list_etag_func = ListKeyConstructor()
 
     authentication_classes = (SessionAuthentication,
+                              IPBasedAuthentication,
                               JWTAuthentication,
                               BasicAuthentication,
-                              TokenAuthentication)
+                              TokenAuthentication,
+                              IPBasedAuthentication,
+                              URLTokenAuthentication,
+                              )
     default_access = acl.ACL_ACCESS_LOGIN
+    content_negotiation_class = CT
     filter_backends = [SystemFilterBackend,
                        QueryStringFilterBackend,
                        OrderingFilter]
@@ -57,6 +64,8 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
                         MSJSONRenderer,
                         XMLRenderer,
                         MSXmlRenderer,
+                        TextRenderer,
+                        IQYRenderer,
                         ]
     ordering_fields = ('id',)
     ordering = 'id'
@@ -75,6 +84,11 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
             request.api_info["service"] = self.get_service()
 
         return super().dispatch(request, *args, **kwargs)
+
+    # def filter_queryset(self, queryset):
+    #     if hasattr(self.request, 'api_info'):
+    #         self.request.api_info["sql"] = str(queryset.query)
+    #     return super().filter_queryset(queryset)
 
     @classproperty
     def label(cls):

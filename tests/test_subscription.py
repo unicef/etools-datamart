@@ -1,7 +1,10 @@
+import base64
 import json
+from unittest.mock import MagicMock
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.http import HttpResponse
 from django.urls import reverse
 from test_utilities.factories import EmailTemplateFactory, HACTFactory, SubscriptionFactory
 from unicef_rest_framework.test_utils import user_allow_service
@@ -9,6 +12,7 @@ from unicef_rest_framework.test_utils import user_allow_service
 from etools_datamart.apps.data.models import HACT
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.subscriptions.models import Subscription
+from etools_datamart.apps.subscriptions.urls import http_basic_auth
 from etools_datamart.apps.subscriptions.views import subscribe
 
 
@@ -103,3 +107,60 @@ def test_notification_email_attachment(subscription_attachment: Subscription, em
     assert len(emails) == 1
     assert emails[0].to == [subscription_attachment.user.email]
     assert emails[0].attachments.count() == 1
+
+
+def test_http_basic_auth_401(rf):
+    request = rf.get('/')
+    request.user = AnonymousUser()
+
+    def view(request):
+        return 11
+
+    f = http_basic_auth(view)
+    res = f(request)
+    assert res.status_code == 401
+
+
+def test_http_basic_auth_401b(rf, admin_user):
+    string = '%s:%s' % ('admin', '--')
+    base64string = base64.standard_b64encode(string.encode('utf-8'))
+    request = rf.get('/', HTTP_AUTHORIZATION="Digest %s" % base64string.decode('utf-8'))
+    request.user = AnonymousUser()
+    request.session = MagicMock()
+
+    def view(request):
+        return HttpResponse("Ok")
+
+    f = http_basic_auth(view)
+    res = f(request)
+    assert res.status_code == 401
+
+
+def test_http_basic_auth_400(rf, admin_user):
+    string = '%s:%s' % ('admin', '--')
+    base64string = base64.standard_b64encode(string.encode('utf-8'))
+    request = rf.get('/', HTTP_AUTHORIZATION="Basic %s" % base64string.decode('utf-8'))
+    request.user = AnonymousUser()
+    request.session = MagicMock()
+
+    def view(request):
+        return HttpResponse("Ok")
+
+    f = http_basic_auth(view)
+    res = f(request)
+    assert res.status_code == 403
+
+
+def test_http_basic_auth_200(rf, admin_user):
+    string = '%s:%s' % ('admin', 'password')
+    base64string = base64.standard_b64encode(string.encode('utf-8'))
+    request = rf.get('/', HTTP_AUTHORIZATION="Basic %s" % base64string.decode('utf-8'))
+    request.user = AnonymousUser()
+    request.session = MagicMock()
+
+    def view(request):
+        return HttpResponse("Ok")
+
+    f = http_basic_auth(view)
+    res = f(request)
+    assert res.status_code == 200

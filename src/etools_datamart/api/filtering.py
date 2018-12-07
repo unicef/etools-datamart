@@ -20,13 +20,7 @@ class CountryNameProcessor:
     def process_country_name(self, efilters, eexclude, field, value, request,
                              op, param, negate, **payload):
         filters = {}
-        if not value:
-            if not request.user.is_superuser:
-                allowed = get_etools_allowed_schemas(request.user)
-                if not allowed:  # pragma: no cover
-                    raise PermissionDenied("You don't have enabled schemas")
-                filters['country_name__iregex'] = r'(' + '|'.join(allowed) + ')'
-        else:
+        if value:
             value = set(value.lower().split(","))
             validate_schemas(*value)
             if not request.user.is_superuser:
@@ -34,6 +28,12 @@ class CountryNameProcessor:
                 if not user_schemas.issuperset(value):
                     raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
             filters['country_name__iregex'] = r'(' + '|'.join(value) + ')'
+        else:
+            if not request.user.is_superuser:
+                allowed = get_etools_allowed_schemas(request.user)
+                if not allowed:  # pragma: no cover
+                    raise PermissionDenied("You don't have enabled schemas")
+                filters['country_name__iregex'] = r'(' + '|'.join(allowed) + ')'
 
         if negate:
             return {}, filters

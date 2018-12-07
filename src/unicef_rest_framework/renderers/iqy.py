@@ -11,17 +11,17 @@ def labelize(v):
     return v.replace("_", " ").title()
 
 
-class HTMLRenderer(BaseRenderer):
-    media_type = 'text/html'
-    format = 'xhtml'
+class IQYRenderer(BaseRenderer):
+    media_type = 'text/plain'
+    format = 'iqy'
     charset = 'utf-8'
     render_style = 'text'
 
     def get_template(self, meta):
         return loader.select_template([
-            f'renderers/html/{meta.app_label}/{meta.model_name}.html',
-            f'renderers/html/{meta.app_label}/html.html',
-            'renderers/html.html'])
+            f'renderers/iqy/{meta.app_label}/{meta.model_name}.txt',
+            f'renderers/iqy/{meta.app_label}/iqy.txt',
+            'renderers/iqy.txt'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         response = renderer_context['response']

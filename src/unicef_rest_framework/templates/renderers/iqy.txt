@@ -1,0 +1,2 @@
+<table><tr>{% for v in headers %}<th>{{ v }}</th>{% endfor %}{% for row in data %}
+<tr>{% for k,v in row.items %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</table>

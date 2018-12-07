@@ -1,0 +1,2 @@
+{% for v in headers %}{{ v }}   {% endfor %}{% for row in data %}
+{% for k,v in row.items %}{{ v }} {% endfor %}{% endfor %}

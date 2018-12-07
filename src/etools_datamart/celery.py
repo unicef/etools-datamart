@@ -4,11 +4,6 @@ from time import time
 from celery import Celery
 from celery.contrib.abortable import AbortableTask
 from celery.signals import task_postrun, task_prerun
-from django.apps import apps
-# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
-#                        related_name='tasks')
-# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()],
-#                        related_name='etl')
 from kombu import Exchange, Queue
 from kombu.serialization import register
 
@@ -62,8 +57,8 @@ class DatamartCelery(Celery):
 
 app = DatamartCelery('datamart')
 app.config_from_object('django.conf:settings', namespace='CELERY')
-# app.autodiscover_tasks()
-app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])
+app.autodiscover_tasks()
+# app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])  # pragma
 
 app.timers = {}
 app.conf.task_queues = (

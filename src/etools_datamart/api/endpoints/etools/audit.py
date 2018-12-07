@@ -7,3 +7,5 @@ from etools_datamart.apps.etools import models
 class EngagementViewSet(common.APIMultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.EngagementSerializer
     queryset = models.AuditEngagement.objects.all()
+    filter_fields = ['joint_audit', 'status', 'engagement_type',
+                     'cancel_comment']

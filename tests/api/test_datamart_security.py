@@ -29,9 +29,7 @@ def user_data(db):
 
 
 PARAMS = [("", 200, 3),
-          ("country_name=", 200, 1),
           ("country_name=lebanon", 200, 1),
-          ("country_name!=lebanon", 200, 2),
           ("country_name!=lebanon", 200, 2),
           ]
 
@@ -48,7 +46,7 @@ def test_datamart_user_access_allowed_countries(user, url, code, expected, user_
     with user_allow_service(user, UserStatsViewSet):
         res = client.get(f"{base}?{url}")
         assert res.status_code == code, res
-        assert len(res.json()['results']) == expected
+        assert len(res.json()['results']) == expected, res.json()
 
 
 def test_datamart_user_access_forbidden_countries(user, user_data):

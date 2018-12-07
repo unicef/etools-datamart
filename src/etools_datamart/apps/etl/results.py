@@ -1,4 +1,5 @@
 import json
+from json.decoder import WHITESPACE
 
 CREATED = 'created'
 UPDATED = 'updated'
@@ -35,7 +36,14 @@ class EtlResult:
         return False
 
 
+class EtlDecoder(json.JSONDecoder):
+
+    def decode(self, s, _w=WHITESPACE.match):
+        return super().decode(s, _w)
+
+
 class EtlEncoder(json.JSONEncoder):
+
     def default(self, obj):
         if isinstance(obj, EtlResult):
             return {
@@ -60,4 +68,4 @@ def etl_dumps(obj):
 
 # Decoder function
 def etl_loads(obj):
-    return json.loads(obj, object_hook=etl_decoder)
+    return json.loads(obj, cls=EtlDecoder, object_hook=etl_decoder)

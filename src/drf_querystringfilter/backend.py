@@ -123,7 +123,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
         - exclude null values: country__not=><
         - only values in list: &country__id__in=176,20
-        - exclude values in list: &country__id__not_in=176,20
+        - exclude values in list: &country__id=176,20
 
         """
         self.opts = queryset.model._meta
@@ -137,8 +137,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
             for fieldname_arg in self.query_params:
                 raw_value = self.query_params.get(fieldname_arg)
-                if not raw_value:
-                    continue
+                if raw_value in ["''", '""']:
+                    raw_value = ""
+
                 negate = fieldname_arg[-1] == "!"
 
                 if negate:
@@ -168,6 +169,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
                     processor = getattr(self, 'process_{}'.format(filter_field_name), None)
                     if (filter_field_name not in filter_fields) and (not processor):
                         raise InvalidQueryArgumentError(filter_field_name)
+                    if raw_value is None and not processor:
+                        continue
                     # field is configured in Serializer
                     # so we use 'source' attribute
                     if filter_field_name in mapping:

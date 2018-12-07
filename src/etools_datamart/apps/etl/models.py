@@ -10,6 +10,9 @@ from etools_datamart.celery import app, ETLTask
 
 
 class TaskLogManager(models.Manager):
+    def filter_for_models(self, *models):
+        return self.filter(content_type__in=ContentType.objects.get_for_models(*models).values())
+
     def get_for_model(self, model: DataMartModel):
         try:
             return self.get(content_type=ContentType.objects.get_for_model(model))

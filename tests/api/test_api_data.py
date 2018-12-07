@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import pytest
+from dateutil.utils import today
+from django.contrib.contenttypes.models import ContentType
 from test_utilities.factories import (FAMIndicatorFactory, HACTFactory, InterventionFactory,
-                                      PMPIndicatorFactory, UserStatsFactory,)
+                                      PMPIndicatorFactory, TaskLogFactory, UserStatsFactory,)
 
 from etools_datamart.api.endpoints import (FAMIndicatorViewSet, HACTViewSet, InterventionViewSet,
                                            PMPIndicatorsViewSet, UserStatsViewSet,)
+from etools_datamart.apps.data.models import FAMIndicator
 from etools_datamart.apps.etl.models import EtlTask
 
 VIEWSETS = [
@@ -50,6 +53,16 @@ def test_list(client, action, viewset, format, ct, data):
     assert res.status_code == 200, res
     assert res.content
     assert res['Content-Type'] == ct
+
+
+def test_updates(client):
+    viewset = FAMIndicatorViewSet()
+    TaskLogFactory(last_changes=today(),
+                   content_type=ContentType.objects.get_for_model(FAMIndicator))
+
+    url = f"{viewset.get_service().endpoint}updates/"
+    res = client.get(url)
+    assert res.status_code == 200, res
 
 # @pytest.mark.parametrize("viewset", VIEWSETS)
 # def test_list_json(client, viewset):

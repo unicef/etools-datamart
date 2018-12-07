@@ -13,6 +13,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
+from unicef_rest_framework.views_mixins import IQYConnectionMixin
 
 from etools_datamart.api.filtering import DatamartQueryStringFilterBackend, TenantQueryStringFilterBackend
 from etools_datamart.apps.etl.models import EtlTask
@@ -63,7 +64,7 @@ class UpdatesMixin:
                         headers={'update-date': offset})
 
 
-class APIReadOnlyModelViewSet(ReadOnlyModelViewSet):
+class APIReadOnlyModelViewSet(ReadOnlyModelViewSet, IQYConnectionMixin):
     filter_backends = [SystemFilterBackend,
                        DatamartQueryStringFilterBackend,
                        OrderingFilter]
