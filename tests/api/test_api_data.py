@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
-from dateutil.utils import today
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 from test_utilities.factories import (FAMIndicatorFactory, HACTFactory, InterventionFactory,
                                       PMPIndicatorFactory, TaskLogFactory, UserStatsFactory,)
 
@@ -57,7 +57,7 @@ def test_list(client, action, viewset, format, ct, data):
 
 def test_updates(client):
     viewset = FAMIndicatorViewSet()
-    TaskLogFactory(last_changes=today(),
+    TaskLogFactory(last_changes=timezone.now(),
                    content_type=ContentType.objects.get_for_model(FAMIndicator))
 
     url = f"{viewset.get_service().endpoint}updates/"
