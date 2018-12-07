@@ -28,11 +28,11 @@ class APIPagination(PageNumberPagination):
 
     # Client can control the page size using this query parameter.
     # Default is 'None'. Set to eg 'page_size' to enable usage.
-    page_size_query_param = None
+    page_size_query_param = 'page_size'
 
     # Set to an integer to limit the maximum page size the client may request.
     # Only relevant if 'page_size_query_param' has also been set.
-    max_page_size = 1000
+    max_page_size = 10000
 
     last_page_strings = ('last',)
 
