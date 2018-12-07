@@ -39,13 +39,14 @@ class URLTokenAuthentication(BaseAuthentication):
 
 class IPBasedAuthentication(BaseAuthentication):
     def authenticate(self, request):
-        ip = get_client_ip(request.META)
-        if ip == '127.0.0.1':
-            User = get_user_model()
-            user = User.objects.get_by_natural_key('sax')
-            request.user = user
-            login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
-            return (user, None)
+        if settings.DEBUG:
+            ip = get_client_ip(request.META)
+            if ip == '127.0.0.1':
+                User = get_user_model()
+                user = User.objects.get_by_natural_key('sax')
+                request.user = user
+                login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
+                return (user, None)
 
 
 class JWTAuthentication(authentication.JSONWebTokenAuthentication):
