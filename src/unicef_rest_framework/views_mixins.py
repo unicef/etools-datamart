@@ -24,8 +24,12 @@ class IQYConnectionMixin:
     @action(methods=['get'], detail=False)
     def iqy(self, request, version):
         """Returns .iqy file to be used as Excel Web Connection """
+        try:
+            filename = self.get_service().name
+        except Exception:
+            filename = self.__class__.__name__
         qs = get_query_string(request.query_params, {'format': 'iqy'},
-                              remove=['format'])
+                              remove=['format', '_display'])
         url = f"{request.path}".replace('/iqy/', '/')
 
         iqy = """WEB
@@ -40,4 +44,7 @@ SingleBlockTextImport=False
 DisableDateRecognition=False
 DisableRedirections=True
 """.format(host=settings.ABSOLUTE_BASE_URL, request=request, qs=qs, url=url)
-        return HttpResponse(iqy, content_type='text/plain')
+        res = HttpResponse(iqy, content_type='text/plain')
+        if not request.query_params.get('_display', ''):
+            res['Content-Disposition'] = u'attachment; filename="%s.iqy"' % filename
+        return res
