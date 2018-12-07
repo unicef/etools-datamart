@@ -39,7 +39,7 @@ class URLTokenAuthentication(BaseAuthentication):
 
 class IPBasedAuthentication(BaseAuthentication):
     def authenticate(self, request):
-        if settings.DEBUG:
+        if settings.DEBUG:  # pragma: no cover
             ip = get_client_ip(request.META)
             if ip == '127.0.0.1':
                 User = get_user_model()
