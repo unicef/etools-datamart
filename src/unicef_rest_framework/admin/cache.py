@@ -40,6 +40,9 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     def get_cache_ttl(self, obj):
         if re.search(r'[smhdwy]', obj.cache_ttl):
             return "{} ({})".format(obj.cache_ttl, parse_ttl(obj.cache_ttl))
@@ -89,12 +92,12 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
         self.generate_cache_token(request, Service.objects.filter(id=pk))
 
     def incr_version(self, request, queryset):
-        queryset.update(version=F("cache_version") + 1)
+        queryset.update(cache_version=F("cache_version") + 1)
 
     incr_version.short_description = "Increment version"
 
     def reset_version(self, request, queryset):
-        queryset.update(version=1)
+        queryset.update(cache_version=1)
 
     incr_version.short_description = "Increment version"
 
