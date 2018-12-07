@@ -2,11 +2,13 @@ from collections import OrderedDict
 
 from django.contrib.admin import AdminSite
 from django.contrib.admin.apps import SimpleAdminConfig
-from django.core.cache import cache
+from django.core.cache import caches
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy
 from django.views.decorators.cache import never_cache
+
+cache = caches['default']
 
 
 def reset_counters(request):
@@ -83,14 +85,13 @@ class DatamartAdminSite(AdminSite):
                 for model in app['models']:
                     sec = get_section(model, app)
                     groups[sec].append(
-                        {'app_label': app['app_label'],
-                         'app_name': app['name'],
+                        {'app_label': str(app['app_label']),
+                         'app_name': str(app['name']),
                          'app_url': app['app_url'],
                          'label': "%s - %s" % (app['name'], model['object_name']),
-                         'model_name': model['name'],
+                         'model_name': str(model['name']),
                          'admin_url': model['admin_url'],
                          'perms': model['perms']})
-
             for __, models in groups.items():
                 models.sort(key=lambda x: x['label'])
             cache.set(key, groups, 60 * 60)
