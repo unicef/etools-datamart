@@ -37,7 +37,7 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install tox --user
-            tox -e py36-d21 deps -- --create-db
+            tox -e py36-d21
       - run:
           name: codecov
           command: |
