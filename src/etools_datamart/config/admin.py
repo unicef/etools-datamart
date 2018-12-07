@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from django.conf import settings
 from django.contrib.admin import AdminSite
 from django.contrib.admin.apps import SimpleAdminConfig
 from django.core.cache import caches
@@ -9,6 +10,18 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.cache import never_cache
 
 cache = caches['default']
+
+DEFAULT_INDEX_SECTIONS = {
+    'Administration': ['unicef_rest_framework', 'constance', 'dbtemplates', 'subscriptions'],
+    'Data': ['data', 'etools', 'etl'],
+    'Security': ['auth', 'unicef_security',
+                 'unicef_rest_framework.GroupAccessControl',
+                 'unicef_rest_framework.UserAccessControl',
+                 ],
+    'Logs': ['tracking', 'django_db_logging', 'crashlog', ],
+    'System': ['redisboard', 'django_celery_beat', 'post_office'],
+    'Other': ['unicef_rest_framework.Application', ],
+}
 
 
 def reset_counters(request):
@@ -58,17 +71,7 @@ class DatamartAdminSite(AdminSite):
         app_list = self.get_app_list(request)
         groups = cache.get(key)
         if not groups:
-            sections = {
-                'Administration': ['unicef_rest_framework', 'constance', 'dbtemplates', 'subscriptions'],
-                'Data': ['data', 'etools', 'etl'],
-                'Security': ['auth', 'unicef_security',
-                             'unicef_rest_framework.GroupAccessControl',
-                             'unicef_rest_framework.UserAccessControl',
-                             ],
-                'Logs': ['tracking', 'django_db_logging', 'crashlog', ],
-                'System': ['redisboard', 'django_celery_beat', 'post_office'],
-                'Other': ['unicef_rest_framework.Application', ],
-            }
+            sections = getattr(settings, 'INDEX_SECTIONS', DEFAULT_INDEX_SECTIONS)
             groups = OrderedDict([(k, []) for k in sections.keys()])
 
             def get_section(model, app):
