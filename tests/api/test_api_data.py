@@ -21,13 +21,15 @@ VIEWSETS = [
 FORMATS = (('', 'application/json'),
            ('csv', 'text/csv; charset=utf-8'),
            ('xml', 'application/xml; charset=utf-8'),
-           # ('html', 'text/html; charset=utf-8'),
+           ('xhtml', 'text/html; charset=utf-8'),
            ('json', 'application/json'),
            ('ms-xml', 'application/xml; charset=utf-8'),
            ('ms-json', 'application/json'),
            ('csv', 'text/csv; charset=utf-8'),
            ('pdf', 'application/pdf; charset=utf-8'),
            ('xlsx', 'application/xlsx; charset=utf-8'),
+           ('txt', 'text/plain; charset=utf-8'),
+           ('iqy', 'text/plain; charset=utf-8'),
            )
 
 

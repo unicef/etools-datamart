@@ -21,6 +21,9 @@ today = timezone.now()
 
 class TaskLogFactory(factory.DjangoModelFactory):
     elapsed = 10
+    last_success = timezone.now()
+    last_failure = timezone.now()
+    last_changes = timezone.now()
 
     class Meta:
         model = EtlTask
@@ -50,6 +53,7 @@ class PMPIndicatorFactory(factory.DjangoModelFactory):
 
 class FAMIndicatorFactory(factory.DjangoModelFactory):
     month = today
+    last_modify_date = timezone.now()
 
     class Meta:
         model = FAMIndicator
