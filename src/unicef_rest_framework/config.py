@@ -9,6 +9,7 @@ from unicef_rest_framework import acl
 class AppSettings(object):
     defaults = {
         'API_CACHE': 'default',
+        'FREE_AUTH_IPS': [],
         'ROUTER': 'unicef_rest_framework.urls.router',
         'DEFAULT_ACCESS': acl.ACL_ACCESS_LOGIN,
         'get_current_user': 'get_current_user',

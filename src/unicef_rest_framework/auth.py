@@ -9,6 +9,7 @@ from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework_jwt import authentication
+from unicef_rest_framework.config import conf
 from unicef_security.graph import default_group, Synchronizer
 
 logger = logging.getLogger()
@@ -41,9 +42,9 @@ class IPBasedAuthentication(BaseAuthentication):
     def authenticate(self, request):
         if settings.DEBUG:  # pragma: no cover
             ip = get_client_ip(request.META)
-            if ip == '127.0.0.1':
+            if ip in conf.FREE_AUTH_IPS:
                 User = get_user_model()
-                user = User.objects.get_by_natural_key('sax')
+                user = User.objects.get_or_create(usename=ip, email=f'noreply@{ip}.org')
                 request.user = user
                 login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
                 return (user, None)
