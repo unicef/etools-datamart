@@ -10,7 +10,21 @@ def cache_random_prefix(*args, **kwargs):
     return str(SEED)
 
 
+# CACHES['default']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
 CACHES['api']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
+# CACHES['lock']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
+CACHES['dbtemplates']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
+
+CACHES['locmem'] = {  # noqa
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'LOCATION': 'unique-snowflake',
+}
+
+CACHES['redis'] = env.cache('CACHE_URL')  # noqa
+# we must have redis here to check for pickling errors
+assert CACHES['redis']['BACKEND'] == 'django_redis.cache.RedisCache'  # noqa
+assert CACHES['lock']['BACKEND'] == 'django_redis.cache.RedisCache'  # noqa
+
 CACHES['api']['KEY_FUNCTION'] = cache_random_prefix  # noqa
 CACHES['default']['KEY_FUNCTION'] = cache_random_prefix  # noqa
 

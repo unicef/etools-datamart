@@ -94,7 +94,7 @@ class UserFactory(factory.DjangoModelFactory):
 
     email = factory.Sequence(lambda n: "m%03d@mailinator.com" % n)
     password = 'password'
-
+    is_superuser = False
     is_active = True
 
     @classmethod
@@ -111,6 +111,10 @@ class UserFactory(factory.DjangoModelFactory):
                 user.save()
         user_grant_permissions(user, permissions).start()
         return user
+
+
+class AdminFactory(UserFactory):
+    is_superuser = True
 
 
 class UserAccessControlFactory(factory.DjangoModelFactory):

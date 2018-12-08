@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 
 def log_request(**kwargs):
     log = APIRequestLog.objects.create(**kwargs)
-    if settings.ENABLE_LIVE_STATS:  # pragma: no cover
+
+    if settings.ENABLE_LIVE_STATS:
         lastMonth = (log.requested_at.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
 
         def _update_stats(target, **extra):
@@ -36,7 +37,7 @@ def log_request(**kwargs):
                 setattr(target, k, v)
             try:
                 target.save()
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error(f"""Error updating {target.__class__.__name__}: {e}
 {extra}
 """)
@@ -80,8 +81,9 @@ def log_request(**kwargs):
 
 def record_to_kwargs(request, response):
     user = None
+    api_info = getattr(request, 'api_info')
 
-    if request.user and request.user.is_authenticated:  # pragma: no cover
+    if request.user and request.user.is_authenticated:
         user = request.user
 
     # compute response time
@@ -98,11 +100,11 @@ def record_to_kwargs(request, response):
         media_type = response.accepted_media_type
     except AttributeError:  # pragma: no cover
         media_type = response['Content-Type'].split(';')[0]
-    view = request.api_info.get('view', None)
+    view = api_info.get('view', None)
     if not view:  # pragma: no cover
         return {}
     viewset = fqn(view)
-    service = request.api_info.get("service")
+    service = api_info.get("service")
     from unicef_rest_framework.utils import get_ident
     return dict(user=user,
                 requested_at=request.timestamp,
@@ -144,7 +146,9 @@ class StatsMiddleware(object):
         request.timestamp = now()
 
         response = self.get_response(request)
-        if response.status_code == 200 and config.TRACK_PATH.match(request.path):
+        if response.status_code == 200 and \
+                hasattr(request, 'api_info') and \
+                config.TRACK_PATH.match(request.path):
             self.log(request, response)
         return response
 

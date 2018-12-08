@@ -1,3 +1,4 @@
+import json
 import os
 from time import time
 
@@ -7,7 +8,7 @@ from celery.signals import task_postrun, task_prerun
 from kombu import Exchange, Queue
 from kombu.serialization import register
 
-from etools_datamart.apps.etl.results import etl_dumps, etl_loads
+from etools_datamart.apps.etl.results import etl_dumps
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
@@ -92,7 +93,7 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
                                      defaults=defs)
 
 
-register('etljson', etl_dumps, etl_loads,
+register('etljson', etl_dumps, json.loads,
          content_type='application/x-myjson', content_encoding='utf-8')
 
 
@@ -124,7 +125,10 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
             'status': state}
 
     if state == 'SUCCESS':
-        defs['results'] = retval.as_dict()
+        try:
+            defs['results'] = retval.as_dict()
+        except Exception:  # pragma: no cover
+            defs['results'] = str(retval)
         if retval.created > 0 or retval.updated > 0:
             defs['last_changes'] = timezone.now()
             for service in sender.linked_model.linked_services:
@@ -133,8 +137,8 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
 
         defs['last_success'] = timezone.now()
     else:
-        if not isinstance(retval, dict):
-            defs['results'] = str(retval)
+        # if not isinstance(retval, dict):
+        defs['results'] = str(retval)
         defs['last_failure'] = timezone.now()
 
     EtlTask.objects.update_or_create(task=task.name, defaults=defs)

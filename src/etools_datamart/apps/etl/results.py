@@ -1,5 +1,6 @@
 import json
-from json.decoder import WHITESPACE
+
+from rest_framework.utils import encoders
 
 CREATED = 'created'
 UPDATED = 'updated'
@@ -36,13 +37,13 @@ class EtlResult:
         return False
 
 
-class EtlDecoder(json.JSONDecoder):
+# class EtlDecoder(json.JSONDecoder):
+#
+#     def decode(self, s, _w=WHITESPACE.match):
+#         return super().decode(s, _w)
+#
 
-    def decode(self, s, _w=WHITESPACE.match):
-        return super().decode(s, _w)
-
-
-class EtlEncoder(json.JSONEncoder):
+class EtlEncoder(encoders.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, EtlResult):
@@ -50,22 +51,21 @@ class EtlEncoder(json.JSONEncoder):
                 '__type__': '__EtlResult__',
                 'data': obj.as_dict()
             }
-        else:
-            return json.JSONEncoder.default(self, obj)
+        return super(EtlEncoder, self).default(obj)
 
-
-def etl_decoder(obj):
-    if '__type__' in obj:
-        if obj['__type__'] == '__EtlResult__':
-            return EtlResult(**obj)
-    return obj
+#
+# def etl_decoder(obj):
+#     if '__type__' in obj:
+#         if obj['__type__'] == '__EtlResult__':
+#             return EtlResult(**obj)
+#     return obj
 
 
 # Encoder function
 def etl_dumps(obj):
     return json.dumps(obj, cls=EtlEncoder)
 
-
-# Decoder function
-def etl_loads(obj):
-    return json.loads(obj, cls=EtlDecoder, object_hook=etl_decoder)
+#
+# # Decoder function
+# def etl_loads(obj):
+#     return json.loads(obj, cls=EtlDecoder, object_hook=etl_decoder)
