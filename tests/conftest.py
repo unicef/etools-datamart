@@ -141,3 +141,18 @@ def staff_user(etools_user):
     return UserFactory(username=etools_user.username,
                        email=etools_user.email,
                        is_staff=True)
+
+
+@pytest.fixture()
+def user(etools_user):
+    from test_utilities.factories import UserFactory
+
+    return UserFactory(username=etools_user.username,
+                       email=etools_user.email)
+
+
+@pytest.fixture()
+def local_user(db):
+    from test_utilities.factories import UserFactory
+
+    return UserFactory()

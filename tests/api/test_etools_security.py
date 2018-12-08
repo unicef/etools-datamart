@@ -1,20 +1,7 @@
-import pytest
 from rest_framework.test import APIClient
-from test_utilities.factories import UserFactory
 from unicef_rest_framework.test_utils import user_allow_service
 
 from etools_datamart.api.endpoints import PartnerViewSet
-
-
-@pytest.fixture()
-def user(etools_user):
-    return UserFactory(username=etools_user.username,
-                       email=etools_user.email)
-
-
-@pytest.fixture()
-def local_user(db):
-    return UserFactory()
 
 
 def test_etools_user_access_allowed_countries(user):

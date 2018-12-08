@@ -2,8 +2,11 @@ from unittest import mock
 
 import pytest
 from celery.signals import task_postrun
+from django.contrib.contenttypes.models import ContentType
+from test_utilities.factories import TaskLogFactory
+from unicef_security.models import User
 
-from etools_datamart.apps.data.models import PMPIndicators
+from etools_datamart.apps.data.models import HACT, PMPIndicators
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.etl.results import EtlResult
 from etools_datamart.apps.etl.tasks.etl import load_pmp_indicator
@@ -15,11 +18,6 @@ pytestmarker = pytest.mark.django_db
 def test_check_extra_attributes(db):
     assert (EtlTask.objects.get_for_task(load_pmp_indicator) ==
             EtlTask.objects.get_for_model(PMPIndicators))
-
-
-#     assert load_pmp_indicator.linked_model
-#     assert load_pmp_indicator.linked_model.task_log
-#     assert PMPIndicators.task_log.table_name == PMPIndicators._meta.db_table
 
 
 def test_load_pmp_indicator(db):
@@ -58,3 +56,11 @@ def test_no_changes(db):
         assert load_pmp_indicator.apply()
         assert EtlTask.objects.filter(task='etools_datamart.apps.etl.tasks.etl.load_pmp_indicator',
                                       status='SUCCESS').exists()
+
+
+def test_manager(db):
+    TaskLogFactory(content_type=ContentType.objects.get_for_model(HACT))
+    assert EtlTask.objects.filter_for_models(HACT)
+    assert EtlTask.objects.get_for_model(HACT)
+    with pytest.raises(EtlTask.DoesNotExist):
+        assert EtlTask.objects.get_for_model(User)

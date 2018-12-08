@@ -71,6 +71,8 @@ class InterventionFactory(factory.DjangoModelFactory):
 
 
 class GroupFactory(factory.DjangoModelFactory):
+    name = factory.Sequence(lambda n: "name%03d" % n)
+
     class Meta:
         model = Group
         django_get_or_create = ('name',)
@@ -160,3 +162,31 @@ class EmailTemplateFactory(factory.DjangoModelFactory):
     class Meta:
         model = EmailTemplate
         django_get_or_create = ('name',)
+
+
+class RegionFactory(factory.DjangoModelFactory):
+    code = factory.Sequence(lambda n: "code%03d" % n)
+    name = factory.Sequence(lambda n: "name%03d" % n)
+
+    class Meta:
+        model = unicef_security.models.Region
+        django_get_or_create = ('name',)
+
+
+class BusinessAreaFactory(factory.DjangoModelFactory):
+    code = factory.Sequence(lambda n: "code%03d" % n)
+    region = SubFactory(RegionFactory)
+
+    class Meta:
+        model = unicef_security.models.BusinessArea
+        django_get_or_create = ('name',)
+
+
+class RoleFactory(factory.DjangoModelFactory):
+    user = SubFactory(UserFactory)
+    group = SubFactory(GroupFactory)
+    business_area = SubFactory(BusinessAreaFactory)
+
+    class Meta:
+        model = unicef_security.models.Role
+        django_get_or_create = ('user', 'group', 'business_area')
