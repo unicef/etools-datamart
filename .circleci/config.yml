@@ -36,7 +36,6 @@ jobs:
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            echo env | sort
             pip install tox --user
             tox -e py36-d21
       - run:
