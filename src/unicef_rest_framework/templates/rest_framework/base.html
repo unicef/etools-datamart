@@ -164,7 +164,12 @@
               {% if admin_url %}
                   <a href="{{ admin_url }}"
                      style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
-                     class="btn btn-primary">Admin</a>
+                     class="btn btn-primary">List</a>
+              {% endif %}
+              {% if service_url %}
+                  <a href="{{ service_url }}"
+                     style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
+                     class="btn btn-primary">Service</a>
               {% endif %}
               {% for name,url in extra_actions.items %}
                   {% if url != request.build_absolute_uri %}

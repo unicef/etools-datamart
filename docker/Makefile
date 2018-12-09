@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=dev
+TARGET?=1.8a7
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -84,6 +84,7 @@ release:
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
+	bumpversion release
 
 run:
 	$(MAKE) .run

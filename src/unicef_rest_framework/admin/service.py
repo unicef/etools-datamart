@@ -127,6 +127,11 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         Service.objects.invalidate_cache()
 
     @action()
+    def api(self, request, pk):
+        service = Service.objects.get(pk=pk)
+        return HttpResponseRedirect(service.endpoint)
+
+    @action()
     def invalidate_cache(self, request, pk):
         service = Service.objects.get(pk=pk)
         service.invalidate_cache()
