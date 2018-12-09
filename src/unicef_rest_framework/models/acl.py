@@ -28,7 +28,7 @@ def default_serializer():
 class AbstractAccessControl(MasterDataModel):
     POLICY_DENY = 0
     POLICY_ALLOW = 1
-    POLICY_DEFAULT = 2
+    POLICY_DEFAULT = 2  # not sure this is really needed.
 
     POLICIES = ((POLICY_DENY, "Forbid"),
                 (POLICY_ALLOW, "Grant"),

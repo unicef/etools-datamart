@@ -4,6 +4,7 @@ import logging
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 from strategy_field.utils import fqn
+from unicef_rest_framework.acl import ACL_ACCESS_OPEN
 from unicef_rest_framework.models import UserAccessControl
 from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl
 
@@ -43,5 +44,8 @@ class ServicePermission(BasePermission):
 
             return True
         except (GroupAccessControl.DoesNotExist):
+            service = view.get_service()
+            if service.access == ACL_ACCESS_OPEN:
+                return True
             logger.error(f"User '{request.user}' does not have grants for '{fqn(view)}'")
             return False

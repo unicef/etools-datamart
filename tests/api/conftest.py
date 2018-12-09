@@ -4,6 +4,7 @@ from functools import partial
 
 import pytest
 from rest_framework.test import APIClient
+from test_utilities.factories import AnonUserFactory
 from unicef_rest_framework.models import Service
 
 from etools_datamart.api.endpoints import InterventionViewSet
@@ -58,3 +59,8 @@ def _assert_duplicate_queries(config, connection=None):
 @pytest.fixture(scope='function')
 def django_assert_no_duplicate_queries(pytestconfig):
     return partial(_assert_duplicate_queries, pytestconfig)
+
+
+@pytest.fixture()
+def anon_user(db):
+    return AnonUserFactory()

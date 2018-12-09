@@ -49,7 +49,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     filter_horizontal = ('linked_models',)
     fieldsets = [("", {"fields": ('name',
                                   'description',
-                                  # 'access',
+                                  'access',
                                   # 'confidentiality',
                                   # 'hidden',
                                   'source_model',

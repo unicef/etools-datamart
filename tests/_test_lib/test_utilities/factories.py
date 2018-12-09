@@ -117,6 +117,10 @@ class AdminFactory(UserFactory):
     is_superuser = True
 
 
+class AnonUserFactory(UserFactory):
+    username = 'anonymous'
+
+
 class UserAccessControlFactory(factory.DjangoModelFactory):
     policy = UserAccessControl.POLICY_ALLOW
     serializers = ["std"]

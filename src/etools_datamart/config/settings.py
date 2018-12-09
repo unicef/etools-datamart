@@ -523,7 +523,7 @@ LOGGING = {
             'format': '%(levelname)-8s: %(asctime)s %(name)20s %(message)s'
         },
         'simple': {
-            'format': '%(levelname)-8s: %(asctime)s %(name)20s: %(funcName)s %(message)s'
+            'format': '%(levelname)-8s: %(asctime)s %(name)20s: %(funcName)s:%(lineno)s %(message)s'
         }
     },
     'filters': {

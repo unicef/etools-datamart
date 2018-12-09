@@ -13,7 +13,7 @@ from rest_framework_yaml.renderers import YAMLRenderer
 from strategy_field.utils import fqn
 
 from . import acl
-from .auth import IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
+from .auth import AnonymousAuthentication, IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
 from .cache import cache_response, etag, ListKeyConstructor
 from .filtering import SystemFilterBackend
 from .negotiation import CT
@@ -48,6 +48,7 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
                               TokenAuthentication,
                               IPBasedAuthentication,
                               URLTokenAuthentication,
+                              AnonymousAuthentication,
                               )
     default_access = acl.ACL_ACCESS_LOGIN
     content_negotiation_class = CT
@@ -79,6 +80,7 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
         self.request._request.api_info[key] = value
 
     def dispatch(self, request, *args, **kwargs):
+        request._view = self
         if hasattr(request, 'api_info'):
             request.api_info["view"] = fqn(self)
             request.api_info["service"] = self.get_service()

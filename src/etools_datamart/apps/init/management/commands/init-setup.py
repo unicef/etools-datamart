@@ -1,4 +1,5 @@
 import os
+import uuid
 import warnings
 from urllib.parse import urlparse
 
@@ -124,6 +125,11 @@ class Command(BaseCommand):
                                                                     defaults={"is_superuser": True,
                                                                               "is_staff": True,
                                                                               "password": make_password(pwd)})
+        anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
+                                                             defaults={"is_superuser": False,
+                                                                       "is_staff": False,
+                                                                       "password": make_password(uuid.uuid4())})
+
         Group.objects.get_or_create(name='Guests')
         all_access, __ = Group.objects.get_or_create(name='Endpoints all access')
 

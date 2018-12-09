@@ -4,11 +4,14 @@ from constance import config
 from crashlog.middleware import process_exception
 from django.conf import settings
 from django.contrib.auth import get_user_model, login
+from django.contrib.auth.backends import ModelBackend
 from django.utils.translation import ugettext as _
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework_jwt import authentication
+from strategy_field.utils import fqn
+from unicef_rest_framework import acl
 from unicef_rest_framework.config import conf
 from unicef_security.graph import default_group, Synchronizer
 
@@ -38,15 +41,27 @@ class URLTokenAuthentication(BaseAuthentication):
         return None
 
 
+class AnonymousAuthentication(BaseAuthentication):
+    def authenticate(self, request):
+        view = request._request._view
+        service = view.get_service()
+        if service.access == acl.ACL_ACCESS_OPEN:
+            User = get_user_model()
+            user = User.objects.get_or_create(username='anonymous')[0]
+            request.user = user
+            login(request, user, fqn(ModelBackend))
+            return (user, None)
+
+
 class IPBasedAuthentication(BaseAuthentication):
     def authenticate(self, request):
         if settings.DEBUG:  # pragma: no cover
             ip = get_client_ip(request.META)
             if ip in conf.FREE_AUTH_IPS:
                 User = get_user_model()
-                user = User.objects.get_or_create(usename=ip, email=f'noreply@{ip}.org')
+                user = User.objects.get_or_create(username=ip, email=f'noreply@{ip}.org')
                 request.user = user
-                login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
+                # login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
                 return (user, None)
 
 
@@ -61,7 +76,7 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
         try:
             user, jwt_value = super(JWTAuthentication, self).authenticate(request)
             request.user = user
-            login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
+            # login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
         except TypeError:  # pragma: no cover
             raise PermissionDenied(detail='No valid authentication provided')
         except AuthenticationFailed as e:  # pragma: no cover
