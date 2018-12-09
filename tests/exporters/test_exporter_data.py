@@ -16,8 +16,7 @@ def client(admin_user):
     return client
 
 
-@pytest.mark.skipif("CIRCLECI" in os.environ,
-                    reason="Skip in CirlceCI")
+@pytest.mark.skipif(os.environ.get("CIRCLECI") == "true", reason="Skip in CirlceCI")
 def test_export_azure_data(db, client, settings):
     load_user_report.unlock()
     load_user_report()
