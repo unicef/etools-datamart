@@ -32,7 +32,7 @@ class classproperty(object):
 
 
 class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
-    serializer_field_param = '+serializer'
+    serializer_field_param = '-serializer'
     dynamic_fields_param = '+fields'
 
     object_cache_key_func = rest_framework_extensions.utils.default_object_cache_key_func
@@ -101,6 +101,13 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     def get_service(cls):
         from unicef_rest_framework.models import Service
         return Service.objects.get_for_viewset(cls)[0]
+
+    # @classproperty
+    # def endpoint(self):
+    #     for __, viewset, base_name in conf.ROUTER.registry:
+    #         if viewset == self:
+    #             return reverse(f'api:{base_name}-list', args=['latest'])
+    #     return None
 
     @etag(etag_func='object_etag_func')
     @cache_response(key_func='object_cache_key_func', cache='api')

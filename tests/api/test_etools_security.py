@@ -25,7 +25,7 @@ def test_etools_user_access_allowed_countries(user):
 
         res = client.get(f"{url}?country_name=lebanon,xxx")
         assert res.status_code == 400, res
-        assert res.json() == {'error': "Invalid schema: 'xxx'",
+        assert res.json() == {'error': "Invalid schema: xxx",
                               'hint': 'Removes wrong schema from selection',
                               'valid': ['bolivia', 'chad', 'lebanon']}
 

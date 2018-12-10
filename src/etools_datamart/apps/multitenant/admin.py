@@ -83,11 +83,18 @@ class ReadOnlyMixin:
         return False
 
 
-class EToolsModelAdmin(ExtraUrlMixin, ReadOnlyMixin, ModelAdmin):
+class DisplayAllMixin:
+    def get_list_display(self, request):  # pragma: no cover
+        if self.list_display == ('__str__',):
+            return [field.name for field in self.model._meta.fields]
+        return self.list_display
+
+
+class EToolsModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
     pass
 
 
-class TenantModelAdmin(ExtraUrlMixin, ReadOnlyMixin, ModelAdmin):
+class TenantModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
     list_filter = [SchemaFilter, ]
 
     # def get_queryset(self, request):

@@ -8,7 +8,7 @@
 * new admin index page
 * Excel IQY support (beta)
 * Allow endpoints to be consumend bny anonymous users
-
+* Countries can be selected using name, schema_name,country_short_code or business_area_code
 
 1.7
 ---

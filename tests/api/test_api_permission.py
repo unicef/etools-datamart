@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
+from django.utils.http import urlquote
 from rest_framework.test import APIClient
 from test_utilities.factories import InterventionFactory
 from unicef_rest_framework.models import UserAccessControl
@@ -91,37 +92,37 @@ def test_permission_allow(client, allow):
 
 def test_permission_check_serializer_allow(client, allow_many_serializer):
     url = allow_many_serializer.service.endpoint
+    view = allow_many_serializer.service.viewset
     client.force_authenticate(allow_many_serializer.user)
 
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
+    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
     assert res.status_code == 200
     # assert res.json()['detail'] == "You do not have permission to perform this action."
 
 
 def test_permission_check_serializer_deny(client, allow_std_serializer):
     url = allow_std_serializer.service.endpoint
+    view = allow_std_serializer.service.viewset
     client.force_authenticate(allow_std_serializer.user)
 
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
+    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
     assert res.status_code == 403
     assert res.json()['error'] == "Forbidden serializer 'short'"
 
 
 def test_permission_check_serializer_any(client, allow_any_serializer):
     url = allow_any_serializer.service.endpoint
+    view = allow_any_serializer.service.viewset
     client.force_authenticate(allow_any_serializer.user)
 
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
+    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
     assert res.status_code == 200
 
 
 def test_permission_check_user(client, allow_any_serializer, user2):
     url = allow_any_serializer.service.endpoint
+    view = allow_any_serializer.service.viewset
     client.force_authenticate(user2)
 
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
+    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
     assert res.status_code == 403

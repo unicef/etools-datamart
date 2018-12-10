@@ -32,6 +32,7 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
                 pass
             try:
                 model = ctx['view'].queryset.model
+                # model = service.managed_model
                 admin_url = reverse(f'admin:{model._meta.app_label}_{model._meta.model_name}_changelist')
                 ctx['admin_url'] = admin_url
             except Exception:  # pragma: no cover

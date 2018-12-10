@@ -26,8 +26,8 @@ class RegionAdmin(ExtraUrlMixin, ModelAdmin):
 
 @admin.register(BusinessArea)
 class BusinessAreaAdmin(ExtraUrlMixin, ModelAdmin):
-    list_display = ['code', 'name', 'long_name', 'region']
-    list_filter = ['region']
+    list_display = ['code', 'name', 'long_name', 'region', 'country']
+    list_filter = ['region', 'country']
     search_fields = ('name',)
 
     @link()

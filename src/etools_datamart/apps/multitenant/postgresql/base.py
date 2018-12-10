@@ -179,7 +179,6 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         Main API method to current database schema,
         but it does not actually modify the db connection.
         """
-
         def _validate(n):
             name = n.lower()
             if name not in self.all_schemas:
@@ -273,7 +272,6 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         # of `set search_path` can be quite time consuming
 
         if not self.search_path_set and self._schemas:
-
             search_paths = ["public"]
             search_paths.extend(self._schemas)
             if name:  # pragma: no cover

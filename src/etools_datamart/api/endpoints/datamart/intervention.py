@@ -44,7 +44,7 @@ class InterventionViewSet(common.DataMartViewSet):
     filter_fields = ('country_name', 'title', 'status', 'last_modify_date',
                      'start_date', 'submission_date', 'document_type')
     serializers_fieldsets = {'std': None,
-                             'short': ["title", "number"]}
+                             'short': ["title", "number", "country_name", "start_date"]}
     # filter_backends = [DjangoFilterBackend, OrderingFilter]
     # filterset_fields = ('category', 'in_stock')
     # filterset_class = InterventionFilter

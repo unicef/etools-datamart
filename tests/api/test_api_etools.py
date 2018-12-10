@@ -27,7 +27,7 @@ def test_list(client, url, format, schema):
     url = f"{url}?country_name={','.join(schema)}"
     res = client.get(url, format=format)
 
-    assert res.status_code == 200, res
+    assert res.status_code == 200, res.content
     assert res.json()
 
 

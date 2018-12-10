@@ -87,7 +87,7 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet, IQYConnectionMixin):
         return field in [self.serializer_field_param,
                          self.dynamic_fields_param,
                          'cursor',
-                         'ordering', 'page_size', 'format', ]
+                         'ordering', 'page_size', 'format', 'page']
 
     def handle_exception(self, exc):
         conn = connections['etools']

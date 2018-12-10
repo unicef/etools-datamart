@@ -101,3 +101,14 @@ class FundsreservationitemAdmin(TenantModelAdmin):
 @register(models.HactAggregatehact)
 class HactAggregatehactAdmin(TenantModelAdmin):
     list_display = ('schema', 'year',)
+
+
+@register(models.TpmTpmvisit)
+class TpmTpmvisitAdmin(TenantModelAdmin):
+    pass
+
+
+@register(models.UsersCountry)
+class UsersCountryAdmin(EToolsModelAdmin):
+    list_display = ('name', 'schema_name', 'business_area_code', 'country_short_code')
+    search_fields = ('name', 'schema_name', 'business_area_code')

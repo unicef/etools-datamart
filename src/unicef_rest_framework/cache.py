@@ -11,6 +11,7 @@ from rest_framework_extensions.key_constructor import bits
 from rest_framework_extensions.key_constructor.bits import KeyBitBase
 from rest_framework_extensions.key_constructor.constructors import KeyConstructor
 from rest_framework_extensions.settings import extensions_api_settings
+from unicef_rest_framework.models import SystemFilter
 
 cache = caches['default']
 
@@ -112,17 +113,33 @@ class CacheVersionKeyBit(KeyBitBase):
         return {'cache_version': str(version)}
 
 
+class SystemFilterKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        flt = SystemFilter.objects.match(request, view_instance)
+        request._request._system_filters = flt
+        qs = flt.get_querystring() if flt else ''
+        request._request.api_info['system-filters'] = qs
+        return {'systemfilter': qs}
+
+
+class QueryPathKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        return {'path': str(request.path)}
+
+
 class ListKeyConstructor(KeyConstructor):
     cache_version = CacheVersionKeyBit()
-    # system_filter = SystemFilterKeyBit()
-
+    system_filter = SystemFilterKeyBit()
+    path = QueryPathKeyBit()
     unique_method_id = bits.UniqueMethodIdKeyBit()
     format = bits.FormatKeyBit()
     headers = bits.HeadersKeyBit(['Accept'])
     # language = bits.LanguageKeyBit()
-    list_sql_query = bits.ListSqlQueryKeyBit()
+    # list_sql_query = bits.ListSqlQueryKeyBit()  # NEVER NEVER USE THIS
+
     querystring = bits.QueryParamsKeyBit()
-    pagination = bits.PaginationKeyBit()
+
+    # pagination = bits.PaginationKeyBit()
 
     def get_key(self, view_instance, view_method, request, args, kwargs):
         key = super().get_key(view_instance, view_method, request, args, kwargs)

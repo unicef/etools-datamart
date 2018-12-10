@@ -1,14 +1,18 @@
 from datetime import datetime
 
+from django.core.cache import caches
 from django.db import connections
+from django.db.models import Q
 from drf_querystringfilter.exceptions import InvalidQueryValueError
 from rest_framework.exceptions import PermissionDenied
 from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
-from etools_datamart.apps.etools.utils import get_etools_allowed_schemas, validate_schemas
-from etools_datamart.apps.multitenant.exceptions import NotAuthorizedSchema
+from etools_datamart.apps.etools.models import UsersCountry
+from etools_datamart.apps.etools.utils import conn, get_etools_allowed_schemas
+from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
 
 # from unicef_rest_framework.state import state
+cache = caches['api']
 
 months = ['jan', 'feb', 'mar',
           'apr', 'may', 'jun',
@@ -16,13 +20,50 @@ months = ['jan', 'feb', 'mar',
           'oct', 'nov', 'dec']
 
 
+def process_country_value(query_args):
+    values = sorted(set(query_args.split(",")))
+    key = hash(str(values))
+    schemas = cache.get(key)
+    if not schemas:
+        _s = conn.schemas
+        conn.set_schemas([])
+        schemas = []
+        errors = []
+        for entry in values:
+            try:
+                if entry.isdigit():
+                    country = UsersCountry.objects.get(business_area_code=entry)
+                else:
+                    f = Q(name=entry) | Q(schema_name=entry) | Q(country_short_code=entry)
+                    country = UsersCountry.objects.get(f)
+                schemas.append(country.schema_name)
+            # except UsersCountry.MultipleObjectsReturned:
+            #
+            except UsersCountry.DoesNotExist:
+                errors.append(entry)
+        conn.set_schemas(_s)
+        if errors:
+            raise InvalidSchema(*errors)
+        cache.set(key, schemas)
+    # else:
+    #     schemas = json.loads(schemas)
+    # schemas = UsersCountry.objects.filter(Q(name__in=values) |
+    #                                       Q(schema_name__in=values) |
+    #                                       Q(country_short_code__in=values) |
+    #                                       Q(business_area_code__in=values)
+    #                                       ).values_list('schema_name', flat=True)
+    # if len(schemas) != len(values):
+    #     raise InvalidSchema(",".join(values))
+    # validate_schemas(*schemas)
+    return set(schemas)
+
+
 class CountryNameProcessor:
     def process_country_name(self, efilters, eexclude, field, value, request,
                              op, param, negate, **payload):
         filters = {}
         if value:
-            value = set(value.lower().split(","))
-            validate_schemas(*value)
+            value = process_country_value(value)
             if not request.user.is_superuser:
                 user_schemas = get_etools_allowed_schemas(request.user)
                 if not user_schemas.issuperset(value):
@@ -109,11 +150,12 @@ class TenantQueryStringFilterBackend(SetHeaderMixin,
                     raise PermissionDenied("You don't have enabled schemas")
                 conn.set_schemas(get_etools_allowed_schemas(request.user))
         else:
-            value = set(value.split(","))
-            validate_schemas(*value)
+            # value = set(value.split(","))
+            # validate_schemas(*value)
+            schemas = process_country_value(value)
             if not request.user.is_superuser:
                 user_schemas = get_etools_allowed_schemas(request.user)
-                if not user_schemas.issuperset(value):
-                    raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
-            conn.set_schemas(value)
+                if not user_schemas.issuperset(schemas):
+                    raise NotAuthorizedSchema(",".join(sorted(schemas - user_schemas)))
+            conn.set_schemas(schemas)
         return queryset

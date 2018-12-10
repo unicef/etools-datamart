@@ -2,6 +2,7 @@ import json
 import logging
 
 import requests
+from django_countries import countries
 from requests.auth import HTTPBasicAuth
 
 from . import config
@@ -10,7 +11,7 @@ from .models import BusinessArea, Region
 
 logger = logging.getLogger(__name__)
 
-
+c = dict(countries)
 #
 # class SyncResult:
 #     def __init__(self):
@@ -50,6 +51,7 @@ def load_business_area():
     for entry in data:
         defaults = {'name': entry['BUSINESS_AREA_NAME'],
                     'long_name': entry['BUSINESS_AREA_LONG_NAME'],
+                    'country': countries.by_name(entry['BUSINESS_AREA_NAME']),
                     'region': Region.objects.get_or_create(code=entry['REGION_CODE'],
                                                            defaults={
                                                                'name': entry['REGION_NAME']}

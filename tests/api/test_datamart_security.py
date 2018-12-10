@@ -64,9 +64,9 @@ def test_datamart_user_access_wrong_countries(user, user_data):
     client.force_authenticate(user)
     base = UserStatsViewSet.get_service().endpoint
     with user_allow_service(user, UserStatsViewSet):
-        res = client.get(f"{base}?country_name=lebanon,xxx")
+        res = client.get(f"{base}?country_name=lebanon,abc,xyz")
         assert res.status_code == 400, res
-        assert res.json() == {'error': "Invalid schema: 'xxx'",
+        assert res.json() == {'error': "Invalid schemas: abc,xyz",
                               'hint': 'Removes wrong schema from selection',
                               'valid': ['bolivia', 'chad', 'lebanon']}
 

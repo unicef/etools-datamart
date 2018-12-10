@@ -5,8 +5,8 @@ import logging
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import F
-from django.urls import reverse
 from django.utils.functional import cached_property
+from rest_framework.reverse import reverse
 from strategy_field.fields import StrategyClassField
 from unicef_rest_framework.config import conf
 
@@ -137,10 +137,11 @@ class Service(MasterDataModel):
     @cached_property
     def managed_model(self):
         try:
-            v = self.viewset()
-            m = v.get_queryset().model
-            del v
-            return m
+            return self.source_model.model_class()
+            # v = self.viewset()
+            # m = v.get_queryset().model
+            # del v
+            # return m
         except TypeError:
             return None
 
