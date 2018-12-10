@@ -1,0 +1,14 @@
+{% load rest_framework %}
+{% load i18n %}
+<h2>{% trans "Serializer" %}</h2>
+<div class="list-group">
+    {% for key in options %}
+        {% if key == current %}
+            <a href="{% add_query_param request param key %}" class="list-group-item active">
+                <span class="glyphicon glyphicon-ok" style="float: right" aria-hidden="true"></span> {{ key }}
+            </a>
+        {% else %}
+            <a href="{% add_query_param request param key %}" class="list-group-item">{{ key }}</a>
+        {% endif %}
+    {% endfor %}
+</div>

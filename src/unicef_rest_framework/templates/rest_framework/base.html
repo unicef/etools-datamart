@@ -1,6 +1,7 @@
 {% load static %}
 {% load i18n %}
 {% load rest_framework %}
+{% load query %}
 
 <!DOCTYPE html>
 <html>
@@ -117,7 +118,7 @@
           {% endif %}
           {% if iqy_url %}
               <span class="button-form" >
-              <a href="{{ iqy_url  }}"
+              <a href="{{ iqy_url  }}?{% set_query_values %}"
                  tyle="float: right; color:black; background-color: #1e90ff; margin-right: 0;margin-top:5px; margin-left: 10px;"
                  class="btn btn-primary js-tooltip">IQY</a>
               </span>

@@ -195,6 +195,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         self.filters.update(**_f)
                         self.exclude.update(**_e)
                     else:
+                        if not raw_value:
+                            continue
                         # field_object = opts.get_field(real_field_name)
                         value_type = self.field_type(real_field_name)
                         if parts:

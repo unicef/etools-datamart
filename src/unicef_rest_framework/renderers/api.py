@@ -19,6 +19,9 @@ class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
         for key, value in sorted(request.api_info.items()):
             if key not in ['cache-hit']:
                 ctx['response_headers'][key] = request.api_info.str(key)
+        # ctx['response_headers']['ordering'] = getattr(view, 'ordering_fields', '')
+        ctx['response_headers']['serializers'] = ", ".join(getattr(view, 'serializers_fieldsets', {}).keys())
+        # ctx['response_headers']['filters'] = getattr(view, 'filter_fields', '')
 
         ctx['extra_actions'] = view.get_extra_action_url_map()
         ctx['base_action'] = reverse(f'api:{view.basename}-list', args=['latest'])

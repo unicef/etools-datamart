@@ -1,27 +1,28 @@
-from rest_framework import serializers
 
 from etools_datamart.apps.etools import models
 
+from .base import EToolsSerializer
 
-class PartnerSerializer(serializers.ModelSerializer):
+
+class PartnerSerializer(EToolsSerializer):
     class Meta:
         model = models.PartnersPartnerorganization
         exclude = ()
 
 
-class ReportsResultSerializer(serializers.ModelSerializer):
+class ReportsResultSerializer(EToolsSerializer):
     class Meta:
         model = models.ReportsResult
         exclude = ()
 
 
-class AssessmentSerializer(serializers.ModelSerializer):
+class AssessmentSerializer(EToolsSerializer):
     class Meta:
         model = models.PartnersAssessment
         exclude = ()
 
 
-class AgreementSerializer(serializers.ModelSerializer):
+class AgreementSerializer(EToolsSerializer):
     class Meta:
         model = models.PartnersAgreement
         exclude = ()
@@ -33,7 +34,7 @@ class AgreementSerializer(serializers.ModelSerializer):
 #         exclude = ()
 
 
-class PlannedengagementSerializer(serializers.ModelSerializer):
+class PlannedengagementSerializer(EToolsSerializer):
     class Meta:
         model = models.PartnersPlannedengagement
         exclude = ()

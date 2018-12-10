@@ -21,7 +21,7 @@ DisableRedirections=True
 class IQYConnectionMixin:
 
     @swagger_auto_schema(responses={200: "OK"})
-    @action(methods=['get'], detail=False)
+    @action(methods=['get'], detail=False, filter_backends=[], pagination_class=None)
     def iqy(self, request, version):
         """Returns .iqy file to be used as Excel Web Connection """
         try:

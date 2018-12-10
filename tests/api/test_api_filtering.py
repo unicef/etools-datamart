@@ -1,8 +1,9 @@
 import pytest
 from rest_framework.test import APIClient
+from test_utilities.factories import AdminFactory, UserFactory
 from unicef_rest_framework.test_utils import user_allow_country, user_allow_service
 
-from etools_datamart.api.endpoints import InterventionViewSet
+from etools_datamart.api.endpoints import EngagementViewSet, InterventionViewSet, PartnerViewSet
 
 
 class MockCache:
@@ -15,51 +16,100 @@ class MockCache:
         return self.data.get(key, None)
 
 
-@pytest.mark.parametrize('flt', ['country_name=bolivia', 'country_name=bolivia,chad'])
+@pytest.fixture()
+def client(user):
+    client = APIClient()
+    client.force_authenticate(user)
+    return client
+
+
+@pytest.mark.parametrize('flt', ['country_name=bolivia', 'country_name=bolivia,chad',
+                                 'country_name=BOL,0810'])
 def test_filter_cache_country_arg(db, client, flt, monkeypatch):
     fake = MockCache()
     monkeypatch.setattr('etools_datamart.api.filtering.cache', fake)
     url = f"/api/latest/etools/audit/engagement/?%s" % flt
-    res = client.get(url)
-    res = client.get(url)
+    with user_allow_service(client.handler._force_user, EngagementViewSet):
+        with user_allow_country(client.handler._force_user, ["bolivia", "chad"]):
+            res = client.get(url)
+            res = client.get(url)
     assert fake.data
-    assert res.status_code == 200
+    assert res.status_code == 200, res.content
     assert res.json()
 
 
-@pytest.mark.parametrize('flt', ['country_name=bolivia', 'country_name=', 'country_name=bolivia,chad'])
-def test_filter_etools_country_name(db, client, flt):
-    url = f"/api/latest/etools/audit/engagement/?%s" % flt
-    res = client.get(url)
-    assert res.status_code == 200
-    assert res.json()
+# @pytest.mark.django_db
+# @pytest.mark.parametrize('user_type', [UserFactory, AdminFactory])
+# @pytest.mark.parametrize('viewset', [PartnerViewSet, InterventionViewSet])
+# @pytest.mark.parametrize('flt', ['bolivia', 'bolivia,chad', 'BOL,0810'])
+# @pytest.mark.parametrize('op', ['=', '!='])
+# def test_filter_country(flt, viewset, user_type, op):
+#     user = user_type()
+#     client = APIClient()
+#     client.force_authenticate(user)
+#     service = viewset.get_service()
+#     schemas = get_schema_names(flt)
+#     url = f"{service.endpoint}?country_name{op}{flt}"
+#     with user_allow_country(user, schemas):
+#         with user_allow_service(user, viewset):
+#             res = client.get(url)
+#     assert res.status_code == 200, res.content
+#     assert res.json()
 
 
-@pytest.mark.parametrize('flt', ['country_name=bolivia', 'country_name=', 'country_name=bolivia,chad'])
-def test_filter_datamart_country_name_admin(db, client, flt):
-    url = f"/api/latest/datamart/interventions/?%s" % flt
-    res = client.get(url)
-    assert res.status_code == 200
-    assert res.json()
-
-
-@pytest.mark.parametrize('flt', ['country_name=lebanon', 'country_name=', 'country_name=lebanon,chad',
-                                 'country_name=LEBA,0810'])
-def test_filter_datamart_country_name_uset(user, flt):
+@pytest.mark.django_db
+@pytest.mark.parametrize('user_type', [UserFactory, AdminFactory])
+@pytest.mark.parametrize('viewset', [PartnerViewSet, InterventionViewSet])
+@pytest.mark.parametrize('op', ['=', '!='])
+def test_filter_country_invalid(viewset, user_type, op):
+    user = user_type()
     client = APIClient()
     client.force_authenticate(user)
-    base = InterventionViewSet.get_service().endpoint
-
-    with user_allow_country(user, ['lebanon', 'chad']):
-        with user_allow_service(user, InterventionViewSet):
-            url = f"{base}?{flt}"
-            res = client.get(url)
-            assert res.status_code == 200
-            assert res.json()
+    service = viewset.get_service()
+    url = f"{service.endpoint}?country_name{op}aaa"
+    with user_allow_service(user, viewset):
+        res = client.get(url)
+    assert res.status_code == 400
 
 
+#
+# @pytest.mark.parametrize('flt', ['country_name=bolivia', 'country_name=', 'country_name=bolivia,chad'])
+# def test_filter_etools_country_name(db, client, flt):
+#     url = f"/api/latest/etools/audit/engagement/?%s" % flt
+#     with user_allow_service(client.handler._force_user, AuditEngagement):
+#         res = client.get(url)
+#     assert res.status_code == 200
+#     assert res.json()
+#
+#
+# @pytest.mark.parametrize('flt', ['country_name=bolivia', 'country_name=', 'country_name=bolivia,chad'])
+# def test_filter_datamart_country_name_admin(db, client, flt):
+#     url = f"/api/latest/datamart/interventions/?%s" % flt
+#     with user_allow_service(client.handler._force_user, InterventionViewSet):
+#         res = client.get(url)
+#     assert res.status_code == 200
+#     assert res.json()
+#
+#
+# @pytest.mark.parametrize('flt', ['country_name=lebanon', 'country_name=', 'country_name=lebanon,chad',
+#                                  'country_name=LEBA,0810'])
+# def test_filter_datamart_country_name_uset(user, flt):
+#     client = APIClient()
+#     client.force_authenticate(user)
+#     base = InterventionViewSet.get_service().endpoint
+#
+#     with user_allow_country(user, ['lebanon', 'chad']):
+#         with user_allow_service(user, InterventionViewSet):
+#             url = f"{base}?{flt}"
+#             res = client.get(url)
+#             assert res.status_code == 200
+#             assert res.json()
+#
+#
 @pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', ''])
 def test_filter_datamart_month(db, client, flt):
+    client.force_authenticate(AdminFactory())
+
     url = f"/api/latest/datamart/user-stats/?month=%s" % flt
     res = client.get(url)
     assert res.status_code == 200

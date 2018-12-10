@@ -3,7 +3,6 @@ from functools import lru_cache
 
 import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
-from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.filters import OrderingFilter
@@ -15,6 +14,7 @@ from strategy_field.utils import fqn
 from . import acl
 from .auth import AnonymousAuthentication, IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
 from .cache import cache_response, etag, ListKeyConstructor
+from .ds import DynamicSerializerFilter, DynamicSerializerMixin
 from .filtering import SystemFilterBackend
 from .negotiation import CT
 from .permissions import ServicePermission
@@ -54,7 +54,9 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     content_negotiation_class = CT
     filter_backends = [SystemFilterBackend,
                        QueryStringFilterBackend,
-                       OrderingFilter]
+                       OrderingFilter,
+                       DynamicSerializerFilter]
+
     renderer_classes = [JSONRenderer,
                         APIBrowsableAPIRenderer,
                         CSVRenderer,

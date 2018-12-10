@@ -6,44 +6,20 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
 from django.http import Http404
 from drf_querystringfilter.exceptions import QueryFilterException
-from dynamic_serializer.core import DynamicSerializerMixin
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from unicef_rest_framework.ds import DynamicSerializerFilter
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.views import ReadOnlyModelViewSet
 from unicef_rest_framework.views_mixins import IQYConnectionMixin
 
-from etools_datamart.api.filtering import DatamartQueryStringFilterBackend, TenantQueryStringFilterBackend
+from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
-
-
-class SchemaSerializerField(coreschema.Enum):
-
-    def __init__(self, view: DynamicSerializerMixin, **kwargs):
-        self.view = view
-        kwargs.setdefault('title', 'serializers')
-        kwargs.setdefault('description', self.build_description())
-        super().__init__(list(view.serializers_fieldsets.keys()), **kwargs)
-
-    def build_description(self):
-        defs = []
-        names = []
-        for k, v in self.view.serializers_fieldsets.items():
-            names.append(k)
-            defs.append(f"""- **{k}**: {self.view.get_serializer_fields(k)}
-""")
-
-        description = f"""Define the set of fields to return. Allowed values are:
-            [{'*, *'.join(names)}*]
-
-{''.join(defs)}
-        """
-        return description
 
 
 class UpdatesMixin:
@@ -65,28 +41,31 @@ class UpdatesMixin:
 
 
 class APIReadOnlyModelViewSet(ReadOnlyModelViewSet, IQYConnectionMixin):
-    filter_backends = [SystemFilterBackend,
+    filter_backends = [CountryFilter,
+                       SystemFilterBackend,
                        DatamartQueryStringFilterBackend,
-                       OrderingFilter]
-    filter_fields = ['country_name']
+                       OrderingFilter,
+                       DynamicSerializerFilter,
+                       ]
+    # filter_fields = ['country_name']
     ordering_fields = ('id',)
     ordering = 'id'
 
     def get_schema_fields(self):
         ret = []
-        if self.serializers_fieldsets:
-            ret.append(coreapi.Field(
-                name=self.serializer_field_param,
-                required=False,
-                location='query',
-                schema=SchemaSerializerField(self)
-            ))
+        # if self.serializers_fieldsets:
+        #     ret.append(coreapi.Field(
+        #         name=self.serializer_field_param,
+        #         required=False,
+        #         location='query',
+        #         schema=SchemaSerializerField(self)
+        #     ))
         return ret
 
     def drf_ignore_filter(self, request, field):
         return field in [self.serializer_field_param,
                          self.dynamic_fields_param,
-                         'cursor',
+                         'cursor', CountryFilter.query_param,
                          'ordering', 'page_size', 'format', 'page']
 
     def handle_exception(self, exc):
@@ -150,9 +129,12 @@ def schema_header(func):
 
 
 class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
-    filter_backends = [SystemFilterBackend,
-                       TenantQueryStringFilterBackend,
-                       OrderingFilter]
+    filter_backends = [TenantCountryFilter,
+                       SystemFilterBackend,
+                       DatamartQueryStringFilterBackend,
+                       OrderingFilter,
+                       DynamicSerializerFilter,
+                       ]
     ordering_fields = ('id',)
     ordering = 'id'
 

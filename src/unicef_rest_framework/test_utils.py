@@ -8,7 +8,7 @@ from unicef_security.models import Role
 class user_allow_country(ContextDecorator):  # noqa
     def __init__(self, user, coutries=None):
         self.user = user
-        if not isinstance(coutries, (list, tuple)):
+        if not isinstance(coutries, (list, tuple, set)):
             coutries = [coutries]
         self.areas = [BusinessAreaFactory(name=s) for s in coutries]
         self.rules = []

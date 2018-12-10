@@ -1,21 +1,22 @@
-from rest_framework import serializers
 
 from etools_datamart.apps.etools import models
 
+from .base import EToolsSerializer
 
-class PartnerSerializer(serializers.ModelSerializer):
+
+class PartnerSerializer(EToolsSerializer):
     class Meta:
         model = models.PartnersPartnerorganization
         exclude = ()
 
 
-class ReportsResultSerializer(serializers.ModelSerializer):
+class ReportsResultSerializer(EToolsSerializer):
     class Meta:
         model = models.ReportsResult
         exclude = ()
 
 
-class AppliedindicatorSerializer(serializers.ModelSerializer):
+class AppliedindicatorSerializer(EToolsSerializer):
     class Meta:
         model = models.ReportsAppliedindicator
         exclude = ()
