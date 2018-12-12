@@ -82,6 +82,7 @@ class Subscription(models.Model):
     type = models.IntegerField(choices=TYPES)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     kwargs = models.CharField(max_length=500, blank=True, null=False, default='')
+    last_notification = models.DateField(blank=True, null=True)
 
     objects = SubscriptionManager()
 
