@@ -33,4 +33,4 @@ def test_user_system_filter(client: APIClient, data_service: Service, user1: Use
     assert res['system-filters'] == "country_name=Bolivia"
     assert res['cache-hit'] == "False"
     assert len(results) == 1
-    assert [r['country_name'] for r in results] == ['bolivia']
+    assert [r['country_name'] for r in results] == ['Bolivia']
