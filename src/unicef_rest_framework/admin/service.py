@@ -44,7 +44,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     search_fields = ('name', 'viewset')
     readonly_fields = ('cache_version', 'cache_ttl', 'cache_key', 'viewset', 'name', 'uuid',
-                       'last_modify_user', 'source_model', 'endpoint', 'basename')
+                       'last_modify_user', 'source_model', 'endpoint', 'basename', 'suffix')
     form = ServiceForm
     filter_horizontal = ('linked_models',)
     fieldsets = [("", {"fields": ('name',
@@ -52,7 +52,8 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
                                   'access',
                                   # 'confidentiality',
                                   # 'hidden',
-                                  ('source_model', 'basename', 'endpoint'),
+                                  ('source_model', 'basename'),
+                                  ('suffix', 'endpoint'),
                                   'linked_models',
                                   )})]
 
@@ -129,9 +130,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     @action()
     def doc(self, request, pk):
         service = Service.objects.get(pk=pk)
-        base = '/api/+redoc/#operation/'
-        path = service.endpoint.replace('/', '_')
-        return HttpResponseRedirect("{0}api_{1}_list".format(base, path))
+        return HttpResponseRedirect(service.doc_url)
 
     @action()
     def api(self, request, pk):

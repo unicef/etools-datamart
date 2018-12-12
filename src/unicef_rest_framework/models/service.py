@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import F
 from django.utils.functional import cached_property
-from django_celery_beat.models import CrontabSchedule
 from rest_framework.reverse import reverse
 from strategy_field.fields import StrategyClassField
 from unicef_rest_framework.config import conf
@@ -41,7 +40,7 @@ class ServiceManager(models.Manager):
 
         service.url_name = url_name
         service.basename = basename
-        service.endpoint = prefix
+        service.suffix = prefix
         service.source_model = source_model
         service.save()
         viewset.get_service.cache_clear()
@@ -90,6 +89,7 @@ class Service(MasterDataModel):
     viewset = StrategyClassField(help_text='class FQN',
                                  unique=True, db_index=True)
     basename = models.CharField(max_length=200, help_text='viewset basename')
+    suffix = models.CharField(max_length=200, help_text='url suffix')
     url_name = models.CharField(max_length=300, help_text='url name as per drf reverse')
     access = models.IntegerField(choices=[(k, v) for k, v in acl.ACL_LABELS.items()],
                                  default=acl.ACL_ACCESS_LOGIN,
@@ -142,6 +142,11 @@ class Service(MasterDataModel):
     def display_name(self):
         return "{} ({})".format(self.viewset.__name__, self.viewset.source)
 
+    def doc_url(self):
+        base = '/api/+redoc/#operation/'
+        path = self.suffix.replace('/', '_')
+        return "{0}api_{1}_list".format(base, path)
+
     @cached_property
     def managed_model(self):
         try:
@@ -150,8 +155,6 @@ class Service(MasterDataModel):
             return None
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.cache_expire:
-            CrontabSchedule
         if self.pk:
             try:
                 v = self.viewset()

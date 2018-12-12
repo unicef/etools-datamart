@@ -32,6 +32,7 @@ class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
                 service = view.get_service()
                 service_url = reverse(f'admin:unicef_rest_framework_service_change', args=[service.pk])
                 ctx['service_url'] = service_url
+                ctx['service'] = service
             except Exception:  # pragma: no cover
                 pass
             try:

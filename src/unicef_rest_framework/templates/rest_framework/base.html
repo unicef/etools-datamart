@@ -100,7 +100,9 @@
           {% block content %}
 
           <div class="region"  aria-label="{% trans "request form" %}">
-
+          <div class="pull-right" style="margin-left: 10px">
+              <a href="{{ service.doc_url }}" class="btn btn-primary js-tooltip" title="Documentation">Doc</a>
+          </div>
           {% if iqy_url %}
               <div class="pull-right" style="margin-left: 10px">
                   <fieldset>

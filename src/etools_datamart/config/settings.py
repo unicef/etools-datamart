@@ -11,9 +11,10 @@ SETTINGS_DIR = Path(__file__).parent
 PACKAGE_DIR = SETTINGS_DIR.parent
 DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 
-env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
+env = environ.Env(API_PREFIX=(str, '/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   ANALYTICS_CODE=(str, ""),
+                  REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
                   CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
@@ -71,6 +72,7 @@ STATIC_ROOT = env('STATIC_ROOT')
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
+API_PREFIX = env('API_PREFIX')
 
 ADMINS = (
     ('Stefano', 'saxix@saxix.onmicrosoft.com'),
@@ -499,7 +501,7 @@ SCOPE = ['openid', 'email']
 IGNORE_DEFAULT_SCOPE = True
 
 SWAGGER_SETTINGS = {
-    'DEFAULT_API_URL': env('API_URL'),
+    'DEFAULT_API_URL': env('ABSOLUTE_BASE_URL') + env('API_PREFIX'),
     'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
     'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
     'SECURITY_DEFINITIONS': {
