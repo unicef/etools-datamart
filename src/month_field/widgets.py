@@ -14,9 +14,11 @@ class MonthSelectorWidget(widgets.MultiWidget):
 
     def __init__(self, attrs=None):
         # create choices for days, months, years
+        months = {"": "--"}
+        months.update(MONTHS)
         _attrs = attrs or {}  # default class
         _attrs['style'] = 'width:20%;'
-        _widgets = [widgets.Select(attrs=_attrs, choices=MONTHS.items()),
+        _widgets = [widgets.Select(attrs=_attrs, choices=months.items()),
                     widgets.NumberInput(attrs=_attrs)
                     ]
         super(MonthSelectorWidget, self).__init__(_widgets, attrs)
@@ -48,7 +50,7 @@ class MonthSelectorWidget(widgets.MultiWidget):
         try:
             D = date(day=1, month=int(datelist[0]),
                      year=int(datelist[1]))
-        except ValueError:
+        except (ValueError, TypeError):
             return ''
         else:
             return str(D)

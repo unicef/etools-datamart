@@ -1,8 +1,9 @@
-{% load rest_framework i18n %}
-<form method="get" action="">
-    <table>
-    {{ form.as_table }}
+{% load rest_framework i18n crispy_forms_tags %}
+{#<h2>{% trans "Fields" %}</h2>#}
+{#<form method="get" action="">#}
 
-    </table>
-    <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
-</form>
+{#    {{ form|crispy }}#}
+    {{ form|crispy }}
+
+{#    <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>#}
+{#</form>#}

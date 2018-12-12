@@ -97,19 +97,6 @@ register('etljson', etl_dumps, json.loads,
          content_type='application/x-myjson', content_encoding='utf-8')
 
 
-# @task_success.connect
-# def task_success_handler(signal, sender, result, **kw):
-#     # TODO: remove me
-#     print(22222222222, sender)
-#     print(22222222222, result)
-#
-#
-# @task_failure.connect
-# def task_failure_handler(signal, sender, task_id, exception, args, kwargs, tarceback, einfo, **kw):
-#     # TODO: remove me
-#     print(33333333333)
-
-
 @task_postrun.connect
 def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, state, **kw):
     from django.utils import timezone

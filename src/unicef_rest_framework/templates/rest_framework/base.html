@@ -5,7 +5,7 @@
 
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     {% block head %}
         <link rel="icon" type="image/ico" href="{% static 'favicon.ico' %}">
       {% block meta %}
@@ -20,7 +20,7 @@
           <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/bootstrap.min.css" %}"/>
           <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/bootstrap-tweaks.css" %}"/>
         {% endblock %}
-
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
         <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/prettify.css" %}"/>
         <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/default.css" %}"/>
         <link rel="stylesheet" type="text/css" href="{% static "style.css" %}"/>
@@ -36,6 +36,20 @@
         </script>
     {% endif %}
     {% endblock %}
+<style>
+    @media (min-width: 768px){
+        #messageModal .modal-dialog {
+            width: 750px;
+            margin: 30px auto;
+        }
+    }
+    @media (min-width: 1024px){
+        #messageModal .modal-dialog {
+            width: 800px;
+            margin: 30px auto;
+        }
+    }
+</style>
   </head>
 
   {% block body %}
@@ -48,7 +62,7 @@
           <div class="container">
             <span>
               {% block branding %}
-                <a class='navbar-brand' rel="nofollow" href='/'>
+                  <a class='navbar-brand' rel="nofollow" href='/'>
                     UNICEF REST Framework
                 </a>
               {% endblock %}
@@ -86,6 +100,30 @@
           {% block content %}
 
           <div class="region"  aria-label="{% trans "request form" %}">
+
+          {% if iqy_url %}
+              <div class="pull-right" style="margin-left: 10px">
+                  <fieldset>
+                  <div class="btn-group format-selection">
+                    <a class="btn btn-primary js-tooltip" href="{{ iqy_url  }}?{% set_query_values %}" rel="nofollow" title="Download IQY file">IQY</a>
+                    <button class="btn btn-primary dropdown-toggle js-tooltip" data-toggle="dropdown" title="IQY">
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                          <a class="js-tooltip format-option" href="{{ iqy_url  }}?{% set_query_values %}" rel="nofollow" title="">Download</a>
+                          <a data-toggle="modal" data-target="#messageModal"
+                             data-source="{{ iqy_url  }}?{% set_query_values _display=1 %}"
+                                  class="display-modal js-tooltip format-option"
+                                    href="#" rel="nofollow" title="">Display</a>
+                        </li>
+                    </ul>
+                      &nbsp;
+              </div>
+              </fieldset>
+             </div>
+          {% endif %}
+
           {% if 'GET' in allowed_methods %}
             <form id="get-form" class="pull-right">
               <fieldset>
@@ -115,13 +153,6 @@
             <form class="button-form" action="{{ request.get_full_path }}" data-method="OPTIONS">
               <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">OPTIONS</button>
             </form>
-          {% endif %}
-          {% if iqy_url %}
-              <span class="button-form" >
-              <a href="{{ iqy_url  }}?{% set_query_values %}"
-                 tyle="float: right; color:black; background-color: #1e90ff; margin-right: 0;margin-top:5px; margin-left: 10px;"
-                 class="btn btn-primary js-tooltip">IQY</a>
-              </span>
           {% endif %}
 
           {% if delete_form %}
@@ -191,7 +222,9 @@
               {% endif %}
 
               <div class="request-info" style="clear: both" aria-label="{% trans "request info" %}">
-                <pre class="prettyprint"><b>{{ request.method }}</b> {{ request.get_full_path }}</pre>
+                <pre class="prettyprint"><b>{{ request.method }}</b> {{ request.get_full_path }}<span style="cursor:pointer;float: right;position: relative;display: inline" id="copyToClipboard">copy</span></pre>
+                  <input style="position: absolute;left:-9999px"
+                          readonly="readonly" type="text" name="query-url" value="{{request.get_full_path}}">
               </div>
 
               <div class="response-info" aria-label="{% trans "response info" %}">
@@ -303,8 +336,22 @@
     </div><!-- ./wrapper -->
 
     {% if filter_form %}
-      {{ filter_form }}
+        {{ filter_form }}
     {% endif %}
+
+    <div class="modal fade" id="messageModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"></h4>
+        </div>
+          <div class="modal-body">
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     {% block script %}
       <script>
@@ -319,10 +366,52 @@
       <script src="{% static "rest_framework/js/bootstrap.min.js" %}"></script>
       <script src="{% static "rest_framework/js/prettify-min.js" %}"></script>
       <script src="{% static "rest_framework/js/default.js" %}"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
       <script>
-        $(document).ready(function() {
-          $('form').ajaxForm();
-        });
+            $(document).ready(function () {
+                $('form').ajaxForm();
+            });
+
+            $('.select2').select2({
+                placeholder: 'Select an option'
+            });
+            $('#filter-form').on("submit", function (e) {
+                var qs = {};
+                $('#filter-form *').filter(':input').each(function (id, el) {
+                    var $el = $(el);
+                    var name = $el.attr("name");
+                    var val = $el.val();
+                    if (name && val) {
+                        if (name === 'month_0'){
+                            qs["month"] = val + "-" +$('input[name=month_1]').val();
+                        }else if (name==='month_1') {
+
+                        }
+                        else if (val.constructor === Array && val.length > 0) {
+                            qs[name] = val.join();
+                        } else {
+                            qs[name] = val;
+                        }
+                    }
+                });
+                location.href = location.pathname+ "?"+ $.param(qs);;
+                return false;
+            });
+            $("#copyToClipboard").on("click", function(){
+                $('input[name=query-url]').select();
+                document.execCommand("copy");
+                console.log("copied")
+            });
+            $(".display-modal").on("click", function(e){
+                var url = $(e.target).data("source");
+                $.ajax(url).done(function( data ) {
+                    $("#messageModal .modal-title").html("IQY file");
+                    $("#messageModal .modal-body").html("<pre>"+data+"</pre>");
+                    $("#messageModal").show();
+                    console.log( data )
+                });
+            });
       </script>
     {% endblock %}
 

@@ -22,9 +22,9 @@ def local_user(db):
 
 @pytest.fixture()
 def user_data(db):
-    data = [UserStatsFactory(country_name='lebanon', month=datetime.datetime(2000, 1, 1)),
-            UserStatsFactory(country_name='chad', month=datetime.datetime(2000, 1, 1)),
-            UserStatsFactory(country_name='bolivia', month=datetime.datetime(2000, 1, 1))]
+    data = [UserStatsFactory(country_name='Lebanon', schema_name='lebanon', month=datetime.datetime(2000, 1, 1)),
+            UserStatsFactory(country_name='Chad', schema_name='chad', month=datetime.datetime(2000, 1, 1)),
+            UserStatsFactory(country_name='Bolivia', schema_name='bolivia', month=datetime.datetime(2000, 1, 1))]
     yield
     [r.delete() for r in data]
 

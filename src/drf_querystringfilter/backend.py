@@ -35,6 +35,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
     allowed_joins = -1
     field_casting = {}
 
+    def __init__(self) -> None:
+        self.unknown_arguments = []
+
     def get_form_class(self, request, view):
         fields = OrderedDict([
             (name, forms.CharField(required=False))
@@ -44,7 +47,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
                     (forms.Form,), fields)
 
     def get_form(self, request, view):
-        # if not hasattr(self, '_form'):
+        if hasattr(view, 'get_querystringfilter_form'):
+            return view.get_querystringfilter_form(request.GET, prefix=self.form_prefix)
+
         Form = self.get_form_class(request, view)
         self._form = Form(request.GET, prefix=self.form_prefix)
         return self._form
@@ -164,11 +169,11 @@ class QueryStringFilterBackend(BaseFilterBackend):
                     else:
                         op = ''
 
-                    #     parts = [field_name]
-
                     processor = getattr(self, 'process_{}'.format(filter_field_name), None)
                     if (filter_field_name not in filter_fields) and (not processor):
-                        raise InvalidQueryArgumentError(filter_field_name)
+                        self.unknown_arguments.append((fieldname_arg, filter_field_name))
+                        continue
+                        # raise InvalidQueryArgumentError(filter_field_name)
                     if raw_value is None and not processor:
                         continue
                     # field is configured in Serializer

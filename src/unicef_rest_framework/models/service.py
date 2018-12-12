@@ -23,6 +23,9 @@ class ServiceManager(models.Manager):
             service.viewset.get_service.cache_clear()
 
     def get_for_viewset(self, viewset):
+        return self.model.objects.get(viewset=viewset)
+
+    def check_or_create(self, prefix, viewset, basename, url_name, ):
         name = getattr(viewset, 'label', viewset.__name__)
         source_model = ContentType.objects.get_for_model(viewset().get_queryset().model)
         service, isnew = self.model.objects.get_or_create(viewset=viewset,
@@ -34,17 +37,22 @@ class ServiceManager(models.Manager):
                                                               'description': getattr(viewset, '__doc__', ""),
                                                               'source_model': source_model
                                                           })
-        if not isnew:
-            service.source_model = source_model
-            service.save()
-            viewset.get_service.cache_clear()
+
+        service.url_name = url_name
+        service.basename = basename
+        service.endpoint = prefix
+        service.source_model = source_model
+        service.save()
+        viewset.get_service.cache_clear()
         return service, isnew
 
     def load_services(self):
         router = conf.ROUTER
         created = deleted = 0
+        list_name = router.routes[0].name
         for prefix, viewset, basename in router.registry:
-            service, isnew = self.get_for_viewset(viewset)
+            service, isnew = self.check_or_create(prefix, viewset, basename,
+                                                  list_name.format(basename=basename))
             # try:
             if isnew:
                 created += 1
@@ -80,6 +88,9 @@ class Service(MasterDataModel):
     description = models.TextField(blank=True, null=True)
     viewset = StrategyClassField(help_text='class FQN',
                                  unique=True, db_index=True)
+    basename = models.CharField(max_length=200, help_text='viewset basename')
+    url_name = models.CharField(max_length=300, help_text='url name as per drf reverse')
+    endpoint = models.CharField(max_length=300, help_text='url path')
     access = models.IntegerField(choices=[(k, v) for k, v in acl.ACL_LABELS.items()],
                                  default=acl.ACL_ACCESS_LOGIN,
                                  help_text="Required privileges")

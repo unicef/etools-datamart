@@ -269,6 +269,14 @@ INSTALLED_APPS = [
     # 'django.contrib.admin',
     'etools_datamart.config.admin.AdminConfig',
 
+    'etools_datamart.apps.core.apps.Config',
+    'etools_datamart.apps.etools',
+    'etools_datamart.apps.data',
+    'etools_datamart.apps.etl.apps.Config',
+    'etools_datamart.apps.tracking.apps.Config',
+    'etools_datamart.apps.subscriptions',
+    'etools_datamart.api',
+
     'admin_extra_urls',
     'unicef_rest_framework.apps.Config',
     'rest_framework',
@@ -293,13 +301,6 @@ INSTALLED_APPS = [
 
     'django_celery_beat',
 
-    'etools_datamart.apps.core.apps.Config',
-    'etools_datamart.apps.etools',
-    'etools_datamart.apps.data',
-    'etools_datamart.apps.etl.apps.Config',
-    'etools_datamart.apps.tracking.apps.Config',
-    'etools_datamart.apps.subscriptions',
-    'etools_datamart.api',
 ]
 DATE_FORMAT = '%d %b %Y'
 DATE_INPUT_FORMATS = [
@@ -340,7 +341,14 @@ POST_OFFICE = {
         'default': 'djcelery_email.backends.CeleryEmailBackend'
     }
 }
+# celery-mail
 CELERY_EMAIL_CHUNK_SIZE = 10
+
+# crispy-forms
+CRISPY_FAIL_SILENTLY = not DEBUG
+CRISPY_CLASS_CONVERTERS = {'textinput': "textinput inputtext"}
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
 # django-secure
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE')
 SECURE_BROWSER_XSS_FILTER = True

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from functools import lru_cache
 
 import coreapi
@@ -16,19 +16,53 @@ class MonthForm(forms.Form):
     month = MonthField()
 
 
+def clean(value):
+    months = list(MONTHS_3.values())
+    if '-' in value:
+        m, y = value.split('-')
+        y = y or datetime.now().year
+    else:
+        m = value
+        y = datetime.now().year
+
+    if m in months:
+        m = months.index(m) + 1
+    elif m in list(map(str, range(12))):
+        m = m
+    elif value == 'current':
+        m = datetime.now().month
+        y = datetime.now().year
+    else:
+        m = 0
+        y = 0
+    return int(m), int(y)
+
+
 class MonthFilterBackend(BaseFilterBackend):
     template = 'month_field/rest_framework/month_filtering.html'
     month_param = 'month'
 
-    def get_value(self, request, queryset, view):
-        return request.query_params.get(self.month_param)
+    def get_value(self, request):
+        raw_value = request.query_params.get(self.month_param, "")
+        return clean(raw_value)
+
+    def get_form(self, request, view, context):
+        month, year = context['current']
+        Frm = type("MonthForm", (forms.Form,),
+                   {self.month_param: MonthField(label="Month",
+                                                 required=False)})
+        if month:
+            return Frm(initial={self.month_param: date(day=1, month=month, year=year)})
+        else:
+            return Frm()
 
     def get_template_context(self, request, queryset, view):
-        current = self.get_value(request, queryset, view)
+        current = self.get_value(request)
         context = {
             'request': request,
-            'form': MonthForm(initial={'month': current}),
+            'current': current,
         }
+        context['form'] = self.get_form(request, view, context)
         return context
 
     def to_html(self, request, queryset, view):
@@ -57,25 +91,10 @@ class MonthFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         value = request.GET.get('month', "").lower()
         m = y = None
-        months = MONTHS_3.values()
+
         if value:
             try:
-                if '-' in value:
-                    m, y = value.split('-')
-                else:
-                    m = value
-                    y = datetime.now().year
-
-                if m in months:
-                    m = months.index(m) + 1
-                elif m in list(map(str, range(12))):
-                    m = m
-                elif value == 'current':
-                    m = datetime.now().month
-                    y = datetime.now().year
-                # elif value == 'latest':
-                #     m = datetime.now().month
-                #     y = datetime.now().year
+                m, y = clean(value)
                 return queryset.filter(month__month=int(m),
                                        month__year=int(y))
             except ValueError:

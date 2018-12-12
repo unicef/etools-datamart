@@ -9,9 +9,9 @@ from unicef_rest_framework.test_utils import user_allow_country
 
 @pytest.fixture(autouse=True)
 def setup_data(db):
-    datas = [InterventionFactory(country_name='bolivia'),
-             InterventionFactory(country_name='chad'),
-             InterventionFactory(country_name='lebanon')]
+    datas = [InterventionFactory(schema_name='bolivia', country_name='Bolivia'),
+             InterventionFactory(schema_name='chad', country_name='Chad'),
+             InterventionFactory(schema_name='lebanon', country_name='Lebanon')]
     yield
     [d.delete() for d in datas]
 
@@ -23,14 +23,14 @@ def test_user_system_filter(client: APIClient, data_service: Service, user1: Use
 
     client.force_authenticate(user1)
     data_service.invalidate_cache()
-    SystemFilterFactory(service=data_service, user=user1, rules={'country_name': 'bolivia'})
+    SystemFilterFactory(service=data_service, user=user1, rules={'country_name': 'Bolivia'})
     UserAccessControlFactory(service=data_service, user=user1)
     with user_allow_country(user1, "bolivia"):
         with django_assert_no_duplicate_queries():
             res = client.get(data_service.endpoint)
     assert res.status_code == 200
     results = res.json()['results']
-    assert res['system-filters'] == "country_name=bolivia"
+    assert res['system-filters'] == "country_name=Bolivia"
     assert res['cache-hit'] == "False"
     assert len(results) == 1
     assert [r['country_name'] for r in results] == ['bolivia']

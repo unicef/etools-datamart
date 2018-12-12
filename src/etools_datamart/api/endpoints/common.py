@@ -6,13 +6,14 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
 from django.http import Http404
 from drf_querystringfilter.exceptions import QueryFilterException
+from dynamic_serializer.core import InvalidSerializerError
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
-from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from unicef_rest_framework.ds import DynamicSerializerFilter
 from unicef_rest_framework.filtering import SystemFilterBackend
-from unicef_rest_framework.views import ReadOnlyModelViewSet
+from unicef_rest_framework.ordering import OrderingFilter
+from unicef_rest_framework.views import URFReadOnlyModelViewSet
 from unicef_rest_framework.views_mixins import IQYConnectionMixin
 
 from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
@@ -40,9 +41,8 @@ class UpdatesMixin:
                         headers={'update-date': offset})
 
 
-class APIReadOnlyModelViewSet(ReadOnlyModelViewSet, IQYConnectionMixin):
+class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin):
     filter_backends = [CountryFilter,
-                       SystemFilterBackend,
                        DatamartQueryStringFilterBackend,
                        OrderingFilter,
                        DynamicSerializerFilter,
@@ -53,19 +53,12 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet, IQYConnectionMixin):
 
     def get_schema_fields(self):
         ret = []
-        # if self.serializers_fieldsets:
-        #     ret.append(coreapi.Field(
-        #         name=self.serializer_field_param,
-        #         required=False,
-        #         location='query',
-        #         schema=SchemaSerializerField(self)
-        #     ))
         return ret
 
     def drf_ignore_filter(self, request, field):
         return field in [self.serializer_field_param,
                          self.dynamic_fields_param,
-                         'cursor', CountryFilter.query_param,
+                         'cursor', CountryFilter.query_param, 'month',
                          'ordering', 'page_size', 'format', 'page']
 
     def handle_exception(self, exc):
@@ -81,6 +74,8 @@ class APIReadOnlyModelViewSet(ReadOnlyModelViewSet, IQYConnectionMixin):
             return Response({"error": str(exc)}, status=403)
         elif isinstance(exc, PermissionDenied):
             return Response({"error": str(exc)}, status=403)
+        elif isinstance(exc, InvalidSerializerError):
+            return Response({"error": str(exc)}, status=400)
         elif isinstance(exc, InvalidSchema):
             return Response({"error": str(exc),
                              "hint": "Removes wrong schema from selection",

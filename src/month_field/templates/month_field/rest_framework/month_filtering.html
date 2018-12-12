@@ -1,15 +1,5 @@
-{% load rest_framework i18n %}
-<h2>{% trans "Month" %}</h2>
+{% load rest_framework i18n crispy_forms_tags %}
+{#<h2>{% trans "Month" %}</h2>#}
 <div class="list-group">
-    <form class="form" method="get" id="month_field_form">
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
-    </form>
-    <script>
-        $('#month_field_form').submit(function (e) {
-            var form = $(this);
-            console.log('11111');
-            return false;
-        })
-    </script>
+    {{ form|crispy }}
 </div>

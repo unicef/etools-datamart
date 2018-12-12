@@ -1,3 +1,4 @@
+import sys
 from collections import OrderedDict
 
 from rest_framework import serializers
@@ -37,22 +38,40 @@ class APIPagination(PageNumberPagination):
     last_page_strings = ('last',)
 
     def get_paginated_response(self, data):
-        return Response(OrderedDict([
-            ('count', self.page.paginator.count),
-            ('next', self.get_next_link()),
-            ('current_page', self.page.number),
-            ('total_pages', self.page.paginator.num_pages),
-            ('previous', self.get_previous_link()),
-            ('results', data)
-        ]))
+        if hasattr(self, 'page'):
+            return Response(OrderedDict([
+                ('count', self.page.paginator.count),
+                ('next', self.get_next_link()),
+                ('current_page', self.page.number),
+                ('total_pages', self.page.paginator.num_pages),
+                ('previous', self.get_previous_link()),
+                ('results', data)
+            ]))
+        else:
+            return Response(OrderedDict([
+                ('count', len(data)),
+                ('next', 'N/A'),
+                ('current_page', 1),
+                ('total_pages', 1),
+                ('previous', 'N/A'),
+                ('results', data)
+            ]))
 
     def get_page_size(self, request):
-        if request._request.GET.get('format') == 'csv':
-            return 999999999
+        if request._request.GET.get('format') == ['csv', 'iqy', 'xlsx']:
+            return sys.maxsize
+        try:
+            desired = request.query_params[self.page_size_query_param]
+            if desired == "-1":
+                return sys.maxsize
+        except (KeyError, ValueError):
+            pass
         return super().get_page_size(request)
 
     def paginate_queryset(self, queryset, request, view=None):
         # self._handle_backwards_compat(view)
+        if self.get_page_size(request) == sys.maxsize:
+            return queryset
         return super(APIPagination, self).paginate_queryset(queryset, request, view)
 
     def get_next_link(self):

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class SystemFilterBackend(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
-        # _system_filters ahs been set by cache.SystemFilterKeyBit
+        # _system_filters has been set by cache.SystemFilterKeyBit
         # if hasattr(request._request, "_system_filters"):
         #     if request._request._system_filters:
         #         queryset = request._request._system_filters.filter_queryset(queryset)

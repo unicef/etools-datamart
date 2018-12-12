@@ -1,5 +1,6 @@
 import coreapi
 import coreschema
+from django.forms import ChoiceField, forms
 from django.template import loader
 from dynamic_serializer.core import DynamicSerializerMixin as DynamicSerializerMixinBase
 from rest_framework.filters import BaseFilterBackend
@@ -37,7 +38,7 @@ class SchemaSerializerField(coreschema.Enum):
 class DynamicSerializerFilter(BaseFilterBackend):
     # template = 'rest_framework/filters/search.html'
     ordering_title = 'Serializer'
-    template = 'dynamic_serializer/filter.html'
+    template = 'dynamic_serializer/select.html'
 
     def get_schema_fields(self, view):
         ret = []
@@ -53,16 +54,27 @@ class DynamicSerializerFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         return queryset
 
+    def get_form(self, request, view):
+        choices = zip(view.serializers_fieldsets.keys(), view.serializers_fieldsets.keys())
+        Frm = type("SerializerForm", (forms.Form,),
+                   {view.serializer_field_param: ChoiceField(
+                       label="Serializer",
+                       choices=choices,
+                       required=False)})
+        return Frm(request.GET)
+
     def get_template_context(self, request, queryset, view):
         current = view.get_selected_serializer_name()
         context = {'request': request,
                    'current': current,
+                   'form': self.get_form(request, view),
                    'param': view.serializer_field_param,
                    }
         context['options'] = view.serializers_fieldsets.keys()
         return context
 
     def to_html(self, request, queryset, view):
-        template = loader.get_template(self.template)
-        context = self.get_template_context(request, queryset, view)
-        return template.render(context)
+        if len(view.serializers_fieldsets.keys()) > 1:
+            template = loader.get_template(self.template)
+            context = self.get_template_context(request, queryset, view)
+            return template.render(context)

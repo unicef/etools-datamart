@@ -7,11 +7,12 @@ from rest_framework.reverse import reverse
 logger = logging.getLogger(__name__)
 
 
-class APIBrowsableAPIRenderer(_BrowsableAPIRenderer):
+class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
     template = 'rest_framework/api.html'
+    filter_template = 'rest_framework/filter_template.html'
 
     def get_context(self, data, accepted_media_type, renderer_context):
-        ctx = super(APIBrowsableAPIRenderer, self).get_context(data, accepted_media_type, renderer_context)
+        ctx = super(URFBrowsableAPIRenderer, self).get_context(data, accepted_media_type, renderer_context)
         # in the real flow, this is added by the MultiTenant Middleware
         # but this function is called before the middleware system is involved
         request = ctx['request']

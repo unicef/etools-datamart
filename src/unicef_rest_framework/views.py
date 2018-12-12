@@ -5,7 +5,6 @@ import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
-from rest_framework.filters import OrderingFilter
 from rest_framework.renderers import JSONRenderer
 from rest_framework_xml.renderers import XMLRenderer
 from rest_framework_yaml.renderers import YAMLRenderer
@@ -17,9 +16,10 @@ from .cache import cache_response, etag, ListKeyConstructor
 from .ds import DynamicSerializerFilter, DynamicSerializerMixin
 from .filtering import SystemFilterBackend
 from .negotiation import CT
+from .ordering import OrderingFilter
 from .permissions import ServicePermission
-from .renderers import (APIBrowsableAPIRenderer, HTMLRenderer, IQYRenderer, MSJSONRenderer,
-                        MSXmlRenderer, PDFRenderer, TextRenderer, XLSXRenderer,)
+from .renderers import (HTMLRenderer, IQYRenderer, MSJSONRenderer, MSXmlRenderer,
+                        PDFRenderer, TextRenderer, URFBrowsableAPIRenderer, XLSXRenderer,)
 from .renderers.csv import CSVRenderer
 
 
@@ -31,7 +31,7 @@ class classproperty(object):
         return self.getter(owner)
 
 
-class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
+class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
     serializer_field_param = '-serializer'
     dynamic_fields_param = '+fields'
 
@@ -52,13 +52,12 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
                               )
     default_access = acl.ACL_ACCESS_LOGIN
     content_negotiation_class = CT
-    filter_backends = [SystemFilterBackend,
-                       QueryStringFilterBackend,
+    filter_backends = [QueryStringFilterBackend,
                        OrderingFilter,
                        DynamicSerializerFilter]
 
     renderer_classes = [JSONRenderer,
-                        APIBrowsableAPIRenderer,
+                        URFBrowsableAPIRenderer,
                         CSVRenderer,
                         YAMLRenderer,
                         XLSXRenderer,
@@ -77,6 +76,17 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     # pagination_class = paginator()
     permission_classes = [ServicePermission, ]
     serializers_fieldsets = {}
+
+    def get_filter_backends(self, removes=None):
+        flt = list(self.filter_backends)
+        if SystemFilterBackend not in flt:
+            flt.insert(0, SystemFilterBackend)
+        return list(filter(removes, flt))
+
+    def filter_queryset(self, queryset):
+        for backend in self.get_filter_backends():
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
 
     def store(self, key, value):
         self.request._request.api_info[key] = value
@@ -102,7 +112,7 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     @lru_cache()
     def get_service(cls):
         from unicef_rest_framework.models import Service
-        return Service.objects.get_for_viewset(cls)[0]
+        return Service.objects.get_for_viewset(cls)
 
     # @classproperty
     # def endpoint(self):
@@ -114,12 +124,12 @@ class ReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet
     @etag(etag_func='object_etag_func')
     @cache_response(key_func='object_cache_key_func', cache='api')
     def retrieve(self, request, *args, **kwargs):
-        return super(ReadOnlyModelViewSet, self).retrieve(request, *args, **kwargs)
+        return super(URFReadOnlyModelViewSet, self).retrieve(request, *args, **kwargs)
 
     @etag(etag_func='list_etag_func')
     @cache_response(key_func='list_cache_key_func', cache='api')
     def list(self, request, *args, **kwargs):
-        return super(ReadOnlyModelViewSet, self).list(request, *args, **kwargs)
+        return super(URFReadOnlyModelViewSet, self).list(request, *args, **kwargs)
 
     @property
     def paginator(self):

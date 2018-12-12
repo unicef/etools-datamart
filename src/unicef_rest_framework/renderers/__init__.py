@@ -1,4 +1,4 @@
-from .api import APIBrowsableAPIRenderer  # noqa
+from .api import URFBrowsableAPIRenderer  # noqa
 from .microsoft.json import MSJSONRenderer  # noqa
 from .microsoft.xml import MSXmlRenderer  # noqa
 from .xls import XLSXRenderer  # noqa
