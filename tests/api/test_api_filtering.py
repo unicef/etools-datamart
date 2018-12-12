@@ -1,6 +1,6 @@
 import pytest
 from rest_framework.test import APIClient
-from test_utilities.factories import AdminFactory, UserFactory
+from test_utilities.factories import AdminFactory, FAMIndicatorFactory, UserFactory
 from unicef_rest_framework.test_utils import user_allow_country, user_allow_service
 
 from etools_datamart.api.endpoints import EngagementViewSet, InterventionViewSet, PartnerViewSet
@@ -106,14 +106,26 @@ def test_filter_country_invalid(viewset, user_type, op):
 #             assert res.json()
 #
 #
-@pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', ''])
-def test_filter_datamart_month(db, client, flt):
+
+@pytest.mark.parametrize('ct', ['text/html', 'application/json'])
+@pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', '', '12-'])
+def test_filter_datamart_month(db, client, flt, ct):
+    FAMIndicatorFactory(month='2018-12')
     client.force_authenticate(AdminFactory())
 
-    url = f"/api/latest/datamart/user-stats/?month=%s" % flt
-    res = client.get(url)
+    url = f"/api/latest/datamart/fam-indicators/?month=%s" % flt
+    res = client.get(url, HTTP_ACCEPT=ct)
     assert res.status_code == 200
-    assert res.json()
+    # assert res.json()
+
+#
+# @pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', '', '10-'])
+# def test_filter_datamart_month_browseable(admin_user, django_app, flt):
+#     url = f"/api/latest/datamart/user-stats/?month=%s" % flt
+#     res = django_app.get(url, user=admin_user, HTTP_ACCEPT='text/html')
+#     assert res.status_code == 200
+#     assert res.content == ""
+#
 
 #
 # @pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', ''])

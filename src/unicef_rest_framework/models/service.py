@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import F
 from django.utils.functional import cached_property
+from django_celery_beat.models import CrontabSchedule
 from rest_framework.reverse import reverse
 from strategy_field.fields import StrategyClassField
 from unicef_rest_framework.config import conf
@@ -90,7 +91,6 @@ class Service(MasterDataModel):
                                  unique=True, db_index=True)
     basename = models.CharField(max_length=200, help_text='viewset basename')
     url_name = models.CharField(max_length=300, help_text='url name as per drf reverse')
-    endpoint = models.CharField(max_length=300, help_text='url path')
     access = models.IntegerField(choices=[(k, v) for k, v in acl.ACL_LABELS.items()],
                                  default=acl.ACL_ACCESS_LOGIN,
                                  help_text="Required privileges")
@@ -102,7 +102,6 @@ class Service(MasterDataModel):
 
     cache_version = models.IntegerField(default=1)
     cache_ttl = models.CharField(default='1d', max_length=5)
-    # cache_expire = models.TimeField(blank=True, null=True)
     cache_key = models.CharField(max_length=1000,
                                  null=True, blank=True,
                                  help_text='Key used to invalidate service cache')
@@ -125,6 +124,7 @@ class Service(MasterDataModel):
     def invalidate_cache(self):
         Service.objects.invalidate_cache(id=self.pk)
         self.refresh_from_db()
+        return self.cache_version
 
     def reset_cache(self, value=0):
         Service.objects.filter(id=self.pk).update(cache_version=value)
@@ -136,10 +136,7 @@ class Service(MasterDataModel):
 
     @cached_property
     def endpoint(self):
-        for __, viewset, base_name in conf.ROUTER.registry:
-            if viewset == self.viewset:
-                return reverse(f'api:{base_name}-list', args=['latest'])
-        return None
+        return reverse(f'api:{self.basename}-list', args=['latest'])
 
     @cached_property
     def display_name(self):
@@ -149,14 +146,12 @@ class Service(MasterDataModel):
     def managed_model(self):
         try:
             return self.source_model.model_class()
-            # v = self.viewset()
-            # m = v.get_queryset().model
-            # del v
-            # return m
         except TypeError:
             return None
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.cache_expire:
+            CrontabSchedule
         if self.pk:
             try:
                 v = self.viewset()
@@ -167,11 +162,8 @@ class Service(MasterDataModel):
                 logger.exception(e)
         super(Service, self).save(force_insert, force_update, using, update_fields)
 
-        # self.invalidate_cache()
-
     def __str__(self):
         return self.name
-        # return "Service:{} ({})".format(self.name, self.viewset)
 
 
 class CacheVersion(Service):

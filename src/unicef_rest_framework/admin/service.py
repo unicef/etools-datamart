@@ -39,12 +39,12 @@ def get_stash_url(obj, label=None, **kwargs):
 
 
 class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('name', 'visible', 'access', 'cache_version', 'source_model', 'json', 'admin')
+    list_display = ('name', 'visible', 'access', 'cache_version', 'basename', 'json', 'admin')
     list_filter = ('hidden', 'access')
 
     search_fields = ('name', 'viewset')
     readonly_fields = ('cache_version', 'cache_ttl', 'cache_key', 'viewset', 'name', 'uuid',
-                       'last_modify_user', 'source_model',)
+                       'last_modify_user', 'source_model', 'endpoint', 'basename')
     form = ServiceForm
     filter_horizontal = ('linked_models',)
     fieldsets = [("", {"fields": ('name',
@@ -52,7 +52,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
                                   'access',
                                   # 'confidentiality',
                                   # 'hidden',
-                                  'source_model',
+                                  ('source_model', 'basename', 'endpoint'),
                                   'linked_models',
                                   )})]
 
@@ -127,9 +127,22 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         Service.objects.invalidate_cache()
 
     @action()
+    def doc(self, request, pk):
+        service = Service.objects.get(pk=pk)
+        base = '/api/+redoc/#operation/'
+        path = service.endpoint.replace('/', '_')
+        return HttpResponseRedirect("{0}api_{1}_list".format(base, path))
+
+    @action()
     def api(self, request, pk):
         service = Service.objects.get(pk=pk)
         return HttpResponseRedirect(service.endpoint)
+
+    @action()
+    def crontab_expire(self, request, pk):
+        base = reverse("admin:django_celery_beat_crontabschedule_add")
+        url = f"{base}?"
+        return HttpResponseRedirect(url)
 
     @action()
     def invalidate_cache(self, request, pk):

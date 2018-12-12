@@ -27,7 +27,7 @@ def clean(value):
 
     if m in months:
         m = months.index(m) + 1
-    elif m in list(map(str, range(12))):
+    elif m in list(map(str, range(1, 13))):
         m = m
     elif value == 'current':
         m = datetime.now().month
