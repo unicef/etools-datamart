@@ -7,13 +7,11 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 description = """
-# Welcome to eTools Datamart API
-
 Each API endpoint allows filtering and/or ordering results.
+Different formats can be requested using `format` argument.
+Pagination can be disabled with `page_size=-1`
 
 ## Query lookups
-
-Any field where query functions are enabled allow to....
 
 ### Generic lookups
 

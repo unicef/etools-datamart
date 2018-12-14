@@ -1,15 +1,33 @@
+nav {
+  font-family: Roboto, sans-serif; }
+  nav span.title {
+    display: inline-block;
+    font-weight: normal;
+    font-size: 20px; }
+  nav img {
+    margin-left: 10px;
+    width: 50px;
+    vertical-align: middle; }
+  nav .links {
+    margin-right: 50px;
+    float: right;
+    font-size: 16px;
+    line-height: 2;
+    padding: 2px; }
+    nav .links a {
+      color: #32329f;
+      text-transform: none;
+      text-decoration: none; }
+      nav .links a::after {
+        content: " |"; }
+      nav .links a:last-child:after {
+        content: ''; }
+
 .menu-content:before {
-  content: '';
-  /* with class ModalCarrot ??*/
-  background: url("unicef_logo.png");
-  background-size: 100px;
-  background-repeat: no-repeat;
   margin-left: 80px;
-  margin-bottom: 10px;
-  height: 100px;
+  align-content: center;
+  min-height: 110px;
   overflow: hidden;
-  display: block;
-  left: -50px;
-  top: 10px; }
+  display: block; }
 
 /*# sourceMappingURL=api-doc.css.map */
