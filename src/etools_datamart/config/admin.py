@@ -9,11 +9,14 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy
 from django.views.decorators.cache import never_cache
 
+from etools_datamart.libs.version import get_full_version
+
 cache = caches['default']
 
 DEFAULT_INDEX_SECTIONS = {
-    'Administration': ['unicef_rest_framework', 'constance', 'dbtemplates', 'subscriptions'],
-    'Data': ['data', 'etools', 'etl'],
+    'Administration': ['unicef_rest_framework', 'constance',
+                       'dbtemplates', 'subscriptions', 'etl'],
+    'Data': ['data', 'etools'],
     'Security': ['auth', 'unicef_security',
                  'unicef_rest_framework.GroupAccessControl',
                  'unicef_rest_framework.UserAccessControl',
@@ -67,7 +70,7 @@ class DatamartAdminSite(AdminSite):
 
     @never_cache
     def index_new(self, request, extra_context=None):
-        key = f'apps_groups:{request.user.id}'
+        key = f'apps_groups:{request.user.id}:{get_full_version()}'
         app_list = self.get_app_list(request)
         groups = cache.get(key)
         if not groups:

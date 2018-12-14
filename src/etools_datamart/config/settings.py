@@ -629,15 +629,3 @@ def extra(r):
 
 
 SYSINFO = {"extra": {'Azure': extra}}
-
-INDEX_SECTIONS = {
-    'Administration': ['unicef_rest_framework', 'constance', 'dbtemplates', 'subscriptions'],
-    'Data': ['data', 'etools', 'etl'],
-    'Security': ['auth', 'unicef_security',
-                 'unicef_rest_framework.GroupAccessControl',
-                 'unicef_rest_framework.UserAccessControl',
-                 ],
-    'Logs': ['tracking', 'django_db_logging', 'crashlog', ],
-    'System': ['redisboard', 'django_celery_beat', 'post_office'],
-    'Other': ['unicef_rest_framework.Application', ],
-}

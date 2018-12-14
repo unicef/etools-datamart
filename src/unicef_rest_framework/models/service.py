@@ -118,6 +118,7 @@ class Service(MasterDataModel):
 
     class Meta:
         ordering = ('name',)
+        verbose_name_plural = "Services"
 
     objects = ServiceManager()
 
