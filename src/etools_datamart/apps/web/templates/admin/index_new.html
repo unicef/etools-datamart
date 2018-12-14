@@ -1,19 +1,21 @@
-{% extends "admin/index.html" %}{% load i18n %}
+{% extends "admin/index.html" %}{% load i18n static %}
 {% block content %}
+
     <div id="content-main">
+    <input type="text" style="width: 578px;padding:10px;margin-bottom:10px"  id="filterInput" placeholder="Search for names..">
         {% if groups %}
             {% for section, apps in groups.items %}
                 <div class="module">
-                    <table style="width: 100%">
+                    <table style="width: 100%" class="section">
                         <caption>
                             {{ section }}
                         </caption>
                         {% for model in apps %}
                             <tr>
                                 {% if model.admin_url %}
-                                    <th scope="row"><a href="{{ model.admin_url }}">{{ model.label }}</a></th>
+                                    <td scope="row"><a href="{{ model.admin_url }}">{{ model.label }}</a></td>
                                 {% else %}
-                                    <th scope="row">{{ model.model_name }}</th>
+                                    <td scope="row">{{ model.model_name }}</td>
                                 {% endif %}
                             </tr>
                         {% endfor %}
@@ -24,6 +26,27 @@
             <p>{% trans "You don't have permission to view or edit anything." %}</p>
         {% endif %}
     </div>
+    <script src="{% static 'jquery-3.3.1.min.js' %}"></script>
+    <script>
+        $('#filterInput').on('keyup', function () {
+            let filter = this.value.toUpperCase();
+            $('table.section tr').each(function (i, el) {
+                let txt = $(el).find('td,caption').text();
+                if (txt.toUpperCase().indexOf(filter) > -1) {
+                    $(el).closest('.section').show();
+                    $(el).show();
+                } else {
+                    $(el).hide();
+                }
+                $('table.section').each(function(i, t){
+                    if ($(t).find('tr:visible').length === 0){
+                        $(t).hide()
+                    }
+                });
+            });
+        }).focus();
+    </script>
+
 {% endblock %}
 {% block sidebar %}
 {% endblock sidebar %}
