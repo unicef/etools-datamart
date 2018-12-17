@@ -6,7 +6,7 @@ from unicef_rest_framework.utils import get_query_string
 
 IQY = """WEB
 1
-http://datamart.unicef.io/api/latest/hact/?format=iqy
+https://datamart.unicef.io/api/latest/hact/?format=iqy
 
 Selection=AllTables
 Formatting=html

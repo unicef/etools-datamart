@@ -12,6 +12,7 @@
             <li><a href="{% url "api:schema-redoc" %}">Documentation</a></li>
             <li><a href="{% url "api:schema-swagger-ui" %}">Swagger</a></li>
             <li><a href="{% url "monitor" %}">Monitor</a></li>
+            <li><a href="{% url "profile" %}">Settings</a></li>
             {% if request.user.is_staff %}
                 <li class="menu-sep h10">&nbsp;</li>
                 <li><a href="{% url "admin:index" %}">Admin</a></li>

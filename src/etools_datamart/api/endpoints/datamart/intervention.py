@@ -2,6 +2,7 @@
 # import django_filters
 from django_filters import rest_framework as filters
 
+from etools_datamart.api.endpoints.datamart.serializers import InterventionSerializerFull
 from etools_datamart.apps.data import models
 
 from . import serializers
@@ -44,6 +45,7 @@ class InterventionViewSet(common.DataMartViewSet):
     filter_fields = ('country_name', 'title', 'status', 'last_modify_date',
                      'start_date', 'submission_date', 'document_type')
     serializers_fieldsets = {'std': None,
+                             'full': InterventionSerializerFull,
                              'short': ["title", "number", "country_name", "start_date"]}
     # filter_backends = [DjangoFilterBackend, OrderingFilter]
     # filterset_fields = ('category', 'in_stock')

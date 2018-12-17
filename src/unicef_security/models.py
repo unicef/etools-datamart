@@ -1,3 +1,4 @@
+from adminactions.mass_update import mass_update
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
@@ -103,6 +104,8 @@ class Role(models.Model, TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     business_area = models.ForeignKey(BusinessArea, on_delete=models.CASCADE)
+    actions = (mass_update,)
 
     class Meta:
         app_label = 'unicef_security'
+        unique_together = ('user', 'group', 'business_area')

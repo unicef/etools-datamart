@@ -19,6 +19,7 @@
 </head>
 <body class="{{ page }}">
 
+{% block body %}
 {% block content %}
 
     <div class="limiter">
@@ -48,14 +49,17 @@
                     {% endblock right %}
 
                 </div>
-                <div class="left">
-                    <img src="{% static 'unicef_logo.png' %}">
-                </div>
+                {% block left %}
+                    <div class="left">
+                        <img src="{% static 'unicef_logo.png' %}">
+                    </div>
+                {% endblock left %}
             </div>
         </div>
     </div>
 
 
+{% endblock %}
 {% endblock %}
 
 {% block footer %}

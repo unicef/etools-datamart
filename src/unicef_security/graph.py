@@ -16,6 +16,8 @@ from social_core.exceptions import AuthTokenError
 from social_django.models import UserSocialAuth
 from unicef_security.config import GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET
 
+from etools_datamart.libs.version import get_full_version
+
 from . import config
 
 AZURE_GRAPH_API_TOKEN_CACHE_KEY = 'azure_graph_api_token_cache_key'
@@ -191,10 +193,14 @@ class Synchronizer:
         self._delta_link = ''
         self.echo = echo or (lambda l: True)
 
+    @property
+    def token_key(self):
+        return "%s:%s" % (AZURE_GRAPH_API_TOKEN_CACHE_KEY, get_full_version())
+
     def get_token(self):
         if not self.id and self.secret:
             raise ValueError("Configure AZURE_CLIENT_ID and/or AZURE_CLIENT_SECRET")
-        token = cache.get(AZURE_GRAPH_API_TOKEN_CACHE_KEY)
+        token = cache.get(self.token_key)
         if not token:
             post_dict = {'grant_type': 'client_credentials',
                          'client_id': self.id,
@@ -207,7 +213,7 @@ class Synchronizer:
             jresponse = response.json()
             token = jresponse['access_token']
             # Cache token for 3600 seconds, which matches the default Azure token expiration
-            cache.set(AZURE_GRAPH_API_TOKEN_CACHE_KEY, token, 3600)
+            cache.set(self.token_key, token, 3600)
         return token
 
     @property

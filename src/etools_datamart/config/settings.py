@@ -58,7 +58,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   EMAIL_HOST_USER=(str, ''),
                   EMAIL_HOST_PASSWORD=(str, ''),
                   EMAIL_PORT=(int, 587),
-
+                  USE_X_FORWARDED_HOST=(bool, False),
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -277,6 +277,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.etl.apps.Config',
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
+    'etools_datamart.apps.me',
     'etools_datamart.api',
 
     'admin_extra_urls',
@@ -359,9 +360,11 @@ SECURE_FRAME_DENY = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_SECONDS = 1
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
 X_FRAME_OPTIONS = env('X_FRAME_OPTIONS')
+USE_X_FORWARDED_HOST = env('USE_X_FORWARDED_HOST')
 
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 

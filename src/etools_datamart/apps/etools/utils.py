@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 from django.db import connections
+from unicef_rest_framework.models import Service
 from unicef_security.models import Role
 
 from etools_datamart.apps.etools.models import UsersUserprofile
@@ -19,9 +20,15 @@ def get_allowed_schemas(user):
         if etools_user:
             aa.extend(set(etools_user.countries_available.values_list('schema_name', flat=True)))
 
-    return set(filter(None, aa))
+    return set(sorted(filter(None, aa)))
     # return set(map(lambda s: s.lower(), aa))
-#
+
+
+def get_allowed_services(user):
+    if user.is_superuser:
+        return Service.objects.all()
+    return Service.objects.filter(groupaccesscontrol__group__user=user)
+
 # def schema_is_valid(*schema):
 #     return schema in conn.all_schemas
 

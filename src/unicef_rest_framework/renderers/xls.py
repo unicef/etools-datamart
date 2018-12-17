@@ -13,10 +13,10 @@ class XLSXRenderer(_XLSXRenderer):
         if response.status_code != 200:
             return ''
         try:
-            if data and 'results' in data:
-                data = data['results']
-            if not data:
-                return ''
+            # if data and 'results' in data:
+            #     data = data['results']
+            # if not data:
+            #     return ''
             return super().render(data, accepted_media_type, renderer_context)
         except Exception as e:
             process_exception(e)

@@ -109,7 +109,6 @@ input.input100 {
 
 /*[ Button ]*/
 .container-login100-form-btn {
-  width: 100%;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -127,7 +126,6 @@ input.input100 {
   justify-content: center;
   align-items: center;
   padding: 0 20px;
-  width: 100%;
   height: 50px;
   border-radius: 3px;
   background: #2090F8;
@@ -157,37 +155,84 @@ input.input100 {
   -moz-border-radius: 20px;
   border-radius: 20px; }
 
-.monitor .menubar {
+.monitor .menubar, .profile .menubar {
   padding: 10px; }
-  .monitor .menubar a {
+  .monitor .menubar a, .profile .menubar a {
     text-transform: none;
     color: #2090F8; }
-    .monitor .menubar a:visited {
+    .monitor .menubar a:visited, .profile .menubar a:visited {
       text-transform: none; }
-.monitor #monitor {
+.monitor #monitor, .profile #monitor {
   width: 100%;
   padding: 30px; }
-  .monitor #monitor .SUCCESS {
+  .monitor #monitor .SUCCESS, .profile #monitor .SUCCESS {
     color: #00b200;
     font-weight: bold; }
-  .monitor #monitor .row {
+  .monitor #monitor .row, .profile #monitor .row {
     width: 100%;
     padding: 5px; }
-    .monitor #monitor .row.header {
+    .monitor #monitor .row.header, .profile #monitor .row.header {
       font-weight: bold; }
-    .monitor #monitor .row.odd {
+    .monitor #monitor .row.odd, .profile #monitor .row.odd {
       background-color: #eeeeee; }
-  .monitor #monitor .col {
+  .monitor #monitor .col, .profile #monitor .col {
     display: inline-block; }
-    .monitor #monitor .col.task {
+    .monitor #monitor .col.task, .profile #monitor .col.task {
       width: 30%; }
-    .monitor #monitor .col.last_run {
+    .monitor #monitor .col.last_run, .profile #monitor .col.last_run {
       width: 200px; }
-    .monitor #monitor .col.last_changes {
+    .monitor #monitor .col.last_changes, .profile #monitor .col.last_changes {
       width: 200px; }
-    .monitor #monitor .col.status {
+    .monitor #monitor .col.status, .profile #monitor .col.status {
       width: 120px; }
-    .monitor #monitor .col.subscription {
+    .monitor #monitor .col.subscription, .profile #monitor .col.subscription {
       width: 180px; }
+
+.profile #areas, .profile #services, .profile #password {
+  margin-right: 20px;
+  padding: 10px;
+  position: relative;
+  display: inline-block; }
+  .profile #areas h1, .profile #services h1, .profile #password h1 {
+    font-size: 14pt;
+    margin-bottom: 5px; }
+  .profile #areas ul, .profile #areas form, .profile #services ul, .profile #services form, .profile #password ul, .profile #password form {
+    border: 1px solid #cfcfcf;
+    overflow-y: scroll;
+    width: 200px;
+    height: 300px; }
+.profile #password .message {
+  margin: 20px;
+  text-align: left; }
+  .profile #password .message .password {
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+    font-family: monospace;
+    font-size: 20px;
+    border: 1px solid grey; }
+.profile #password form {
+  width: 400px;
+  overflow-y: auto;
+  text-align: center; }
+.profile #password .btn {
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  height: 40px;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #0;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  -webkit-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  transition: all 0.4s;
+  cursor: pointer; }
+.profile #password .btn-submit {
+  background: #2090F8;
+  color: #fff; }
 
 /*# sourceMappingURL=style.css.map */

@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}{% load i18n admin_urls static admin_modify %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; Business Areas Grants
+    </div>
+{% endblock %}
+{% block object-tools %}{% endblock %}
+
+{#{% block content %}#}
+{#    <h1>Grant Access multiple services</h1>#}
+{#    <form method="post" id="load_users" novalidate>#}
+{#        {% csrf_token %}#}
+{#        <fieldset class="module aligned {{ fieldset.classes }}">#}
+{#        <div class="fieldBox">{{ form.services }}</div>#}
+{#        </fieldset>#}
+{#        <table>#}
+{#            {{ form }}#}
+{#        </table>#}
+{#        <div><input type="submit" value="Add multiple rules"></div>#}
+{#    </form>#}
+{#{% endblock content %}#}
+
+{% block submit_buttons_bottom %}
+    <input type="submit" value="Add multiple rules">
+{% endblock %}
