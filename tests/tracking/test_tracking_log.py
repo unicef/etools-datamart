@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 import logging
-from time import sleep
-from unittest.mock import Mock
 
 import pytest
-from django.contrib.auth.models import AnonymousUser
+# from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
-from test_utilities.factories import AdminFactory, UserFactory
 
 from etools_datamart.api.endpoints import InterventionViewSet
-from etools_datamart.apps.tracking.middleware import StatsMiddleware, ThreadedStatsMiddleware
+# from etools_datamart.apps.tracking.middleware import StatsMiddleware, ThreadedStatsMiddleware
 from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter
+
+# from time import sleep
+# from unittest.mock import Mock
+
+# from test_utilities.factories import AdminFactory, UserFactory
+
 
 logger = logging.getLogger(__name__)
 

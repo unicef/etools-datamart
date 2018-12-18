@@ -1,14 +1,11 @@
 import random
 import string
 
-from django.contrib.auth import login, BACKEND_SESSION_KEY
+from django.contrib.auth import BACKEND_SESSION_KEY, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
-from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
-from unicef_security.models import User
 
 from etools_datamart.apps.etools.utils import get_allowed_schemas, get_allowed_services
 from etools_datamart.apps.me.forms import ProfileForm
@@ -43,13 +40,7 @@ class ProfileView(FormView):
                 return pwd
 
     def get_context_data(self, **kwargs):
-        if 'password' in self.request.session:
-            password = self.request.session['password']
-            del self.request.session['password']
-        else:
-            password = None
         kwargs.update({'page': 'profile',
-                       'password': password,
                        'business_areas': sorted(get_allowed_schemas(self.request.user)),
                        'services': get_allowed_services(self.request.user),
                        'user': self.request.user
@@ -67,14 +58,8 @@ class ProfileView(FormView):
         ctx = self.get_context_data(form=form)
         if self.request.user.is_authenticated:
             pwd = self.generate()
-            # self.request.session['password'] = pwd
-            # User.objects.filter(id=self.request.user.pk).update(
-            #     password=make_password(pwd)
-            # )
             self.request.user.set_password(pwd)
             self.request.user.save()
             ctx['password'] = pwd
             login(self.request, self.request.user, self.request.session[BACKEND_SESSION_KEY])
-        # return HttpResponseRedirect(self.get_success_url())
-        #
         return self.render_to_response(ctx)
