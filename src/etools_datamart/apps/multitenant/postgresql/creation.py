@@ -114,6 +114,8 @@ SET default_tablespace = '';
                 "-h", self.connection.settings_dict['HOST'],
                 "-d", self.connection.settings_dict['NAME'],
                 "--no-owner",
+                "--clean",
+                "--if-exists",
                 "--disable-triggers",
                 "--exit-on-error",
                 str(public_dump)]

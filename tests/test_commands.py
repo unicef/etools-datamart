@@ -24,8 +24,9 @@ def invalidate_cache():
 
 
 @pytest.mark.django_db
-def test_init_setup_all(db, settings, autocreate_users, invalidate_cache):
+def test_init_setup_all(db, settings, autocreate_users, invalidate_cache, tmpdir):
     settings.DEBUG = True
+    settings.STATIC_ROOT = tmpdir
     call_command("init-setup", all=True, refresh=True, stdout=StringIO())
     ModelUser = get_user_model()
     assert ModelUser.objects.exists()

@@ -1,4 +1,5 @@
 import os
+import tempfile
 import warnings
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from _pytest.fixtures import SubRequest
 def pytest_configure(config):
     # enable this to remove deprecations
     os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
-    os.environ['STATIC_URL'] = "."
+    os.environ['STATIC_URL'] = tempfile.gettempdir()
 
 
 # warnings.simplefilter('once', DeprecationWarning)
