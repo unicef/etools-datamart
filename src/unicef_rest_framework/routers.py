@@ -7,6 +7,7 @@ from rest_framework import routers, views
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.routers import DynamicRoute, Route
+from unicef_rest_framework.models import Service
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,12 @@ class APIRootView(views.APIView):
         ret = OrderedDict()
         namespace = request.resolver_match.namespace
         for key, url_name in self.api_root_dict.items():
+            hidden = Service.objects.get(suffix=key).hidden
+            if hidden:
+                if request.user.is_superuser:
+                    key = f" * {key}"
+                else:
+                    continue
             if namespace:
                 url_name = namespace + ':' + url_name
             try:

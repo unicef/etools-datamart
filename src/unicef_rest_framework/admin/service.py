@@ -5,6 +5,7 @@ import logging
 import os
 
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from adminactions.mass_update import mass_update
 from constance import config
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -39,7 +40,7 @@ def get_stash_url(obj, label=None, **kwargs):
 
 
 class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('name', 'visible', 'access', 'cache_version', 'basename', 'json', 'admin')
+    list_display = ('name', 'visible', 'access', 'cache_version', 'suffix', 'json', 'admin')
     list_filter = ('hidden', 'access')
 
     search_fields = ('name', 'viewset')
@@ -49,13 +50,13 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     filter_horizontal = ('linked_models',)
     fieldsets = [("", {"fields": ('name',
                                   'description',
-                                  'access',
+                                  ('access', 'hidden',),
                                   # 'confidentiality',
-                                  # 'hidden',
                                   ('source_model', 'basename'),
                                   ('suffix', 'endpoint'),
                                   'linked_models',
                                   )})]
+    actions = [mass_update, ]
 
     # change_list_template = 'admin/unicef_rest_framework/service/change_list.html'
 

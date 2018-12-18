@@ -283,6 +283,7 @@ INSTALLED_APPS = [
     'etools_datamart.api',
 
     'admin_extra_urls',
+    'adminactions',
     'unicef_rest_framework.apps.Config',
     'rest_framework',
     'oauth2_provider',

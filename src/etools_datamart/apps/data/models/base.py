@@ -21,6 +21,7 @@ class DataMartManager(BaseManager.from_queryset(DataMartQuerySet)):
 
 class DataMartModel(models.Model):
     country_name = models.CharField(max_length=50, db_index=True)
+    area_code = models.CharField(max_length=10, db_index=True)
     schema_name = models.CharField(max_length=50, db_index=True)
     last_modify_date = models.DateTimeField(blank=True, auto_now=True)
 

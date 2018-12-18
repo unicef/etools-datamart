@@ -109,7 +109,7 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
 
 @register(models.PMPIndicators)
 class PMPIndicatorsAdmin(DataModelAdmin, TruncateTableMixin):
-    list_display = ('country_name', 'partner_name', 'partner_type', 'business_area_code')
+    list_display = ('country_name', 'partner_name', 'partner_type', 'area_code')
     list_filter = (SchemaFilter,
                    ('partner_type', AllValuesComboFilter),
                    ('pd_ssfa_status', AllValuesComboFilter),

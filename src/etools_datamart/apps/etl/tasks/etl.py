@@ -97,6 +97,7 @@ def load_hact():
                       completed_special_audits=data['assurance_activities']['special_audit'],
                       )
         op = process(HACT, filters=dict(year=today.year,
+                                        area_code=country.business_area_code,
                                         country_name=country.name,
                                         schema_name=country.schema_name),
                      values=values)
@@ -139,7 +140,7 @@ def load_pmp_indicator() -> EtlResult:
                 has_assessment = bool(getattr(partner.current_core_value_assessment, 'assessment', False))
                 values = {'country_name': country.name,
                           'schema_name': country.schema_name,
-                          'business_area_code': country.business_area_code,
+                          'area_code': country.business_area_code,
                           'partner_name': partner.name,
                           'partner_type': partner.cso_type,
                           'vendor_number': partner.vendor_number,
@@ -276,6 +277,7 @@ def load_intervention() -> EtlResult:
                           )
             op = process(Intervention, filters=dict(country_name=country.name,
                                                     schema_name=country.schema_name,
+                                                    area_code=country.business_area_code,
                                                     agreement_id=record.agreement.pk,
                                                     intervention_id=record.pk),
                          values=values)
@@ -344,6 +346,7 @@ def load_fam_indicator() -> EtlResult:
                 #     raise
             op = process(FAMIndicator, filters=dict(month=start_date,
                                                     country_name=country.name,
+                                                    area_code=country.business_area_code,
                                                     schema_name=country.schema_name),
                          values=values)
             results.incr(op)

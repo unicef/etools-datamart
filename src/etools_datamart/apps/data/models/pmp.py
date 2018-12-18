@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 class PMPIndicators(DataMartModel):
     vendor_number = models.CharField(max_length=255, null=True, db_index=True)
-    business_area_code = models.CharField(max_length=100, null=True, db_index=True)
 
     partner_name = models.CharField(max_length=255, null=True, db_index=True)
     partner_type = models.CharField(max_length=255, null=True, db_index=True)
