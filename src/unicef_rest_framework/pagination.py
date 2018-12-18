@@ -37,9 +37,10 @@ class PageFilter(BaseFilterBackend):
         return context
 
     def to_html(self, request, queryset, view):
-        template = loader.get_template(self.template)
-        context = self.get_template_context(request, queryset, view)
-        return template.render(context)
+        if view.pagination_class:
+            template = loader.get_template(self.template)
+            context = self.get_template_context(request, queryset, view)
+            return template.render(context)
 
     def get_default_pagination(self, view):
         return view.pagination_class.page_size
