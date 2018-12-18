@@ -55,8 +55,8 @@ def test_datamart_user_access_forbidden_countries(user, user_data):
     base = UserStatsViewSet.get_service().endpoint
     with user_allow_service(user, UserStatsViewSet):
         res = client.get(f"{base}?country_name=lebanon,chad")
-        assert res.status_code == 403, res
-        assert res.json() == {'error': "You are not allowed to access schema: 'chad'"}
+    assert res.status_code == 403, res
+    assert res.json() == {'error': "You are not allowed to access schema: 'chad'"}
 
 
 def test_datamart_user_access_wrong_countries(user, user_data):
@@ -106,4 +106,4 @@ def test_access(db, user_type, op, query, code, allowed):
     with user_allow_service(user, HACTViewSet):
         with user_allow_country(user, allowed):
             res = client.get(f"{url}?country_name{op}{query}")
-            assert res.status_code == code, res.content
+    assert res.status_code == code, res.content

@@ -6,19 +6,18 @@ from unicef_rest_framework.models import Service
 
 from etools_datamart.apps.etools.models import UsersUserprofile
 from etools_datamart.apps.security.models import SchemaAccessControl
-from etools_datamart.libs.cache import get_cache_key
+from etools_datamart.libs.version import get_full_version
 
 conn = connections['etools']
 cache = caches['default']
 
 
 def get_allowed_schemas(user):
-    key = get_cache_key('allowed_schemas', user.pk)
+    key = f"allowed_schemas:{get_full_version()}:{config.CACHE_VERSION}:{user.pk}"
     values = cache.get(key)
     if not values:
         if config.DISABLE_SCHEMA_RESTRICTIONS:
             values = conn.all_schemas
-
         elif not user.is_authenticated:
             values = []
         elif user.is_superuser:
@@ -29,8 +28,8 @@ def get_allowed_schemas(user):
                 etools_user = UsersUserprofile.objects.filter(user__email=user.email).first()
                 if etools_user:
                     aa.extend(set(etools_user.countries_available.values_list('schema_name', flat=True)))
-
             values = list(filter(None, aa))
+        cache.set(key, list(values))
     return set(values)
     # return set(map(lambda s: s.lower(), aa))
 

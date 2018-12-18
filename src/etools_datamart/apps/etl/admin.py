@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import action, link
+from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
 from adminactions.mass_update import mass_update
 from crashlog.middleware import process_exception
@@ -13,13 +13,12 @@ from humanize import naturaldelta
 
 from etools_datamart.apps.etl.lock import cache
 from etools_datamart.celery import app
-from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
 
 
 @register(models.EtlTask)
-class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
+class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', 'last_run', 'status', 'time',
                     'last_success', 'last_failure', 'locked', 'scheduling',
                     'unlock_task',

@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.db import OperationalError
 
+pytestmark = pytest.mark.slow
+
 
 @pytest.fixture()
 def autocreate_users():

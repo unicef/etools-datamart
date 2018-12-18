@@ -31,7 +31,7 @@ def test_filter_cache_country_arg(db, client, flt, monkeypatch):
     url = f"/api/latest/etools/audit/engagement/?%s" % flt
     with user_allow_service(client.handler._force_user, EngagementViewSet):
         with user_allow_country(client.handler._force_user, ["bolivia", "chad"]):
-            res = client.get(url)
+            client.get(url)
             res = client.get(url)
     assert fake.data
     assert res.status_code == 200, res.content

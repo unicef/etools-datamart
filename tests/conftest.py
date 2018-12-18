@@ -2,6 +2,7 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -28,6 +29,11 @@ def django_db_setup(request,
                     django_db_createdb,
                     django_db_modify_db_settings):
     # never touch etools DB
+    if django_db_keepdb:
+        import django.core.management.commands.migrate
+        django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
+        django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
+
     from pytest_django.fixtures import django_db_setup as dj_db_setup
     dj_db_setup(request,
                 django_test_environment,
@@ -40,7 +46,6 @@ def django_db_setup(request,
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory
-
     with django_db_blocker.unblock():
         Service.objects.load_services()
         UserAccessControl.objects.all().delete()
@@ -66,7 +71,7 @@ def user2(db):
 def reset(monkeypatch):
     # from etools_datamart.state import state
     from django.db import connections
-
+    monkeypatch.setattr("etools_datamart.apps.security.utils.cache", MagicMock(get=lambda *a: []))
     # state.request = None
     conn = connections['etools']
     conn.set_schemas([])
