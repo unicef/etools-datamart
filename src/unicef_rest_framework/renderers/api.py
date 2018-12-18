@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from django.template import loader
 from rest_framework.renderers import BrowsableAPIRenderer as _BrowsableAPIRenderer
 from rest_framework.reverse import reverse
 
@@ -10,6 +11,37 @@ logger = logging.getLogger(__name__)
 class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
     template = 'rest_framework/api.html'
     filter_template = 'rest_framework/filter_template.html'
+
+    def get_filter_form(self, data, view, request):
+        if not hasattr(view, 'get_queryset') or not hasattr(view, 'filter_backends'):
+            return
+
+        # Infer if this is a list view or not.
+        paginator = getattr(view, 'paginator', None)
+        if isinstance(data, list):
+            pass
+        elif paginator is not None and data is not None:
+            try:
+                paginator.get_results(data)
+            except (TypeError, KeyError):
+                return
+        elif not isinstance(data, list):
+            return
+
+        queryset = view.get_queryset()
+        elements = []
+        for backend in view.get_filter_backends():
+            if hasattr(backend, 'to_html'):
+                html = backend().to_html(request, queryset, view)
+                if html:
+                    elements.append(html)
+
+        if not elements:
+            return
+
+        template = loader.get_template(self.filter_template)
+        context = {'elements': elements}
+        return template.render(context)
 
     def get_context(self, data, accepted_media_type, renderer_context):
         ctx = super(URFBrowsableAPIRenderer, self).get_context(data, accepted_media_type, renderer_context)

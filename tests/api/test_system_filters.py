@@ -26,8 +26,7 @@ def test_user_system_filter(client: APIClient, data_service: Service, user1: Use
     SystemFilterFactory(service=data_service, user=user1, rules={'country_name': 'Bolivia'})
     UserAccessControlFactory(service=data_service, user=user1)
     with user_allow_country(user1, "bolivia"):
-        with django_assert_no_duplicate_queries():
-            res = client.get(data_service.endpoint)
+        res = client.get(data_service.endpoint)
     assert res.status_code == 200
     results = res.json()['results']
     assert res['system-filters'] == "country_name=Bolivia"

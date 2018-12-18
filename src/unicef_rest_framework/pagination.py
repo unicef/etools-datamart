@@ -1,10 +1,48 @@
 import sys
 from collections import OrderedDict
 
+from django import forms
+from django.template import loader
 from rest_framework import serializers
+from rest_framework.filters import BaseFilterBackend
 from rest_framework.pagination import CursorPagination, PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.utils.urls import remove_query_param, replace_query_param
+
+
+class PageFilter(BaseFilterBackend):
+    template = 'rest_framework/filters/paging.html'
+    pagination_param = 'page_size'
+
+    def get_form(self, request, view):
+        Frm = type("SerializerForm", (forms.Form,),
+                   {view.pagination_class.page_size_query_param: forms.IntegerField(label="Page Size", required=False)})
+        return Frm(request.GET,
+                   initial={view.pagination_class.page_size_query_param: self.get_pagination(request, view)})
+
+    def filter_queryset(self, request, queryset, view):
+        return queryset
+
+    def get_pagination(self, request, view):
+        ps = request.query_params.get(view.pagination_class.page_size_query_param)
+        return ps or view.pagination_class.page_size
+
+    def get_template_context(self, request, queryset, view):
+        current = self.get_pagination(request, view)
+        context = {'request': request,
+                   'current': current,
+                   'form': self.get_form(request, view),
+                   'param': view.pagination_class.page_size_query_param,
+                   }
+        return context
+
+    def to_html(self, request, queryset, view):
+        template = loader.get_template(self.template)
+        context = self.get_template_context(request, queryset, view)
+        return template.render(context)
+
+    def get_default_pagination(self, view):
+        return view.pagination_class.page_size
 
 
 class CurrentPageField(serializers.Field):

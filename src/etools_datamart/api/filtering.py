@@ -7,8 +7,8 @@ from rest_framework.filters import BaseFilterBackend
 from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
 from etools_datamart.apps.etools.models import UsersCountry
-from etools_datamart.apps.etools.utils import conn, get_allowed_schemas
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
+from etools_datamart.apps.security.utils import conn, get_allowed_schemas
 
 # from unicef_rest_framework.state import state
 cache = caches['api']

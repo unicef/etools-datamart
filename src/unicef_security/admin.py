@@ -1,20 +1,17 @@
 import logging
 
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
-from adminfilters.filters import RelatedFieldComboFilter
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin, widgets
-from django.contrib.admin.helpers import AdminForm
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.forms import Form
-from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from unicef_security.graph import default_group, Synchronizer, SyncResult
-from unicef_security.models import BusinessArea, Region, Role, User
+from unicef_security.models import BusinessArea, Region, User
 from unicef_security.sync import load_business_area, load_region
 
 logger = logging.getLogger(__name__)
@@ -170,52 +167,52 @@ class RoleForm(forms.Form):
     group = forms.ModelChoiceField(queryset=Group.objects.all())
 
 
-@admin.register(Role)
-class RoleAdmin(ExtraUrlMixin, ModelAdmin):
-    list_display = ['user', 'group', 'business_area']
-    search_fields = ('user',)
-    list_filter = ('group', ('business_area', RelatedFieldComboFilter))
-
-    def has_add_permission(self, request):
-        return False
-
-    @link()
-    def add_grants(self, request):
-        opts = self.model._meta
-        ctx = {
-            'opts': opts,
-            'add': False,
-            'has_view_permission': True,
-            'has_editable_inline_admin_formsets': True,
-            'app_label': opts.app_label,
-            'change': True,
-            'is_popup': False,
-            'save_as': False,
-            'media': self.media,
-            'has_delete_permission': False,
-            'has_add_permission': False,
-            'has_change_permission': True,
-        }
-        if request.method == 'POST':
-            form = RoleForm(request.POST)
-            if form.is_valid():
-                user = form.cleaned_data.pop('user')
-                business_areas = form.cleaned_data.pop('business_areas')
-                group = form.cleaned_data.pop('group')
-                # overwrite_existing = form.cleaned_data.pop('overwrite_existing')
-
-                for business_area in business_areas:
-                    Role.objects.update_or_create(user=user,
-                                                  business_area=business_area,
-                                                  group=group)
-                self.message_user(request, 'ACLs created')
-                return HttpResponseRedirect(admin_reverse(Role))
-        else:
-            form = RoleForm(initial={})
-        ctx['adminform'] = AdminForm(form,
-                                     [(None, {'fields': ['user',
-                                                         'group',
-                                                         'business_areas']})],
-                                     {})
-        ctx['media'] = self.media + form.media
-        return TemplateResponse(request, 'admin/unicef_security/add_grants.html', ctx)
+# @admin.register(Role)
+# class RoleAdmin(ExtraUrlMixin, ModelAdmin):
+#     list_display = ['user', 'group', 'business_area']
+#     search_fields = ('user',)
+#     list_filter = ('group', ('business_area', RelatedFieldComboFilter))
+#
+#     def has_add_permission(self, request):
+#         return False
+#
+#     @link()
+#     def add_grants(self, request):
+#         opts = self.model._meta
+#         ctx = {
+#             'opts': opts,
+#             'add': False,
+#             'has_view_permission': True,
+#             'has_editable_inline_admin_formsets': True,
+#             'app_label': opts.app_label,
+#             'change': True,
+#             'is_popup': False,
+#             'save_as': False,
+#             'media': self.media,
+#             'has_delete_permission': False,
+#             'has_add_permission': False,
+#             'has_change_permission': True,
+#         }
+#         if request.method == 'POST':
+#             form = RoleForm(request.POST)
+#             if form.is_valid():
+#                 user = form.cleaned_data.pop('user')
+#                 business_areas = form.cleaned_data.pop('business_areas')
+#                 group = form.cleaned_data.pop('group')
+#                 # overwrite_existing = form.cleaned_data.pop('overwrite_existing')
+#
+#                 for business_area in business_areas:
+#                     Role.objects.update_or_create(user=user,
+#                                                   business_area=business_area,
+#                                                   group=group)
+#                 self.message_user(request, 'ACLs created')
+#                 return HttpResponseRedirect(admin_reverse(Role))
+#         else:
+#             form = RoleForm(initial={})
+#         ctx['adminform'] = AdminForm(form,
+#                                      [(None, {'fields': ['user',
+#                                                          'group',
+#                                                          'business_areas']})],
+#                                      {})
+#         ctx['media'] = self.media + form.media
+#         return TemplateResponse(request, 'admin/unicef_security/add_grants.html', ctx)

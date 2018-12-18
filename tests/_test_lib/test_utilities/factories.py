@@ -194,11 +194,11 @@ class BusinessAreaFactory(factory.DjangoModelFactory):
         django_get_or_create = ('name',)
 
 
-class RoleFactory(factory.DjangoModelFactory):
-    user = SubFactory(UserFactory)
-    group = SubFactory(GroupFactory)
-    business_area = SubFactory(BusinessAreaFactory)
-
-    class Meta:
-        model = unicef_security.models.Role
-        django_get_or_create = ('user', 'group', 'business_area')
+# class RoleFactory(factory.DjangoModelFactory):
+#     user = SubFactory(UserFactory)
+#     group = SubFactory(GroupFactory)
+#     business_area = SubFactory(BusinessAreaFactory)
+#
+#     class Meta:
+#         model = unicef_security.models.Role
+#         django_get_or_create = ('user', 'group', 'business_area')

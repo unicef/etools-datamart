@@ -13,6 +13,3 @@ class UserStatsViewSet(common.DataMartViewSet):
     queryset = models.UserStats.objects.all()
     filter_fields = ('last_modify_date', )
     serializers_fieldsets = {"std": None}
-
-    def get_filter_backends(self, removes=None):
-        return super().get_filter_backends(removes)

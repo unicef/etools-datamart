@@ -10,6 +10,7 @@ from rest_framework_xml.renderers import XMLRenderer
 from rest_framework_yaml.renderers import YAMLRenderer
 from strategy_field.utils import fqn
 
+from unicef_rest_framework.pagination import PageFilter
 from . import acl
 from .auth import AnonymousAuthentication, IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
 from .cache import cache_response, etag, ListKeyConstructor
@@ -81,6 +82,8 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
         flt = list(self.filter_backends)
         if SystemFilterBackend not in flt:
             flt.insert(0, SystemFilterBackend)
+        if PageFilter not in flt:
+            flt.append(PageFilter)
         return list(filter(removes, flt))
 
     def filter_queryset(self, queryset):

@@ -1,25 +1,28 @@
 from contextlib import ContextDecorator
 
-from test_utilities.factories import BusinessAreaFactory, RoleFactory
+from test_utilities.factories import GroupFactory
 from unicef_rest_framework.models import Service, UserAccessControl
-from unicef_security.models import Role
+
+from etools_datamart.apps.security.models import SchemaAccessControl
 
 
 class user_allow_country(ContextDecorator):  # noqa
-    def __init__(self, user, coutries=None):
+    def __init__(self, user, countries=None):
         self.user = user
-        if not isinstance(coutries, (list, tuple, set)):
-            coutries = [coutries]
-        self.areas = [BusinessAreaFactory(name=s) for s in coutries]
-        self.rules = []
+        if not isinstance(countries, (list, tuple, set)):
+            countries = [countries]
+        self.areas = countries
+        self.rule = None
 
     def __enter__(self):
-        for area in self.areas:
-            rule = RoleFactory(user=self.user, business_area=area)
-            self.rules.append(rule.pk)
+        self.group = GroupFactory()
+        self.group.user_set.add(self.user)
+        self.rule = SchemaAccessControl.objects.get_or_create(group=self.group,
+                                                              schemas=self.areas)[0]
 
     def __exit__(self, e_typ, e_val, trcbak):
-        Role.objects.filter(id__in=self.rules).delete()
+        self.group.delete()
+        self.rule.delete()
         if e_typ:
             raise e_typ(e_val).with_traceback(trcbak)
 

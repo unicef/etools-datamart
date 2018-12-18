@@ -6,7 +6,6 @@ from test_utilities.factories import AdminFactory, UserFactory, UserStatsFactory
 from unicef_rest_framework.test_utils import user_allow_country, user_allow_service
 
 from etools_datamart.api.endpoints import HACTViewSet, PartnerViewSet, UserStatsViewSet
-from etools_datamart.apps.etools.utils import get_allowed_schemas
 
 
 @pytest.fixture()
@@ -100,7 +99,6 @@ def test_local_user_access(local_user, user_data):
                                                              ])
 def test_access(db, user_type, op, query, code, allowed):
     # etools user has access same countries as in eTools app
-    get_allowed_schemas.cache_clear()
     user = user_type()
     client = APIClient()
     client.force_authenticate(user)

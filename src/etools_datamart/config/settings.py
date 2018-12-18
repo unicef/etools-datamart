@@ -23,6 +23,8 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   # CACHE_URL_API=(str, "dummycache://"),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
+                  DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
+                  DISABLE_SERVICE_RESTRICTIONS=(bool, False),
                   ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
@@ -258,7 +260,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.web.apps.Config',
     'etools_datamart.apps.init.apps.Config',
     'etools_datamart.apps.multitenant',
-    'etools_datamart.apps.security',
+    'etools_datamart.apps.security.apps.Config',
 
     'constance',
     'constance.backends.database',
@@ -365,7 +367,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
 X_FRAME_OPTIONS = env('X_FRAME_OPTIONS')
 USE_X_FORWARDED_HOST = env('USE_X_FORWARDED_HOST')
-
+SESSION_SAVE_EVERY_REQUEST = True
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 
 # django-constance
@@ -396,9 +398,12 @@ AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
 AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
+    'CACHE_VERSION': (1, 'Use MS Graph API to fetch user data', int),
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
     'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
     'ANALYTICS_CODE': (env('ANALYTICS_CODE'), 'Google analytics code'),
+    'DISABLE_SCHEMA_RESTRICTIONS': (env('DISABLE_SCHEMA_RESTRICTIONS'), 'Disable per user schema authorizations'),
+    'DISABLE_SERVICE_RESTRICTIONS': (env('DISABLE_SERVICE_RESTRICTIONS'), 'Disable per user service authorizations'),
 }
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
@@ -500,7 +505,7 @@ SOCIAL_AUTH_AZUREAD_OAUTH2_RESOURCE = 'https://graph.microsoft.com/'
 SOCIAL_AUTH_USER_MODEL = 'unicef_security.User'
 
 # POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
-SCOPE = ['openid', 'email']
+SCOPE = ['openid', ]
 IGNORE_DEFAULT_SCOPE = True
 
 SWAGGER_SETTINGS = {

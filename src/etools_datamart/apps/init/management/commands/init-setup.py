@@ -3,12 +3,14 @@ import uuid
 import warnings
 from urllib.parse import urlparse
 
+from constance import config
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.db import connections
 from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
 from humanize import naturaldelta
@@ -18,6 +20,7 @@ from strategy_field.utils import fqn
 from unicef_rest_framework.models.acl import GroupAccessControl
 
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.celery import app
 
 MAIL = r"""Dear {{user.label}},
@@ -111,6 +114,7 @@ class Command(BaseCommand):
         # interactive = options['interactive']
 
         if migrate or _all:
+            self.stdout.write(f"Run migrations")
             call_command('migrate', verbosity=verbosity - 1)
 
         ModelUser = get_user_model()
@@ -125,18 +129,27 @@ class Command(BaseCommand):
                                                                     defaults={"is_superuser": True,
                                                                               "is_staff": True,
                                                                               "password": make_password(pwd)})
-        anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
-                                                             defaults={"is_superuser": False,
-                                                                       "is_staff": False,
-                                                                       "password": make_password(uuid.uuid4())})
-
-        Group.objects.get_or_create(name='Guests')
-        all_access, __ = Group.objects.get_or_create(name='Endpoints all access')
 
         if created:  # pragma: no cover
             self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
         else:  # pragma: no cover
             self.stdout.write(f"Superuser `{admin}` already exists`.")
+
+        self.stdout.write(f"Create anonymous")
+        anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
+                                                             defaults={"is_superuser": False,
+                                                                       "is_staff": False,
+                                                                       "password": make_password(uuid.uuid4())})
+        self.stdout.write(f"Create group `Guest`")
+        Group.objects.get_or_create(name='Guests')
+
+        self.stdout.write(f"Create group `Endpoints all access`")
+        all_access, __ = Group.objects.get_or_create(name='Endpoints all access')
+
+        conn = connections['etools']
+        self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
+        SchemaAccessControl.objects.get_or_create(group=all_access,
+                                                  schemas=list(conn.all_schemas))
 
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
@@ -216,6 +229,7 @@ class Command(BaseCommand):
                                             defaults=dict(subject='Dataset changed',
                                                           content=MAIL,
                                                           html_content=MAIL_HTML))
+        config.CACHE_VERSION = config.CACHE_VERSION + 1
 
         if options['refresh']:
             self.stdout.write("Refreshing datamart...")

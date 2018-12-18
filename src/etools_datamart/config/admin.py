@@ -17,13 +17,17 @@ DEFAULT_INDEX_SECTIONS = {
     'Administration': ['unicef_rest_framework', 'constance',
                        'dbtemplates', 'subscriptions', 'etl'],
     'Data': ['data', 'etools'],
-    'Security': ['auth', 'unicef_security',
+    'Security': ['auth',
+                 'unicef_security.User',
+                 'security',
                  'unicef_rest_framework.GroupAccessControl',
                  'unicef_rest_framework.UserAccessControl',
                  ],
     'Logs': ['tracking', 'django_db_logging', 'crashlog', ],
     'System': ['redisboard', 'django_celery_beat', 'post_office'],
     'Other': ['unicef_rest_framework.Application', ],
+    '_hidden_': ['sites', 'unicef_rest_framework.Application',
+                 'oauth2_provider', 'social_django']
 }
 
 
@@ -70,7 +74,8 @@ class DatamartAdminSite(AdminSite):
 
     @never_cache
     def index_new(self, request, extra_context=None):
-        key = f'apps_groups:{request.user.id}:{get_full_version()}'
+        import time
+        key = f'apps_groups:{request.user.id}:{get_full_version()}:{time.time()}'
         app_list = self.get_app_list(request)
         groups = cache.get(key)
         if not groups:
@@ -80,6 +85,9 @@ class DatamartAdminSite(AdminSite):
             def get_section(model, app):
                 fqn = "%s.%s" % (app['app_label'], model['object_name'])
                 target = 'Other'
+                if fqn in sections['_hidden_'] or app['app_label'] in sections['_hidden_']:
+                    return '_hidden_'
+
                 for sec, models in sections.items():
                     if fqn in models:
                         return sec

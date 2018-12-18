@@ -199,8 +199,8 @@ input.input100 {
   .profile #areas ul, .profile #areas form, .profile #services ul, .profile #services form, .profile #password ul, .profile #password form {
     border: 1px solid #cfcfcf;
     overflow-y: scroll;
-    width: 200px;
-    height: 300px; }
+    width: 300px;
+    height: 400px; }
 .profile #password .message {
   margin: 20px;
   text-align: left; }

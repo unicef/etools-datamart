@@ -15,12 +15,12 @@ from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter
 logger = logging.getLogger(__name__)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def user(admin_user):
     return admin_user
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def django_app(django_app_mixin, system_user):
     APIRequestLog.objects.truncate()
     django_app_mixin._patch_settings()
@@ -56,13 +56,13 @@ def test_log(enable_stats, django_app, system_user, reset_stats):
     assert daily.response_average == log.response_ms
 
 
-@pytest.mark.django_db
-def test_threaedlog(enable_threadstats, django_app, admin_user):
-    url = reverse("api:intervention-list", args=['v1'])
-    url = f"{url}?country_name=bolivia,chad,lebanon"
-
-    res = django_app.get(url)
-    assert res.status_code == 200
+# @pytest.mark.django_db
+# def test_threaedlog(enable_threadstats, django_app, admin_user):
+#     url = reverse("api:intervention-list", args=['v1'])
+#     url = f"{url}?country_name=bolivia,chad,lebanon"
+#
+#     res = django_app.get(url)
+#     assert res.status_code == 200
 
 
 # @pytest.mark.parametrize("code", [200, 500])
@@ -70,7 +70,7 @@ def test_threaedlog(enable_threadstats, django_app, admin_user):
 # @pytest.mark.parametrize("user_type", [AnonymousUser, UserFactory, AdminFactory])
 # @pytest.mark.parametrize("middleware", [StatsMiddleware, ThreadedStatsMiddleware])
 # @pytest.mark.django_db(transaction=True)
-# def test_threaedlog2(rf, settings, user_type, middleware, stats, code):
+# def test_middleware(rf, settings, user_type, middleware, stats, code):
 #     user = user_type()
 #     settings.ENABLE_LIVE_STATS = stats
 #
@@ -92,3 +92,4 @@ def test_threaedlog(enable_threadstats, django_app, admin_user):
 #         assert log
 #     else:
 #         assert not log
+#

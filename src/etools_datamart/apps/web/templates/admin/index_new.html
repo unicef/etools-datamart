@@ -5,6 +5,7 @@
     <input type="text" style="width: 578px;padding:10px;margin-bottom:10px"  id="filterInput" placeholder="Search for names..">
         {% if groups %}
             {% for section, apps in groups.items %}
+                {% if section != '_hidden_' %}
                 <div class="module">
                     <table style="width: 100%" class="section">
                         <caption>
@@ -21,6 +22,7 @@
                         {% endfor %}
                     </table>
                 </div>
+                {% endif %}
             {% endfor %}
         {% else %}
             <p>{% trans "You don't have permission to view or edit anything." %}</p>

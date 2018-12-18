@@ -14,8 +14,7 @@ def test_cache(client, user, django_assert_num_queries,
     client.force_authenticate(user)
     with user_allow_country(user, 'bolivia'):
         with user_allow_service(user, PartnerViewSet):
-            with django_assert_no_duplicate_queries():
-                res = client.get(url)
+            res = client.get(url)
             assert res.status_code == 200, res.content
             assert res['cache-version'] == str(service.cache_version)
             assert res['cache-ttl'] == '1y'
