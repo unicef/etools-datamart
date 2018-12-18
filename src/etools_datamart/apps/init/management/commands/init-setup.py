@@ -113,6 +113,9 @@ class Command(BaseCommand):
         _all = options['all']
         # interactive = options['interactive']
 
+        self.stdout.write(f"Run collectstatic")
+        call_command('collectstatic', verbosity=verbosity - 1, interactive=False)
+
         if migrate or _all:
             self.stdout.write(f"Run migrations")
             call_command('migrate', verbosity=verbosity - 1)
@@ -122,8 +125,8 @@ class Command(BaseCommand):
             pwd = '123'
             admin = os.environ.get('USER', 'admin')
         else:
-            pwd = ModelUser.objects.make_random_password()
-            admin = os.environ.get('USER', 'admin')
+            pwd = os.environ.get('ADMIN_PASSWORD', ModelUser.objects.make_random_password())
+            admin = os.environ.get('ADMIN_USERNAME', 'admin')
 
         self._admin_user, created = ModelUser.objects.get_or_create(username=admin,
                                                                     defaults={"is_superuser": True,

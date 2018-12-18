@@ -49,13 +49,16 @@ build:
 	 		--rm \
 	 		--name=${CONTAINER_NAME} \
 			-p 8000:8000 \
-			-e CACHE_URL=redis://127.0.0.1:6379/1 \
-			-e CELERY_BROKER_URL=redis://127.0.0.1:6379/2 \
-			-e CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/3 \
+			-e CACHE_URL=redis://192.168.66.66:6379/1 \
+			-e CACHE_URL_API=redis://192.168.66.66:6379/2 \
+			-e CACHE_URL_LOCK=redis://192.168.66.66:6379/3 \
+			-e CACHE_URL_TEMPLATE=redis://192.168.66.66:6379/4 \
+			-e CELERY_BROKER_URL=redis://192.168.66.66:6379/2 \
+			-e CELERY_RESULT_BACKEND=redis://192.168.66.66:6379/3 \
 			-e CSRF_COOKIE_SECURE=false \
 			-e DATABASE_URL=${DATABASE_URL} \
 			-e DATABASE_URL_ETOOLS=${DATABASE_URL_ETOOLS} \
-			-e DEBUG=true \
+			-e DEBUG=false \
 			-e DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \
 			-e SECURE_BROWSER_XSS_FILTER=0 \
 			-e SECURE_CONTENT_TYPE_NOSNIFF=0 \
