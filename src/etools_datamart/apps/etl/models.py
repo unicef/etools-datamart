@@ -6,7 +6,7 @@ from django.utils.functional import cached_property
 from django_celery_beat.models import PeriodicTask
 
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.celery import app, ETLTask
+from etools_datamart.celery import app
 
 
 class TaskLogManager(models.Manager):
@@ -19,11 +19,11 @@ class TaskLogManager(models.Manager):
         except EtlTask.DoesNotExist:
             raise EtlTask.DoesNotExist(f"EtlTask for model '{model.__name__}' does not exists")
 
-    def get_for_task(self, task: ETLTask):
-        return self.get_or_create(task=task.name,
-                                  defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
-                                                last_run=None,
-                                                table_name=task.linked_model._meta.db_table))[0]
+    # def get_for_task(self, task: ETLTask):
+    #     return self.get_or_create(task=task.name,
+    #                               defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
+    #                                             last_run=None,
+    #                                             table_name=task.linked_model._meta.db_table))[0]
 
     def inspect(self):
         tasks = app.get_all_etls()

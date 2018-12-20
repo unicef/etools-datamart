@@ -3,6 +3,7 @@ import re
 from contextlib import contextmanager
 from functools import lru_cache
 from time import time
+from typing import List
 
 import django.db.utils
 import psycopg2
@@ -13,6 +14,7 @@ from django.db.backends.utils import CursorWrapper
 from django.utils.functional import cached_property
 
 # from etools_datamart.state import state
+from etools_datamart.apps.etools.models import UsersCountry
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema
 
 from ..sql import Parser
@@ -166,13 +168,14 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         self.set_schemas(old)
 
     @lru_cache()
-    def get_tenants(self):
+    def get_tenants(self) -> List[UsersCountry]:
+        # should be etools.UsersCountry
         model = apps.get_model(settings.TENANT_MODEL)
         return model.objects.filter(**settings.SCHEMA_FILTER).exclude(**settings.SCHEMA_EXCLUDE).order_by('name')
 
     @cached_property
     def all_schemas(self):
-        return set([c.schema_name for c in self.get_tenants()])
+        return sorted(set([c.schema_name for c in self.get_tenants()]))
 
     def set_schemas(self, schemas):
         """

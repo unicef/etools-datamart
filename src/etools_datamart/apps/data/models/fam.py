@@ -1,7 +1,37 @@
 from django.db import models
 from month_field.models import MonthField
 
+from etools_datamart.apps.data.loader import EtlResult, Loader
 from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
+                                                AuditSpecialaudit, AuditSpotcheck,)
+
+
+class FAMIndicatorLoader(Loader):
+
+    def process_country(self, results: EtlResult, country, context):
+        engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
+        start_date = context['today'].date()
+        for model in engagements:
+            realname = "_".join(model._meta.db_table.split('_')[1:])
+            values = {}
+            for status, status_display in AuditEngagement.STATUSES:
+                filter_dict = {
+                    'engagement_ptr__status': status,
+                    'engagement_ptr__start_date__month': start_date.month,
+                    'engagement_ptr__start_date__year': start_date.year,
+                }
+                field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
+                value = model.objects.filter(**filter_dict).count()
+                values[field_name] = value
+            op = self.process(filters=dict(month=start_date,
+                                           country_name=country.name,
+                                           area_code=country.business_area_code,
+                                           schema_name=country.schema_name),
+                              values=values)
+            results.incr(op)
+
+        return results
 
 
 class FAMIndicator(DataMartModel):
@@ -28,3 +58,5 @@ class FAMIndicator(DataMartModel):
         ordering = ('month', 'country_name')
         unique_together = ('month', 'country_name')
         verbose_name = "FAM Indicator"
+
+    loader = FAMIndicatorLoader()

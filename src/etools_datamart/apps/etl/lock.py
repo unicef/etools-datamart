@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from functools import partial, wraps
+from functools import wraps
 
 from django.core.cache import caches
 from redis.exceptions import LockError
@@ -52,5 +52,5 @@ def only_one(function, key, timeout=None):
 
         return _caller
 
-    function.unlock = partial(_unlock, key)
+    # function.unlock = partial(_unlock, key)
     return _dec(function) if function is not None else _dec

@@ -265,6 +265,7 @@ INSTALLED_APPS = [
     'constance',
     'constance.backends.database',
     'django.contrib.auth',
+    'django.contrib.gis',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',

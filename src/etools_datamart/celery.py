@@ -1,47 +1,47 @@
-import json
+# import json
 import os
 from time import time
 
 from celery import Celery
-from celery.contrib.abortable import AbortableTask
+# from celery.contrib.abortable import AbortableTask
 from celery.signals import task_postrun, task_prerun
 from kombu import Exchange, Queue
 from kombu.serialization import register
 
-from etools_datamart.apps.etl.results import etl_dumps
+from etools_datamart.apps.etl.results import etl_dumps, etl_loads
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
 
-class ETLTask(AbortableTask):
-    abstract = True
-    linked_model = None
+# class ETLTask(AbortableTask):
+#     abstract = True
+#     linked_model = None
 
 
 class DatamartCelery(Celery):
-    etl_cls = ETLTask
+    # etl_cls = ETLTask
     _mapping = {}
 
-    def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
-        from etools_datamart.apps.etl.lock import only_one
-        linked_model = options.get('linked_model', None)
-        if linked_model:
-            name = name or self.gen_task_name(fun.__name__, fun.__module__)
-            options['lock_key'] = f"{name}-lock"
-            fun = only_one(fun, options['lock_key'])
-            options['unlock'] = fun.unlock
-            task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
-            linked_model._etl_task = task
-            linked_model._etl_loader = fun
-        else:
-            task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
-        return task
-
-    def etl(self, model, *args, **opts):
-        opts['base'] = ETLTask
-        opts['linked_model'] = model
-        task = super().task(*args, **opts)
-        return task
+    # def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
+    #     from etools_datamart.apps.etl.lock import only_one
+    #     linked_model = options.get('linked_model', None)
+    #     if linked_model:
+    #         name = name or self.gen_task_name(fun.__name__, fun.__module__)
+    #         options['lock_key'] = f"{name}-lock"
+    #         fun = only_one(fun, options['lock_key'])
+    #         # options['unlock'] = fun.unlock
+    #         task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
+    #         linked_model._etl_task = task
+    #         linked_model._etl_loader = fun
+    #     else:
+    #         task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
+    #     return task
+    #
+    # def etl(self, model, *args, **opts):
+    #     opts['base'] = ETLTask
+    #     opts['linked_model'] = model
+    #     task = super().task(*args, **opts)
+    #     return task
 
     def get_all_etls(self):
         return [cls for (name, cls) in self.tasks.items() if hasattr(cls, 'linked_model')]
@@ -93,7 +93,7 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
                                      defaults=defs)
 
 
-register('etljson', etl_dumps, json.loads,
+register('etljson', etl_dumps, etl_loads,
          content_type='application/x-myjson', content_encoding='utf-8')
 
 

@@ -1,0 +1,20 @@
+{% extends "admin/change_form.html" %}
+{% block extrahead %}{{ block.super }}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
+    <script>window.jQuery = window.$ = django.jQuery;</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+{% endblock %}
+
+
+{% block admin_change_form_document_ready %}
+    {{ block.super }}
+    <style>
+        select {
+            width: 100%;
+        }
+    </style>
+    <script>
+        django.jQuery('select').select2();
+    </script>
+{% endblock %}

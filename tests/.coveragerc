@@ -17,6 +17,7 @@ omit =
         **/api/endpoints/unicef/business_area.py
         **/api/endpoints/unicef/region.py
         **/api/endpoints/unicef/serializers.py
+        **/etools_datamart/apps/data/management/commands/load.py
 
 
 [report]
