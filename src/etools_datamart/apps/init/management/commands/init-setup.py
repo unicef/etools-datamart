@@ -68,9 +68,25 @@ MAIL_ATTACHMENT_HTML = r"""<div>Dear {{user.label}},</div>
 <div>To unsubscribe, change your preferences in <a href="{{base_url}}{% url 'monitor' %}">Datamart Monitor</a></div>
 """
 
+RESTRICTED_AREAS = {'234R': ['mpawlowski@unicef.org',
+                             'jmege@unicef.org',
+                             'nukhan@unicef.org']}
+
+
+def get_everybody_available_areas():
+    conn = connections['etools']
+    return [c.schema_name for c in conn.get_tenants()
+            if c.business_area_code not in RESTRICTED_AREAS.keys()]
+
+
+def get_restricted_areas():
+    conn = connections['etools']
+    return [c.schema_name for c in conn.get_tenants()
+            if c.business_area_code in RESTRICTED_AREAS.keys()]
+
 
 class Command(BaseCommand):
-    help = "My shiny new management command."
+    help = ""
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -147,12 +163,16 @@ class Command(BaseCommand):
         Group.objects.get_or_create(name='Guests')
 
         self.stdout.write(f"Create group `Endpoints all access`")
-        all_access, __ = Group.objects.get_or_create(name='Endpoints all access')
+        all_access, __ = Group.objects.get_or_create(name='All endpoints access')
+        public_areas, __ = Group.objects.get_or_create(name='Public areas access')
+        restricted_areas, __ = Group.objects.get_or_create(name='Restricted areas access')
 
-        conn = connections['etools']
         self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
-        SchemaAccessControl.objects.get_or_create(group=all_access,
-                                                  schemas=list(conn.all_schemas))
+        SchemaAccessControl.objects.get_or_create(group=public_areas,
+                                                  schemas=get_everybody_available_areas())
+
+        SchemaAccessControl.objects.get_or_create(group=restricted_areas,
+                                                  schemas=get_restricted_areas())
 
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
@@ -167,6 +187,12 @@ class Command(BaseCommand):
                 serializers=['*'],
                 policy=GroupAccessControl.POLICY_ALLOW
             )
+        for area, users in RESTRICTED_AREAS.items():
+            for email in users:
+                u, __ = ModelUser.objects.get_or_create(username=email,
+                                                        email=email)
+                u.groups.add(restricted_areas)
+
         # hostname
         for entry, values in settings.CACHES.items():
             loc = values.get('LOCATION', '')
@@ -180,9 +206,8 @@ class Command(BaseCommand):
             self.stdout.write("Going to create new users")
             try:
                 for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
-                    user, pwd = entry.split(',')
-                    User = get_user_model()
-                    u, created = User.objects.get_or_create(username=user)
+                    email, pwd = entry.split(',')
+                    u, created = ModelUser.objects.get_or_create(username=email)
                     if created:
                         self.stdout.write(f"Created user {u}")
                         u.set_password(pwd)

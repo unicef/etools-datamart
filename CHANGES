@@ -11,6 +11,7 @@
 * Countries can be selected using name, schema_name,country_short_code or business_area_code
 * Improved Browseable API
 * `page_size` now accept `-1` to disable pagination
+* new endpoints 'Location' and 'GatewayType'
 
 
 1.7
