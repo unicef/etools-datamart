@@ -21,7 +21,12 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt-get update && sudo apt-get -y install postgresql
+            sudo apt-get update \
+                  && sudo apt-get -y install \
+                            postgresql \
+                            gcc \
+                            gdal-bin \
+                            python-dev
 
       - restore_cache:
           keys:

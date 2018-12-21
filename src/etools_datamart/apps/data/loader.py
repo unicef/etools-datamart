@@ -238,13 +238,13 @@ class Loader:
         lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
         try:
             have_lock = lock.acquire(blocking=False)
-            if have_lock:
+            if have_lock:  # pragma: no branch
                 if not ignore_dependencies:
                     for dependency in self.config.depends:
                         dependency.loader.load(stdout=stdout)
                 self.always_update = always_update
                 connection = connections['etools']
-                if not countries:
+                if not countries:  # pragma: no branch
                     countries = connection.get_tenants()
                 if self.config.mapping:
                     self.mapping = {}
@@ -262,7 +262,7 @@ class Loader:
                                            stdout=stdout)
 
                 for country in countries:
-                    if stdout:
+                    if stdout:  # pragma: no cover
                         stdout.write(f"{country}\n")
                     connection.set_schemas([country.schema_name])
                     self.process_country(results, country, context)
@@ -272,7 +272,7 @@ class Loader:
                     if stdout:  # pragma: no cover
                         stdout.write("\n")
         finally:
-            if have_lock:
+            if have_lock:  # pragma: no branch
                 try:
                     lock.release()
                 except LockError as e:  # pragma: no cover

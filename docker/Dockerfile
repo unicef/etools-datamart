@@ -16,7 +16,9 @@ RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
 FROM python:3.6.7-slim as base
 RUN apt-get update \
  	&& apt-get install -y --no-install-recommends \
- 	    gdal-bin
+ 	    gcc \
+ 	    gdal-bin \
+ 	    python-dev
 
 #RUN apk add --no-cache \
 #    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
