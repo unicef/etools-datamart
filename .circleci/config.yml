@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: circleci/python:3.6
+      - image: python:3.6.7-slim
         environment:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
@@ -21,12 +21,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt-get update \
-                  && sudo apt-get -y install \
-                            postgresql \
-                            gcc \
-                            gdal-bin \
-                            python-dev
+            apt-get update
+            apt-get install -y --no-install-recommends \
+                  gcc \
+                  gdal-bin \
+                  python-dev
 
       - restore_cache:
           keys:
@@ -41,7 +40,7 @@ jobs:
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            pip install tox --user
+            pip install tox
             tox -e py36-d21
       - run:
           name: codecov
@@ -69,14 +68,14 @@ jobs:
       - deploy:
           name: tag and release if release candidate
           command: |
-              if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
-                curl --user ${CIRCLE_TOKEN}: \
-                  --data build_parameters[CIRCLE_JOB]=tag \
-                  --data revision=$CIRCLE_SHA1 \
-                  https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
-              else
-                echo "Skipped as '$CIRCLE_BRANCH' does not match '$RELEASE_MATCH' branch"
-              fi
+            if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
+              curl --user ${CIRCLE_TOKEN}: \
+                --data build_parameters[CIRCLE_JOB]=tag \
+                --data revision=$CIRCLE_SHA1 \
+                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
+            else
+              echo "Skipped as '$CIRCLE_BRANCH' does not match '$RELEASE_MATCH' branch"
+            fi
   tag:
     docker:
       - image: circleci/python:3.6
@@ -156,11 +155,11 @@ jobs:
       - deploy:
           name: dockerize
           command: |
-              export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
-              curl --user ${CIRCLE_TOKEN}: \
-                --data build_parameters[TAG]=$TAG \
-                --data build_parameters[JOB]=dockerize \
-                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/develop
+            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            curl --user ${CIRCLE_TOKEN}: \
+              --data build_parameters[TAG]=$TAG \
+              --data build_parameters[JOB]=dockerize \
+              https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/develop
 
   dockerize:
     working_directory: ~/code
@@ -206,25 +205,25 @@ jobs:
       - run:
           name: Test Backend docker image
           command: |
-              echo "Testing ${DOCKER_IMAGE}:${TAG}"
-              docker run -p 8000:8000 \
-                      --rm \
-                      -e DATABASE_URL=${DATABASE_URL} \
-                      -e DEBUG=0 \
-                      -e SECURE_SSL_REDIRECT=0 \
-                      -e SESSION_COOKIE_SECURE=0 \
-                      -e SESSION_COOKIE_HTTPONLY=9 \
-                      -e SESSION_COOKIE_HTTPONLY=0 \
-                      -e CSRF_COOKIE_SECURE=0 \
-                      -it ${DOCKER_IMAGE}:${TAG} \
-                      django-admin check --deploy
+            echo "Testing ${DOCKER_IMAGE}:${TAG}"
+            docker run -p 8000:8000 \
+                    --rm \
+                    -e DATABASE_URL=${DATABASE_URL} \
+                    -e DEBUG=0 \
+                    -e SECURE_SSL_REDIRECT=0 \
+                    -e SESSION_COOKIE_SECURE=0 \
+                    -e SESSION_COOKIE_HTTPONLY=9 \
+                    -e SESSION_COOKIE_HTTPONLY=0 \
+                    -e CSRF_COOKIE_SECURE=0 \
+                    -it ${DOCKER_IMAGE}:${TAG} \
+                    django-admin check --deploy
       - deploy:
           name: Push Backend docker image
           command: |
-              echo "Pushing ${DOCKER_IMAGE}:${TAG} to Docker Hub"
-              export TODAY=`date '+%d %B %Y at %H:%M'`
+            echo "Pushing ${DOCKER_IMAGE}:${TAG} to Docker Hub"
+            export TODAY=`date '+%d %B %Y at %H:%M'`
 
-              docker login -u $DOCKER_USER -p $DOCKER_PASS
-              docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
-              docker push ${DOCKER_IMAGE}:latest
-              docker push ${DOCKER_IMAGE}:${TAG}
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
+            docker push ${DOCKER_IMAGE}:latest
+            docker push ${DOCKER_IMAGE}:${TAG}
