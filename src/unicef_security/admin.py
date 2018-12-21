@@ -10,6 +10,7 @@ from django.forms import Form
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
 from unicef_security.graph import default_group, Synchronizer, SyncResult
 from unicef_security.models import BusinessArea, Region, User
 from unicef_security.sync import load_business_area, load_region

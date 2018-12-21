@@ -1,25 +1,36 @@
-import random
-from datetime import datetime
 
 import factory
-import unicef_security.models
 from django.contrib.auth.models import Group
-from django.contrib.contenttypes.models import ContentType
-from django.db import connections
 from django.utils import timezone
 from factory import SubFactory
+from factory.base import FactoryMetaClass
 from post_office.models import EmailTemplate
-from unicef_rest_framework.models import Service, SystemFilter, UserAccessControl
 
-from etools_datamart.apps.data.models import FAMIndicator, HACT, Intervention, PMPIndicators, UserStats
+import unicef_rest_framework.models
+import unicef_security.models
+
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.apps.subscriptions.models import Subscription
 from etools_datamart.apps.tracking.models import APIRequestLog
 
 today = timezone.now()
 
+factories_registry = {}
 
-class TaskLogFactory(factory.DjangoModelFactory):
+
+class AutoRegisterFactoryMetaClass(FactoryMetaClass):
+    def __new__(mcs, class_name, bases, attrs):
+        new_class = super().__new__(mcs, class_name, bases, attrs)
+        factories_registry[new_class._meta.model] = new_class
+        return new_class
+
+
+class RegisterModelFactory(factory.DjangoModelFactory, metaclass=AutoRegisterFactoryMetaClass):
+    pass
+
+
+class TaskLogFactory(RegisterModelFactory):
     elapsed = 10
     last_success = timezone.now()
     last_failure = timezone.now()
@@ -29,7 +40,7 @@ class TaskLogFactory(factory.DjangoModelFactory):
         model = EtlTask
 
 
-class APIRequestLogFactory(factory.DjangoModelFactory):
+class APIRequestLogFactory(RegisterModelFactory):
     requested_at = timezone.now()
     remote_addr = factory.Faker('ipv4_public')
 
@@ -37,44 +48,13 @@ class APIRequestLogFactory(factory.DjangoModelFactory):
         model = APIRequestLog
 
 
-class HACTFactory(factory.DjangoModelFactory):
-    year = today.year
-    country_name = lambda: random.choice(connections['etools'].get_tenants())  # noqa
-
+class ServiceFactory(RegisterModelFactory):
     class Meta:
-        model = HACT
-
-
-class PMPIndicatorFactory(factory.DjangoModelFactory):
-    # country_name = lambda: random.choice(connections['etools'].get_tenants())  # noqa
-    class Meta:
-        model = PMPIndicators
-
-
-class FAMIndicatorFactory(factory.DjangoModelFactory):
-    month = today
-    last_modify_date = timezone.now()
-
-    class Meta:
-        model = FAMIndicator
-
-
-class ServiceFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Service
+        model = unicef_rest_framework.models.Service
         django_get_or_create = ('viewset',)
 
 
-class InterventionFactory(factory.DjangoModelFactory):
-    metadata = {}
-    title = factory.Sequence(lambda n: "title%03d" % n)
-    number = factory.Sequence(lambda n: "#%03d" % n)
-
-    class Meta:
-        model = Intervention
-
-
-class GroupFactory(factory.DjangoModelFactory):
+class GroupFactory(RegisterModelFactory):
     name = factory.Sequence(lambda n: "name%03d" % n)
 
     class Meta:
@@ -82,7 +62,7 @@ class GroupFactory(factory.DjangoModelFactory):
         django_get_or_create = ('name',)
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(RegisterModelFactory):
     class Meta:
         model = unicef_security.models.User
         django_get_or_create = ('username',)
@@ -99,12 +79,12 @@ class UserFactory(factory.DjangoModelFactory):
 
     @classmethod
     def _prepare(cls, create, **kwargs):
-        from .perms import user_grant_permissions
+        from ..perms import user_grant_permissions
 
         permissions = kwargs.pop('permissions', [])
 
         password = kwargs.pop('password')
-        user = super(UserFactory, cls)._prepare(create, **kwargs)
+        user = super()._prepare(cls, create, **kwargs)
         if password:
             user.set_password(password)
             if create:
@@ -121,27 +101,18 @@ class AnonUserFactory(UserFactory):
     username = 'anonymous'
 
 
-class UserAccessControlFactory(factory.DjangoModelFactory):
-    policy = UserAccessControl.POLICY_ALLOW
+class UserAccessControlFactory(RegisterModelFactory):
+    policy = unicef_rest_framework.models.UserAccessControl.POLICY_ALLOW
     serializers = ["std"]
 
     class Meta:
-        model = UserAccessControl
+        model = unicef_rest_framework.models.UserAccessControl
         django_get_or_create = ('user', 'service')
 
 
-class UserStatsFactory(factory.DjangoModelFactory):
-    month = lambda: datetime(today.year, random.choice([1, 2, 3]), 1)  # noqa
-    country_name = lambda: random.choice(connections['etools'].get_tenants())  # noqa
-
+class SystemFilterFactory(RegisterModelFactory):
     class Meta:
-        model = UserStats
-        django_get_or_create = ('month', 'country_name')
-
-
-class SystemFilterFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = SystemFilter
+        model = unicef_rest_framework.models.SystemFilter
         django_get_or_create = ('user', 'service')
 
     @factory.post_generation
@@ -157,18 +128,19 @@ class SystemFilterFactory(factory.DjangoModelFactory):
                 rule.save()
 
 
-class SubscriptionFactory(factory.DjangoModelFactory):
+class SubscriptionFactory(RegisterModelFactory):
     kwargs = ''
     user = SubFactory(UserFactory)
     type = Subscription.MESSAGE
-    content_type = lambda x: ContentType.objects.get_for_model(HACT)  # noqa: E731
+
+    # content_type = lambda x: ContentType.objects.get_for_model(HACT)  # noqa: E731
 
     class Meta:
         model = Subscription
         django_get_or_create = ('user', 'content_type')
 
 
-class EmailTemplateFactory(factory.DjangoModelFactory):
+class EmailTemplateFactory(RegisterModelFactory):
     name = 'dataset_changed'
 
     class Meta:
@@ -176,7 +148,7 @@ class EmailTemplateFactory(factory.DjangoModelFactory):
         django_get_or_create = ('name',)
 
 
-class RegionFactory(factory.DjangoModelFactory):
+class RegionFactory(RegisterModelFactory):
     code = factory.Sequence(lambda n: "code%03d" % n)
     name = factory.Sequence(lambda n: "name%03d" % n)
 
@@ -185,20 +157,18 @@ class RegionFactory(factory.DjangoModelFactory):
         django_get_or_create = ('name',)
 
 
-class BusinessAreaFactory(factory.DjangoModelFactory):
+class SchemaAccessControlFactory(RegisterModelFactory):
+    group = factory.SubFactory(GroupFactory)
+    schemas = ['bolivia', 'chad']
+
+    class Meta:
+        model = SchemaAccessControl
+
+
+class BusinessAreaFactory(RegisterModelFactory):
     code = factory.Sequence(lambda n: "code%03d" % n)
     region = SubFactory(RegionFactory)
 
     class Meta:
         model = unicef_security.models.BusinessArea
         django_get_or_create = ('name',)
-
-
-# class RoleFactory(factory.DjangoModelFactory):
-#     user = SubFactory(UserFactory)
-#     group = SubFactory(GroupFactory)
-#     business_area = SubFactory(BusinessAreaFactory)
-#
-#     class Meta:
-#         model = unicef_security.models.Role
-#         django_get_or_create = ('user', 'group', 'business_area')

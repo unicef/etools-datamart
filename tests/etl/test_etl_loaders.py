@@ -1,36 +1,61 @@
 # -*- coding: utf-8 -*-
-from etools_datamart.apps.data.loader import EtlResult
-from etools_datamart.apps.data.models import FAMIndicator, PMPIndicators
+from django.apps import apps
+
+from etools_datamart.apps.data.loader import loadeables
 
 
-def test_load_pmp_indicator(number_of_intervention):
-    PMPIndicators.objects.truncate()
-    PMPIndicators.loader.unlock()
-    assert PMPIndicators.loader.load() == EtlResult(created=153)
-    assert PMPIndicators.objects.count() == number_of_intervention * 3
+def pytest_generate_tests(metafunc):
+    if 'loader' in metafunc.fixturenames:
+        m = []
+        ids = []
+        for model_name in loadeables:
+            model = apps.get_model(model_name)
+            m.append(model.loader)
+            ids.append(model.__name__)
+        metafunc.parametrize("loader", m, ids=ids)
 
 
+def test_loader_load(loader, number_of_intervention):
+    loader.model.objects.truncate()
+    loader.unlock()
+    loader.load(max_records=2)
+    assert loader.model.objects.count()
+
+#
+# def test_load_pmp_indicator(number_of_intervention):
+#     PMPIndicators.objects.truncate()
+#     PMPIndicators.loader.unlock()
+#     assert PMPIndicators.loader.load() == EtlResult(created=153)
+#     assert PMPIndicators.objects.count() == number_of_intervention * 3
+#
+#
 # def test_load_intervention(number_of_intervention, settings, monkeypatch):
-#     load_intervention.unlock()
-#     assert load_intervention() == EtlResult(created=number_of_intervention*3)
+#     Intervention.loader.unlock()
+#     assert Intervention.loader.load() == EtlResult(created=number_of_intervention * 3)
 #     assert Intervention.objects.count() == number_of_intervention * 3
 #
 #
-def test_load_fam_indicator(db, settings, monkeypatch):
-    FAMIndicator.loader.unlock()
-    FAMIndicator.loader.load()
-    assert FAMIndicator.objects.count() == 3
-
+# def test_load_fam_indicator(db, settings, monkeypatch):
+#     FAMIndicator.loader.unlock()
+#     FAMIndicator.loader.load()
+#     assert FAMIndicator.objects.count() == 3
+#
 #
 # def test_load_user_stats(db, settings, monkeypatch):
-#     load_user_report.unlock()
-#     load_user_report()
+#     UserStats.loader.unlock()
+#     UserStats.loader.load()
+#     assert UserStats.objects.count() == 3
+#
+#
+# def test_load_location(db, settings, monkeypatch):
+#     Location.loader.unlock()
+#     Location.loader.load()
 #     assert UserStats.objects.count() == 3
 #
 #
 # def test_load_hact(db, settings, monkeypatch):
-#     load_hact.unlock()
-#     load_hact()
+#     HACT.loader.unlock()
+#     HACT.loader.load()
 #     assert HACT.objects.count() == 3
 #     bolivia = HACT.objects.get(country_name='Bolivia')
 #     assert bolivia.microassessments_total == 0
@@ -39,25 +64,25 @@ def test_load_fam_indicator(db, settings, monkeypatch):
 #     assert bolivia.completed_spotcheck == 0
 #     assert bolivia.completed_hact_audits == 0
 #     assert bolivia.completed_special_audits == 0
-#     res = load_hact()
+#     res = HACT.loader.load()
 #     assert res == EtlResult(unchanged=3)
 #
 #
 # @freeze_time("2018-11-10")
 # def test_dataset_increased(db, settings, monkeypatch):
-#     load_user_report.unlock()
-#     load_user_report()
+#     UserStats.loader.unlock()
+#     UserStats.loader.load()
 #     UserStats.objects.first().delete()
-#     ret = load_user_report()
+#     ret = UserStats.loader.load()
 #     assert ret == EtlResult(created=1, unchanged=2)
 #
 #
 # @freeze_time("2018-11-10")
 # def test_dataset_changed(db, settings, monkeypatch):
-#     load_user_report.unlock()
-#     ret = load_user_report()
+#     UserStats.loader.unlock()
+#     ret = UserStats.loader.load()
 #     assert ret == EtlResult(created=3)
 #     UserStats.objects.update(total=999, unicef=999)
 #
-#     ret = load_user_report()
+#     ret = UserStats.loader.load()
 #     assert ret == EtlResult(updated=3)

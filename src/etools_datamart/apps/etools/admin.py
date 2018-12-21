@@ -60,17 +60,12 @@ class AuditEngagementAdmin(TenantModelAdmin):
 @register(models.PartnersIntervention)
 class PartnersInterventionAdmin(TenantModelAdmin):
     list_display = ('number', 'title', 'document_type', 'schema')
-    list_filter = ('document_type',)
+    # list_filter = ('document_type',)
 
 
 @register(models.T2FTravel)
 class T2FTravelAdmin(TenantModelAdmin):
-    list_display = ("id", "schema", "office", "currency", "status", "purpose")
-
-    # list_filter = ("status", )
-    def get_queryset(self, request):
-        return models.T2FTravel.objects.select_related("currency",
-                                                       "office")
+    list_display = ("id", "schema", "status", "purpose")
 
 
 @register(models.ReportsAppliedindicator)

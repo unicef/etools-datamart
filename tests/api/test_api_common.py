@@ -4,6 +4,7 @@ from unittest.mock import Mock
 import pytest
 from django.http import Http404
 from drf_querystringfilter.exceptions import QueryFilterException
+from dynamic_serializer.core import InvalidSerializerError
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied
 from rest_framework.reverse import reverse
 
@@ -32,6 +33,7 @@ def test_options(client, url):
                                        (PermissionDenied, 403),
                                        (InvalidSchema, 400),
                                        (AuthenticationFailed, 403),
+                                       (InvalidSerializerError, 400),
                                        ])
 def test_handle_exception(client, exc, code):
     view = APIReadOnlyModelViewSet()

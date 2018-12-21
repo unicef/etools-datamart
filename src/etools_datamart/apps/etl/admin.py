@@ -11,7 +11,7 @@ from django.utils.html import format_html
 from django_celery_beat.models import PeriodicTask
 from humanize import naturaldelta
 
-from etools_datamart.apps.etl.lock import cache
+# from etools_datamart.apps.etl.lock import cache
 from etools_datamart.celery import app
 
 from . import models
@@ -72,7 +72,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return naturaldelta(obj.elapsed)
 
     def locked(self, obj):
-        return obj.lock_key not in cache
+        return obj.content_type.model_class().loader.is_locked
 
     locked.boolean = True
 
@@ -100,7 +100,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         obj = self.get_object(request, pk)
 
         def _action(request):
-            cache.delete(obj.lock_key)
+            obj.loader.unlock()
 
         return _confirm_action(self, request, _action, f"Continuing will unlock selected task. ({obj.task})",
                                "Successfully executed", )

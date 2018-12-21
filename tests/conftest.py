@@ -1,5 +1,6 @@
 import os
 import tempfile
+import uuid
 import warnings
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -20,6 +21,22 @@ def pytest_configure(config):
 warnings.simplefilter('ignore', UserWarning)
 
 
+@pytest.fixture(scope="session")
+def disable_migration_signals(request):
+    return request.config.getvalue("disable_migration_signals")
+
+
+def pytest_addoption(parser):
+    group = parser.getgroup("django")
+    group._addoption(
+        "--disable-migration-signals",
+        action="store_true",
+        dest="disable_migration_signals",
+        default=False,
+        help="disable pre/post migration signals",
+    )
+
+
 @pytest.yield_fixture(scope='session')
 def django_db_setup(request,
                     django_test_environment,
@@ -27,12 +44,13 @@ def django_db_setup(request,
                     django_db_use_migrations,
                     django_db_keepdb,
                     django_db_createdb,
-                    django_db_modify_db_settings):
+                    django_db_modify_db_settings,
+                    disable_migration_signals):
     # never touch etools DB
-    # if django_db_keepdb:
-    #     import django.core.management.commands.migrate
-    #     django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
-    #     django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
+    if disable_migration_signals:
+        import django.core.management.commands.migrate
+        django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
+        django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
 
     from pytest_django.fixtures import django_db_setup as dj_db_setup
     dj_db_setup(request,
@@ -154,6 +172,7 @@ def user(etools_user):
     from test_utilities.factories import UserFactory
 
     return UserFactory(username=etools_user.username,
+                       azure_id=uuid.uuid4(),
                        email=etools_user.email)
 
 

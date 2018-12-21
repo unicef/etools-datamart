@@ -13,6 +13,7 @@ from rest_framework_extensions.key_constructor.bits import KeyBitBase
 from rest_framework_extensions.key_constructor.constructors import KeyConstructor
 from rest_framework_extensions.settings import extensions_api_settings
 from strategy_field.utils import fqn
+
 from unicef_rest_framework.models import SystemFilter
 
 cache = caches['default']

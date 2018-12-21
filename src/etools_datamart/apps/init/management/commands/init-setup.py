@@ -13,10 +13,10 @@ from django.core.management.base import BaseCommand
 from django.db import connections
 from django.utils.module_loading import import_string
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
-from humanize import naturaldelta
 from post_office.models import EmailTemplate
 from redisboard.models import RedisServer
 from strategy_field.utils import fqn
+
 from unicef_rest_framework.models.acl import GroupAccessControl
 
 from etools_datamart.apps.etl.models import EtlTask
@@ -234,16 +234,16 @@ class Command(BaseCommand):
                                                           html_content=MAIL_HTML))
         config.CACHE_VERSION = config.CACHE_VERSION + 1
 
-        if options['refresh']:
-            self.stdout.write("Refreshing datamart...")
-            for task in PeriodicTask.objects.all()[1:]:
-                try:
-                    etl = import_string(task.task)
-                except ImportError:
-                    continue
-                self.stdout.write(f"Running {task.name}...", ending='\r')
-                self.stdout.flush()
-
-                etl.apply()
-                cost = naturaldelta(app.timers[task.name])
-                self.stdout.write(f"{task.name} excuted in {cost}")
+        # if options['refresh']:
+        #     self.stdout.write("Refreshing datamart...")
+        #     for task in PeriodicTask.objects.all()[1:]:
+        #         try:
+        #             etl = import_string(task.task)
+        #         except ImportError:
+        #             continue
+        #         self.stdout.write(f"Running {task.name}...", ending='\r')
+        #         self.stdout.flush()
+        #
+        #         etl.apply()
+        #         cost = naturaldelta(app.timers[task.name])
+        #         self.stdout.write(f"{task.name} excuted in {cost}")

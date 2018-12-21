@@ -2,6 +2,7 @@
 import pytest
 from concurrency.api import disable_concurrency
 from rest_framework.test import APIClient
+
 from unicef_rest_framework.acl import ACL_ACCESS_LOGIN, ACL_ACCESS_OPEN
 
 from etools_datamart.api.endpoints import PartnerViewSet

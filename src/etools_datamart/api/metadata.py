@@ -72,7 +72,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         metadata['ordering'] = getattr(view, 'ordering_fields', '')
         if hasattr(view, 'serializers_fieldsets'):
             metadata['serializers'] = ", ".join(view.serializers_fieldsets.keys())
-        else:
+        else:  # pragma: no cover
             metadata['serializers'] = 'std'
 
             # from django.db import connection

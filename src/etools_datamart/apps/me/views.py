@@ -28,7 +28,8 @@ class ProfileView(FormView):
     def generate(self, length=20):
         pwd = ""
         count = 0
-        while count != length:
+        length = max(8, length)
+        while count < length:
             upper = [random.choice(string.ascii_uppercase)]
             lower = [random.choice(string.ascii_lowercase)]
             num = [random.choice(string.digits)]
@@ -37,7 +38,8 @@ class ProfileView(FormView):
             pwd += random.choice(everything)
             count += 1
             if count >= length:
-                return pwd
+                break
+        return pwd
 
     def get_context_data(self, **kwargs):
         kwargs.update({'page': 'profile',
@@ -51,8 +53,8 @@ class ProfileView(FormView):
         return {
         }
 
-    def get_success_url(self):
-        return self.request.path
+    # def get_success_url(self):
+    #     return self.request.path
 
     def form_valid(self, form):
         ctx = self.get_context_data(form=form)

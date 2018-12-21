@@ -1,6 +1,7 @@
 from contextlib import ContextDecorator
 
 from test_utilities.factories import GroupFactory
+
 from unicef_rest_framework.models import Service, UserAccessControl
 
 from etools_datamart.apps.security.models import SchemaAccessControl

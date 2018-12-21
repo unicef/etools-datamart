@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.template import loader
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import BaseFilterBackend
+
 from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
 from etools_datamart.apps.etools.models import UsersCountry

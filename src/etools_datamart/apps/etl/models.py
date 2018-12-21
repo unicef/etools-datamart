@@ -62,9 +62,16 @@ class EtlTask(models.Model):
     def __str__(self):
         return f"{self.task} {self.status}"
 
+    # @cached_property
+    # def lock_key(self):
+    #     return f"{self.task}-lock"
+
     @cached_property
-    def lock_key(self):
-        return f"{self.task}-lock"
+    def loader(self):
+        try:
+            return self.content_type.model_class().loader
+        except AttributeError:
+            return None
 
     @cached_property
     def verbose_name(self):

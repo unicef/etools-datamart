@@ -5,7 +5,7 @@ import sys
 from django.apps import apps
 from django.core.management import BaseCommand
 
-from etools_datamart.apps.data.loader import loadeable
+from etools_datamart.apps.data.loader import loadeables
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +45,10 @@ class Command(BaseCommand):
         _all = options['all']
         unlock = options['unlock']
         if _all:
-            model_names = sorted(list(loadeable))
+            model_names = sorted(list(loadeables))
 
         if not model_names:
-            for model_name in sorted(list(loadeable)):
+            for model_name in sorted(list(loadeables)):
                 self.stdout.write(model_name)
         else:
             for model_name in model_names:

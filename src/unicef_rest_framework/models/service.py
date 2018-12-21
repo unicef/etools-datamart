@@ -8,6 +8,7 @@ from django.db.models import F
 from django.utils.functional import cached_property
 from rest_framework.reverse import reverse
 from strategy_field.fields import StrategyClassField
+
 from unicef_rest_framework.config import conf
 
 from .. import acl

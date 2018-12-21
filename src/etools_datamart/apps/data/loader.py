@@ -11,7 +11,7 @@ from strategy_field.utils import get_attr
 
 from etools_datamart.celery import app
 
-loadeable = set()
+loadeables = set()
 locks = caches['lock']
 
 logger = logging.getLogger(__name__)
@@ -108,15 +108,15 @@ class LoaderTask(celery.Task):
         self.loader.load()
 
 
-def get_or_fail(Model, **kwargs):
-    try:
-        Model.objects.get(**kwargs)
-    except Model.DoesNotExist:
-        raise Model.DoesNotExist(f"Unable to get {Model.__name__} using {kwargs}")
+# def get_or_fail(Model, **kwargs):
+#     try:
+#         Model.objects.get(**kwargs)
+#     except Model.DoesNotExist:
+#         raise Model.DoesNotExist(f"Unable to get {Model.__name__} using {kwargs}")
 
 
 class Loader:
-    __slots__ = ['model', 'config', 'mapping', 'task', 'tree_parents', 'always_update']
+    # __slots__ = ['model', 'config', 'mapping', 'task', 'tree_parents', 'always_update']
 
     def __init__(self) -> None:
         self.config = None
@@ -131,18 +131,18 @@ class Loader:
         self.config = model._etl_config
         del model._etl_config
         if not model._meta.abstract:
-            loadeable.add("{0._meta.app_label}.{0._meta.model_name}".format(model))
+            loadeables.add("{0._meta.app_label}.{0._meta.model_name}".format(model))
         if self.config.celery:
             self.task = LoaderTask(self)
             self.config.celery.tasks.register(self.task)
 
         setattr(model, name, self)
 
-    def deconstruct(self):
-        return []
-
-    def check(self, **kwargs):
-        return []
+    # def deconstruct(self):
+    #     return []
+    #
+    # def check(self, **kwargs):
+    #     return []
 
     def process(self, filters, values):
         try:
@@ -200,20 +200,28 @@ class Loader:
     def process_country(self, results: EtlResult, country, context) -> EtlResult:
         qs = self.config.queryset()
         stdout = context['stdout']
+        max_records = context['max_records']
         for record in qs.all():
             filters = self.config.key(country, record)
             values = self.get_values(country, record)
             op = self.process(filters, values)
             results.incr(op)
-            if stdout:
+            context['records'] += 1
+            if stdout:  # pragma: no cover
                 stdout.write('.')
                 stdout.flush()
+            if max_records and context['records'] >= max_records:
+                break
         return results
 
     def get_context(self, **kwargs):
         context = {}
         context.update(kwargs)
         return context
+
+    @property
+    def is_locked(self):
+        return self.config.lock_key in locks
 
     def unlock(self):
         try:
@@ -223,7 +231,8 @@ class Loader:
         except LockError:
             pass
 
-    def load(self, verbosity=0, always_update=False, stdout=None, ignore_dependencies=False):
+    def load(self, verbosity=0, always_update=False, stdout=None,
+             ignore_dependencies=False, max_records=None, countries=None):
         have_lock = False
         results = EtlResult()
         lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
@@ -235,7 +244,8 @@ class Loader:
                         dependency.loader.load(stdout=stdout)
                 self.always_update = always_update
                 connection = connections['etools']
-                countries = connection.get_tenants()
+                if not countries:
+                    countries = connection.get_tenants()
                 if self.config.mapping:
                     self.mapping = {}
                     mart_fields = self.model._meta.concrete_fields
@@ -246,6 +256,9 @@ class Loader:
                     self.mapping.update(self.config.mapping)
 
                 context = self.get_context(today=timezone.now(),
+                                           countries=countries,
+                                           max_records=max_records,
+                                           records=0,
                                            stdout=stdout)
 
                 for country in countries:
@@ -254,7 +267,9 @@ class Loader:
                     connection.set_schemas([country.schema_name])
                     self.process_country(results, country, context)
                     self.process_post_country(country, context)
-                    if stdout:
+                    if max_records and context['records'] >= max_records:
+                        break
+                    if stdout:  # pragma: no cover
                         stdout.write("\n")
         finally:
             if have_lock:

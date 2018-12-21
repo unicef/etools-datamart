@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from constance import config
 from django.conf import settings
 from django.contrib.admin import AdminSite
 from django.contrib.admin.apps import SimpleAdminConfig
@@ -74,8 +75,7 @@ class DatamartAdminSite(AdminSite):
 
     @never_cache
     def index_new(self, request, extra_context=None):
-        import time
-        key = f'apps_groups:{request.user.id}:{get_full_version()}:{time.time()}'
+        key = f'apps_groups:{request.user.id}:{get_full_version()}:{config.CACHE_VERSION}'
         app_list = self.get_app_list(request)
         groups = cache.get(key)
         if not groups:

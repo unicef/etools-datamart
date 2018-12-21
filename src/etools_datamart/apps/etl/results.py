@@ -62,7 +62,7 @@ class EtlEncoder(encoders.JSONEncoder):
 
 def etl_decoder(obj):
     if '__type__' in obj:
-        if obj['__type__'] == '__EtlResult__':
+        if obj['__type__'] == '__EtlResult__':  # pragma: no cover
             from etools_datamart.apps.data.loader import EtlResult
             return EtlResult(**obj['data'])
     return obj

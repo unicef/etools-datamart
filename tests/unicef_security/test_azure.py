@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 import vcr
+
 from unicef_security.graph import Synchronizer
 
 

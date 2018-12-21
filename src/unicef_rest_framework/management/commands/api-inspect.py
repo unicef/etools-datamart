@@ -2,6 +2,7 @@
 import logging
 
 from django.core.management import BaseCommand
+
 from unicef_rest_framework.config import conf
 from unicef_rest_framework.models import Service
 

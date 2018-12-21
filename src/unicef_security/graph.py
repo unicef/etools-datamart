@@ -14,6 +14,7 @@ from jwt import decode as jwt_decode, DecodeError, ExpiredSignature
 from social_core.backends.azuread_tenant import AzureADTenantOAuth2
 from social_core.exceptions import AuthTokenError
 from social_django.models import UserSocialAuth
+
 from unicef_security.config import GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET
 
 from etools_datamart.libs.version import get_full_version

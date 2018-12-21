@@ -20,7 +20,7 @@ def test_profile(django_app, admin_user):
     assert res.status_code == 200
 
 
-def test_profile_post(django_app, admin_user):
-    res = django_app.get(reverse('profile'), user=admin_user)
+def test_profile_post(django_app, user):
+    res = django_app.get(reverse('profile'), user=user)
     res = res.form.submit()
     assert res.status_code == 200

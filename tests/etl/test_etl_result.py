@@ -50,5 +50,9 @@ def test_dumps():
         EtlResult(1, 1, 1)) == '{"__type__": "__EtlResult__", "data": {"created": 1, "updated": 1, "unchanged": 1}}'
 
 
+def test_dumps2():
+    assert etl_dumps({} == '{}')
+
+
 def test_loads():
     assert etl_loads(etl_dumps({"a": 1})) == {"a": 1}

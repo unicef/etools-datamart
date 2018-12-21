@@ -53,9 +53,9 @@ class DataMartModelBase(ModelBase):
 
 
 class DataMartModel(models.Model, metaclass=DataMartModelBase):
-    country_name = models.CharField(max_length=50, db_index=True)
+    country_name = models.CharField(max_length=100, db_index=True)
+    schema_name = models.CharField(max_length=63, db_index=True)
     area_code = models.CharField(max_length=10, db_index=True)
-    schema_name = models.CharField(max_length=50, db_index=True)
     last_modify_date = models.DateTimeField(blank=True, auto_now=True)
 
     class Meta:

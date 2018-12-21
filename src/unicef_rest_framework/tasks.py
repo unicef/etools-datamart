@@ -1,4 +1,5 @@
 from celery.app import default_app
+
 from unicef_rest_framework.models import Service
 
 

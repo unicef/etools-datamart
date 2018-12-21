@@ -21,7 +21,6 @@ django-redis = "*"
 django-regex = "*"
 django-strategy-field = "*"
 django-sysinfo = "*"
-django-tenant-schemas = "*"
 djangorestframework-csv = "*"
 djangorestframework-jwt = "*"
 drf-dynamic-serializer = ">=1.2.0"
@@ -50,15 +49,12 @@ djangorestframework-yaml = "*"
 django-storages = {extras = ["azure"], version = "*"}
 onedrivesdk = "*"
 azure-storage = "*"
-django-basicauth = "*"
 django-post-office = "*"
 django-celery-email = "*"
 "xhtml2pdf" = "*"
 django-crispy-forms = "*"
 django-adminactions = "*"
 django-dbtemplates = {file = "https://github.com/jazzband/django-dbtemplates/archive/2.0.1.tar.gz"}
-versio = "*"
-django-advanced-filters = "*"
 django-mptt = "*"
 
 [dev-packages]

@@ -6,8 +6,9 @@ import concurrency.fields
 import django.contrib.postgres.fields
 import django.db.models.deletion
 import strategy_field.fields
-import unicef_rest_framework.models.acl
 from django.db import migrations, models
+
+import unicef_rest_framework.models.acl
 
 
 class Migration(migrations.Migration):

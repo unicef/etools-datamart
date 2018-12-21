@@ -5,8 +5,9 @@ import django.contrib.auth.validators
 import django.db.models.deletion
 import django.utils.timezone
 import django_countries.fields
-import unicef_security.models
 from django.db import migrations, models
+
+import unicef_security.models
 
 
 class Migration(migrations.Migration):

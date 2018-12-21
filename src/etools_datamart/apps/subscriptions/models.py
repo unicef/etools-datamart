@@ -8,6 +8,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from post_office import mail
 from rest_framework.test import APIRequestFactory
+
 from unicef_rest_framework.models import Service
 
 from etools_datamart.apps.etl.models import EtlTask

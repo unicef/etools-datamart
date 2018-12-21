@@ -5,6 +5,7 @@ from functools import partial, partialmethod
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
+
 from unicef_security.models import User
 
 from etools_datamart.apps.etools.models import PartnersPlannedengagement, T2FTravel

@@ -2,6 +2,7 @@ from concurrency.utils import flatten
 from constance import config
 from django.core.cache import caches
 from django.db import connections
+
 from unicef_rest_framework.models import Service
 
 from etools_datamart.apps.etools.models import UsersUserprofile

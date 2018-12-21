@@ -4,6 +4,7 @@ import pytest
 from celery.signals import task_postrun
 from django.contrib.contenttypes.models import ContentType
 from test_utilities.factories import TaskLogFactory
+
 from unicef_security.models import User
 
 from etools_datamart.apps.data.loader import EtlResult
