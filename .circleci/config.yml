@@ -1,2 +1,238 @@
-# Config Translation Error
-# Could not find stored inference data.  Please run a build and try again.
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: python:3.6.7-slim
+        environment:
+          PGHOST: 127.0.0.1
+          PIPENV_VENV_IN_PROJECT: 1
+          DATABASE_URL: "postgis://postgres:postgres@127.0.0.1:5432/etools_datamart"
+          DATABASE_URL_ETOOLS: "postgis://postgres:postgres@127.0.0.1:5432/etools"
+          RELEASE_MATCH: "release/*"
+      - image: redis:alpine
+      - image: mdillon/postgis:9.6
+        environment:
+          POSTGRES_USER: postgres
+          PGUSER: postgres
+          POSTGRES_DB: etools_datamart
+          POSTGRES_PASSWORD: postgres
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            mkdir -p /usr/share/man/man1
+            mkdir -p /usr/share/man/man7
+            apt-get update
+            apt-get install -y \
+                  libc-bin \
+                  gcc \
+                  gdal-bin \
+                  python-dev \
+                  postgresql-client-9.6
+
+      - run:
+          name: Create databases
+          command: |
+            createdb --user postgres etools
+
+      - restore_cache:
+          keys:
+            - source-{{ .Branch }}-{{ .Revision }}
+      - checkout
+      - restore_cache:
+          keys:
+            - deps-v2-{{ checksum "Pipfile.lock" }}
+
+      - run:
+          name: run tests
+          command: |
+            export PATH=/home/circleci/.local/bin:$PATH
+            export PYTHONHASHSEED=${RANDOM}
+            pip install tox
+            tox -e py36-d21
+      - run:
+          name: codecov
+          command: |
+            PATH=$HOME/.local/bin:$PATH
+            pip install --user codecov
+            coverage xml
+            ~/.local/bin/codecov --required -X search gcov pycov -f coverage.xml --flags $CIRCLE_JOB
+      - store_artifacts:
+          path: ~build/coverage
+          destination: coverage
+
+      - save_cache:
+          key: source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+
+      - save_cache:
+          key: deps-v2-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".tox"
+            - ".venv"
+            - "~/.cache/pip"
+
+      - deploy:
+          name: tag and release if release candidate
+          command: |
+            if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
+              curl --user ${CIRCLE_TOKEN}: \
+                --data build_parameters[CIRCLE_JOB]=tag \
+                --data revision=$CIRCLE_SHA1 \
+                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
+            else
+              echo "Skipped as '$CIRCLE_BRANCH' does not match '$RELEASE_MATCH' branch"
+            fi
+  tag:
+    docker:
+      - image: circleci/python:3.6
+        environment:
+          API_URL: https://api.github.com/repos/unicef/etools-datamart
+          RELEASE_MATCH: "release/*"
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "73:a6:f1:56:5a:28:c5:ea:50:ed:4d:c5:b3:00:54:9c"
+      - run:
+          name: close release branch and create tag
+          command: |
+            export PATH=/home/circleci/.local/bin:$PATH
+            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            git status
+            git show-branch "release/$TAG"
+            git reset --hard
+
+            git config user.email "ci@unicef.org"
+            git config user.name "CI"
+
+            echo
+            echo "Process master"
+            git checkout master
+            git pull
+            git merge --no-ff release/$TAG -m "merge release/$TAG"
+            echo
+
+            echo "Creating tag $TAG"
+            git tag -a -m "v$TAG" $TAG
+            echo
+
+            echo "Process develop"
+            git checkout develop
+            git pull
+            git merge --no-ff release/$TAG -m "merge release/$TAG"
+            echo
+
+            echo "Deleting branch release/$TAG"
+            git branch -d release/$TAG
+            echo
+
+            echo "Pushing everything to origin"
+            git push --verbose --all
+            git push --verbose --tags
+            git push origin --verbose --delete release/$TAG
+      - run:
+          name: create github release
+          command: |
+            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            echo
+            export TODAY=`date '+%d %B %Y at %H:%M'`
+            function is_pre()
+            {
+                [[ "$(echo "$TAG" | sed 's/[0-9.]//g')" == "" ]] && echo false || echo true
+            }
+            function data() {
+            cat <<EOF
+            { "tag_name": "$TAG",
+              "name": "v$TAG",
+              "body": "version $TAG - Built on $TODAY",
+              "draft": false,
+              "prerelease": $(is_pre)
+            }
+            EOF
+            }
+            data=$(data)
+            curl -X POST -s \
+              --fail --verbose \
+              -H "Accept: application/json" \
+              -H "Content-Type:application/json" \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              ${API_URL}/releases \
+              -d "$data"
+      - deploy:
+          name: dockerize
+          command: |
+            export TAG=${TAG:=${CIRCLE_BRANCH#*/}}
+            curl --user ${CIRCLE_TOKEN}: \
+              --data build_parameters[TAG]=$TAG \
+              --data build_parameters[JOB]=dockerize \
+              https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/develop
+
+  dockerize:
+    working_directory: ~/code
+    docker:
+      - image: docker:17.05.0-ce-git
+        environment:
+          PGHOST: 127.0.0.1
+          PIPENV_VENV_IN_PROJECT: 1
+          DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
+          DATABASE_URL_ETOOLS: "postgres://postgres:postgres@127.0.0.1:5432/etools"
+      - image: circleci/postgres:9.6-alpine-postgis
+        environment:
+          POSTGRES_USER: postgres
+          PGUSER: postgres
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: postgres
+
+    environment:
+      DOCKER_IMAGE: unicef/datamart
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "70:aa:15:2a:d9:1c:74:f3:a1:f7:c4:cd:9b:d2:d1:f5"
+      - setup_remote_docker
+      - run:
+          name: Dump Environment
+          command: |
+            env | sort
+      - run:
+          name: Build docker image
+          command: |
+            if [ -z "$TAG" ];then
+              echo "Tag not set. exit"
+              exit 1
+            fi
+            docker build  \
+                    --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
+                    --build-arg VERSION=${TAG} \
+                    -t ${DOCKER_IMAGE}:${TAG} \
+                    -f docker/Dockerfile .
+            docker images "unicef/datamart*"
+      - run:
+          name: Test Backend docker image
+          command: |
+            echo "Testing ${DOCKER_IMAGE}:${TAG}"
+            docker run -p 8000:8000 \
+                    --rm \
+                    -e DATABASE_URL=${DATABASE_URL} \
+                    -e DEBUG=0 \
+                    -e SECURE_SSL_REDIRECT=0 \
+                    -e SESSION_COOKIE_SECURE=0 \
+                    -e SESSION_COOKIE_HTTPONLY=9 \
+                    -e SESSION_COOKIE_HTTPONLY=0 \
+                    -e CSRF_COOKIE_SECURE=0 \
+                    -it ${DOCKER_IMAGE}:${TAG} \
+                    django-admin check --deploy
+      - deploy:
+          name: Push Backend docker image
+          command: |
+            echo "Pushing ${DOCKER_IMAGE}:${TAG} to Docker Hub"
+            export TODAY=`date '+%d %B %Y at %H:%M'`
+
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
+            docker push ${DOCKER_IMAGE}:latest
+            docker push ${DOCKER_IMAGE}:${TAG}
