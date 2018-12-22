@@ -27,6 +27,7 @@ jobs:
             apt-get install -y \
                   libc-bin \
                   gcc \
+                  curl \
                   gdal-bin \
                   python-dev \
                   postgresql-client-9.6
