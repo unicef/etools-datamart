@@ -1,7 +1,8 @@
 import logging
 
-from crashlog.middleware import process_exception
 from django.template import loader
+
+from crashlog.middleware import process_exception
 from rest_framework.renderers import BaseRenderer
 
 logger = logging.getLogger(__name__)

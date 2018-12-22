@@ -4,14 +4,15 @@ import inspect
 import logging
 import os
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
-from adminactions.mass_update import mass_update
-from constance import config
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.safestring import mark_safe
+
+from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from adminactions.mass_update import mass_update
+from constance import config
 from strategy_field.utils import fqn, import_by_name
 
 from unicef_rest_framework import acl

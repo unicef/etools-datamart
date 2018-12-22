@@ -1,8 +1,9 @@
-from constance import config
 from django.contrib.auth.models import Group
 from django.forms import ChoiceField, HiddenInput, Select, Textarea, TextInput
 from django.template import Context, Template
 from django.utils.safestring import mark_safe
+
+from constance import config
 
 
 class GroupChoiceField(ChoiceField):

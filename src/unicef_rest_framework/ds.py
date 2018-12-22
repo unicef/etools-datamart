@@ -1,7 +1,8 @@
-import coreapi
-import coreschema
 from django.forms import ChoiceField, forms
 from django.template import loader
+
+import coreapi
+import coreschema
 from dynamic_serializer.core import DynamicSerializerMixin as DynamicSerializerMixinBase
 from rest_framework.filters import BaseFilterBackend
 

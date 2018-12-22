@@ -1,11 +1,12 @@
 import logging
 from io import BytesIO
 
-from crashlog.middleware import process_exception
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.functional import cached_property
+
+from crashlog.middleware import process_exception
 from post_office import mail
 from rest_framework.test import APIRequestFactory
 

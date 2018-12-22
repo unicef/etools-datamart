@@ -1,7 +1,8 @@
-from concurrency.utils import flatten
-from constance import config
 from django.core.cache import caches
 from django.db import connections
+
+from concurrency.utils import flatten
+from constance import config
 
 from unicef_rest_framework.models import Service
 

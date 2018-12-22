@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
-from admin_extra_urls.mixins import _confirm_action
-from adminactions.mass_update import mass_update
-from crashlog.middleware import process_exception
 from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
+
+from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from admin_extra_urls.mixins import _confirm_action
+from adminactions.mass_update import mass_update
+from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 from humanize import naturaldelta
 
-# from etools_datamart.apps.etl.lock import cache
 from etools_datamart.celery import app
 
 from . import models
@@ -23,11 +23,6 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     'last_success', 'last_failure', 'locked',
                     'data', 'scheduling', 'unlock_task', 'queue_task')
 
-    # readonly_fields = ('task', 'last_run',
-    #                    'last_success', 'last_failure', 'last_changes',
-    #                    'results', 'elapsed', 'time', 'status',
-    #                    'table_name', 'content_type',
-    #                    )
     date_hierarchy = 'last_run'
     actions = [mass_update, ]
 

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
+
 from strategy_field.utils import fqn
 
 from .application import Application

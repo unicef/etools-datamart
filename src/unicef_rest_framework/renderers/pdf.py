@@ -2,9 +2,10 @@ import io
 import logging
 import os
 
-from crashlog.middleware import process_exception
 from django.conf import settings
 from django.template import loader
+
+from crashlog.middleware import process_exception
 from xhtml2pdf import pisa
 
 from .html import HTMLRenderer

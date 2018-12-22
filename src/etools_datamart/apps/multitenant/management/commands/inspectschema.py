@@ -5,6 +5,7 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.constants import LOOKUP_SEP
+
 from django_regex.utils import RegexList
 
 # from etools_datamart import state

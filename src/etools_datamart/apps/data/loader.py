@@ -1,11 +1,12 @@
 import logging
 from inspect import isclass
 
-import celery
-from crashlog.middleware import process_exception
 from django.core.cache import caches
 from django.db import connections, models
 from django.utils import timezone
+
+import celery
+from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
 

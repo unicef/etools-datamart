@@ -1,9 +1,10 @@
-from celery.local import class_property
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.base import ModelBase
 from django.db.models.manager import BaseManager
+
+from celery.local import class_property
 
 from etools_datamart.apps.data.loader import Loader, LoaderOptions
 

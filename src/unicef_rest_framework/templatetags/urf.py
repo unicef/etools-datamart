@@ -1,9 +1,10 @@
 import logging
 
-import six
 from django import template
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+
+import six
 from strategy_field.utils import fqn
 
 from unicef_rest_framework.admin.service import ACL_ICONS

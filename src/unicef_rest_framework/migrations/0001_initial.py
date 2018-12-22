@@ -2,11 +2,12 @@
 
 import uuid
 
-import concurrency.fields
 import django.contrib.postgres.fields
 import django.db.models.deletion
-import strategy_field.fields
 from django.db import migrations, models
+
+import concurrency.fields
+import strategy_field.fields
 
 import unicef_rest_framework.models.acl
 

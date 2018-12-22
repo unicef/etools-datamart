@@ -2,10 +2,11 @@
 import json
 import logging
 
-from admin_extra_urls.extras import link
 from django.contrib import admin
 from django.template.defaultfilters import pluralize, urlencode
 from django.utils.safestring import mark_safe
+
+from admin_extra_urls.extras import link
 
 from unicef_rest_framework.admin import APIModelAdmin, TruncateTableMixin
 from unicef_rest_framework.utils import humanize_size

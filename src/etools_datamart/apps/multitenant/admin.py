@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
 from django.contrib.admin import ListFilter, ModelAdmin
 from django.contrib.admin.utils import quote
@@ -8,6 +7,8 @@ from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.db import connections, models
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
+from admin_extra_urls.extras import ExtraUrlMixin
 
 
 class TenantChangeList(ChangeList):

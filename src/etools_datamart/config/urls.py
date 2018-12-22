@@ -1,5 +1,6 @@
 from django.contrib.admin import site
 from django.urls import include, path, re_path
+
 from django_sysinfo.views import admin_sysinfo, http_basic_login, sysinfo, version
 from oauth2_provider.views import AuthorizationView
 

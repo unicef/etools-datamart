@@ -7,6 +7,7 @@ import logging
 from django.conf import settings
 from django.db.models import F
 from django.utils.timezone import now
+
 from strategy_field.utils import fqn
 
 from etools_datamart.apps.tracking import config

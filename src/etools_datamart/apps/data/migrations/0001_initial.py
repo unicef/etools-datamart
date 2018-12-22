@@ -3,8 +3,9 @@
 import django.contrib.gis.db.models.fields
 import django.contrib.postgres.fields.jsonb
 import django.db.models.deletion
-import month_field.models
 from django.db import migrations, models
+
+import month_field.models
 
 
 class Migration(migrations.Migration):

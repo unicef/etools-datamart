@@ -375,18 +375,6 @@ NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 # django-constance
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_ADDITIONAL_FIELDS = {
-    # 'read_only_text': ['django.forms.fields.CharField', {
-    #     'required': False,
-    #     'widget': 'etools_datamart.libs.constance.ObfuscatedInput',
-    # }],
-    # 'write_only_text': ['django.forms.fields.CharField', {
-    #     'required': False,
-    #     'widget': 'etools_datamart.libs.constance.WriteOnlyTextarea',
-    # }],
-    # 'write_only_input': ['django.forms.fields.CharField', {
-    #     'required': False,
-    #     'widget': 'etools_datamart.libs.constance.WriteOnlyInput',
-    # }],
     'select_group': ['etools_datamart.libs.constance.GroupChoiceField', {
         'required': False,
         'widget': 'etools_datamart.libs.constance.GroupChoice',
@@ -412,20 +400,8 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
-# CELERY_ACCEPT_CONTENT = ['application/json']
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
-#                        "etools_datamart.apps.etl.tasks.tasks", ]
-# CELERY_BEAT_SCHEDULE = {}
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
-
-# CELERY_TASK_ROUTES = {
-#     'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
-#     'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
-# }
-
 CELERY_ACCEPT_CONTENT = ['etljson']
 CELERY_TASK_SERIALIZER = 'etljson'
 CELERY_RESULT_SERIALIZER = 'etljson'
@@ -439,12 +415,9 @@ REST_FRAMEWORK = {
     ),
     "PAGE_SIZE": 100,
     'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'unicef_rest_framework.negotiation.CT',
-    # "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
     'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
-    # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
-    # 'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
     'DATETIME_FORMAT': DATETIME_FORMAT

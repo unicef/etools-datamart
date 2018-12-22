@@ -4,7 +4,6 @@ import logging
 import re
 import uuid
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -13,6 +12,8 @@ from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
+
+from admin_extra_urls.extras import action, ExtraUrlMixin, link
 
 from unicef_rest_framework.cache import humanize_ttl, parse_ttl
 from unicef_rest_framework.forms import CacheVersionForm

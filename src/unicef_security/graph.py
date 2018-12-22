@@ -3,13 +3,14 @@ import json
 import logging
 import os
 
-import requests
-from constance import config as constance
-from crashlog.middleware import process_exception
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.cache import cache
+
+import requests
+from constance import config as constance
+from crashlog.middleware import process_exception
 from jwt import decode as jwt_decode, DecodeError, ExpiredSignature
 from social_core.backends.azuread_tenant import AzureADTenantOAuth2
 from social_core.exceptions import AuthTokenError

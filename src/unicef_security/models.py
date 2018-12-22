@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
+
 from django_countries.fields import CountryField
 
 app_label = 'unicef_security'

@@ -6,12 +6,13 @@ from time import time
 from typing import List
 
 import django.db.utils
-import psycopg2
 from django.apps import apps
 from django.conf import settings
 from django.db.backends.postgresql import base as original_backend
 from django.db.backends.utils import CursorWrapper
 from django.utils.functional import cached_property
+
+import psycopg2
 
 # from etools_datamart.state import state
 from etools_datamart.apps.etools.models import UsersCountry

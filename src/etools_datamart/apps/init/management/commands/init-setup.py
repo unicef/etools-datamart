@@ -3,7 +3,6 @@ import uuid
 import warnings
 from urllib.parse import urlparse
 
-from constance import config
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -12,6 +11,8 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connections
 from django.utils.module_loading import import_string
+
+from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
 from post_office.models import EmailTemplate
 from redisboard.models import RedisServer

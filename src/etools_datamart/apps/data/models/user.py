@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db import models
+
 from month_field.models import MonthField
 
 from etools_datamart.apps.data.loader import EtlResult, Loader

@@ -2,7 +2,6 @@
 
 import logging
 
-from admin_extra_urls.extras import ExtraUrlMixin, link
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
@@ -10,6 +9,8 @@ from django.contrib.admin.helpers import AdminForm
 from django.contrib.auth.models import Group
 from django.contrib.postgres.forms import SimpleArrayField
 from django.template.response import TemplateResponse
+
+from admin_extra_urls.extras import ExtraUrlMixin, link
 
 from unicef_rest_framework.models import Service, UserAccessControl
 from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl

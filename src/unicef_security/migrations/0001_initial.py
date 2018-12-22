@@ -4,8 +4,9 @@ import django.contrib.auth.models
 import django.contrib.auth.validators
 import django.db.models.deletion
 import django.utils.timezone
-import django_countries.fields
 from django.db import migrations, models
+
+import django_countries.fields
 
 import unicef_security.models
 

@@ -1,6 +1,5 @@
 from collections import OrderedDict
 
-from constance import config
 from django.conf import settings
 from django.contrib.admin import AdminSite
 from django.contrib.admin.apps import SimpleAdminConfig
@@ -9,6 +8,8 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy
 from django.views.decorators.cache import never_cache
+
+from constance import config
 
 from etools_datamart.libs.version import get_full_version
 

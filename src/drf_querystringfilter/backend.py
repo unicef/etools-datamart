@@ -5,14 +5,15 @@ import logging
 from collections import OrderedDict
 from functools import lru_cache
 
-import coreapi
-import coreschema
 from django import forms
 from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models import BooleanField, FieldDoesNotExist
 from django.template import loader
 from django.utils.encoding import force_text
+
+import coreapi
+import coreschema
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.settings import api_settings
 
