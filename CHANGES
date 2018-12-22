@@ -1,5 +1,5 @@
-1.8 (dev)
----------
+1.8
+---
 * WARNINGS: migration reset
 * add ability to create 'per model' custom templates for html/pdf renderers
     new `TEMPLATE_CACHE_URL` enironment variable
@@ -11,7 +11,6 @@
 * Countries can be selected using name, schema_name,country_short_code or business_area_code
 * Improved Browseable API
 * `page_size` now accept `-1` to disable pagination
-* new endpoints 'Location' and 'GatewayType'
 
 
 1.7
