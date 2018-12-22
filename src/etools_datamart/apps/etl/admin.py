@@ -20,9 +20,8 @@ from . import models
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', 'last_run', 'status', 'time',
-                    'last_success', 'last_failure', 'locked', 'scheduling',
-                    'unlock_task',
-                    'queue_task')
+                    'last_success', 'last_failure', 'locked',
+                    'data', 'scheduling', 'unlock_task', 'queue_task')
 
     # readonly_fields = ('task', 'last_run',
     #                    'last_success', 'last_failure', 'last_changes',
@@ -45,6 +44,14 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             label = 'Schedule'
 
         return format_html(f'<a href="{url}">{label}</a>')
+
+    def data(self, obj):
+        model = obj.content_type.model_class()
+        opts = model._meta
+        url = reverse('admin:%s_%s_changelist' % (opts.app_label, opts.model_name))
+        return format_html(f'<a href="{url}">data</a>')
+
+    data.verbse_name = 'data'
 
     def queue_task(self, obj):
         opts = self.model._meta
