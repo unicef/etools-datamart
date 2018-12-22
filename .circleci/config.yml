@@ -21,11 +21,20 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            mkdir -p /usr/share/man/man1
+            mkdir -p /usr/share/man/man7
             apt-get update
-            apt-get install -y --no-install-recommends \
+            apt-get install -y \
+                  libc-bin \
                   gcc \
                   gdal-bin \
-                  python-dev
+                  python-dev \
+                  postgresql-client-9.6
+
+      - run:
+          name: Create databases
+          command: |
+            createdb --user postgres etools
 
       - restore_cache:
           keys:
