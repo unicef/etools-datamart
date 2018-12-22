@@ -415,16 +415,16 @@ CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 # CELERY_ACCEPT_CONTENT = ['application/json']
 # CELERY_RESULT_SERIALIZER = 'json'
 # CELERY_TASK_SERIALIZER = 'json'
-CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
-                       "etools_datamart.apps.etl.tasks.tasks", ]
-CELERY_BEAT_SCHEDULE = {}
+# CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
+#                        "etools_datamart.apps.etl.tasks.tasks", ]
+# CELERY_BEAT_SCHEDULE = {}
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
 
-CELERY_TASK_ROUTES = {
-    'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
-    'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
-}
+# CELERY_TASK_ROUTES = {
+#     'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
+#     'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
+# }
 
 CELERY_ACCEPT_CONTENT = ['etljson']
 CELERY_TASK_SERIALIZER = 'etljson'

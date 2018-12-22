@@ -7,7 +7,7 @@ from django.core.cache import caches
 from django.db import connections, models
 from django.utils import timezone
 from redis.exceptions import LockError
-from strategy_field.utils import get_attr
+from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.celery import app
 
@@ -67,7 +67,7 @@ DEFAULT_KEY = lambda country, record: dict(country_name=country.name,
 class LoaderOptions:
     __attrs__ = ['mapping', 'celery', 'source',
                  'queryset', 'key', 'locks',
-                 'depends', 'timeout']
+                 'depends', 'timeout', 'lock_key']
 
     def __init__(self, base=None):
         self.mapping = {}
@@ -89,12 +89,12 @@ class LoaderOptions:
 
         if not self.queryset and self.source:
             self.queryset = lambda: self.source.objects
-        if not self.lock_key:
-            self.lock_key = f"{self.source}-lock"
 
     def contribute_to_class(self, model, name):
         self.model = model
         setattr(model, name, self)
+        if not self.lock_key:
+            self.lock_key = f"{fqn(model)}-lock"
 
 
 class LoaderTask(celery.Task):
@@ -105,7 +105,7 @@ class LoaderTask(celery.Task):
         self.name = "load_{0.app_label}_{0.model_name}".format(loader.model._meta)
 
     def run(self, *args, **kwargs):
-        self.loader.load()
+        return self.loader.load()
 
 
 # def get_or_fail(Model, **kwargs):

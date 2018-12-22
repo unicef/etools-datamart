@@ -102,7 +102,10 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         def _action(request):
             obj.loader.unlock()
 
-        return _confirm_action(self, request, _action, f"Continuing will unlock selected task. ({obj.task})",
+        return _confirm_action(self, request, _action,
+                               f"""Continuing will unlock selected task. ({obj.task}).
+{obj.loader.task.name} - {obj.loader.config.lock_key}
+""",
                                "Successfully executed", )
 
     @link()

@@ -5,6 +5,7 @@ from time import time
 from celery import Celery
 # from celery.contrib.abortable import AbortableTask
 from celery.signals import task_postrun, task_prerun
+from celery.utils.log import get_task_logger
 from kombu import Exchange, Queue
 from kombu.serialization import register
 
@@ -13,47 +14,11 @@ from etools_datamart.apps.etl.results import etl_dumps, etl_loads
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'etools_datamart.config.settings')
 
 
-# class ETLTask(AbortableTask):
-#     abstract = True
-#     linked_model = None
-
-
 class DatamartCelery(Celery):
-    # etl_cls = ETLTask
     _mapping = {}
-
-    # def _task_from_fun(self, fun, name=None, base=None, bind=False, **options):
-    #     from etools_datamart.apps.etl.lock import only_one
-    #     linked_model = options.get('linked_model', None)
-    #     if linked_model:
-    #         name = name or self.gen_task_name(fun.__name__, fun.__module__)
-    #         options['lock_key'] = f"{name}-lock"
-    #         fun = only_one(fun, options['lock_key'])
-    #         # options['unlock'] = fun.unlock
-    #         task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
-    #         linked_model._etl_task = task
-    #         linked_model._etl_loader = fun
-    #     else:
-    #         task = super()._task_from_fun(fun, name=name, base=None, bind=False, **options)
-    #     return task
-    #
-    # def etl(self, model, *args, **opts):
-    #     opts['base'] = ETLTask
-    #     opts['linked_model'] = model
-    #     task = super().task(*args, **opts)
-    #     return task
 
     def get_all_etls(self):
         return [cls for (name, cls) in self.tasks.items() if hasattr(cls, 'linked_model')]
-
-    # def gen_task_name(self, name, module):
-    #     prefix = ""
-    #     if module.endswith('.tasks.etl'):
-    #         module = module[:-10]
-    #         prefix = 'etl_'
-    #     if module.endswith('.tasks'):
-    #         module = module[:-6]
-    #     return prefix + super(DatamartCelery, self).gen_task_name(name, module)
 
 
 app = DatamartCelery('datamart')
@@ -102,6 +67,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     from django.utils import timezone
     from etools_datamart.apps.subscriptions.models import Subscription
     from etools_datamart.apps.etl.models import EtlTask
+    logger = get_task_logger('etl')
     if not hasattr(sender, 'linked_model'):
         return
     try:
@@ -114,15 +80,16 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     if state == 'SUCCESS':
         try:
             defs['results'] = retval.as_dict()
-        except Exception:  # pragma: no cover
-            defs['results'] = str(retval)
-        if retval.created > 0 or retval.updated > 0:
-            defs['last_changes'] = timezone.now()
-            for service in sender.linked_model.linked_services:
-                service.invalidate_cache()
-                Subscription.objects.notify(sender.linked_model)
+            if retval.created > 0 or retval.updated > 0:
+                defs['last_changes'] = timezone.now()
+                for service in sender.linked_model.linked_services:
+                    service.invalidate_cache()
+                    Subscription.objects.notify(sender.linked_model)
+            defs['last_success'] = timezone.now()
 
-        defs['last_success'] = timezone.now()
+        except Exception as e:  # pragma: no cover
+            logger.error(e)
+            defs['results'] = str(retval)
     else:
         # if not isinstance(retval, dict):
         defs['results'] = str(retval)
