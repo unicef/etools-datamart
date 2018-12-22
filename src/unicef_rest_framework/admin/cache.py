@@ -4,7 +4,6 @@ import logging
 import re
 import uuid
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -13,6 +12,9 @@ from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
+
+from admin_extra_urls.extras import action, ExtraUrlMixin, link
+
 from unicef_rest_framework.cache import humanize_ttl, parse_ttl
 from unicef_rest_framework.forms import CacheVersionForm
 from unicef_rest_framework.models import Service
@@ -28,9 +30,10 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('name', 'cache_version', 'get_cache_ttl', 'cache_key')
     search_fields = ('name', 'viewset')
     actions = ['incr_version', 'reset_version', 'generate_cache_token']
-    readonly_fields = ('cache_key', )
+    readonly_fields = ('cache_key', 'name')
     list_filter = ('hidden',)
     form = CacheVersionForm
+    fieldsets = [("", {"fields": ('name', 'cache_version', 'cache_ttl', 'cache_key')})]
 
     def get_queryset(self, request):
         return super(CacheVersionAdmin, self).get_queryset(request). \
@@ -38,6 +41,9 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
             select_related(*self.raw_id_fields)
 
     def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False
 
     def get_cache_ttl(self, obj):
@@ -51,7 +57,7 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     @action(label='View Service')
     def goto_service(self, request, pk):
-        url = reverse("admin:core_service_change", args=[pk])
+        url = reverse("admin:unicef_rest_framework_service_change", args=[pk])
         return HttpResponseRedirect(url)
 
     @link(label='Reset cache', css_class="btn btn-danger", icon="fa fa-warning icon-white")
@@ -89,12 +95,12 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
         self.generate_cache_token(request, Service.objects.filter(id=pk))
 
     def incr_version(self, request, queryset):
-        queryset.update(version=F("cache_version") + 1)
+        queryset.update(cache_version=F("cache_version") + 1)
 
     incr_version.short_description = "Increment version"
 
     def reset_version(self, request, queryset):
-        queryset.update(version=1)
+        queryset.update(cache_version=1)
 
     incr_version.short_description = "Increment version"
 

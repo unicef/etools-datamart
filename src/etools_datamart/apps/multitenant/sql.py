@@ -2,8 +2,9 @@
 import re
 from collections import OrderedDict
 
-import sqlparse
 from django.utils.functional import cached_property
+
+import sqlparse
 from django_regex.utils import RegexList
 from sqlparse.sql import Function, Identifier, IdentifierList, Where
 from sqlparse.tokens import Keyword, Whitespace

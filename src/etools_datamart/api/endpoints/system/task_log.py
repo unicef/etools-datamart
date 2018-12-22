@@ -5,7 +5,7 @@ from . import serializers
 from .. import common
 
 
-class TaskLogViewSet(common.APIReadOnlyModelViewSet):
+class MonitorViewSet(common.APIReadOnlyModelViewSet):
     """
 
     """

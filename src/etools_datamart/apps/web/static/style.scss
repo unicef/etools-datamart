@@ -8,13 +8,16 @@
 body, html {
   height: 50%;
   font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
   a {
     color: black;
+
     &:hover {
       color: black;
 
     }
   }
+
   span.str {
     color: black;
   }
@@ -61,9 +64,11 @@ body, html {
   //display: -ms-flexbox;
   //display: flex;
   flex-wrap: wrap;
+
   form {
     padding: 100px 0 0 65px;
   }
+
   .center {
     width: 100%;
     text-align: center;
@@ -74,24 +79,50 @@ body, html {
     font-size: 24pt;
     text-align: center;
   }
+
   h2 {
     font-size: 14pt;
   }
-  //h1 {
-  //  width: 100%;
-  //  font-size: 24pt;
-  //  text-align: center;
-  //}
-  ul {
-    padding: 20px 0 0 65px;
-    list-style: none;
-    font-size: 18pt;
-  }
+}
+
+ul.index-menu {
+  padding: 20px 0 0 65px;
+  list-style: none;
+  font-size: 18pt;
+
   a {
     color: #2090F8;
+    text-transform: none;
+    text-decoration: none;
   }
 
+  li.menu-sep {
+    width: 100%;
+    font-size: 2px;
+    //border: 1px solid black;
+  }
 }
+
+.h10 {
+  display: block;
+  height: 10px;
+}
+
+.h30 {
+  display: block;
+  height: 30px;
+}
+
+//.pad4 {
+//  padding: 4px;
+//}
+//
+//.pad6 {
+//  padding: 6px;
+//}
+//.pad10 {
+//  padding: 10px;
+//}
 
 /* [ login more ]*/
 
@@ -140,7 +171,7 @@ input.input100 {
 
 /*[ Button ]*/
 .container-login100-form-btn {
-  width: 100%;
+  //width: 100%;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -159,7 +190,7 @@ input.input100 {
   justify-content: center;
   align-items: center;
   padding: 0 20px;
-  width: 100%;
+  //width: 100%;
   height: 50px;
   border-radius: 3px;
   background: #2090F8;
@@ -230,61 +261,144 @@ input.input100 {
     color: white;
   }
 }
+
 .rounded {
-   -webkit-border-radius: 20px;
-   -moz-border-radius: 20px;
-   border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
 }
 
-.monitor {
+.monitor, .profile {
   .menubar {
     padding: 10px;
+
     a {
       &:visited {
         text-transform: none;
       }
+
       text-transform: none;
       color: #2090F8;
     }
   }
+
   #monitor {
     width: 100%;
     padding: 30px;
+
     .SUCCESS {
       color: #00b200;
       font-weight: bold;
     }
+
     .row {
       width: 100%;
       padding: 5px;
-      &.header{
+
+      &.header {
         font-weight: bold;
       }
-      &.odd{
+
+      &.odd {
         background-color: #eeeeee;
       }
-      &.even{
+
+      &.even {
 
       }
     }
 
     .col {
       display: inline-block;
+
       &.task {
         width: 30%;
       }
-      &.last_run{
+
+      &.last_run {
         width: 200px;
       }
+
       &.last_changes {
         width: 200px;
       }
+
       &.status {
         width: 120px;
       }
+
       &.subscription {
         width: 180px;
       }
+    }
+  }
+}
+
+.profile {
+
+  #areas, #services, #password {
+    margin-right: 20px;
+    padding: 10px;
+    position: relative;
+    display: inline-block;
+
+    h1 {
+      font-size: 14pt;
+      margin-bottom: 5px;
+    }
+
+    ul, form {
+      border: 1px solid #cfcfcf;
+      overflow-y: scroll;
+      width: 300px;
+      height: 400px;
+    }
+  }
+
+  #password {
+    .message {
+      margin: 20px;
+      text-align: left;
+
+      .password {
+        text-align: center;
+
+        margin: 20px;
+        padding: 20px;
+        font-family: monospace;
+        font-size: 20px;
+        border: 1px solid grey;
+      }
+    }
+
+    form {
+      width: 400px;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    .btn {
+      justify-content: center;
+      align-items: center;
+      padding: 0 20px;
+      height: 40px;
+      border-radius: 3px;
+      font-size: 12px;
+      //background: #2090F8;
+      color: #0;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      -webkit-transition: all 0.4s;
+      -o-transition: all 0.4s;
+      -moz-transition: all 0.4s;
+      transition: all 0.4s;
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      background: #2090F8;
+      color: #fff;
     }
   }
 }

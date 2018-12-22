@@ -7,9 +7,11 @@ import logging
 from django.conf import settings
 from django.db.models import F
 from django.utils.timezone import now
+
 from strategy_field.utils import fqn
 
 from etools_datamart.apps.tracking import config
+from etools_datamart.apps.tracking.asyncqueue import AsyncQueue
 
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
 
@@ -21,7 +23,8 @@ logger = logging.getLogger(__name__)
 
 def log_request(**kwargs):
     log = APIRequestLog.objects.create(**kwargs)
-    if settings.ENABLE_LIVE_STATS:  # pragma: no cover
+
+    if settings.ENABLE_LIVE_STATS:
         lastMonth = (log.requested_at.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
 
         def _update_stats(target, **extra):
@@ -35,7 +38,7 @@ def log_request(**kwargs):
                 setattr(target, k, v)
             try:
                 target.save()
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error(f"""Error updating {target.__class__.__name__}: {e}
 {extra}
 """)
@@ -79,8 +82,9 @@ def log_request(**kwargs):
 
 def record_to_kwargs(request, response):
     user = None
+    api_info = getattr(request, 'api_info')
 
-    if request.user and request.user.is_authenticated:  # pragma: no cover
+    if request.user and request.user.is_authenticated:
         user = request.user
 
     # compute response time
@@ -97,11 +101,11 @@ def record_to_kwargs(request, response):
         media_type = response.accepted_media_type
     except AttributeError:  # pragma: no cover
         media_type = response['Content-Type'].split(';')[0]
-    view = request.api_info.get('view', None)
+    view = api_info.get('view', None)
     if not view:  # pragma: no cover
         return {}
     viewset = fqn(view)
-    service = request.api_info.get("service")
+    service = api_info.get("service")
     from unicef_rest_framework.utils import get_ident
     return dict(user=user,
                 requested_at=request.timestamp,
@@ -118,10 +122,14 @@ def record_to_kwargs(request, response):
                 cached=request.api_info.get('cache-hit', False),  # see api.common.APICacheResponse
                 content_type=media_type)
 
+
 #
-# class AsyncLogger(AsyncQueue):
-#     def _process(self, record):
-#         log_request(**record_to_kwargs(**record))
+class AsyncLogger(AsyncQueue):
+    def _process(self, record):
+        # import requests
+        # payload = 'v=1&t=event&tid=UA-XXXXXY&cid=555&ec=video&ea=play&el=holiday&ev=300'
+        # r = requests.post('http://www.google-analytics.com/collect', data=payload)
+        log_request(**record_to_kwargs(**record))
 
 
 class StatsMiddleware(object):
@@ -139,15 +147,17 @@ class StatsMiddleware(object):
         request.timestamp = now()
 
         response = self.get_response(request)
-        if response.status_code == 200 and config.TRACK_PATH.match(request.path):
+        if response.status_code == 200 and \
+                hasattr(request, 'api_info') and \
+                config.TRACK_PATH.match(request.path):
             self.log(request, response)
         return response
 
-#
-# class ThreadedStatsMiddleware(StatsMiddleware):
-#     def __init__(self, get_response):
-#         super(ThreadedStatsMiddleware, self).__init__(get_response)
-#         self.worker = AsyncLogger()
-#
-#     def log(self, request, response):
-#         self.worker.queue({'request': request, 'response': response})
+
+class ThreadedStatsMiddleware(StatsMiddleware):
+    def __init__(self, get_response):
+        super(ThreadedStatsMiddleware, self).__init__(get_response)
+        self.worker = AsyncLogger()
+
+    def log(self, request, response):
+        self.worker.queue({'request': request, 'response': response})

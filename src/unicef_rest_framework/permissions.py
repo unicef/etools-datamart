@@ -4,6 +4,8 @@ import logging
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 from strategy_field.utils import fqn
+
+from unicef_rest_framework.acl import ACL_ACCESS_OPEN
 from unicef_rest_framework.models import UserAccessControl
 from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl
 
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class ServicePermission(BasePermission):
-    serializer_field = "+serializer"
+    # serializer_field = "-serializer"
 
     def get_acl(self, request, view):
         try:
@@ -34,7 +36,7 @@ class ServicePermission(BasePermission):
                 logger.error(f"Access denied for user '{request.user}' to '{fqn(view)}'")
                 raise PermissionDenied
 
-            requested_serializer = request.GET.get(self.serializer_field, "std")
+            requested_serializer = request.GET.get(view.serializer_field_param, "std")
 
             if (requested_serializer not in acl.serializers) and ("*" not in acl.serializers):
                 logger.error(
@@ -43,5 +45,8 @@ class ServicePermission(BasePermission):
 
             return True
         except (GroupAccessControl.DoesNotExist):
+            service = view.get_service()
+            if service.access == ACL_ACCESS_OPEN:
+                return True
             logger.error(f"User '{request.user}' does not have grants for '{fqn(view)}'")
             return False

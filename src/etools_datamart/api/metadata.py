@@ -67,11 +67,15 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     def determine_metadata(self, request, view):
         metadata = super(SimpleMetadataWithFilters, self).determine_metadata(request, view)
-        metadata['filters'] = getattr(view, 'filter_fields')
-        metadata['filter_blacklist'] = getattr(view, 'filter_blacklist')
-        metadata['ordering'] = getattr(view, 'ordering_fields')
-        metadata['serializers'] = getattr(view, 'serializers_fieldsets')
-        # from django.db import connection
+        metadata['filters'] = getattr(view, 'filter_fields', '')
+        metadata['filter_blacklist'] = getattr(view, 'filter_blacklist', '')
+        metadata['ordering'] = getattr(view, 'ordering_fields', '')
+        if hasattr(view, 'serializers_fieldsets'):
+            metadata['serializers'] = ", ".join(view.serializers_fieldsets.keys())
+        else:  # pragma: no cover
+            metadata['serializers'] = 'std'
+
+            # from django.db import connection
         # with connection.schema_editor() as editor:
         #     sql = get_create_model(editor, view.queryset.model)
         # metadata['sql'] = sql

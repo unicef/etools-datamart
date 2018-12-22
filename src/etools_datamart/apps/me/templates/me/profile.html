@@ -1,0 +1,88 @@
+{% extends 'me/base.html' %}{% load static %}
+
+{% block title %}Profile{% endblock %}
+{% block content %}
+    <div style="padding-left: 30px">
+        <div>{{ user.display_name }} - {{ user.email }}</div>
+        <div>Groups: &nbsp;{% for g in user.groups.all %}{{ g.name }}{% endfor %}</div>
+        <div id="areas">
+            <h1>Areas</h1>
+            <ul>
+                {% for area in business_areas %}
+                    <li>{{ area }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="services">
+            <h1>Services</h1>
+
+            <ul>
+                {% for service in services %}
+                    <li>{{ service.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="password">
+            <h1>Excel integration</h1>
+            {% if user.azure_id %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="message">
+                        {% if password %}
+                            A new password has been generated, save it in a safe place.
+                            <h4>Note: Datamart cannot shows it in the future.</h4>
+                            <div>If lost you must generate a new one</div>
+                            <input type="text" class="password" name="password"
+                                   readonly="readonly" value="{{ password }}">
+                        {% else %}
+                            {% if user.has_usable_password %}
+                                You have enabled extended Excel integration. Datamart cannot
+                                show you the password but can generate a new one.
+                                <input type="text" class="password" name="password"
+                                       readonly="readonly" value="**********">
+                            {% else %}
+                                Extended Excel integration is disabled.
+                                To enable it you must generate a valid password.
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    {% if password %}
+                        <input class="btn btn-submit" type="submit" value="ReGenerate">
+                        <input class="btn" id="copyToClipboard" type="button" value="Copy">
+                    {% else %}
+                        {% if user.has_usable_password %}
+                            <input class="btn btn-submit" type="submit" value="ReGenerate">
+                        {% else %}
+                            <input class="btn" type="submit" value="Generate">
+                        {% endif %}
+                    {% endif %}
+                </form>
+            {% else %}
+                <form>
+                    <div class="message">
+                        This account cannot enable Excel integration.
+                        If you are logged in using corporate single sign-on (Azure/Active directory credentials)
+                        contact Datamart administrators to enable it.
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+    </script>
+{% endblock %}
+{% block bottom_scripts %}
+    <script src="{% static 'jquery-3.3.1.min.js' %}"></script>
+
+    <script>
+        $("#copyToClipboard").on("click", function () {
+            let msg = "<div class='center'>Copied to clipboard</div>";
+            $('input[name=password]').select();
+            document.execCommand("copy");
+            console.log("copied");
+            $('input[name=password]').val('*********').after(msg);
+            $("#copyToClipboard").hide();
+        });
+    </script>
+{% endblock %}

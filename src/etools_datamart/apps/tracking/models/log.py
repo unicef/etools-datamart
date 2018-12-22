@@ -4,6 +4,7 @@ import logging
 from django.conf import settings
 from django.db import connections, models
 from django.utils.timezone import now
+
 from strategy_field.fields import StrategyClassField
 
 logger = logging.getLogger(__name__)

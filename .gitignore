@@ -37,3 +37,5 @@ src/etools_datamart/apps/etools/models/public_old.py
 src/etools_datamart/apps/etools/models/tenant_old.py
 xml
 ~*
+**/dual-listbox-master/
+#src/etools_datamart/apps/security/static/security/dual-listbox-master

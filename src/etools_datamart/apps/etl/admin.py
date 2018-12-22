@@ -1,33 +1,30 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import action, link
-from admin_extra_urls.mixins import _confirm_action
 from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
+
+from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from admin_extra_urls.mixins import _confirm_action
+from adminactions.mass_update import mass_update
+from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 from humanize import naturaldelta
 
-from etools_datamart.apps.etl.lock import cache
 from etools_datamart.celery import app
-from etools_datamart.libs.truncate import TruncateTableMixin
 
 from . import models
 
 
 @register(models.EtlTask)
-class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
+class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', 'last_run', 'status', 'time',
-                    'last_success', 'last_failure', 'lock', 'scheduling', 'queue_task')
+                    'last_success', 'last_failure', 'locked',
+                    'data', 'scheduling', 'unlock_task', 'queue_task')
 
-    readonly_fields = ('task', 'last_run',
-                       'last_success', 'last_failure', 'last_changes',
-                       'results', 'elapsed', 'time', 'status',
-                       'table_name', 'content_type',
-                       )
     date_hierarchy = 'last_run'
-    actions = None
+    actions = [mass_update, ]
 
     def scheduling(self, obj):
         opts = PeriodicTask._meta
@@ -43,6 +40,14 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
 
         return format_html(f'<a href="{url}">{label}</a>')
 
+    def data(self, obj):
+        model = obj.content_type.model_class()
+        opts = model._meta
+        url = reverse('admin:%s_%s_changelist' % (opts.app_label, opts.model_name))
+        return format_html(f'<a href="{url}">data</a>')
+
+    data.verbse_name = 'data'
+
     def queue_task(self, obj):
         opts = self.model._meta
         url = reverse('admin:%s_%s_queue' % (opts.app_label,
@@ -50,6 +55,14 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
         return format_html(f'<a href="{url}">queue</a>')
 
     queue_task.verbse_name = 'queue'
+
+    def unlock_task(self, obj):
+        opts = self.model._meta
+        url = reverse('admin:%s_%s_unlock' % (opts.app_label,
+                                              opts.model_name), args=[obj.id])
+        return format_html(f'<a href="{url}">unlock</a>')
+
+    queue_task.verbse_name = 'unlock'
 
     def has_add_permission(self, request):
         return False
@@ -60,10 +73,10 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
     def time(self, obj):
         return naturaldelta(obj.elapsed)
 
-    def lock(self, obj):
-        return f"{obj.task}-lock" in cache
+    def locked(self, obj):
+        return obj.content_type.model_class().loader.is_locked
 
-    lock.boolean = True
+    locked.boolean = True
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         if request.method == 'POST':
@@ -76,22 +89,25 @@ class EtlTaskAdmin(TruncateTableMixin, admin.ModelAdmin):
     def queue(self, request, pk):
         obj = self.get_object(request, pk)
         try:
-            task = app.tasks[obj.task]
+            task = app.tasks.get(obj.task)
             task.delay()
             self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
+            process_exception(e)
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
         return HttpResponseRedirect(reverse("admin:etl_etltask_changelist"))
 
     @action()
     def unlock(self, request, pk):
         obj = self.get_object(request, pk)
-        key = f"{obj.task}-lock"
 
         def _action(request):
-            cache.delete(key)
+            obj.loader.unlock()
 
-        return _confirm_action(self, request, _action, f"Continuing will unlock selected task. ({key})",
+        return _confirm_action(self, request, _action,
+                               f"""Continuing will unlock selected task. ({obj.task}).
+{obj.loader.task.name} - {obj.loader.config.lock_key}
+""",
                                "Successfully executed", )
 
     @link()

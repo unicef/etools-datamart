@@ -21,7 +21,7 @@ class InvalidQueryArgumentError(QueryFilterException):
 class InvalidQueryValueError(QueryFilterException):
 
     def __init__(self, field, argument='', *args, **kwargs):
-        msg = "Invalid value '{}' for parameter {}".format(field, argument)
+        msg = "Invalid value '{}' for parameter {}".format(argument, field)
         super(InvalidQueryValueError, self).__init__(msg)
 
 

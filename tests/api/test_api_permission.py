@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import pytest
+from django.utils.http import urlquote
 from rest_framework.test import APIClient
 from test_utilities.factories import InterventionFactory
+
 from unicef_rest_framework.models import UserAccessControl
+from unicef_rest_framework.test_utils import user_allow_country
 
 from etools_datamart.api.endpoints import InterventionViewSet
 
@@ -84,44 +87,44 @@ def test_permission_deny(client, deny):
 def test_permission_allow(client, allow):
     url = allow.service.endpoint
     client.force_authenticate(allow.user)
-
-    res = client.get(url, HTTP_X_SCHEMA="bolivia")
+    with user_allow_country(allow.user, 'bolivia'):
+        res = client.get(url)
     assert res.status_code == 200
 
 
 def test_permission_check_serializer_allow(client, allow_many_serializer):
     url = allow_many_serializer.service.endpoint
+    view = allow_many_serializer.service.viewset
     client.force_authenticate(allow_many_serializer.user)
-
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
+    with user_allow_country(allow_many_serializer.user, 'bolivia'):
+        res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
     assert res.status_code == 200
     # assert res.json()['detail'] == "You do not have permission to perform this action."
 
 
 def test_permission_check_serializer_deny(client, allow_std_serializer):
     url = allow_std_serializer.service.endpoint
+    view = allow_std_serializer.service.viewset
     client.force_authenticate(allow_std_serializer.user)
-
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
-    assert res.status_code == 403
+    # with user_allow_country(allow_many_serializer.user, 'bolivia'):
+    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
+    assert res.status_code == 403, res.content
     assert res.json()['error'] == "Forbidden serializer 'short'"
 
 
 def test_permission_check_serializer_any(client, allow_any_serializer):
     url = allow_any_serializer.service.endpoint
+    view = allow_any_serializer.service.viewset
     client.force_authenticate(allow_any_serializer.user)
-
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
-    assert res.status_code == 200
+    with user_allow_country(allow_any_serializer.user, 'bolivia'):
+        res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
+    assert res.status_code == 200, res.content
 
 
 def test_permission_check_user(client, allow_any_serializer, user2):
     url = allow_any_serializer.service.endpoint
+    view = allow_any_serializer.service.viewset
     client.force_authenticate(user2)
 
-    res = client.get(f"{url}?%2bserializer=short",
-                     HTTP_X_SCHEMA="bolivia")
+    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
     assert res.status_code == 403

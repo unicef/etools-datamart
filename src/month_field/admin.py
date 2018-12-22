@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.contrib.admin import FieldListFilter
 from django.utils.dates import MONTHS
+
 from month_field.models import MonthField
 
 today = datetime.today()

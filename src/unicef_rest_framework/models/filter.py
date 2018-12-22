@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
+
 from strategy_field.utils import fqn
 
 from .application import Application
@@ -42,11 +43,12 @@ class SystemFilterHandler(object):
 class SystemFilterManager(models.Manager):
     @lru_cache()
     def match(self, request, view):
-        try:
-            return SystemFilter.objects.get(service=view.get_service(),
-                                            user=request.user)
-        except SystemFilter.DoesNotExist:
-            return None
+        if request.user and request.user.is_authenticated:
+            try:
+                return SystemFilter.objects.get(service=view.get_service(),
+                                                user=request.user)
+            except SystemFilter.DoesNotExist:
+                return None
 
 
 class SystemFilter(models.Model):
@@ -58,8 +60,7 @@ class SystemFilter(models.Model):
     group = models.ForeignKey(Group, models.CASCADE, blank=True, null=True)
     service = models.ForeignKey(Service, models.CASCADE)
     description = models.TextField(blank=True)
-    handler = models.CharField(max_length=500,
-                               default=fqn(SystemFilterHandler))
+    handler = models.CharField(max_length=500, default=fqn(SystemFilterHandler))
 
     objects = SystemFilterManager()
 

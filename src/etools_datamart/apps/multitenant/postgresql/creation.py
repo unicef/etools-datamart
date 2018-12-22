@@ -114,12 +114,17 @@ SET default_tablespace = '';
                 "-h", self.connection.settings_dict['HOST'],
                 "-d", self.connection.settings_dict['NAME'],
                 "--no-owner",
+                "--clean",
+                "--if-exists",
                 "--disable-triggers",
                 "--exit-on-error",
                 str(public_dump)]
-
-        subprocess.check_call(cmds)
-
+        try:
+            subprocess.check_call(cmds)
+        except Exception as e:
+            print(e)
+            print(" ".join(cmds))
+            sys.exit(1)
         try:
             cur.execute(raw_sql(header.format(schema='public')))
         except Exception as e:

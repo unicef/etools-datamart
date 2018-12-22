@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import messages
 from django.contrib.admin import ListFilter, ModelAdmin
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
-from django.db import connections
+from django.db import connections, models
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
+from admin_extra_urls.extras import ExtraUrlMixin
 
 
 class TenantChangeList(ChangeList):
@@ -83,11 +84,19 @@ class ReadOnlyMixin:
         return False
 
 
-class EToolsModelAdmin(ExtraUrlMixin, ReadOnlyMixin, ModelAdmin):
+class DisplayAllMixin:
+    def get_list_display(self, request):  # pragma: no cover
+        if self.list_display == ('__str__',):
+            return [field.name for field in self.model._meta.fields
+                    if not isinstance(field, models.ForeignKey)]
+        return self.list_display
+
+
+class EToolsModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
     pass
 
 
-class TenantModelAdmin(ExtraUrlMixin, ReadOnlyMixin, ModelAdmin):
+class TenantModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
     list_filter = [SchemaFilter, ]
 
     # def get_queryset(self, request):

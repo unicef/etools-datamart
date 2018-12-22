@@ -5,14 +5,15 @@ import logging
 from collections import OrderedDict
 from functools import lru_cache
 
-import coreapi
-import coreschema
 from django import forms
 from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models import BooleanField, FieldDoesNotExist
 from django.template import loader
 from django.utils.encoding import force_text
+
+import coreapi
+import coreschema
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.settings import api_settings
 
@@ -35,6 +36,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
     allowed_joins = -1
     field_casting = {}
 
+    def __init__(self) -> None:
+        self.unknown_arguments = []
+
     def get_form_class(self, request, view):
         fields = OrderedDict([
             (name, forms.CharField(required=False))
@@ -44,7 +48,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
                     (forms.Form,), fields)
 
     def get_form(self, request, view):
-        # if not hasattr(self, '_form'):
+        if hasattr(view, 'get_querystringfilter_form'):
+            return view.get_querystringfilter_form(request.GET, prefix=self.form_prefix)
+
         Form = self.get_form_class(request, view)
         self._form = Form(request.GET, prefix=self.form_prefix)
         return self._form
@@ -123,7 +129,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
         - exclude null values: country__not=><
         - only values in list: &country__id__in=176,20
-        - exclude values in list: &country__id__not_in=176,20
+        - exclude values in list: &country__id=176,20
 
         """
         self.opts = queryset.model._meta
@@ -137,6 +143,9 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
             for fieldname_arg in self.query_params:
                 raw_value = self.query_params.get(fieldname_arg)
+                if raw_value in ["''", '""']:
+                    raw_value = ""
+
                 negate = fieldname_arg[-1] == "!"
 
                 if negate:
@@ -161,11 +170,13 @@ class QueryStringFilterBackend(BaseFilterBackend):
                     else:
                         op = ''
 
-                    #     parts = [field_name]
-
                     processor = getattr(self, 'process_{}'.format(filter_field_name), None)
                     if (filter_field_name not in filter_fields) and (not processor):
-                        raise InvalidQueryArgumentError(filter_field_name)
+                        self.unknown_arguments.append((fieldname_arg, filter_field_name))
+                        continue
+                        # raise InvalidQueryArgumentError(filter_field_name)
+                    if raw_value is None and not processor:
+                        continue
                     # field is configured in Serializer
                     # so we use 'source' attribute
                     if filter_field_name in mapping:
@@ -190,6 +201,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         self.filters.update(**_f)
                         self.exclude.update(**_e)
                     else:
+                        if not raw_value:
+                            continue
                         # field_object = opts.get_field(real_field_name)
                         value_type = self.field_type(real_field_name)
                         if parts:

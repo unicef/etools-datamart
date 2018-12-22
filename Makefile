@@ -30,9 +30,6 @@ lint:
 	pipenv run pre-commit run --all-files
 	pipenv run pre-commit run --all-files --hook-stage push
 	pipenv run pre-commit run --all-files --hook-stage manual
-#	pipenv run flake8 src/ tests/
-#	pipenv run isort -rc src/ --check-only
-#	pipenv run check-manifest
 
 clean:
 	rm -fr ${BUILDDIR} dist *.egg-info .coverage coverage.xml .eggs
@@ -59,14 +56,17 @@ urf:
 	pipenv run pytest tests/urf --cov-config tests/urf/.coveragerc
 
 
-demo:
+stack:
 	PYTHONPATH=./src pipenv run celery worker -A etools_datamart --loglevel=DEBUG --concurrency=4 --purge --pidfile celery.pid &
 	PYTHONPATH=./src pipenv run celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile beat.pid &
-	PYTHONPATH=./src pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
-	pipenv run docker run  -d -p 5555:5555 -e CELERY_BROKER_URL=$CELERY_BROKER_URL --name datamart-flower --rm saxix/flower
+#	PYTHONPATH=./src pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
+	pipenv run docker run  -d -p 5555:5555 -e CELERY_BROKER_URL=${CELERY_BROKER_URL} --name datamart-flower --rm saxix/flower
 
-stop-demo:
-	- kill `cat gunicorn.pid`
-	- kill `cat beat.pid`
-	- kill `cat celery.pid`
-	- docker stop datamart-flower
+demo: stack
+	PYTHONPATH=./src pipenv run gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi --pid gunicorn.pid &
+
+demo-stop:
+	-kill `cat gunicorn.pid`
+	-kill `cat beat.pid`
+	-kill `cat celery.pid`
+	-docker stop datamart-flower

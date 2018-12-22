@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from celery.signals import task_postrun
 from django.apps import AppConfig
+
+from celery.signals import task_postrun
 
 from etools_datamart.apps.etl.signals import data_refreshed
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from urllib.parse import urlencode
 
 from rest_framework.settings import api_settings
 
@@ -49,3 +50,22 @@ def humanize_size(num, suffix='B'):
 
 def get_hostname():
     return os.environ.get('HOSTNAME')
+
+
+def get_query_string(params, new_params=None, remove=None):
+    if new_params is None:
+        new_params = {}
+    if remove is None:
+        remove = []
+    p = params.copy()
+    for r in remove:
+        for k in list(p):
+            if k.startswith(r):
+                del p[k]
+    for k, v in new_params.items():
+        if v is None:
+            if k in p:
+                del p[k]
+        else:
+            p[k] = v
+    return '?%s' % urlencode(sorted(p.items()))

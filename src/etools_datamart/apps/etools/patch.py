@@ -5,9 +5,10 @@ from functools import partial, partialmethod
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
+
 from unicef_security.models import User
 
-from etools_datamart.apps.etools.models import PartnersPlannedengagement
+from etools_datamart.apps.etools.models import PartnersPlannedengagement, T2FTravel
 
 
 def label(attr, self):
@@ -163,3 +164,31 @@ def patch():
                 'planned_budget'], ['partnersintervention_funds_fundsreservationheader_intervention_id',
                                     'frs'])
     create_alias(PartnersIntervention, aliases)
+
+    T2FTravel.PLANNED = 'planned'
+    T2FTravel.SUBMITTED = 'submitted'
+    T2FTravel.REJECTED = 'rejected'
+    T2FTravel.APPROVED = 'approved'
+    T2FTravel.CANCELLED = 'cancelled'
+    T2FTravel.SENT_FOR_PAYMENT = 'sent_for_payment'
+    T2FTravel.CERTIFICATION_SUBMITTED = 'certification_submitted'
+    T2FTravel.CERTIFICATION_APPROVED = 'certification_approved'
+    T2FTravel.CERTIFICATION_REJECTED = 'certification_rejected'
+    T2FTravel.CERTIFIED = 'certified'
+    T2FTravel.COMPLETED = 'completed'
+
+    T2FTravel.CHOICES = (
+        (T2FTravel.PLANNED, _('Planned')),
+        (T2FTravel.SUBMITTED, _('Submitted')),
+        (T2FTravel.REJECTED, _('Rejected')),
+        (T2FTravel.APPROVED, _('Approved')),
+        (T2FTravel.COMPLETED, _('Completed')),
+        (T2FTravel.CANCELLED, _('Cancelled')),
+        (T2FTravel.SENT_FOR_PAYMENT, _('Sent for payment')),
+        (T2FTravel.CERTIFICATION_SUBMITTED, _('Certification submitted')),
+        (T2FTravel.CERTIFICATION_APPROVED, _('Certification approved')),
+        (T2FTravel.CERTIFICATION_REJECTED, _('Certification rejected')),
+        (T2FTravel.CERTIFIED, _('Certified')),
+        (T2FTravel.COMPLETED, _('Completed')),
+    )
+    T2FTravel._meta.get_field('status').choices = T2FTravel.CHOICES

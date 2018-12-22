@@ -1,0 +1,27 @@
+{% extends "admin/change_form.html" %}{% load staticfiles %}
+{% block extrahead %}{{ block.super }}
+    <link href="{% static "security/dual-listbox.css" %}" rel="stylesheet"/>
+    <script>window.jQuery = window.$ = django.jQuery;</script>
+    <script src="{% static "security/dual-listbox.js" %}"></script>
+
+{% endblock %}
+
+
+{% block admin_change_form_document_ready %}
+    {{ block.super }}
+    <style>
+        .dual-listbox .dual-listbox__button {
+            background-color: #79aec8;
+            font-size: 13px;
+            font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+        }
+    </style>
+    <script>
+        let dlb1 = new DualListbox('select[name=schemas]',
+            {
+                availableTitle: 'Available areas',
+                selectedTitle: 'Selected areas',
+            });
+
+    </script>
+{% endblock %}

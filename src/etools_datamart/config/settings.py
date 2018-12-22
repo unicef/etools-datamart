@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import os
 from pathlib import Path
 
 import environ
@@ -10,16 +11,20 @@ SETTINGS_DIR = Path(__file__).parent
 PACKAGE_DIR = SETTINGS_DIR.parent
 DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 
-env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
+env = environ.Env(API_PREFIX=(str, '/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
-
+                  ANALYTICS_CODE=(str, ""),
+                  REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
-                  # API_CACHE_URL=(str, "redis://127.0.0.1:6379/2"),
-                  API_CACHE_URL=(str, "locmemcache://"),
+                  CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
+                  CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
+                  CACHE_URL_TEMPLATE=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
                   # CACHE_URL=(str, "dummycache://"),
-                  # API_CACHE_URL=(str, "dummycache://"),
+                  # CACHE_URL_API=(str, "dummycache://"),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
+                  DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
+                  DISABLE_SERVICE_RESTRICTIONS=(bool, False),
                   ENABLE_LIVE_STATS=(bool, True),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
@@ -55,7 +60,7 @@ env = environ.Env(API_URL=(str, 'http://localhost:8000/api/'),
                   EMAIL_HOST_USER=(str, ''),
                   EMAIL_HOST_PASSWORD=(str, ''),
                   EMAIL_PORT=(int, 587),
-
+                  USE_X_FORWARDED_HOST=(bool, False),
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -69,6 +74,7 @@ STATIC_ROOT = env('STATIC_ROOT')
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
+API_PREFIX = env('API_PREFIX')
 
 ADMINS = (
     ('Stefano', 'saxix@saxix.onmicrosoft.com'),
@@ -182,14 +188,16 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     # 'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
-    'unicef_security.azure.AzureADTenantOAuth2Ext',
+    'unicef_security.graph.AzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 ]
 
 CACHES = {
     'default': env.cache(),
-    'api': env.cache('API_CACHE_URL')
+    'lock': env.cache('CACHE_URL_LOCK'),
+    'api': env.cache('CACHE_URL_API'),
+    'dbtemplates': env.cache('CACHE_URL_TEMPLATE')
 }
 
 ROOT_URLCONF = 'etools_datamart.config.urls'
@@ -204,10 +212,12 @@ TEMPLATES = [
         'APP_DIRS': False,
         'OPTIONS': {
             'loaders': [
+                'dbtemplates.loader.Loader',
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
             ],
             'context_processors': [
+                'constance.context_processors.config',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'etools_datamart.apps.multitenant.context_processors.schemas',
@@ -250,11 +260,12 @@ INSTALLED_APPS = [
     'etools_datamart.apps.web.apps.Config',
     'etools_datamart.apps.init.apps.Config',
     'etools_datamart.apps.multitenant',
-    'etools_datamart.apps.security',
+    'etools_datamart.apps.security.apps.Config',
 
     'constance',
     'constance.backends.database',
     'django.contrib.auth',
+    'django.contrib.gis',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -263,8 +274,18 @@ INSTALLED_APPS = [
     # 'django.contrib.admin',
     'etools_datamart.config.admin.AdminConfig',
 
+    'etools_datamart.apps.core.apps.Config',
+    'etools_datamart.apps.etools',
+    'etools_datamart.apps.data',
+    'etools_datamart.apps.etl.apps.Config',
+    'etools_datamart.apps.tracking.apps.Config',
+    'etools_datamart.apps.subscriptions',
+    'etools_datamart.apps.me',
+    'etools_datamart.api',
+
     'admin_extra_urls',
-    'unicef_rest_framework',
+    'adminactions',
+    'unicef_rest_framework.apps.Config',
     'rest_framework',
     'oauth2_provider',
     'social_django',
@@ -275,6 +296,7 @@ INSTALLED_APPS = [
     'month_field',
     'drf_querystringfilter',
     'crispy_forms',
+    'dbtemplates',
 
     'drf_yasg',
     'adminfilters',
@@ -286,13 +308,6 @@ INSTALLED_APPS = [
 
     'django_celery_beat',
 
-    'etools_datamart.apps.core.apps.Config',
-    'etools_datamart.apps.etools',
-    'etools_datamart.apps.data',
-    'etools_datamart.apps.etl.apps.Config',
-    'etools_datamart.apps.tracking.apps.Config',
-    'etools_datamart.apps.subscriptions',
-    'etools_datamart.api',
 ]
 DATE_FORMAT = '%d %b %Y'
 DATE_INPUT_FORMATS = [
@@ -333,7 +348,14 @@ POST_OFFICE = {
         'default': 'djcelery_email.backends.CeleryEmailBackend'
     }
 }
+# celery-mail
 CELERY_EMAIL_CHUNK_SIZE = 10
+
+# crispy-forms
+CRISPY_FAIL_SILENTLY = not DEBUG
+CRISPY_CLASS_CONVERTERS = {'textinput': "textinput inputtext"}
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
 # django-secure
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE')
 SECURE_BROWSER_XSS_FILTER = True
@@ -342,27 +364,17 @@ SECURE_FRAME_DENY = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_SECONDS = 1
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
 X_FRAME_OPTIONS = env('X_FRAME_OPTIONS')
-
+USE_X_FORWARDED_HOST = env('USE_X_FORWARDED_HOST')
+SESSION_SAVE_EVERY_REQUEST = True
 NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 
 # django-constance
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_ADDITIONAL_FIELDS = {
-    # 'read_only_text': ['django.forms.fields.CharField', {
-    #     'required': False,
-    #     'widget': 'etools_datamart.libs.constance.ObfuscatedInput',
-    # }],
-    # 'write_only_text': ['django.forms.fields.CharField', {
-    #     'required': False,
-    #     'widget': 'etools_datamart.libs.constance.WriteOnlyTextarea',
-    # }],
-    # 'write_only_input': ['django.forms.fields.CharField', {
-    #     'required': False,
-    #     'widget': 'etools_datamart.libs.constance.WriteOnlyInput',
-    # }],
     'select_group': ['etools_datamart.libs.constance.GroupChoiceField', {
         'required': False,
         'widget': 'etools_datamart.libs.constance.GroupChoice',
@@ -376,28 +388,20 @@ AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
 AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
+    'CACHE_VERSION': (1, 'Use MS Graph API to fetch user data', int),
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
     'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
+    'ANALYTICS_CODE': (env('ANALYTICS_CODE'), 'Google analytics code'),
+    'DISABLE_SCHEMA_RESTRICTIONS': (env('DISABLE_SCHEMA_RESTRICTIONS'), 'Disable per user schema authorizations'),
+    'DISABLE_SERVICE_RESTRICTIONS': (env('DISABLE_SERVICE_RESTRICTIONS'), 'Disable per user service authorizations'),
 }
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
-# CELERY_ACCEPT_CONTENT = ['application/json']
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TASK_SERIALIZER = 'json'
-CELERY_TASK_IMPORTS = ["etools_datamart.apps.etl.tasks.etl",
-                       "etools_datamart.apps.etl.tasks.tasks", ]
-CELERY_BEAT_SCHEDULE = {}
-CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', False)
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
-
-CELERY_TASK_ROUTES = {
-    'etools_datamart.apps.etl.tasks.etl': {'queue': 'etl'},
-    'etools_datamart.apps.etl.tasks.tasks': {'queue': 'tasks'},
-}
-
 CELERY_ACCEPT_CONTENT = ['etljson']
 CELERY_TASK_SERIALIZER = 'etljson'
 CELERY_RESULT_SERIALIZER = 'etljson'
@@ -410,12 +414,10 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
     "PAGE_SIZE": 100,
-    # "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.CursorPagination',
+    'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'unicef_rest_framework.negotiation.CT',
     'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
-    # 'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.swagger.APIAutoSchema',
-    # 'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
     'DATETIME_FORMAT': DATETIME_FORMAT
@@ -455,7 +457,7 @@ SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', ]
 SOCIAL_AUTH_REVOKE_TOKENS_ON_DISCONNECT = True
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
-    'unicef_security.azure.get_unicef_user',
+    'unicef_security.graph.get_unicef_user',
     # 'unicef_security.azure.social_uid',
     # 'social_core.pipeline.social_auth.social_uid',
     # 'social_core.pipeline.social_auth.social_user',
@@ -467,7 +469,7 @@ SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.social_auth.load_extra_data',
     # 'social_core.pipeline.user.user_details',
     # 'social_core.pipeline.social_auth.associate_by_email',
-    'unicef_security.azure.default_group',
+    'unicef_security.graph.default_group',
 )
 
 SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_KEY = env.str('AZURE_CLIENT_ID')
@@ -478,11 +480,11 @@ SOCIAL_AUTH_AZUREAD_OAUTH2_RESOURCE = 'https://graph.microsoft.com/'
 SOCIAL_AUTH_USER_MODEL = 'unicef_security.User'
 
 # POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
-SCOPE = ['openid', 'email']
+SCOPE = ['openid', ]
 IGNORE_DEFAULT_SCOPE = True
 
 SWAGGER_SETTINGS = {
-    'DEFAULT_API_URL': env('API_URL'),
+    'DEFAULT_API_URL': env('ABSOLUTE_BASE_URL') + env('API_PREFIX'),
     'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
     'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
     'SECURITY_DEFINITIONS': {
@@ -514,7 +516,7 @@ LOGGING = {
             'format': '%(levelname)-8s: %(asctime)s %(name)20s %(message)s'
         },
         'simple': {
-            'format': '%(levelname)-8s: %(asctime)s %(name)20s: %(funcName)s %(message)s'
+            'format': '%(levelname)-8s: %(asctime)s %(name)20s: %(funcName)s:%(lineno)s %(message)s'
         }
     },
     'filters': {
@@ -601,3 +603,12 @@ ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')
 
 BUSINESSAREA_MODEL = 'unicef_security.BusinessArea'
 AUTH_USER_MODEL = 'unicef_security.User'
+
+
+def extra(r):
+    return {'AZURE_CLIENT_ID': os.environ['AZURE_CLIENT_ID'],
+            'GRAPH_CLIENT_ID': os.environ['GRAPH_CLIENT_ID'],
+            'AZURE_TENANT': os.environ['AZURE_TENANT']}
+
+
+SYSINFO = {"extra": {'Azure': extra}}

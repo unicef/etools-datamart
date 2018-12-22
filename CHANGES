@@ -1,3 +1,18 @@
+1.8
+---
+* WARNINGS: migration reset
+* add ability to create 'per model' custom templates for html/pdf renderers
+    new `TEMPLATE_CACHE_URL` enironment variable
+* fixes error in some renderers with cached response
+* Adopting of RabbitMQ to prevent message loss
+* new admin index page
+* Excel IQY support (beta)
+* Allow endpoints to be consumend bny anonymous users
+* Countries can be selected using name, schema_name,country_short_code or business_area_code
+* Improved Browseable API
+* `page_size` now accept `-1` to disable pagination
+
+
 1.7
 ---
 * WARNINGS: migration reset

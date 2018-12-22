@@ -1,13 +1,15 @@
 import logging
 from io import BytesIO
 
-from crashlog.middleware import process_exception
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.functional import cached_property
+
+from crashlog.middleware import process_exception
 from post_office import mail
 from rest_framework.test import APIRequestFactory
+
 from unicef_rest_framework.models import Service
 
 from etools_datamart.apps.etl.models import EtlTask
@@ -82,6 +84,7 @@ class Subscription(models.Model):
     type = models.IntegerField(choices=TYPES)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     kwargs = models.CharField(max_length=500, blank=True, null=False, default='')
+    last_notification = models.DateField(blank=True, null=True)
 
     objects = SubscriptionManager()
 
@@ -91,13 +94,13 @@ class Subscription(models.Model):
     def __str__(self):
         return f"#{self.pk} {self.user} {self.get_type_display()} {self.content_type}"
 
-    @cached_property
-    def endpoint(self):
-        return self.content_type.model_class().service.endpoint
-
-    @cached_property
-    def service(self):
-        return self.content_type.model_class().service
+    # @cached_property
+    # def endpoint(self):
+    #     return self.content_type.model_class().service.endpoint
+    #
+    # @cached_property
+    # def service(self):
+    #     return self.content_type.model_class().service
 
     @cached_property
     def viewset(self):

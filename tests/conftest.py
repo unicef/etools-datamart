@@ -1,6 +1,9 @@
 import os
+import tempfile
+import uuid
 import warnings
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -9,13 +12,29 @@ from _pytest.fixtures import SubRequest
 def pytest_configure(config):
     # enable this to remove deprecations
     os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
-    os.environ['STATIC_URL'] = "."
+    os.environ['STATIC_ROOT'] = tempfile.gettempdir()
 
 
 # warnings.simplefilter('once', DeprecationWarning)
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
 warnings.simplefilter('ignore', UserWarning)
+
+
+@pytest.fixture(scope="session")
+def disable_migration_signals(request):
+    return request.config.getvalue("disable_migration_signals")
+
+
+def pytest_addoption(parser):
+    group = parser.getgroup("django")
+    group._addoption(
+        "--disable-migration-signals",
+        action="store_true",
+        dest="disable_migration_signals",
+        default=False,
+        help="disable pre/post migration signals",
+    )
 
 
 @pytest.yield_fixture(scope='session')
@@ -25,8 +44,14 @@ def django_db_setup(request,
                     django_db_use_migrations,
                     django_db_keepdb,
                     django_db_createdb,
-                    django_db_modify_db_settings):
+                    django_db_modify_db_settings,
+                    disable_migration_signals):
     # never touch etools DB
+    if disable_migration_signals:
+        import django.core.management.commands.migrate
+        django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
+        django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
+
     from pytest_django.fixtures import django_db_setup as dj_db_setup
     dj_db_setup(request,
                 django_test_environment,
@@ -39,7 +64,6 @@ def django_db_setup(request,
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory
-
     with django_db_blocker.unblock():
         Service.objects.load_services()
         UserAccessControl.objects.all().delete()
@@ -65,7 +89,7 @@ def user2(db):
 def reset(monkeypatch):
     # from etools_datamart.state import state
     from django.db import connections
-
+    monkeypatch.setattr("etools_datamart.apps.security.utils.cache", MagicMock(get=lambda *a: []))
     # state.request = None
     conn = connections['etools']
     conn.set_schemas([])
@@ -141,3 +165,19 @@ def staff_user(etools_user):
     return UserFactory(username=etools_user.username,
                        email=etools_user.email,
                        is_staff=True)
+
+
+@pytest.fixture()
+def user(etools_user):
+    from test_utilities.factories import UserFactory
+
+    return UserFactory(username=etools_user.username,
+                       azure_id=uuid.uuid4(),
+                       email=etools_user.email)
+
+
+@pytest.fixture()
+def local_user(db):
+    from test_utilities.factories import UserFactory
+
+    return UserFactory()

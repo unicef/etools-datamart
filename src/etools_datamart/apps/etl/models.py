@@ -3,21 +3,28 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.functional import cached_property
+
 from django_celery_beat.models import PeriodicTask
 
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.celery import app, ETLTask
+from etools_datamart.celery import app
 
 
 class TaskLogManager(models.Manager):
-    def get_for_model(self, model: DataMartModel):
-        return self.get(content_type=ContentType.objects.get_for_model(model))
+    def filter_for_models(self, *models):
+        return self.filter(content_type__in=ContentType.objects.get_for_models(*models).values())
 
-    def get_for_task(self, task: ETLTask):
-        return self.get_or_create(task=task.name,
-                                  defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
-                                                last_run=None,
-                                                table_name=task.linked_model._meta.db_table))[0]
+    def get_for_model(self, model: DataMartModel):
+        try:
+            return self.get(content_type=ContentType.objects.get_for_model(model))
+        except EtlTask.DoesNotExist:
+            raise EtlTask.DoesNotExist(f"EtlTask for model '{model.__name__}' does not exists")
+
+    # def get_for_task(self, task: ETLTask):
+    #     return self.get_or_create(task=task.name,
+    #                               defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
+    #                                             last_run=None,
+    #                                             table_name=task.linked_model._meta.db_table))[0]
 
     def inspect(self):
         tasks = app.get_all_etls()
@@ -55,6 +62,17 @@ class EtlTask(models.Model):
 
     def __str__(self):
         return f"{self.task} {self.status}"
+
+    # @cached_property
+    # def lock_key(self):
+    #     return f"{self.task}-lock"
+
+    @cached_property
+    def loader(self):
+        try:
+            return self.content_type.model_class().loader
+        except AttributeError:
+            return None
 
     @cached_property
     def verbose_name(self):

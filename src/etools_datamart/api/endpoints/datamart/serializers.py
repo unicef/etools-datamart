@@ -17,9 +17,15 @@ class PMPIndicatorsSerializer(DataMartSerializer):
         model = models.PMPIndicators
 
 
-class InterventionSerializer(DataMartSerializer):
+class InterventionSerializerFull(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Intervention
+
+
+class InterventionSerializer(InterventionSerializerFull):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Intervention
+        exclude = ('metadata',)
 
 
 class FAMIndicatorSerializer(DataMartSerializer):

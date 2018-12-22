@@ -1,8 +1,12 @@
-from celery.local import class_property
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
+from django.db.models.base import ModelBase
 from django.db.models.manager import BaseManager
+
+from celery.local import class_property
+
+from etools_datamart.apps.data.loader import Loader, LoaderOptions
 
 
 class DataMartQuerySet(QuerySet):
@@ -14,14 +18,45 @@ class DataMartQuerySet(QuerySet):
 
 
 class DataMartManager(BaseManager.from_queryset(DataMartQuerySet)):
-    pass
-    # def truncate(self):
-    #     self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
+
+    def truncate(self):
+        self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
 
 
-class DataMartModel(models.Model):
-    country_name = models.CharField(max_length=50, db_index=True)
-    schema_name = models.CharField(max_length=50, db_index=True)
+class DataMartModelBase(ModelBase):
+    def __new__(cls, name, bases, attrs, **kwargs):
+        super_new = super().__new__
+        parents = [b for b in bases if isinstance(b, DataMartModelBase)]
+        if not parents:
+            return super_new(cls, name, bases, attrs)
+        loader = attrs.pop('loader', None)
+        config = attrs.pop('Options', None)
+
+        new_class = super_new(cls, name, bases, attrs, **kwargs)
+        if not loader:  # no custom loader use default
+            loader = Loader()
+        base_config = getattr(new_class, '_etl_config', None)
+
+        if not config:
+            config = LoaderOptions(base_config)
+        else:
+            config = LoaderOptions(config)
+
+        new_class.add_to_class('_etl_config', config)
+        new_class.add_to_class('loader', loader)
+        #
+        # attr_meta = attrs.get('Meta', None)
+        # attr_loader = attrs.get('Loader', None)
+        # loader = attr_meta or getattr(new_class, 'Meta', None)
+        # base_meta = getattr(new_class, '_meta', None)
+
+        return new_class
+
+
+class DataMartModel(models.Model, metaclass=DataMartModelBase):
+    country_name = models.CharField(max_length=100, db_index=True)
+    schema_name = models.CharField(max_length=63, db_index=True)
+    area_code = models.CharField(max_length=10, db_index=True)
     last_modify_date = models.DateTimeField(blank=True, auto_now=True)
 
     class Meta:

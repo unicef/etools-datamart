@@ -1,8 +1,10 @@
 import re
+import time
 
 from django.core.cache import caches
 from django.utils.http import quote_etag
 from django.utils.translation import ugettext as _
+
 from humanize.i18n import ngettext
 from humanize.time import date_and_delta
 from rest_framework_extensions.cache.decorators import CacheResponse
@@ -11,6 +13,9 @@ from rest_framework_extensions.key_constructor import bits
 from rest_framework_extensions.key_constructor.bits import KeyBitBase
 from rest_framework_extensions.key_constructor.constructors import KeyConstructor
 from rest_framework_extensions.settings import extensions_api_settings
+from strategy_field.utils import fqn
+
+from unicef_rest_framework.models import SystemFilter
 
 cache = caches['default']
 
@@ -112,17 +117,41 @@ class CacheVersionKeyBit(KeyBitBase):
         return {'cache_version': str(version)}
 
 
+class SystemFilterKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        flt = SystemFilter.objects.match(request, view_instance)
+        request._request._system_filters = flt
+        qs = flt.get_querystring() if flt else ''
+        request._request.api_info['system-filters'] = qs
+        return {'systemfilter': qs}
+
+
+class QueryPathKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        return {'path': str(request.path)}
+
+
+class DevelopKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        if 'disable-cache' in request.GET:
+            return {'dev': str(time.time())}
+        return {}
+
+
 class ListKeyConstructor(KeyConstructor):
     cache_version = CacheVersionKeyBit()
-    # system_filter = SystemFilterKeyBit()
-
+    system_filter = SystemFilterKeyBit()
+    path = QueryPathKeyBit()
     unique_method_id = bits.UniqueMethodIdKeyBit()
     format = bits.FormatKeyBit()
     headers = bits.HeadersKeyBit(['Accept'])
+    dev = DevelopKeyBit()
     # language = bits.LanguageKeyBit()
-    list_sql_query = bits.ListSqlQueryKeyBit()
+    # list_sql_query = bits.ListSqlQueryKeyBit()  # NEVER NEVER USE THIS
+
     querystring = bits.QueryParamsKeyBit()
-    pagination = bits.PaginationKeyBit()
+
+    # pagination = bits.PaginationKeyBit()
 
     def get_key(self, view_instance, view_method, request, args, kwargs):
         key = super().get_key(view_instance, view_method, request, args, kwargs)
@@ -176,7 +205,12 @@ class APICacheResponse(CacheResponse):
 
         view_instance.store('cache-ttl', view_instance.get_service().cache_ttl)
         view_instance.store('service', view_instance.get_service())
-        view_instance.store('view', view_instance)
+        view_instance.store('view', fqn(view_instance))
+        # view_instance.store('_filters', request._filters)
+        # conn = connections['etools']
+        # view_instance.store('_schemas', conn.schemas)
+        # view_instance.store('_countries', conn.schemas)
+
         # view_instance.request._request.api_info['cache-ttl'] = view_instance.get_service().cache_ttl
         # view_instance.request._request.api_info['service'] = view_instance.get_service()
         # view_instance.request._request.api_info['view'] = fqn(view_instance)

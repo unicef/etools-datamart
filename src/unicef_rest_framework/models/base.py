@@ -3,11 +3,12 @@
 import logging
 import uuid
 
-from concurrency.fields import IntegerVersionField
 from django.conf import settings
 from django.db import models
 from django.db.models import UUIDField
 from django.utils.translation import ugettext_lazy as _
+
+from concurrency.fields import IntegerVersionField
 
 logger = logging.getLogger(__name__)
 

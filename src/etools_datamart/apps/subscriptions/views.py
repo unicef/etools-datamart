@@ -16,13 +16,13 @@ class SubscriptionForm(ModelForm):
 
 @csrf_exempt
 def subscribe(request, etl_id):
-    code = 200
     values = {'status': "", 'detail': ""}
     try:
         user = request.user
         payload = json.loads(request.body)
         form = SubscriptionForm(data=payload)
         if form.is_valid():
+            code = 200
             etl = EtlTask.objects.get(id=etl_id)
             s, created = Subscription.objects.update_or_create(user=user,
                                                                content_type=etl.content_type,

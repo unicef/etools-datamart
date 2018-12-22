@@ -1,5 +1,6 @@
 from django.core.management.base import CommandError, LabelCommand
 from django.utils.module_loading import import_string
+
 from django_extensions.management.utils import signalcommand
 
 

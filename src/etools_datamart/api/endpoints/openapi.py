@@ -7,14 +7,11 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 description = """
-# Welcome to eTools Datamart API
-
 Each API endpoint allows filtering and/or ordering results.
+Different formats can be requested using `format` argument.
+Pagination can be disabled with `page_size=-1`
 
-Fiel
 ## Query lookups
-
-Any field where query functions are enabled allow to....
 
 ### Generic lookups
 
@@ -53,27 +50,27 @@ Any field where query functions are enabled allow to....
 
 Select all interventions in Bolivia and Chad
 
-- {HOST}datamart/interventions/?country_name__in=Bolivia,Chad
+- {HOST}latest/datamart/interventions/?country_name__in=Bolivia,Chad
 
 Select all interventions in all countries except Bolivia and Zimbabwe
 
-- {HOST}datamart/interventions/?country_name__in!=Bolivia,Zimbabwe (note `!=` instead of `=`)
+- {HOST}latest/datamart/interventions/?country_name__in!=Bolivia,Zimbabwe (note `!=` instead of `=`)
 
 Select all interventions submitted in 2017
 
-- {HOST}datamart/interventions/?submission_date__year=2017
+- {HOST}latest/datamart/interventions/?submission_date__year=2017
 
 Select all interventions submitted after 2017 (ie starting 2018)
 
-- {HOST}datamart/interventions/?submission_date__year__gt=2017
+- {HOST}latest/datamart/interventions/?submission_date__year__gt=2017
 
 Retrieve entries in the second quarter (April 1 to June 30):
 
-- {HOST}datamart/interventions/?submission_date__quarter=2
+- {HOST}latest/datamart/interventions/?submission_date__quarter=2
 
 Retrieve entries in the second/third/fourth quarter (April 1 to June 30):
 
-- {HOST}datamart/interventions/?submission_date__quarter__gte=2
+- {HOST}latest/datamart/interventions/?submission_date__quarter__gte=2
 
 
 """.format(HOST=swagger_settings.DEFAULT_API_URL)

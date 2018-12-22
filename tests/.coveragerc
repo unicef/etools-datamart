@@ -13,6 +13,12 @@ omit =
         **/multitenant/postgresql/creation.py
         **/apps/etools/models/public_old.py
         **/apps/etools/models/tenant_old.py
+        **/tracking/management/commands/track.py
+        **/api/endpoints/unicef/business_area.py
+        **/api/endpoints/unicef/region.py
+        **/api/endpoints/unicef/serializers.py
+        **/etools_datamart/apps/data/management/commands/load.py
+
 
 [report]
 # Regexes for lines to exclude from consideration

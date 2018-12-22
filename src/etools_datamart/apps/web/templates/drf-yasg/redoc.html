@@ -8,7 +8,7 @@
 
     {% block extra_head %}
         {# -- Add any extra HTML heads tags here - except scripts and styles -- #}
-            <link rel="stylesheet" type="text/css" href="{% static 'api-doc.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'api-doc.css' %}"/>
 
     {% endblock %}
 
@@ -28,24 +28,37 @@
 
 {% block extra_body %}
     {# -- Add any header/body markup here (rendered BEFORE the swagger-ui/redoc element) -- #}
-{% endblock %}
 
-<div id="redoc-placeholder"></div>
+    <nav ><a href=".">
+    <img src="{% static "logo_100.png" %}" class="sc-1den5ya-3 hcTurM"></a>
+        <span class="title">Datamart Documentation</span>
+    <div class="links">
+        <a href="/">Home</a></li>
+        <a href="{% url "api:api-root" version="latest" %}">API</a>
+        {% if request.user.is_staff %}
+            <a href="{% url "admin:index" %}">Admin</a>
+        {% endif %}
+    </div>
+    </nav>
 
-{% block footer %}
-    {# -- Add any footer markup here (rendered AFTER the swagger-ui/redoc element) -- #}
 {% endblock %}
+    <div id="redoc-placeholder"></div>
 
-<script id="redoc-settings" type="application/json">{{ redoc_settings | safe }}</script>
+    {% block footer %}
+        {# -- Add any footer markup here (rendered AFTER the swagger-ui/redoc element) -- #}
+    {% endblock %}
 
-{% block main_scripts %}
-    <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
-    <script src="{% static 'drf-yasg/url-polyfill.min.js' %}"></script>
-    <script src="{% static 'drf-yasg/redoc-init.js' %}"></script>
-    <script src="{% static 'drf-yasg/redoc/redoc.min.js' %}"></script>
-{% endblock %}
-{% block extra_scripts %}
-    {# -- Add any additional scripts here -- #}
-{% endblock %}
+    <script id="redoc-settings" type="application/json">{{ redoc_settings | safe }}</script>
+
+    {% block main_scripts %}
+        <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
+        <script src="{% static 'drf-yasg/url-polyfill.min.js' %}"></script>
+        <script src="{% static 'drf-yasg/redoc-init.js' %}"></script>
+        <script src="{% static 'drf-yasg/redoc/redoc.min.js' %}"></script>
+    {% endblock %}
+    {% block extra_scripts %}
+        {# -- Add any additional scripts here -- #}
+    {% endblock %}
+
 </body>
 </html>

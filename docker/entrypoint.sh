@@ -2,6 +2,7 @@
 set -e
 
 mkdir -p /var/datamart/{static,log,conf,run}
+mkdir -p ${STATIC_ROOT}
 rm -f /var/datamart/run/*
 
 

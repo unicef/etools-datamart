@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=dev
+TARGET?=1.8
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -38,9 +38,9 @@ build:
 			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 #	flatten image
-	docker create ${DOCKER_IMAGE_NAME}:${TARGET} foo
-	docker export foo | docker import - unicef/datamart:${TARGET}
-	docker rm foo
+#	docker create --name foo ${DOCKER_IMAGE_NAME}:${TARGET}
+#	docker export foo | docker import - unicef/datamart:${TARGET}
+#	docker rm foo
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
 
@@ -49,13 +49,16 @@ build:
 	 		--rm \
 	 		--name=${CONTAINER_NAME} \
 			-p 8000:8000 \
-			-e CACHE_URL=redis://127.0.0.1:6379/1 \
-			-e CELERY_BROKER_URL=redis://127.0.0.1:6379/2 \
-			-e CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/3 \
+			-e CACHE_URL=redis://192.168.66.66:6379/1 \
+			-e CACHE_URL_API=redis://192.168.66.66:6379/2 \
+			-e CACHE_URL_LOCK=redis://192.168.66.66:6379/3 \
+			-e CACHE_URL_TEMPLATE=redis://192.168.66.66:6379/4 \
+			-e CELERY_BROKER_URL=redis://192.168.66.66:6379/2 \
+			-e CELERY_RESULT_BACKEND=redis://192.168.66.66:6379/3 \
 			-e CSRF_COOKIE_SECURE=false \
 			-e DATABASE_URL=${DATABASE_URL} \
 			-e DATABASE_URL_ETOOLS=${DATABASE_URL_ETOOLS} \
-			-e DEBUG=true \
+			-e DEBUG=false \
 			-e DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \
 			-e SECURE_BROWSER_XSS_FILTER=0 \
 			-e SECURE_CONTENT_TYPE_NOSNIFF=0 \
@@ -80,10 +83,11 @@ local:
 	$(MAKE) .run
 
 release:
-	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
+	bumpversion release
 
 run:
 	$(MAKE) .run

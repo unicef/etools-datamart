@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import vcr
+
 from unicef_security.sync import load_business_area, load_region
 
 

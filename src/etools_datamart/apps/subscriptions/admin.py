@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from admin_extra_urls.extras import ExtraUrlMixin
 from django.contrib import admin
 from django.contrib.admin import register
+
+from admin_extra_urls.extras import ExtraUrlMixin
 
 from . import models
 

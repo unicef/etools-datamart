@@ -9,9 +9,13 @@ logger = logging.getLogger(__name__)
 class CSVRenderer(r.CSVRenderer):
 
     def render(self, data, media_type=None, renderer_context=None, writer_opts=None):
+        response = renderer_context['response']
+        if response.status_code != 200:
+            return ''
         try:
-            data = dict(data)['results']
-            return super().render(data, media_type, renderer_context or {}, writer_opts)
+            if data and 'results' in data:
+                data = dict(data)['results']
+            return super().render(data, media_type, renderer_context, writer_opts)
         except Exception as e:
             process_exception(e)
             logger.exception(e)

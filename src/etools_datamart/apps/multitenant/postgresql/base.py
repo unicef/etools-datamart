@@ -3,16 +3,19 @@ import re
 from contextlib import contextmanager
 from functools import lru_cache
 from time import time
+from typing import List
 
 import django.db.utils
-import psycopg2
 from django.apps import apps
 from django.conf import settings
 from django.db.backends.postgresql import base as original_backend
 from django.db.backends.utils import CursorWrapper
 from django.utils.functional import cached_property
 
+import psycopg2
+
 # from etools_datamart.state import state
+from etools_datamart.apps.etools.models import UsersCountry
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema
 
 from ..sql import Parser
@@ -166,20 +169,20 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         self.set_schemas(old)
 
     @lru_cache()
-    def get_tenants(self):
+    def get_tenants(self) -> List[UsersCountry]:
+        # should be etools.UsersCountry
         model = apps.get_model(settings.TENANT_MODEL)
         return model.objects.filter(**settings.SCHEMA_FILTER).exclude(**settings.SCHEMA_EXCLUDE).order_by('name')
 
     @cached_property
     def all_schemas(self):
-        return set([c.schema_name for c in self.get_tenants()])
+        return sorted(set([c.schema_name for c in self.get_tenants()]))
 
     def set_schemas(self, schemas):
         """
         Main API method to current database schema,
         but it does not actually modify the db connection.
         """
-
         def _validate(n):
             name = n.lower()
             if name not in self.all_schemas:
@@ -273,7 +276,6 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         # of `set search_path` can be quite time consuming
 
         if not self.search_path_set and self._schemas:
-
             search_paths = ["public"]
             search_paths.extend(self._schemas)
             if name:  # pragma: no cover

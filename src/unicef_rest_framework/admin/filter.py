@@ -2,13 +2,14 @@
 
 import logging
 
-import requests
-from admin_extra_urls.extras import action, ExtraUrlMixin
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin import TabularInline
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
+import requests
+from admin_extra_urls.extras import action, ExtraUrlMixin
 
 from ..models.filter import SystemFilter, SystemFilterFieldRule
 

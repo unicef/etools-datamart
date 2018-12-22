@@ -3,12 +3,12 @@ import logging
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.utils.http import urlencode
 from django.views.generic.edit import FormView
 
-from etools_datamart.apps.multitenant.forms import SchemasForm
-
 # from unicef_rest_framework.state import state
+from unicef_rest_framework.utils import get_query_string
+
+from etools_datamart.apps.multitenant.forms import SchemasForm
 
 logger = logging.getLogger(__name__)
 
@@ -50,19 +50,20 @@ class SelectSchema(FormView):
         return response
 
     def get_query_string(self, new_params=None, remove=None):
-        if new_params is None:
-            new_params = {}
-        if remove is None:
-            remove = []
-        p = self.params.copy()
-        for r in remove:
-            for k in list(p):
-                if k.startswith(r):
-                    del p[k]
-        for k, v in new_params.items():
-            if v is None:
-                if k in p:
-                    del p[k]
-            else:
-                p[k] = v
-        return '?%s' % urlencode(sorted(p.items()))
+        return get_query_string(self.params, new_params, remove)
+        # if new_params is None:
+        #     new_params = {}
+        # if remove is None:
+        #     remove = []
+        # p = self.params.copy()
+        # for r in remove:
+        #     for k in list(p):
+        #         if k.startswith(r):
+        #             del p[k]
+        # for k, v in new_params.items():
+        #     if v is None:
+        #         if k in p:
+        #             del p[k]
+        #     else:
+        #         p[k] = v
+        # return '?%s' % urlencode(sorted(p.items()))

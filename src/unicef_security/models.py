@@ -1,35 +1,11 @@
-from django.apps import apps as django_apps
-from django.conf import settings
-from django.contrib.auth.models import AbstractUser, Group
-from django.core.exceptions import ImproperlyConfigured
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
+
 from django_countries.fields import CountryField
 
 app_label = 'unicef_security'
-
-
-def get_businessarea_model():
-    try:
-        name = getattr(settings, 'BUSINESSAREA_MODEL', 'unicef_security.BusinessArea')
-        setattr(settings, 'BUSINESSAREA_MODEL', name)
-        model = django_apps.get_model(name, require_ready=False)
-        if not issubclass(model, AbstractBusinessArea):
-            raise ImproperlyConfigured("BUSINESSAREA_MODEL must be a subclass of AbstractBusinessArea")
-        return name
-    except ValueError:
-        raise ImproperlyConfigured("BUSINESSAREA_MODEL must be of the form 'app_label.model_name'")
-    except LookupError:
-        raise ImproperlyConfigured(
-            "BUSINESSAREA_MODEL refers to model '%s' that has not been installed" % settings.BUSINESSAREA_MODEL
-        )
-    #
-    # name = getattr(settings, 'BUSINESSAREA_MODEL', 'unicef_security.BusinessArea')
-    #
-    # model = apps.get_model(name.split('.'))
-    # assert isinstance(model, AbstractBusinessArea)
-    # return model
 
 
 class TimeStampedModel:
@@ -98,10 +74,13 @@ class User(AbstractUser, TimeStampedModel):
             self.display_name = self.label
         super().save(*args, **kwargs)
 
-
-class Role(models.Model, TimeStampedModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-
-    class Meta:
-        app_label = 'unicef_security'
+#
+# class Role(models.Model, TimeStampedModel):
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+#     business_area = models.ForeignKey(BusinessArea, on_delete=models.CASCADE)
+#     actions = (mass_update,)
+#
+#     class Meta:
+#         app_label = 'unicef_security'
+#         unique_together = ('user', 'group', 'business_area')

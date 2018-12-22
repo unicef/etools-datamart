@@ -2,13 +2,16 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.urls import get_callable
+
 from strategy_field.utils import import_by_name
+
 from unicef_rest_framework import acl
 
 
 class AppSettings(object):
     defaults = {
         'API_CACHE': 'default',
+        'FREE_AUTH_IPS': [],
         'ROUTER': 'unicef_rest_framework.urls.router',
         'DEFAULT_ACCESS': acl.ACL_ACCESS_LOGIN,
         'get_current_user': 'get_current_user',

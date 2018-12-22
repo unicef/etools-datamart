@@ -4,14 +4,17 @@ import inspect
 import logging
 import os
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
-from constance import config
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.safestring import mark_safe
+
+from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from adminactions.mass_update import mass_update
+from constance import config
 from strategy_field.utils import fqn, import_by_name
+
 from unicef_rest_framework import acl
 from unicef_rest_framework.forms import ServiceForm
 from unicef_rest_framework.models import Service
@@ -39,15 +42,23 @@ def get_stash_url(obj, label=None, **kwargs):
 
 
 class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('name', 'visible', 'security', 'cache_version', 'source_model',
-                    'json', 'admin')
+    list_display = ('name', 'visible', 'access', 'cache_version', 'suffix', 'json', 'admin')
     list_filter = ('hidden', 'access')
 
     search_fields = ('name', 'viewset')
     readonly_fields = ('cache_version', 'cache_ttl', 'cache_key', 'viewset', 'name', 'uuid',
-                       'last_modify_user')
+                       'last_modify_user', 'source_model', 'endpoint', 'basename', 'suffix')
     form = ServiceForm
     filter_horizontal = ('linked_models',)
+    fieldsets = [("", {"fields": ('name',
+                                  'description',
+                                  ('access', 'hidden',),
+                                  # 'confidentiality',
+                                  ('source_model', 'basename'),
+                                  ('suffix', 'endpoint'),
+                                  'linked_models',
+                                  )})]
+    actions = [mass_update, ]
 
     # change_list_template = 'admin/unicef_rest_framework/service/change_list.html'
 
@@ -118,6 +129,22 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     @link(label='Invalidate Cache')
     def invalidate_all_cache(self, request):
         Service.objects.invalidate_cache()
+
+    @action()
+    def doc(self, request, pk):
+        service = Service.objects.get(pk=pk)
+        return HttpResponseRedirect(service.doc_url)
+
+    @action()
+    def api(self, request, pk):
+        service = Service.objects.get(pk=pk)
+        return HttpResponseRedirect(service.endpoint)
+
+    @action()
+    def crontab_expire(self, request, pk):
+        base = reverse("admin:django_celery_beat_crontabschedule_add")
+        url = f"{base}?"
+        return HttpResponseRedirect(url)
 
     @action()
     def invalidate_cache(self, request, pk):

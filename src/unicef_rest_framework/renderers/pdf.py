@@ -2,9 +2,10 @@ import io
 import logging
 import os
 
-from crashlog.middleware import process_exception
 from django.conf import settings
 from django.template import loader
+
+from crashlog.middleware import process_exception
 from xhtml2pdf import pisa
 
 from .html import HTMLRenderer
@@ -48,9 +49,13 @@ class PDFRenderer(HTMLRenderer):
     def get_template(self, meta):
         return loader.select_template([
             f'renderers/pdf/{meta.app_label}/{meta.model_name}.html',
-            'renderers/pdf/pdf.html'])
+            f'renderers/pdf/{meta.app_label}/pdf.html',
+            'renderers/pdf.html'])
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
+        response = renderer_context['response']
+        if response.status_code != 200:
+            return ''
         try:
             html = super(PDFRenderer, self).render(data, accepted_media_type, renderer_context)
 
@@ -65,4 +70,4 @@ class PDFRenderer(HTMLRenderer):
         except Exception as e:
             process_exception(e)
             logger.exception(e)
-            raise Exception('Error processing request')
+            raise Exception('Error processing request') from e

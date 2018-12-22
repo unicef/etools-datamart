@@ -1,4 +1,5 @@
 import os
+import uuid
 import warnings
 from urllib.parse import urlparse
 
@@ -8,15 +9,19 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.db import connections
 from django.utils.module_loading import import_string
+
+from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
-from humanize import naturaldelta
 from post_office.models import EmailTemplate
 from redisboard.models import RedisServer
 from strategy_field.utils import fqn
+
 from unicef_rest_framework.models.acl import GroupAccessControl
 
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.celery import app
 
 MAIL = r"""Dear {{user.label}},
@@ -64,9 +69,25 @@ MAIL_ATTACHMENT_HTML = r"""<div>Dear {{user.label}},</div>
 <div>To unsubscribe, change your preferences in <a href="{{base_url}}{% url 'monitor' %}">Datamart Monitor</a></div>
 """
 
+RESTRICTED_AREAS = {'234R': ['mpawlowski@unicef.org',
+                             'jmege@unicef.org',
+                             'nukhan@unicef.org']}
+
+
+def get_everybody_available_areas():
+    conn = connections['etools']
+    return [c.schema_name for c in conn.get_tenants()
+            if c.business_area_code not in RESTRICTED_AREAS.keys()]
+
+
+def get_restricted_areas():
+    conn = connections['etools']
+    return [c.schema_name for c in conn.get_tenants()
+            if c.business_area_code in RESTRICTED_AREAS.keys()]
+
 
 class Command(BaseCommand):
-    help = "My shiny new management command."
+    help = ""
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -103,20 +124,17 @@ class Command(BaseCommand):
             default=False,
             help='refresh datamart tables')
 
-        parser.add_argument(
-            '--async',
-            action='store_true',
-            dest='_async',
-            default=False,
-            help='use celery to refresh datamart')
-
     def handle(self, *args, **options):
         verbosity = options['verbosity']
         migrate = options['migrate']
         _all = options['all']
         # interactive = options['interactive']
 
+        self.stdout.write(f"Run collectstatic")
+        call_command('collectstatic', verbosity=verbosity - 1, interactive=False)
+
         if migrate or _all:
+            self.stdout.write(f"Run migrations")
             call_command('migrate', verbosity=verbosity - 1)
 
         ModelUser = get_user_model()
@@ -124,20 +142,42 @@ class Command(BaseCommand):
             pwd = '123'
             admin = os.environ.get('USER', 'admin')
         else:
-            pwd = ModelUser.objects.make_random_password()
-            admin = os.environ.get('USER', 'admin')
+            pwd = os.environ.get('ADMIN_PASSWORD', ModelUser.objects.make_random_password())
+            admin = os.environ.get('ADMIN_USERNAME', 'admin')
 
         self._admin_user, created = ModelUser.objects.get_or_create(username=admin,
                                                                     defaults={"is_superuser": True,
                                                                               "is_staff": True,
                                                                               "password": make_password(pwd)})
-        Group.objects.get_or_create(name='Guests')
-        all_access, __ = Group.objects.get_or_create(name='Endpoints all access')
 
         if created:  # pragma: no cover
             self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
         else:  # pragma: no cover
             self.stdout.write(f"Superuser `{admin}` already exists`.")
+
+        self.stdout.write(f"Create anonymous")
+        anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
+                                                             defaults={"is_superuser": False,
+                                                                       "is_staff": False,
+                                                                       "password": make_password(uuid.uuid4())})
+        # self.stdout.write(f"Create group `Guest`")
+        # Group.objects.get_or_create(name='Guests')
+        # self.stdout.write(f"Create group `Endpoints all access`")
+        # all_access, __ = Group.objects.get_or_create(name='All endpoints access')
+
+        self.stdout.write(f"Create group `Public areas access`")
+        public_areas, __ = Group.objects.get_or_create(name='Public areas access')
+        config.DEFAULT_GROUP = 'Public areas access'
+
+        self.stdout.write(f"Create group `Restricted areas access`")
+        restricted_areas, __ = Group.objects.get_or_create(name='Restricted areas access')
+
+        self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
+        SchemaAccessControl.objects.get_or_create(group=public_areas,
+                                                  schemas=get_everybody_available_areas())
+
+        SchemaAccessControl.objects.get_or_create(group=restricted_areas,
+                                                  schemas=get_restricted_areas())
 
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
@@ -147,17 +187,24 @@ class Command(BaseCommand):
 
         for service in Service.objects.all():
             GroupAccessControl.objects.get_or_create(
-                group=all_access,
+                group=public_areas,
                 service=service,
                 serializers=['*'],
                 policy=GroupAccessControl.POLICY_ALLOW
             )
+        for area, users in RESTRICTED_AREAS.items():
+            for email in users:
+                u, __ = ModelUser.objects.get_or_create(username=email,
+                                                        email=email)
+                u.groups.add(public_areas)
+                u.groups.add(restricted_areas)
+
         # hostname
         for entry, values in settings.CACHES.items():
             loc = values.get('LOCATION', '')
             spec = urlparse(loc)
             if spec.scheme == 'redis':
-                RedisServer.objects.get_or_create(hostname=spec.netloc,
+                RedisServer.objects.get_or_create(hostname=spec.hostname,
                                                   port=int(spec.port))
 
         if os.environ.get('AUTOCREATE_USERS'):
@@ -165,14 +212,13 @@ class Command(BaseCommand):
             self.stdout.write("Going to create new users")
             try:
                 for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
-                    user, pwd = entry.split(',')
-                    User = get_user_model()
-                    u, created = User.objects.get_or_create(username=user)
+                    email, pwd = entry.split(',')
+                    u, created = ModelUser.objects.get_or_create(username=email)
                     if created:
                         self.stdout.write(f"Created user {u}")
                         u.set_password(pwd)
                         u.save()
-                        u.groups.add(all_access)
+                        u.groups.add(public_areas)
                     else:  # pragma: no cover
                         self.stdout.write(f"User {u} already exists.")
 
@@ -181,6 +227,10 @@ class Command(BaseCommand):
 
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
+            CrontabSchedule.objects.get_or_create(hour=[0, 6, 12, 18])
+            CrontabSchedule.objects.get_or_create(hour=[0, 12])
+            IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
+
             every_minute, __ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
 
             tasks = app.get_all_etls()
@@ -213,21 +263,18 @@ class Command(BaseCommand):
                                             defaults=dict(subject='Dataset changed',
                                                           content=MAIL,
                                                           html_content=MAIL_HTML))
+        config.CACHE_VERSION = config.CACHE_VERSION + 1
 
-        if options['refresh']:
-            self.stdout.write("Refreshing datamart...")
-            for task in PeriodicTask.objects.all()[1:]:
-                try:
-                    etl = import_string(task.task)
-                except ImportError:
-                    continue
-                self.stdout.write(f"Running {task.name}...", ending='\r')
-                self.stdout.flush()
-
-                if options['_async']:
-                    etl.delay()
-                    self.stdout.write(f"{task.name} scheduled")
-                else:
-                    etl.apply()
-                    cost = naturaldelta(app.timers[task.name])
-                    self.stdout.write(f"{task.name} excuted in {cost}")
+        # if options['refresh']:
+        #     self.stdout.write("Refreshing datamart...")
+        #     for task in PeriodicTask.objects.all()[1:]:
+        #         try:
+        #             etl = import_string(task.task)
+        #         except ImportError:
+        #             continue
+        #         self.stdout.write(f"Running {task.name}...", ending='\r')
+        #         self.stdout.flush()
+        #
+        #         etl.apply()
+        #         cost = naturaldelta(app.timers[task.name])
+        #         self.stdout.write(f"{task.name} excuted in {cost}")

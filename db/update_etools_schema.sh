@@ -138,7 +138,7 @@ echo "Running..."
 # 1 - restore from database dump
 
 if [ "$RESTORE" == "1" ]; then
-    echo "1.1 Dropping ans recreating database ${DATABASE_NAME}"
+    echo "1.1 Dropping and recreating database ${DATABASE_NAME}"
     dropdb -h ${PGHOST} -p ${PGPORT} --if-exists ${DATABASE_NAME} || exit 1
     createdb -h ${PGHOST} -p ${PGPORT} ${DATABASE_NAME} || exit 1
 

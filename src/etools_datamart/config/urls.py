@@ -1,5 +1,6 @@
 from django.contrib.admin import site
 from django.urls import include, path, re_path
+
 from django_sysinfo.views import admin_sysinfo, http_basic_login, sysinfo, version
 from oauth2_provider.views import AuthorizationView
 
@@ -7,6 +8,7 @@ import etools_datamart.api.urls
 from etools_datamart.apps.multitenant.views import SelectSchema
 
 urlpatterns = [
+    path(r'me/', include('etools_datamart.apps.me.urls')),
     path(r's/', include('etools_datamart.apps.subscriptions.urls')),
     path(r'', include('etools_datamart.apps.web.urls')),
     path(r'', include('social_django.urls', namespace='social')),

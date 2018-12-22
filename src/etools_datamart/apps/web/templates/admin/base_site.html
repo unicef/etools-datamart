@@ -1,9 +1,19 @@
 {% extends "admin/base.html" %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
-
+{% block extrastyle %}
+    {% if config.ANALYTICS_CODE %}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.ANALYTICS_CODE }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ config.ANALYTICS_CODE }}');
+        </script>
+    {% endif %}
+{% endblock %}
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
 {% endblock %}
 
 {% block userlinks %}
@@ -11,8 +21,16 @@
     {% if user.is_superuser %}
         {% url 'sys-admin-info' as sysinfo %}
         {% if sysinfo %}
-            <a href="{{ sysinfo }}">Sys Infos</a>
+            / <a href="{{ sysinfo }}">Sys Infos</a>
         {% endif %}
+        / <a href="javascript:document.cookie='old_index_style={{ index_style }}; path=/';window.location.reload(true);">Switch index</a>
     {% endif %}
 {% endblock %}
 {% block nav-global %}{% endblock %}
+{#{% block footer %}#}
+{#    <div id="footer">#}
+{#        <div style="float:right">#}
+{#            <a href="javascript:document.cookie='old_index_style={{ index_style }}; path=/';window.location.reload(true);">Switch index</a>#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock %}#}

@@ -3,9 +3,11 @@
 import logging
 import uuid
 
-from admin_extra_urls.extras import ExtraUrlMixin
 from django import forms
 from django.contrib import admin
+
+from admin_extra_urls.extras import ExtraUrlMixin
+
 from unicef_rest_framework.models import Application
 
 logger = logging.getLogger(__name__)

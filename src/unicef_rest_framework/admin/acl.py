@@ -2,7 +2,6 @@
 
 import logging
 
-from admin_extra_urls.extras import ExtraUrlMixin, link
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
@@ -10,6 +9,9 @@ from django.contrib.admin.helpers import AdminForm
 from django.contrib.auth.models import Group
 from django.contrib.postgres.forms import SimpleArrayField
 from django.template.response import TemplateResponse
+
+from admin_extra_urls.extras import ExtraUrlMixin, link
+
 from unicef_rest_framework.models import Service, UserAccessControl
 from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl
 
@@ -39,6 +41,7 @@ class UserAccessControlAdmin(admin.ModelAdmin):
 
 
 class GroupAccessControlForm(forms.Form):
+    overwrite_existing = forms.BooleanField(help_text="Overwrite existing entries", required=False)
     group = forms.ModelChoiceField(queryset=Group.objects.all())
     policy = forms.ChoiceField(choices=AbstractAccessControl.POLICIES)
     services = forms.ModelMultipleChoiceField(queryset=Service.objects.all(),
@@ -61,6 +64,9 @@ class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def get_queryset(self, request):
         return super(GroupAccessControlAdmin, self).get_queryset(request).select_related(*self.raw_id_fields)
 
+    def has_add_permission(self, request):
+        return False
+
     @link()
     def add_acl(self, request):
         opts = self.model._meta
@@ -82,9 +88,18 @@ class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
             form = GroupAccessControlForm(request.POST)
             if form.is_valid():
                 services = form.cleaned_data.pop('services')
+                group = form.cleaned_data.pop('group')
+                overwrite_existing = form.cleaned_data.pop('overwrite_existing')
+
                 for service in services:
-                    GroupAccessControl.objects.get_or_create(service=service,
-                                                             **form.cleaned_data)
+                    if overwrite_existing:
+                        GroupAccessControl.objects.update_or_create(service=service,
+                                                                    group=group,
+                                                                    defaults=form.cleaned_data)
+                    else:
+                        GroupAccessControl.objects.update_or_create(service=service,
+                                                                    group=group,
+                                                                    defaults=form.cleaned_data)
                 self.message_user(request, 'ACLs created')
 
         else:
@@ -92,8 +107,8 @@ class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
                                                    'policy': AbstractAccessControl.POLICY_ALLOW,
                                                    'serializers': 'std'})
         ctx['adminform'] = AdminForm(form,
-                                     [(None, {'fields': [['group',
-                                                          'policy'],
+                                     [(None, {'fields': ['overwrite_existing',
+                                                         ['group', 'policy'],
                                                          'services',
                                                          ['rate', 'serializers']]})],
                                      {})

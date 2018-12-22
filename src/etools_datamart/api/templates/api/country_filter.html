@@ -1,0 +1,11 @@
+{% load rest_framework i18n query %}
+{#<h2>{% trans "Country" %}</h2>#}
+<div class="list-group">
+<label for="id_vendor_number" class="control-label ">Countries</label>
+<select name="country_name" multiple="multiple" class="select2" style="width: 100%">
+{% for country in countries %}<option {% if country in selection %}selected="selected"{% endif %}>{{ country }}</option>
+{% endfor %}
+</select>
+</div>
+<script>
+</script>
