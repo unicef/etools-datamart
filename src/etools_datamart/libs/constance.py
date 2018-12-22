@@ -9,7 +9,7 @@ class GroupChoiceField(ChoiceField):
 
     def __init__(self, **kwargs):
         names = list(Group.objects.values_list('name', flat=True))
-        choices = [[i, i] for i in names]
+        choices = zip(names, names)
         super().__init__(choices=choices, **kwargs)
 
 

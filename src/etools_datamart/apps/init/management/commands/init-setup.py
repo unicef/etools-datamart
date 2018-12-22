@@ -159,12 +159,16 @@ class Command(BaseCommand):
                                                              defaults={"is_superuser": False,
                                                                        "is_staff": False,
                                                                        "password": make_password(uuid.uuid4())})
-        self.stdout.write(f"Create group `Guest`")
-        Group.objects.get_or_create(name='Guests')
+        # self.stdout.write(f"Create group `Guest`")
+        # Group.objects.get_or_create(name='Guests')
+        # self.stdout.write(f"Create group `Endpoints all access`")
+        # all_access, __ = Group.objects.get_or_create(name='All endpoints access')
 
-        self.stdout.write(f"Create group `Endpoints all access`")
-        all_access, __ = Group.objects.get_or_create(name='All endpoints access')
+        self.stdout.write(f"Create group `Public areas access`")
         public_areas, __ = Group.objects.get_or_create(name='Public areas access')
+        config.DEFAULT_GROUP = 'Public areas access'
+
+        self.stdout.write(f"Create group `Restricted areas access`")
         restricted_areas, __ = Group.objects.get_or_create(name='Restricted areas access')
 
         self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
@@ -182,7 +186,7 @@ class Command(BaseCommand):
 
         for service in Service.objects.all():
             GroupAccessControl.objects.get_or_create(
-                group=all_access,
+                group=public_areas,
                 service=service,
                 serializers=['*'],
                 policy=GroupAccessControl.POLICY_ALLOW
@@ -191,6 +195,7 @@ class Command(BaseCommand):
             for email in users:
                 u, __ = ModelUser.objects.get_or_create(username=email,
                                                         email=email)
+                u.groups.add(public_areas)
                 u.groups.add(restricted_areas)
 
         # hostname
@@ -212,7 +217,7 @@ class Command(BaseCommand):
                         self.stdout.write(f"Created user {u}")
                         u.set_password(pwd)
                         u.save()
-                        u.groups.add(all_access)
+                        u.groups.add(public_areas)
                     else:  # pragma: no cover
                         self.stdout.write(f"User {u} already exists.")
 
