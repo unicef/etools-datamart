@@ -1,7 +1,8 @@
 
-import factory
 from django.contrib.auth.models import Group
 from django.utils import timezone
+
+import factory
 from factory import SubFactory
 from factory.base import FactoryMetaClass
 from post_office.models import EmailTemplate
@@ -9,7 +10,6 @@ from post_office.models import EmailTemplate
 import unicef_rest_framework.models
 import unicef_security.models
 
-from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.apps.subscriptions.models import Subscription
 from etools_datamart.apps.tracking.models import APIRequestLog
@@ -30,14 +30,14 @@ class RegisterModelFactory(factory.DjangoModelFactory, metaclass=AutoRegisterFac
     pass
 
 
-class TaskLogFactory(RegisterModelFactory):
-    elapsed = 10
-    last_success = timezone.now()
-    last_failure = timezone.now()
-    last_changes = timezone.now()
-
-    class Meta:
-        model = EtlTask
+# class TaskLogFactory(RegisterModelFactory):
+#     elapsed = 10
+#     last_success = timezone.now()
+#     last_failure = timezone.now()
+#     last_changes = timezone.now()
+#
+#     class Meta:
+#         model = EtlTask
 
 
 class APIRequestLogFactory(RegisterModelFactory):

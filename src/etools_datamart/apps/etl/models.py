@@ -17,6 +17,8 @@ class TaskLogManager(models.Manager):
     def get_for_model(self, model: DataMartModel):
         try:
             return self.get(content_type=ContentType.objects.get_for_model(model))
+        except EtlTask.MultipleObjectsReturned:
+            raise EtlTask.MultipleObjectsReturned(f"MultipleObjectsReturned for model '{model.__name__}'")
         except EtlTask.DoesNotExist:
             raise EtlTask.DoesNotExist(f"EtlTask for model '{model.__name__}' does not exists")
 
@@ -31,15 +33,15 @@ class TaskLogManager(models.Manager):
         results = {True: 0, False: 0}
         new = []
         for task in tasks:
-            t, created = self.get_or_create(task=task.name,
+            t, created = self.get_or_create(content_type=ContentType.objects.get_for_model(task.linked_model),
                                             defaults=dict(
-                                                content_type=ContentType.objects.get_for_model(task.linked_model),
+                                                task=task.name,
                                                 last_run=None,
                                                 table_name=task.linked_model._meta.db_table))
             results[created] += 1
             new.append(t.id)
         self.exclude(id__in=new).delete()
-        return results[True], results[False]
+        return {'created': results[True], 'updated': results[False]}
 
 
 class EtlTask(models.Model):
@@ -51,7 +53,7 @@ class EtlTask(models.Model):
     last_failure = models.DateTimeField(null=True, help_text="last failure execution time")
     last_changes = models.DateTimeField(null=True, help_text="last time data have been changed")
     table_name = models.CharField(max_length=200, null=True)
-    content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
+    content_type = models.OneToOneField(ContentType, models.CASCADE, null=True)
 
     results = JSONField(blank=True, null=True)
 

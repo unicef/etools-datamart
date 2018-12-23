@@ -26,6 +26,7 @@ router.register(r'etools/reports/appliedindicator', endpoints.AppliedindicatorVi
 router.register(r'etools/reports/results', endpoints.ReportsResultViewSet)
 router.register(r'etools/t2/ftravel', endpoints.FTravelViewSet)
 router.register(r'etools/tpm/tpmvisit', endpoints.TpmTpmvisitViewSet)
+router.register(r'etools/locations', endpoints.LocationViewSet)
 
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/interventions', endpoints.InterventionViewSet)

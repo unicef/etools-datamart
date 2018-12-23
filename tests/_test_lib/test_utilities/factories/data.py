@@ -1,9 +1,10 @@
 import random
 from datetime import datetime
 
-import factory
 from django.db import connections
 from django.utils import timezone
+
+import factory
 from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory

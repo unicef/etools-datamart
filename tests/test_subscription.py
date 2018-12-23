@@ -2,10 +2,11 @@ import base64
 import json
 from unittest.mock import MagicMock
 
-import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
 from django.urls import reverse
+
+import pytest
 from test_utilities.factories import EmailTemplateFactory, HACTFactory, SubscriptionFactory
 
 from unicef_rest_framework.test_utils import user_allow_service

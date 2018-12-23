@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from rest_framework.reverse import reverse
-from test_utilities.factories import TaskLogFactory
 
 from etools_datamart.api.urls import router
 
@@ -14,7 +13,6 @@ def pytest_generate_tests(metafunc):
 
 
 def test_list(client, url):
-    TaskLogFactory()
     res = client.get(url, HTTP_X_SCHEMA="public")
     assert res.status_code == 200, res
     assert res.json()

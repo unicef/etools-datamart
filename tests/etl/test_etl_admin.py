@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.contrib import messages
 from django.urls import reverse
+
+import pytest
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from etools_datamart.apps.etl.models import EtlTask

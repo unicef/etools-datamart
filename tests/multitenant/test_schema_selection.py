@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.db import connections
 from django.urls import reverse
+
+import pytest
 
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema
 

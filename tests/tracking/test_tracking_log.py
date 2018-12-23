@@ -3,9 +3,10 @@ import logging
 from time import sleep
 from unittest.mock import Mock
 
-import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
+
+import pytest
 from test_utilities.factories import AdminFactory, UserFactory
 
 from etools_datamart.api.endpoints import InterventionViewSet

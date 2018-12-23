@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.contrib.admin.sites import site
 from django.db import connections
 from django.urls import reverse
+
+import pytest
 
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
 from etools_datamart.apps.multitenant.models import TenantModel

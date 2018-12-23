@@ -2,8 +2,6 @@ from unittest import mock
 
 import pytest
 from celery.signals import task_postrun
-from django.contrib.contenttypes.models import ContentType
-from test_utilities.factories import TaskLogFactory
 
 from unicef_security.models import User
 
@@ -54,7 +52,7 @@ def test_no_changes(db):
 
 
 def test_manager(db):
-    TaskLogFactory(content_type=ContentType.objects.get_for_model(HACT))
+    # TaskLogFactory(content_type=ContentType.objects.get_for_model(HACT))
     assert EtlTask.objects.filter_for_models(HACT)
     assert EtlTask.objects.get_for_model(HACT)
     with pytest.raises(EtlTask.DoesNotExist):

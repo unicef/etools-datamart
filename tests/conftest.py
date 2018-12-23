@@ -8,6 +8,8 @@ from unittest.mock import MagicMock
 import pytest
 from _pytest.fixtures import SubRequest
 
+from etools_datamart.apps.etl.models import EtlTask
+
 
 def pytest_configure(config):
     # enable this to remove deprecations
@@ -65,6 +67,7 @@ def django_db_setup(request,
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory
     with django_db_blocker.unblock():
+        EtlTask.objects.inspect()
         Service.objects.load_services()
         UserAccessControl.objects.all().delete()
         APIRequestLog.objects.truncate()

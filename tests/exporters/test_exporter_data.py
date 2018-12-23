@@ -1,8 +1,9 @@
 import io
 import os
 
-import pytest
 from django.urls import reverse
+
+import pytest
 from rest_framework.test import APIClient
 
 from etools_datamart.apps.data.models import UserStats

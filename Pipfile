@@ -56,6 +56,7 @@ django-crispy-forms = "*"
 django-adminactions = "*"
 django-dbtemplates = {file = "https://github.com/jazzband/django-dbtemplates/archive/2.0.1.tar.gz"}
 django-mptt = "*"
+djangorestframework-gis = "*"
 
 [dev-packages]
 "flake8" = ">=3.6.0"

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.contrib.auth.models import User
+
+import pytest
 from rest_framework.test import APIClient
 from test_utilities.factories import InterventionFactory, SystemFilterFactory, UserAccessControlFactory
 
