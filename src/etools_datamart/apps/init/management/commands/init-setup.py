@@ -252,11 +252,8 @@ class Command(BaseCommand):
                                                                 defaults={'name': task.name,
                                                                           'crontab': midnight})
 
-            PeriodicTask.objects.get_or_create(task='AAAAAA',
-                                               defaults={'name': 'AAAAA',
-                                                         'crontab': midnight})
             ret = PeriodicTask.objects.exclude(name__in=list(app.tasks.keys())).delete()
-            counters[False] = ret['django_celery_beat.PeriodicTask']
+            counters[False] = ret[1].get('django_celery_beat.PeriodicTask', 0)
 
             EtlTask.objects.inspect()
             self.stdout.write(
