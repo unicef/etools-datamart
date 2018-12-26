@@ -227,8 +227,8 @@ class Command(BaseCommand):
 
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-            CrontabSchedule.objects.get_or_create(hour=[0, 6, 12, 18])
-            CrontabSchedule.objects.get_or_create(hour=[0, 12])
+            CrontabSchedule.objects.get_or_create(hour='0, 6, 12, 18')
+            CrontabSchedule.objects.get_or_create(hour='0, 12')
             IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
 
             every_minute, __ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
