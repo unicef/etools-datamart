@@ -10,7 +10,6 @@ from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connections
-from django.utils.module_loading import import_string
 
 from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
@@ -104,10 +103,24 @@ class Command(BaseCommand):
             help='select all production deployment options')
 
         parser.add_argument(
-            '--no-migrate',
-            action='store_false',
+            '--collectstatic',
+            action='store_true',
+            dest='collectstatic',
+            default=False,
+            help='')
+
+        parser.add_argument(
+            '--users',
+            action='store_true',
+            dest='users',
+            default=False,
+            help='')
+
+        parser.add_argument(
+            '--migrate',
+            action='store_true',
             dest='migrate',
-            default=True,
+            default=False,
             help='select all production deployment options')
 
         parser.add_argument(
@@ -128,42 +141,17 @@ class Command(BaseCommand):
         verbosity = options['verbosity']
         migrate = options['migrate']
         _all = options['all']
+        ModelUser = get_user_model()
+
         # interactive = options['interactive']
 
-        self.stdout.write(f"Run collectstatic")
-        call_command('collectstatic', verbosity=verbosity - 1, interactive=False)
+        if options['collectstatic'] or _all:
+            self.stdout.write(f"Run collectstatic")
+            call_command('collectstatic', verbosity=verbosity - 1, interactive=False)
 
         if migrate or _all:
             self.stdout.write(f"Run migrations")
             call_command('migrate', verbosity=verbosity - 1)
-
-        ModelUser = get_user_model()
-        if settings.DEBUG:
-            pwd = '123'
-            admin = os.environ.get('USER', 'admin')
-        else:
-            pwd = os.environ.get('ADMIN_PASSWORD', ModelUser.objects.make_random_password())
-            admin = os.environ.get('ADMIN_USERNAME', 'admin')
-
-        self._admin_user, created = ModelUser.objects.get_or_create(username=admin,
-                                                                    defaults={"is_superuser": True,
-                                                                              "is_staff": True,
-                                                                              "password": make_password(pwd)})
-
-        if created:  # pragma: no cover
-            self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
-        else:  # pragma: no cover
-            self.stdout.write(f"Superuser `{admin}` already exists`.")
-
-        self.stdout.write(f"Create anonymous")
-        anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
-                                                             defaults={"is_superuser": False,
-                                                                       "is_staff": False,
-                                                                       "password": make_password(uuid.uuid4())})
-        # self.stdout.write(f"Create group `Guest`")
-        # Group.objects.get_or_create(name='Guests')
-        # self.stdout.write(f"Create group `Endpoints all access`")
-        # all_access, __ = Group.objects.get_or_create(name='All endpoints access')
 
         self.stdout.write(f"Create group `Public areas access`")
         public_areas, __ = Group.objects.get_or_create(name='Public areas access')
@@ -171,6 +159,48 @@ class Command(BaseCommand):
 
         self.stdout.write(f"Create group `Restricted areas access`")
         restricted_areas, __ = Group.objects.get_or_create(name='Restricted areas access')
+
+        if options['users'] or _all:
+            if settings.DEBUG:
+                pwd = '123'
+                admin = os.environ.get('USER', 'admin')
+            else:
+                pwd = os.environ.get('ADMIN_PASSWORD', ModelUser.objects.make_random_password())
+                admin = os.environ.get('ADMIN_USERNAME', 'admin')
+
+            self._admin_user, created = ModelUser.objects.get_or_create(username=admin,
+                                                                        defaults={"is_superuser": True,
+                                                                                  "is_staff": True,
+                                                                                  "password": make_password(pwd)})
+
+            if created:  # pragma: no cover
+                self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
+            else:  # pragma: no cover
+                self.stdout.write(f"Superuser `{admin}` already exists`.")
+
+            self.stdout.write(f"Create anonymous")
+            anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
+                                                                 defaults={"is_superuser": False,
+                                                                           "is_staff": False,
+                                                                           "password": make_password(uuid.uuid4())})
+
+            if os.environ.get('AUTOCREATE_USERS'):
+                self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
+                self.stdout.write("Going to create new users")
+                try:
+                    for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
+                        email, pwd = entry.split(',')
+                        u, created = ModelUser.objects.get_or_create(username=email)
+                        if created:
+                            self.stdout.write(f"Created user {u}")
+                            u.set_password(pwd)
+                            u.save()
+                            u.groups.add(public_areas)
+                        else:  # pragma: no cover
+                            self.stdout.write(f"User {u} already exists.")
+
+                except Exception as e:  # pragma: no cover
+                    warnings.warn(f"Unable to create default users. {e}")
 
         self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
         SchemaAccessControl.objects.get_or_create(group=public_areas,
@@ -207,24 +237,6 @@ class Command(BaseCommand):
                 RedisServer.objects.get_or_create(hostname=spec.hostname,
                                                   port=int(spec.port))
 
-        if os.environ.get('AUTOCREATE_USERS'):
-            self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
-            self.stdout.write("Going to create new users")
-            try:
-                for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
-                    email, pwd = entry.split(',')
-                    u, created = ModelUser.objects.get_or_create(username=email)
-                    if created:
-                        self.stdout.write(f"Created user {u}")
-                        u.set_password(pwd)
-                        u.save()
-                        u.groups.add(public_areas)
-                    else:  # pragma: no cover
-                        self.stdout.write(f"User {u} already exists.")
-
-            except Exception as e:  # pragma: no cover
-                warnings.warn(f"Unable to create default users. {e}")
-
         if options['tasks'] or _all or options['refresh']:
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
             CrontabSchedule.objects.get_or_create(hour='0, 6, 12, 18')
@@ -239,12 +251,12 @@ class Command(BaseCommand):
                 __, is_new = PeriodicTask.objects.get_or_create(task=fqn(task),
                                                                 defaults={'name': task.name,
                                                                           'crontab': midnight})
-            for task in PeriodicTask.objects.all():
-                try:
-                    import_string(task.task)
-                except ImportError:
-                    task.delete()
-                    counters[False] += 1
+
+            PeriodicTask.objects.get_or_create(task='AAAAAA',
+                                               defaults={'name': 'AAAAA',
+                                                         'crontab': midnight})
+            ret = PeriodicTask.objects.exclude(name__in=list(app.tasks.keys())).delete()
+            counters[False] = ret['django_celery_beat.PeriodicTask']
 
             EtlTask.objects.inspect()
             self.stdout.write(
