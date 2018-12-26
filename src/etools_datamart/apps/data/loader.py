@@ -103,8 +103,8 @@ class LoaderTask(celery.Task):
     def __init__(self, loader) -> None:
         self.loader = loader
         self.linked_model = loader.model
-        self.name = fqn(self.linked_model)
-        # self.name = "load_{0.app_label}_{0.model_name}".format(loader.model._meta)
+        # self.name = fqn(self.linked_model)
+        self.name = "load_{0.app_label}_{0.model_name}".format(loader.model._meta)
 
     def run(self, *args, **kwargs):
         return self.loader.load()
