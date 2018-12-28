@@ -19,6 +19,7 @@ from strategy_field.utils import fqn
 
 from unicef_rest_framework.models.acl import GroupAccessControl
 
+from etools_datamart.apps.data.loader import loadeables
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.celery import app
@@ -90,6 +91,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
+            '--deploy',
+            action='store_true',
+            dest='deploy',
+            default=False,
+            help='run deployment related actions')
+        parser.add_argument(
             '--all',
             action='store_true',
             dest='all',
@@ -141,9 +148,10 @@ class Command(BaseCommand):
         verbosity = options['verbosity']
         migrate = options['migrate']
         _all = options['all']
+        deploy = options['deploy']
+        if deploy:
+            _all = True
         ModelUser = get_user_model()
-
-        # interactive = options['interactive']
 
         if options['collectstatic'] or _all:
             self.stdout.write(f"Run collectstatic")
@@ -212,8 +220,6 @@ class Command(BaseCommand):
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
         self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
-        if os.environ.get('INVALIDATE_CACHE'):
-            Service.objects.invalidate_cache()
 
         for service in Service.objects.all():
             GroupAccessControl.objects.get_or_create(
@@ -272,18 +278,12 @@ class Command(BaseCommand):
                                             defaults=dict(subject='Dataset changed',
                                                           content=MAIL,
                                                           html_content=MAIL_HTML))
-        config.CACHE_VERSION = config.CACHE_VERSION + 1
 
-        # if options['refresh']:
-        #     self.stdout.write("Refreshing datamart...")
-        #     for task in PeriodicTask.objects.all()[1:]:
-        #         try:
-        #             etl = import_string(task.task)
-        #         except ImportError:
-        #             continue
-        #         self.stdout.write(f"Running {task.name}...", ending='\r')
-        #         self.stdout.flush()
-        #
-        #         etl.apply()
-        #         cost = naturaldelta(app.timers[task.name])
-        #         self.stdout.write(f"{task.name} excuted in {cost}")
+        if options['refresh'] or deploy:
+            self.stdout.write("Refreshing datamart...")
+            for loadeable in loadeables:
+                loadeable.loader.task.delay()
+
+        if deploy:
+            Service.objects.invalidate_cache()
+            config.CACHE_VERSION = config.CACHE_VERSION + 1
