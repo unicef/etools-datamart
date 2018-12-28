@@ -229,10 +229,8 @@ class Loader:
             kk.save()
         self.tree_parents = []
 
-        # delete unseen records
+        # mark seen records
         self.model.objects.filter(id__in=self.seen).update(seen=context['today'])
-        deleted = self.model.objects.exclude(id__in=self.seen).delete()[0]
-        self.results.deleted += deleted
 
     def process_country(self, country, context):
         qs = self.config.queryset()
@@ -269,7 +267,7 @@ class Loader:
             pass
 
     @atomic()
-    def load(self, verbosity=0, always_update=False, stdout=None,
+    def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None):
         have_lock = False
         self.results = EtlResult()
@@ -292,8 +290,8 @@ class Loader:
                                               'id', 'last_modify_date']:
                             self.mapping[field.name] = field.name
                     self.mapping.update(self.config.mapping)
-
-                context = self.get_context(today=timezone.now(),
+                today = timezone.now()
+                context = self.get_context(today=today,
                                            countries=countries,
                                            max_records=max_records,
                                            records=0,
@@ -309,6 +307,9 @@ class Loader:
                         break
                     if stdout:  # pragma: no cover
                         stdout.write("\n")
+                # deleted = self.model.objects.exclude(seen=today).delete()[0]
+                # self.results.deleted = deleted
+
         except LoaderException:
             raise
         finally:

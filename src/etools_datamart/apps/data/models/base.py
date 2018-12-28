@@ -12,11 +12,10 @@ from etools_datamart.apps.data.loader import Loader, LoaderOptions
 class DataMartQuerySet(QuerySet):
     def get(self, *args, **kwargs):
         try:
-            super(DataMartQuerySet, self).get(*args, **kwargs)
-        except self.model.DoesNotExist:
+            return super(DataMartQuerySet, self).get(*args, **kwargs)
+        except self.model.DoesNotExist as e:
             raise self.model.DoesNotExist(
-                "%s matching query does not exist. (%s %s)" %
-                (self.model._meta.object_name, args, kwargs)
+                "%s  (%s %s)" % (e, args, kwargs)
             )
         except self.model.MultipleObjectsReturned as e:
             raise self.model.MultipleObjectsReturned(
