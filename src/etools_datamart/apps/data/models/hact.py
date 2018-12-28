@@ -3,13 +3,13 @@ import json
 from django.db import models
 from django.utils import timezone
 
-from etools_datamart.apps.data.loader import EtlResult, Loader
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import HactAggregatehact
 
 
 class HACTLoader(Loader):
-    def process_country(self, results: EtlResult, country, context):
+    def process_country(self, country, context):
         today = timezone.now()
         aggregate = HactAggregatehact.objects.get(year=today.year)
         data = json.loads(aggregate.partner_values)
@@ -27,9 +27,7 @@ class HACTLoader(Loader):
                                        country_name=country.name,
                                        schema_name=country.schema_name),
                           values=values)
-        results.incr(op)
-
-        return results
+        self.results.incr(op)
 
 
 class HACT(DataMartModel):

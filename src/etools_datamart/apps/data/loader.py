@@ -22,17 +22,20 @@ logger = logging.getLogger(__name__)
 CREATED = 'created'
 UPDATED = 'updated'
 UNCHANGED = 'unchanged'
+DELETED = 'deleted'
 
 
 class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED]
+    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'status', 'context', 'error']
 
-    def __init__(self, updated=0, created=0, unchanged=0, status='SUCCESS', **kwargs):
+    def __init__(self, updated=0, created=0, unchanged=0, deleted=0, status='SUCCESS', context=None, **kwargs):
         self.created = created
         self.updated = updated
         self.unchanged = unchanged
+        self.deleted = deleted
         self.status = status
         self.error = None
+        self.context = context or {}
 
     def __repr__(self):
         return repr(self.as_dict())
@@ -40,12 +43,27 @@ class EtlResult:
     def incr(self, counter):
         setattr(self, counter, getattr(self, counter) + 1)
 
+    def add(self, counter, value):
+        setattr(self, counter, getattr(self, counter) + value)
+
     def as_dict(self):
         return {'created': self.created,
                 'updated': self.updated,
                 'unchanged': self.unchanged,
+                'deleted': self.deleted,
                 'status': self.status,
                 'error': self.error}
+
+    def __add__(self, other):
+        if isinstance(other, EtlResult):
+            ret = EtlResult(created=self.created + other.created,
+                            updated=self.updated + other.updated,
+                            unchanged=self.unchanged + other.unchanged,
+                            deleted=self.deleted + other.deleted,
+                            context=self.context
+                            )
+            return ret
+        raise ValueError(f"Cannot add EtlREsult with {other}")
 
     def __eq__(self, other):
         if isinstance(other, EtlResult):
@@ -54,7 +72,9 @@ class EtlResult:
         if isinstance(other, dict):
             return (self.created == other['created'] and
                     self.updated == other['updated'] and
-                    self.unchanged == other['unchanged'])
+                    self.unchanged == other['unchanged'] and
+                    self.deleted == other['deleted']
+                    )
         return False
 
 
@@ -130,6 +150,7 @@ class Loader:
         self.config = None
         self.tree_parents = []
         self.always_update = False
+        self.seen = []
 
     def __repr__(self):
         return "<%sLoader>" % self.model._meta.object_name
@@ -154,17 +175,18 @@ class Loader:
 
     def process(self, filters, values):
         try:
-            existing, created = self.model.objects.get_or_create(**filters,
-                                                                 defaults=values)
+            record, created = self.model.objects.get_or_create(**filters,
+                                                               defaults=values)
             if created:
                 op = CREATED
             else:
-                if self.always_update or is_record_changed(existing, values):
+                if self.always_update or is_record_changed(record, values):
                     op = UPDATED
-                    self.model.objects.update_or_create(**filters,
-                                                        defaults=values)
+                    record, created = self.model.objects.update_or_create(**filters,
+                                                                          defaults=values)
                 else:
                     op = UNCHANGED
+            self.seen.append(record.pk)
             return op
         except Exception as e:  # pragma: no cover
             logger.exception(e)
@@ -172,7 +194,7 @@ class Loader:
             raise LoaderException(f"Error in {self}: {e}",
                                   err) from e
 
-    def get_values(self, country, record):
+    def get_values(self, country, record, context):
         ret = {}
         for k, v in self.mapping.items():
             if v == '__self__':
@@ -195,9 +217,10 @@ class Loader:
                 ret[k] = v(country, record)
             else:
                 ret[k] = get_attr(record, v)
+        ret['seen'] = context['today']
         return ret
 
-    def process_post_country(self, country, context):
+    def post_process_country(self, country, context):
         for mart, etools in self.tree_parents:
             kk = self.model.objects.get(schema_name=country.schema_name,
                                         source_id=mart)
@@ -206,22 +229,27 @@ class Loader:
             kk.save()
         self.tree_parents = []
 
-    def process_country(self, results: EtlResult, country, context) -> EtlResult:
+        # delete unseen records
+        self.model.objects.filter(id__in=self.seen).update(seen=context['today'])
+        deleted = self.model.objects.exclude(id__in=self.seen).delete()[0]
+        self.results.deleted += deleted
+
+    def process_country(self, country, context):
         qs = self.config.queryset()
         stdout = context['stdout']
         max_records = context['max_records']
+        self.seen = []
         for record in qs.all():
             filters = self.config.key(country, record)
-            values = self.get_values(country, record)
+            values = self.get_values(country, record, context)
             op = self.process(filters, values)
-            results.incr(op)
+            self.results.incr(op)
             context['records'] += 1
             if stdout:  # pragma: no cover
                 stdout.write('.')
                 stdout.flush()
             if max_records and context['records'] >= max_records:
                 break
-        return results
 
     def get_context(self, **kwargs):
         context = {}
@@ -244,7 +272,7 @@ class Loader:
     def load(self, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None):
         have_lock = False
-        results = EtlResult()
+        self.results = EtlResult()
         lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
         try:
             have_lock = lock.acquire(blocking=False)
@@ -270,13 +298,13 @@ class Loader:
                                            max_records=max_records,
                                            records=0,
                                            stdout=stdout)
-
+                self.results.context = context
                 for country in countries:
                     if stdout:  # pragma: no cover
                         stdout.write(f"{country}\n")
                     connection.set_schemas([country.schema_name])
-                    self.process_country(results, country, context)
-                    self.process_post_country(country, context)
+                    self.process_country(country, context)
+                    self.post_process_country(country, context)
                     if max_records and context['records'] >= max_records:
                         break
                     if stdout:  # pragma: no cover
@@ -289,4 +317,4 @@ class Loader:
                     lock.release()
                 except LockError as e:  # pragma: no cover
                     logger.warning(e)
-        return results
+        return self.results

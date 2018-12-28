@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class PMPIndicatorLoader(Loader):
-    def process_country(self, results, country, context):
+    def process_country(self, country, context):
         for partner in PartnersPartnerorganization.objects.all():
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
@@ -57,8 +57,7 @@ class PMPIndicatorLoader(Loader):
                                                partner_id=partner.pk,
                                                intervention_id=intervention.pk),
                                   values=values)
-                results.incr(op)
-        return results
+                self.results.incr(op)
 
 
 class PMPIndicators(DataMartModel):

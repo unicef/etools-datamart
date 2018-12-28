@@ -16,10 +16,14 @@ def pytest_generate_tests(metafunc):
 
 
 def test_loader_load(loader, number_of_intervention):
+    # factory = factories_registry.get(loader.model)
+    # to_delete = factory()
     loader.model.objects.truncate()
     loader.unlock()
-    loader.load(max_records=2)
+    ret = loader.load(max_records=2)
     assert loader.model.objects.count()
+    assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
+    # assert not loader.model.objects.filter(id=to_delete.pk).exists()
 
 #
 # def test_load_pmp_indicator(number_of_intervention):

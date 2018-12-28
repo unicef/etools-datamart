@@ -2,7 +2,7 @@ from django.db import models
 
 from month_field.models import MonthField
 
-from etools_datamart.apps.data.loader import EtlResult, Loader
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
                                                 AuditSpecialaudit, AuditSpotcheck,)
@@ -10,7 +10,7 @@ from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, Aud
 
 class FAMIndicatorLoader(Loader):
 
-    def process_country(self, results: EtlResult, country, context):
+    def process_country(self, country, context):
         engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
         start_date = context['today'].date()
         for model in engagements:
@@ -30,9 +30,7 @@ class FAMIndicatorLoader(Loader):
                                            area_code=country.business_area_code,
                                            schema_name=country.schema_name),
                               values=values)
-            results.incr(op)
-
-        return results
+            self.results.incr(op)
 
 
 class FAMIndicator(DataMartModel):
