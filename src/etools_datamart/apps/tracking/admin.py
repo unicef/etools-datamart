@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+from urllib.parse import urlencode
 
 from django.contrib import admin
-from django.template.defaultfilters import pluralize, urlencode
+from django.template.defaultfilters import pluralize
 from django.utils.safestring import mark_safe
 
 from admin_extra_urls.extras import link
