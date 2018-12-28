@@ -3,6 +3,7 @@ import uuid
 import warnings
 from urllib.parse import urlparse
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -281,8 +282,9 @@ class Command(BaseCommand):
 
         if options['refresh'] or deploy:
             self.stdout.write("Refreshing datamart...")
-            for loadeable in loadeables:
-                loadeable.loader.task.delay()
+            for model_name in loadeables:
+                model = apps.get_model(model_name)
+                model.loader.task.delay()
 
         if deploy:
             Service.objects.invalidate_cache()

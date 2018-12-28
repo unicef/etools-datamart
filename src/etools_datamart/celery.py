@@ -2,10 +2,7 @@
 import os
 from time import time
 
-from django.db.models import F
-
 from celery import Celery
-# from celery.contrib.abortable import AbortableTask
 from celery.signals import task_postrun, task_prerun
 from celery.utils.log import get_task_logger
 from kombu import Exchange, Queue
@@ -53,7 +50,6 @@ def task_prerun_handler(signal, sender, task_id, task, args, kwargs, **kw):
     from etools_datamart.apps.etl.models import EtlTask
     from django.utils import timezone
     defs = {'status': 'RUNNING',
-            'code': F('code') + 1,
             'last_run': timezone.now()}
     EtlTask.objects.update_or_create(task=task.name,
                                      content_type=ContentType.objects.get_for_model(task.linked_model),

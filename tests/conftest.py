@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import uuid
 import warnings
@@ -25,7 +26,13 @@ warnings.simplefilter('ignore', UserWarning)
 
 @pytest.fixture(scope="session")
 def disable_migration_signals(request):
-    return request.config.getvalue("disable_migration_signals")
+    return request.config.option.disable_migration_signals
+    # FIXME: pdb
+    # import pdb; pdb.set_trace()
+    # if 'disable_migration_signals' in request.config.items():
+    #     return request.config.getvalue("disable_migration_signals")
+    #
+    # return request.config.inicfg.get('disable_migration_signals') == 'true'
 
 
 def pytest_addoption(parser):
@@ -48,8 +55,8 @@ def django_db_setup(request,
                     django_db_createdb,
                     django_db_modify_db_settings,
                     disable_migration_signals):
-    # never touch etools DB
-    if disable_migration_signals:
+    if not django_db_createdb and django_db_keepdb and disable_migration_signals:
+        sys.stdout.write("Warning pre/post migrate signals have been dosabled\n")
         import django.core.management.commands.migrate
         django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
