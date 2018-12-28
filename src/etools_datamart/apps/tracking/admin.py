@@ -86,7 +86,7 @@ class APIRequestLogAdmin(TruncateTableMixin, admin.ModelAdmin):
     # event.allow_tags = True
 
     def size(self, obj):
-        mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
+        return mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
 
     size.admin_order_field = 'response_length'
     size.allow_tags = True
