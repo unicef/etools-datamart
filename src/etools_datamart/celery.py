@@ -80,13 +80,15 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
     if state == 'SUCCESS':
         try:
             defs['results'] = retval.as_dict()
-            if retval.created > 0 or retval.updated > 0:
-                defs['last_changes'] = timezone.now()
-                for service in sender.linked_model.linked_services:
-                    service.invalidate_cache()
-                    Subscription.objects.notify(sender.linked_model)
-            defs['last_success'] = timezone.now()
-
+            if not retval.error:
+                if retval.created > 0 or retval.updated > 0:
+                    defs['last_changes'] = timezone.now()
+                    for service in sender.linked_model.linked_services:
+                        service.invalidate_cache()
+                        Subscription.objects.notify(sender.linked_model)
+                defs['last_success'] = timezone.now()
+            else:
+                defs['status'] = 'ERROR'
         except Exception as e:  # pragma: no cover
             logger.error(e)
             defs['results'] = str(retval)

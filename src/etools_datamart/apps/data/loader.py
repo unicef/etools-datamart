@@ -3,6 +3,7 @@ from inspect import isclass
 
 from django.core.cache import caches
 from django.db import connections, models
+from django.db.transaction import atomic
 from django.utils import timezone
 
 import celery
@@ -10,6 +11,7 @@ from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
 
+from etools_datamart.apps.data.exceptions import LoaderException
 from etools_datamart.celery import app
 
 loadeables = set()
@@ -25,10 +27,12 @@ UNCHANGED = 'unchanged'
 class EtlResult:
     __slots__ = [CREATED, UPDATED, UNCHANGED]
 
-    def __init__(self, updated=0, created=0, unchanged=0, **kwargs):
+    def __init__(self, updated=0, created=0, unchanged=0, status='SUCCESS', **kwargs):
         self.created = created
         self.updated = updated
         self.unchanged = unchanged
+        self.status = status
+        self.error = None
 
     def __repr__(self):
         return repr(self.as_dict())
@@ -39,7 +43,9 @@ class EtlResult:
     def as_dict(self):
         return {'created': self.created,
                 'updated': self.updated,
-                'unchanged': self.unchanged}
+                'unchanged': self.unchanged,
+                'status': self.status,
+                'error': self.error}
 
     def __eq__(self, other):
         if isinstance(other, EtlResult):
@@ -162,8 +168,9 @@ class Loader:
             return op
         except Exception as e:  # pragma: no cover
             logger.exception(e)
-            process_exception(e)
-            raise Exception(f"Error in {self}: {e}") from e
+            err = process_exception(e)
+            raise LoaderException(f"Error in {self}: {e}",
+                                  err) from e
 
     def get_values(self, country, record):
         ret = {}
@@ -233,6 +240,7 @@ class Loader:
         except LockError:
             pass
 
+    @atomic()
     def load(self, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None):
         have_lock = False
@@ -273,6 +281,8 @@ class Loader:
                         break
                     if stdout:  # pragma: no cover
                         stdout.write("\n")
+        except LoaderException:
+            raise
         finally:
             if have_lock:  # pragma: no branch
                 try:
