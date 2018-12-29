@@ -45,6 +45,7 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
 
     authentication_classes = (SessionAuthentication,
                               IPBasedAuthentication,
+                              TokenAuthentication,
                               JWTAuthentication,
                               BasicAuthentication,
                               TokenAuthentication,

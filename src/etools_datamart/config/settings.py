@@ -30,7 +30,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CELERY_ALWAYS_EAGER=(bool, False),
                   CSRF_COOKIE_SECURE=(bool, True),
-                  DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
+                  DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DEBUG=(bool, False),
                   MEDIA_ROOT=(str, '/tmp/media'),
@@ -43,6 +43,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
                   STATIC_URL=(str, '/dm-static/'),
+                  SYSTEM_PASSWORD=(str, ''),
                   X_FRAME_OPTIONS=(str, 'DENY'),
 
                   AZURE_CLIENT_ID=(str, ''),
@@ -287,6 +288,7 @@ INSTALLED_APPS = [
     'adminactions',
     'unicef_rest_framework.apps.Config',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_gis',
     'oauth2_provider',
     'social_django',
@@ -376,6 +378,18 @@ NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 # django-constance
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_ADDITIONAL_FIELDS = {
+    # 'read_only_text': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.ObfuscatedInput',
+    # }],
+    # 'write_only_text': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.WriteOnlyTextarea',
+    # }],
+    # 'write_only_input': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.WriteOnlyInput',
+    # }],
     'select_group': ['etools_datamart.libs.constance.GroupChoiceField', {
         'required': False,
         'widget': 'etools_datamart.libs.constance.GroupChoice',

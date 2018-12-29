@@ -199,11 +199,13 @@ class Command(BaseCommand):
                 try:
                     for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
                         email, pwd = entry.split(',')
-                        u, created = ModelUser.objects.get_or_create(username=email)
+                        u, created = ModelUser.objects.get_or_create(username=email,
+                                                                     defaults={"is_superuser": False,
+                                                                               "is_staff": False,
+                                                                               "password": make_password(pwd)})
+
                         if created:
                             self.stdout.write(f"Created user {u}")
-                            u.set_password(pwd)
-                            u.save()
                             u.groups.add(public_areas)
                         else:  # pragma: no cover
                             self.stdout.write(f"User {u} already exists.")
