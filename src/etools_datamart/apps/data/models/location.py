@@ -20,6 +20,7 @@ class GatewayType(DataMartModel):
                                            name=record.name)
         mapping = {'source_id': 'id',
                    'area_code': lambda country, record: country.business_area_code,
+                   'country_name': lambda country, record: country.name,
                    }
 
 

@@ -2,7 +2,7 @@
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 {% block extrastyle %}
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}?_={% version %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dm-admin.css' %}?_={% version %}">
 
     {% if config.ANALYTICS_CODE %}
         <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.ANALYTICS_CODE }}"></script>
