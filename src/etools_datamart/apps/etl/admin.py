@@ -4,6 +4,7 @@ from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
@@ -19,12 +20,20 @@ from . import models
 
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', 'last_run', 'status', 'time',
+    list_display = ('task', 'last_run', '_status', 'time',
                     'last_success', 'last_failure', 'locked',
                     'data', 'scheduling', 'unlock_task', 'queue_task')
 
     date_hierarchy = 'last_run'
     actions = [mass_update, ]
+
+    def _status(self, obj):
+        cls = obj.status.lower()
+        if obj.status == 'SUCCESS':
+            pass
+        return mark_safe('<span class="%s">%s</span>' % (cls, obj.status))
+
+    _status.verbse_name = 'status'
 
     def scheduling(self, obj):
         opts = PeriodicTask._meta

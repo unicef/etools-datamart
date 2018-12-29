@@ -105,7 +105,7 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     def refresh(self, request):
         try:
             start = time()
-            self.model.loader.load()
+            self.model.loader.task.apply()
             stop = time()
             duration = stop - start
             self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)

@@ -1,21 +1,43 @@
 * {
-  margin: 0px;
-  padding: 0px;
-  box-sizing: border-box; }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.success {
+  color: #00b600;
+}
+
+.failure {
+  color: #d2625d;
+}
+
+.error {
+  color: #d2625d;
+}
+
+.results .success, .results .error, .results .failure {
+  font-weight: bold;
+}
 
 body, html {
   height: 50%;
-  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif; }
-  body a, html a {
-    color: black; }
-    body a:hover, html a:hover {
-      color: black; }
-  body span.str, html span.str {
-    color: black; }
+  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+body a, html a {
+  color: black;
+}
+body a:hover, html a:hover {
+  color: black;
+}
+body span.str, html span.str {
+  color: black;
+}
 
 .limiter {
   width: 100%;
-  margin: 0 auto; }
+  margin: 0 auto;
+}
 
 .master-container {
   width: 100%;
@@ -28,7 +50,8 @@ body, html {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  padding: 15px; }
+  padding: 15px;
+}
 
 .box {
   width: 1170px;
@@ -41,42 +64,53 @@ body, html {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  flex-direction: row-reverse; }
+  flex-direction: row-reverse;
+}
 
 .right {
   width: 50%;
-  flex-wrap: wrap; }
-  .right form {
-    padding: 100px 0 0 65px; }
-  .right .center {
-    width: 100%;
-    text-align: center; }
-  .right h1 {
-    width: 100%;
-    font-size: 24pt;
-    text-align: center; }
-  .right h2 {
-    font-size: 14pt; }
+  flex-wrap: wrap;
+}
+.right form {
+  padding: 100px 0 0 65px;
+}
+.right .center {
+  width: 100%;
+  text-align: center;
+}
+.right h1 {
+  width: 100%;
+  font-size: 24pt;
+  text-align: center;
+}
+.right h2 {
+  font-size: 14pt;
+}
 
 ul.index-menu {
   padding: 20px 0 0 65px;
   list-style: none;
-  font-size: 18pt; }
-  ul.index-menu a {
-    color: #2090F8;
-    text-transform: none;
-    text-decoration: none; }
-  ul.index-menu li.menu-sep {
-    width: 100%;
-    font-size: 2px; }
+  font-size: 18pt;
+}
+ul.index-menu a {
+  color: #2090F8;
+  text-transform: none;
+  text-decoration: none;
+}
+ul.index-menu li.menu-sep {
+  width: 100%;
+  font-size: 2px;
+}
 
 .h10 {
   display: block;
-  height: 10px; }
+  height: 10px;
+}
 
 .h30 {
   display: block;
-  height: 30px; }
+  height: 30px;
+}
 
 /* [ login more ]*/
 .left {
@@ -85,15 +119,18 @@ ul.index-menu {
   background-size: cover;
   background-position: center;
   position: relative;
-  z-index: 1; }
+  z-index: 1;
+}
 
 .m-b-20 {
-  margin-bottom: 20px; }
+  margin-bottom: 20px;
+}
 
 .wrap-input100 {
   width: 100%;
   position: relative;
-  border: 1px solid #e6e6e6; }
+  border: 1px solid #e6e6e6;
+}
 
 .input100 {
   display: block;
@@ -102,10 +139,12 @@ ul.index-menu {
   font-size: 18px;
   color: #666666;
   line-height: 1.2;
-  padding: 0 25px; }
+  padding: 0 25px;
+}
 
 input.input100 {
-  height: 55px; }
+  height: 55px;
+}
 
 /*[ Button ]*/
 .container-login100-form-btn {
@@ -115,7 +154,8 @@ input.input100 {
   display: -ms-flexbox;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; }
+  justify-content: center;
+}
 
 .login100-form-btn {
   display: -webkit-box;
@@ -137,84 +177,109 @@ input.input100 {
   -webkit-transition: all 0.4s;
   -o-transition: all 0.4s;
   -moz-transition: all 0.4s;
-  transition: all 0.4s; }
+  transition: all 0.4s;
+}
 
 .login100-form-btn:hover {
-  background: #333333; }
+  background: #333333;
+}
 
 /* [ Responsive ]*/
 .navbar {
   border-top: none;
   background: #2090F8;
-  color: black; }
-  .navbar a.navbar-brand {
-    color: white; }
+  color: black;
+}
+.navbar a.navbar-brand {
+  color: white;
+}
 
 .rounded {
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
-  border-radius: 20px; }
+  border-radius: 20px;
+}
 
 .monitor .menubar, .profile .menubar {
-  padding: 10px; }
-  .monitor .menubar a, .profile .menubar a {
-    text-transform: none;
-    color: #2090F8; }
-    .monitor .menubar a:visited, .profile .menubar a:visited {
-      text-transform: none; }
+  padding: 10px;
+}
+.monitor .menubar a, .profile .menubar a {
+  text-transform: none;
+  color: #2090F8;
+}
+.monitor .menubar a:visited, .profile .menubar a:visited {
+  text-transform: none;
+}
 .monitor #monitor, .profile #monitor {
   width: 100%;
-  padding: 30px; }
-  .monitor #monitor .SUCCESS, .profile #monitor .SUCCESS {
-    color: #00b200;
-    font-weight: bold; }
-  .monitor #monitor .row, .profile #monitor .row {
-    width: 100%;
-    padding: 5px; }
-    .monitor #monitor .row.header, .profile #monitor .row.header {
-      font-weight: bold; }
-    .monitor #monitor .row.odd, .profile #monitor .row.odd {
-      background-color: #eeeeee; }
-  .monitor #monitor .col, .profile #monitor .col {
-    display: inline-block; }
-    .monitor #monitor .col.task, .profile #monitor .col.task {
-      width: 30%; }
-    .monitor #monitor .col.last_run, .profile #monitor .col.last_run {
-      width: 200px; }
-    .monitor #monitor .col.last_changes, .profile #monitor .col.last_changes {
-      width: 200px; }
-    .monitor #monitor .col.status, .profile #monitor .col.status {
-      width: 120px; }
-    .monitor #monitor .col.subscription, .profile #monitor .col.subscription {
-      width: 180px; }
+  padding: 30px;
+}
+.monitor #monitor .SUCCESS, .profile #monitor .SUCCESS {
+  color: #00b200;
+  font-weight: bold;
+}
+.monitor #monitor .row, .profile #monitor .row {
+  width: 100%;
+  padding: 5px;
+}
+.monitor #monitor .row.header, .profile #monitor .row.header {
+  font-weight: bold;
+}
+.monitor #monitor .row.odd, .profile #monitor .row.odd {
+  background-color: #eeeeee;
+}
+.monitor #monitor .col, .profile #monitor .col {
+  display: inline-block;
+}
+.monitor #monitor .col.task, .profile #monitor .col.task {
+  width: 30%;
+}
+.monitor #monitor .col.last_run, .profile #monitor .col.last_run {
+  width: 200px;
+}
+.monitor #monitor .col.last_changes, .profile #monitor .col.last_changes {
+  width: 200px;
+}
+.monitor #monitor .col.status, .profile #monitor .col.status {
+  width: 120px;
+}
+.monitor #monitor .col.subscription, .profile #monitor .col.subscription {
+  width: 180px;
+}
 
 .profile #areas, .profile #services, .profile #password {
   margin-right: 20px;
   padding: 10px;
   position: relative;
-  display: inline-block; }
-  .profile #areas h1, .profile #services h1, .profile #password h1 {
-    font-size: 14pt;
-    margin-bottom: 5px; }
-  .profile #areas ul, .profile #areas form, .profile #services ul, .profile #services form, .profile #password ul, .profile #password form {
-    border: 1px solid #cfcfcf;
-    overflow-y: scroll;
-    width: 300px;
-    height: 400px; }
+  display: inline-block;
+}
+.profile #areas h1, .profile #services h1, .profile #password h1 {
+  font-size: 14pt;
+  margin-bottom: 5px;
+}
+.profile #areas ul, .profile #areas form, .profile #services ul, .profile #services form, .profile #password ul, .profile #password form {
+  border: 1px solid #cfcfcf;
+  overflow-y: scroll;
+  width: 300px;
+  height: 400px;
+}
 .profile #password .message {
   margin: 20px;
-  text-align: left; }
-  .profile #password .message .password {
-    text-align: center;
-    margin: 20px;
-    padding: 20px;
-    font-family: monospace;
-    font-size: 20px;
-    border: 1px solid grey; }
+  text-align: left;
+}
+.profile #password .message .password {
+  text-align: center;
+  margin: 20px;
+  padding: 20px;
+  font-family: monospace;
+  font-size: 20px;
+  border: 1px solid grey;
+}
 .profile #password form {
   width: 400px;
   overflow-y: auto;
-  text-align: center; }
+  text-align: center;
+}
 .profile #password .btn {
   justify-content: center;
   align-items: center;
@@ -222,7 +287,7 @@ input.input100 {
   height: 40px;
   border-radius: 3px;
   font-size: 12px;
-  color: #0;
+  color: black;
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -230,9 +295,11 @@ input.input100 {
   -o-transition: all 0.4s;
   -moz-transition: all 0.4s;
   transition: all 0.4s;
-  cursor: pointer; }
+  cursor: pointer;
+}
 .profile #password .btn-submit {
   background: #2090F8;
-  color: #fff; }
+  color: #fff;
+}
 
 /*# sourceMappingURL=style.css.map */

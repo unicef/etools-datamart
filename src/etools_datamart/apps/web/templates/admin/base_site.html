@@ -1,7 +1,9 @@
-{% extends "admin/base.html" %}
+{% extends "admin/base.html" %}{% load static datamart %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 {% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}?_={% version %}">
+
     {% if config.ANALYTICS_CODE %}
         <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.ANALYTICS_CODE }}"></script>
         <script>

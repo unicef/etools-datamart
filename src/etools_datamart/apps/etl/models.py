@@ -22,12 +22,6 @@ class TaskLogManager(models.Manager):
         except EtlTask.DoesNotExist:
             raise EtlTask.DoesNotExist(f"EtlTask for model '{model.__name__}' does not exists")
 
-    # def get_for_task(self, task: ETLTask):
-    #     return self.get_or_create(task=task.name,
-    #                               defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
-    #                                             last_run=None,
-    #                                             table_name=task.linked_model._meta.db_table))[0]
-
     def inspect(self):
         tasks = app.get_all_etls()
         results = {True: 0, False: 0}
@@ -64,10 +58,6 @@ class EtlTask(models.Model):
 
     def __str__(self):
         return f"{self.task} {self.status}"
-
-    # @cached_property
-    # def lock_key(self):
-    #     return f"{self.task}-lock"
 
     @cached_property
     def loader(self):

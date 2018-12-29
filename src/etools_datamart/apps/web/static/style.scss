@@ -1,8 +1,26 @@
 
 * {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+}
+
+.success {
+  color: #00b600;
+}
+
+.failure {
+  color: #d2625d;
+}
+
+.error {
+  color: #d2625d;
+}
+
+.results {
+  .success, .error, .failure {
+    font-weight: bold;
+  }
 }
 
 body, html {
@@ -385,7 +403,7 @@ input.input100 {
       border-radius: 3px;
       font-size: 12px;
       //background: #2090F8;
-      color: #0;
+      color: black;
       line-height: 1.2;
       text-transform: uppercase;
       letter-spacing: 1px;

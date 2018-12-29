@@ -129,23 +129,13 @@ class LoaderTask(celery.Task):
     def __init__(self, loader) -> None:
         self.loader = loader
         self.linked_model = loader.model
-        # self.name = fqn(self.linked_model)
         self.name = "load_{0.app_label}_{0.model_name}".format(loader.model._meta)
 
     def run(self, *args, **kwargs):
         return self.loader.load()
 
 
-# def get_or_fail(Model, **kwargs):
-#     try:
-#         Model.objects.get(**kwargs)
-#     except Model.DoesNotExist:
-#         raise Model.DoesNotExist(f"Unable to get {Model.__name__} using {kwargs}")
-
-
 class Loader:
-    # __slots__ = ['model', 'config', 'mapping', 'task', 'tree_parents', 'always_update']
-
     def __init__(self) -> None:
         self.config = None
         self.tree_parents = []
@@ -166,12 +156,6 @@ class Loader:
             self.config.celery.tasks.register(self.task)
 
         setattr(model, name, self)
-
-    # def deconstruct(self):
-    #     return []
-    #
-    # def check(self, **kwargs):
-    #     return []
 
     def process(self, filters, values):
         try:
