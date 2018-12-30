@@ -16,14 +16,12 @@ from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
 from post_office.models import EmailTemplate
 from redisboard.models import RedisServer
-from strategy_field.utils import fqn
 
 from unicef_rest_framework.models.acl import GroupAccessControl
 
 from etools_datamart.apps.data.loader import loadeables
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.security.models import SchemaAccessControl
-from etools_datamart.celery import app
 
 MAIL = r"""Dear {{user.label}},
 
@@ -254,19 +252,25 @@ class Command(BaseCommand):
 
             every_minute, __ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
 
-            tasks = app.get_all_etls()
+            # tasks = app.get_all_etls()
             counters = {True: 0, False: 0}
-            for task in tasks:
-                __, is_new = PeriodicTask.objects.get_or_create(task=fqn(task),
-                                                                defaults={'name': task.name,
+            loaders = []
+            for loadeable in loadeables:
+                model = apps.get_model(loadeable)
+                loaders.append(loadeable)
+                __, is_new = PeriodicTask.objects.get_or_create(task=model.loader.task.name,
+                                                                defaults={'name': loadeable,
                                                                           'crontab': midnight})
+                if is_new:
+                    self.stdout.write(f"NEW task {model.loader.task.name} scheduled at {midnight}")
 
-            ret = PeriodicTask.objects.exclude(name__in=list(app.tasks.keys())).delete()
-            counters[False] = ret[1].get('django_celery_beat.PeriodicTask', 0)
+            ret = PeriodicTask.objects.filter(name__startswith='data.').exclude(name__in=loaders).delete()
+            counters[False] = ret[0]
 
             EtlTask.objects.inspect()
             self.stdout.write(
-                f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
+                f"{PeriodicTask.objects.filter(name__startswith='data.').count()} "
+                f"periodic task found. {counters[True]} new. {counters[False]} deleted")
 
             PeriodicTask.objects.get_or_create(task='send_queued_mail',
                                                defaults={'name': 'process mail queue',
