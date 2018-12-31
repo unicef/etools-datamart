@@ -39,7 +39,7 @@ class AbstractAccessControl(MasterDataModel):
     serializers = ArrayField(SerializerField(),
                              default=default_serializer,
                              blank=True)
-    policy = models.IntegerField(choices=POLICIES)
+    policy = models.IntegerField(choices=POLICIES, db_index=True)
 
     class Meta:
         abstract = True
