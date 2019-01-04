@@ -18,6 +18,14 @@ from etools_datamart.celery import app
 from . import models
 
 
+def queue(modeladmin, request, queryset):
+    count = len(queryset)
+    for obj in queryset:
+        task = app.tasks.get(obj.task)
+        task.delay()
+    modeladmin.message_user(request, f"{count} tasks queued", messages.SUCCESS)
+
+
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', 'last_run', '_status', 'time',
@@ -25,7 +33,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     'data', 'scheduling', 'unlock_task', 'queue_task')
 
     date_hierarchy = 'last_run'
-    actions = [mass_update, ]
+    actions = [mass_update, queue]
 
     def _status(self, obj):
         cls = obj.status.lower()
