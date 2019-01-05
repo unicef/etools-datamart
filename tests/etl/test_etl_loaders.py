@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.apps import apps
 
+from freezegun import freeze_time
+
 from etools_datamart.apps.data.loader import loadeables
 
 
@@ -18,9 +20,10 @@ def pytest_generate_tests(metafunc):
 def test_loader_load(loader, number_of_intervention):
     # factory = factories_registry.get(loader.model)
     # to_delete = factory()
-    loader.model.objects.truncate()
-    loader.unlock()
-    ret = loader.load(max_records=2)
+    with freeze_time("2018-12-31"):
+        loader.model.objects.truncate()
+        loader.unlock()
+        ret = loader.load(max_records=2)
     assert loader.model.objects.count()
     assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
     # assert not loader.model.objects.filter(id=to_delete.pk).exists()
