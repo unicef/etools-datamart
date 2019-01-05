@@ -2,6 +2,7 @@
 ---------
 * WARNINGS: migration reset
 * Location/GatewayType endpoints
+* add action to queue multiple tasks
 
 
 1.8

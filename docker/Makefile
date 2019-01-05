@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.9
+TARGET?=1.9a2
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -83,11 +83,11 @@ local:
 	$(MAKE) .run
 
 release:
-	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
-	docker push ${DOCKER_IMAGE_NAME}:latest
-	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
-	bumpversion --config-file=$$PWD/../.bumpversion.cfg release
+#	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+#	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
+#	docker push ${DOCKER_IMAGE_NAME}:latest
+#	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
+	cd .. && bumpversion --config-file=.bumpversion.cfg num
 
 run:
 	$(MAKE) .run
