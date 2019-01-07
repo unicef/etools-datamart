@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.admin import site
 from django.urls import include, path, re_path
 
@@ -23,4 +24,8 @@ urlpatterns = [
     path(r'sys/info/', http_basic_login(sysinfo), name='sys-info'),
     path(r'sys/version/<name>/', http_basic_login(version), name='sys-version'),
 
+]
+
+urlpatterns = [
+    path(settings.URL_PREFIX, include(urlpatterns)),
 ]
