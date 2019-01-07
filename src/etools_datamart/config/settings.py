@@ -56,6 +56,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   STATIC_ROOT=(str, '/tmp/static'),
                   STATIC_URL=(str, '/dm-static/'),
                   SYSTEM_PASSWORD=(str, ''),
+                  TIME_ZONE=(str, 'UTC'),
                   URL_PREFIX=(str, ''),
                   USE_X_FORWARDED_HOST=(bool, False),
                   X_FRAME_OPTIONS=(str, 'SAMEORIGIN'),
@@ -107,7 +108,7 @@ LOGIN_REDIRECT_URL = URL_PREFIX
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'UTC'
+TIME_ZONE = env('TIME_ZONE')
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
