@@ -43,7 +43,6 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   EMAIL_USE_TLS=(bool, True),
                   ENABLE_LIVE_STATS=(bool, True),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
-                  LOGIN_URL=(str, '/login/'),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   SECRET_KEY=(str, 'secret'),
@@ -98,8 +97,8 @@ DATABASE_ROUTERS = [
     router_factory('etools', ['etools'], syncdb=False),
 ]
 
-LOGIN_URL = env('LOGIN_URL')
-LOGIN_REDIRECT_URL = URL_PREFIX
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
