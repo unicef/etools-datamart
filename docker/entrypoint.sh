@@ -17,7 +17,7 @@ elif [[ "$*" == "beat" ]];then
 elif [[ "$*" == "datamart" ]];then
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
-    django-admin init-setup --all --verbosity 1
+    django-admin init-setup --all --verbosity 2
     django-admin db-isready --wait --timeout 300 --connection etools
     gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi
 else
