@@ -3,7 +3,7 @@
 * WARNINGS: migration reset
 * Location/GatewayType endpoints
 * add action to queue multiple tasks
-* updates schema to eTools
+* updates schema to eTools v6.5.1
 
 1.8
 ---
