@@ -873,7 +873,6 @@ class UnicefNotificationNotification(models.Model):
 
 
 class UsersCountry(models.Model):
-    domain_url = models.CharField(unique=True, max_length=128)
     schema_name = models.CharField(unique=True, max_length=63)
     name = models.CharField(max_length=100)
     business_area_code = models.CharField(max_length=10)
