@@ -44,7 +44,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   STATIC_ROOT=(str, '/tmp/static'),
                   STATIC_URL=(str, '/dm-static/'),
                   SYSTEM_PASSWORD=(str, ''),
-                  X_FRAME_OPTIONS=(str, 'DENY'),
+                  X_FRAME_OPTIONS=(str, 'SAMEORIGIN'),
 
                   AZURE_CLIENT_ID=(str, ''),
                   AZURE_CLIENT_SECRET=(str, ''),
@@ -73,7 +73,7 @@ MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
 
@@ -113,7 +113,7 @@ TIME_ZONE = 'UTC'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'en-us'
 ugettext = lambda s: s  # noqa
 LANGUAGES = (
     ('es', ugettext('Spanish')),
@@ -156,19 +156,19 @@ MEDIA_URL = '/dm-media/'
 STATIC_URL = env('STATIC_URL')
 
 # Additional locations of static files
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     # os.path.join(PROJECT_DIR, '../static'),
-)
+]
 
 # List of finder classes that know how to find static files in
 # various locations.
-STATICFILES_FINDERS = (
+STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -312,7 +312,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
 ]
-DATE_FORMAT = '%d %b %Y'
+# DATE_FORMAT = '%d %b %Y'
+DATE_FORMAT = 'N j, Y'  # default
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
     '%b %d %Y', '%b %d, %Y',  # 'Oct 25 2006', 'Oct 25, 2006'
@@ -321,7 +322,8 @@ DATE_INPUT_FORMATS = [
     '%d %B %Y', '%d %B, %Y',  # '25 October 2006', '25 October, 2006'
 ]
 
-DATETIME_FORMAT = '%d %b %Y %H:%M:%S'
+# DATETIME_FORMAT = '%d %b %Y %H:%M:%S'
+DATETIME_FORMAT = 'N j, Y, P'  # default
 
 DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',  # '2006-10-25 14:30:59'

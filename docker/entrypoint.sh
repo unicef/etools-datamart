@@ -5,6 +5,8 @@ mkdir -p /var/datamart/{static,log,conf,run}
 mkdir -p ${STATIC_ROOT}
 rm -f /var/datamart/run/*
 
+django-admin info
+django-admin diffsettings --output hash
 
 if [[ "$*" == "workers" ]];then
     django-admin db-isready --wait --timeout 60 --sleep 5
