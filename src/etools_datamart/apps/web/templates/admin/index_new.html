@@ -30,7 +30,19 @@
     </div>
     <script src="{% static 'jquery-3.3.1.min.js' %}"></script>
     <script>
-        $('#filterInput').on('keyup', function () {
+
+    function delay(callback, ms) {
+      var timer = 0;
+      return function () {
+        var context = this, args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          callback.apply(context, args);
+        }, ms || 0);
+      };
+    }
+
+        $('#filterInput').on('keyup', delay(function () {
             let filter = this.value.toUpperCase();
             $('table.section tr').each(function (i, el) {
                 let txt = $(el).find('td,caption').text();
@@ -46,7 +58,7 @@
                     }
                 });
             });
-        }).trigger('keyup').focus();
+        }, 300)).trigger('keyup').focus();
 
     </script>
 
