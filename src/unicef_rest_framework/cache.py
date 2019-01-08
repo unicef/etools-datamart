@@ -136,6 +136,11 @@ class SuperuserKeyBit(KeyBitBase):
         return {'admin': request.user.is_superuser}
 
 
+class IsStaffKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        return {'staff': request.user.is_staff}
+
+
 class DevelopKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         if 'disable-cache' in request.GET:
@@ -152,6 +157,7 @@ class ListKeyConstructor(KeyConstructor):
     headers = bits.HeadersKeyBit(['Accept'])
     dev = DevelopKeyBit()
     admin = SuperuserKeyBit()
+    staff = IsStaffKeyBit()
     # language = bits.LanguageKeyBit()
     # list_sql_query = bits.ListSqlQueryKeyBit()  # NEVER NEVER USE THIS
 
