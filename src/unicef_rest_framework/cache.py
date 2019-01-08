@@ -158,12 +158,7 @@ class ListKeyConstructor(KeyConstructor):
     dev = DevelopKeyBit()
     admin = SuperuserKeyBit()
     staff = IsStaffKeyBit()
-    # language = bits.LanguageKeyBit()
-    # list_sql_query = bits.ListSqlQueryKeyBit()  # NEVER NEVER USE THIS
-
     querystring = bits.QueryParamsKeyBit()
-
-    # pagination = bits.PaginationKeyBit()
 
     def get_key(self, view_instance, view_method, request, args, kwargs):
         key = super().get_key(view_instance, view_method, request, args, kwargs)
