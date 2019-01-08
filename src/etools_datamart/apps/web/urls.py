@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 
-from .views import DatamartLoginView, DisconnectView, index, monitor
+from .views import DatamartLoginView, DisconnectView, index, monitor, whoami
 
 urlpatterns = [
     path(r'', index, name='home'),
@@ -9,5 +9,6 @@ urlpatterns = [
     path(r'login/', DatamartLoginView.as_view(template_name='login.html'), name='login'),
     path(r'logout/', LogoutView.as_view(next_page='/'), name='logout'),
     path(r'disconnect/', DisconnectView.as_view(next_page='/'), name='disconnect'),
+    path(r'whoami/', whoami, name='whoami'),
 
 ]

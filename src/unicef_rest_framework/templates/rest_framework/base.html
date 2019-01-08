@@ -67,15 +67,16 @@
                 </a>
               {% endblock %}
             </span>
-{#            <ul class="nav navbar-nav pull-right">#}
-{#              {% block userlinks %}#}
+            <ul class="nav navbar-nav pull-right">
+              {% block userlinks %}
+                  <li id="whoami" class="navbar-text"></li>
 {#                {% if user.is_authenticated %}#}
 {#                  {% optional_logout request user %}#}
 {#                {% else %}#}
 {#                  {% optional_login request %}#}
 {#                {% endif %}#}
-{#              {% endblock %}#}
-{#            </ul>#}
+              {% endblock %}
+            </ul>
           </div>
         </div>
       {% endblock %}
@@ -418,6 +419,10 @@
                     console.log( data )
                 });
             });
+            $.get("{% url 'whoami' %}")
+                .done(function (data) {
+                    $("#whoami").text(data);
+            })
       </script>
     {% endblock %}
 
