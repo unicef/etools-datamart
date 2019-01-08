@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"272213a40f8c70916f6a8a454fb99b1c\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.user.UserStatsViewSet"
+        ],
+        "service": [
+            "service",
+            "UserStats"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "172"
+        ]
+    },
+    "data": {
+        "id": 98,
+        "month": "Mar 2019",
+        "country_name": "bolivia",
+        "area_code": "",
+        "last_modify_date": "08 Jan 2019 22:06:08",
+        "seen": null,
+        "total": 0,
+        "unicef": 0,
+        "logins": 0,
+        "unicef_logins": 0
+    },
+    "content_type": null
+}

@@ -1,0 +1,61 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.hact",
+                "pk": 15,
+                "fields": {
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "last_modify_date": "2019-01-08T21:51:11.031Z",
+                    "seen": null,
+                    "year": 2019,
+                    "microassessments_total": 0,
+                    "programmaticvisits_total": 0,
+                    "followup_spotcheck": 0,
+                    "completed_spotcheck": 0,
+                    "completed_hact_audits": 0,
+                    "completed_special_audits": 0
+                }
+            },
+            {
+                "model": "data.hact",
+                "pk": 16,
+                "fields": {
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "last_modify_date": "2019-01-08T21:51:11.041Z",
+                    "seen": null,
+                    "year": 2019,
+                    "microassessments_total": 0,
+                    "programmaticvisits_total": 0,
+                    "followup_spotcheck": 0,
+                    "completed_spotcheck": 0,
+                    "completed_hact_audits": 0,
+                    "completed_special_audits": 0
+                }
+            },
+            {
+                "model": "data.hact",
+                "pk": 17,
+                "fields": {
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "last_modify_date": "2019-01-08T21:51:11.045Z",
+                    "seen": null,
+                    "year": 2019,
+                    "microassessments_total": 0,
+                    "programmaticvisits_total": 0,
+                    "followup_spotcheck": 0,
+                    "completed_spotcheck": 0,
+                    "completed_hact_audits": 0,
+                    "completed_special_audits": 0
+                }
+            }
+        ],
+        "deps": []
+    }
+}

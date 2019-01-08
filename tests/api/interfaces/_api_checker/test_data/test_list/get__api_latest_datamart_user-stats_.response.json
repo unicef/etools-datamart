@@ -1,0 +1,103 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"2289007146baa7a1a21386bab566e9a7\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.user.UserStatsViewSet"
+        ],
+        "service": [
+            "service",
+            "UserStats"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "2289007146baa7a1a21386bab566e9a7"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "600"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 95,
+                "month": "Jan 2019",
+                "country_name": "bolivia",
+                "area_code": "",
+                "last_modify_date": "08 Jan 2019 21:51:10",
+                "seen": null,
+                "total": 0,
+                "unicef": 0,
+                "logins": 0,
+                "unicef_logins": 0
+            },
+            {
+                "id": 96,
+                "month": "Feb 2019",
+                "country_name": "chad",
+                "area_code": "",
+                "last_modify_date": "08 Jan 2019 21:51:10",
+                "seen": null,
+                "total": 0,
+                "unicef": 0,
+                "logins": 0,
+                "unicef_logins": 0
+            },
+            {
+                "id": 97,
+                "month": "Jan 2019",
+                "country_name": "lebanon",
+                "area_code": "",
+                "last_modify_date": "08 Jan 2019 21:51:10",
+                "seen": null,
+                "total": 0,
+                "unicef": 0,
+                "logins": 0,
+                "unicef_logins": 0
+            }
+        ]
+    },
+    "content_type": null
+}

@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"3b892be720654ecc82d51991054edeed\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.hact.HACTViewSet"
+        ],
+        "service": [
+            "service",
+            "HACT"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "273"
+        ]
+    },
+    "data": {
+        "id": 18,
+        "country_name": "bolivia",
+        "area_code": "",
+        "last_modify_date": "08 Jan 2019 22:06:08",
+        "seen": null,
+        "year": 2019,
+        "microassessments_total": 0,
+        "programmaticvisits_total": 0,
+        "followup_spotcheck": 0,
+        "completed_spotcheck": 0,
+        "completed_hact_audits": 0,
+        "completed_special_audits": 0
+    },
+    "content_type": null
+}
