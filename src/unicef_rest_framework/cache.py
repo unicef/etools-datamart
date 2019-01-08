@@ -131,6 +131,11 @@ class QueryPathKeyBit(KeyBitBase):
         return {'path': str(request.path)}
 
 
+class SuperuserKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        return {'admin': request.user.is_superuser}
+
+
 class DevelopKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         if 'disable-cache' in request.GET:
@@ -146,6 +151,7 @@ class ListKeyConstructor(KeyConstructor):
     format = bits.FormatKeyBit()
     headers = bits.HeadersKeyBit(['Accept'])
     dev = DevelopKeyBit()
+    admin = SuperuserKeyBit()
     # language = bits.LanguageKeyBit()
     # list_sql_query = bits.ListSqlQueryKeyBit()  # NEVER NEVER USE THIS
 

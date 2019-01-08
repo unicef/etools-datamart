@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from functools import lru_cache
-
 import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
@@ -114,7 +112,6 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
         return cls.__name__.replace("ViewSet", "")
 
     @classmethod
-    @lru_cache()
     def get_service(cls):
         from unicef_rest_framework.models import Service
         return Service.objects.get_for_viewset(cls)
