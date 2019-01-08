@@ -313,8 +313,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
 ]
-# DATE_FORMAT = '%d %b %Y'
-DATE_FORMAT = 'N j, Y'  # default
+DATE_FORMAT = '%d %b %Y'
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
     '%b %d %Y', '%b %d, %Y',  # 'Oct 25 2006', 'Oct 25, 2006'
@@ -323,8 +322,7 @@ DATE_INPUT_FORMATS = [
     '%d %B %Y', '%d %B, %Y',  # '25 October 2006', '25 October, 2006'
 ]
 
-# DATETIME_FORMAT = '%d %b %Y %H:%M:%S'
-DATETIME_FORMAT = 'N j, Y, P'  # default
+DATETIME_FORMAT = '%d %b %Y %H:%M:%S'
 
 DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',  # '2006-10-25 14:30:59'
