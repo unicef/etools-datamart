@@ -45,6 +45,7 @@ class ServiceManager(models.Manager):
         service.suffix = prefix
         service.source_model = source_model
         service.save()
+        service.viewset.get_service.cache_clear()
         return service, isnew
 
     def load_services(self):
