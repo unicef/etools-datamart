@@ -44,12 +44,13 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   ENABLE_LIVE_STATS=(bool, True),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   MEDIA_ROOT=(str, '/tmp/media'),
+                  MEDUSA_PASSWORD=(str, ''),
                   REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   SECRET_KEY=(str, 'secret'),
                   SECURE_BROWSER_XSS_FILTER=(bool, True),
                   SECURE_CONTENT_TYPE_NOSNIFF=(bool, True),
                   SECURE_FRAME_DENY=(bool, True),
-                  SECURE_HSTS_PRELOAD=(bool, 'True'),
+                  SECURE_HSTS_PRELOAD=(bool, True),
                   SECURE_SSL_REDIRECT=(bool, True),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
@@ -58,7 +59,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   TIME_ZONE=(str, 'UTC'),
                   URL_PREFIX=(str, ''),
                   USE_X_FORWARDED_HOST=(bool, False),
-                  X_FRAME_OPTIONS=(str, 'SAMEORIGIN'),
+                  X_FRAME_OPTIONS=(str, 'DENY'),
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -190,7 +191,9 @@ AUTHENTICATION_BACKENDS = [
     'unicef_security.graph.AzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
+    'etools_datamart.libs.medusa.MedusaBackend',
 ]
+MEDUSA_PASSWORD = env('MEDUSA_PASSWORD')
 
 CACHES = {
     'default': env.cache(),

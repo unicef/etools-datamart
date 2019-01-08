@@ -83,7 +83,7 @@ body, html {
   //display: flex;
   flex-wrap: wrap;
 
-  form {
+  form, #login-menu {
     padding: 100px 0 0 65px;
   }
 
@@ -99,7 +99,15 @@ body, html {
   }
 
   h2 {
-    font-size: 14pt;
+    font-size: 16pt;
+  }
+
+  h1, h2, h3, h4 {
+    margin: 20px;
+  }
+
+  a {
+    text-decoration: none;
   }
 }
 

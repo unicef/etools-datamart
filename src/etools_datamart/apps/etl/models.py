@@ -39,6 +39,12 @@ class TaskLogManager(models.Manager):
 
 
 class EtlTask(models.Model):
+    STATUSES = (('QUEUED', 'QUEUED'),
+                ('RUNNING', 'RUNNING'),
+                ('FAILURE', 'FAILURE'),
+                ('SUCCESS', 'SUCCESS'),
+                ('ERROR', 'ERROR'),
+                )
     task = models.CharField(max_length=200, unique=True)
     last_run = models.DateTimeField(null=True, help_text="last execution time")
     status = models.CharField(max_length=200)

@@ -106,6 +106,8 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def queue(self, request, pk):
         obj = self.get_object(request, pk)
         try:
+            obj.status = 'QUEUED'
+            obj.save()
             task = app.tasks.get(obj.task)
             task.delay()
             self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)

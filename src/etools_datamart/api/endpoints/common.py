@@ -21,6 +21,7 @@ from unicef_rest_framework.views_mixins import IQYConnectionMixin
 from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
+from etools_datamart.libs.medusa import MedusaBasicAuthentication
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
 
@@ -49,6 +50,7 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin):
                        OrderingFilter,
                        DynamicSerializerFilter,
                        ]
+    authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MedusaBasicAuthentication,)
     # filter_fields = ['country_name']
     ordering_fields = ('id',)
     ordering = 'id'

@@ -71,7 +71,7 @@ body span.str, html span.str {
   width: 50%;
   flex-wrap: wrap;
 }
-.right form {
+.right form, .right #login-menu {
   padding: 100px 0 0 65px;
 }
 .right .center {
@@ -84,7 +84,13 @@ body span.str, html span.str {
   text-align: center;
 }
 .right h2 {
-  font-size: 14pt;
+  font-size: 16pt;
+}
+.right h1, .right h2, .right h3, .right h4 {
+  margin: 20px;
+}
+.right a {
+  text-decoration: none;
 }
 
 ul.index-menu {

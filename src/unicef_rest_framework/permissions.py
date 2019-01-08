@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from functools import lru_cache
 
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
@@ -13,15 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class ServicePermission(BasePermission):
-    # serializer_field = "-serializer"
-
+    @lru_cache(10)
     def get_acl(self, request, service: Service):
-        try:
-            return UserAccessControl.objects.filter(service=service,
-                                                    user=request.user).order_by('-policy')
-        except UserAccessControl.DoesNotExist:
-            return GroupAccessControl.objects.filter(service=service,
-                                                     group__user=request.user).order_by('-policy')
+        # PERF: this can be can be cached if we need to handle
+        # consecutive OPTIONS/GET requests
+        return (list(UserAccessControl.objects.filter(service=service,
+                                                      user=request.user).order_by('-policy')) +
+                list(GroupAccessControl.objects.filter(service=service,
+                                                       group__user=request.user).order_by('-policy')))
 
     def has_permission(self, request, view):
         if request.user.is_superuser:
