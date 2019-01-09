@@ -40,6 +40,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
         self.unknown_arguments = []
 
     def get_form_class(self, request, view):
+        if hasattr(view, 'querystringfilter_form_class'):
+            return view.querystringfilter_form_class
         fields = OrderedDict([
             (name, forms.CharField(required=False))
             for name in view.filter_fields or []])
@@ -49,7 +51,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
     def get_form(self, request, view):
         if hasattr(view, 'get_querystringfilter_form'):
-            return view.get_querystringfilter_form(request.GET, prefix=self.form_prefix)
+            return view.get_querystringfilter_form(request, self)
 
         Form = self.get_form_class(request, view)
         self._form = Form(request.GET, prefix=self.form_prefix)

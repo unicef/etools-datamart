@@ -145,6 +145,8 @@ class DevelopKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         if 'disable-cache' in request.GET:
             return {'dev': str(time.time())}
+        if request.META.get('HTTP_X_DM_CACHE') == 'disabled':
+            return {'dev': str(time.time())}
         return {}
 
 

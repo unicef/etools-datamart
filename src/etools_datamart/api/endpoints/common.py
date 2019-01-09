@@ -51,7 +51,6 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin):
                        DynamicSerializerFilter,
                        ]
     authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MedusaBasicAuthentication,)
-    # filter_fields = ['country_name']
     ordering_fields = ('id',)
     ordering = 'id'
 

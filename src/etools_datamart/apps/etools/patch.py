@@ -76,6 +76,26 @@ def patch():
     PartnersIntervention.total_unicef_budget = cached_property(
         lambda self: self.total_unicef_cash + self.total_in_kind_amount)
 
+    PartnersIntervention.DRAFT = 'draft'
+    PartnersIntervention.SIGNED = 'signed'
+    PartnersIntervention.ACTIVE = 'active'
+    PartnersIntervention.ENDED = 'ended'
+    PartnersIntervention.IMPLEMENTED = 'implemented'
+    PartnersIntervention.CLOSED = 'closed'
+    PartnersIntervention.SUSPENDED = 'suspended'
+    PartnersIntervention.TERMINATED = 'terminated'
+    PartnersIntervention.CANCELLED = 'cancelled'
+
+    PartnersIntervention.STATUSES = (
+        (PartnersIntervention.DRAFT, "Draft"),
+        (PartnersIntervention.SIGNED, 'Signed'),
+        (PartnersIntervention.ACTIVE, "Active"),
+        (PartnersIntervention.ENDED, "Ended"),
+        (PartnersIntervention.CLOSED, "Closed"),
+        (PartnersIntervention.SUSPENDED, "Suspended"),
+        (PartnersIntervention.TERMINATED, "Terminated"),
+        (PartnersIntervention.CANCELLED, "Cancelled"),
+    )
     # Fix User OneToOneField
     # for model in [AuthUserGroups, UsersUserprofile]:
 

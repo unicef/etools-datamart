@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 
@@ -34,3 +35,18 @@ class ServiceForm(ModelForm):
         except Exception:
             raise ValidationError(value)
         return value
+
+
+class Select2ChoiceField(forms.ChoiceField):
+    def widget_attrs(self, widget):
+        return {"class": "select2"}
+
+
+class Select2MultipleChoiceField(forms.MultipleChoiceField):
+    def widget_attrs(self, widget):
+        return {"class": "select2"}
+
+
+class DatePickerField(forms.DateField):
+    def widget_attrs(self, widget):
+        return {"class": "datepicker"}
