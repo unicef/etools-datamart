@@ -60,16 +60,42 @@ def django_db_setup(request,
         import django.core.management.commands.migrate
         django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
+    #
+    # from pytest_django.fixtures import django_db_setup as dj_db_setup
+    # dj_db_setup(request,
+    #             django_test_environment,
+    #             django_db_blocker,
+    #             django_db_use_migrations,
+    #             django_db_keepdb,
+    #             django_db_createdb,
+    #             django_db_modify_db_settings)
 
-    from pytest_django.fixtures import django_db_setup as dj_db_setup
-    dj_db_setup(request,
-                django_test_environment,
-                django_db_blocker,
-                django_db_use_migrations,
-                django_db_keepdb,
-                django_db_createdb,
-                django_db_modify_db_settings)
+    """Top level fixture to ensure test databases are available"""
+    from pytest_django.compat import setup_databases, teardown_databases
+    from pytest_django.fixtures import _disable_native_migrations
+    setup_databases_args = {}
 
+    if not django_db_use_migrations:
+        _disable_native_migrations()
+
+    if django_db_keepdb and not django_db_createdb:
+        setup_databases_args["keepdb"] = True
+
+    with django_db_blocker.unblock():
+        db_cfg = setup_databases(
+            verbosity=pytest.config.option.verbose,
+            interactive=False,
+            **setup_databases_args
+        )
+
+    def teardown_database():
+        with django_db_blocker.unblock():
+            teardown_databases(db_cfg, verbosity=pytest.config.option.verbose)
+
+    if not django_db_keepdb:
+        request.addfinalizer(teardown_database)
+
+    #
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory

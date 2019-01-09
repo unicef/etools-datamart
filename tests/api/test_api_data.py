@@ -32,13 +32,18 @@ def data(db, request):
 
 def pytest_generate_tests(metafunc, *args):
     if 'serializer' in metafunc.fixturenames:
+        params = []
+        ids = []
         for prefix, viewset, basenametry in router.registry:
             if prefix.startswith('datamart/'):
                 sers = viewset.serializers_fieldsets.keys()
                 for ser in sers:
-                    metafunc.addcall(funcargs={'viewset': viewset,
-                                               'serializer': ser},
-                                     id=f'{viewset.__name__}-{ser}')
+                    params.append([viewset, ser])
+                    ids.append(f'{viewset.__name__}-{ser}')
+                    # metafunc.addcall(funcargs={'viewset': viewset,
+                    #                            'serializer': ser},
+                    #                  id=f'{viewset.__name__}-{ser}')
+        metafunc.parametrize("viewset,serializer", params, ids=ids)
 
 
 @pytest.mark.parametrize("action", ['', 'updates/'])

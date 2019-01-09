@@ -52,10 +52,15 @@ def frozenfixture2(use_request=False):
 
 def pytest_generate_tests(metafunc, *args):
     if 'viewset' in metafunc.fixturenames:
+        params = []
+        ids = []
         for prefix, viewset, basenametry in router.registry:
             if prefix.startswith('datamart/'):
-                metafunc.addcall(funcargs={'viewset': viewset},
-                                 id=viewset.__name__)
+                params.append(viewset)
+                ids.append(f'{viewset.__name__}')
+                # metafunc.addcall(funcargs={'viewset': viewset},
+                #                  id=viewset.__name__)
+        metafunc.parametrize("viewset", params, ids=ids)
 
 
 @frozenfixture2()
