@@ -388,7 +388,7 @@
                 $('form').ajaxForm();
             });
 
-            $('.datepicker').datepicker({format: 'yyyy-mm-dd', autoclose: true});
+            $('.datepicker').datepicker({format: 'yyyy-mm-dd', autoclose: true, clearBtn: true});
 
             $('.select2').select2({
                 placeholder: 'Select an option'
@@ -414,7 +414,7 @@
                     }
                 });
                 location.href = location.pathname + "?" + $.param(qs);
-                ;
+
                 return false;
             });
             $("#copyToClipboard").on("click", function () {
