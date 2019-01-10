@@ -1,5 +1,5 @@
 class LoaderException(Exception):
-    def __init__(self, message, error=None):
+    def __init__(self, message, error=None):  # pragma: no cover
         self.message = message
         self.error = error
 

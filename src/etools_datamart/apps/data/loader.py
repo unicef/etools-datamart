@@ -294,7 +294,7 @@ class Loader:
                 # deleted = self.model.objects.exclude(seen=today).delete()[0]
                 # self.results.deleted = deleted
 
-        except LoaderException:
+        except LoaderException:  # pragma: no cover
             raise
         finally:
             if have_lock:  # pragma: no branch
