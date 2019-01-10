@@ -28,7 +28,7 @@ class PMPIndicatorLoader(Loader):
                           'vendor_number': partner.vendor_number,
 
                           'pd_ssfa_ref': intervention.number.replace(',', '-'),
-                          'pd_ssfa_status': intervention.status.title(),
+                          'pd_ssfa_status': intervention.status.lower(),
                           'pd_ssfa_start_date': intervention.start,
                           'pd_ssfa_creation_date': intervention.created,
                           'pd_ssfa_end_date': intervention.end,

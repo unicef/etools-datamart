@@ -26,11 +26,14 @@ class InterventionFilterForm(forms.Form):
 
     submission_date__gt = DatePickerField(label='Submitted after',
                                           required=False)
+    document_type__in = Select2MultipleChoiceField(label='Document Type',
+                                                   choices=PartnersIntervention.INTERVENTION_TYPES,
+                                                   required=False)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, *args, **kwargs):
         filters = data.copy()
         if 'status__in' in filters:
-            filters['status__in'] = data['status__in'].split(',')
+            filters.setlist('status__in', data['status__in'].split(','))
         super().__init__(filters, files, auto_id, prefix, initial, *args, **kwargs)
 
 

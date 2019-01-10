@@ -56,6 +56,12 @@ def patch():
         (AuditEngagement.CANCELLED, _('Cancelled')),
     )
     # AuditEngagement._meta.fields['engagement_type'].choices = AuditEngagement.TYPES
+    PartnersPartnerorganization.CSO_TYPES = (
+        ('International', 'International'),
+        ('National', 'National'),
+        ('Community Based Organization', 'Community Based Organization'),
+        ('Academic Institution', 'Academic Institution'),
+    )
 
     PartnersPartnerorganization.current_core_value_assessment = cached_property(
         lambda self:
@@ -96,9 +102,17 @@ def patch():
         (PartnersIntervention.TERMINATED, "Terminated"),
         (PartnersIntervention.CANCELLED, "Cancelled"),
     )
+    PartnersIntervention.PD = 'PD'
+    PartnersIntervention.SHPD = 'SHPD'
+    PartnersIntervention.SSFA = 'SSFA'
+
+    PartnersIntervention.INTERVENTION_TYPES = (
+        (PartnersIntervention.PD, 'Programme Document'),
+        (PartnersIntervention.SHPD, 'Simplified Humanitarian Programme Document'),
+        (PartnersIntervention.SSFA, 'SSFA'),
+    )
     # Fix User OneToOneField
     # for model in [AuthUserGroups, UsersUserprofile]:
-
 
     f = [f for f in AuthUserGroups._meta.local_fields if f.name != 'user_id']
     AuthUserGroups._meta.local_fields = f
@@ -118,7 +132,6 @@ def patch():
                                  through=AuthUserGroups,
                                  ).contribute_to_class(AuthUser, 'groups')
 
-
     # models.OneToOneField(UsersUserprofile,
     #                      on_delete=models.PROTECT,
     #                      ).contribute_to_class(AuthUser, 'profile')
@@ -131,7 +144,6 @@ def patch():
 
     AuthUser.is_authenticated = True
     AuthUser.set_password = User.set_password
-
 
     # AuthUser.profile = cached_property(lambda self: UsersUserprofile.objects.get(user_id=self.id))
 
@@ -177,8 +189,8 @@ def patch():
     f = [f for f in PartnersPlannedengagement._meta.local_fields if f.name != 'partner']
     PartnersPlannedengagement._meta.local_fields = f
     models.OneToOneField(PartnersPartnerorganization,
-                      related_name='planned_engagement',
-                      on_delete=models.PROTECT).contribute_to_class(PartnersPlannedengagement, 'partner')
+                         related_name='planned_engagement',
+                         on_delete=models.PROTECT).contribute_to_class(PartnersPlannedengagement, 'partner')
 
     aliases = (['partnersintervention_partners_interventionbudget_intervention_id',
                 'planned_budget'], ['partnersintervention_funds_fundsreservationheader_intervention_id',

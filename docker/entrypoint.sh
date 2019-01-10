@@ -5,7 +5,6 @@ mkdir -p /var/datamart/{static,log,conf,run}
 mkdir -p ${STATIC_ROOT}
 rm -f /var/datamart/run/*
 
-django-admin info
 django-admin diffsettings --output unified
 django-admin makemigrations --dry-run
 
