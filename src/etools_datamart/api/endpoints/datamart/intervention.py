@@ -42,8 +42,8 @@ class InterventionViewSet(common.DataMartViewSet):
 
     serializer_class = serializers.InterventionSerializer
     queryset = models.Intervention.objects.all()
-    filter_fields = ('title', 'status', 'last_modify_date',
-                     'start_date', 'submission_date', 'document_type')
+    filter_fields = ('status', 'last_modify_date', 'document_type',
+                     'start_date', 'submission_date',)
     serializers_fieldsets = {'std': None,
                              'full': InterventionSerializerFull,
                              'short': ["title", "number", "country_name", "start_date"]}
@@ -57,6 +57,7 @@ class InterventionViewSet(common.DataMartViewSet):
             for name in self.filter_fields if name not in ('status',
                                                            'start_date',
                                                            'submission_date',
+                                                           'document_type',
                                                            'last_modify_date')])
 
         return type(str('%sForm' % self.__class__.__name__),
