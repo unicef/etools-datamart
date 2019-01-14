@@ -1,0 +1,11 @@
+{% spaceless %}
+<div class="input-group daterange">
+    {% with widget.subwidgets.0 as widget %}
+        {% include widget.template_name %}
+    {% endwith %}
+    <div class="input-group-addon">to</div>
+    {% with widget.subwidgets.1 as widget %}
+        {% include widget.template_name %}
+    {% endwith %}
+</div>
+{% endspaceless %}

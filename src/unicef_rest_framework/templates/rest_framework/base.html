@@ -35,6 +35,9 @@
             function gtag() {dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'UA-130479575-1');
+            window.beforeShowDay = function (d) {
+                console.log(11111)
+            }
         </script>
     {% endif %}
     {% endblock %}
@@ -388,7 +391,46 @@
                 $('form').ajaxForm();
             });
 
-            $('.datepicker').datepicker({format: 'yyyy-mm-dd', autoclose: true, clearBtn: true});
+            {#$('.datepicker').datepicker({format: 'yyyy-mm-dd', autoclose: true, clearBtn: true});#}
+
+            $('.datepicker').each(function(){
+                var $target = $(this);
+                var config = $target.data('pickeroptions');
+                $target.datepicker( config );
+            });
+
+            $('.end-range').change(function () {
+                if (this.value) {
+                    var $other = $( $(this).data("start-range") );
+                    var start = Date.parse(  $other.val() );
+                    var end = Date.parse(  this.value );
+                    if ( start > end ){
+                        alert("End date cannot be before start date");
+                        $(this).val("");
+                    }
+                }
+            });
+
+            $('.start-range').change(function () {
+                if (this.value) {
+                    var $other = $( $(this).data("end-range") );
+                    var end = Date.parse(  $other.val() );
+                    var start = Date.parse(  this.value );
+                    if ( start > end ){
+                        alert("Start date cannot be after end date");
+                        $(this).val("");
+                    }
+                }
+            });
+
+
+            $('.daterange input').each(function() {
+                var $target = $(this);
+                var config = $target.data('pickeroptions');
+                $target.datepicker( config );
+            });
+
+            // **/
 
             $('.select2').select2({
                 placeholder: 'Select an option'

@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 # import django_filters
-from collections import OrderedDict
-
 from django import forms
 
-from unicef_rest_framework.forms import DatePickerField, Select2MultipleChoiceField
+from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import InterventionSerializerFull
 from etools_datamart.apps.data import models
@@ -18,14 +16,14 @@ class InterventionFilterForm(forms.Form):
     status__in = Select2MultipleChoiceField(label='Status',
                                             choices=PartnersIntervention.STATUSES,
                                             required=False)
-    last_modify_date__gte = DatePickerField(label='Modified after',
+    last_modify_date = DateRangePickerField(label='Modified between',
                                             required=False)
 
-    start_date__gte = DatePickerField(label='Started after',
+    start_date = DateRangePickerField(label='Started between',
                                       required=False)
+    submission_date = DateRangePickerField(label='Submitted between',
+                                           required=False)
 
-    submission_date__gt = DatePickerField(label='Submitted after',
-                                          required=False)
     document_type__in = Select2MultipleChoiceField(label='Document Type',
                                                    choices=PartnersIntervention.INTERVENTION_TYPES,
                                                    required=False)
@@ -48,17 +46,24 @@ class InterventionViewSet(common.DataMartViewSet):
                              'full': InterventionSerializerFull,
                              'short': ["title", "number", "country_name", "start_date"]}
 
-    def get_schema_fields(self):
-        return super().get_schema_fields()
+    def process_filter_last_modify_date__range(self):
+        return {}
+
+    # def get_filter_backends(self, removes=None):
+    #     return super().get_filter_backends()
+    #
+    # def get_schema_fields(self):
+    #     return super().get_schema_fields()
 
     def get_querystringfilter_form(self, request, filter):
-        fields = OrderedDict([
-            (name, forms.CharField(required=False))
-            for name in self.filter_fields if name not in ('status',
-                                                           'start_date',
-                                                           'submission_date',
-                                                           'document_type',
-                                                           'last_modify_date')])
-
-        return type(str('%sForm' % self.__class__.__name__),
-                    (InterventionFilterForm,), fields)(request.GET, filter.form_prefix)
+        return InterventionFilterForm(request.GET, filter.form_prefix)
+        # fields = OrderedDict([
+        #     (name, forms.CharField(required=False))
+        #     for name in self.filter_fields if name not in ('status',
+        #                                                    'start_date',
+        #                                                    'submission_date',
+        #                                                    'document_type',
+        #                                                    'last_modify_date')])
+        #
+        # return type(str('%sForm' % self.__class__.__name__),
+        #             (InterventionFilterForm,), fields)(request.GET, filter.form_prefix)
