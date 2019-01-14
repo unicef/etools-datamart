@@ -88,6 +88,7 @@ release:
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num
+	lazo upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET} -vvv
 
 run:
 	$(MAKE) .run
