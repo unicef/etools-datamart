@@ -43,6 +43,9 @@ class Location(DataMartModel):
 
     source_id = models.IntegerField(blank=True, null=True)
 
+    class Meta:
+        unique_together = ('schema_name', 'source_id')
+
     class Options:
         depends = (GatewayType,)
         # source = LocationsLocation
