@@ -70,3 +70,11 @@ demo-stop:
 	-kill `cat beat.pid`
 	-kill `cat celery.pid`
 	-docker stop datamart-flower
+
+reset-migrations:
+	find src -name '000[1,2,3,4,5,6,7,8,9]*' | xargs rm -f
+	dropdb --if-exists -h 127.0.0.1 -U postgres test_etools_datamart
+	dropdb --if-exists -h 127.0.0.1 -U postgres etools_datamart
+	createdb -h 127.0.0.1 -U postgres etools_datamart
+	./manage.py reset-migrations
+	./manage.py init-setup --all

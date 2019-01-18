@@ -13,12 +13,10 @@ logger = logging.getLogger(__name__)
 class Intervention(DataMartModel):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
-    document_type = models.CharField(max_length=255,
-                                     null=True)
+    document_type = models.CharField(max_length=255, null=True)
     number = models.CharField(max_length=64, null=True)
     title = models.CharField(max_length=256, null=True, db_index=True)
-    status = models.CharField(max_length=32,
-                              null=True)
+    status = models.CharField(max_length=32, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
     submission_date = models.DateField(null=True)
@@ -54,6 +52,16 @@ class Intervention(DataMartModel):
     partner_focal_point_email = models.CharField(max_length=128, null=True)
     partner_focal_point_phone = models.CharField(max_length=64, null=True)
 
+    partner_contribution = models.DecimalField(max_digits=20, decimal_places=2)
+    unicef_cash = models.DecimalField(max_digits=20, decimal_places=2)
+    in_kind_amount = models.DecimalField(max_digits=20, decimal_places=2)
+    partner_contribution_local = models.DecimalField(max_digits=20, decimal_places=2)
+    unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2)
+    in_kind_amount_local = models.DecimalField(max_digits=20, decimal_places=2)
+    total = models.DecimalField(max_digits=20, decimal_places=2)
+    total_local = models.DecimalField(max_digits=20, decimal_places=2)
+    currency = models.CharField(max_length=4)
+
     intervention_id = models.IntegerField(null=True)
     agreement_id = models.IntegerField(null=True)
     country_programme_id = models.IntegerField(null=True)
@@ -69,6 +77,7 @@ class Intervention(DataMartModel):
                                                                        'partner_authorized_officer_signatory',
                                                                        'unicef_signatory',
                                                                        'country_programme',
+                                                                       'partnersintervention_partners_interventionbudget_intervention_id'
                                                                        )
         key = lambda country, record: dict(country_name=country.name,
                                            schema_name=country.schema_name,
@@ -95,4 +104,15 @@ class Intervention(DataMartModel):
                        partner_focal_point_last_name='partner_focal_point.last_name',
                        partner_focal_point_email='partner_focal_point.email',
                        partner_focal_point_phone='partner_focal_point.phone',
-                       updated='modified')
+                       updated='modified',
+
+                       partner_contribution='planned_budget.partner_contribution',
+                       unicef_cash='planned_budget.unicef_cash',
+                       in_kind_amount='planned_budget.in_kind_amount',
+                       partner_contribution_local='planned_budget.partner_contribution_local',
+                       unicef_cash_local='planned_budget.unicef_cash_local',
+                       in_kind_amount_local='planned_budget.in_kind_amount_local',
+                       total='planned_budget.total',
+                       total_local='planned_budget.total_local',
+                       currency='planned_budget.currency',
+                       )
