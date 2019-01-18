@@ -4,7 +4,7 @@ from django import forms
 
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
-from etools_datamart.api.endpoints.datamart.serializers import InterventionSerializerFull
+from etools_datamart.api.endpoints.datamart.serializers import InterventionSerializerBudget, InterventionSerializerFull
 from etools_datamart.apps.data import models
 from etools_datamart.apps.etools.models import PartnersIntervention
 
@@ -44,6 +44,7 @@ class InterventionViewSet(common.DataMartViewSet):
                      'start_date', 'submission_date',)
     serializers_fieldsets = {'std': None,
                              'full': InterventionSerializerFull,
+                             'budget': InterventionSerializerBudget,
                              'short': ["title", "number", "country_name", "start_date"]}
 
     def process_filter_last_modify_date__range(self):
