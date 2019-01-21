@@ -56,11 +56,14 @@ def pytest_generate_tests(metafunc, *args):
         ids = []
         for prefix, viewset, basenametry in router.registry:
             if prefix.startswith('datamart/'):
-                params.append(viewset)
-                ids.append(f'{viewset.__name__}')
-                # metafunc.addcall(funcargs={'viewset': viewset},
-                #                  id=viewset.__name__)
-        metafunc.parametrize("viewset", params, ids=ids)
+                sers = viewset.serializers_fieldsets.keys()
+                for ser in sers:
+                    params.append([viewset, ser])
+                    ids.append(f'{viewset.__name__}-{ser}')
+
+                # params.append(viewset)
+                # ids.append(f'{viewset.__name__}')
+        metafunc.parametrize("viewset,serializer", params, ids=ids)
 
 
 @frozenfixture2()
@@ -75,9 +78,9 @@ def data(db, request):
 
 
 @contract(recorder_class=MyRecorder)
-def test_list(viewset, data):
+def test_list(viewset, serializer, data):
     url = f"{viewset.get_service().endpoint}"
-    return url
+    return [url, {'serializer': serializer}]
 
 
 @frozenfixture2()
@@ -89,6 +92,6 @@ def record(db, request):
 
 
 @contract(recorder_class=MyRecorder)
-def test_record(viewset, record):
+def test_record(viewset, serializer, record):
     url = f"{viewset.get_service().endpoint}{record.pk}/"
     return url
