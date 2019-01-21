@@ -8,7 +8,8 @@ app_name = 'api'
 
 
 class ReadOnlyRouter(APIReadOnlyRouter):
-    pass
+    def inspect(self):
+        pass
 
 
 router = ReadOnlyRouter()
@@ -33,6 +34,7 @@ router.register(r'datamart/interventions', endpoints.InterventionViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
 router.register(r'datamart/hact', endpoints.HACTViewSet)
+router.register(r'datamart/funds-reservation', endpoints.FundsReservationViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 

@@ -32,6 +32,10 @@ class Command(BaseCommand):
             '--unlock', action='store_true',
             help="Unlock all loaders.",
         )
+        parser.add_argument(
+            '--no-deps', action='store_true',
+            help="Unlock all loaders.",
+        )
 
     def notify(self, model, created, name, tpl="  {op} {model} `{name}`"):
         if self.verbosity > 2:
@@ -56,6 +60,7 @@ class Command(BaseCommand):
                 if unlock:
                     model.loader.load.unlock()
                 res = model.loader.load(always_update=options['ignore_changes'],
+                                        ignore_dependencies=options['no_deps'],
                                         stdout=sys.stdout)
                 self.stdout.write(f"{model_name:20}: "
                                   f"  created: {res.created:<3}"

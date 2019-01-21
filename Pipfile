@@ -60,7 +60,6 @@ djangorestframework-gis = "*"
 openpyxl = "==2.5.12"
 
 [dev-packages]
-"flake8" = ">=3.6.0"
 check-manifest= "*"
 django-extensions = "*"
 django-webtest = "*"

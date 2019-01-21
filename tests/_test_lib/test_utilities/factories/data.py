@@ -9,8 +9,8 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data.models import (FAMIndicator, GatewayType, HACT, Intervention,
-                                              Location, PMPIndicators, UserStats,)
+from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT,
+                                              Intervention, Location, PMPIndicators, UserStats,)
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -97,3 +97,10 @@ class UserStatsFactory(DataMartModelFactory):
     class Meta:
         model = UserStats
         django_get_or_create = ('month', 'country_name')
+
+
+class FundsReservationFactory(DataMartModelFactory):
+    intervention = factory.SubFactory(InterventionFactory)
+
+    class Meta:
+        model = FundsReservation
