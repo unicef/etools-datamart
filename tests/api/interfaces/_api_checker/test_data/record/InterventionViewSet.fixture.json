@@ -2,18 +2,18 @@
     "record": {
         "master": {
             "model": "data.intervention",
-            "pk": 1110,
+            "pk": 549,
             "fields": {
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "last_modify_date": "2019-01-21T10:35:39.800Z",
+                "last_modify_date": "2019-01-21T19:52:22.071Z",
                 "seen": null,
-                "created": "2019-01-21T10:35:39.800Z",
+                "created": "2019-01-21T19:52:22.071Z",
                 "updated": null,
                 "document_type": null,
-                "number": "#003",
-                "title": "title003",
+                "number": "#272",
+                "title": "title272",
                 "status": null,
                 "start_date": null,
                 "end_date": null,
@@ -54,7 +54,7 @@
                 "total": "10.00",
                 "total_local": "10.00",
                 "currency": "USD",
-                "intervention_id": null,
+                "intervention_id": 272,
                 "agreement_id": null,
                 "country_programme_id": null,
                 "unicef_signatory_id": null
