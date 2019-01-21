@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from .pmpindicators import PMPIndicatorsViewSet  # noqa
-from .intervention import InterventionViewSet  # noqa
-from .famindicator import FAMIndicatorViewSet  # noqa
-from .user import UserStatsViewSet  # noqa
-from .hact import HACTViewSet  # noqa
-from .location import LocationViewSet  # noqa
+# flake8: noqa: F401
+from .pmpindicators import PMPIndicatorsViewSet
+from .intervention import InterventionViewSet
+from .famindicator import FAMIndicatorViewSet
+from .user import UserStatsViewSet
+from .hact import HACTViewSet
+from .location import LocationViewSet
+from .funds_reservation import FundsReservationViewSet

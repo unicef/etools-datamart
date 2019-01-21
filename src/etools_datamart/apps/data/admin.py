@@ -172,3 +172,9 @@ class GatewayTypeAdmin(DataModelAdmin):
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude')
     readonly_fields = ('parent', 'gateway')
+
+
+@register(models.FundsReservation)
+class FundsReservationAdmin(DataModelAdmin):
+    list_display = ('country_name', 'schema_name', 'fr_number', 'fr_type', 'wbs')
+    date_hierarchy = 'start_date'

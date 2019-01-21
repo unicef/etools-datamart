@@ -62,7 +62,7 @@ class Intervention(DataMartModel):
     total_local = models.DecimalField(max_digits=20, decimal_places=2)
     currency = models.CharField(max_length=4)
 
-    intervention_id = models.IntegerField(null=True)
+    intervention_id = models.IntegerField(null=False)
     agreement_id = models.IntegerField(null=True)
     country_programme_id = models.IntegerField(null=True)
     unicef_signatory_id = models.IntegerField(null=True)
@@ -70,6 +70,7 @@ class Intervention(DataMartModel):
     class Meta:
         ordering = ('country_name', 'title')
         verbose_name = "Intervention"
+        unique_together = ('schema_name', 'intervention_id')
 
     class Options:
         source = PartnersIntervention
@@ -88,7 +89,7 @@ class Intervention(DataMartModel):
                        partner_name='agreement.partner.name',
                        partner_authorized_officer_signatory_id='partner_authorized_officer_signatory.pk',
                        country_programme_id='country_programme.pk',
-                       intervention_id='pk',
+                       intervention_id='id',
                        unicef_signatory_id='unicef_signatory.pk',
                        unicef_signatory_first_name='unicef_signatory.first_name',
                        unicef_signatory_last_name='unicef_signatory.last_name',

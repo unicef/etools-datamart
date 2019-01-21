@@ -3,14 +3,14 @@
         "master": [
             {
                 "model": "data.intervention",
-                "pk": 1107,
+                "pk": 274,
                 "fields": {
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
                     "area_code": "",
-                    "last_modify_date": "2019-01-21T10:35:38.650Z",
+                    "last_modify_date": "2019-01-21T19:17:09.988Z",
                     "seen": null,
-                    "created": "2019-01-21T10:35:38.650Z",
+                    "created": "2019-01-21T19:17:09.988Z",
                     "updated": null,
                     "document_type": null,
                     "number": "#000",
@@ -55,7 +55,7 @@
                     "total": "10.00",
                     "total_local": "10.00",
                     "currency": "USD",
-                    "intervention_id": null,
+                    "intervention_id": 0,
                     "agreement_id": null,
                     "country_programme_id": null,
                     "unicef_signatory_id": null
@@ -63,14 +63,14 @@
             },
             {
                 "model": "data.intervention",
-                "pk": 1108,
+                "pk": 275,
                 "fields": {
                     "country_name": "chad",
                     "schema_name": "chad",
                     "area_code": "",
-                    "last_modify_date": "2019-01-21T10:35:38.659Z",
+                    "last_modify_date": "2019-01-21T19:17:09.994Z",
                     "seen": null,
-                    "created": "2019-01-21T10:35:38.659Z",
+                    "created": "2019-01-21T19:17:09.994Z",
                     "updated": null,
                     "document_type": null,
                     "number": "#001",
@@ -115,7 +115,7 @@
                     "total": "10.00",
                     "total_local": "10.00",
                     "currency": "USD",
-                    "intervention_id": null,
+                    "intervention_id": 1,
                     "agreement_id": null,
                     "country_programme_id": null,
                     "unicef_signatory_id": null
@@ -123,14 +123,14 @@
             },
             {
                 "model": "data.intervention",
-                "pk": 1109,
+                "pk": 276,
                 "fields": {
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
                     "area_code": "",
-                    "last_modify_date": "2019-01-21T10:35:38.662Z",
+                    "last_modify_date": "2019-01-21T19:17:09.997Z",
                     "seen": null,
-                    "created": "2019-01-21T10:35:38.662Z",
+                    "created": "2019-01-21T19:17:09.997Z",
                     "updated": null,
                     "document_type": null,
                     "number": "#002",
@@ -175,7 +175,7 @@
                     "total": "10.00",
                     "total_local": "10.00",
                     "currency": "USD",
-                    "intervention_id": null,
+                    "intervention_id": 2,
                     "agreement_id": null,
                     "country_programme_id": null,
                     "unicef_signatory_id": null

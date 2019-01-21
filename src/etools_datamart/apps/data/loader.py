@@ -179,7 +179,8 @@ class Loader:
                                   err) from e
 
     def get_values(self, country, record, context):
-        ret = {}
+        ret = {'area_code': country.business_area_code}
+
         for k, v in self.mapping.items():
             if v == '__self__':
                 try:
