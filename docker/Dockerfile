@@ -20,39 +20,6 @@ RUN apt-get update \
  	    gdal-bin \
  	    python-dev
 
-#RUN apk add --no-cache \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-#    bash \
-#    freetype \
-#    geos \
-#    gdal \
-#    lcms2 \
-#    libjpeg-turbo \
-#    libpng \
-#    libpq \
-#    openjpeg \
-#    postgresql-libs \
-#    tiff \
-#    && apk add --no-cache --virtual .build-deps \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-#    freetype-dev \
-#    gcc \
-#    gdal-dev \
-#    geos-dev \
-#    jpeg-dev \
-#    lcms2-dev \
-#    libffi-dev \
-#    linux-headers \
-#    musl-dev \
-#    openjpeg-dev \
-#    postgresql-dev \
-#    python3-dev \
-#    tcl-dev \
-#    tiff-dev \
-#    tk-dev \
-#    zlib-dev \
 
 RUN pip install pip==18.0 pipenv --upgrade \
     && adduser --system datamart
