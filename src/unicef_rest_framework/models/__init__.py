@@ -5,3 +5,4 @@ from .application import Application  # noqa
 from .token import UserServiceToken # noqa
 from .service import Service, CacheVersion  # noqa
 from .filter import SystemFilter, SystemFilterFieldRule  # noqa
+from .periodic_task import PeriodicTask  # noqa

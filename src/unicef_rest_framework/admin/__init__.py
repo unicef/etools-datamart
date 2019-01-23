@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+from django_celery_beat.models import CrontabSchedule
 
 from unicef_rest_framework.models.acl import GroupAccessControl
 from .base import APIModelAdmin  # noqa
@@ -8,19 +9,28 @@ from ..models import (Application,
                       Service,
                       CacheVersion,
                       UserAccessControl,
+                      PeriodicTask,
                       SystemFilter)
 from .base import ListDisplayAllMixin, ReadOnlyAdminMixin, TruncateTableMixin  # noqa
 from .application import ApplicationAdmin
 from .service import ServiceAdmin
 from .cache import CacheVersionAdmin
 from .acl import UserAccessControlAdmin, GroupAccessControlAdmin
+from .beat import CrontabScheduleAdmin, PeriodicTaskAdmin
 
 __all__ = ['ApplicationAdmin',
            'GroupAccessControlAdmin',
            'ServiceAdmin',
            'UserAccessControlAdmin',
            'ListDisplayAllMixin',
-           'ReadOnlyAdminMixin']
+           'ReadOnlyAdminMixin',
+           'PeriodicTaskAdmin',
+           'CrontabScheduleAdmin']
+
+# admin.site.unregister(PeriodicTask)
+admin.site.unregister(CrontabSchedule)
+admin.site.register(PeriodicTask, PeriodicTaskAdmin)
+admin.site.register(CrontabSchedule, CrontabScheduleAdmin)
 
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(CacheVersion, CacheVersionAdmin)

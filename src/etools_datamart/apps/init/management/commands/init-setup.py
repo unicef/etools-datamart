@@ -13,11 +13,14 @@ from django.core.management.base import BaseCommand
 from django.db import connections
 
 from constance import config
-from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
+from django_celery_beat.models import CrontabSchedule, IntervalSchedule
 from post_office.models import EmailTemplate
 from redisboard.models import RedisServer
+from strategy_field.utils import fqn
 
+from unicef_rest_framework.models import PeriodicTask
 from unicef_rest_framework.models.acl import GroupAccessControl
+from unicef_rest_framework.tasks import preload
 
 from etools_datamart.apps.data.loader import loadeables
 from etools_datamart.apps.etl.models import EtlTask
@@ -245,8 +248,8 @@ class Command(BaseCommand):
                                                   port=int(spec.port))
 
         if options['tasks'] or _all or options['refresh']:
+            preload_cron, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-            one, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)
             CrontabSchedule.objects.get_or_create(hour='0, 6, 12, 18')
             CrontabSchedule.objects.get_or_create(hour='0, 12')
             IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
@@ -259,11 +262,23 @@ class Command(BaseCommand):
             for loadeable in loadeables:
                 model = apps.get_model(loadeable)
                 loaders.append(loadeable)
-                __, is_new = PeriodicTask.objects.get_or_create(task=model.loader.task.name,
+                __, is_new = PeriodicTask.objects.get_or_create(task=f"ETL {model.loader.task.name}",
                                                                 defaults={'name': loadeable,
+                                                                          'service': Service.objects.get_for_model(model),
                                                                           'crontab': midnight})
                 if is_new:
-                    self.stdout.write(f"NEW task {model.loader.task.name} scheduled at {midnight}")
+                    self.stdout.write(f"NEW load task {model.loader.task.name} scheduled at {midnight}")
+
+            # preload
+            for service in Service.objects.all():
+                url = service.endpoint
+                pp, is_new = PeriodicTask.objects.get_or_create(name=f'PRELOAD {url}',
+                                                                defaults={'task': fqn(preload),
+                                                                          'crontab': preload_cron,
+                                                                          'service': service,
+                                                                          'args': f'["{url}?page_size=-1"]'})
+                if is_new:
+                    self.stdout.write(f"NEW preload task for '{url}'")
 
             ret = PeriodicTask.objects.filter(name__startswith='data.').exclude(name__in=loaders).delete()
             counters[False] = ret[0]
@@ -276,6 +291,10 @@ class Command(BaseCommand):
             PeriodicTask.objects.get_or_create(task='send_queued_mail',
                                                defaults={'name': 'process mail queue',
                                                          'interval': every_minute})
+
+            # PeriodicTask.objects.get_or_create(task='send_queued_mail',
+            #                                    defaults={'name': 'process mail queue',
+            #                                              'interval': every_minute})
 
         EmailTemplate.objects.get_or_create(name='dataset_changed_attachment',
                                             defaults=dict(subject='Dataset changed',

@@ -27,6 +27,11 @@ class ServiceManager(models.Manager):
     def get_for_viewset(self, viewset):
         return self.model.objects.get(viewset=viewset)
 
+    def get_for_model(self, model):
+        return self.model.objects.filter(source_model__app_label=model._meta.app_label,
+                                         source_model__model=model._meta.model_name,
+                                         ).first()
+
     def check_or_create(self, prefix, viewset, basename, url_name, ):
         name = getattr(viewset, 'label', viewset.__name__)
         source_model = ContentType.objects.get_for_model(viewset().get_queryset().model)

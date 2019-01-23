@@ -81,9 +81,10 @@ ENV PIPSI_HOME=/usr/local/pipsi/environments
 ENV PIPSI_BIN_DIR=/usr/local/bin
 ENV PYTHONUNBUFFERED 1
 ENV USE_GUNICORN 0
-ENV GUNICORN_CMD_ARGS "-b 0.0.0.0:8000 \
+ENV GUNICORN_CMD_ARGS " --name datamart \
 --chdir /var/datamart \
 --access-logfile - \
+--timeout 120 \
 --access-logformat \"%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s\" "
 
 ENV ALLOWED_HOSTS *

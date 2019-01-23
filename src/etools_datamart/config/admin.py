@@ -26,10 +26,12 @@ DEFAULT_INDEX_SECTIONS = {
                  'unicef_rest_framework.UserAccessControl',
                  ],
     'Logs': ['tracking', 'django_db_logging', 'crashlog', ],
-    'System': ['redisboard', 'django_celery_beat', 'post_office'],
-    'Other': ['unicef_rest_framework.Application', ],
+    'System': ['redisboard', 'django_celery_beat', 'post_office',
+               'unicef_rest_framework.PeriodicTask'],
+    'Other': [],
     '_hidden_': ['sites', 'unicef_rest_framework.Application',
-                 'oauth2_provider', 'social_django']
+                 'oauth2_provider', 'social_django',
+                 'django_celery_beat.PeriodicTask']
 }
 
 

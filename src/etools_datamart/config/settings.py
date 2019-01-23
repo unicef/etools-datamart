@@ -412,7 +412,7 @@ CONSTANCE_CONFIG = {
     'DISABLE_SERVICE_RESTRICTIONS': (env('DISABLE_SERVICE_RESTRICTIONS'), 'Disable per user service authorizations'),
 }
 
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
