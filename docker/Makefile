@@ -16,6 +16,7 @@ DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
+PORTS=
 
 help:
 	@echo "dev                  build dev image (based on local code)"
@@ -44,7 +45,6 @@ build:
 	cd .. && docker run \
 	 		--rm \
 	 		--name=${CONTAINER_NAME} \
-			-p 8000:8000 \
 			-e CACHE_URL=redis://192.168.66.66:6379/1 \
 			-e CACHE_URL_API=redis://192.168.66.66:6379/2 \
 			-e CACHE_URL_LOCK=redis://192.168.66.66:6379/3 \
@@ -87,13 +87,13 @@ release:
 	lazo upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET} -vvv
 
 run:
-	$(MAKE) .run
+	RUN_OPTIONS="-p 8000:8000" CONTAINER_NAME=datamart $(MAKE) .run
 
 workers:
-	CMD=workers $(MAKE) .run
+	CONTAINER_NAME=datamart-workers CMD=workers $(MAKE) .run
 
 beat:
-	CMD=beat $(MAKE) .run
+	CONTAINER_NAME=datamart-beat CMD=beat $(MAKE) .run
 
 
 test:

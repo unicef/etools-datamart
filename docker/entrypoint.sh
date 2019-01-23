@@ -6,7 +6,7 @@ mkdir -p ${STATIC_ROOT}
 rm -f /var/datamart/run/*
 
 django-admin diffsettings --output unified
-django-admin makemigrations --dry-run
+django-admin makemigrations --check --dry-run
 
 if [[ "$*" == "workers" ]];then
     django-admin db-isready --wait --timeout 60 --sleep 5
