@@ -628,3 +628,5 @@ def extra(r):
 
 
 SYSINFO = {"extra": {'Azure': extra}}
+
+MIGRATION_MODULES = {'dbtemplates': 'etools_datamart.custom_migrations.dbtemplates'}
