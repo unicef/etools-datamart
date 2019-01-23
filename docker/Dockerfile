@@ -40,7 +40,7 @@ ARG PIPENV_ARGS
 ARG VERSION
 
 ENV VERSION ${VERSION}
-
+ENV ABSOLUTE_BASE_URL "
 ENV PIPENV_PYPI_MIRROR ${PIPENV_PYPI_MIRROR}
 ENV PIPENV_ARGS ${PIPENV_ARGS}
 ENV HOME /root/
@@ -48,7 +48,8 @@ ENV PIPSI_HOME=/usr/local/pipsi/environments
 ENV PIPSI_BIN_DIR=/usr/local/bin
 ENV PYTHONUNBUFFERED 1
 ENV USE_GUNICORN 0
-ENV GUNICORN_CMD_ARGS " --name datamart \
+ENV GUNICORN_CMD_ARGS " -b 0.0.0.0:8000 \
+--name datamart \
 --chdir /var/datamart \
 --access-logfile - \
 --timeout 120 \

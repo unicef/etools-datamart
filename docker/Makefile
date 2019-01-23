@@ -17,6 +17,7 @@ DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
 PORTS=
+ABSOLUTE_BASE_URL?="http://192.168.66.66:8000"
 
 help:
 	@echo "dev                  build dev image (based on local code)"
@@ -45,6 +46,7 @@ build:
 	cd .. && docker run \
 	 		--rm \
 	 		--name=${CONTAINER_NAME} \
+			-e ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
 			-e CACHE_URL=redis://192.168.66.66:6379/1 \
 			-e CACHE_URL_API=redis://192.168.66.66:6379/2 \
 			-e CACHE_URL_LOCK=redis://192.168.66.66:6379/3 \
@@ -87,13 +89,19 @@ release:
 	lazo upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET} -vvv
 
 run:
-	RUN_OPTIONS="-p 8000:8000" CONTAINER_NAME=datamart $(MAKE) .run
+	RUN_OPTIONS="-p 8000:8000" \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+		$(MAKE) .run
 
 workers:
-	CONTAINER_NAME=datamart-workers CMD=workers $(MAKE) .run
+	CONTAINER_NAME=datamart-workers \
+			ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+			CMD=workers $(MAKE) .run
 
 beat:
-	CONTAINER_NAME=datamart-beat CMD=beat $(MAKE) .run
+	CONTAINER_NAME=datamart-beat \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+		CMD=beat $(MAKE) .run
 
 
 test:
