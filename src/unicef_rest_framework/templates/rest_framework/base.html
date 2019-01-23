@@ -29,15 +29,12 @@
         {% if code_style %}<style>{{ code_style }}</style>{% endif %}
       {% endblock %}
     {% if config.ANALYTICS_CODE %}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130479575-1"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.ANALYTICS_CODE }}"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag() {dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'UA-130479575-1');
-            window.beforeShowDay = function (d) {
-                console.log(11111)
-            }
+            gtag('config', '{{ config.ANALYTICS_CODE }}');
         </script>
     {% endif %}
     {% endblock %}
