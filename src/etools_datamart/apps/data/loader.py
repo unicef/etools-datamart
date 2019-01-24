@@ -1,12 +1,16 @@
+import datetime
 import logging
+import time
 from inspect import isclass
 
+from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
-from django.db import connections, models
-from django.db.transaction import atomic
+from django.db import connections, models, transaction
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 import celery
+from celery.exceptions import Retry
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
@@ -24,17 +28,32 @@ UPDATED = 'updated'
 UNCHANGED = 'unchanged'
 DELETED = 'deleted'
 
+RUN_UNKNOWN = 0
+RUN_MANUAL = 1
+RUN_COMMAND = 2
+RUN_SCHEDULE = 3
+RUN_QUEUED = 4
+RUN_AS_REQUIREMENT = 5
+RUN_TYPES = ((RUN_UNKNOWN, ""),
+             (RUN_MANUAL, "Manual"),
+             (RUN_COMMAND, "cli"),
+             (RUN_SCHEDULE, "Celery"),
+             (RUN_QUEUED, "Forced queue"),
+             (RUN_AS_REQUIREMENT, "Required by task"),
+             )
+
 
 class EtlResult:
     __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'status', 'context', 'error']
 
-    def __init__(self, updated=0, created=0, unchanged=0, deleted=0, status='SUCCESS', context=None, **kwargs):
+    def __init__(self, updated=0, created=0, unchanged=0, deleted=0,
+                 status='SUCCESS', context=None, error=None, **kwargs):
         self.created = created
         self.updated = updated
         self.unchanged = unchanged
         self.deleted = deleted
         self.status = status
-        self.error = None
+        self.error = error
         self.context = context or {}
 
     def __repr__(self):
@@ -91,9 +110,17 @@ DEFAULT_KEY = lambda country, record: dict(country_name=country.name,
                                            source_id=record.pk)
 
 
+class RequiredIsRunning(Exception):
+    pass
+
+
+class RequiredIsMissing(Exception):
+    pass
+
+
 class LoaderOptions:
-    __attrs__ = ['mapping', 'celery', 'source',
-                 'queryset', 'key', 'locks',
+    __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
+                 'queryset', 'key', 'locks', 'filters',
                  'depends', 'timeout', 'lock_key']
 
     def __init__(self, base=None):
@@ -105,6 +132,9 @@ class LoaderOptions:
         self.key = DEFAULT_KEY
         self.timeout = None
         self.depends = ()
+        self.filters = None
+        self.last_modify_field = None
+
         if base:
             for attr in self.__attrs__:
                 if hasattr(base, attr):
@@ -113,9 +143,6 @@ class LoaderOptions:
                         setattr(self, attr, n)
                     else:
                         setattr(self, attr, getattr(base, attr, getattr(self, attr)))
-
-        if not self.queryset and self.source:
-            self.queryset = lambda: self.source.objects
 
     def contribute_to_class(self, model, name):
         self.model = model
@@ -132,7 +159,11 @@ class LoaderTask(celery.Task):
         self.name = "load_{0.app_label}_{0.model_name}".format(loader.model._meta)
 
     def run(self, *args, **kwargs):
-        return self.loader.load()
+        logger.debug(kwargs)
+        try:
+            return self.loader.load(run_type=RUN_SCHEDULE, check_requirement=True)
+        except (RequiredIsRunning, RequiredIsMissing):  # pragma: no cover
+            raise Retry
 
 
 class Loader:
@@ -144,6 +175,10 @@ class Loader:
 
     def __repr__(self):
         return "<%sLoader>" % self.model._meta.object_name
+
+    @property
+    def model_name(self):
+        return ".".join([self.model._meta.app_label, self.model._meta.model_name])
 
     def contribute_to_class(self, model, name):
         self.model = model
@@ -157,7 +192,57 @@ class Loader:
 
         setattr(model, name, self)
 
-    def process(self, filters, values):
+    def get_queryset(self, context):
+
+        if self.config.queryset:
+            ret = self.config.queryset()
+        elif self.config.source:
+            ret = self.config.source.objects.all()
+        else:  # pragma: no cover
+            raise ValueError("Option must define 'queryset' or 'source' attribute")
+
+        return ret
+
+    def filter_queryset(self, qs, context):
+        use_delta = context['filter_last_modified'] and not context['is_empty']
+
+        if self.config.filters:
+            qs = qs.filter(**self.config.filters)
+        if use_delta and (self.config.last_modify_field and self.last_run):
+            logger.info("Loader {self}: use deltas")
+            qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.last_run})
+        return qs
+
+    @property
+    def last_run(self):
+        last_run = self.etl_task.last_run
+        # delta is not required as last_run is set at the beginning
+        # here just for safety
+        if last_run and self.etl_task.elapsed:
+            delta = datetime.timedelta(seconds=self.etl_task.elapsed)
+            return last_run - delta
+        return None
+
+    def is_running(self):
+        return self.etl_task.status == 'RUNNING'
+
+    def need_refresh(self, sender):
+        if not self.etl_task.last_success:
+            return True
+        if self.etl_task.status != 'SUCCESS':
+            return True
+
+        if sender.etl_task.last_success:
+            return self.etl_task.last_success.day < sender.etl_task.last_run.day
+        return False
+
+    def process(self, filters, values, context):
+        stdout = context['stdout']
+        verbosity = context['verbosity']
+        if stdout and verbosity > 2:  # pragma: no cover
+            stdout.write('.')
+            stdout.flush()
+
         try:
             record, created = self.model.objects.get_or_create(**filters,
                                                                defaults=values)
@@ -196,7 +281,7 @@ class Loader:
                 try:
                     ret[k] = v.objects.get(schema_name=country.schema_name,
                                            source_id=getattr(record, k).id)
-                except AttributeError:
+                except AttributeError:  # pragma: no cover
                     pass
             elif callable(v):
                 ret[k] = v(country, record)
@@ -218,19 +303,15 @@ class Loader:
         self.model.objects.filter(id__in=self.seen).update(seen=context['today'])
 
     def process_country(self, country, context):
-        qs = self.config.queryset()
-        stdout = context['stdout']
+        qs = self.filter_queryset(self.get_queryset(context), context)
         max_records = context['max_records']
         self.seen = []
         for record in qs.all():
             filters = self.config.key(country, record)
             values = self.get_values(country, record, context)
-            op = self.process(filters, values)
+            op = self.process(filters, values, context)
             self.results.incr(op)
             context['records'] += 1
-            if stdout:  # pragma: no cover
-                stdout.write('.')
-                stdout.flush()
             if max_records and context['records'] >= max_records:
                 break
 
@@ -251,18 +332,78 @@ class Loader:
         except LockError:
             pass
 
-    @atomic()
+    @cached_property
+    def etl_task(self):
+        from etools_datamart.apps.etl.models import EtlTask
+        return EtlTask.objects.get_or_create(task=self.task.name,
+                                             content_type=ContentType.objects.get_for_model(self.config.model),
+                                             table_name=self.config.model._meta.db_table)[0]
+
+    def on_start(self, run_type):
+        from django.utils import timezone
+        logger.info(f"Start loader {self}")
+        self._start = time.time()
+
+        defs = {'status': 'RUNNING',
+                'elapsed': None,
+                'run_type': run_type,
+                'last_run': timezone.now()}
+        self.etl_task.update(**defs)
+
+    def on_end(self, error=None):
+        from etools_datamart.apps.subscriptions.models import Subscription
+        from django.utils import timezone
+
+        cost = time.time() - self._start
+        defs = {'elapsed': cost,
+                'results': self.results.as_dict()}
+        if error:
+            defs['status'] = 'FAILURE'
+            defs['results'] = str(error)
+            defs['last_failure'] = timezone.now()
+        else:
+            defs['status'] = 'SUCCESS'
+            if self.results.error:
+                defs['status'] = 'ERROR'
+                defs['last_failure'] = timezone.now()
+            else:
+                defs['last_success'] = timezone.now()
+                defs['last_failure'] = None
+                if self.results.created > 0 or self.results.updated > 0:
+                    defs['last_changes'] = timezone.now()
+                    for service in self.config.model.linked_services:
+                        service.invalidate_cache()
+                        Subscription.objects.notify(self.config.model)
+        self.etl_task.update(**defs)
+
     def load(self, *, verbosity=0, always_update=False, stdout=None,
-             ignore_dependencies=False, max_records=None, countries=None):
+             ignore_dependencies=False, max_records=None, countries=None,
+             ignore_last_modify_field=False, run_type=RUN_UNKNOWN,
+             check_requirements=False, force_requirements=False):
+        self.on_start(run_type)
         have_lock = False
         self.results = EtlResult()
         lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
+        logger.debug(f"Running loader {self}")
+
         try:
             have_lock = lock.acquire(blocking=False)
             if have_lock:  # pragma: no branch
                 if not ignore_dependencies:
-                    for dependency in self.config.depends:
-                        dependency.loader.load(stdout=stdout)
+                    for requirement in self.config.depends:
+                        if force_requirements or requirement.loader.need_refresh(self):
+                            if check_requirements:
+                                raise RequiredIsMissing(requirement)
+                            logger.info(f"Loader {requirement} need refresh")
+                            if requirement.loader.is_running():
+                                raise RequiredIsRunning(requirement)
+                            logger.info(f"Load required dataset {requirement}")
+                            requirement.loader.load(stdout=stdout,
+                                                    force_requirements=force_requirements,
+                                                    check_requirements=check_requirements,
+                                                    run_type=RUN_AS_REQUIREMENT)
+                        else:
+                            logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update
                 connection = connections['etools']
                 if not countries:  # pragma: no branch
@@ -279,28 +420,44 @@ class Loader:
                 context = self.get_context(today=today,
                                            countries=countries,
                                            max_records=max_records,
+                                           verbosity=verbosity,
                                            records=0,
+                                           filter_last_modified=not ignore_last_modify_field,
+                                           is_empty=self.model.objects.exists(),
                                            stdout=stdout)
-                self.results.context = context
-                for country in countries:
-                    if stdout:  # pragma: no cover
-                        stdout.write(f"{country}\n")
-                    connection.set_schemas([country.schema_name])
-                    self.process_country(country, context)
-                    self.post_process_country(country, context)
-                    if max_records and context['records'] >= max_records:
-                        break
-                    if stdout:  # pragma: no cover
-                        stdout.write("\n")
-                # deleted = self.model.objects.exclude(seen=today).delete()[0]
-                # self.results.deleted = deleted
+                sid = transaction.savepoint()
+                total_countries = len(countries)
+                try:
+                    self.results.context = context
+                    for i, country in enumerate(countries, 1):
+                        if stdout and verbosity > 0:  # pragma: no cover
+                            stdout.write(f"{i:>3}/{total_countries} {country}")
+                        connection.set_schemas([country.schema_name])
+                        self.process_country(country, context)
+                        self.post_process_country(country, context)
+                        if max_records and context['records'] >= max_records:
+                            break
+                        if stdout and verbosity > 0:  # pragma: no cover
+                            stdout.write("\n")
+                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
+                    # self.results.deleted = deleted
+                except Exception:  # pragma: no cover
+                    transaction.savepoint_rollback(sid)
+                    raise
+            else:
+                logger.info(f"Unable to get lock for {self}")
 
-        except LoaderException:  # pragma: no cover
+        except BaseException as e:  # pragma: no cover
+            self.on_end(e)
+            process_exception(e)
             raise
+        else:
+            self.on_end(None)
         finally:
             if have_lock:  # pragma: no branch
                 try:
                     lock.release()
                 except LockError as e:  # pragma: no cover
                     logger.warning(e)
+
         return self.results

@@ -9,7 +9,7 @@ from etools_datamart.config.settings import env
 
 
 def index(request):
-    context = {'page': 'index'}
+    context = {'page': 'index', 'title': 'eTools Datamart'}
     return TemplateResponse(request, 'index.html', context)
 
 

@@ -47,24 +47,5 @@ class InterventionViewSet(common.DataMartViewSet):
                              'budget': InterventionSerializerBudget,
                              'short': ["title", "number", "country_name", "start_date"]}
 
-    def process_filter_last_modify_date__range(self):
-        return {}
-
-    # def get_filter_backends(self, removes=None):
-    #     return super().get_filter_backends()
-    #
-    # def get_schema_fields(self):
-    #     return super().get_schema_fields()
-
     def get_querystringfilter_form(self, request, filter):
         return InterventionFilterForm(request.GET, filter.form_prefix)
-        # fields = OrderedDict([
-        #     (name, forms.CharField(required=False))
-        #     for name in self.filter_fields if name not in ('status',
-        #                                                    'start_date',
-        #                                                    'submission_date',
-        #                                                    'document_type',
-        #                                                    'last_modify_date')])
-        #
-        # return type(str('%sForm' % self.__class__.__name__),
-        #             (InterventionFilterForm,), fields)(request.GET, filter.form_prefix)

@@ -9,8 +9,6 @@ from unittest.mock import MagicMock
 import pytest
 from _pytest.fixtures import SubRequest
 
-from etools_datamart.apps.etl.models import EtlTask
-
 
 def pytest_configure(config):
     # enable this to remove deprecations
@@ -22,6 +20,7 @@ def pytest_configure(config):
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
 warnings.simplefilter('ignore', UserWarning)
+warnings.simplefilter('ignore', RuntimeWarning, lineno=1421)
 
 
 @pytest.fixture(scope="session")
@@ -99,6 +98,8 @@ def django_db_setup(request,
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory
+    from etools_datamart.apps.etl.models import EtlTask
+
     with django_db_blocker.unblock():
         EtlTask.objects.inspect()
         Service.objects.load_services()
@@ -217,3 +218,10 @@ def local_user(db):
     from test_utilities.factories import UserFactory
 
     return UserFactory()
+
+
+@pytest.fixture()
+def schema_access_control(db):
+    from test_utilities.factories import SchemaAccessControlFactory
+
+    return SchemaAccessControlFactory()

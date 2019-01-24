@@ -56,7 +56,8 @@ class PMPIndicatorLoader(Loader):
                                                schema_name=country.schema_name,
                                                partner_id=partner.pk,
                                                intervention_id=intervention.pk),
-                                  values=values)
+                                  values=values,
+                                  context=context)
                 self.results.incr(op)
 
 

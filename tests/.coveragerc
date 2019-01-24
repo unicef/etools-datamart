@@ -3,21 +3,22 @@ branch = True
 source = etools_datamart
 
 omit =
-        tests/**
-        **/reset-migrations.py
-        **/inspectschema.py
-        **/introspection.py
-        **/db_router.py
         **/api-builder.py
-        **/queue.py
-        **/multitenant/postgresql/creation.py
-        **/apps/etools/models/public_old.py
-        **/apps/etools/models/tenant_old.py
-        **/tracking/management/commands/track.py
         **/api/endpoints/unicef/business_area.py
         **/api/endpoints/unicef/region.py
         **/api/endpoints/unicef/serializers.py
+        **/apps/etools/models/public_old.py
+        **/apps/etools/models/tenant_old.py
+        **/db_router.py
         **/etools_datamart/apps/data/management/commands/load.py
+        **/inspectschema.py
+        **/introspection.py
+        **/libs/mystica.py
+        **/multitenant/postgresql/creation.py
+        **/queue.py
+        **/reset-migrations.py
+        **/tracking/management/commands/track.py
+        tests/**
 
 
 [report]

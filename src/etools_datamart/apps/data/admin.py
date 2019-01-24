@@ -33,12 +33,6 @@ class DatamartChangeList(ChangeList):
 class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = [mass_update, ]
 
-    def __init__(self, model, admin_site):
-        import etools_datamart.apps.etl.tasks.etl as mod
-        # we ned to force celery task initialization
-        self.loaders = [v for v in mod.__dict__.values() if hasattr(v, 'apply_async')]
-        super().__init__(model, admin_site)
-
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
             self.list_filter = (SchemaFilter,) + self.list_filter

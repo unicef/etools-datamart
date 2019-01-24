@@ -31,7 +31,8 @@ class UserStatsLoader(Loader):
         op = self.process(filters=dict(month=first_of_month,
                                        country_name=country.name,
                                        schema_name=country.schema_name, ),
-                          values=values)
+                          values=values,
+                          context=context)
         self.results.incr(op)
 
 

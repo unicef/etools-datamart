@@ -43,7 +43,7 @@ class FundsReservation(DataMartModel):
     donor_code = models.CharField(max_length=30, blank=True, null=True)
 
     # extras
-
+    pd_ssfa_number = models.CharField(max_length=64, null=True)
     # internals
     source_id = models.IntegerField()
     source_intervention_id = models.IntegerField()
@@ -60,6 +60,7 @@ class FundsReservation(DataMartModel):
         depends = (Intervention,)
         source = FundsFundsreservationitem
         queryset = lambda: FundsFundsreservationitem.objects.select_related('fund_reservation')
+        last_modify_field = 'modified'
         key = lambda country, record: dict(country_name=country.name,
                                            schema_name=country.schema_name,
                                            fr_number=record.fund_reservation.fr_number)
@@ -67,6 +68,7 @@ class FundsReservation(DataMartModel):
         mapping = dict(vendor_code='fund_reservation.vendor_code',
                        fr_number='fund_reservation.fr_number',
                        document_date='fund_reservation.document_date',
+                       pd_ssfa_number='fund_reservation.number',
                        fr_type='fund_reservation.fr_type',
                        currency='fund_reservation.currency',
                        document_text='fund_reservation.document_text',

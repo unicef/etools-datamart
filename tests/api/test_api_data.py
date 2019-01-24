@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from django.utils import timezone
+
 import pytest
 from test_utilities.factories import factories_registry
 
 from etools_datamart.api.urls import router
+from etools_datamart.apps.etl.models import EtlTask
 
 FORMATS = (('', 'application/json'),
            ('csv', 'text/csv; charset=utf-8'),
@@ -40,16 +43,25 @@ def pytest_generate_tests(metafunc, *args):
                 for ser in sers:
                     params.append([viewset, ser])
                     ids.append(f'{viewset.__name__}-{ser}')
-                    # metafunc.addcall(funcargs={'viewset': viewset,
-                    #                            'serializer': ser},
-                    #                  id=f'{viewset.__name__}-{ser}')
         metafunc.parametrize("viewset,serializer", params, ids=ids)
 
 
-@pytest.mark.parametrize("action", ['', 'updates/'])
 @pytest.mark.parametrize("format,ct", FORMATS, ids=[f[0] for f in FORMATS])
-def test_list(client, action, viewset, format, ct, data, serializer):
-    res = client.get(f"{viewset.get_service().endpoint}{action}?format={format}")
+def test_list(client, viewset, format, ct, data, serializer):
+    res = client.get(f"{viewset.get_service().endpoint}?format={format}")
+    assert res.status_code == 200, res
+    assert res.content
+    assert res['Content-Type'] == ct
+
+
+@pytest.mark.parametrize("updates", [True, False])
+@pytest.mark.parametrize("format,ct", FORMATS, ids=[f[0] for f in FORMATS])
+def test_updates(client, viewset, format, ct, data, serializer, updates):
+    if updates:
+        task = EtlTask.objects.get_for_model(viewset.queryset.model)
+        task.update(last_changes=timezone.now())
+
+    res = client.get(f"{viewset.get_service().endpoint}updates/?format={format}")
     assert res.status_code == 200, res
     assert res.content
     assert res['Content-Type'] == ct

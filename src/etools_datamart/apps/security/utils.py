@@ -37,7 +37,7 @@ def get_allowed_schemas(user):
 
 
 def get_allowed_services(user):
-    if not user.is_authenticated:
+    if not user.is_authenticated:  # pragma: no cover
         return []
     if user.is_superuser or config.DISABLE_SERVICE_RESTRICTIONS:
         return Service.objects.all()

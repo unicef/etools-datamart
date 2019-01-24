@@ -17,7 +17,7 @@ class DataMartQuerySet(QuerySet):
             raise self.model.DoesNotExist(
                 "%s  (%s %s)" % (e, args, kwargs)
             )
-        except self.model.MultipleObjectsReturned as e:
+        except self.model.MultipleObjectsReturned as e:  # pragma: no cover
             raise self.model.MultipleObjectsReturned(
                 "%s (%s %s) " % (e, args, kwargs)
             )

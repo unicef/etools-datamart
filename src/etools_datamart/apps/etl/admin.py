@@ -3,6 +3,7 @@ from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -13,6 +14,7 @@ from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 from humanize import naturaldelta
 
+from etools_datamart.apps.data.loader import RUN_QUEUED
 from etools_datamart.celery import app
 
 from . import models
@@ -28,7 +30,7 @@ def queue(modeladmin, request, queryset):
 
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', 'last_run', '_status', 'time',
+    list_display = ('task', 'last_run', 'run_type', '_status', 'time',
                     'last_success', 'last_failure', 'locked',
                     'data', 'scheduling', 'unlock_task', 'queue_task')
 
@@ -109,7 +111,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             obj.status = 'QUEUED'
             obj.save()
             task = app.tasks.get(obj.task)
-            task.delay()
+            task.delay(run_type=RUN_QUEUED)
             self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             process_exception(e)
@@ -122,6 +124,8 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
         def _action(request):
             obj.loader.unlock()
+            obj.update(status='FAILURE', run_type=0,
+                       last_failure=timezone.now())
 
         return _confirm_action(self, request, _action,
                                f"""Continuing will unlock selected task. ({obj.task}).

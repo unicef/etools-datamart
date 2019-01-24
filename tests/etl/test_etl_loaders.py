@@ -20,10 +20,10 @@ def pytest_generate_tests(metafunc):
 def test_loader_load(loader, number_of_intervention):
     # factory = factories_registry.get(loader.model)
     # to_delete = factory()
-    with freeze_time("2018-12-31"):
+    with freeze_time("2018-12-31", tz_offset=1):
         loader.model.objects.truncate()
         loader.unlock()
-        ret = loader.load(max_records=2)
+        ret = loader.load(max_records=2, force_requirements=True)
     assert loader.model.objects.count()
     assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
     # assert not loader.model.objects.filter(id=to_delete.pk).exists()

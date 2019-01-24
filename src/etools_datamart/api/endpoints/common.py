@@ -22,7 +22,7 @@ from unicef_rest_framework.views_mixins import IQYConnectionMixin
 from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
-from etools_datamart.libs.medusa import MedusaBasicAuthentication
+from etools_datamart.libs.mystica import MysticaBasicAuthentication
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
 
@@ -61,7 +61,7 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
                        OrderingFilter,
                        DynamicSerializerFilter,
                        ]
-    authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MedusaBasicAuthentication,)
+    authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MysticaBasicAuthentication,)
     ordering_fields = ('id',)
     ordering = 'id'
     family = 'datamart'

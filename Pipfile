@@ -80,6 +80,7 @@ pytest-pythonpath = "*"
 tox = "*"
 vcrpy = "*"
 yapf = "*"
+fancycompleter = {git = "https://github.com/theY4Kman/fancycompleter.git"}
 
 [requires]
 python_version = "3.6"

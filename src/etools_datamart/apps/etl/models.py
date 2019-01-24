@@ -6,6 +6,7 @@ from django.utils.functional import cached_property
 
 from django_celery_beat.models import PeriodicTask
 
+from etools_datamart.apps.data.loader import RUN_TYPES, RUN_UNKNOWN
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.celery import app
 
@@ -49,6 +50,7 @@ class EtlTask(models.Model):
     last_run = models.DateTimeField(null=True, help_text="last execution time")
     status = models.CharField(max_length=200)
     elapsed = models.IntegerField(null=True)
+    run_type = models.IntegerField(choices=RUN_TYPES, default=RUN_UNKNOWN)
     last_success = models.DateTimeField(null=True, help_text="last successully execution time")
     last_failure = models.DateTimeField(null=True, help_text="last failure execution time")
     last_changes = models.DateTimeField(null=True, help_text="last time data have been changed")
@@ -71,6 +73,13 @@ class EtlTask(models.Model):
             return self.content_type.model_class().loader
         except AttributeError:
             return None
+
+    def update(self, **values):
+        for attr, val in values.items():
+            setattr(self, attr, val)
+        self.save()
+
+    update.alters_data = True
 
     @cached_property
     def verbose_name(self):

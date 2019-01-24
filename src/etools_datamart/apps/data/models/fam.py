@@ -29,7 +29,8 @@ class FAMIndicatorLoader(Loader):
                                            country_name=country.name,
                                            area_code=country.business_area_code,
                                            schema_name=country.schema_name),
-                              values=values)
+                              values=values,
+                              context=context)
             self.results.incr(op)
 
 
@@ -59,3 +60,6 @@ class FAMIndicator(DataMartModel):
         verbose_name = "FAM Indicator"
 
     loader = FAMIndicatorLoader()
+
+    class Option:
+        pass

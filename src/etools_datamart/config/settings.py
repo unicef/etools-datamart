@@ -44,7 +44,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   ENABLE_LIVE_STATS=(bool, True),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   MEDIA_ROOT=(str, '/tmp/media'),
-                  MEDUSA_PASSWORD=(str, ''),
+                  MYSTICA_PASSWORD=(str, ''),
                   REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   SECRET_KEY=(str, 'secret'),
                   SECURE_BROWSER_XSS_FILTER=(bool, True),
@@ -191,9 +191,9 @@ AUTHENTICATION_BACKENDS = [
     'unicef_security.graph.AzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
-    'etools_datamart.libs.medusa.MedusaBackend',
+    'etools_datamart.libs.mystica.MysticaBackend',
 ]
-MEDUSA_PASSWORD = env('MEDUSA_PASSWORD')
+MYSTICA_PASSWORD = env('MYSTICA_PASSWORD')
 
 CACHES = {
     'default': env.cache(),

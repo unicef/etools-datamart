@@ -8,8 +8,7 @@ app_name = 'api'
 
 
 class ReadOnlyRouter(APIReadOnlyRouter):
-    def inspect(self):
-        pass
+    pass
 
 
 router = ReadOnlyRouter()
