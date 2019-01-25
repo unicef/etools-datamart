@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.9a24
+TARGET?=1.9a25
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -70,7 +70,6 @@ build:
 			-e DEVELOPMENT_MODE=0 \
 			-e STACK=1 \
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
-			-v $$PWD/~build/volumes/var/datamart:/var/datamart/ \
 			${RUN_OPTIONS} \
 			${DOCKER_IMAGE} \
 			${CMD}
