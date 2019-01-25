@@ -102,7 +102,9 @@ RUN set -ex \
     && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
 
 RUN pip install . \
-    && rm -fr /code
+    && rm -fr /code \
+    && mkdir -p /var/datamart/ \
+    && chown -R datamart /var/datamart/
 
 
 #RUN apk del .build-deps \
