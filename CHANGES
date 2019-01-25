@@ -1,9 +1,23 @@
-1.11 (dev)
+1.11
+---------
+* add impersonation
+* fixes schema permission check
+
+
+1.10
+----
+* Loader refactoring
+* new endpoint 'Funds Reservation'
+* add budget informations to interventions
+
+
+1.9 (dev)
 ---------
 * WARNINGS: migration reset
 * Location/GatewayType endpoints
 * add action to queue multiple tasks
 * updates schema to eTools v6.5.1
+
 
 1.8
 ---
