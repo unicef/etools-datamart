@@ -84,8 +84,9 @@ release:
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
+
+bump:
 	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num
-	lazo upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET} -vvv
 
 run:
 	RUN_OPTIONS="-p 8000:8000" \

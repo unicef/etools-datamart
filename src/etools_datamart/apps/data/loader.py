@@ -10,7 +10,6 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 import celery
-from celery.exceptions import Retry
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
@@ -44,14 +43,15 @@ RUN_TYPES = ((RUN_UNKNOWN, ""),
 
 
 class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'status', 'context', 'error']
+    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'status', 'context', 'error', 'retry']
 
     def __init__(self, updated=0, created=0, unchanged=0, deleted=0,
-                 status='SUCCESS', context=None, error=None, **kwargs):
+                 status='SUCCESS', context=None, error=None, retry=False, **kwargs):
         self.created = created
         self.updated = updated
         self.unchanged = unchanged
         self.deleted = deleted
+        self.retry = retry
         self.status = status
         self.error = error
         self.context = context or {}
@@ -111,11 +111,21 @@ DEFAULT_KEY = lambda country, record: dict(country_name=country.name,
 
 
 class RequiredIsRunning(Exception):
-    pass
+
+    def __init__(self, req, *args: object) -> None:
+        self.req = req
+
+    def __str__(self):
+        return "Required datased %s is still updating" % self.req
 
 
 class RequiredIsMissing(Exception):
-    pass
+
+    def __init__(self, req, *args: object) -> None:
+        self.req = req
+
+    def __str__(self):
+        return "Missing required datased %s" % self.req
 
 
 class LoaderOptions:
@@ -152,6 +162,7 @@ class LoaderOptions:
 
 
 class LoaderTask(celery.Task):
+    default_retry_delay = 3 * 60
 
     def __init__(self, loader) -> None:
         self.loader = loader
@@ -162,8 +173,8 @@ class LoaderTask(celery.Task):
         logger.debug(kwargs)
         try:
             return self.loader.load(run_type=RUN_SCHEDULE, check_requirements=True)
-        except (RequiredIsRunning, RequiredIsMissing):  # pragma: no cover
-            raise Retry
+        except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
+            self.retry(exc=e)
 
 
 class Loader:
@@ -350,14 +361,18 @@ class Loader:
                 'last_run': timezone.now()}
         self.etl_task.update(**defs)
 
-    def on_end(self, error=None):
+    def on_end(self, error=None, retry=False):
         from etools_datamart.apps.subscriptions.models import Subscription
         from django.utils import timezone
 
         cost = time.time() - self._start
         defs = {'elapsed': cost,
                 'results': self.results.as_dict()}
-        if error:
+        if retry:
+            defs['status'] = 'RETRY'
+            defs['results'] = str(error)
+            defs['last_failure'] = timezone.now()
+        elif error:
             defs['status'] = 'FAILURE'
             defs['results'] = str(error)
             defs['last_failure'] = timezone.now()
@@ -447,6 +462,9 @@ class Loader:
             else:
                 logger.info(f"Unable to get lock for {self}")
 
+        except (RequiredIsMissing, RequiredIsRunning) as e:  # pragma: no cover
+            self.on_end(error=e, retry=True)
+            raise
         except BaseException as e:  # pragma: no cover
             self.on_end(e)
             process_exception(e)
