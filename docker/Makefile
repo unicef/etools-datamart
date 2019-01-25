@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.9a25
+TARGET?=1.9a26
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
