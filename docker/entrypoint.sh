@@ -1,8 +1,10 @@
 #!/bin/bash -e
 set -e
 
-django-admin diffsettings --output unified
-django-admin makemigrations --check --dry-run
+mkdir -p /var/datamart/static
+mkdir -p /var/datamart/log
+mkdir -p /var/datamart/conf
+mkdir -p /var/datamart/run
 
 if [[ "$*" == "workers" ]];then
     django-admin db-isready --wait --timeout 60 --sleep 5
@@ -11,10 +13,10 @@ if [[ "$*" == "workers" ]];then
 elif [[ "$*" == "beat" ]];then
     celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile run/celerybeat.pid
 elif [[ "$*" == "datamart" ]];then
-
-    mkdir -p ${STATIC_ROOT}
     rm -f /var/datamart/run/*
 
+    django-admin diffsettings --output unified
+    django-admin makemigrations --check --dry-run
 
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy

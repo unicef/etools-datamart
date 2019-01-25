@@ -1,3 +1,4 @@
+from django.template.defaultfilters import pluralize
 from django.utils.translation import ugettext_lazy as _
 
 from admin_extra_urls.extras import action, ExtraUrlMixin
@@ -39,6 +40,28 @@ class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
             'classes': ('extrapretty', 'wide', 'collapse', 'in'),
         }),
     )
+
+    def run_tasks(self, request, queryset):
+        self.celery_app.loader.import_default_modules()
+        tasks = [(self.celery_app.tasks.get(periodic_task.task),
+                  loads(periodic_task.args),
+                  loads(periodic_task.kwargs))
+                 for periodic_task in queryset]
+
+        task_ids = [task.delay(*args, **kwargs)
+                    for task, args, kwargs in tasks if task and task.delay]
+
+        tasks_run = len(task_ids)
+        self.message_user(
+            request,
+            _('{0} task{1} {2} successfully run').format(
+                tasks_run,
+                pluralize(tasks_run),
+                pluralize(tasks_run, _('was,were')),
+            ),
+        )
+
+    run_tasks.short_description = _('Run selected tasks')
 
     @action()
     def run_task(self, request, pk):

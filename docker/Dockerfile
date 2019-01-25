@@ -103,7 +103,10 @@ RUN set -ex \
 
 RUN pip install . \
     && rm -fr /code \
-    && mkdir -p /var/datamart/ \
+    && mkdir -p /var/datamart/static \
+    && mkdir -p /var/datamart/log \
+    && mkdir -p /var/datamart/conf \
+    && mkdir -p /var/datamart/run \
     && chown -R datamart /var/datamart/
 
 

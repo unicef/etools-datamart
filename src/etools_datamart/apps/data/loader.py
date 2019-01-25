@@ -161,7 +161,7 @@ class LoaderTask(celery.Task):
     def run(self, *args, **kwargs):
         logger.debug(kwargs)
         try:
-            return self.loader.load(run_type=RUN_SCHEDULE, check_requirement=True)
+            return self.loader.load(run_type=RUN_SCHEDULE, check_requirements=True)
         except (RequiredIsRunning, RequiredIsMissing):  # pragma: no cover
             raise Retry
 
