@@ -30,6 +30,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
+                  IGNORED_SCHEMAS=(str, "public,uat,frg"),
                   DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DEBUG=(bool, False),
@@ -613,7 +614,7 @@ ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 SCHEMA_FILTER = {}
-SCHEMA_EXCLUDE = {'schema_name__in': ['public', 'uat', 'frg']}
+SCHEMA_EXCLUDE = {'schema_name__in': env.list('IGNORED_SCHEMAS')}
 
 ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')
 
