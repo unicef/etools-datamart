@@ -66,6 +66,10 @@
     <hr/>
     <div style="float: left;padding: 10px">
         {{ user.label }}
+        {% if user.is_impersonate %}
+            [<a href="{% url 'impersonate-stop' %}">Back to {{ request.real_user }}</a>]
+        {% endif %}
+
     </div>
     <div style="float: right;padding: 10px">
         Version: {% version %}

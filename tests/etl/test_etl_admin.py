@@ -57,6 +57,18 @@ def test_tasklog_queue(django_app, admin_user, tasklog):
     assert [m.message for m in storage] == [f"Task '{tasklog.task}' queued"]
 
 
+def test_tasklog_queue_action(django_app, admin_user, tasklog):
+    tasklog.loader.task.delay = lambda: True
+    url = reverse("admin:etl_etltask_changelist")
+    res = django_app.get(url, user=admin_user)
+    res.form['action'].value = 'queue'
+    res.form['_selected_action'] = [tasklog.id]
+    res = res.form.submit().follow()
+    assert res.status_code == 200
+    storage = res.context['messages']
+    assert [m.message for m in storage] == ["1 task queued"]
+
+
 def test_tasklog_refresh(django_app, admin_user, tasklog):
     url = reverse("admin:etl_etltask_change", args=[tasklog.id])
     res = django_app.get(url, user=admin_user)

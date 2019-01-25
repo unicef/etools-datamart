@@ -62,8 +62,8 @@ class EtlResult:
     def incr(self, counter):
         setattr(self, counter, getattr(self, counter) + 1)
 
-    def add(self, counter, value):
-        setattr(self, counter, getattr(self, counter) + value)
+    # def add(self, counter, value):
+    #     setattr(self, counter, getattr(self, counter) + value)
 
     def as_dict(self):
         return {'created': self.created,
@@ -73,36 +73,28 @@ class EtlResult:
                 'status': self.status,
                 'error': self.error}
 
-    def __add__(self, other):
-        if isinstance(other, EtlResult):
-            ret = EtlResult(created=self.created + other.created,
-                            updated=self.updated + other.updated,
-                            unchanged=self.unchanged + other.unchanged,
-                            deleted=self.deleted + other.deleted,
-                            context=self.context
-                            )
-            return ret
-        raise ValueError(f"Cannot add EtlREsult with {other}")
+    # def __add__(self, other):
+    #     if isinstance(other, EtlResult):
+    #         ret = EtlResult(created=self.created + other.created,
+    #                         updated=self.updated + other.updated,
+    #                         unchanged=self.unchanged + other.unchanged,
+    #                         deleted=self.deleted + other.deleted,
+    #                         context=self.context
+    #                         )
+    #         return ret
+    #     raise ValueError(f"Cannot add EtlREsult with {other}")
 
-    def __eq__(self, other):
-        if isinstance(other, EtlResult):
-            other = other.as_dict()
-
-        if isinstance(other, dict):
-            return (self.created == other['created'] and
-                    self.updated == other['updated'] and
-                    self.unchanged == other['unchanged'] and
-                    self.deleted == other['deleted']
-                    )
-        return False
-
-
-def is_record_changed(record, values):
-    other = type(record)(**values)
-    for field_name, field_value in values.items():
-        if getattr(record, field_name) != getattr(other, field_name):
-            return True
-    return False
+    # def __eq__(self, other):
+    #     if isinstance(other, EtlResult):
+    #         other = other.as_dict()
+    #
+    #     if isinstance(other, dict):
+    #         return (self.created == other['created'] and
+    #                 self.updated == other['updated'] and
+    #                 self.unchanged == other['unchanged'] and
+    #                 self.deleted == other['deleted']
+    #                 )
+    #     return False
 
 
 DEFAULT_KEY = lambda country, record: dict(country_name=country.name,
@@ -157,7 +149,7 @@ class LoaderOptions:
     def contribute_to_class(self, model, name):
         self.model = model
         setattr(model, name, self)
-        if not self.lock_key:
+        if not self.lock_key:  # pragma: no branch
             self.lock_key = f"{fqn(model)}-lock"
 
 
@@ -187,9 +179,9 @@ class Loader:
     def __repr__(self):
         return "<%sLoader>" % self.model._meta.object_name
 
-    @property
-    def model_name(self):
-        return ".".join([self.model._meta.app_label, self.model._meta.model_name])
+    # @property
+    # def model_name(self):
+    #     return ".".join([self.model._meta.app_label, self.model._meta.model_name])
 
     def contribute_to_class(self, model, name):
         self.model = model
@@ -197,9 +189,9 @@ class Loader:
         del model._etl_config
         if not model._meta.abstract:
             loadeables.add("{0._meta.app_label}.{0._meta.model_name}".format(model))
-        if self.config.celery:
-            self.task = LoaderTask(self)
-            self.config.celery.tasks.register(self.task)
+        # if self.config.celery:
+        self.task = LoaderTask(self)
+        self.config.celery.tasks.register(self.task)
 
         setattr(model, name, self)
 
@@ -247,9 +239,18 @@ class Loader:
             return self.etl_task.last_success.day < sender.etl_task.last_run.day
         return False
 
-    def process(self, filters, values, context):
+    def is_record_changed(self, record, values):
+        other = type(record)(**values)
+        # for field_name, field_value in values.items():
+        for field_name in self.fields_to_compare:
+            if getattr(record, field_name) != getattr(other, field_name):
+                return True
+        return False
+
+    def process_record(self, filters, values, context):
         stdout = context['stdout']
         verbosity = context['verbosity']
+
         if stdout and verbosity > 2:  # pragma: no cover
             stdout.write('.')
             stdout.flush()
@@ -260,7 +261,7 @@ class Loader:
             if created:
                 op = CREATED
             else:
-                if self.always_update or is_record_changed(record, values):
+                if self.always_update or self.is_record_changed(record, values):
                     op = UPDATED
                     record, created = self.model.objects.update_or_create(**filters,
                                                                           defaults=values)
@@ -320,7 +321,7 @@ class Loader:
         for record in qs.all():
             filters = self.config.key(country, record)
             values = self.get_values(country, record, context)
-            op = self.process(filters, values, context)
+            op = self.process_record(filters, values, context)
             self.results.incr(op)
             context['records'] += 1
             if max_records and context['records'] >= max_records:
@@ -391,19 +392,21 @@ class Loader:
                         Subscription.objects.notify(self.config.model)
         self.etl_task.update(**defs)
 
+    def lock(self):
+        lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
+        if lock.acquire(blocking=False):
+            return lock
+
     def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None,
              ignore_last_modify_field=False, run_type=RUN_UNKNOWN,
              check_requirements=False, force_requirements=False):
         self.on_start(run_type)
-        have_lock = False
         self.results = EtlResult()
-        lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
         logger.debug(f"Running loader {self}")
-
+        lock = self.lock()
         try:
-            have_lock = lock.acquire(blocking=False)
-            if have_lock:  # pragma: no branch
+            if lock:  # pragma: no branch
                 if not ignore_dependencies:
                     for requirement in self.config.depends:
                         if force_requirements or requirement.loader.need_refresh(self):
@@ -423,13 +426,13 @@ class Loader:
                 connection = connections['etools']
                 if not countries:  # pragma: no branch
                     countries = connection.get_tenants()
-                if self.config.mapping:
-                    self.mapping = {}
-                    mart_fields = self.model._meta.concrete_fields
-                    for field in mart_fields:
-                        if field.name not in ['country_name', 'schema_name', 'area_code',
-                                              'id', 'last_modify_date']:
-                            self.mapping[field.name] = field.name
+                self.mapping = {}
+                mart_fields = self.model._meta.concrete_fields
+                for field in mart_fields:
+                    if field.name not in ['country_name', 'schema_name', 'area_code',
+                                          'id', 'last_modify_date']:
+                        self.mapping[field.name] = field.name
+                if self.config.mapping:  # pragma: no branch
                     self.mapping.update(self.config.mapping)
                 today = timezone.now()
                 context = self.get_context(today=today,
@@ -438,41 +441,43 @@ class Loader:
                                            verbosity=verbosity,
                                            records=0,
                                            filter_last_modified=not ignore_last_modify_field,
-                                           is_empty=self.model.objects.exists(),
+                                           is_empty=not self.model.objects.exists(),
                                            stdout=stdout)
                 sid = transaction.savepoint()
                 total_countries = len(countries)
                 try:
                     self.results.context = context
+                    self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+
                     for i, country in enumerate(countries, 1):
-                        if stdout and verbosity > 0:  # pragma: no cover
+                        if stdout and verbosity > 0:
                             stdout.write(f"{i:>3}/{total_countries} {country}")
                         connection.set_schemas([country.schema_name])
                         self.process_country(country, context)
                         self.post_process_country(country, context)
                         if max_records and context['records'] >= max_records:
                             break
-                        if stdout and verbosity > 0:  # pragma: no cover
-                            stdout.write("\n")
+                    if stdout and verbosity > 0:
+                        stdout.write("\n")
                     # deleted = self.model.objects.exclude(seen=today).delete()[0]
                     # self.results.deleted = deleted
-                except Exception:  # pragma: no cover
+                except Exception:
                     transaction.savepoint_rollback(sid)
                     raise
             else:
                 logger.info(f"Unable to get lock for {self}")
 
-        except (RequiredIsMissing, RequiredIsRunning) as e:  # pragma: no cover
+        except (RequiredIsMissing, RequiredIsRunning) as e:
             self.on_end(error=e, retry=True)
             raise
-        except BaseException as e:  # pragma: no cover
+        except BaseException as e:
             self.on_end(e)
             process_exception(e)
             raise
         else:
             self.on_end(None)
         finally:
-            if have_lock:  # pragma: no branch
+            if lock:  # pragma: no branch
                 try:
                     lock.release()
                 except LockError as e:  # pragma: no cover

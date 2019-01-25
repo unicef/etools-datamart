@@ -52,12 +52,12 @@ class PMPIndicatorLoader(Loader):
                           # 'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
                           # 'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
                           }
-                op = self.process(filters=dict(country_name=country.name,
-                                               schema_name=country.schema_name,
-                                               partner_id=partner.pk,
-                                               intervention_id=intervention.pk),
-                                  values=values,
-                                  context=context)
+                op = self.process_record(filters=dict(country_name=country.name,
+                                                      schema_name=country.schema_name,
+                                                      partner_id=partner.pk,
+                                                      intervention_id=intervention.pk),
+                                         values=values,
+                                         context=context)
                 self.results.incr(op)
 
 

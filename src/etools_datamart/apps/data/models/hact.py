@@ -24,14 +24,14 @@ class HACTLoader(Loader):
                           completed_hact_audits=data['assurance_activities']['scheduled_audit'],
                           completed_special_audits=data['assurance_activities']['special_audit'],
                           )
-            op = self.process(filters=dict(year=today.year,
-                                           area_code=country.business_area_code,
-                                           country_name=country.name,
-                                           schema_name=country.schema_name),
-                              values=values,
-                              context=context)
+            op = self.process_record(filters=dict(year=today.year,
+                                                  area_code=country.business_area_code,
+                                                  country_name=country.name,
+                                                  schema_name=country.schema_name),
+                                     values=values,
+                                     context=context)
             self.results.incr(op)
-        except HactAggregatehact.DoesNotExist:
+        except HactAggregatehact.DoesNotExist:  # pragma: no cover
             pass
 
 

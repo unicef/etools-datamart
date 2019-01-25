@@ -178,6 +178,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'impersonate.middleware.ImpersonateMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
     'crashlog.middleware.CrashLogMiddleware',
     'unicef_rest_framework.middleware.ApiMiddleware',
@@ -192,7 +193,6 @@ AUTHENTICATION_BACKENDS = [
     'unicef_security.graph.AzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
-    'etools_datamart.libs.mystica.MysticaBackend',
 ]
 MYSTICA_PASSWORD = env('MYSTICA_PASSWORD')
 
@@ -285,7 +285,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
     'etools_datamart.api',
-
+    'impersonate',
     'admin_extra_urls',
     'adminactions',
     'unicef_rest_framework.apps.Config',

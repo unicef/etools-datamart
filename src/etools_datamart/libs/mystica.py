@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
 
 from rest_framework.authentication import BasicAuthentication
 
@@ -19,12 +18,13 @@ def mystica_auth(username, password):
             return user
 
 
-class MysticaBackend(ModelBackend):
-    def authenticate(self, request, username=None, password=None, **kwargs):
-        if username is None:
-            username = kwargs.get(UserModel.USERNAME_FIELD)
-        return mystica_auth(username, password)
-
+#
+# class MysticaBackend(ModelBackend):
+#     def authenticate(self, request, username=None, password=None, **kwargs):
+#         if username is None:
+#             username = kwargs.get(UserModel.USERNAME_FIELD)
+#         return mystica_auth(username, password)
+#
 
 class MysticaBasicAuthentication(BasicAuthentication):
     def authenticate_credentials(self, userid, password, request=None):

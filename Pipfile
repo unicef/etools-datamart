@@ -57,6 +57,7 @@ redis = "==2.10.6"
 social-auth-app-django = "*"
 sqlparse = "*"
 whitenoise = "*"
+django-impersonate = "*"
 
 [dev-packages]
 bumpversion = "*"

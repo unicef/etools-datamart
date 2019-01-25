@@ -2,6 +2,7 @@
 from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
+from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -25,7 +26,9 @@ def queue(modeladmin, request, queryset):
     for obj in queryset:
         task = app.tasks.get(obj.task)
         task.delay()
-    modeladmin.message_user(request, f"{count} tasks queued", messages.SUCCESS)
+    modeladmin.message_user(request,
+                            "{0} task{1} queued".format(count, pluralize(count)),
+                            messages.SUCCESS)
 
 
 @register(models.EtlTask)

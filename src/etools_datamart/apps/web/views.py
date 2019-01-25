@@ -21,7 +21,6 @@ def monitor(request):
     return TemplateResponse(request, 'monitor.html', context)
 
 
-@login_required
 def whoami(request):
     if request.user.is_authenticated:
         return HttpResponse(request.user.email)

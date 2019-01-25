@@ -26,6 +26,9 @@
             / <a href="{{ sysinfo }}">Sys Infos</a>
         {% endif %}
         / <a href="javascript:document.cookie='old_index_style={{ index_style }}; path=/';window.location.reload(true);">Switch index</a>
+        {% if user.is_impersonate %}
+            <a href="{% url 'impersonate-stop' %}">Back to {{ request.real_user }}</a>
+        {% endif %}
     {% endif %}
 {% endblock %}
 {% block nav-global %}{% endblock %}

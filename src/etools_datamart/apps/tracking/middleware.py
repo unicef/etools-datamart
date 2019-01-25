@@ -11,7 +11,6 @@ from django.utils.timezone import now
 from strategy_field.utils import fqn
 
 from etools_datamart.apps.tracking import config
-from etools_datamart.apps.tracking.asyncqueue import AsyncQueue
 
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
 
@@ -124,11 +123,11 @@ def record_to_kwargs(request, response):
 
 
 #
-class AsyncLogger(AsyncQueue):
-    def _process(self, record):
-        values = record_to_kwargs(**record)
-        if values:
-            log_request(**values)
+# class AsyncLogger(AsyncQueue):
+#     def _process(self, record):
+#         values = record_to_kwargs(**record)
+#         if values:
+#             log_request(**values)
 
 
 class StatsMiddleware(object):
@@ -154,11 +153,11 @@ class StatsMiddleware(object):
             self.log(request, response)
         return response
 
-
-class ThreadedStatsMiddleware(StatsMiddleware):
-    def __init__(self, get_response):
-        super(ThreadedStatsMiddleware, self).__init__(get_response)
-        self.worker = AsyncLogger()
-
-    def log(self, request, response):
-        self.worker.queue({'request': request, 'response': response})
+#
+# class ThreadedStatsMiddleware(StatsMiddleware):
+#     def __init__(self, get_response):
+#         super(ThreadedStatsMiddleware, self).__init__(get_response)
+#         self.worker = AsyncLogger()
+#
+#     def log(self, request, response):
+#         self.worker.queue({'request': request, 'response': response})

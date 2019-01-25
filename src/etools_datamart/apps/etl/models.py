@@ -18,7 +18,7 @@ class TaskLogManager(models.Manager):
     def get_for_model(self, model: DataMartModel):
         try:
             return self.get(content_type=ContentType.objects.get_for_model(model))
-        except EtlTask.MultipleObjectsReturned:
+        except EtlTask.MultipleObjectsReturned:  # pragma: no cover
             raise EtlTask.MultipleObjectsReturned(f"MultipleObjectsReturned for model '{model.__name__}'")
         except EtlTask.DoesNotExist:
             raise EtlTask.DoesNotExist(f"EtlTask for model '{model.__name__}' does not exists")
@@ -69,10 +69,7 @@ class EtlTask(models.Model):
 
     @cached_property
     def loader(self):
-        try:
-            return self.content_type.model_class().loader
-        except AttributeError:
-            return None
+        return self.content_type.model_class().loader
 
     def update(self, **values):
         for attr, val in values.items():

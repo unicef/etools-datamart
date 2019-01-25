@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "48d82e1436c891980e34fd1a8296f4cd8bf0642d033da6aacaea79d6768c1b26"
+            "sha256": "0e3cfd4ee72358f857008c17c8282dea84ee4efcff6abf44b80067b391199499"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -872,6 +872,13 @@
             ],
             "index": "pypi",
             "version": "==2.1.0"
+        },
+        "django-impersonate": {
+            "hashes": [
+                "sha256:8a32a314eb4ef167dcf3cb4ad2b71f69786768a4e9a35b22d1169020c0f5a438"
+            ],
+            "index": "pypi",
+            "version": "==1.4"
         },
         "django-js-asset": {
             "hashes": [
@@ -2153,10 +2160,10 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:34b9ae3742abed2f95d3970acf4d80533261d6061b51160b197f84e5b4c98b4c",
-                "sha256:fa736831a7b18bd2bfeef746beb622a92509e9733d645952da136b0639cd40cd"
+                "sha256:58c359370401e0af817fb0070911e599c5fdc836166306b04fd0f278151ed125",
+                "sha256:729f0bcab430e4ef137646805b5b1d8efbb43fe53d4a0f33328624a84a5121f7"
             ],
-            "version": "==16.2.0"
+            "version": "==16.3.0"
         },
         "waitress": {
             "hashes": [

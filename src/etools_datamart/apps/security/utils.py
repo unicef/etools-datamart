@@ -18,12 +18,12 @@ cache = caches['default']
 def get_allowed_schemas(user):
     key = f"allowed_schemas:{get_full_version()}:{config.CACHE_VERSION}:{user.pk}"
     values = cache.get(key)
-    if not values:
-        if config.DISABLE_SCHEMA_RESTRICTIONS:
-            values = conn.all_schemas
-        elif not user.is_authenticated:
-            values = []
-        elif user.is_superuser:
+    if not values:  # pragma: no branch
+        # if config.DISABLE_SCHEMA_RESTRICTIONS:
+        #     values = conn.all_schemas
+        # elif not user.is_authenticated:
+        #     values = []
+        if user.is_superuser:
             values = conn.all_schemas
         else:
             with conn.noschema():

@@ -28,7 +28,6 @@ def test_loader_load(loader, number_of_intervention):
     assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
     # assert not loader.model.objects.filter(id=to_delete.pk).exists()
 
-#
 # def test_load_pmp_indicator(number_of_intervention):
 #     PMPIndicators.objects.truncate()
 #     PMPIndicators.loader.unlock()

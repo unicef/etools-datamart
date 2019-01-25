@@ -19,6 +19,11 @@ def test_whoami(django_app, admin_user):
     assert res.status_code == 200
 
 
+def test_whoami_anon(django_app):
+    res = django_app.get(reverse('whoami'))
+    assert res.status_code == 200
+
+
 def test_monitor(django_app, admin_user):
     EtlTask.objects.inspect()
     res = django_app.get(reverse('monitor'), user=admin_user)

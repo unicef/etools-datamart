@@ -20,6 +20,7 @@ urlpatterns = [
     path(r'admin/', site.urls),
     path(r'admin/schemas/', SelectSchema.as_view(), name='select-schema'),
     path(r'admin/sysinfo/', admin_sysinfo, name="sys-admin-info"),
+    path(r'impersonate/', include('impersonate.urls')),
 
     path(r'sys/info/', http_basic_login(sysinfo), name='sys-info'),
     path(r'sys/version/<name>/', http_basic_login(version), name='sys-version'),

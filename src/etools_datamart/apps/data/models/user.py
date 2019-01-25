@@ -28,11 +28,11 @@ class UserStatsLoader(Loader):
                 last_login__month=first_of_month.month,
                 email__endswith='@unicef.org').count(),
         }
-        op = self.process(filters=dict(month=first_of_month,
-                                       country_name=country.name,
-                                       schema_name=country.schema_name, ),
-                          values=values,
-                          context=context)
+        op = self.process_record(filters=dict(month=first_of_month,
+                                              country_name=country.name,
+                                              schema_name=country.schema_name, ),
+                                 values=values,
+                                 context=context)
         self.results.incr(op)
 
 

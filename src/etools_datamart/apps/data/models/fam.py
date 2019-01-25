@@ -25,12 +25,12 @@ class FAMIndicatorLoader(Loader):
                 field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
                 value = model.objects.filter(**filter_dict).count()
                 values[field_name] = value
-            op = self.process(filters=dict(month=start_date,
-                                           country_name=country.name,
-                                           area_code=country.business_area_code,
-                                           schema_name=country.schema_name),
-                              values=values,
-                              context=context)
+            op = self.process_record(filters=dict(month=start_date,
+                                                  country_name=country.name,
+                                                  area_code=country.business_area_code,
+                                                  schema_name=country.schema_name),
+                                     values=values,
+                                     context=context)
             self.results.incr(op)
 
 
