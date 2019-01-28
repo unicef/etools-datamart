@@ -315,7 +315,7 @@ class Loader:
         self.tree_parents = []
 
         # mark seen records
-        # self.model.objects.filter(id__in=self.seen).update(seen=context['today'])
+        self.model.objects.filter(id__in=self.seen).update(seen=context['today'])
 
     def process_country(self, country, context):
         qs = self.filter_queryset(self.get_queryset(context), context)
