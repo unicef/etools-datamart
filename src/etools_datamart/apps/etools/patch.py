@@ -8,7 +8,8 @@ from django.utils.translation import ugettext as _
 
 from unicef_security.models import User
 
-from etools_datamart.apps.etools.models import PartnersPlannedengagement, T2FTravel
+from etools_datamart.apps.etools.models import PartnersPlannedengagement, T2FTravel, ReportsAppliedindicator, \
+    ReportsAppliedindicatorDisaggregation, ReportsAppliedindicatorLocations, ReportsDisaggregation, LocationsLocation
 
 
 def label(attr, self):
@@ -131,6 +132,15 @@ def patch():
     fld = models.ManyToManyField(AuthGroup,
                                  through=AuthUserGroups,
                                  ).contribute_to_class(AuthUser, 'groups')
+
+    # Fix ReportsAppliedindicator ManyToManyField
+    models.ManyToManyField(ReportsDisaggregation,
+                           through=ReportsAppliedindicatorDisaggregation,
+                           ).contribute_to_class(ReportsAppliedindicator, 'disaggregations')
+
+    models.ManyToManyField(LocationsLocation,
+                           through=ReportsAppliedindicatorLocations,
+                           ).contribute_to_class(ReportsAppliedindicator, 'locations')
 
     # models.OneToOneField(UsersUserprofile,
     #                      on_delete=models.PROTECT,

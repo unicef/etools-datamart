@@ -424,7 +424,7 @@ class Loader:
                             logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update
                 connection = connections['etools']
-                if not countries:  # pragma: no branch
+                if countries is None:  # pragma: no branch
                     countries = connection.get_tenants()
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields

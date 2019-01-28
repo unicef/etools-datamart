@@ -172,3 +172,10 @@ class LocationAdmin(DataModelAdmin):
 class FundsReservationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'fr_number', 'fr_type', 'wbs')
     date_hierarchy = 'start_date'
+
+
+
+@register(models.PDIndicator)
+class PDIndicatorAdmin(DataModelAdmin):
+    list_display = ('title', 'unit', 'display_type')
+    # list_filter = ('disaggregatable', )
