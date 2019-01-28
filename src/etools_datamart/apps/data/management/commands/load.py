@@ -4,6 +4,7 @@ import sys
 
 from django.apps import apps
 from django.core.management import BaseCommand
+from django.db import connections
 
 from etools_datamart.apps.data.loader import loadeables, RUN_COMMAND
 from etools_datamart.apps.etl.models import EtlTask
@@ -42,6 +43,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('args',
                             metavar='models', nargs='*', help='One or more application label.')
+
         parser.add_argument('-e', '--exclude',
                             metavar='excludes',
                             nargs='*', help='exclude.')
@@ -78,6 +80,17 @@ class Command(BaseCommand):
             help="Run only failed tasks",
         )
 
+        parser.add_argument('-c',
+                            '--countries',
+                            help="Run only selected counries",
+                            )
+
+        parser.add_argument('-r',
+                            '--records',
+                            type=int,
+                            help="Only load <n> records",
+                            )
+
     def notify(self, model, created, name, tpl="  {op} {model} `{name}`"):
         if self.verbosity > 2:
             op = {True: "Created", False: "Updated"}[created]
@@ -92,6 +105,9 @@ class Command(BaseCommand):
         debug = options['debug']
         unlock = options['unlock']
         excludes = options['exclude'] or []
+        records = options['records']
+        countries = options['countries'].split(',')
+
         if debug:
             setup_logging(self.verbosity)
         if _all:
@@ -100,6 +116,11 @@ class Command(BaseCommand):
             qs = EtlTask.objects.exclude(status__in=['SUCCESS', 'RUNNING'])
             model_names = [t.loader.model_name for t in qs]
 
+        if countries:
+            connection = connections['etools']
+            schemas = [c for c in connection.get_tenants() if c.schema_name in countries]
+        else:
+            schemas = None
         if not model_names:
             for model_name in sorted(list(loadeables)):
                 self.stdout.write(model_name)
@@ -125,6 +146,8 @@ class Command(BaseCommand):
                                             ignore_dependencies=options['no_deps'],
                                             verbosity=self.verbosity,
                                             run_type=RUN_COMMAND,
+                                            max_records=records,
+                                            countries=schemas,
                                             stdout=sys.stdout)
                     self.stdout.write(f"{model_name:20}: "
                                       f"  created: {res.created:<3}"

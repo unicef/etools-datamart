@@ -2,13 +2,14 @@
     "record": {
         "master": {
             "model": "data.famindicator",
-            "pk": 353,
+            "pk": 518,
             "fields": {
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "last_modify_date": "2019-01-08T22:06:07.843Z",
+                "last_modify_date": "2019-01-28T16:49:08.167Z",
                 "seen": null,
+                "source_id": null,
                 "month": "2019-01-01",
                 "spotcheck_ip_contacted": 0,
                 "spotcheck_report_submitted": 0,

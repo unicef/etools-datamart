@@ -276,8 +276,11 @@ class Loader:
                                   err) from e
 
     def get_values(self, country, record, context):
-        ret = {'area_code': country.business_area_code}
-
+        ret = {'area_code': country.business_area_code,
+               'schema_name': country.schema_name,
+               'country_name': country.name,
+               'source_id': record.id
+               }
         for k, v in self.mapping.items():
             if v == '__self__':
                 try:
@@ -424,12 +427,12 @@ class Loader:
                             logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update
                 connection = connections['etools']
-                if not countries:  # pragma: no branch
+                if countries is None:  # pragma: no branch
                     countries = connection.get_tenants()
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
-                    if field.name not in ['country_name', 'schema_name', 'area_code',
+                    if field.name not in ['country_name', 'schema_name', 'area_code', 'source_id',
                                           'id', 'last_modify_date']:
                         self.mapping[field.name] = field.name
                 if self.config.mapping:  # pragma: no branch
@@ -459,8 +462,8 @@ class Loader:
                             break
                     if stdout and verbosity > 0:
                         stdout.write("\n")
-                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
-                    # self.results.deleted = deleted
+                    deleted = self.model.objects.exclude(seen=today).delete()[0]
+                    self.results.deleted = deleted
                 except Exception:
                     transaction.savepoint_rollback(sid)
                     raise
