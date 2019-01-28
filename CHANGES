@@ -1,4 +1,9 @@
-1.11
+1.12
+---------
+* new endpoint DPIndicator
+* preload helpers
+
+1.12
 ---------
 * add impersonation
 * fixes schema permission check
