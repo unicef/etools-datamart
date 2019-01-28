@@ -10,7 +10,7 @@ from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
 from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT,
-                                              Intervention, Location, PMPIndicators, UserStats,)
+                                              Intervention, Location, PDIndicator, PMPIndicators, UserStats,)
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -120,3 +120,11 @@ class FundsReservationFactory(DataMartModelFactory):
 
     class Meta:
         model = FundsReservation
+
+
+class PDIndicatorFactory(DataMartModelFactory):
+    is_active = True
+    is_high_frequency = True
+
+    class Meta:
+        model = PDIndicator

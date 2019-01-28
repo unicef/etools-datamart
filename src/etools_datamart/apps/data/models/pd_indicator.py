@@ -44,8 +44,8 @@ class PDIndicator(DataMartModel):
     response_plan_name = models.CharField(max_length=1024, blank=True, null=True)
     # section = models.ForeignKey('ReportsSector', models.DO_NOTHING,
     #                             related_name='reportssector_reports_appliedindicator_section_id', blank=True, null=True)
-    is_active = models.BooleanField()
-    is_high_frequency = models.BooleanField()
+    is_active = models.BooleanField(blank=True, null=True)
+    is_high_frequency = models.BooleanField(blank=True, null=True)
 
     denominator_label = models.CharField(max_length=256, blank=True, null=True)
     label = models.TextField(blank=True, null=True)
