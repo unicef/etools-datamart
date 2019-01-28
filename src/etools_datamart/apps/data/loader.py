@@ -276,8 +276,11 @@ class Loader:
                                   err) from e
 
     def get_values(self, country, record, context):
-        ret = {'area_code': country.business_area_code}
-
+        ret = {'area_code': country.business_area_code,
+               'schema_name': country.schema_name,
+               'country_name': country.name,
+               'source_id': record.id
+               }
         for k, v in self.mapping.items():
             if v == '__self__':
                 try:
@@ -429,7 +432,7 @@ class Loader:
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
-                    if field.name not in ['country_name', 'schema_name', 'area_code',
+                    if field.name not in ['country_name', 'schema_name', 'area_code', 'source_id',
                                           'id', 'last_modify_date']:
                         self.mapping[field.name] = field.name
                 if self.config.mapping:  # pragma: no branch

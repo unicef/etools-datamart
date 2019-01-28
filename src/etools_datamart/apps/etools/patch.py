@@ -8,8 +8,9 @@ from django.utils.translation import ugettext as _
 
 from unicef_security.models import User
 
-from etools_datamart.apps.etools.models import PartnersPlannedengagement, T2FTravel, ReportsAppliedindicator, \
-    ReportsAppliedindicatorDisaggregation, ReportsAppliedindicatorLocations, ReportsDisaggregation, LocationsLocation
+from etools_datamart.apps.etools.models import (LocationsLocation, PartnersPlannedengagement,
+                                                ReportsAppliedindicator, ReportsAppliedindicatorDisaggregation,
+                                                ReportsAppliedindicatorLocations, ReportsDisaggregation, T2FTravel,)
 
 
 def label(attr, self):

@@ -174,7 +174,6 @@ class FundsReservationAdmin(DataModelAdmin):
     date_hierarchy = 'start_date'
 
 
-
 @register(models.PDIndicator)
 class PDIndicatorAdmin(DataModelAdmin):
     list_display = ('title', 'unit', 'display_type')

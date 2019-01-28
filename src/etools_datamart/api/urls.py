@@ -28,12 +28,13 @@ router.register(r'etools/t2/ftravel', endpoints.FTravelViewSet)
 router.register(r'etools/tpm/tpmvisit', endpoints.TpmTpmvisitViewSet)
 router.register(r'etools/locations', endpoints.LocationViewSet)
 
-router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
-router.register(r'datamart/interventions', endpoints.InterventionViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
-router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
-router.register(r'datamart/hact', endpoints.HACTViewSet)
 router.register(r'datamart/funds-reservation', endpoints.FundsReservationViewSet)
+router.register(r'datamart/hact', endpoints.HACTViewSet)
+router.register(r'datamart/interventions', endpoints.InterventionViewSet)
+router.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)
+router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
+router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 

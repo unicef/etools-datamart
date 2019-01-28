@@ -80,3 +80,9 @@ reset-migrations:
 
 	./manage.py reset-migrations
 	./manage.py init-setup --all
+
+new-data-migration:
+	./manage.py migrate data 0001
+	find src/etools_datamart/apps/data/migrations -name '000[2,3,4,5,6,7,8,9]*' | xargs rm -f
+	./manage.py makemigrations data
+	./manage.py migrate data

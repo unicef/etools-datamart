@@ -9,3 +9,4 @@ class Config(AppConfig):
     def ready(self):
         from . import tasks  # noqa
         from . import handlers  # noqa
+        from . import checks  # noqa
