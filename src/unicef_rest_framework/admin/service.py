@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import inspect
 import logging
 import os
 
@@ -13,7 +12,7 @@ from django.utils.safestring import mark_safe
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from adminactions.mass_update import mass_update
 from constance import config
-from strategy_field.utils import fqn, import_by_name
+from strategy_field.utils import fqn
 
 from unicef_rest_framework import acl
 from unicef_rest_framework.forms import ServiceForm
@@ -140,11 +139,11 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         service = Service.objects.get(pk=pk)
         return HttpResponseRedirect(service.endpoint)
 
-    @action()
-    def crontab_expire(self, request, pk):
-        base = reverse("admin:django_celery_beat_crontabschedule_add")
-        url = f"{base}?"
-        return HttpResponseRedirect(url)
+    # @action()
+    # def crontab_expire(self, request, pk):
+    #     base = reverse("admin:django_celery_beat_crontabschedule_add")
+    #     url = f"{base}?"
+    #     return HttpResponseRedirect(url)
 
     @action()
     def invalidate_cache(self, request, pk):
@@ -155,16 +154,16 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         else:
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-    @action(visible=False)
-    def code(self, request, pk):
-        cls = request.GET.get('c', None)
-        if cls:
-            target = import_by_name(cls)
-        else:
-            service = Service.objects.get(pk=pk)
-            target = service.view
-        code = inspect.getsource(target)
-        return HttpResponse(code, content_type='text/plain')
+    # @action(visible=False)
+    # def code(self, request, pk):
+    #     cls = request.GET.get('c', None)
+    #     if cls:
+    #         target = import_by_name(cls)
+    #     else:
+    #         service = Service.objects.get(pk=pk)
+    #         target = service.view
+    #     code = inspect.getsource(target)
+    #     return HttpResponse(code, content_type='text/plain')
 
-    def changelist_view(self, request, extra_context=None):
-        return super(ServiceAdmin, self).changelist_view(request, extra_context)
+    # def changelist_view(self, request, extra_context=None):
+    #     return super(ServiceAdmin, self).changelist_view(request, extra_context)
