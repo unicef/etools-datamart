@@ -45,3 +45,4 @@ exclude hooks
 recursive-exclude docker *
 recursive-exclude deploy *
 recursive-exclude hooks *
+recursive-exclude src *.scss

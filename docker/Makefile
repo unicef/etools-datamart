@@ -36,6 +36,7 @@ build:
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
 			--build-arg VERSION=${TARGET} \
+			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
@@ -68,7 +69,6 @@ build:
 			-e SESSION_COOKIE_SECURE=false \
 			-e STATIC_ROOT=/var/datamart/static/ \
 			-e DEVELOPMENT_MODE=0 \
-			-e STACK=1 \
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
 			${RUN_OPTIONS} \
 			${DOCKER_IMAGE} \
@@ -118,8 +118,12 @@ scratch:
 	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
 
 shell:
+	RUN_OPTIONS="-p 8000:8000 -it" \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+	CMD='/bin/bash' \
+		$(MAKE) .run
 #	docker exec -it ${CONTAINER_NAME} /bin/bash
-	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
+#	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
 
 docker-remove:
 	docker-remove.sh ${IMAGE_NAME} -o ${ORGANIZATION}

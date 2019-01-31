@@ -1,5 +1,4 @@
 #!/bin/bash -e
-set -e
 
 mkdir -p /var/datamart/static
 mkdir -p /var/datamart/log

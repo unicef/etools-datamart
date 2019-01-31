@@ -13,43 +13,16 @@ RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
     && curl ${GITHUB_CREDENTIALS}: -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
-FROM python:3.6-alpine as base
+FROM python:3.6.7-slim as base
+RUN apt-get update \
+ 	&& apt-get install -y --no-install-recommends \
+ 	    gcc \
+ 	    gdal-bin \
+ 	    python-dev
 
-RUN apk add --no-cache \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-    bash \
-    freetype \
-    geos \
-    gdal \
-    lcms2 \
-    libjpeg-turbo \
-    libpng \
-    libpq \
-    openjpeg \
-    postgresql-libs \
-    tiff \
-    && apk add --no-cache --virtual .build-deps \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-    freetype-dev \
-    gcc \
-    gdal-dev \
-    geos-dev \
-    jpeg-dev \
-    lcms2-dev \
-    libffi-dev \
-    linux-headers \
-    musl-dev \
-    openjpeg-dev \
-    postgresql-dev \
-    python3-dev \
-    tcl-dev \
-    tiff-dev \
-    tk-dev \
-    zlib-dev \
-    && pip install pip==18.0 pipenv --upgrade \
-    && adduser -S datamart
+
+RUN pip install pip==18.0 pipenv --upgrade \
+    && adduser --system datamart
 
 FROM base
 COPY --from=builder /code /code
@@ -67,7 +40,7 @@ ARG PIPENV_ARGS
 ARG VERSION
 
 ENV VERSION ${VERSION}
-
+ENV ABSOLUTE_BASE_URL "http://datamart.unicef.io"
 ENV PIPENV_PYPI_MIRROR ${PIPENV_PYPI_MIRROR}
 ENV PIPENV_ARGS ${PIPENV_ARGS}
 ENV HOME /root/
@@ -75,9 +48,11 @@ ENV PIPSI_HOME=/usr/local/pipsi/environments
 ENV PIPSI_BIN_DIR=/usr/local/bin
 ENV PYTHONUNBUFFERED 1
 ENV USE_GUNICORN 0
-ENV GUNICORN_CMD_ARGS "-b 0.0.0.0:8000 \
+ENV GUNICORN_CMD_ARGS " -b 0.0.0.0:8000 \
+--name datamart \
 --chdir /var/datamart \
 --access-logfile - \
+--timeout 120 \
 --access-logformat \"%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s\" "
 
 ENV ALLOWED_HOSTS *
@@ -127,12 +102,17 @@ RUN set -ex \
     && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
 
 RUN pip install . \
-    && rm -fr /code
+    && rm -fr /code \
+    && mkdir -p /var/datamart/static \
+    && mkdir -p /var/datamart/log \
+    && mkdir -p /var/datamart/conf \
+    && mkdir -p /var/datamart/run \
+    && chown -R datamart /var/datamart/
 
 
-RUN apk del .build-deps \
-    && rm -rf /var/cache/apk/* \
-    && rm -fr /root/.cache/
+#RUN apk del .build-deps \
+#    && rm -rf /var/cache/apk/* \
+#    && rm -fr /root/.cache/
 
 WORKDIR /var/datamart
 
