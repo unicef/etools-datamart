@@ -48,7 +48,8 @@ class FundsReservation(DataMartModel):
     source_id = models.IntegerField()
     source_intervention_id = models.IntegerField()
 
-    intervention = models.ForeignKey(Intervention, models.DO_NOTHING,
+    intervention = models.ForeignKey(Intervention,
+                                     models.SET_NULL,
                                      related_name='funds', blank=True, null=True)
 
     class Meta:
