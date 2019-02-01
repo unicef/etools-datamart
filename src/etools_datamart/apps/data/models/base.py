@@ -31,7 +31,7 @@ class DataMartQuerySet(QuerySet):
 class DataMartManager(BaseManager.from_queryset(DataMartQuerySet)):
 
     def truncate(self):
-        self.raw('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
+        self.raw('TRUNCATE TABLE {0} CASCADE'.format(self.model._meta.db_table))
 
 
 class DataMartModelBase(ModelBase):

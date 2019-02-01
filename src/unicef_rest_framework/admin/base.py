@@ -24,7 +24,7 @@ class TruncateTableMixin(ExtraUrlMixin):
     def _truncate(self, request):
         from django.db import connection
         cursor = connection.cursor()
-        cursor.execute('TRUNCATE TABLE {0}'.format(self.model._meta.db_table))
+        cursor.execute('TRUNCATE TABLE "{0}" CASCADE '.format(self.model._meta.db_table))
 
     @link(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
     def truncate(self, request):

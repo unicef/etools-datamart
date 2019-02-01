@@ -9,7 +9,7 @@ from django.contrib.admin.views.main import ChangeList
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from admin_extra_urls.extras import ExtraUrlMixin, link
+from admin_extra_urls.extras import link
 from adminactions.mass_update import mass_update
 from adminfilters.filters import AllValuesComboFilter
 from crashlog.middleware import process_exception
@@ -30,7 +30,7 @@ class DatamartChangeList(ChangeList):
     pass
 
 
-class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
+class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     actions = [mass_update, ]
 
     def get_list_filter(self, request):
