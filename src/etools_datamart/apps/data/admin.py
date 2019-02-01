@@ -30,7 +30,7 @@ class DatamartChangeList(ChangeList):
     pass
 
 
-class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
+class DataModelAdmin(ExtraUrlMixin, TruncateTableMixin, ModelAdmin):
     actions = [mass_update, ]
 
     def get_list_filter(self, request):
