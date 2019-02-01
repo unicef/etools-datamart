@@ -262,8 +262,8 @@ class Command(BaseCommand):
             for loadeable in loadeables:
                 model = apps.get_model(loadeable)
                 loaders.append(loadeable)
-                __, is_new = PeriodicTask.objects.get_or_create(task=f"ETL {model.loader.task.name}",
-                                                                defaults={'name': loadeable,
+                __, is_new = PeriodicTask.objects.get_or_create(name=f"ETL {model.loader.task.name}",
+                                                                defaults={'task': model.loader.task.name,
                                                                           'service': Service.objects.get_for_model(model),
                                                                           'crontab': midnight})
                 if is_new:
