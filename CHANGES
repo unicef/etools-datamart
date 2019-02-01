@@ -1,3 +1,8 @@
+1.15
+----
+* add ability to truncate DataMart tables
+* fixes init-setup PeriodicTask creation
+
 1.14
 ----
 * Fix loading Intervention
