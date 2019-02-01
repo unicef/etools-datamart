@@ -52,14 +52,25 @@ class Intervention(DataMartModel):
     partner_focal_point_email = models.CharField(max_length=128, null=True)
     partner_focal_point_phone = models.CharField(max_length=64, null=True)
 
-    intervention_id = models.IntegerField(null=True)
-    agreement_id = models.IntegerField(null=True)
-    country_programme_id = models.IntegerField(null=True)
-    unicef_signatory_id = models.IntegerField(null=True)
+    partner_contribution = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    unicef_cash = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    in_kind_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    partner_contribution_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    in_kind_amount_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    total_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    currency = models.CharField(max_length=4, blank=True, null=True)
+
+    intervention_id = models.IntegerField(blank=True, null=True)
+    agreement_id = models.IntegerField(blank=True, null=True)
+    country_programme_id = models.IntegerField(blank=True, null=True)
+    unicef_signatory_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         ordering = ('country_name', 'title')
         verbose_name = "Intervention"
+        unique_together = ('schema_name', 'intervention_id')
 
     class Options:
         source = PartnersIntervention
@@ -67,6 +78,7 @@ class Intervention(DataMartModel):
                                                                        'partner_authorized_officer_signatory',
                                                                        'unicef_signatory',
                                                                        'country_programme',
+                                                                       'partnersintervention_partners_interventionbudget_intervention_id'
                                                                        )
         key = lambda country, record: dict(country_name=country.name,
                                            schema_name=country.schema_name,
@@ -77,7 +89,7 @@ class Intervention(DataMartModel):
                        partner_name='agreement.partner.name',
                        partner_authorized_officer_signatory_id='partner_authorized_officer_signatory.pk',
                        country_programme_id='country_programme.pk',
-                       intervention_id='pk',
+                       intervention_id='id',
                        unicef_signatory_id='unicef_signatory.pk',
                        unicef_signatory_first_name='unicef_signatory.first_name',
                        unicef_signatory_last_name='unicef_signatory.last_name',
@@ -93,4 +105,15 @@ class Intervention(DataMartModel):
                        partner_focal_point_last_name='partner_focal_point.last_name',
                        partner_focal_point_email='partner_focal_point.email',
                        partner_focal_point_phone='partner_focal_point.phone',
-                       updated='modified')
+                       updated='modified',
+
+                       partner_contribution='planned_budget.partner_contribution',
+                       unicef_cash='planned_budget.unicef_cash',
+                       in_kind_amount='planned_budget.in_kind_amount',
+                       partner_contribution_local='planned_budget.partner_contribution_local',
+                       unicef_cash_local='planned_budget.unicef_cash_local',
+                       in_kind_amount_local='planned_budget.in_kind_amount_local',
+                       total='planned_budget.total',
+                       total_local='planned_budget.total_local',
+                       currency='planned_budget.currency',
+                       )

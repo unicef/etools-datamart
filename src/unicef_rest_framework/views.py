@@ -45,6 +45,7 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
 
     authentication_classes = (SessionAuthentication,
                               IPBasedAuthentication,
+                              TokenAuthentication,
                               JWTAuthentication,
                               BasicAuthentication,
                               TokenAuthentication,
@@ -79,15 +80,17 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
     permission_classes = [ServicePermission, ]
     serializers_fieldsets = {}
 
-    def get_filter_backends(self, removes=None):
+    def get_filter_backends(self):
+        #
         flt = list(self.filter_backends)
         if SystemFilterBackend not in flt:
             flt.insert(0, SystemFilterBackend)
         if PageFilter not in flt:
             flt.append(PageFilter)
-        return list(filter(removes, flt))
+        return flt
 
     def filter_queryset(self, queryset):
+        # overridden to use get_filter_backends()
         for backend in self.get_filter_backends():
             queryset = backend().filter_queryset(self.request, queryset, self)
         return queryset
@@ -102,11 +105,6 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
             request.api_info["service"] = self.get_service()
 
         return super().dispatch(request, *args, **kwargs)
-
-    # def filter_queryset(self, queryset):
-    #     if hasattr(self.request, 'api_info'):
-    #         self.request.api_info["sql"] = str(queryset.query)
-    #     return super().filter_queryset(queryset)
 
     @classproperty
     def label(cls):

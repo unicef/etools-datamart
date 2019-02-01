@@ -9,6 +9,16 @@
 from django.db import models
 
 
+class EquitrackDomain(models.Model):
+    domain = models.CharField(unique=True, max_length=253)
+    is_primary = models.BooleanField()
+    tenant = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='userscountry_EquiTrack_domain_tenant_id')
+
+    class Meta:
+        managed = False
+        db_table = 'EquiTrack_domain'
+
+
 class AccountEmailaddress(models.Model):
     email = models.CharField(unique=True, max_length=254)
     verified = models.BooleanField()
@@ -149,6 +159,7 @@ class DjangoCeleryBeatCrontabschedule(models.Model):
     day_of_week = models.CharField(max_length=64)
     day_of_month = models.CharField(max_length=124)
     month_of_year = models.CharField(max_length=64)
+    timezone = models.CharField(max_length=63)
 
     class Meta:
         managed = False
@@ -181,6 +192,8 @@ class DjangoCeleryBeatPeriodictask(models.Model):
     crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.DO_NOTHING, related_name='djangocelerybeatcrontabschedule_django_celery_beat_periodictask_crontab_id', blank=True, null=True)
     interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.DO_NOTHING, related_name='djangocelerybeatintervalschedule_django_celery_beat_periodictask_interval_id', blank=True, null=True)
     solar = models.ForeignKey('DjangoCeleryBeatSolarschedule', models.DO_NOTHING, related_name='djangocelerybeatsolarschedule_django_celery_beat_periodictask_solar_id', blank=True, null=True)
+    one_off = models.BooleanField()
+    start_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -873,7 +886,6 @@ class UnicefNotificationNotification(models.Model):
 
 
 class UsersCountry(models.Model):
-    domain_url = models.CharField(unique=True, max_length=128)
     schema_name = models.CharField(unique=True, max_length=63)
     name = models.CharField(max_length=100)
     business_area_code = models.CharField(max_length=10)

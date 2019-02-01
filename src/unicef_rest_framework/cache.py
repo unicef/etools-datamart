@@ -10,7 +10,7 @@ from humanize.time import date_and_delta
 from rest_framework_extensions.cache.decorators import CacheResponse
 from rest_framework_extensions.etag.decorators import ETAGProcessor
 from rest_framework_extensions.key_constructor import bits
-from rest_framework_extensions.key_constructor.bits import KeyBitBase
+from rest_framework_extensions.key_constructor.bits import KeyBitBase, QueryParamsKeyBit
 from rest_framework_extensions.key_constructor.constructors import KeyConstructor
 from rest_framework_extensions.settings import extensions_api_settings
 from strategy_field.utils import fqn
@@ -131,11 +131,39 @@ class QueryPathKeyBit(KeyBitBase):
         return {'path': str(request.path)}
 
 
+class SuperuserKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        return {'admin': request.user.is_superuser}
+
+
+class IsStaffKeyBit(KeyBitBase):
+    def get_data(self, params, view_instance, view_method, request, args, kwargs):
+        return {'staff': request.user.is_staff}
+
+
 class DevelopKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         if 'disable-cache' in request.GET:
             return {'dev': str(time.time())}
+        if request.META.get('HTTP_X_DM_CACHE') == 'disabled':
+            return {'dev': str(time.time())}
         return {}
+
+
+class SmartQueryParamsKeyBit(QueryParamsKeyBit):
+    """
+    Return example:
+        {'part': 'Londo', 'callback': 'jquery_callback'}
+
+    """
+
+    def get_source_dict(self, params, view_instance, view_method, request, args, kwargs):
+        values = request.GET.copy()
+        if not values.get('ordering', None) == view_instance.ordering:
+            values['ordering'] = view_instance.ordering
+        if not values.get(view_instance.serializer_field_param, None):
+            values[view_instance.serializer_field_param] = 'std'
+        return values
 
 
 class ListKeyConstructor(KeyConstructor):
@@ -146,12 +174,9 @@ class ListKeyConstructor(KeyConstructor):
     format = bits.FormatKeyBit()
     headers = bits.HeadersKeyBit(['Accept'])
     dev = DevelopKeyBit()
-    # language = bits.LanguageKeyBit()
-    # list_sql_query = bits.ListSqlQueryKeyBit()  # NEVER NEVER USE THIS
-
-    querystring = bits.QueryParamsKeyBit()
-
-    # pagination = bits.PaginationKeyBit()
+    admin = SuperuserKeyBit()
+    staff = IsStaffKeyBit()
+    querystring = SmartQueryParamsKeyBit()
 
     def get_key(self, view_instance, view_method, request, args, kwargs):
         key = super().get_key(view_instance, view_method, request, args, kwargs)

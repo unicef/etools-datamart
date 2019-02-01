@@ -33,3 +33,17 @@ def test_index_old(django_app, admin_user):
     url = reverse("admin:index")
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
+
+
+def test_schemaaccesscontrol_list(django_app, admin_user):
+    url = reverse("admin:security_schemaaccesscontrol_changelist")
+    res = django_app.get(url, user=admin_user)
+    assert res.status_code == 200
+
+
+def test_schemaaccesscontrol_change(django_app, admin_user, schema_access_control):
+    url = reverse("admin:security_schemaaccesscontrol_change", args=[schema_access_control.pk])
+    res = django_app.get(url, user=admin_user)
+    assert res.status_code == 200
+    res = res.form.submit()
+    assert res.status_code == 302

@@ -1,9 +1,76 @@
-FROM pstauffer/curl:latest as builder
-ARG DEVELOP
-ARG GITHUB_CREDENTIALS
-ARG VERSION
+FROM python:3.6.8-alpine3.8 as base
+FROM base
 
-RUN mkdir /code
+ARG BUILD_DATE
+ARG PIPENV_ARGS
+ARG VERSION
+ARG DEVELOP
+
+ENV CPLUS_INCLUDE_PATH /usr/include/gdal
+ENV C_INCLUDE_PATH /usr/include/gdal
+
+RUN apk add --no-cache --virtual .fetch-deps \
+        curl \
+        ca-certificates \
+        openssl \
+        tar
+
+RUN apk add --no-cache --virtual .build-deps \
+        autoconf \
+        automake \
+        pkgconf \
+        g++ \
+        json-c-dev \
+        libtool \
+        libxml2-dev \
+        make \
+        perl
+
+RUN apk add --no-cache --virtual .build-deps-edge \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        proj4-dev \
+        protobuf-c-dev
+
+RUN apk add --no-cache --virtual .postgis-rundeps \
+        json-c
+
+RUN apk add --no-cache --virtual .postgis-rundeps-edge \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        binutils \
+        geos \
+        geos-dev \
+        gdal-dev \
+        gdal \
+        proj4 \
+        protobuf-c
+
+RUN apk add --no-cache --virtual .datamart-build-deps \
+        freetype-dev \
+        fontconfig-dev \
+        freetype-dev \
+        jpeg-dev \
+        lcms2-dev \
+        libffi-dev \
+        libressl-dev \
+        linux-headers \
+        musl-dev \
+        openjpeg-dev \
+        postgresql-dev \
+        python3-dev \
+        tcl-dev \
+        tiff-dev \
+        tk-dev \
+        zlib-dev
+
+RUN apk add --no-cache --virtual .datamart-run-deps \
+        postgresql-libs
+
+RUN apk add --no-cache --virtual .system-run-deps \
+        bash
+
+RUN mkdir -p /code
 ADD . /code
 
 RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
@@ -13,52 +80,15 @@ RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
     && curl ${GITHUB_CREDENTIALS}: -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
-FROM python:3.6.7-slim as base
-RUN apt-get update \
- 	&& apt-get install -y --no-install-recommends \
- 	    gcc \
- 	    gdal-bin \
- 	    python-dev
+RUN pip install pip==18.0 pipenv --upgrade
 
-#RUN apk add --no-cache \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-#    bash \
-#    freetype \
-#    geos \
-#    gdal \
-#    lcms2 \
-#    libjpeg-turbo \
-#    libpng \
-#    libpq \
-#    openjpeg \
-#    postgresql-libs \
-#    tiff \
-#    && apk add --no-cache --virtual .build-deps \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-#    freetype-dev \
-#    gcc \
-#    gdal-dev \
-#    geos-dev \
-#    jpeg-dev \
-#    lcms2-dev \
-#    libffi-dev \
-#    linux-headers \
-#    musl-dev \
-#    openjpeg-dev \
-#    postgresql-dev \
-#    python3-dev \
-#    tcl-dev \
-#    tiff-dev \
-#    tk-dev \
-#    zlib-dev \
+WORKDIR /code
 
-RUN pip install pip==18.0 pipenv --upgrade \
-    && adduser --system datamart
-
-FROM base
-COPY --from=builder /code /code
+RUN set -ex \
+    ls -al /code \
+    && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS \
+    && pip3 install . \
+    && rm -fr /code
 
 LABEL org.label.name="eTools Datamart" \
       org.label.maintainer="sapostolico@unicef.org" \
@@ -67,10 +97,6 @@ LABEL org.label.name="eTools Datamart" \
       org.label.vcs-url="https://github.com/unicef/etools-datamart" \
       org.label.version=$VERSION
 
-
-ARG BUILD_DATE
-ARG PIPENV_ARGS
-ARG VERSION
 
 ENV VERSION ${VERSION}
 
@@ -109,44 +135,28 @@ ENV SENTRY_DSN ""
 ENV SESSION_COOKIE_HTTPONLY True
 ENV SESSION_COOKIE_SECURE True
 ENV STATIC_ROOT /tmp/static
-#ENV SUPERVISOR_USER admin
-#ENV SUPERVISOR_PWD ""
-#ENV FLOWER_USER admin
-#ENV FLOWER_PWD ""
-#ENV X_FRAME_OPTIONS "DENY"
-#ENV START_DATAMART "true"
-#ENV START_REDIS "true"
-#ENV START_CELERY "true"
 
-#RUN apt-get update && apt-get install -y --force-yes \
-#    gcc
-
-RUN mkdir -p \
-    /var/datamart/ \
-    && chown datamart /var/datamart/ \
-    && pip install pip==18.0 pipenv --upgrade
-
-WORKDIR /code
-
-RUN set -ex \
-    ls -al /code \
-    && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
-
-RUN pip install . \
-    && rm -fr /code
-
-
-#RUN apk del .build-deps \
-#    && rm -rf /var/cache/apk/* \
-#    && rm -fr /root/.cache/
-
-WORKDIR /var/datamart
 
 EXPOSE 8000
+RUN apk del .fetch-deps .build-deps .build-deps-edge .datamart-build-deps
+RUN rm -rf /var/cache/apk/* \
+    rm -fr /root/.cache/ \
+    rm -fr /code \
+    rm -fr /usr/include/
 
-USER datamart
+RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
+    && python -O -m compileall -fqb /usr/local/lib/python3.6/ \
+    && find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+RUN adduser -S datamart \
+    && mkdir -p /var/datamart \
+    && chown datamart /var/datamart/
+
+WORKDIR /var/datamart
+USER datamart
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 CMD ["datamart"]

@@ -1,3 +1,35 @@
+1.14
+----
+* Fix loading Intervention
+* migrations reset
+
+
+1.14
+---------
+* new endpoint DPIndicator
+* preload helpers
+
+1.14
+---------
+* add impersonation
+* fixes schema permission check
+
+
+1.10
+----
+* Loader refactoring
+* new endpoint 'Funds Reservation'
+* add budget informations to interventions
+
+
+1.9 (dev)
+---------
+* WARNINGS: migration reset
+* Location/GatewayType endpoints
+* add action to queue multiple tasks
+* updates schema to eTools v6.5.1
+
+
 1.8
 ---
 * WARNINGS: migration reset

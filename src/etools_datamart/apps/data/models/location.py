@@ -11,12 +11,16 @@ class GatewayType(DataMartModel):
     source_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('schema_name', 'name'), ('schema_name', 'admin_level')
+        unique_together = (('schema_name', 'name'),
+                           ('schema_name', 'admin_level'))
 
     class Options:
         source = LocationsGatewaytype
+        key = lambda country, record: dict(schema_name=country.schema_name,
+                                           name=record.name)
         mapping = {'source_id': 'id',
                    'area_code': lambda country, record: country.business_area_code,
+                   'country_name': lambda country, record: country.name,
                    }
 
 
@@ -38,6 +42,9 @@ class Location(DataMartModel):
     is_active = models.BooleanField()
 
     source_id = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('schema_name', 'source_id')
 
     class Options:
         depends = (GatewayType,)

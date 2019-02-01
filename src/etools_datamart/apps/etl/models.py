@@ -6,6 +6,7 @@ from django.utils.functional import cached_property
 
 from django_celery_beat.models import PeriodicTask
 
+from etools_datamart.apps.data.loader import RUN_TYPES, RUN_UNKNOWN
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.celery import app
 
@@ -17,41 +18,44 @@ class TaskLogManager(models.Manager):
     def get_for_model(self, model: DataMartModel):
         try:
             return self.get(content_type=ContentType.objects.get_for_model(model))
+        except EtlTask.MultipleObjectsReturned:  # pragma: no cover
+            raise EtlTask.MultipleObjectsReturned(f"MultipleObjectsReturned for model '{model.__name__}'")
         except EtlTask.DoesNotExist:
             raise EtlTask.DoesNotExist(f"EtlTask for model '{model.__name__}' does not exists")
-
-    # def get_for_task(self, task: ETLTask):
-    #     return self.get_or_create(task=task.name,
-    #                               defaults=dict(content_type=ContentType.objects.get_for_model(task.linked_model),
-    #                                             last_run=None,
-    #                                             table_name=task.linked_model._meta.db_table))[0]
 
     def inspect(self):
         tasks = app.get_all_etls()
         results = {True: 0, False: 0}
         new = []
         for task in tasks:
-            t, created = self.get_or_create(task=task.name,
+            t, created = self.get_or_create(content_type=ContentType.objects.get_for_model(task.linked_model),
                                             defaults=dict(
-                                                content_type=ContentType.objects.get_for_model(task.linked_model),
+                                                task=task.name,
                                                 last_run=None,
                                                 table_name=task.linked_model._meta.db_table))
             results[created] += 1
             new.append(t.id)
         self.exclude(id__in=new).delete()
-        return results[True], results[False]
+        return {'created': results[True], 'updated': results[False]}
 
 
 class EtlTask(models.Model):
+    STATUSES = (('QUEUED', 'QUEUED'),
+                ('RUNNING', 'RUNNING'),
+                ('FAILURE', 'FAILURE'),
+                ('SUCCESS', 'SUCCESS'),
+                ('ERROR', 'ERROR'),
+                )
     task = models.CharField(max_length=200, unique=True)
     last_run = models.DateTimeField(null=True, help_text="last execution time")
     status = models.CharField(max_length=200)
     elapsed = models.IntegerField(null=True)
+    run_type = models.IntegerField(choices=RUN_TYPES, default=RUN_UNKNOWN)
     last_success = models.DateTimeField(null=True, help_text="last successully execution time")
     last_failure = models.DateTimeField(null=True, help_text="last failure execution time")
     last_changes = models.DateTimeField(null=True, help_text="last time data have been changed")
     table_name = models.CharField(max_length=200, null=True)
-    content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
+    content_type = models.OneToOneField(ContentType, models.CASCADE, null=True)
 
     results = JSONField(blank=True, null=True)
 
@@ -63,16 +67,16 @@ class EtlTask(models.Model):
     def __str__(self):
         return f"{self.task} {self.status}"
 
-    # @cached_property
-    # def lock_key(self):
-    #     return f"{self.task}-lock"
-
     @cached_property
     def loader(self):
-        try:
-            return self.content_type.model_class().loader
-        except AttributeError:
-            return None
+        return self.content_type.model_class().loader
+
+    def update(self, **values):
+        for attr, val in values.items():
+            setattr(self, attr, val)
+        self.save()
+
+    update.alters_data = True
 
     @cached_property
     def verbose_name(self):

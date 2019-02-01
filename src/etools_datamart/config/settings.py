@@ -12,55 +12,55 @@ PACKAGE_DIR = SETTINGS_DIR.parent
 DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 
 env = environ.Env(API_PREFIX=(str, '/api/'),
-                  ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
+                  ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   ANALYTICS_CODE=(str, ""),
-                  REDOC_BASE=(str, '/api/+redoc/#operation/'),
+                  AZURE_ACCOUNT_KEY=(str, ''),
+                  AZURE_ACCOUNT_NAME=(str, ''),
+                  AZURE_CLIENT_ID=(str, ''),
+                  AZURE_CLIENT_SECRET=(str, ''),
+                  AZURE_CONTAINER=(str, ''),
+                  AZURE_LOCATION=(str, ''),
+                  AZURE_OVERWRITE_FILES=(bool, True),
+                  AZURE_TENANT=(str, ''),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
                   CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
                   CACHE_URL_TEMPLATE=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
-                  # CACHE_URL=(str, "dummycache://"),
-                  # CACHE_URL_API=(str, "dummycache://"),
-                  ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
-                  DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
-                  DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
-                  DISABLE_SERVICE_RESTRICTIONS=(bool, False),
-                  ENABLE_LIVE_STATS=(bool, True),
+                  CELERY_ALWAYS_EAGER=(bool, False),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
-                  CELERY_ALWAYS_EAGER=(bool, False),
                   CSRF_COOKIE_SECURE=(bool, True),
-                  DATABASE_URL=(str, "postgres://postgres:@127.0.0.1:5432/etools_datamart"),
+                  IGNORED_SCHEMAS=(str, ["public", "uat", "frg"]),
+                  DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DEBUG=(bool, False),
+                  DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
+                  DISABLE_SERVICE_RESTRICTIONS=(bool, False),
+                  DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
+                  EMAIL_HOST=(str, ''),
+                  EMAIL_HOST_PASSWORD=(str, ''),
+                  EMAIL_HOST_USER=(str, ''),
+                  EMAIL_PORT=(int, 587),
+                  EMAIL_USE_TLS=(bool, True),
+                  ENABLE_LIVE_STATS=(bool, True),
+                  ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   MEDIA_ROOT=(str, '/tmp/media'),
+                  MYSTICA_PASSWORD=(str, ''),
+                  REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   SECRET_KEY=(str, 'secret'),
-                  SECURE_HSTS_PRELOAD=(bool, 'True'),
-                  SECURE_SSL_REDIRECT=(bool, True),
                   SECURE_BROWSER_XSS_FILTER=(bool, True),
                   SECURE_CONTENT_TYPE_NOSNIFF=(bool, True),
                   SECURE_FRAME_DENY=(bool, True),
+                  SECURE_HSTS_PRELOAD=(bool, True),
+                  SECURE_SSL_REDIRECT=(bool, True),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
                   STATIC_URL=(str, '/dm-static/'),
-                  X_FRAME_OPTIONS=(str, 'DENY'),
-
-                  AZURE_CLIENT_ID=(str, ''),
-                  AZURE_CLIENT_SECRET=(str, ''),
-                  AZURE_TENANT=(str, ''),
-
-                  AZURE_ACCOUNT_NAME=(str, ''),
-                  AZURE_ACCOUNT_KEY=(str, ''),
-                  AZURE_CONTAINER=(str, ''),
-                  AZURE_OVERWRITE_FILES=(bool, True),
-                  AZURE_LOCATION=(str, ''),
-
-                  EMAIL_USE_TLS=(bool, True),
-                  EMAIL_HOST=(str, ''),
-                  EMAIL_HOST_USER=(str, ''),
-                  EMAIL_HOST_PASSWORD=(str, ''),
-                  EMAIL_PORT=(int, 587),
+                  SYSTEM_PASSWORD=(str, ''),
+                  TIME_ZONE=(str, 'UTC'),
+                  URL_PREFIX=(str, ''),
                   USE_X_FORWARDED_HOST=(bool, False),
+                  X_FRAME_OPTIONS=(str, 'DENY'),
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -72,9 +72,10 @@ MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
+URL_PREFIX = env('URL_PREFIX')
 
 ADMINS = (
     ('Stefano', 'saxix@saxix.onmicrosoft.com'),
@@ -98,8 +99,8 @@ DATABASE_ROUTERS = [
     router_factory('etools', ['etools'], syncdb=False),
 ]
 
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -108,11 +109,11 @@ LOGIN_REDIRECT_URL = "/"
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'UTC'
+TIME_ZONE = env('TIME_ZONE')
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'en-us'
 ugettext = lambda s: s  # noqa
 LANGUAGES = (
     ('es', ugettext('Spanish')),
@@ -155,19 +156,19 @@ MEDIA_URL = '/dm-media/'
 STATIC_URL = env('STATIC_URL')
 
 # Additional locations of static files
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     # os.path.join(PROJECT_DIR, '../static'),
-)
+]
 
 # List of finder classes that know how to find static files in
 # various locations.
-STATICFILES_FINDERS = (
+STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -177,6 +178,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'impersonate.middleware.ImpersonateMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
     'crashlog.middleware.CrashLogMiddleware',
     'unicef_rest_framework.middleware.ApiMiddleware',
@@ -192,6 +194,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 ]
+MYSTICA_PASSWORD = env('MYSTICA_PASSWORD')
 
 CACHES = {
     'default': env.cache(),
@@ -282,11 +285,13 @@ INSTALLED_APPS = [
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
     'etools_datamart.api',
-
+    'impersonate',
     'admin_extra_urls',
     'adminactions',
     'unicef_rest_framework.apps.Config',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_gis',
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
@@ -375,6 +380,18 @@ NOTIFICATION_SENDER = "etools_datamart@unicef.org"
 # django-constance
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_ADDITIONAL_FIELDS = {
+    # 'read_only_text': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.ObfuscatedInput',
+    # }],
+    # 'write_only_text': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.WriteOnlyTextarea',
+    # }],
+    # 'write_only_input': ['django.forms.fields.CharField', {
+    #     'required': False,
+    #     'widget': 'etools_datamart.libs.constance.WriteOnlyInput',
+    # }],
     'select_group': ['etools_datamart.libs.constance.GroupChoiceField', {
         'required': False,
         'widget': 'etools_datamart.libs.constance.GroupChoice',
@@ -396,7 +413,7 @@ CONSTANCE_CONFIG = {
     'DISABLE_SERVICE_RESTRICTIONS': (env('DISABLE_SERVICE_RESTRICTIONS'), 'Disable per user service authorizations'),
 }
 
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
@@ -597,7 +614,7 @@ ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 SCHEMA_FILTER = {}
-SCHEMA_EXCLUDE = {'schema_name__in': ['public', 'uat', 'frg']}
+SCHEMA_EXCLUDE = {'schema_name__in': env.list('IGNORED_SCHEMAS')}
 
 ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')
 
@@ -612,3 +629,5 @@ def extra(r):
 
 
 SYSINFO = {"extra": {'Azure': extra}}
+
+MIGRATION_MODULES = {'dbtemplates': 'etools_datamart.custom_migrations.dbtemplates'}

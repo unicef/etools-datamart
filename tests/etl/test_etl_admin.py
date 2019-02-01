@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.contrib import messages
 from django.urls import reverse
+
+import pytest
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from etools_datamart.apps.etl.models import EtlTask
@@ -54,6 +55,18 @@ def test_tasklog_queue(django_app, admin_user, tasklog):
     res = res.follow()
     storage = res.context['messages']
     assert [m.message for m in storage] == [f"Task '{tasklog.task}' queued"]
+
+
+def test_tasklog_queue_action(django_app, admin_user, tasklog):
+    tasklog.loader.task.delay = lambda: True
+    url = reverse("admin:etl_etltask_changelist")
+    res = django_app.get(url, user=admin_user)
+    res.form['action'].value = 'queue'
+    res.form['_selected_action'] = [tasklog.id]
+    res = res.form.submit().follow()
+    assert res.status_code == 200
+    storage = res.context['messages']
+    assert [m.message for m in storage] == ["1 task queued"]
 
 
 def test_tasklog_refresh(django_app, admin_user, tasklog):

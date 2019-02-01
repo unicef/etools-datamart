@@ -3,33 +3,36 @@ import json
 from django.db import models
 from django.utils import timezone
 
-from etools_datamart.apps.data.loader import EtlResult, Loader
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import HactAggregatehact
 
 
 class HACTLoader(Loader):
-    def process_country(self, results: EtlResult, country, context):
+    def process_country(self, country, context):
         today = timezone.now()
-        aggregate = HactAggregatehact.objects.get(year=today.year)
-        data = json.loads(aggregate.partner_values)
+        try:
+            aggregate = HactAggregatehact.objects.get(year=today.year)
 
-        # # Total number of completed Microassessments in the business area in the past year
-        values = dict(microassessments_total=data['assurance_activities']['micro_assessment'],
-                      programmaticvisits_total=data['assurance_activities']['programmatic_visits']['completed'],
-                      followup_spotcheck=data['assurance_activities']['spot_checks']['follow_up'],
-                      completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
-                      completed_hact_audits=data['assurance_activities']['scheduled_audit'],
-                      completed_special_audits=data['assurance_activities']['special_audit'],
-                      )
-        op = self.process(filters=dict(year=today.year,
-                                       area_code=country.business_area_code,
-                                       country_name=country.name,
-                                       schema_name=country.schema_name),
-                          values=values)
-        results.incr(op)
+            data = json.loads(aggregate.partner_values)
 
-        return results
+            # # Total number of completed Microassessments in the business area in the past year
+            values = dict(microassessments_total=data['assurance_activities']['micro_assessment'],
+                          programmaticvisits_total=data['assurance_activities']['programmatic_visits']['completed'],
+                          followup_spotcheck=data['assurance_activities']['spot_checks']['follow_up'],
+                          completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
+                          completed_hact_audits=data['assurance_activities']['scheduled_audit'],
+                          completed_special_audits=data['assurance_activities']['special_audit'],
+                          )
+            op = self.process_record(filters=dict(year=today.year,
+                                                  area_code=country.business_area_code,
+                                                  country_name=country.name,
+                                                  schema_name=country.schema_name),
+                                     values=values,
+                                     context=context)
+            self.results.incr(op)
+        except HactAggregatehact.DoesNotExist:  # pragma: no cover
+            pass
 
 
 class HACT(DataMartModel):

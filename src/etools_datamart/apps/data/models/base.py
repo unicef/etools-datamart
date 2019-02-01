@@ -10,6 +10,17 @@ from etools_datamart.apps.data.loader import Loader, LoaderOptions
 
 
 class DataMartQuerySet(QuerySet):
+    def get(self, *args, **kwargs):
+        try:
+            return super(DataMartQuerySet, self).get(*args, **kwargs)
+        except self.model.DoesNotExist as e:
+            raise self.model.DoesNotExist(
+                "%s  (%s %s)" % (e, args, kwargs)
+            )
+        except self.model.MultipleObjectsReturned as e:  # pragma: no cover
+            raise self.model.MultipleObjectsReturned(
+                "%s (%s %s) " % (e, args, kwargs)
+            )
 
     def filter_schemas(self, *schemas):
         if schemas and schemas[0]:
@@ -58,6 +69,9 @@ class DataMartModel(models.Model, metaclass=DataMartModelBase):
     schema_name = models.CharField(max_length=63, db_index=True)
     area_code = models.CharField(max_length=10, db_index=True)
     last_modify_date = models.DateTimeField(blank=True, auto_now=True)
+    seen = models.DateTimeField(blank=True, null=True)
+
+    source_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         abstract = True

@@ -1,0 +1,17 @@
+.success {
+  color: #00b600;
+}
+
+.failure {
+  color: #d2625d;
+}
+
+.error {
+  color: #d2625d;
+}
+
+.results {
+  .success, .error, .failure, .running {
+    font-weight: bold;
+  }
+}

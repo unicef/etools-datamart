@@ -21,18 +21,20 @@
           <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/bootstrap-tweaks.css" %}"/>
         {% endblock %}
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css"
+                  rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/prettify.css" %}"/>
         <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/default.css" %}"/>
         <link rel="stylesheet" type="text/css" href="{% static "style.css" %}"/>
         {% if code_style %}<style>{{ code_style }}</style>{% endif %}
       {% endblock %}
     {% if config.ANALYTICS_CODE %}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130479575-1"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.ANALYTICS_CODE }}"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag() {dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'UA-130479575-1');
+            gtag('config', '{{ config.ANALYTICS_CODE }}');
         </script>
     {% endif %}
     {% endblock %}
@@ -69,11 +71,12 @@
             </span>
             <ul class="nav navbar-nav pull-right">
               {% block userlinks %}
-                {% if user.is_authenticated %}
-                  {% optional_logout request user %}
-                {% else %}
-                  {% optional_login request %}
-                {% endif %}
+                  <li id="whoami" class="navbar-text"></li>
+{#                {% if user.is_authenticated %}#}
+{#                  {% optional_logout request user %}#}
+{#                {% else %}#}
+{#                  {% optional_login request %}#}
+{#                {% endif %}#}
               {% endblock %}
             </ul>
           </div>
@@ -95,38 +98,43 @@
           </ul>
         {% endblock %}
 
-        <!-- Content -->
-        <div id="content" role="main" aria-label="{% trans "content" %}">
-          {% block content %}
+            <!-- Content -->
+            <div id="content" role="main" aria-label="{% trans "content" %}">
+                {% block content %}
 
-          <div class="region"  aria-label="{% trans "request form" %}">
-          {% if service %}
-          <div class="pull-right" style="margin-left: 10px">
-              <a href="{{ service.doc_url }}" class="btn btn-primary js-tooltip" title="Documentation">Doc</a>
-          </div>
-          {% endif %}
-          {% if iqy_url %}
-              <div class="pull-right" style="margin-left: 10px">
-                  <fieldset>
-                  <div class="btn-group format-selection">
-                    <a class="btn btn-primary js-tooltip" href="{{ iqy_url  }}?{% set_query_values %}" rel="nofollow" title="Download IQY file">IQY</a>
-                    <button class="btn btn-primary dropdown-toggle js-tooltip" data-toggle="dropdown" title="IQY">
-                      <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                          <a class="js-tooltip format-option" href="{{ iqy_url  }}?{% set_query_values %}" rel="nofollow" title="">Download</a>
-                          <a data-toggle="modal" data-target="#messageModal"
-                             data-source="{{ iqy_url  }}?{% set_query_values _display=1 %}"
-                                  class="display-modal js-tooltip format-option"
-                                    href="#" rel="nofollow" title="">Display</a>
-                        </li>
-                    </ul>
-                      &nbsp;
-              </div>
-              </fieldset>
-             </div>
-          {% endif %}
+                    <div class="region" aria-label="{% trans "request form" %}">
+                        {% if service %}
+                            <div class="pull-right" style="margin-left: 10px">
+                                <a href="{{ service.doc_url }}" class="btn btn-primary js-tooltip"
+                                   title="Documentation">Doc</a>
+                            </div>
+                        {% endif %}
+                        {% if iqy_url %}
+                            <div class="pull-right" style="margin-left: 10px">
+                                <fieldset>
+                                    <div class="btn-group format-selection">
+                                        <a class="btn btn-primary js-tooltip"
+                                           href="{{ iqy_url }}?{% set_query_values %}" rel="nofollow"
+                                           title="Download IQY file">IQY</a>
+                                        <button class="btn btn-primary dropdown-toggle js-tooltip"
+                                                data-toggle="dropdown" title="IQY">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="js-tooltip format-option"
+                                                   href="{{ iqy_url }}?{% set_query_values %}" rel="nofollow" title="">Download</a>
+                                                <a data-toggle="modal" data-target="#messageModal"
+                                                   data-source="{{ iqy_url }}?{% set_query_values _display=1 %}"
+                                                   class="display-modal js-tooltip format-option"
+                                                   href="#" rel="nofollow" title="">Display</a>
+                                            </li>
+                                        </ul>
+                                        &nbsp;
+                                    </div>
+                                </fieldset>
+                            </div>
+                        {% endif %}
 
           {% if 'GET' in allowed_methods %}
             <form id="get-form" class="pull-right">
@@ -201,6 +209,9 @@
                   <a href="{{ admin_url }}"
                      style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
                      class="btn btn-primary">Data</a>
+                  <a href='{% url 'admin:django_celery_beat_periodictask_add' %}?name=preload&task=unicef_rest_framework.tasks.preload&args=["{{ request.path }}"]&crontab=1'
+                     style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
+                     class="btn btn-primary">Preload</a>
               {% endif %}
               {% if service_url %}
                   <a href="{{ service_url }}"
@@ -373,15 +384,59 @@
       <script src="{% static "rest_framework/js/prettify-min.js" %}"></script>
       <script src="{% static "rest_framework/js/default.js" %}"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
 
-      <script>
+        <script>
             $(document).ready(function () {
                 $('form').ajaxForm();
             });
 
+            {#$('.datepicker').datepicker({format: 'yyyy-mm-dd', autoclose: true, clearBtn: true});#}
+
+            $('.datepicker').each(function(){
+                var $target = $(this);
+                var config = $target.data('pickeroptions');
+                $target.datepicker( config );
+            });
+
+            $('.end-range').change(function () {
+                if (this.value) {
+                    var $other = $( $(this).data("start-range") );
+                    var start = Date.parse(  $other.val() );
+                    var end = Date.parse(  this.value );
+                    if ( start > end ){
+                        alert("End date cannot be before start date");
+                        $(this).val("");
+                    }
+                }
+            });
+
+            $('.start-range').change(function () {
+                if (this.value) {
+                    var $other = $( $(this).data("end-range") );
+                    var end = Date.parse(  $other.val() );
+                    var start = Date.parse(  this.value );
+                    if ( start > end ){
+                        alert("Start date cannot be after end date");
+                        $(this).val("");
+                    }
+                }
+            });
+
+
+            $('.daterange input').each(function() {
+                var $target = $(this);
+                var config = $target.data('pickeroptions');
+                $target.datepicker( config );
+            });
+
+            // **/
+
             $('.select2').select2({
                 placeholder: 'Select an option'
             });
+            $('.select2-container').attr('style', 'width:100%');
+
             $('#filter-form').on("submit", function (e) {
                 var qs = {};
                 $('#filter-form *').filter(':input').each(function (id, el) {
@@ -389,38 +444,42 @@
                     var name = $el.attr("name");
                     var val = $el.val();
                     if (name && val) {
-                        if (name === 'month_0'){
-                            qs["month"] = val + "-" +$('input[name=month_1]').val();
-                        }else if (name==='month_1') {
+                        if (name === 'month_0') {
+                            qs["month"] = val + "-" + $('input[name=month_1]').val();
+                        } else if (name === 'month_1') {
 
-                        }
-                        else if (val.constructor === Array && val.length > 0) {
+                        } else if (val.constructor === Array && val.length > 0) {
                             qs[name] = val.join();
                         } else {
                             qs[name] = val;
                         }
                     }
                 });
-                location.href = location.pathname+ "?"+ $.param(qs);;
+                location.href = location.pathname + "?" + $.param(qs);
+
                 return false;
             });
-            $("#copyToClipboard").on("click", function(){
+            $("#copyToClipboard").on("click", function () {
                 $('input[name=query-url]').select();
                 document.execCommand("copy");
                 console.log("copied")
             });
-            $(".display-modal").on("click", function(e){
+            $(".display-modal").on("click", function (e) {
                 var url = $(e.target).data("source");
-                $.ajax(url).done(function( data ) {
+                $.ajax(url).done(function (data) {
                     $("#messageModal .modal-title").html("IQY file");
-                    $("#messageModal .modal-body").html("<pre>"+data+"</pre>");
+                    $("#messageModal .modal-body").html("<pre>" + data + "</pre>");
                     $("#messageModal").show();
-                    console.log( data )
+                    console.log(data)
                 });
             });
-      </script>
+            $.get("{% url 'whoami' %}")
+                .done(function (data) {
+                    $("#whoami").text(data);
+                })
+        </script>
     {% endblock %}
 
-  </body>
-  {% endblock %}
+    </body>
+{% endblock %}
 </html>

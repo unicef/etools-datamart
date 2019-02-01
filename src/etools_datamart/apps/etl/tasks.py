@@ -16,7 +16,7 @@ HEALTHCHECK_FORMAT = '%Y-%m-%d %H:%M:%S'
 def healthcheck():
     cache.set('healthcheck', timezone.now().strftime(HEALTHCHECK_FORMAT))
 
-
-@app.on_after_configure.connect
-def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(60.0, healthcheck.s(), name='healthcheck')
+#
+# @app.on_after_configure.connect
+# def setup_periodic_tasks(sender, **kwargs):
+#     sender.add_periodic_task(60.0, healthcheck.s(), name='healthcheck')

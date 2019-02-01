@@ -1,10 +1,9 @@
 #!/bin/bash -e
-set -e
 
-mkdir -p /var/datamart/{static,log,conf,run}
-mkdir -p ${STATIC_ROOT}
-rm -f /var/datamart/run/*
-
+mkdir -p /var/datamart/static
+mkdir -p /var/datamart/log
+mkdir -p /var/datamart/conf
+mkdir -p /var/datamart/run
 
 if [[ "$*" == "workers" ]];then
     django-admin db-isready --wait --timeout 60 --sleep 5
@@ -13,9 +12,14 @@ if [[ "$*" == "workers" ]];then
 elif [[ "$*" == "beat" ]];then
     celery beat -A etools_datamart.celery --loglevel=DEBUG --pidfile run/celerybeat.pid
 elif [[ "$*" == "datamart" ]];then
+    rm -f /var/datamart/run/*
+
+    django-admin diffsettings --output unified
+    django-admin makemigrations --check --dry-run
+
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
-    django-admin init-setup --all --verbosity 1
+    django-admin init-setup --all --verbosity 2
     django-admin db-isready --wait --timeout 300 --connection etools
     gunicorn -b 0.0.0.0:8000 etools_datamart.config.wsgi
 else

@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import uuid
 import warnings
@@ -19,11 +20,18 @@ def pytest_configure(config):
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
 warnings.simplefilter('ignore', UserWarning)
+warnings.simplefilter('ignore', RuntimeWarning, lineno=1421)
 
 
 @pytest.fixture(scope="session")
 def disable_migration_signals(request):
-    return request.config.getvalue("disable_migration_signals")
+    return request.config.option.disable_migration_signals
+    # FIXME: pdb
+    # import pdb; pdb.set_trace()
+    # if 'disable_migration_signals' in request.config.items():
+    #     return request.config.getvalue("disable_migration_signals")
+    #
+    # return request.config.inicfg.get('disable_migration_signals') == 'true'
 
 
 def pytest_addoption(parser):
@@ -46,25 +54,54 @@ def django_db_setup(request,
                     django_db_createdb,
                     django_db_modify_db_settings,
                     disable_migration_signals):
-    # never touch etools DB
-    if disable_migration_signals:
+    if not django_db_createdb and django_db_keepdb and disable_migration_signals:
+        sys.stdout.write("Warning pre/post migrate signals have been dosabled\n")
         import django.core.management.commands.migrate
         django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
+    #
+    # from pytest_django.fixtures import django_db_setup as dj_db_setup
+    # dj_db_setup(request,
+    #             django_test_environment,
+    #             django_db_blocker,
+    #             django_db_use_migrations,
+    #             django_db_keepdb,
+    #             django_db_createdb,
+    #             django_db_modify_db_settings)
 
-    from pytest_django.fixtures import django_db_setup as dj_db_setup
-    dj_db_setup(request,
-                django_test_environment,
-                django_db_blocker,
-                django_db_use_migrations,
-                django_db_keepdb,
-                django_db_createdb,
-                django_db_modify_db_settings)
+    """Top level fixture to ensure test databases are available"""
+    from pytest_django.compat import setup_databases, teardown_databases
+    from pytest_django.fixtures import _disable_native_migrations
+    setup_databases_args = {}
 
+    if not django_db_use_migrations:
+        _disable_native_migrations()
+
+    if django_db_keepdb and not django_db_createdb:
+        setup_databases_args["keepdb"] = True
+
+    with django_db_blocker.unblock():
+        db_cfg = setup_databases(
+            verbosity=pytest.config.option.verbose,
+            interactive=False,
+            **setup_databases_args
+        )
+
+    def teardown_database():
+        with django_db_blocker.unblock():
+            teardown_databases(db_cfg, verbosity=pytest.config.option.verbose)
+
+    if not django_db_keepdb:
+        request.addfinalizer(teardown_database)
+
+    #
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory
+    from etools_datamart.apps.etl.models import EtlTask
+
     with django_db_blocker.unblock():
+        EtlTask.objects.inspect()
         Service.objects.load_services()
         UserAccessControl.objects.all().delete()
         APIRequestLog.objects.truncate()
@@ -181,3 +218,10 @@ def local_user(db):
     from test_utilities.factories import UserFactory
 
     return UserFactory()
+
+
+@pytest.fixture()
+def schema_access_control(db):
+    from test_utilities.factories import SchemaAccessControlFactory
+
+    return SchemaAccessControlFactory()

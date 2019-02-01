@@ -11,7 +11,6 @@ from django.utils.timezone import now
 from strategy_field.utils import fqn
 
 from etools_datamart.apps.tracking import config
-from etools_datamart.apps.tracking.asyncqueue import AsyncQueue
 
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
 
@@ -103,7 +102,7 @@ def record_to_kwargs(request, response):
         media_type = response['Content-Type'].split(';')[0]
     view = api_info.get('view', None)
     if not view:  # pragma: no cover
-        return {}
+        return None
     viewset = fqn(view)
     service = api_info.get("service")
     from unicef_rest_framework.utils import get_ident
@@ -124,12 +123,11 @@ def record_to_kwargs(request, response):
 
 
 #
-class AsyncLogger(AsyncQueue):
-    def _process(self, record):
-        # import requests
-        # payload = 'v=1&t=event&tid=UA-XXXXXY&cid=555&ec=video&ea=play&el=holiday&ev=300'
-        # r = requests.post('http://www.google-analytics.com/collect', data=payload)
-        log_request(**record_to_kwargs(**record))
+# class AsyncLogger(AsyncQueue):
+#     def _process(self, record):
+#         values = record_to_kwargs(**record)
+#         if values:
+#             log_request(**values)
 
 
 class StatsMiddleware(object):
@@ -138,7 +136,9 @@ class StatsMiddleware(object):
 
     def log(self, request, response):
         try:
-            log_request(**record_to_kwargs(request, response))
+            values = record_to_kwargs(request, response)
+            if values:
+                log_request(**values)
         except Exception as e:  # pragma: no cover
             logger.exception(e)
 
@@ -153,11 +153,11 @@ class StatsMiddleware(object):
             self.log(request, response)
         return response
 
-
-class ThreadedStatsMiddleware(StatsMiddleware):
-    def __init__(self, get_response):
-        super(ThreadedStatsMiddleware, self).__init__(get_response)
-        self.worker = AsyncLogger()
-
-    def log(self, request, response):
-        self.worker.queue({'request': request, 'response': response})
+#
+# class ThreadedStatsMiddleware(StatsMiddleware):
+#     def __init__(self, get_response):
+#         super(ThreadedStatsMiddleware, self).__init__(get_response)
+#         self.worker = AsyncLogger()
+#
+#     def log(self, request, response):
+#         self.worker.queue({'request': request, 'response': response})

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from unittest.mock import Mock
 
-import pytest
 from django.http import Http404
+
+import pytest
 from drf_querystringfilter.exceptions import QueryFilterException
 from dynamic_serializer.core import InvalidSerializerError
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied

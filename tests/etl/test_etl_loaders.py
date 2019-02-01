@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.apps import apps
 
+import pytest
+from freezegun import freeze_time
+
 from etools_datamart.apps.data.loader import loadeables
 
 
@@ -10,18 +13,25 @@ def pytest_generate_tests(metafunc):
         ids = []
         for model_name in loadeables:
             model = apps.get_model(model_name)
-            m.append(model.loader)
+            if model_name in ['data.pdindicator']:
+                m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
+            else:
+                m.append(model.loader)
             ids.append(model.__name__)
         metafunc.parametrize("loader", m, ids=ids)
 
 
 def test_loader_load(loader, number_of_intervention):
-    loader.model.objects.truncate()
-    loader.unlock()
-    loader.load(max_records=2)
+    # factory = factories_registry.get(loader.model)
+    # to_delete = factory()
+    with freeze_time("2018-12-31", tz_offset=1):
+        loader.model.objects.truncate()
+        loader.unlock()
+        ret = loader.load(max_records=2, force_requirements=True)
     assert loader.model.objects.count()
+    assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
+    # assert not loader.model.objects.filter(id=to_delete.pk).exists()
 
-#
 # def test_load_pmp_indicator(number_of_intervention):
 #     PMPIndicators.objects.truncate()
 #     PMPIndicators.loader.unlock()

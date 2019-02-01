@@ -4,7 +4,7 @@ from django.db import models
 
 from month_field.models import MonthField
 
-from etools_datamart.apps.data.loader import EtlResult, Loader
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import AuthUser
 
@@ -16,7 +16,7 @@ class UserStatsLoader(Loader):
         context.update(kwargs)
         return context
 
-    def process_country(self, results: EtlResult, country, context):
+    def process_country(self, country, context):
         first_of_month = context['first_of_month']
         base = AuthUser.objects.filter(profile__country=country)
         values = {
@@ -28,12 +28,12 @@ class UserStatsLoader(Loader):
                 last_login__month=first_of_month.month,
                 email__endswith='@unicef.org').count(),
         }
-        op = self.process(filters=dict(month=first_of_month,
-                                       country_name=country.name,
-                                       schema_name=country.schema_name, ),
-                          values=values)
-        results.incr(op)
-        return results
+        op = self.process_record(filters=dict(month=first_of_month,
+                                              country_name=country.name,
+                                              schema_name=country.schema_name, ),
+                                 values=values,
+                                 context=context)
+        self.results.incr(op)
 
 
 class UserStats(DataMartModel):

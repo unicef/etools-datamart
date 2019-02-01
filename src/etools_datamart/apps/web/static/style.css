@@ -1,7 +1,19 @@
 * {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box; }
+
+.success {
+  color: #00b600; }
+
+.failure {
+  color: #d2625d; }
+
+.error {
+  color: #d2625d; }
+
+.results .success, .results .error, .results .failure {
+  font-weight: bold; }
 
 body, html {
   height: 50%;
@@ -46,7 +58,7 @@ body, html {
 .right {
   width: 50%;
   flex-wrap: wrap; }
-  .right form {
+  .right form, .right #login-menu {
     padding: 100px 0 0 65px; }
   .right .center {
     width: 100%;
@@ -56,14 +68,18 @@ body, html {
     font-size: 24pt;
     text-align: center; }
   .right h2 {
-    font-size: 14pt; }
+    font-size: 16pt; }
+  .right h1, .right h2, .right h3, .right h4 {
+    margin: 20px; }
+  .right a {
+    text-decoration: none; }
 
 ul.index-menu {
   padding: 20px 0 0 65px;
   list-style: none;
   font-size: 18pt; }
   ul.index-menu a {
-    color: #2090F8;
+    color: #4bace9;
     text-transform: none;
     text-decoration: none; }
   ul.index-menu li.menu-sep {
@@ -128,7 +144,7 @@ input.input100 {
   padding: 0 20px;
   height: 50px;
   border-radius: 3px;
-  background: #2090F8;
+  background: #4bace9;
   font-size: 12px;
   color: #fff;
   line-height: 1.2;
@@ -145,7 +161,7 @@ input.input100 {
 /* [ Responsive ]*/
 .navbar {
   border-top: none;
-  background: #2090F8;
+  background: #4bace9;
   color: black; }
   .navbar a.navbar-brand {
     color: white; }
@@ -159,9 +175,10 @@ input.input100 {
   padding: 10px; }
   .monitor .menubar a, .profile .menubar a {
     text-transform: none;
-    color: #2090F8; }
+    color: #4bace9; }
     .monitor .menubar a:visited, .profile .menubar a:visited {
       text-transform: none; }
+
 .monitor #monitor, .profile #monitor {
   width: 100%;
   padding: 30px; }
@@ -201,6 +218,7 @@ input.input100 {
     overflow-y: scroll;
     width: 300px;
     height: 400px; }
+
 .profile #password .message {
   margin: 20px;
   text-align: left; }
@@ -211,10 +229,12 @@ input.input100 {
     font-family: monospace;
     font-size: 20px;
     border: 1px solid grey; }
+
 .profile #password form {
   width: 400px;
   overflow-y: auto;
   text-align: center; }
+
 .profile #password .btn {
   justify-content: center;
   align-items: center;
@@ -222,7 +242,7 @@ input.input100 {
   height: 40px;
   border-radius: 3px;
   font-size: 12px;
-  color: #0;
+  color: black;
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -231,8 +251,7 @@ input.input100 {
   -moz-transition: all 0.4s;
   transition: all 0.4s;
   cursor: pointer; }
-.profile #password .btn-submit {
-  background: #2090F8;
-  color: #fff; }
 
-/*# sourceMappingURL=style.css.map */
+.profile #password .btn-submit {
+  background: #4bace9;
+  color: #fff; }

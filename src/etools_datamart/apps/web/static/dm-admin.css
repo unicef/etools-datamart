@@ -1,0 +1,17 @@
+.success {
+  color: #00b600;
+}
+
+.failure {
+  color: #d2625d;
+}
+
+.error {
+  color: #d2625d;
+}
+
+.results .success, .results .error, .results .failure, .results .running {
+  font-weight: bold;
+}
+
+/*# sourceMappingURL=dm-admin.css.map */

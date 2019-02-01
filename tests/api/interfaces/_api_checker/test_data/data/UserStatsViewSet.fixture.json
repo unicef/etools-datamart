@@ -1,0 +1,58 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.userstats",
+                "pk": 128,
+                "fields": {
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "last_modify_date": "2019-01-28T16:49:07.810Z",
+                    "seen": null,
+                    "source_id": null,
+                    "month": "2019-01-01",
+                    "total": 0,
+                    "unicef": 0,
+                    "logins": 0,
+                    "unicef_logins": 0
+                }
+            },
+            {
+                "model": "data.userstats",
+                "pk": 129,
+                "fields": {
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "last_modify_date": "2019-01-28T16:49:07.842Z",
+                    "seen": null,
+                    "source_id": null,
+                    "month": "2019-01-01",
+                    "total": 0,
+                    "unicef": 0,
+                    "logins": 0,
+                    "unicef_logins": 0
+                }
+            },
+            {
+                "model": "data.userstats",
+                "pk": 130,
+                "fields": {
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "last_modify_date": "2019-01-28T16:49:07.855Z",
+                    "seen": null,
+                    "source_id": null,
+                    "month": "2019-01-01",
+                    "total": 0,
+                    "unicef": 0,
+                    "logins": 0,
+                    "unicef_logins": 0
+                }
+            }
+        ],
+        "deps": []
+    }
+}

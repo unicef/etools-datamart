@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.cache import caches
 from django.db import connections
 
@@ -17,19 +18,20 @@ cache = caches['default']
 def get_allowed_schemas(user):
     key = f"allowed_schemas:{get_full_version()}:{config.CACHE_VERSION}:{user.pk}"
     values = cache.get(key)
-    if not values:
-        if config.DISABLE_SCHEMA_RESTRICTIONS:
-            values = conn.all_schemas
-        elif not user.is_authenticated:
-            values = []
-        elif user.is_superuser:
+    if not values:  # pragma: no branch
+        # if config.DISABLE_SCHEMA_RESTRICTIONS:
+        #     values = conn.all_schemas
+        # elif not user.is_authenticated:
+        #     values = []
+        if user.is_superuser:
             values = conn.all_schemas
         else:
             with conn.noschema():
                 aa = flatten(list(SchemaAccessControl.objects.filter(group__user=user).values_list('schemas')))
                 etools_user = UsersUserprofile.objects.filter(user__email=user.email).first()
                 if etools_user:
-                    aa.extend(set(etools_user.countries_available.values_list('schema_name', flat=True)))
+                    etools_allowed = etools_user.countries_available.exclude(**settings.SCHEMA_EXCLUDE)
+                    aa.extend(set(etools_allowed.values_list('schema_name', flat=True)))
             values = list(filter(None, aa))
         cache.set(key, list(values))
     return set(values)
@@ -37,7 +39,7 @@ def get_allowed_schemas(user):
 
 
 def get_allowed_services(user):
-    if not user.is_authenticated:
+    if not user.is_authenticated:  # pragma: no cover
         return []
     if user.is_superuser or config.DISABLE_SERVICE_RESTRICTIONS:
         return Service.objects.all()

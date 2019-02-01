@@ -2,8 +2,11 @@
 from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
+from django.template.defaultfilters import pluralize
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
@@ -12,19 +15,38 @@ from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 from humanize import naturaldelta
 
+from etools_datamart.apps.data.loader import RUN_QUEUED
 from etools_datamart.celery import app
 
 from . import models
 
 
+def queue(modeladmin, request, queryset):
+    count = len(queryset)
+    for obj in queryset:
+        task = app.tasks.get(obj.task)
+        task.delay()
+    modeladmin.message_user(request,
+                            "{0} task{1} queued".format(count, pluralize(count)),
+                            messages.SUCCESS)
+
+
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', 'last_run', 'status', 'time',
+    list_display = ('task', 'last_run', 'run_type', '_status', 'time',
                     'last_success', 'last_failure', 'locked',
                     'data', 'scheduling', 'unlock_task', 'queue_task')
 
     date_hierarchy = 'last_run'
-    actions = [mass_update, ]
+    actions = [mass_update, queue]
+
+    def _status(self, obj):
+        cls = obj.status.lower()
+        if obj.status == 'SUCCESS':
+            pass
+        return mark_safe('<span class="%s">%s</span>' % (cls, obj.status))
+
+    _status.verbse_name = 'status'
 
     def scheduling(self, obj):
         opts = PeriodicTask._meta
@@ -89,8 +111,10 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def queue(self, request, pk):
         obj = self.get_object(request, pk)
         try:
+            obj.status = 'QUEUED'
+            obj.save()
             task = app.tasks.get(obj.task)
-            task.delay()
+            task.delay(run_type=RUN_QUEUED)
             self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             process_exception(e)
@@ -103,6 +127,8 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
         def _action(request):
             obj.loader.unlock()
+            obj.update(status='FAILURE', run_type=0,
+                       last_failure=timezone.now())
 
         return _confirm_action(self, request, _action,
                                f"""Continuing will unlock selected task. ({obj.task}).

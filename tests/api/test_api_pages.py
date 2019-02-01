@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.urls import reverse
+
+import pytest
 from test_utilities.factories import InterventionFactory
 
 

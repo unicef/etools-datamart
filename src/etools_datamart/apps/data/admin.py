@@ -33,12 +33,6 @@ class DatamartChangeList(ChangeList):
 class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     actions = [mass_update, ]
 
-    def __init__(self, model, admin_site):
-        import etools_datamart.apps.etl.tasks.etl as mod
-        # we ned to force celery task initialization
-        self.loaders = [v for v in mod.__dict__.values() if hasattr(v, 'apply_async')]
-        super().__init__(model, admin_site)
-
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
             self.list_filter = (SchemaFilter,) + self.list_filter
@@ -105,7 +99,7 @@ class DataModelAdmin(ExtraUrlMixin, ModelAdmin):
     def refresh(self, request):
         try:
             start = time()
-            self.model.loader.load()
+            self.model.loader.task.apply()
             stop = time()
             duration = stop - start
             self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
@@ -172,3 +166,15 @@ class GatewayTypeAdmin(DataModelAdmin):
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude')
     readonly_fields = ('parent', 'gateway')
+
+
+@register(models.FundsReservation)
+class FundsReservationAdmin(DataModelAdmin):
+    list_display = ('country_name', 'schema_name', 'fr_number', 'fr_type', 'wbs')
+    date_hierarchy = 'start_date'
+
+
+@register(models.PDIndicator)
+class PDIndicatorAdmin(DataModelAdmin):
+    list_display = ('title', 'unit', 'display_type')
+    # list_filter = ('disaggregatable', )

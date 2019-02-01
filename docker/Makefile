@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.8
+TARGET?=1.14
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -16,6 +16,8 @@ DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
+PORTS=
+ABSOLUTE_BASE_URL?="http://192.168.66.66:8000"
 
 help:
 	@echo "dev                  build dev image (based on local code)"
@@ -34,13 +36,10 @@ build:
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
 			--build-arg VERSION=${TARGET} \
+			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
-#	flatten image
-#	docker create --name foo ${DOCKER_IMAGE_NAME}:${TARGET}
-#	docker export foo | docker import - unicef/datamart:${TARGET}
-#	docker rm foo
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
 
@@ -48,7 +47,7 @@ build:
 	cd .. && docker run \
 	 		--rm \
 	 		--name=${CONTAINER_NAME} \
-			-p 8000:8000 \
+			-e ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
 			-e CACHE_URL=redis://192.168.66.66:6379/1 \
 			-e CACHE_URL_API=redis://192.168.66.66:6379/2 \
 			-e CACHE_URL_LOCK=redis://192.168.66.66:6379/3 \
@@ -70,9 +69,7 @@ build:
 			-e SESSION_COOKIE_SECURE=false \
 			-e STATIC_ROOT=/var/datamart/static/ \
 			-e DEVELOPMENT_MODE=0 \
-			-e STACK=1 \
 			-e X_FRAME_OPTIONS="SAMEORIGIN" \
-			-v $$PWD/~build/volumes/var/datamart:/var/datamart/ \
 			${RUN_OPTIONS} \
 			${DOCKER_IMAGE} \
 			${CMD}
@@ -87,10 +84,25 @@ release:
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
-	bumpversion release
+
+bump:
+	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num
 
 run:
-	$(MAKE) .run
+	RUN_OPTIONS="-p 8000:8000" \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+		$(MAKE) .run
+
+workers:
+	CONTAINER_NAME=datamart-workers \
+			ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+			CMD=workers $(MAKE) .run
+
+beat:
+	CONTAINER_NAME=datamart-beat \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+		CMD=beat $(MAKE) .run
+
 
 test:
 	RUN_OPTIONS="-e DEBUG=0 \
@@ -106,8 +118,12 @@ scratch:
 	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
 
 shell:
+	RUN_OPTIONS="-p 8000:8000 -it" \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+	CMD='/bin/bash' \
+		$(MAKE) .run
 #	docker exec -it ${CONTAINER_NAME} /bin/bash
-	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
+#	RUN_OPTIONS=-it CMD='/bin/bash' $(MAKE) .run
 
 docker-remove:
 	docker-remove.sh ${IMAGE_NAME} -o ${ORGANIZATION}

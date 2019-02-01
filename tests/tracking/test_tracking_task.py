@@ -2,8 +2,9 @@
 import datetime
 from datetime import timedelta
 
-import pytest
 from django.utils import timezone
+
+import pytest
 from test_utilities.factories import APIRequestLogFactory
 
 from etools_datamart.apps.tracking.middleware import log_request

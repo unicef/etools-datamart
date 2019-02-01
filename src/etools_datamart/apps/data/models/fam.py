@@ -2,7 +2,7 @@ from django.db import models
 
 from month_field.models import MonthField
 
-from etools_datamart.apps.data.loader import EtlResult, Loader
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
                                                 AuditSpecialaudit, AuditSpotcheck,)
@@ -10,7 +10,7 @@ from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, Aud
 
 class FAMIndicatorLoader(Loader):
 
-    def process_country(self, results: EtlResult, country, context):
+    def process_country(self, country, context):
         engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
         start_date = context['today'].date()
         for model in engagements:
@@ -25,14 +25,13 @@ class FAMIndicatorLoader(Loader):
                 field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
                 value = model.objects.filter(**filter_dict).count()
                 values[field_name] = value
-            op = self.process(filters=dict(month=start_date,
-                                           country_name=country.name,
-                                           area_code=country.business_area_code,
-                                           schema_name=country.schema_name),
-                              values=values)
-            results.incr(op)
-
-        return results
+            op = self.process_record(filters=dict(month=start_date,
+                                                  country_name=country.name,
+                                                  area_code=country.business_area_code,
+                                                  schema_name=country.schema_name),
+                                     values=values,
+                                     context=context)
+            self.results.incr(op)
 
 
 class FAMIndicator(DataMartModel):
@@ -61,3 +60,6 @@ class FAMIndicator(DataMartModel):
         verbose_name = "FAM Indicator"
 
     loader = FAMIndicatorLoader()
+
+    class Option:
+        pass

@@ -1,6 +1,6 @@
 import pytest
 from rest_framework.test import APIClient
-from test_utilities.factories import AdminFactory, FAMIndicatorFactory, UserFactory
+from test_utilities.factories import AdminFactory, FAMIndicatorFactory, FundsReservationFactory, UserFactory
 
 from unicef_rest_framework.test_utils import user_allow_country, user_allow_service
 
@@ -115,6 +115,18 @@ def test_filter_datamart_month(db, client, flt, ct):
     client.force_authenticate(AdminFactory())
 
     url = f"/api/latest/datamart/fam-indicators/?month=%s" % flt
+    res = client.get(url, HTTP_ACCEPT=ct)
+    assert res.status_code == 200
+    # assert res.json()
+
+
+@pytest.mark.parametrize('ct', ['text/html', 'application/json'])
+@pytest.mark.parametrize('flt', ['2000-01-01'])
+def test_filter_datamart_fundsreservation(db, client, flt, ct):
+    FundsReservationFactory()
+    client.force_authenticate(AdminFactory())
+
+    url = f"/api/latest/datamart/funds-reservation/?start_date__gt=%s" % flt
     res = client.get(url, HTTP_ACCEPT=ct)
     assert res.status_code == 200
     # assert res.json()

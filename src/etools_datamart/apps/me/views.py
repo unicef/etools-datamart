@@ -3,18 +3,16 @@ import string
 
 from django.contrib.auth import BACKEND_SESSION_KEY, login
 from django.contrib.auth.decorators import login_required
-from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
 
 from etools_datamart.apps.etools.utils import get_allowed_schemas, get_allowed_services
 from etools_datamart.apps.me.forms import ProfileForm
 
-
-@login_required
-def profile(request):
-    context = {'form': ProfileForm()}
-    return TemplateResponse(request, 'index.html', context)
+# @login_required
+# def profile(request):
+#     context = {'form': ProfileForm()}
+#     return TemplateResponse(request, 'index.html', context)
 
 
 class ProfileView(FormView):
@@ -37,8 +35,8 @@ class ProfileView(FormView):
             everything = upper + lower + num + symbol
             pwd += random.choice(everything)
             count += 1
-            if count >= length:
-                break
+            # if count >= length:
+            #     break
         return pwd
 
     def get_context_data(self, **kwargs):
@@ -58,10 +56,10 @@ class ProfileView(FormView):
 
     def form_valid(self, form):
         ctx = self.get_context_data(form=form)
-        if self.request.user.is_authenticated:
-            pwd = self.generate()
-            self.request.user.set_password(pwd)
-            self.request.user.save()
-            ctx['password'] = pwd
-            login(self.request, self.request.user, self.request.session[BACKEND_SESSION_KEY])
+        # if self.request.user.is_authenticated:
+        pwd = self.generate()
+        self.request.user.set_password(pwd)
+        self.request.user.save()
+        ctx['password'] = pwd
+        login(self.request, self.request.user, self.request.session[BACKEND_SESSION_KEY])
         return self.render_to_response(ctx)

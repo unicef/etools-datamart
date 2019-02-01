@@ -54,7 +54,7 @@ def _assert_duplicate_queries(config, connection=None):
                 msg += '\n\nQueries:\n========\n\n%s' % '\n\n'.join(sqls)
             else:
                 msg += " (add -v option to show queries)"
-            pytest.fail(msg)
+            pytest.fail(str(msg))
 
 
 @pytest.fixture(scope='function')

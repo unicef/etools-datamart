@@ -17,6 +17,17 @@ class PMPIndicatorsSerializer(DataMartSerializer):
         model = models.PMPIndicators
 
 
+class InterventionSerializerBudget(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Intervention
+        exclude = None
+        fields = ('number', 'title', 'status', 'start_date', 'end_date',
+                  'partner_contribution', 'unicef_cash', 'in_kind_amount',
+                  'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
+                  'total', 'total_local', 'currency',
+                  )
+
+
 class InterventionSerializerFull(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Intervention
@@ -25,7 +36,9 @@ class InterventionSerializerFull(DataMartSerializer):
 class InterventionSerializer(InterventionSerializerFull):
     class Meta(DataMartSerializer.Meta):
         model = models.Intervention
-        exclude = ('metadata',)
+        exclude = ('metadata', 'partner_contribution', 'unicef_cash', 'in_kind_amount',
+                   'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
+                   'total', 'total_local', 'currency',)
 
 
 class FAMIndicatorSerializer(DataMartSerializer):

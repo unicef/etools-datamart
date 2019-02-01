@@ -118,6 +118,7 @@ class AttachmentsAttachmentflat(models.TenantModel):
     agreement_reference_number = models.CharField(max_length=100)
     object_link = models.CharField(max_length=200)
     source = models.CharField(max_length=150)
+    pd_ssfa = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -652,6 +653,7 @@ class PartnersAssessment(models.TenantModel):
     requesting_officer = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_partners_assessment_requesting_officer_id', blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    active = models.BooleanField()
 
     class Meta:
         managed = False
@@ -798,6 +800,7 @@ class PartnersInterventionattachment(models.TenantModel):
     type = models.ForeignKey(PartnersFiletype, models.DO_NOTHING, related_name='partnersfiletype_partners_interventionattachment_type_id')
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    active = models.BooleanField()
 
     class Meta:
         managed = False
@@ -871,27 +874,6 @@ class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
         managed = False
         db_table = 'partners_interventionresultlink_ram_indicators'
         unique_together = (('indicator', 'interventionresultlink'),)
-
-
-class PartnersInterventionsectorlocationlink(models.TenantModel):
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='partnersintervention_partners_interventionsectorlocationlink_intervention_id')
-    sector = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='reportssector_partners_interventionsectorlocationlink_sector_id')
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'partners_interventionsectorlocationlink'
-
-
-class PartnersInterventionsectorlocationlinkLocations(models.TenantModel):
-    interventionsectorlocationlink = models.ForeignKey(PartnersInterventionsectorlocationlink, models.DO_NOTHING, related_name='partnersinterventionsectorlocationlink_partners_interventionsectorlocationlink_locations_interventionsectorlocationlink_id')
-    location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='locationslocation_partners_interventionsectorlocationlink_locations_location_id')
-
-    class Meta:
-        managed = False
-        db_table = 'partners_interventionsectorlocationlink_locations'
-        unique_together = (('interventionsectorlocationlink', 'location'),)
 
 
 class PartnersPartnerorganization(models.TenantModel):
@@ -1299,34 +1281,6 @@ class T2FExpense(models.TenantModel):
     class Meta:
         managed = False
         db_table = 't2f_expense'
-
-
-class T2FInvoice(models.TenantModel):
-    reference_number = models.CharField(unique=True, max_length=32)
-    business_area = models.CharField(max_length=32)
-    vendor_number = models.CharField(max_length=32)
-    amount = models.DecimalField(max_digits=20, decimal_places=4)
-    status = models.CharField(max_length=16)
-    vision_fi_id = models.CharField(max_length=16)
-    currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='publicscurrency_t2f_invoice_currency_id')
-    travel = models.ForeignKey('T2FTravel', models.DO_NOTHING, related_name='t2ftravel_t2f_invoice_travel_id')
-    messages = models.TextField()  # This field type is a guess.
-
-    class Meta:
-        managed = False
-        db_table = 't2f_invoice'
-
-
-class T2FInvoiceitem(models.TenantModel):
-    amount = models.DecimalField(max_digits=20, decimal_places=10)
-    fund = models.ForeignKey('PublicsFund', models.DO_NOTHING, related_name='publicsfund_t2f_invoiceitem_fund_id', blank=True, null=True)
-    grant = models.ForeignKey('PublicsGrant', models.DO_NOTHING, related_name='publicsgrant_t2f_invoiceitem_grant_id', blank=True, null=True)
-    invoice = models.ForeignKey(T2FInvoice, models.DO_NOTHING, related_name='t2finvoice_t2f_invoiceitem_invoice_id')
-    wbs = models.ForeignKey('PublicsWbs', models.DO_NOTHING, related_name='publicswbs_t2f_invoiceitem_wbs_id', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 't2f_invoiceitem'
 
 
 class T2FItineraryitem(models.TenantModel):

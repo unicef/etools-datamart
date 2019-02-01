@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import pytest
 from django.utils.http import urlquote
+
+import pytest
 from rest_framework.test import APIClient
 from test_utilities.factories import InterventionFactory
 

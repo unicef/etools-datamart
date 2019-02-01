@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+from urllib.parse import urlencode
 
 from django.contrib import admin
-from django.template.defaultfilters import pluralize, urlencode
+from django.http import HttpResponseRedirect
+from django.template.defaultfilters import pluralize
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.extras import link
+from admin_extra_urls.extras import action, link
+from django_celery_beat.models import CrontabSchedule
+from rest_framework.reverse import reverse
+from strategy_field.utils import fqn
 
 from unicef_rest_framework.admin import APIModelAdmin, TruncateTableMixin
+from unicef_rest_framework.tasks import preload
 from unicef_rest_framework.utils import humanize_size
 
 from .models import APIRequestLog, DailyCounter, MonthlyCounter, PathCounter, UserCounter
@@ -55,6 +61,28 @@ class APIRequestLogAdmin(TruncateTableMixin, admin.ModelAdmin):
         processed = APIRequestLog.objects.aggregate()
         self.message_user(request, "{} {} aggregated".format(processed, pluralize(processed, 'day,days')))
 
+    @action()
+    def preload(self, request, pk):
+        obj = APIRequestLog.objects.get(id=pk)
+        base_url = reverse("admin:unicef_rest_framework_periodictask_preload")
+        params = json.loads(obj.query_params)
+        preload_cron, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)
+        if params:
+            path = "{0.path}?{1}".format(obj, urlencode(params))
+        else:
+            path = obj.path
+        qs = {'task': fqn(preload),
+              'name': f'PRELOAD {path}',
+              'crontab': preload_cron.id,
+              'service': obj.viewset.get_service().id,
+              'args': json.dumps([path]),
+              'kwargs': "{}",
+              'enabled': True,
+              '_from': reverse('admin:tracking_apirequestlog_change', args=[obj.pk])
+              }
+        url = f'{base_url}?{urlencode(qs)}'
+        return HttpResponseRedirect(url)
+
     def is_filtered(self, obj):
         return obj.query_params != '{}'
 
@@ -85,7 +113,7 @@ class APIRequestLogAdmin(TruncateTableMixin, admin.ModelAdmin):
     # event.allow_tags = True
 
     def size(self, obj):
-        mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
+        return mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
 
     size.admin_order_field = 'response_length'
     size.allow_tags = True

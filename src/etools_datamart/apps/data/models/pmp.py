@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class PMPIndicatorLoader(Loader):
-    def process_country(self, results, country, context):
+    def process_country(self, country, context):
         for partner in PartnersPartnerorganization.objects.all():
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
@@ -28,7 +28,7 @@ class PMPIndicatorLoader(Loader):
                           'vendor_number': partner.vendor_number,
 
                           'pd_ssfa_ref': intervention.number.replace(',', '-'),
-                          'pd_ssfa_status': intervention.status.title(),
+                          'pd_ssfa_status': intervention.status.lower(),
                           'pd_ssfa_start_date': intervention.start,
                           'pd_ssfa_creation_date': intervention.created,
                           'pd_ssfa_end_date': intervention.end,
@@ -52,13 +52,13 @@ class PMPIndicatorLoader(Loader):
                           # 'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
                           # 'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
                           }
-                op = self.process(filters=dict(country_name=country.name,
-                                               schema_name=country.schema_name,
-                                               partner_id=partner.pk,
-                                               intervention_id=intervention.pk),
-                                  values=values)
-                results.incr(op)
-        return results
+                op = self.process_record(filters=dict(country_name=country.name,
+                                                      schema_name=country.schema_name,
+                                                      partner_id=partner.pk,
+                                                      intervention_id=intervention.pk),
+                                         values=values,
+                                         context=context)
+                self.results.incr(op)
 
 
 class PMPIndicators(DataMartModel):

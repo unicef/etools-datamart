@@ -11,6 +11,7 @@ from dynamic_serializer.core import InvalidSerializerError
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
+from strategy_field.utils import fqn
 
 from unicef_rest_framework.ds import DynamicSerializerFilter
 from unicef_rest_framework.filtering import SystemFilterBackend
@@ -21,6 +22,7 @@ from unicef_rest_framework.views_mixins import IQYConnectionMixin
 from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
+from etools_datamart.libs.mystica import MysticaBasicAuthentication
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
 
@@ -43,15 +45,26 @@ class UpdatesMixin:
                         headers={'update-date': offset})
 
 
-class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin):
+class AutoRegisterMetaClass(type):
+    registry = {}
+
+    def __new__(mcs, class_name, bases, attrs):
+        new_class = super().__new__(mcs, class_name, bases, attrs)
+        mcs.registry[fqn(new_class)] = new_class
+        return new_class
+
+
+class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
+                              metaclass=AutoRegisterMetaClass):
     filter_backends = [CountryFilter,
                        DatamartQueryStringFilterBackend,
                        OrderingFilter,
                        DynamicSerializerFilter,
                        ]
-    # filter_fields = ['country_name']
+    authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MysticaBasicAuthentication,)
     ordering_fields = ('id',)
     ordering = 'id'
+    family = 'datamart'
 
     def get_schema_fields(self):
         ret = []
@@ -132,6 +145,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
                        OrderingFilter,
                        DynamicSerializerFilter,
                        ]
+    family = 'etools'
     ordering_fields = ('id',)
     ordering = 'id'
 

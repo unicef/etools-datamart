@@ -1,8 +1,9 @@
 from unittest import mock
 
+from django.urls import reverse
+
 import pytest
 from constance.test import override_config
-from django.urls import reverse
 from test_utilities.factories import UserFactory
 
 TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Imk2bEdrM0ZaenhSY1ViMkMzbkVRN3N5SEpsWSJ9." \

@@ -3,6 +3,7 @@ import uuid
 import warnings
 from urllib.parse import urlparse
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -10,19 +11,20 @@ from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connections
-from django.utils.module_loading import import_string
 
 from constance import config
-from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
+from django_celery_beat.models import CrontabSchedule, IntervalSchedule
 from post_office.models import EmailTemplate
 from redisboard.models import RedisServer
 from strategy_field.utils import fqn
 
+from unicef_rest_framework.models import PeriodicTask
 from unicef_rest_framework.models.acl import GroupAccessControl
+from unicef_rest_framework.tasks import preload
 
+from etools_datamart.apps.data.loader import loadeables
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.security.models import SchemaAccessControl
-from etools_datamart.celery import app
 
 MAIL = r"""Dear {{user.label}},
 
@@ -91,6 +93,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
+            '--deploy',
+            action='store_true',
+            dest='deploy',
+            default=False,
+            help='run deployment related actions')
+        parser.add_argument(
             '--all',
             action='store_true',
             dest='all',
@@ -104,10 +112,24 @@ class Command(BaseCommand):
             help='select all production deployment options')
 
         parser.add_argument(
-            '--no-migrate',
-            action='store_false',
+            '--collectstatic',
+            action='store_true',
+            dest='collectstatic',
+            default=False,
+            help='')
+
+        parser.add_argument(
+            '--users',
+            action='store_true',
+            dest='users',
+            default=False,
+            help='')
+
+        parser.add_argument(
+            '--migrate',
+            action='store_true',
             dest='migrate',
-            default=True,
+            default=False,
             help='select all production deployment options')
 
         parser.add_argument(
@@ -128,42 +150,18 @@ class Command(BaseCommand):
         verbosity = options['verbosity']
         migrate = options['migrate']
         _all = options['all']
-        # interactive = options['interactive']
+        deploy = options['deploy']
+        if deploy:
+            _all = True
+        ModelUser = get_user_model()
 
-        self.stdout.write(f"Run collectstatic")
-        call_command('collectstatic', verbosity=verbosity - 1, interactive=False)
+        if options['collectstatic'] or _all:
+            self.stdout.write(f"Run collectstatic")
+            call_command('collectstatic', verbosity=verbosity - 1, interactive=False)
 
         if migrate or _all:
             self.stdout.write(f"Run migrations")
             call_command('migrate', verbosity=verbosity - 1)
-
-        ModelUser = get_user_model()
-        if settings.DEBUG:
-            pwd = '123'
-            admin = os.environ.get('USER', 'admin')
-        else:
-            pwd = os.environ.get('ADMIN_PASSWORD', ModelUser.objects.make_random_password())
-            admin = os.environ.get('ADMIN_USERNAME', 'admin')
-
-        self._admin_user, created = ModelUser.objects.get_or_create(username=admin,
-                                                                    defaults={"is_superuser": True,
-                                                                              "is_staff": True,
-                                                                              "password": make_password(pwd)})
-
-        if created:  # pragma: no cover
-            self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
-        else:  # pragma: no cover
-            self.stdout.write(f"Superuser `{admin}` already exists`.")
-
-        self.stdout.write(f"Create anonymous")
-        anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
-                                                             defaults={"is_superuser": False,
-                                                                       "is_staff": False,
-                                                                       "password": make_password(uuid.uuid4())})
-        # self.stdout.write(f"Create group `Guest`")
-        # Group.objects.get_or_create(name='Guests')
-        # self.stdout.write(f"Create group `Endpoints all access`")
-        # all_access, __ = Group.objects.get_or_create(name='All endpoints access')
 
         self.stdout.write(f"Create group `Public areas access`")
         public_areas, __ = Group.objects.get_or_create(name='Public areas access')
@@ -171,6 +169,50 @@ class Command(BaseCommand):
 
         self.stdout.write(f"Create group `Restricted areas access`")
         restricted_areas, __ = Group.objects.get_or_create(name='Restricted areas access')
+
+        if options['users'] or _all:
+            if settings.DEBUG:
+                pwd = '123'
+                admin = os.environ.get('USER', 'admin')
+            else:
+                pwd = os.environ.get('ADMIN_PASSWORD', ModelUser.objects.make_random_password())
+                admin = os.environ.get('ADMIN_USERNAME', 'admin')
+
+            self._admin_user, created = ModelUser.objects.get_or_create(username=admin,
+                                                                        defaults={"is_superuser": True,
+                                                                                  "is_staff": True,
+                                                                                  "password": make_password(pwd)})
+
+            if created:  # pragma: no cover
+                self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
+            else:  # pragma: no cover
+                self.stdout.write(f"Superuser `{admin}` already exists`.")
+
+            self.stdout.write(f"Create anonymous")
+            anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
+                                                                 defaults={"is_superuser": False,
+                                                                           "is_staff": False,
+                                                                           "password": make_password(uuid.uuid4())})
+
+            if os.environ.get('AUTOCREATE_USERS'):
+                self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
+                self.stdout.write("Going to create new users")
+                try:
+                    for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
+                        email, pwd = entry.split(',')
+                        u, created = ModelUser.objects.get_or_create(username=email,
+                                                                     defaults={"is_superuser": False,
+                                                                               "is_staff": False,
+                                                                               "password": make_password(pwd)})
+
+                        if created:
+                            self.stdout.write(f"Created user {u}")
+                            u.groups.add(public_areas)
+                        else:  # pragma: no cover
+                            self.stdout.write(f"User {u} already exists.")
+
+                except Exception as e:  # pragma: no cover
+                    warnings.warn(f"Unable to create default users. {e}")
 
         self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
         SchemaAccessControl.objects.get_or_create(group=public_areas,
@@ -182,8 +224,6 @@ class Command(BaseCommand):
         from unicef_rest_framework.models import Service
         created, deleted, total = Service.objects.load_services()
         self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
-        if os.environ.get('INVALIDATE_CACHE'):
-            Service.objects.invalidate_cache()
 
         for service in Service.objects.all():
             GroupAccessControl.objects.get_or_create(
@@ -207,52 +247,54 @@ class Command(BaseCommand):
                 RedisServer.objects.get_or_create(hostname=spec.hostname,
                                                   port=int(spec.port))
 
-        if os.environ.get('AUTOCREATE_USERS'):
-            self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
-            self.stdout.write("Going to create new users")
-            try:
-                for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
-                    email, pwd = entry.split(',')
-                    u, created = ModelUser.objects.get_or_create(username=email)
-                    if created:
-                        self.stdout.write(f"Created user {u}")
-                        u.set_password(pwd)
-                        u.save()
-                        u.groups.add(public_areas)
-                    else:  # pragma: no cover
-                        self.stdout.write(f"User {u} already exists.")
-
-            except Exception as e:  # pragma: no cover
-                warnings.warn(f"Unable to create default users. {e}")
-
         if options['tasks'] or _all or options['refresh']:
+            preload_cron, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)
             midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-            CrontabSchedule.objects.get_or_create(hour=[0, 6, 12, 18])
-            CrontabSchedule.objects.get_or_create(hour=[0, 12])
+            CrontabSchedule.objects.get_or_create(hour='0, 6, 12, 18')
+            CrontabSchedule.objects.get_or_create(hour='0, 12')
             IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
 
             every_minute, __ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
 
-            tasks = app.get_all_etls()
+            # tasks = app.get_all_etls()
             counters = {True: 0, False: 0}
-            for task in tasks:
-                __, is_new = PeriodicTask.objects.get_or_create(task=fqn(task),
-                                                                defaults={'name': task.name,
+            loaders = []
+            for loadeable in loadeables:
+                model = apps.get_model(loadeable)
+                loaders.append(loadeable)
+                __, is_new = PeriodicTask.objects.get_or_create(task=f"ETL {model.loader.task.name}",
+                                                                defaults={'name': loadeable,
+                                                                          'service': Service.objects.get_for_model(model),
                                                                           'crontab': midnight})
-            for task in PeriodicTask.objects.all():
-                try:
-                    import_string(task.task)
-                except ImportError:
-                    task.delete()
-                    counters[False] += 1
+                if is_new:
+                    self.stdout.write(f"NEW load task {model.loader.task.name} scheduled at {midnight}")
+
+            # preload
+            for service in Service.objects.all():
+                url = service.endpoint
+                pp, is_new = PeriodicTask.objects.get_or_create(name=f'PRELOAD {url}',
+                                                                defaults={'task': fqn(preload),
+                                                                          'crontab': preload_cron,
+                                                                          'service': service,
+                                                                          'args': f'["{url}?page_size=-1"]'})
+                if is_new:
+                    self.stdout.write(f"NEW preload task for '{url}'")
+
+            ret = PeriodicTask.objects.filter(name__startswith='data.').exclude(name__in=loaders).delete()
+            counters[False] = ret[0]
 
             EtlTask.objects.inspect()
             self.stdout.write(
-                f"{PeriodicTask.objects.count()} tasks found. {counters[True]} new. {counters[False]} deleted")
+                f"{PeriodicTask.objects.filter(name__startswith='data.').count()} "
+                f"periodic task found. {counters[True]} new. {counters[False]} deleted")
 
             PeriodicTask.objects.get_or_create(task='send_queued_mail',
                                                defaults={'name': 'process mail queue',
                                                          'interval': every_minute})
+
+            # PeriodicTask.objects.get_or_create(task='send_queued_mail',
+            #                                    defaults={'name': 'process mail queue',
+            #                                              'interval': every_minute})
 
         EmailTemplate.objects.get_or_create(name='dataset_changed_attachment',
                                             defaults=dict(subject='Dataset changed',
@@ -263,18 +305,13 @@ class Command(BaseCommand):
                                             defaults=dict(subject='Dataset changed',
                                                           content=MAIL,
                                                           html_content=MAIL_HTML))
-        config.CACHE_VERSION = config.CACHE_VERSION + 1
 
-        # if options['refresh']:
-        #     self.stdout.write("Refreshing datamart...")
-        #     for task in PeriodicTask.objects.all()[1:]:
-        #         try:
-        #             etl = import_string(task.task)
-        #         except ImportError:
-        #             continue
-        #         self.stdout.write(f"Running {task.name}...", ending='\r')
-        #         self.stdout.flush()
-        #
-        #         etl.apply()
-        #         cost = naturaldelta(app.timers[task.name])
-        #         self.stdout.write(f"{task.name} excuted in {cost}")
+        if options['refresh'] or deploy:
+            self.stdout.write("Refreshing datamart...")
+            for model_name in loadeables:
+                model = apps.get_model(model_name)
+                model.loader.task.delay()
+
+        if deploy:
+            Service.objects.invalidate_cache()
+            config.CACHE_VERSION = config.CACHE_VERSION + 1
