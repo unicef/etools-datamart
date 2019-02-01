@@ -3,18 +3,18 @@
 * add ability to truncate DataMart tables
 * fixes init-setup PeriodicTask creation
 
-1.14
+1.15
 ----
 * Fix loading Intervention
 * migrations reset
 
 
-1.14
+1.15
 ---------
 * new endpoint DPIndicator
 * preload helpers
 
-1.14
+1.15
 ---------
 * add impersonation
 * fixes schema permission check
