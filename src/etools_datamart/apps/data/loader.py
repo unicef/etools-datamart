@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 import celery
+from constance import config
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
@@ -166,7 +167,11 @@ class LoaderTask(celery.Task):
         try:
             return self.loader.load(run_type=RUN_SCHEDULE, check_requirements=True)
         except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
-            self.retry(exc=e)
+            st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
+            self.loader.etl_task.status = st
+            self.loader.etl_task.save()
+            self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
+                       countdown=config.ETL_RETRY_COUNTDOWN)
 
 
 class Loader:
@@ -372,6 +377,7 @@ class Loader:
         cost = time.time() - self._start
         defs = {'elapsed': cost,
                 'results': self.results.as_dict()}
+
         if retry:
             defs['status'] = 'RETRY'
             defs['results'] = str(error)

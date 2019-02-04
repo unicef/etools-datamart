@@ -411,6 +411,9 @@ CONSTANCE_CONFIG = {
     'ANALYTICS_CODE': (env('ANALYTICS_CODE'), 'Google analytics code'),
     'DISABLE_SCHEMA_RESTRICTIONS': (env('DISABLE_SCHEMA_RESTRICTIONS'), 'Disable per user schema authorizations'),
     'DISABLE_SERVICE_RESTRICTIONS': (env('DISABLE_SERVICE_RESTRICTIONS'), 'Disable per user service authorizations'),
+
+    'ETL_MAX_RETRIES': (30, 'Max retries for dependent tasks', int),
+    'ETL_RETRY_COUNTDOWN': (180, 'Retry counddown in secods', int),
 }
 
 CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
