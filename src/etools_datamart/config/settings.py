@@ -631,3 +631,7 @@ def extra(r):
 SYSINFO = {"extra": {'Azure': extra}}
 
 MIGRATION_MODULES = {'dbtemplates': 'etools_datamart.custom_migrations.dbtemplates'}
+
+IMPERSONATE_PAGINATE_COUNT = 50
+IMPERSONATE_REQUIRE_SUPERUSER = True
+IMPERSONATE_CUSTOM_USER_QUERYSET = 'etools_datamart.libs.impersonate.queryset'

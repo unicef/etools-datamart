@@ -1,0 +1,21 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<h1>User List {% if page.has_next %}- Page {{ page_number }}{% endif %}</h1>
+
+{% if page.object_list %}
+  <ul>
+    {% for user in page.object_list %}
+      <li><a href="{% url 'impersonate-start' user.pk %}{{redirect}}">{{ user }}</a></li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if page.has_previous %}
+<a href="{% url 'impersonate-list' %}?page={{ page.previous_page_number }}">Previous Page</a> &nbsp;
+{% endif %}
+
+{% if page.has_next %}
+<a href="{% url 'impersonate-list' %}?page={{ page.next_page_number }}">Next Page</a> &nbsp;
+{% endif %}
+
+{% endblock content %}
