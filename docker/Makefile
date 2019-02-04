@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.15
+TARGET?=1.16.0a
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -34,7 +34,6 @@ build:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg DEVELOP=${DEVELOP} \
-			--build-arg GITHUB_CREDENTIALS=${GITHUB_CREDENTIALS} \
 			--build-arg VERSION=${TARGET} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
@@ -82,8 +81,8 @@ local:
 release:
 	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
-	docker push ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
+	docker push ${DOCKER_IMAGE_NAME}:latest
 
 bump:
 	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num

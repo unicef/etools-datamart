@@ -1,5 +1,4 @@
-FROM python:3.6.8-alpine3.8 as base
-FROM base
+FROM python:3.6.8-alpine3.8
 
 ARG BUILD_DATE
 ARG PIPENV_ARGS
@@ -10,10 +9,10 @@ ENV CPLUS_INCLUDE_PATH /usr/include/gdal
 ENV C_INCLUDE_PATH /usr/include/gdal
 
 RUN apk add --no-cache --virtual .fetch-deps \
-        curl \
-        ca-certificates \
-        openssl \
-        tar
+        curl
+#        ca-certificates \
+#        openssl \
+#        tar
 
 RUN apk add --no-cache --virtual .build-deps \
         autoconf \
@@ -72,17 +71,17 @@ RUN apk add --no-cache --virtual .system-run-deps \
 
 RUN mkdir -p /code
 ADD . /code
+WORKDIR /code
 
 RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
     echo "${VERSION}-develop"; \
     else \
     echo "Download package: https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" \
-    && curl ${GITHUB_CREDENTIALS}: -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
+    && curl -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
 RUN pip install pip==18.0 pipenv --upgrade
 
-WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
