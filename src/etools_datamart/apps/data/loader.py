@@ -165,7 +165,9 @@ class LoaderTask(celery.Task):
     def run(self, *args, **kwargs):
         logger.debug(kwargs)
         try:
-            return self.loader.load(run_type=RUN_SCHEDULE, check_requirements=True)
+            kwargs.setdefault('ignore_dependencies', False)
+            kwargs.setdefault('force_requirements', True)
+            return self.loader.load(**kwargs)
         except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
             st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
             self.loader.etl_task.status = st
@@ -241,7 +243,7 @@ class Loader:
             return True
 
         if sender.etl_task.last_success:
-            return self.etl_task.last_success.day < sender.etl_task.last_run.day
+            return self.etl_task.last_success.day > sender.etl_task.last_run.day
         return False
 
     def is_record_changed(self, record, values):
@@ -409,7 +411,7 @@ class Loader:
     def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None,
              ignore_last_modify_field=False, run_type=RUN_UNKNOWN,
-             check_requirements=False, force_requirements=False):
+             force_requirements=False):
         self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
@@ -418,16 +420,14 @@ class Loader:
             if lock:  # pragma: no branch
                 if not ignore_dependencies:
                     for requirement in self.config.depends:
-                        if force_requirements or requirement.loader.need_refresh(self):
-                            if check_requirements:
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        if requirement.loader.need_refresh(self):
+                            if not force_requirements:
                                 raise RequiredIsMissing(requirement)
-                            logger.info(f"Loader {requirement} need refresh")
-                            if requirement.loader.is_running():
-                                raise RequiredIsRunning(requirement)
                             logger.info(f"Load required dataset {requirement}")
                             requirement.loader.load(stdout=stdout,
                                                     force_requirements=force_requirements,
-                                                    check_requirements=check_requirements,
                                                     run_type=RUN_AS_REQUIREMENT)
                         else:
                             logger.info(f"Loader {requirement} is uptodate")

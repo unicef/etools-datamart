@@ -19,39 +19,39 @@ def loader1(db):
 def test_load_requiredismissing(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
         with pytest.raises(RequiredIsMissing):
-            loader1.load(check_requirements=True, max_records=2)
+            loader1.load(max_records=2)
 
 
 def test_load_requiredisrunning(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
         with mock.patch('etools_datamart.apps.data.models.Intervention.loader.is_running', lambda *a: True):
             with pytest.raises(RequiredIsRunning):
-                loader1.load(check_requirements=False, max_records=2)
+                loader1.load(max_records=2)
 
 
 def test_load_requiredsuccess(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
         with mock.patch('etools_datamart.apps.data.models.Intervention.loader.load', lambda *a, **kw: True):
-            loader1.load(check_requirements=False, max_records=2)
+            loader1.load(force_requirements=True, max_records=2)
 
 
 def test_load_requiredready(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: False):
-        loader1.load(check_requirements=False, max_records=2)
+        loader1.load(max_records=2)
 
 
 def test_load_always_update(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: False):
-        loader1.load(check_requirements=False, max_records=2, always_update=True)
-        ret = loader1.load(check_requirements=False, max_records=2, always_update=True)
+        loader1.load(max_records=2, always_update=True)
+        ret = loader1.load(max_records=2, always_update=True)
     assert ret.created == 0
     assert ret.updated == 2
 
 
 def test_load_no_changes(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: False):
-        loader1.load(check_requirements=False, max_records=2)
-        ret = loader1.load(check_requirements=False, max_records=2)
+        loader1.load(max_records=2)
+        ret = loader1.load(max_records=2)
     assert ret.unchanged == 2
 
 
@@ -59,7 +59,7 @@ def test_load_exception(loader1):
     with mock.patch('etools_datamart.apps.data.models.FundsReservation.loader.process_country',
                     side_effect=Exception()):
         with pytest.raises(Exception):
-            loader1.load(check_requirements=False, max_records=2)
+            loader1.load(max_records=2)
 
 
 def test_load_ignore_dependencies(loader1):

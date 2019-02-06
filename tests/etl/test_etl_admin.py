@@ -58,7 +58,7 @@ def test_tasklog_queue(django_app, admin_user, tasklog):
 
 
 def test_tasklog_queue_action(django_app, admin_user, tasklog):
-    tasklog.loader.task.delay = lambda: True
+    tasklog.loader.task.delay = lambda **kw: True
     url = reverse("admin:etl_etltask_changelist")
     res = django_app.get(url, user=admin_user)
     res.form['action'].value = 'queue'
