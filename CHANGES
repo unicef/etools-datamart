@@ -1,11 +1,14 @@
 1.16
 ----
-*
+* update to eTools 6.7
+* improves Loader logic
+
 
 1.15
 ----
 * add ability to truncate DataMart tables
 * fixes init-setup PeriodicTask creation
+
 
 1.14
 ----
@@ -17,6 +20,7 @@
 ---------
 * new endpoint DPIndicator
 * preload helpers
+
 
 1.11
 ---------

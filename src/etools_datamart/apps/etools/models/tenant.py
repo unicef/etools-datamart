@@ -526,6 +526,8 @@ class LocationsCartodbtable(models.TenantModel):
     rght = models.IntegerField()
     tree_id = models.IntegerField()
     remap_table_name = models.CharField(max_length=254, blank=True, null=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -535,6 +537,8 @@ class LocationsCartodbtable(models.TenantModel):
 class LocationsGatewaytype(models.TenantModel):
     name = models.CharField(unique=True, max_length=64)
     admin_level = models.SmallIntegerField(unique=True, blank=True, null=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -569,6 +573,7 @@ class LocationsLocationremaphistory(models.TenantModel):
     created = models.DateTimeField()
     new_location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='locationslocation_locations_locationremaphistory_new_location_id')
     old_location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='locationslocation_locations_locationremaphistory_old_location_id')
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -1233,17 +1238,6 @@ class SnapshotActivity(models.TenantModel):
         db_table = 'snapshot_activity'
 
 
-class T2FClearances(models.TenantModel):
-    medical_clearance = models.CharField(max_length=14)
-    security_clearance = models.CharField(max_length=14)
-    security_course = models.CharField(max_length=14)
-    travel = models.OneToOneField('T2FTravel', models.DO_NOTHING, related_name='t2ftravel_t2f_clearances_travel_id')
-
-    class Meta:
-        managed = False
-        db_table = 't2f_clearances'
-
-
 class T2FCostassignment(models.TenantModel):
     share = models.IntegerField()
     delegate = models.BooleanField()
@@ -1385,7 +1379,7 @@ class T2FTravelactivityTravels(models.TenantModel):
 class T2FTravelattachment(models.TenantModel):
     type = models.CharField(max_length=64)
     name = models.CharField(max_length=255)
-    file = models.CharField(max_length=255)
+    file = models.CharField(max_length=255, blank=True, null=True)
     travel = models.ForeignKey(T2FTravel, models.DO_NOTHING, related_name='t2ftravel_t2f_travelattachment_travel_id')
 
     class Meta:

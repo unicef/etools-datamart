@@ -82,6 +82,8 @@ class AuthUser(models.Model):
     is_active = models.BooleanField()
     date_joined = models.DateTimeField()
     middle_name = models.CharField(max_length=50)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -761,6 +763,67 @@ class RegistrationRegistrationprofile(models.Model):
     class Meta:
         managed = False
         db_table = 'registration_registrationprofile'
+
+
+class SocialAuthAssociation(models.Model):
+    server_url = models.CharField(max_length=255)
+    handle = models.CharField(max_length=255)
+    secret = models.CharField(max_length=255)
+    issued = models.IntegerField()
+    lifetime = models.IntegerField()
+    assoc_type = models.CharField(max_length=64)
+
+    class Meta:
+        managed = False
+        db_table = 'social_auth_association'
+        unique_together = (('handle', 'server_url'),)
+
+
+class SocialAuthCode(models.Model):
+    email = models.CharField(max_length=254)
+    code = models.CharField(max_length=32)
+    verified = models.BooleanField()
+    timestamp = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'social_auth_code'
+        unique_together = (('code', 'email'),)
+
+
+class SocialAuthNonce(models.Model):
+    server_url = models.CharField(max_length=255)
+    timestamp = models.IntegerField()
+    salt = models.CharField(max_length=65)
+
+    class Meta:
+        managed = False
+        db_table = 'social_auth_nonce'
+        unique_together = (('salt', 'server_url', 'timestamp'),)
+
+
+class SocialAuthPartial(models.Model):
+    token = models.CharField(max_length=32)
+    next_step = models.SmallIntegerField()
+    backend = models.CharField(max_length=32)
+    data = models.TextField()  # This field type is a guess.
+    timestamp = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'social_auth_partial'
+
+
+class SocialAuthUsersocialauth(models.Model):
+    provider = models.CharField(max_length=32)
+    uid = models.CharField(max_length=255)
+    extra_data = models.TextField()  # This field type is a guess.
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_social_auth_usersocialauth_user_id')
+
+    class Meta:
+        managed = False
+        db_table = 'social_auth_usersocialauth'
+        unique_together = (('provider', 'uid'),)
 
 
 class SocialaccountSocialaccount(models.Model):
