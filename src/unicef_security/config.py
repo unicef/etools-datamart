@@ -16,3 +16,5 @@ AZURE_TOKEN_URL = 'https://login.microsoftonline.com/unicef.org/oauth2/token'
 AZURE_GRAPH_API_BASE_URL = 'https://graph.microsoft.com'
 AZURE_GRAPH_API_VERSION = 'v1.0'
 AZURE_GRAPH_API_PAGE_SIZE = 300
+
+INSIGHT_URL = 'https://devapis.unicef.org/BIService/BIWebService.svc/'

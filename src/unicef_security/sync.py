@@ -27,7 +27,7 @@ def get_vision_auth():
 
 
 def load_region():
-    url = "https://devapis.unicef.org/BIService/BIWebService.svc/GetBusinessAreaList_JSON"
+    url = "{}GetBusinessAreaList_JSON".format(config.INSIGHT_URL)
     response = requests.get(url, auth=get_vision_auth()).json()
     data = json.loads(response['GetBusinessAreaList_JSONResult'])
     results = SyncResult()
@@ -44,7 +44,7 @@ def load_region():
 
 
 def load_business_area():
-    url = "https://devapis.unicef.org/BIService/BIWebService.svc/GetBusinessAreaList_JSON"
+    url = "{}GetBusinessAreaList_JSON".format(config.INSIGHT_URL)
     response = requests.get(url, auth=get_vision_auth()).json()
     data = json.loads(response['GetBusinessAreaList_JSONResult'])
     results = SyncResult()
