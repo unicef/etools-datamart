@@ -24,7 +24,7 @@ router.register(r'etools/partners/plannedengagement', endpoints.Plannedengagemen
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
 router.register(r'etools/reports/appliedindicator', endpoints.AppliedindicatorViewSet)
 router.register(r'etools/reports/results', endpoints.ReportsResultViewSet)
-router.register(r'etools/t2/ftravel', endpoints.FTravelViewSet)
+router.register(r'etools/t2f/travel', endpoints.TravelViewSet)
 router.register(r'etools/tpm/tpmvisit', endpoints.TpmTpmvisitViewSet)
 router.register(r'etools/locations', endpoints.LocationViewSet)
 

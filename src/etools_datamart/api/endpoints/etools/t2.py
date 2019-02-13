@@ -4,6 +4,6 @@ from etools_datamart.api.endpoints.etools import serializers
 from etools_datamart.apps.etools import models
 
 
-class FTravelViewSet(common.APIMultiTenantReadOnlyModelViewSet):
-    serializer_class = serializers.FTravelSerializer
+class TravelViewSet(common.APIMultiTenantReadOnlyModelViewSet):
+    serializer_class = serializers.TravelSerializer
     queryset = models.T2FTravel.objects.all()
