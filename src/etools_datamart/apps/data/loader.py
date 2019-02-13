@@ -1,4 +1,3 @@
-import datetime
 import logging
 import time
 from inspect import isclass
@@ -63,8 +62,8 @@ class EtlResult:
     def incr(self, counter):
         setattr(self, counter, getattr(self, counter) + 1)
 
-    # def add(self, counter, value):
-    #     setattr(self, counter, getattr(self, counter) + value)
+    def add(self, counter, value):
+        setattr(self, counter, getattr(self, counter) + value)
 
     def as_dict(self):
         return {'created': self.created,
@@ -123,7 +122,7 @@ class RequiredIsMissing(Exception):
 
 class LoaderOptions:
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
-                 'queryset', 'key', 'locks', 'filters',
+                 'queryset', 'key', 'locks', 'filters', 'sync_deleted_records',
                  'depends', 'timeout', 'lock_key']
 
     def __init__(self, base=None):
@@ -137,6 +136,7 @@ class LoaderOptions:
         self.depends = ()
         self.filters = None
         self.last_modify_field = None
+        self.sync_deleted_records = lambda context, country: True
 
         if base:
             for attr in self.__attrs__:
@@ -181,7 +181,6 @@ class Loader:
         self.config = None
         self.tree_parents = []
         self.always_update = False
-        self.seen = []
 
     def __repr__(self):
         return "<%sLoader>" % self.model._meta.object_name
@@ -225,13 +224,13 @@ class Loader:
 
     @property
     def last_run(self):
-        last_run = self.etl_task.last_run
+        # last_run = self.etl_task.last_run
         # delta is not required as last_run is set at the beginning
         # here just for safety
-        if last_run and self.etl_task.elapsed:
-            delta = datetime.timedelta(seconds=self.etl_task.elapsed)
-            return last_run - delta
-        return None
+        # if last_run and self.etl_task.elapsed:
+        #     delta = datetime.timedelta(seconds=self.etl_task.elapsed)
+        #     return last_run - delta
+        return self.etl_task.last_run
 
     def is_running(self):
         return self.etl_task.status == 'RUNNING'
@@ -274,7 +273,6 @@ class Loader:
                                                                           defaults=values)
                 else:
                     op = UNCHANGED
-            self.seen.append(record.pk)
             return op
         except Exception as e:  # pragma: no cover
             logger.exception(e)
@@ -312,6 +310,12 @@ class Loader:
         ret['seen'] = context['today']
         return ret
 
+    def remove_deleted(self, country, context):
+        existing = list(self.get_queryset(context).only('id').values_list('id', flat=True))
+        to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
+        self.results.add('deleted', to_delete.count())
+        to_delete.delete()
+
     def post_process_country(self, country, context):
         for mart, etools in self.tree_parents:
             kk = self.model.objects.get(schema_name=country.schema_name,
@@ -320,14 +324,11 @@ class Loader:
                                                source_id=etools)
             kk.save()
         self.tree_parents = []
-
         # mark seen records
-        self.model.objects.filter(id__in=self.seen).update(seen=context['today'])
 
     def process_country(self, country, context):
         qs = self.filter_queryset(self.get_queryset(context), context)
         max_records = context['max_records']
-        self.seen = []
         for record in qs.all():
             filters = self.config.key(country, record)
             values = self.get_values(country, record, context)
@@ -410,7 +411,7 @@ class Loader:
 
     def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None,
-             ignore_last_modify_field=False, run_type=RUN_UNKNOWN,
+             only_delta=True, run_type=RUN_UNKNOWN,
              force_requirements=False):
         self.on_start(run_type)
         self.results = EtlResult()
@@ -449,7 +450,7 @@ class Loader:
                                            max_records=max_records,
                                            verbosity=verbosity,
                                            records=0,
-                                           filter_last_modified=not ignore_last_modify_field,
+                                           filter_last_modified=only_delta,
                                            is_empty=not self.model.objects.exists(),
                                            stdout=stdout)
                 sid = transaction.savepoint()
@@ -460,16 +461,19 @@ class Loader:
 
                     for i, country in enumerate(countries, 1):
                         if stdout and verbosity > 0:
-                            stdout.write(f"{i:>3}/{total_countries} {country}")
+                            stdout.write(f"{i:>3}/{total_countries} {country}\n")
+                            stdout.flush()
                         connection.set_schemas([country.schema_name])
                         self.process_country(country, context)
                         self.post_process_country(country, context)
+                        if self.config.sync_deleted_records(context, country):
+                            self.remove_deleted(country, context)
                         if max_records and context['records'] >= max_records:
                             break
                     if stdout and verbosity > 0:
                         stdout.write("\n")
-                    deleted = self.model.objects.exclude(seen=today).delete()[0]
-                    self.results.deleted = deleted
+                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
+                    # self.results.deleted = deleted
                 except Exception:
                     transaction.savepoint_rollback(sid)
                     raise

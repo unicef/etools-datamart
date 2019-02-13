@@ -66,7 +66,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            '--ignore-last-modify-field', action='store_true',
+            '--no-delta', action='store_true',
             help="Do not use last_modify_field if present. Reload full dataset.",
         )
 
@@ -106,7 +106,8 @@ class Command(BaseCommand):
         unlock = options['unlock']
         excludes = options['exclude'] or []
         records = options['records']
-        countries = options['countries'].split(',')
+        countries = options['countries']
+        no_delta = options['no_delta']
 
         if debug:
             setup_logging(self.verbosity)
@@ -117,8 +118,9 @@ class Command(BaseCommand):
             model_names = [t.loader.model_name for t in qs]
 
         if countries:
+
             connection = connections['etools']
-            schemas = [c for c in connection.get_tenants() if c.schema_name in countries]
+            schemas = [c for c in connection.get_tenants() if c.schema_name in countries.split(',')]
         else:
             schemas = None
         if not model_names:
@@ -148,11 +150,13 @@ class Command(BaseCommand):
                                             run_type=RUN_COMMAND,
                                             max_records=records,
                                             countries=schemas,
+                                            only_delta=not no_delta,
                                             stdout=sys.stdout)
                     self.stdout.write(f"{model_name:20}: "
                                       f"  created: {res.created:<3}"
                                       f"  updated: {res.updated:<3}"
-                                      f"  unchanged: {res.unchanged:<3}\n"
+                                      f"  unchanged: {res.unchanged:<3}"
+                                      f"  deleted: {res.deleted:<3}\n"
                                       )
             except KeyboardInterrupt:
                 return "Interrupted"

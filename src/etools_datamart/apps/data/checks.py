@@ -19,11 +19,15 @@ def check_loader(app_configs, **kwargs):
         #         id='H001',
         #     ))
         if cfg.last_modify_field:
+            if cfg.queryset:
+                opts = cfg.queryset().model._meta
+            else:
+                opts = cfg.source._meta
             try:
-                cfg.source._meta.get_field(cfg.last_modify_field)
+                opts.get_field(cfg.last_modify_field)
             except Exception:
                 errors.append(Error(
-                    f"LoaderOptions last_modify_field: '{cfg.last_modify_field}' does not exists in {cfg.source}",
+                    f"LoaderOptions last_modify_field: '{cfg.last_modify_field}' does not exists in {opts}",
                     hint='',
                     obj=model.loader,
                     id='L001',

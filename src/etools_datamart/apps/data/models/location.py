@@ -41,8 +41,6 @@ class Location(DataMartModel):
     modified = models.DateTimeField()
     is_active = models.BooleanField()
 
-    source_id = models.IntegerField(blank=True, null=True)
-
     class Meta:
         unique_together = ('schema_name', 'source_id')
 
@@ -50,7 +48,8 @@ class Location(DataMartModel):
         depends = (GatewayType,)
         # source = LocationsLocation
         queryset = lambda: LocationsLocation.objects.order_by('-parent')
-
+        last_modify_field = 'modified'
+        # sync_deleted_records = False
         mapping = {'source_id': 'id',
                    'area_code': lambda country, record: country.business_area_code,
                    'parent': '__self__',

@@ -71,7 +71,7 @@ class DataMartModel(models.Model, metaclass=DataMartModelBase):
     last_modify_date = models.DateTimeField(blank=True, auto_now=True)
     seen = models.DateTimeField(blank=True, null=True)
 
-    source_id = models.IntegerField(blank=True, null=True)
+    source_id = models.IntegerField(blank=True, null=True, db_index=True)
 
     class Meta:
         abstract = True
