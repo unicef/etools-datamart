@@ -277,6 +277,7 @@ class Command(BaseCommand):
                     url = service.endpoint
                 except NoReverseMatch:
                     PeriodicTask.objects.filter(service=service).delete()
+                    service.delete()
                 else:
                     pp, is_new = PeriodicTask.objects.get_or_create(name=f'PRELOAD {url}',
                                                                     defaults={'task': fqn(preload),
