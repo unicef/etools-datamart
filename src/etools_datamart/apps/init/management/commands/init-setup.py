@@ -11,6 +11,7 @@ from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connections
+from django.urls import NoReverseMatch
 
 from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule
@@ -264,21 +265,26 @@ class Command(BaseCommand):
                 loaders.append(model.loader.task.name)
                 __, is_new = PeriodicTask.objects.get_or_create(name=f"ETL {model.loader.task.name}",
                                                                 defaults={'task': model.loader.task.name,
-                                                                          'service': Service.objects.get_for_model(model),
+                                                                          'service': Service.objects.get_for_model(
+                                                                              model),
                                                                           'crontab': midnight})
                 if is_new:
                     self.stdout.write(f"NEW load task {model.loader.task.name} scheduled at {midnight}")
 
             # preload
             for service in Service.objects.all():
-                url = service.endpoint
-                pp, is_new = PeriodicTask.objects.get_or_create(name=f'PRELOAD {url}',
-                                                                defaults={'task': fqn(preload),
-                                                                          'crontab': preload_cron,
-                                                                          'service': service,
-                                                                          'args': f'["{url}?page_size=-1"]'})
-                if is_new:
-                    self.stdout.write(f"NEW preload task for '{url}'")
+                try:
+                    url = service.endpoint
+                except NoReverseMatch:
+                    PeriodicTask.objects.filter(service=service).delete()
+                else:
+                    pp, is_new = PeriodicTask.objects.get_or_create(name=f'PRELOAD {url}',
+                                                                    defaults={'task': fqn(preload),
+                                                                              'crontab': preload_cron,
+                                                                              'service': service,
+                                                                              'args': f'["{url}?page_size=-1"]'})
+                    if is_new:
+                        self.stdout.write(f"NEW preload task for '{url}'")
 
             ret = PeriodicTask.objects.filter(task__startswith='load_').exclude(task__in=loaders).delete()
             counters[False] = ret[0]
