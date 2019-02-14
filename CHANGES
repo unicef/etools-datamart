@@ -1,5 +1,11 @@
 1.17
 ----
+* fixes travel filtering
+* disable live stats
+
+
+1.16
+----
 * update to eTools 6.7
 * improves Loader logic
 * add Travel endpoint

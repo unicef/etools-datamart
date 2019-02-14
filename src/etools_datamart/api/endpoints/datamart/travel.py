@@ -50,9 +50,8 @@ class TravelViewSet(common.DataMartViewSet):
 
     serializer_class = TravelSerializer
     queryset = models.Travel.objects.all()
-    filter_fields = ('status', 'created'
-
-                               'completed_at', 'approved_at', 'end_date', 'start_date')
+    filter_fields = ('status', 'created',
+                     'completed_at', 'approved_at', 'end_date', 'start_date')
 
     def get_querystringfilter_form(self, request, filter):
         return TravelFilterForm(request.GET, filter.form_prefix)

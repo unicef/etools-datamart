@@ -321,8 +321,6 @@ class Loader:
     def remove_deleted(self, country, context):
         existing = list(self.get_queryset(context).only('id').values_list('id', flat=True))
         to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
-        # TODO: remove me
-        print(111, "loader.py:321", to_delete.count())
         self.results.add('deleted', to_delete.count())
         to_delete.delete()
 

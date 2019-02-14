@@ -28,7 +28,7 @@ def log_request(**kwargs):
 
         def _update_stats(target, **extra):
 
-            extra['total'] = F('total') + target.total
+            extra['total'] = F('total') + 1
             extra['response_max'] = max(target.response_max, log.response_ms)
             extra['response_min'] = min(target.response_min, log.response_ms)
             extra['response_avg'] = target.response_max / target.total

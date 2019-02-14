@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from admin_extra_urls.extras import link
+from adminactions.api import export_as_csv, export_as_xls
 from adminactions.mass_update import mass_update
 from adminfilters.filters import AllValuesComboFilter
 from crashlog.middleware import process_exception
@@ -31,7 +32,7 @@ class DatamartChangeList(ChangeList):
 
 
 class DataModelAdmin(TruncateTableMixin, ModelAdmin):
-    actions = [mass_update, ]
+    actions = [mass_update, export_as_csv, export_as_xls]
 
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
