@@ -122,7 +122,7 @@ class RequiredIsMissing(Exception):
 
 class LoaderOptions:
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
-                 'queryset', 'key', 'locks', 'filters', 'sync_deleted_records',
+                 'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
                  'depends', 'timeout', 'lock_key']
 
     def __init__(self, base=None):
@@ -137,7 +137,7 @@ class LoaderOptions:
         self.filters = None
         self.last_modify_field = None
         self.sync_deleted_records = lambda context, country: True
-
+        self.truncate = False
         if base:
             for attr in self.__attrs__:
                 if hasattr(base, attr):
@@ -146,6 +146,9 @@ class LoaderOptions:
                         setattr(self, attr, n)
                     else:
                         setattr(self, attr, getattr(base, attr, getattr(self, attr)))
+
+        if self.truncate:
+            self.sync_deleted_records = lambda context, country: False
 
     def contribute_to_class(self, model, name):
         self.model = model
@@ -213,8 +216,7 @@ class Loader:
         return ret
 
     def filter_queryset(self, qs, context):
-        use_delta = context['filter_last_modified'] and not context['is_empty']
-
+        use_delta = context['only_delta'] and not context['is_empty']
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
         if use_delta and (self.config.last_modify_field and self.last_run):
@@ -260,7 +262,6 @@ class Loader:
         if stdout and verbosity > 2:  # pragma: no cover
             stdout.write('.')
             stdout.flush()
-
         try:
             record, created = self.model.objects.get_or_create(**filters,
                                                                defaults=values)
@@ -280,12 +281,19 @@ class Loader:
             raise LoaderException(f"Error in {self}: {e}",
                                   err) from e
 
-    def get_values(self, country, record, context):
+    def get_mart_values(self, country, context, record=None):
         ret = {'area_code': country.business_area_code,
                'schema_name': country.schema_name,
                'country_name': country.name,
-               'source_id': record.id
+               'seen': context['today']
                }
+        if record:
+            ret['source_id'] = record.id
+        return ret
+
+    def get_values(self, country, record, context):
+        ret = self.get_mart_values(country, context, record)
+
         for k, v in self.mapping.items():
             if v == '__self__':
                 try:
@@ -307,12 +315,14 @@ class Loader:
                 ret[k] = v(country, record)
             else:
                 ret[k] = get_attr(record, v)
-        ret['seen'] = context['today']
+
         return ret
 
     def remove_deleted(self, country, context):
         existing = list(self.get_queryset(context).only('id').values_list('id', flat=True))
         to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
+        # TODO: remove me
+        print(111, "loader.py:321", to_delete.count())
         self.results.add('deleted', to_delete.count())
         to_delete.delete()
 
@@ -417,6 +427,7 @@ class Loader:
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
         lock = self.lock()
+        truncate = self.config.truncate
         try:
             if lock:  # pragma: no branch
                 if not ignore_dependencies:
@@ -436,6 +447,8 @@ class Loader:
                 connection = connections['etools']
                 if countries is None:  # pragma: no branch
                     countries = connection.get_tenants()
+                else:
+                    truncate = False
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
@@ -450,7 +463,7 @@ class Loader:
                                            max_records=max_records,
                                            verbosity=verbosity,
                                            records=0,
-                                           filter_last_modified=only_delta,
+                                           only_delta=only_delta,
                                            is_empty=not self.model.objects.exists(),
                                            stdout=stdout)
                 sid = transaction.savepoint()
@@ -458,8 +471,11 @@ class Loader:
                 try:
                     self.results.context = context
                     self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+                    if truncate:
+                        self.model.objects.truncate()
 
                     for i, country in enumerate(countries, 1):
+                        context['country'] = country
                         if stdout and verbosity > 0:
                             stdout.write(f"{i:>3}/{total_countries} {country}\n")
                             stdout.flush()

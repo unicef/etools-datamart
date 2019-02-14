@@ -1,7 +1,6 @@
 import json
 
 from django.db import models
-from django.utils import timezone
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
@@ -9,10 +8,13 @@ from etools_datamart.apps.etools.models import HactAggregatehact
 
 
 class HACTLoader(Loader):
+
+    def get_queryset(self, context):
+        return HactAggregatehact.objects.filter(year=context['today'].year)
+
     def process_country(self, country, context):
-        today = timezone.now()
         try:
-            aggregate = HactAggregatehact.objects.get(year=today.year)
+            aggregate = self.get_queryset(context).get()
 
             data = json.loads(aggregate.partner_values)
 
@@ -23,8 +25,8 @@ class HACTLoader(Loader):
                           completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
                           completed_hact_audits=data['assurance_activities']['scheduled_audit'],
                           completed_special_audits=data['assurance_activities']['special_audit'],
-                          )
-            op = self.process_record(filters=dict(year=today.year,
+                          seen=context['today'])
+            op = self.process_record(filters=dict(year=context['today'].year,
                                                   area_code=country.business_area_code,
                                                   country_name=country.name,
                                                   schema_name=country.schema_name),
@@ -56,3 +58,6 @@ class HACT(DataMartModel):
         ordering = ('year', 'country_name')
         unique_together = ('year', 'country_name')
         verbose_name = "HACT"
+
+    class Option:
+        truncate = True

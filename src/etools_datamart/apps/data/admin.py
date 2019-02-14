@@ -51,7 +51,7 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
         return request.user.is_superuser
 
     def get_readonly_fields(self, request, obj=None):
-        if not request.user.is_superuser:
+        if not request.user.is_superuser or not settings.DEBUG:
             self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
         return self.readonly_fields
 
@@ -178,3 +178,12 @@ class FundsReservationAdmin(DataModelAdmin):
 class PDIndicatorAdmin(DataModelAdmin):
     list_display = ('title', 'unit', 'display_type')
     # list_filter = ('disaggregatable', )
+
+
+@register(models.Travel)
+class TravelAdmin(DataModelAdmin):
+    list_display = ('traveler_email', 'supervisor_email', 'created')
+    date_hierarchy = 'created'
+    list_filter = ('international_travel', 'office_name', 'status',
+                   'completed_at', 'approved_at', 'end_date', 'start_date')
+    search_fields = ('office_name', 'traveler_email',)

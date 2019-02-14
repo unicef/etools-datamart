@@ -73,7 +73,7 @@ RUN mkdir -p /code
 ADD . /code
 WORKDIR /code
 
-RUN set -o pipefail && if [ "${DEVELOP}" = "1" ]; then \
+RUN set -o pipefail && echo "DEVELOP: ${DEVELOP}" && if [ "${DEVELOP}" == "1" ]; then \
     echo "${VERSION}-develop"; \
     else \
     echo "Download package: https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" \

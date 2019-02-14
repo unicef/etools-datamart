@@ -6,3 +6,4 @@ from .hact import HACT  # noqa
 from .location import GatewayType, Location  # noqa
 from .funds_reservation import FundsReservation  # noqa
 from .pd_indicator import PDIndicator  # noqa
+from .travel import Travel  # noqa

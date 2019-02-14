@@ -26,7 +26,7 @@ help:
 	@echo "run                  run ${DOCKER_IMAGE} locally"
 
 build-base:
-	docker build --target base \
+	cd .. && docker build --target base \
 			-t ${DOCKER_IMAGE_NAME}:base \
 			-f docker/${DOCKERFILE} .
 

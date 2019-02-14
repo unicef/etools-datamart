@@ -13,8 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 class PMPIndicatorLoader(Loader):
+
+    def get_queryset(self, context):
+        return PartnersPartnerorganization.objects.all()
+
     def process_country(self, country, context):
-        for partner in PartnersPartnerorganization.objects.all():
+        for partner in self.get_queryset(context):
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
                                          'partnersintervention_partners_interventionbudget_intervention_id', None)
@@ -51,6 +55,7 @@ class PMPIndicatorLoader(Loader):
                           'core_value_attached': has_assessment,
                           # 'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
                           # 'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
+                          'seen': context['today']
                           }
                 op = self.process_record(filters=dict(country_name=country.name,
                                                       schema_name=country.schema_name,
@@ -107,3 +112,4 @@ class PMPIndicators(DataMartModel):
     class Options:
         source = PartnersPartnerorganization
         mapping = None
+        sync_deleted_records = lambda context, country: False

@@ -10,6 +10,10 @@ from etools_datamart.apps.etools.models import AuthUser
 
 
 class UserStatsLoader(Loader):
+
+    def get_queryset(self, context):
+        return AuthUser.objects.filter(profile__country=context['country'])
+
     def get_context(self, **kwargs):
         today = kwargs['today']
         context = {'first_of_month': datetime(today.year, today.month, 1)}
@@ -18,7 +22,8 @@ class UserStatsLoader(Loader):
 
     def process_country(self, country, context):
         first_of_month = context['first_of_month']
-        base = AuthUser.objects.filter(profile__country=country)
+        # base = AuthUser.objects.filter(profile__country=country)
+        base = self.get_queryset(context)
         values = {
             'total': base.count(),
             'unicef': base.filter(email__endswith='@unicef.org').count(),
@@ -27,6 +32,7 @@ class UserStatsLoader(Loader):
             'unicef_logins': base.filter(
                 last_login__month=first_of_month.month,
                 email__endswith='@unicef.org').count(),
+            'seen': context['today']
         }
         op = self.process_record(filters=dict(month=first_of_month,
                                               country_name=country.name,
@@ -49,3 +55,7 @@ class UserStats(DataMartModel):
         verbose_name = "User Access Statistics"
 
     loader = UserStatsLoader()
+
+    class Options:
+        sync_deleted_records = lambda context, country: False
+        truncate = True

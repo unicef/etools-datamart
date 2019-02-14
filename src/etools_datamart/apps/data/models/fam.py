@@ -11,11 +11,11 @@ from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, Aud
 class FAMIndicatorLoader(Loader):
 
     def process_country(self, country, context):
-        engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
         start_date = context['today'].date()
+        engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
         for model in engagements:
             realname = "_".join(model._meta.db_table.split('_')[1:])
-            values = {}
+            values = self.get_mart_values(country, context)
             for status, status_display in AuditEngagement.STATUSES:
                 filter_dict = {
                     'engagement_ptr__status': status,
@@ -61,5 +61,6 @@ class FAMIndicator(DataMartModel):
 
     loader = FAMIndicatorLoader()
 
-    class Option:
-        pass
+    class Options:
+        sync_deleted_records = lambda context, country: False
+        mapping = dict(source_id='engagement_ptr_id')

@@ -29,6 +29,35 @@ def create_alias(model, aliases):
     #     setattr(model, business_name, fld)
 
 
+T2FTravel_PLANNED = 'planned'
+T2FTravel_SUBMITTED = 'submitted'
+T2FTravel_REJECTED = 'rejected'
+T2FTravel_APPROVED = 'approved'
+T2FTravel_CANCELLED = 'cancelled'
+T2FTravel_SENT_FOR_PAYMENT = 'sent_for_payment'
+T2FTravel_CERTIFICATION_SUBMITTED = 'certification_submitted'
+T2FTravel_CERTIFICATION_APPROVED = 'certification_approved'
+T2FTravel_CERTIFICATION_REJECTED = 'certification_rejected'
+T2FTravel_CERTIFIED = 'certified'
+T2FTravel_COMPLETED = 'completed'
+
+T2FTravel_CHOICES = (
+    (T2FTravel_PLANNED, _('Planned')),
+    (T2FTravel_SUBMITTED, _('Submitted')),
+    (T2FTravel_REJECTED, _('Rejected')),
+    (T2FTravel_APPROVED, _('Approved')),
+    (T2FTravel_COMPLETED, _('Completed')),
+    (T2FTravel_CANCELLED, _('Cancelled')),
+    (T2FTravel_SENT_FOR_PAYMENT, _('Sent for payment')),
+    (T2FTravel_CERTIFICATION_SUBMITTED, _('Certification submitted')),
+    (T2FTravel_CERTIFICATION_APPROVED, _('Certification approved')),
+    (T2FTravel_CERTIFICATION_REJECTED, _('Certification rejected')),
+    (T2FTravel_CERTIFIED, _('Certified')),
+    (T2FTravel_COMPLETED, _('Completed')),
+)
+
+
+
 def patch():
     from django.apps import apps
     from .models import (AuditEngagement, AuthGroup, AuthUser, AuthUserGroups, PartnersIntervention,
@@ -208,30 +237,16 @@ def patch():
                                     'frs'])
     create_alias(PartnersIntervention, aliases)
 
-    T2FTravel.PLANNED = 'planned'
-    T2FTravel.SUBMITTED = 'submitted'
-    T2FTravel.REJECTED = 'rejected'
-    T2FTravel.APPROVED = 'approved'
-    T2FTravel.CANCELLED = 'cancelled'
-    T2FTravel.SENT_FOR_PAYMENT = 'sent_for_payment'
-    T2FTravel.CERTIFICATION_SUBMITTED = 'certification_submitted'
-    T2FTravel.CERTIFICATION_APPROVED = 'certification_approved'
-    T2FTravel.CERTIFICATION_REJECTED = 'certification_rejected'
-    T2FTravel.CERTIFIED = 'certified'
-    T2FTravel.COMPLETED = 'completed'
+    T2FTravel.PLANNED = T2FTravel_PLANNED
+    T2FTravel.SUBMITTED = T2FTravel_SUBMITTED
+    T2FTravel.REJECTED = T2FTravel_REJECTED
+    T2FTravel.APPROVED = T2FTravel_APPROVED
+    T2FTravel.CANCELLED = T2FTravel_CANCELLED
+    T2FTravel.SENT_FOR_PAYMENT = T2FTravel_SENT_FOR_PAYMENT
+    T2FTravel.CERTIFICATION_SUBMITTED = T2FTravel_CERTIFICATION_SUBMITTED
+    T2FTravel.CERTIFICATION_APPROVED = T2FTravel_CERTIFICATION_APPROVED
+    T2FTravel.CERTIFICATION_REJECTED = T2FTravel_CERTIFICATION_REJECTED
+    T2FTravel.CERTIFIED = T2FTravel_CERTIFIED
+    T2FTravel.COMPLETED = T2FTravel_COMPLETED
 
-    T2FTravel.CHOICES = (
-        (T2FTravel.PLANNED, _('Planned')),
-        (T2FTravel.SUBMITTED, _('Submitted')),
-        (T2FTravel.REJECTED, _('Rejected')),
-        (T2FTravel.APPROVED, _('Approved')),
-        (T2FTravel.COMPLETED, _('Completed')),
-        (T2FTravel.CANCELLED, _('Cancelled')),
-        (T2FTravel.SENT_FOR_PAYMENT, _('Sent for payment')),
-        (T2FTravel.CERTIFICATION_SUBMITTED, _('Certification submitted')),
-        (T2FTravel.CERTIFICATION_APPROVED, _('Certification approved')),
-        (T2FTravel.CERTIFICATION_REJECTED, _('Certification rejected')),
-        (T2FTravel.CERTIFIED, _('Certified')),
-        (T2FTravel.COMPLETED, _('Completed')),
-    )
-    T2FTravel._meta.get_field('status').choices = T2FTravel.CHOICES
+    T2FTravel._meta.get_field('status').choices = T2FTravel_CHOICES

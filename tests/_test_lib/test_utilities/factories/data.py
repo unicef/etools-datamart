@@ -9,8 +9,8 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT,
-                                              Intervention, Location, PDIndicator, PMPIndicators, UserStats,)
+from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT, Intervention,
+                                              Location, PDIndicator, PMPIndicators, Travel, UserStats,)
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -128,3 +128,10 @@ class PDIndicatorFactory(DataMartModelFactory):
 
     class Meta:
         model = PDIndicator
+
+
+class TravelFactory(DataMartModelFactory):
+    created = timezone.now()
+
+    class Meta:
+        model = Travel
