@@ -1,13 +1,8 @@
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import T2FTravel
 from etools_datamart.apps.etools.patch import T2FTravel_CHOICES
-
-
-class TravelLoader(Loader):
-    pass
 
 
 class Travel(DataMartModel):
@@ -49,8 +44,6 @@ class Travel(DataMartModel):
     ta_required = models.NullBooleanField(blank=True, null=True, )
     # traveler = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_travel_traveler_id', blank=True, null=True)
     traveler_email = models.CharField(max_length=200, blank=True, null=True, db_index=True)
-
-    loader = TravelLoader()
 
     class Meta:
         unique_together = ('schema_name', 'reference_number')

@@ -27,7 +27,7 @@ help:
 
 build-base:
 	cd .. && docker build --target base \
-			-t ${DOCKER_IMAGE_NAME}:base \
+			-t ${DOCKER_IMAGE_NAME}:base- \
 			-f docker/${DOCKERFILE} .
 
 build:

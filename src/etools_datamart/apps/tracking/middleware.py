@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import datetime
 import json
 import logging
 
@@ -24,7 +22,8 @@ def log_request(**kwargs):
     log = APIRequestLog.objects.create(**kwargs)
 
     if settings.ENABLE_LIVE_STATS:
-        lastMonth = (log.requested_at.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+        # lastMonth = (log.requested_at.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+        lastMonth = log.requested_at.replace(day=1)
 
         def _update_stats(target, **extra):
 

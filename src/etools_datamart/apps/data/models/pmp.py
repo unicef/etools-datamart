@@ -14,11 +14,12 @@ logger = logging.getLogger(__name__)
 
 class PMPIndicatorLoader(Loader):
 
-    def get_queryset(self, context):
+    def get_queryset(self):
         return PartnersPartnerorganization.objects.all()
 
-    def process_country(self, country, context):
-        for partner in self.get_queryset(context):
+    def process_country(self):
+        country = self.context['country']
+        for partner in self.get_queryset():
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
                                          'partnersintervention_partners_interventionbudget_intervention_id', None)
@@ -55,15 +56,14 @@ class PMPIndicatorLoader(Loader):
                           'core_value_attached': has_assessment,
                           # 'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),
                           # 'intervention_link': '{}/pmp/interventions/{}/details'.format(base_url, intervention.pk),
-                          'seen': context['today']
+                          'seen': self.context['today']
                           }
                 op = self.process_record(filters=dict(country_name=country.name,
                                                       schema_name=country.schema_name,
                                                       partner_id=partner.pk,
                                                       intervention_id=intervention.pk),
-                                         values=values,
-                                         context=context)
-                self.results.incr(op)
+                                         values=values)
+                self.increment_counter(op)
 
 
 class PMPIndicators(DataMartModel):
@@ -112,4 +112,4 @@ class PMPIndicators(DataMartModel):
     class Options:
         source = PartnersPartnerorganization
         mapping = None
-        sync_deleted_records = lambda context, country: False
+        sync_deleted_records = lambda loader: False

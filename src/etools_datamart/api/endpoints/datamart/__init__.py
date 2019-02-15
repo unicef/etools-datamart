@@ -9,3 +9,4 @@ from .location import LocationViewSet
 from .funds_reservation import FundsReservationViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .travel import TravelViewSet
+from .partner import PartnerViewSet

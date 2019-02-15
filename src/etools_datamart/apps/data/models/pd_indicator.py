@@ -6,24 +6,18 @@ from etools_datamart.apps.etools.models import models, ReportsAppliedindicator
 
 class PDIndicatorLoader(Loader):
 
-    def process_country(self, country, context):
-        qs = self.filter_queryset(self.get_queryset(context), context)
-        max_records = context['max_records']
-        self.seen = []
+    def process_country(self):
+        country = self.context['country']
+        qs = self.filter_queryset(self.get_queryset())
         for indicator in qs.all():
             for disaggregation in indicator.disaggregations.all():
                 indicator.disaggregation = disaggregation
                 for location in indicator.locations.all():
                     indicator.location = location
                     filters = self.config.key(country, indicator)
-                    values = self.get_values(country, indicator, context)
-                    op = self.process_record(filters, values, context)
-                    self.results.incr(op)
-                    context['records'] += 1
-                    if max_records and context['records'] > max_records:
-                        break
-            if max_records and context['records'] > max_records:
-                break
+                    values = self.get_values(indicator)
+                    op = self.process_record(filters, values)
+                    self.increment_counter(op)
 
 
 class PDIndicator(DataMartModel):

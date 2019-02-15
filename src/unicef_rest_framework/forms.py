@@ -45,6 +45,11 @@ class Select2ChoiceField(forms.ChoiceField):
         return {"class": "select2"}
 
 
+class CleareableSelect2ChoiceField(forms.ChoiceField):
+    def widget_attrs(self, widget):
+        return {"class": "select2", "data-allowclear": "true"}
+
+
 class Select2MultipleChoiceField(forms.MultipleChoiceField):
     def widget_attrs(self, widget):
         return {"class": "select2"}

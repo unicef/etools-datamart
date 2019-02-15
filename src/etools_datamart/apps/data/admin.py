@@ -10,8 +10,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from admin_extra_urls.extras import link
-from adminactions.api import export_as_csv, export_as_xls
-from adminactions.mass_update import mass_update
+from adminactions.actions import export_as_csv, export_as_xls, mass_update
 from adminfilters.filters import AllValuesComboFilter
 from crashlog.middleware import process_exception
 from humanize import naturaldelta
@@ -188,3 +187,11 @@ class TravelAdmin(DataModelAdmin):
     list_filter = ('international_travel', 'office_name', 'status',
                    'completed_at', 'approved_at', 'end_date', 'start_date')
     search_fields = ('office_name', 'traveler_email',)
+
+
+@register(models.Partner)
+class PartnerAdmin(DataModelAdmin):
+    list_display = ('name', 'partner_type', 'vendor_number', 'cso_type', 'rating')
+    date_hierarchy = 'created'
+    list_filter = ('partner_type', 'hidden', 'cso_type', 'rating')
+    search_fields = ('vendor_number', 'name',)

@@ -7,7 +7,7 @@ from .exceptions import InvalidPattern, InvalidQueryValueError
 
 
 def parse_bool(value):
-    if str(value).lower() in ['true', '1', 'yes', 't', 'y']:
+    if str(value).lower() in ['true', '1', 'yes', 't', 'y', 'on']:
         return True
     elif str(value).lower() in ['false', '0', 'no', 'f', 'n']:
         return False

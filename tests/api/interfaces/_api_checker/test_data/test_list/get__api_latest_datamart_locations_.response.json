@@ -1,0 +1,109 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"5a48ddf46c9577345006b8c145c2d244\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "5a48ddf46c9577345006b8c145c2d244"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "819"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 401,
+                "country_name": "bolivia",
+                "area_code": "",
+                "last_modify_date": "14 Feb 2019 22:38:42",
+                "seen": null,
+                "name": "name396",
+                "p_code": "",
+                "created": "14 Feb 2019 22:30:40",
+                "modified": "14 Feb 2019 22:30:40",
+                "is_active": true,
+                "gateway": 407,
+                "parent": null
+            },
+            {
+                "id": 402,
+                "country_name": "chad",
+                "area_code": "",
+                "last_modify_date": "14 Feb 2019 22:38:42",
+                "seen": null,
+                "name": "name397",
+                "p_code": "",
+                "created": "14 Feb 2019 22:30:40",
+                "modified": "14 Feb 2019 22:30:40",
+                "is_active": true,
+                "gateway": 408,
+                "parent": null
+            },
+            {
+                "id": 403,
+                "country_name": "lebanon",
+                "area_code": "",
+                "last_modify_date": "14 Feb 2019 22:38:42",
+                "seen": null,
+                "name": "name398",
+                "p_code": "",
+                "created": "14 Feb 2019 22:30:40",
+                "modified": "14 Feb 2019 22:30:40",
+                "is_active": true,
+                "gateway": 409,
+                "parent": null
+            }
+        ]
+    },
+    "content_type": null
+}

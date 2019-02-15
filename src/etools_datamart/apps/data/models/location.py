@@ -16,6 +16,8 @@ class GatewayType(DataMartModel):
 
     class Options:
         source = LocationsGatewaytype
+        sync_deleted_records = lambda loader: False
+
         key = lambda country, record: dict(schema_name=country.schema_name,
                                            name=record.name)
         mapping = {'source_id': 'id',

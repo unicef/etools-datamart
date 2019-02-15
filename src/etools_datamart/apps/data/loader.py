@@ -43,7 +43,7 @@ RUN_TYPES = ((RUN_UNKNOWN, ""),
 
 
 class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'status', 'context', 'error', 'retry']
+    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'total', 'status', 'context', 'error', 'retry']
 
     def __init__(self, updated=0, created=0, unchanged=0, deleted=0,
                  status='SUCCESS', context=None, error=None, retry=False, **kwargs):
@@ -55,15 +55,17 @@ class EtlResult:
         self.status = status
         self.error = error
         self.context = context or {}
+        self.total = 0
 
     def __repr__(self):
         return repr(self.as_dict())
 
     def incr(self, counter):
         setattr(self, counter, getattr(self, counter) + 1)
+        self.total += 1
 
-    def add(self, counter, value):
-        setattr(self, counter, getattr(self, counter) + value)
+    # def add(self, counter, value):
+    #     setattr(self, counter, getattr(self, counter) + value)
 
     def as_dict(self):
         return {'created': self.created,
@@ -120,6 +122,10 @@ class RequiredIsMissing(Exception):
         return "Missing required datased %s" % self.req
 
 
+class MaxRecordsException(Exception):
+    pass
+
+
 class LoaderOptions:
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
                  'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
@@ -136,7 +142,7 @@ class LoaderOptions:
         self.depends = ()
         self.filters = None
         self.last_modify_field = None
-        self.sync_deleted_records = lambda context, country: True
+        self.sync_deleted_records = lambda loader: True
         self.truncate = False
         if base:
             for attr in self.__attrs__:
@@ -148,7 +154,7 @@ class LoaderOptions:
                         setattr(self, attr, getattr(base, attr, getattr(self, attr)))
 
         if self.truncate:
-            self.sync_deleted_records = lambda context, country: False
+            self.sync_deleted_records = lambda loader: False
 
     def contribute_to_class(self, model, name):
         self.model = model
@@ -182,6 +188,7 @@ class LoaderTask(celery.Task):
 class Loader:
     def __init__(self) -> None:
         self.config = None
+        self.context = {}
         self.tree_parents = []
         self.always_update = False
 
@@ -204,7 +211,7 @@ class Loader:
 
         setattr(model, name, self)
 
-    def get_queryset(self, context):
+    def get_queryset(self):
 
         if self.config.queryset:
             ret = self.config.queryset()
@@ -215,8 +222,8 @@ class Loader:
 
         return ret
 
-    def filter_queryset(self, qs, context):
-        use_delta = context['only_delta'] and not context['is_empty']
+    def filter_queryset(self, qs):
+        use_delta = self.context['only_delta'] and not self.context['is_empty']
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
         if use_delta and (self.config.last_modify_field and self.last_run):
@@ -255,10 +262,9 @@ class Loader:
                 return True
         return False
 
-    def process_record(self, filters, values, context):
-        stdout = context['stdout']
-        verbosity = context['verbosity']
-
+    def process_record(self, filters, values):
+        stdout = self.context['stdout']
+        verbosity = self.context['verbosity']
         if stdout and verbosity > 2:  # pragma: no cover
             stdout.write('.')
             stdout.flush()
@@ -270,8 +276,8 @@ class Loader:
             else:
                 if self.always_update or self.is_record_changed(record, values):
                     op = UPDATED
-                    record, created = self.model.objects.update_or_create(**filters,
-                                                                          defaults=values)
+                    self.model.objects.update_or_create(**filters,
+                                                        defaults=values)
                 else:
                     op = UNCHANGED
             return op
@@ -281,18 +287,20 @@ class Loader:
             raise LoaderException(f"Error in {self}: {e}",
                                   err) from e
 
-    def get_mart_values(self, country, context, record=None):
+    def get_mart_values(self, record=None):
+        country = self.context['country']
         ret = {'area_code': country.business_area_code,
                'schema_name': country.schema_name,
                'country_name': country.name,
-               'seen': context['today']
+               'seen': self.context['today']
                }
         if record:
             ret['source_id'] = record.id
         return ret
 
-    def get_values(self, country, record, context):
-        ret = self.get_mart_values(country, context, record)
+    def get_values(self, record):
+        country = self.context['country']
+        ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
             if v == '__self__':
@@ -318,13 +326,15 @@ class Loader:
 
         return ret
 
-    def remove_deleted(self, country, context):
-        existing = list(self.get_queryset(context).only('id').values_list('id', flat=True))
+    def remove_deleted(self):
+        country = self.context['country']
+        existing = list(self.get_queryset().only('id').values_list('id', flat=True))
         to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
-        self.results.add('deleted', to_delete.count())
+        self.results.deleted += to_delete.count()
         to_delete.delete()
 
-    def post_process_country(self, country, context):
+    def post_process_country(self):
+        country = self.context['country']
         for mart, etools in self.tree_parents:
             kk = self.model.objects.get(schema_name=country.schema_name,
                                         source_id=mart)
@@ -334,22 +344,14 @@ class Loader:
         self.tree_parents = []
         # mark seen records
 
-    def process_country(self, country, context):
-        qs = self.filter_queryset(self.get_queryset(context), context)
-        max_records = context['max_records']
+    def process_country(self):
+        country = self.context['country']
+        qs = self.filter_queryset(self.get_queryset())
         for record in qs.all():
             filters = self.config.key(country, record)
-            values = self.get_values(country, record, context)
-            op = self.process_record(filters, values, context)
-            self.results.incr(op)
-            context['records'] += 1
-            if max_records and context['records'] >= max_records:
-                break
-
-    def get_context(self, **kwargs):
-        context = {}
-        context.update(kwargs)
-        return context
+            values = self.get_values(record)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
 
     @property
     def is_locked(self):
@@ -417,6 +419,16 @@ class Loader:
         if lock.acquire(blocking=False):
             return lock
 
+    def increment_counter(self, op):
+        self.results.incr(op)
+        self.context['records'] += 1
+        if self.context['max_records'] and self.context['records'] >= self.context['max_records']:
+            raise MaxRecordsException
+
+    def update_context(self, **kwargs):
+        self.context.update(kwargs)
+        return self.context
+
     def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None,
              only_delta=True, run_type=RUN_UNKNOWN,
@@ -455,39 +467,38 @@ class Loader:
                         self.mapping[field.name] = field.name
                 if self.config.mapping:  # pragma: no branch
                     self.mapping.update(self.config.mapping)
-                today = timezone.now()
-                context = self.get_context(today=today,
-                                           countries=countries,
-                                           max_records=max_records,
-                                           verbosity=verbosity,
-                                           records=0,
-                                           only_delta=only_delta,
-                                           is_empty=not self.model.objects.exists(),
-                                           stdout=stdout)
+                self.update_context(today=timezone.now(),
+                                    countries=countries,
+                                    max_records=max_records,
+                                    verbosity=verbosity,
+                                    records=0,
+                                    only_delta=only_delta,
+                                    is_empty=not self.model.objects.exists(),
+                                    stdout=stdout)
                 sid = transaction.savepoint()
                 total_countries = len(countries)
                 try:
-                    self.results.context = context
+                    self.results.context = self.context
                     self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
                     if truncate:
                         self.model.objects.truncate()
 
                     for i, country in enumerate(countries, 1):
-                        context['country'] = country
+                        self.context['country'] = country
                         if stdout and verbosity > 0:
                             stdout.write(f"{i:>3}/{total_countries} {country}\n")
                             stdout.flush()
                         connection.set_schemas([country.schema_name])
-                        self.process_country(country, context)
-                        self.post_process_country(country, context)
-                        if self.config.sync_deleted_records(context, country):
-                            self.remove_deleted(country, context)
-                        if max_records and context['records'] >= max_records:
-                            break
+                        self.process_country()
+                        self.post_process_country()
+                        if self.config.sync_deleted_records(self):
+                            self.remove_deleted()
                     if stdout and verbosity > 0:
                         stdout.write("\n")
                     # deleted = self.model.objects.exclude(seen=today).delete()[0]
                     # self.results.deleted = deleted
+                except MaxRecordsException:
+                    pass
                 except Exception:
                     transaction.savepoint_rollback(sid)
                     raise

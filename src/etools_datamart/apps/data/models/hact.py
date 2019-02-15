@@ -9,12 +9,13 @@ from etools_datamart.apps.etools.models import HactAggregatehact
 
 class HACTLoader(Loader):
 
-    def get_queryset(self, context):
-        return HactAggregatehact.objects.filter(year=context['today'].year)
+    def get_queryset(self):
+        return HactAggregatehact.objects.filter(year=self.context['today'].year)
 
-    def process_country(self, country, context):
+    def process_country(self):
+        country = self.context['country']
         try:
-            aggregate = self.get_queryset(context).get()
+            aggregate = self.get_queryset().get()
 
             data = json.loads(aggregate.partner_values)
 
@@ -25,14 +26,13 @@ class HACTLoader(Loader):
                           completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
                           completed_hact_audits=data['assurance_activities']['scheduled_audit'],
                           completed_special_audits=data['assurance_activities']['special_audit'],
-                          seen=context['today'])
-            op = self.process_record(filters=dict(year=context['today'].year,
+                          seen=self.context['today'])
+            op = self.process_record(filters=dict(year=self.context['today'].year,
                                                   area_code=country.business_area_code,
                                                   country_name=country.name,
                                                   schema_name=country.schema_name),
-                                     values=values,
-                                     context=context)
-            self.results.incr(op)
+                                     values=values)
+            self.increment_counter(op)
         except HactAggregatehact.DoesNotExist:  # pragma: no cover
             pass
 

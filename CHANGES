@@ -1,3 +1,9 @@
+1.18.0a
+-------
+* add Partner endpoint
+
+
+
 1.17
 ----
 * fixes travel filtering
@@ -9,6 +15,7 @@
 * update to eTools 6.7
 * improves Loader logic
 * add Travel endpoint
+
 
 1.15
 ----

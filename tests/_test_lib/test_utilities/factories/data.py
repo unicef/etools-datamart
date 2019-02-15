@@ -10,7 +10,7 @@ from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
 from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT, Intervention,
-                                              Location, PDIndicator, PMPIndicators, Travel, UserStats,)
+                                              Location, Partner, PDIndicator, PMPIndicators, Travel, UserStats,)
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -135,3 +135,17 @@ class TravelFactory(DataMartModelFactory):
 
     class Meta:
         model = Travel
+
+
+class PartnerFactory(DataMartModelFactory):
+    name = factory.Sequence(lambda n: "name%03d" % n)
+    blocked = False
+    created = timezone.now()
+    description = ""
+    manually_blocked = False
+    vision_synced = True
+    deleted_flag = False
+    hidden = False
+
+    class Meta:
+        model = Partner

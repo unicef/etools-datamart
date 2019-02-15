@@ -432,9 +432,12 @@
 
             // **/
 
-            $('.select2').select2({
-                placeholder: 'Select an option'
-            });
+            $('.select2').each(function(){
+                $(this).select2({
+                placeholder: 'Select an option',
+                    allowClear: $(this).data('allowclear')
+                }
+            )});
             $('.select2-container').attr('style', 'width:100%');
 
             $('#filter-form').on("submit", function (e) {
