@@ -18,31 +18,35 @@ class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
             return
 
         # Infer if this is a list view or not.
-        paginator = getattr(view, 'paginator', None)
-        if isinstance(data, list):
-            pass
-        elif paginator is not None and data is not None:
-            try:
-                paginator.get_results(data)
-            except (TypeError, KeyError):
-                return
-        elif not isinstance(data, list):
-            return
+        # paginator = getattr(view, 'paginator', None)
+        # if isinstance(data, list):
+        #     pass
+        # elif paginator is not None and data is not None:
+        #     try:
+        #         paginator.get_results(data)
+        #     except (TypeError, KeyError):
+        #         return
+        # elif not isinstance(data, list):
+        #     return
 
-        queryset = view.get_queryset()
+        # queryset = view.get_queryset()
         elements = []
         for backend in view.get_filter_backends():
             if hasattr(backend, 'to_html'):
-                html = backend().to_html(request, queryset, view)
+                html = backend().to_html(request, None, view)
                 if html:
                     elements.append(html)
 
         if not elements:
             return
-
+        #
         template = loader.get_template(self.filter_template)
         context = {'elements': elements}
+        # context = {}
         return template.render(context)
+
+    def get_content(self, renderer, data, accepted_media_type, renderer_context):
+        return "000000"
 
     def get_context(self, data, accepted_media_type, renderer_context):
         ctx = super(URFBrowsableAPIRenderer, self).get_context(data, accepted_media_type, renderer_context)
