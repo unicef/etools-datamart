@@ -11,7 +11,7 @@ azure-storage = "*"
 celery = "*"
 coreapi = "*"
 cryptography = "==2.4.1"
-django = ">=2.1.5,<2.2a"
+django = "==2.1.7"
 django-adminactions = "*"
 django-adminfilters = ">=1.1"
 django-celery-beat = "==1.4.0"
@@ -58,6 +58,7 @@ social-auth-app-django = "*"
 sqlparse = "*"
 whitenoise = "*"
 django-impersonate = "*"
+pyyaml = ">=4.2b1"
 
 [dev-packages]
 bumpversion = "*"
@@ -92,4 +93,4 @@ tox = "tox"
 init-setup = "./manage.py init-setup"
 
 [pipenv]
-allow_prereleases = false
+allow_prereleases = true
