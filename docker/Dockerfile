@@ -139,9 +139,9 @@ ENV STATIC_ROOT /tmp/static
 EXPOSE 8000
 RUN apk del .fetch-deps .build-deps .build-deps-edge .datamart-build-deps
 RUN rm -rf /var/cache/apk/* \
-    rm -fr /root/.cache/ \
-    rm -fr /code \
-    rm -fr /usr/include/
+    && rm -fr /root/.cache/ \
+    && rm -fr /code \
+    && rm -fr /usr/include/
 
 RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
     && python -O -m compileall -fqb /usr/local/lib/python3.6/ \
