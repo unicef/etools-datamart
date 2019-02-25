@@ -99,9 +99,9 @@ class EtlResult:
     #     return False
 
 
-DEFAULT_KEY = lambda country, record: dict(country_name=country.name,
-                                           schema_name=country.schema_name,
-                                           source_id=record.pk)
+DEFAULT_KEY = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          source_id=record.pk)
 
 
 class RequiredIsRunning(Exception):
@@ -345,10 +345,9 @@ class Loader:
         # mark seen records
 
     def process_country(self):
-        country = self.context['country']
         qs = self.filter_queryset(self.get_queryset())
         for record in qs.all():
-            filters = self.config.key(country, record)
+            filters = self.config.key(self, record)
             values = self.get_values(record)
             op = self.process_record(filters, values)
             self.increment_counter(op)

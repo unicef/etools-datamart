@@ -62,9 +62,9 @@ class FundsReservation(DataMartModel):
         source = FundsFundsreservationitem
         queryset = lambda: FundsFundsreservationitem.objects.select_related('fund_reservation')
         last_modify_field = 'modified'
-        key = lambda country, record: dict(country_name=country.name,
-                                           schema_name=country.schema_name,
-                                           fr_number=record.fund_reservation.fr_number)
+        key = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          fr_number=record.fund_reservation.fr_number)
 
         mapping = dict(vendor_code='fund_reservation.vendor_code',
                        fr_number='fund_reservation.fr_number',

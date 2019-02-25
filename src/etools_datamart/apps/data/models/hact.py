@@ -61,3 +61,6 @@ class HACT(DataMartModel):
 
     class Option:
         truncate = True
+        key = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          year=loader.context['today'].year)

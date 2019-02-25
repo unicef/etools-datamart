@@ -80,10 +80,10 @@ class Intervention(DataMartModel):
                                                                        'country_programme',
                                                                        'partnersintervention_partners_interventionbudget_intervention_id'
                                                                        )
-        key = lambda country, record: dict(country_name=country.name,
-                                           schema_name=country.schema_name,
-                                           area_code=country.business_area_code,
-                                           intervention_id=record.pk)
+        key = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          area_code=loader.context['country'].business_area_code,
+                                          intervention_id=record.pk)
         mapping = dict(start_date='start',
                        end_date='end',
                        partner_name='agreement.partner.name',

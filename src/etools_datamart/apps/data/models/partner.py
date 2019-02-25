@@ -64,6 +64,6 @@ class Partner(DataMartModel):
 
     class Options:
         source = PartnersPartnerorganization
-        key = lambda country, record: dict(country_name=country.name,
-                                           schema_name=country.schema_name,
-                                           vendor_number=record.vendor_number)
+        key = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          vendor_number=record.vendor_number)
