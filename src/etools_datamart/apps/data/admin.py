@@ -81,11 +81,13 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     def queue(self, request):
         try:
             start = time()
-            self.model.loader.task.delay()
+            res = self.model.loader.task.delay()
             if settings.CELERY_TASK_ALWAYS_EAGER:  # pragma: no cover
                 stop = time()
                 duration = stop - start
-                self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+                self.message_user(request, "Data loaded in %s. %s" % (naturaldelta(duration),
+                                                                      res.result),
+                                  messages.SUCCESS)
             else:
                 self.message_user(request, "ETL task scheduled", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
@@ -99,10 +101,12 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     def refresh(self, request):
         try:
             start = time()
-            self.model.loader.task.apply()
+            res = self.model.loader.task.apply()
             stop = time()
             duration = stop - start
-            self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+            self.message_user(request, "Data loaded in %s. %s" % (naturaldelta(duration),
+                                                                  res.result),
+                              messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             process_exception(e)
             self.message_user(request, str(e), messages.ERROR)
