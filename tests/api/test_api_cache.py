@@ -22,7 +22,7 @@ def test_cache(client, user, django_assert_num_queries,
             key = res['cache-key']
             etag = res['etag']
 
-            with django_assert_no_duplicate_queries():
+            with django_assert_no_duplicate_queries(ignored=['.*FROM "constance_config"']):
                 res = client.get(url)
             assert res.status_code == 200, res.content
             assert res['cache-version'] == str(service.cache_version)

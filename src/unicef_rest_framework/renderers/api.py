@@ -43,15 +43,15 @@ class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
         context = {'elements': elements}
         return template.render(context)
 
-    def get_content(self, renderer, data, accepted_media_type, renderer_context):
-        view = renderer_context['view']
-        paginator = getattr(view, 'paginator', None)
-        data = data or {}
-        return {'total_records': data.get('count', 0),
-                'current_page': data.get('current_page', 1),
-                'total_pages': data.get('total_pages', 0),
-                'page_size': paginator.page_size,
-                }
+    # def get_content(self, renderer, data, accepted_media_type, renderer_context):
+    #     view = renderer_context['view']
+    #     paginator = getattr(view, 'paginator', None)
+    #     data = data or {}
+    #     return {'total_records': data.get('count', 0),
+    #             'current_page': data.get('current_page', 1),
+    #             'total_pages': data.get('total_pages', 0),
+    #             'page_size': paginator.page_size,
+    #             }
 
     def get_context(self, data, accepted_media_type, renderer_context):
         ctx = super(URFBrowsableAPIRenderer, self).get_context(data, accepted_media_type, renderer_context)

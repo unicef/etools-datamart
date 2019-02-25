@@ -116,7 +116,7 @@ class CacheVersionKeyBit(KeyBitBase):
         version = view_instance.get_service().cache_version
         view_instance.request._request.api_info['cache-version'] = version
         return {'cache_version': str(version),
-                'version': config.CACHE_VERSION}
+                'version': str(config.CACHE_VERSION)}
 
 
 class SystemFilterKeyBit(KeyBitBase):
