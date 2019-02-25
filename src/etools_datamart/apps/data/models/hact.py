@@ -10,31 +10,33 @@ from etools_datamart.apps.etools.models import HactAggregatehact
 class HACTLoader(Loader):
 
     def get_queryset(self):
-        return HactAggregatehact.objects.filter(year=self.context['today'].year)
+        return HactAggregatehact.objects.filter(year=self.context['year'])
 
     def process_country(self):
         country = self.context['country']
-        try:
-            aggregate = self.get_queryset().get()
+        for year in range(2018, self.context['today'].year + 1):
+            self.context['year'] = year
+            try:
+                aggregate = self.get_queryset().get()
 
-            data = json.loads(aggregate.partner_values)
+                data = json.loads(aggregate.partner_values)
 
-            # # Total number of completed Microassessments in the business area in the past year
-            values = dict(microassessments_total=data['assurance_activities']['micro_assessment'],
-                          programmaticvisits_total=data['assurance_activities']['programmatic_visits']['completed'],
-                          followup_spotcheck=data['assurance_activities']['spot_checks']['follow_up'],
-                          completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
-                          completed_hact_audits=data['assurance_activities']['scheduled_audit'],
-                          completed_special_audits=data['assurance_activities']['special_audit'],
-                          seen=self.context['today'])
-            op = self.process_record(filters=dict(year=self.context['today'].year,
-                                                  area_code=country.business_area_code,
-                                                  country_name=country.name,
-                                                  schema_name=country.schema_name),
-                                     values=values)
-            self.increment_counter(op)
-        except HactAggregatehact.DoesNotExist:  # pragma: no cover
-            pass
+                # # Total number of completed Microassessments in the business area in the past year
+                values = dict(microassessments_total=data['assurance_activities']['micro_assessment'],
+                              programmaticvisits_total=data['assurance_activities']['programmatic_visits']['completed'],
+                              followup_spotcheck=data['assurance_activities']['spot_checks']['follow_up'],
+                              completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
+                              completed_hact_audits=data['assurance_activities']['scheduled_audit'],
+                              completed_special_audits=data['assurance_activities']['special_audit'],
+                              seen=self.context['today'])
+                op = self.process_record(filters=dict(year=self.context['year'],
+                                                      area_code=country.business_area_code,
+                                                      country_name=country.name,
+                                                      schema_name=country.schema_name),
+                                         values=values)
+                self.increment_counter(op)
+            except HactAggregatehact.DoesNotExist:  # pragma: no cover
+                pass
 
 
 class HACT(DataMartModel):
@@ -59,8 +61,9 @@ class HACT(DataMartModel):
         unique_together = ('year', 'country_name')
         verbose_name = "HACT"
 
-    class Option:
-        truncate = True
+    class Options:
+        sync_deleted_records = lambda loader: False
+        truncate = False
         key = lambda loader, record: dict(country_name=loader.context['country'].name,
                                           schema_name=loader.context['country'].schema_name,
                                           year=loader.context['today'].year)
