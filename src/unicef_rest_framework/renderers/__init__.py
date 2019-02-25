@@ -6,3 +6,5 @@ from .html import HTMLRenderer  # noqa
 from .pdf import PDFRenderer  # noqa
 from .txt import TextRenderer  # noqa
 from .iqy import IQYRenderer  # noqa
+from .csv import CSVRenderer  # noqa
+from .json import JSONRenderer  # noqa
