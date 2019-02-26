@@ -1,0 +1,34 @@
+{
+    "record": {
+        "master": {
+            "model": "data.famindicator",
+            "pk": 2565,
+            "fields": {
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "last_modify_date": "2019-02-25T14:07:18.142Z",
+                "seen": null,
+                "source_id": null,
+                "month": "2019-02-01",
+                "spotcheck_ip_contacted": 0,
+                "spotcheck_report_submitted": 0,
+                "spotcheck_final_report": 0,
+                "spotcheck_cancelled": 0,
+                "audit_ip_contacted": 0,
+                "audit_report_submitted": 0,
+                "audit_final_report": 0,
+                "audit_cancelled": 0,
+                "specialaudit_ip_contacted": 0,
+                "specialaudit_report_submitted": 0,
+                "specialaudit_final_report": 0,
+                "specialaudit_cancelled": 0,
+                "microassessment_ip_contacted": 0,
+                "microassessment_report_submitted": 0,
+                "microassessment_final_report": 0,
+                "microassessment_cancelled": 0
+            }
+        },
+        "deps": []
+    }
+}

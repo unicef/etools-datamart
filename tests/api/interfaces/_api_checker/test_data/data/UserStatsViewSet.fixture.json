@@ -3,12 +3,12 @@
         "master": [
             {
                 "model": "data.userstats",
-                "pk": 419,
+                "pk": 585,
                 "fields": {
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
                     "area_code": "",
-                    "last_modify_date": "2019-02-25T11:42:38.738Z",
+                    "last_modify_date": "2019-02-25T13:41:19.170Z",
                     "seen": null,
                     "source_id": null,
                     "month": "2019-03-01",
@@ -20,15 +20,15 @@
             },
             {
                 "model": "data.userstats",
-                "pk": 420,
+                "pk": 586,
                 "fields": {
                     "country_name": "chad",
                     "schema_name": "chad",
                     "area_code": "",
-                    "last_modify_date": "2019-02-25T11:42:38.748Z",
+                    "last_modify_date": "2019-02-25T13:41:19.179Z",
                     "seen": null,
                     "source_id": null,
-                    "month": "2019-03-01",
+                    "month": "2019-02-01",
                     "total": 0,
                     "unicef": 0,
                     "logins": 0,
@@ -37,15 +37,15 @@
             },
             {
                 "model": "data.userstats",
-                "pk": 421,
+                "pk": 587,
                 "fields": {
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
                     "area_code": "",
-                    "last_modify_date": "2019-02-25T11:42:38.757Z",
+                    "last_modify_date": "2019-02-25T13:41:19.187Z",
                     "seen": null,
                     "source_id": null,
-                    "month": "2019-03-01",
+                    "month": "2019-02-01",
                     "total": 0,
                     "unicef": 0,
                     "logins": 0,
