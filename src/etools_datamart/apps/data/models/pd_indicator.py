@@ -1,26 +1,26 @@
 from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models import Intervention, Location
+from etools_datamart.apps.data.models import Location
 from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.mixins import LocationMixin
 from etools_datamart.apps.etools.models import models, ReportsAppliedindicator
 
 
 class PDIndicatorLoader(Loader):
 
     def process_country(self):
-        country = self.context['country']
         qs = self.filter_queryset(self.get_queryset())
         for indicator in qs.all():
             for disaggregation in indicator.disaggregations.all():
                 indicator.disaggregation = disaggregation
                 for location in indicator.locations.all():
                     indicator.location = location
-                    filters = self.config.key(country, indicator)
+                    filters = self.config.key(self, indicator)
                     values = self.get_values(indicator)
                     op = self.process_record(filters, values)
                     self.increment_counter(op)
 
 
-class PDIndicator(DataMartModel):
+class PDIndicator(LocationMixin, DataMartModel):
     context_code = models.CharField(max_length=50, blank=True, null=True)
     assumptions = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
@@ -77,14 +77,13 @@ class PDIndicator(DataMartModel):
     disaggregation_active = models.BooleanField(default=False)
 
     # from location
-    location_name = models.CharField(max_length=254, blank=True, null=True)
+    # location_name = models.CharField(max_length=254, blank=True, null=True)
+    # location_pcode = models.CharField(max_length=32, blank=True, null=True)
+    # location_level = models.CharField(max_length=32, blank=True, null=True)
 
     # internals
     location = models.ForeignKey(Location, blank=True, null=True,
                                  on_delete=models.SET_NULL)
-
-    intervention = models.ForeignKey(Intervention, blank=True, null=True,
-                                     on_delete=models.SET_NULL)
 
     # origin
     source_disaggregation_id = models.IntegerField(blank=True, null=True)
@@ -103,10 +102,10 @@ class PDIndicator(DataMartModel):
         source = ReportsAppliedindicator
         queryset = ReportsAppliedindicator.objects.select_related('indicator', 'section').all
 
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.pk,
-                                          source_location_id=record.location.pk,
-                                          source_disaggregation_id=record.disaggregation.pk)
+        # key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+        #                                   source_id=record.pk,
+        #                                   source_location_id=record.location.pk,
+        #                                   source_disaggregation_id=record.disaggregation.pk)
 
         mapping = {'title': 'indicator.title',
                    # 'description': 'indicator.description',
@@ -117,10 +116,10 @@ class PDIndicator(DataMartModel):
                    # 'calculation_formula_across_locations': 'indicator.calculation_formula_across_locations`',
                    # 'calculation_formula_across_periods': 'indicator.calculation_formula_across_periods`',
 
-                   'target_denominator': lambda c, r: r.target['d'],
-                   'target_numerator': lambda c, r: r.target['v'],
-                   'baseline_denominator': lambda c, r: r.baseline['d'],
-                   'baseline_numerator': lambda c, r: r.baseline['v'],
+                   'target_denominator': lambda loader, record: record.target['d'],
+                   'target_numerator': lambda loader, record: record.target['v'],
+                   'baseline_denominator': lambda loader, record: record.baseline['d'],
+                   'baseline_numerator': lambda loader, record: record.baseline['v'],
 
                    'display_type': 'indicator.display_type`',
                    'section_name': 'section.name',
@@ -131,7 +130,11 @@ class PDIndicator(DataMartModel):
                    'disaggregation_active': 'disaggregation.active',
 
                    'location_name': 'location.name',
-                   'location': lambda *a: None,
+                   'location_pcode': 'location.p_code',
+                   'location_level': 'location.level',
+                   'location_levelname': 'location.gateway.name',
+                   'location': lambda loader, record: Location.objects.filter(source_id=record.id,
+                                                                              schema_name=loader.context['country'].schema_name).first(),
 
                    'source_disaggregation_id': 'disaggregation.id',
                    'source_location_id': 'location.id',

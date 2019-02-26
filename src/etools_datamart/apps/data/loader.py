@@ -320,7 +320,7 @@ class Loader:
                 except AttributeError:  # pragma: no cover
                     pass
             elif callable(v):
-                ret[k] = v(country, record)
+                ret[k] = v(self, record)
             else:
                 ret[k] = get_attr(record, v)
 

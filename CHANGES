@@ -1,9 +1,10 @@
 1.19.0a
 -------
 * add Partner endpoint
+* add extra Location fields
 
 
-1.19
+1.18
 ----
 * fixes travel filtering
 * disable live stats
