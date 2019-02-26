@@ -102,10 +102,10 @@ class PDIndicator(LocationMixin, DataMartModel):
         source = ReportsAppliedindicator
         queryset = ReportsAppliedindicator.objects.select_related('indicator', 'section').all
 
-        # key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-        #                                   source_id=record.pk,
-        #                                   source_location_id=record.location.pk,
-        #                                   source_disaggregation_id=record.disaggregation.pk)
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+                                          source_id=record.pk,
+                                          source_location_id=record.location.pk,
+                                          source_disaggregation_id=record.disaggregation.pk)
 
         mapping = {'title': 'indicator.title',
                    # 'description': 'indicator.description',
