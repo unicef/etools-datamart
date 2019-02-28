@@ -9,9 +9,10 @@ from django.utils.translation import ugettext as _
 
 from unicef_security.models import User
 
-from etools_datamart.apps.etools.models import (LocationsLocation, PartnersPlannedengagement,
-                                                ReportsAppliedindicator, ReportsAppliedindicatorDisaggregation,
-                                                ReportsAppliedindicatorLocations, ReportsDisaggregation, T2FTravel,)
+from etools_datamart.apps.etools.models import (LocationsLocation, PartnersPlannedengagement, ReportsAppliedindicator,
+                                                ReportsAppliedindicatorDisaggregation, ReportsAppliedindicatorLocations,
+                                                ReportsDisaggregation, T2FTravel, T2FTravelactivity,
+                                                T2FTravelactivityLocations, T2FTravelactivityTravels,)
 
 
 def label(attr, self):
@@ -337,3 +338,11 @@ def patch():
     T2FTravel.COMPLETED = T2FTravel_COMPLETED
 
     T2FTravel._meta.get_field('status').choices = T2FTravel_CHOICES
+
+    models.ManyToManyField(LocationsLocation,
+                           through=T2FTravelactivityLocations,
+                           ).contribute_to_class(T2FTravelactivity, 'locations')
+
+    models.ManyToManyField(T2FTravel,
+                           through=T2FTravelactivityTravels,
+                           ).contribute_to_class(T2FTravelactivity, 'travels')

@@ -199,3 +199,12 @@ class PartnerAdmin(DataModelAdmin):
     date_hierarchy = 'created'
     list_filter = ('partner_type', 'hidden', 'cso_type', 'rating')
     search_fields = ('vendor_number', 'name',)
+
+
+@register(models.TravelActivity)
+class TravelActivityAdmin(DataModelAdmin):
+    list_display = ('travel_reference_number',
+                    'date',
+                    'location_name',
+                    'partner_name',
+                    'primary_traveler')
