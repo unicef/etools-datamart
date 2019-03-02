@@ -256,7 +256,6 @@ class Loader:
 
     def is_record_changed(self, record, values):
         other = type(record)(**values)
-        # for field_name, field_value in values.items():
         for field_name in self.fields_to_compare:
             if getattr(record, field_name) != getattr(other, field_name):
                 return True
