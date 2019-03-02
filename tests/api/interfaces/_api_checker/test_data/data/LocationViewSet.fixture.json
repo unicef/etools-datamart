@@ -1,0 +1,131 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.location",
+                "pk": 1617,
+                "fields": {
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "last_modify_date": "2019-02-25T13:41:16.412Z",
+                    "seen": null,
+                    "source_id": null,
+                    "name": "name000",
+                    "latitude": null,
+                    "longitude": null,
+                    "p_code": "",
+                    "point": null,
+                    "gateway": 1687,
+                    "geom": null,
+                    "level": 0,
+                    "lft": 1,
+                    "parent": null,
+                    "rght": 1,
+                    "tree_id": 1,
+                    "created": "2019-02-25T13:41:08.537Z",
+                    "modified": "2019-02-25T13:41:08.537Z",
+                    "is_active": true
+                }
+            },
+            {
+                "model": "data.location",
+                "pk": 1618,
+                "fields": {
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "last_modify_date": "2019-02-25T13:41:16.472Z",
+                    "seen": null,
+                    "source_id": null,
+                    "name": "name001",
+                    "latitude": null,
+                    "longitude": null,
+                    "p_code": "",
+                    "point": null,
+                    "gateway": 1688,
+                    "geom": null,
+                    "level": 1,
+                    "lft": 1,
+                    "parent": null,
+                    "rght": 1,
+                    "tree_id": 1,
+                    "created": "2019-02-25T13:41:08.537Z",
+                    "modified": "2019-02-25T13:41:08.537Z",
+                    "is_active": true
+                }
+            },
+            {
+                "model": "data.location",
+                "pk": 1619,
+                "fields": {
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "last_modify_date": "2019-02-25T13:41:16.491Z",
+                    "seen": null,
+                    "source_id": null,
+                    "name": "name002",
+                    "latitude": null,
+                    "longitude": null,
+                    "p_code": "",
+                    "point": null,
+                    "gateway": 1689,
+                    "geom": null,
+                    "level": 2,
+                    "lft": 1,
+                    "parent": null,
+                    "rght": 1,
+                    "tree_id": 1,
+                    "created": "2019-02-25T13:41:08.537Z",
+                    "modified": "2019-02-25T13:41:08.537Z",
+                    "is_active": true
+                }
+            }
+        ],
+        "deps": [
+            {
+                "model": "data.gatewaytype",
+                "pk": 1687,
+                "fields": {
+                    "country_name": "Bolivia",
+                    "schema_name": "Bolivia",
+                    "area_code": "",
+                    "last_modify_date": "2019-02-25T13:41:16.395Z",
+                    "seen": null,
+                    "name": "name000",
+                    "admin_level": null,
+                    "source_id": null
+                }
+            },
+            {
+                "model": "data.gatewaytype",
+                "pk": 1688,
+                "fields": {
+                    "country_name": "Chad",
+                    "schema_name": "Chad",
+                    "area_code": "",
+                    "last_modify_date": "2019-02-25T13:41:16.461Z",
+                    "seen": null,
+                    "name": "name001",
+                    "admin_level": null,
+                    "source_id": null
+                }
+            },
+            {
+                "model": "data.gatewaytype",
+                "pk": 1689,
+                "fields": {
+                    "country_name": "Lebanon",
+                    "schema_name": "Lebanon",
+                    "area_code": "",
+                    "last_modify_date": "2019-02-25T13:41:16.481Z",
+                    "seen": null,
+                    "name": "name002",
+                    "admin_level": null,
+                    "source_id": null
+                }
+            }
+        ]
+    }
+}

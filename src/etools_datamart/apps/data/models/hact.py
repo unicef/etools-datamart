@@ -1,7 +1,6 @@
 import json
 
 from django.db import models
-from django.utils import timezone
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
@@ -9,30 +8,35 @@ from etools_datamart.apps.etools.models import HactAggregatehact
 
 
 class HACTLoader(Loader):
-    def process_country(self, country, context):
-        today = timezone.now()
-        try:
-            aggregate = HactAggregatehact.objects.get(year=today.year)
 
-            data = json.loads(aggregate.partner_values)
+    def get_queryset(self):
+        return HactAggregatehact.objects.filter(year=self.context['year'])
 
-            # # Total number of completed Microassessments in the business area in the past year
-            values = dict(microassessments_total=data['assurance_activities']['micro_assessment'],
-                          programmaticvisits_total=data['assurance_activities']['programmatic_visits']['completed'],
-                          followup_spotcheck=data['assurance_activities']['spot_checks']['follow_up'],
-                          completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
-                          completed_hact_audits=data['assurance_activities']['scheduled_audit'],
-                          completed_special_audits=data['assurance_activities']['special_audit'],
-                          )
-            op = self.process_record(filters=dict(year=today.year,
-                                                  area_code=country.business_area_code,
-                                                  country_name=country.name,
-                                                  schema_name=country.schema_name),
-                                     values=values,
-                                     context=context)
-            self.results.incr(op)
-        except HactAggregatehact.DoesNotExist:  # pragma: no cover
-            pass
+    def process_country(self):
+        country = self.context['country']
+        for year in range(2018, self.context['today'].year + 1):
+            self.context['year'] = year
+            try:
+                aggregate = self.get_queryset().get()
+
+                data = json.loads(aggregate.partner_values)
+
+                # # Total number of completed Microassessments in the business area in the past year
+                values = dict(microassessments_total=data['assurance_activities']['micro_assessment'],
+                              programmaticvisits_total=data['assurance_activities']['programmatic_visits']['completed'],
+                              followup_spotcheck=data['assurance_activities']['spot_checks']['follow_up'],
+                              completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
+                              completed_hact_audits=data['assurance_activities']['scheduled_audit'],
+                              completed_special_audits=data['assurance_activities']['special_audit'],
+                              seen=self.context['today'])
+                op = self.process_record(filters=dict(year=self.context['year'],
+                                                      area_code=country.business_area_code,
+                                                      country_name=country.name,
+                                                      schema_name=country.schema_name),
+                                         values=values)
+                self.increment_counter(op)
+            except HactAggregatehact.DoesNotExist:  # pragma: no cover
+                pass
 
 
 class HACT(DataMartModel):
@@ -56,3 +60,10 @@ class HACT(DataMartModel):
         ordering = ('year', 'country_name')
         unique_together = ('year', 'country_name')
         verbose_name = "HACT"
+
+    class Options:
+        sync_deleted_records = lambda loader: False
+        truncate = False
+        key = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          year=loader.context['today'].year)

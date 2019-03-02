@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from admin_extra_urls.extras import link
-from adminactions.mass_update import mass_update
+from adminactions.actions import export_as_csv, export_as_xls, mass_update
 from adminfilters.filters import AllValuesComboFilter
 from crashlog.middleware import process_exception
 from humanize import naturaldelta
@@ -31,7 +31,7 @@ class DatamartChangeList(ChangeList):
 
 
 class DataModelAdmin(TruncateTableMixin, ModelAdmin):
-    actions = [mass_update, ]
+    actions = [mass_update, export_as_csv, export_as_xls]
 
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
@@ -51,7 +51,7 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
         return request.user.is_superuser
 
     def get_readonly_fields(self, request, obj=None):
-        if not request.user.is_superuser:
+        if not request.user.is_superuser or not settings.DEBUG:
             self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
         return self.readonly_fields
 
@@ -81,11 +81,13 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     def queue(self, request):
         try:
             start = time()
-            self.model.loader.task.delay()
+            res = self.model.loader.task.delay()
             if settings.CELERY_TASK_ALWAYS_EAGER:  # pragma: no cover
                 stop = time()
                 duration = stop - start
-                self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+                self.message_user(request, "Data loaded in %s. %s" % (naturaldelta(duration),
+                                                                      res.result),
+                                  messages.SUCCESS)
             else:
                 self.message_user(request, "ETL task scheduled", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
@@ -99,10 +101,12 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     def refresh(self, request):
         try:
             start = time()
-            self.model.loader.task.apply()
+            res = self.model.loader.task.apply()
             stop = time()
             duration = stop - start
-            self.message_user(request, "Data loaded in %s" % naturaldelta(duration), messages.SUCCESS)
+            self.message_user(request, "Data loaded in %s. %s" % (naturaldelta(duration),
+                                                                  res.result),
+                              messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             process_exception(e)
             self.message_user(request, str(e), messages.ERROR)
@@ -178,3 +182,29 @@ class FundsReservationAdmin(DataModelAdmin):
 class PDIndicatorAdmin(DataModelAdmin):
     list_display = ('title', 'unit', 'display_type')
     # list_filter = ('disaggregatable', )
+
+
+@register(models.Travel)
+class TravelAdmin(DataModelAdmin):
+    list_display = ('traveler_email', 'supervisor_email', 'created')
+    date_hierarchy = 'created'
+    list_filter = ('international_travel', 'office_name', 'status',
+                   'completed_at', 'approved_at', 'end_date', 'start_date')
+    search_fields = ('office_name', 'traveler_email',)
+
+
+@register(models.Partner)
+class PartnerAdmin(DataModelAdmin):
+    list_display = ('name', 'partner_type', 'vendor_number', 'cso_type', 'rating')
+    date_hierarchy = 'created'
+    list_filter = ('partner_type', 'hidden', 'cso_type', 'rating')
+    search_fields = ('vendor_number', 'name',)
+
+
+@register(models.TravelActivity)
+class TravelActivityAdmin(DataModelAdmin):
+    list_display = ('travel_reference_number',
+                    'date',
+                    'location_name',
+                    'partner_name',
+                    'primary_traveler')

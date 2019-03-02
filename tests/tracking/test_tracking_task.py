@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
 from datetime import timedelta
 
 from django.utils import timezone
@@ -20,9 +19,10 @@ def data(db):
      for i in range(30)]
 
 
-def test_stream_aggregation(reset_stats, admin_user):
+def test_stream_aggregation(reset_stats, admin_user, settings):
+    settings.ENABLE_LIVE_STATS = True
     today = timezone.now()
-    lastMonth = (today.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+    lastMonth = today.replace(day=1)
     data = dict(requested_at=today,
                 user=admin_user,
                 path='/a/b/',

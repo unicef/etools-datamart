@@ -5,7 +5,6 @@ import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
-from rest_framework.renderers import JSONRenderer
 from rest_framework_xml.renderers import XMLRenderer
 from rest_framework_yaml.renderers import YAMLRenderer
 from strategy_field.utils import fqn
@@ -20,9 +19,8 @@ from .filtering import SystemFilterBackend
 from .negotiation import CT
 from .ordering import OrderingFilter
 from .permissions import ServicePermission
-from .renderers import (HTMLRenderer, IQYRenderer, MSJSONRenderer, MSXmlRenderer,
-                        PDFRenderer, TextRenderer, URFBrowsableAPIRenderer, XLSXRenderer,)
-from .renderers.csv import CSVRenderer
+from .renderers import (CSVRenderer, HTMLRenderer, IQYRenderer, JSONRenderer, MSJSONRenderer,
+                        MSXmlRenderer, PDFRenderer, TextRenderer, URFBrowsableAPIRenderer, XLSXRenderer,)
 
 
 class classproperty(object):

@@ -1,4 +1,3 @@
-import datetime
 import logging
 import time
 from inspect import isclass
@@ -10,6 +9,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 import celery
+from constance import config
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
@@ -43,7 +43,7 @@ RUN_TYPES = ((RUN_UNKNOWN, ""),
 
 
 class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'status', 'context', 'error', 'retry']
+    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'total', 'status', 'context', 'error', 'retry']
 
     def __init__(self, updated=0, created=0, unchanged=0, deleted=0,
                  status='SUCCESS', context=None, error=None, retry=False, **kwargs):
@@ -55,12 +55,14 @@ class EtlResult:
         self.status = status
         self.error = error
         self.context = context or {}
+        self.total = 0
 
     def __repr__(self):
         return repr(self.as_dict())
 
     def incr(self, counter):
         setattr(self, counter, getattr(self, counter) + 1)
+        self.total += 1
 
     # def add(self, counter, value):
     #     setattr(self, counter, getattr(self, counter) + value)
@@ -97,9 +99,9 @@ class EtlResult:
     #     return False
 
 
-DEFAULT_KEY = lambda country, record: dict(country_name=country.name,
-                                           schema_name=country.schema_name,
-                                           source_id=record.pk)
+DEFAULT_KEY = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          source_id=record.pk)
 
 
 class RequiredIsRunning(Exception):
@@ -120,9 +122,13 @@ class RequiredIsMissing(Exception):
         return "Missing required datased %s" % self.req
 
 
+class MaxRecordsException(Exception):
+    pass
+
+
 class LoaderOptions:
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
-                 'queryset', 'key', 'locks', 'filters',
+                 'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
                  'depends', 'timeout', 'lock_key']
 
     def __init__(self, base=None):
@@ -136,7 +142,8 @@ class LoaderOptions:
         self.depends = ()
         self.filters = None
         self.last_modify_field = None
-
+        self.sync_deleted_records = lambda loader: True
+        self.truncate = False
         if base:
             for attr in self.__attrs__:
                 if hasattr(base, attr):
@@ -145,6 +152,9 @@ class LoaderOptions:
                         setattr(self, attr, n)
                     else:
                         setattr(self, attr, getattr(base, attr, getattr(self, attr)))
+
+        if self.truncate:
+            self.sync_deleted_records = lambda loader: False
 
     def contribute_to_class(self, model, name):
         self.model = model
@@ -164,17 +174,23 @@ class LoaderTask(celery.Task):
     def run(self, *args, **kwargs):
         logger.debug(kwargs)
         try:
-            return self.loader.load(run_type=RUN_SCHEDULE, check_requirements=True)
+            kwargs.setdefault('ignore_dependencies', False)
+            kwargs.setdefault('force_requirements', True)
+            return self.loader.load(**kwargs)
         except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
-            self.retry(exc=e)
+            st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
+            self.loader.etl_task.status = st
+            self.loader.etl_task.save()
+            self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
+                       countdown=config.ETL_RETRY_COUNTDOWN)
 
 
 class Loader:
     def __init__(self) -> None:
         self.config = None
+        self.context = {}
         self.tree_parents = []
         self.always_update = False
-        self.seen = []
 
     def __repr__(self):
         return "<%sLoader>" % self.model._meta.object_name
@@ -195,7 +211,7 @@ class Loader:
 
         setattr(model, name, self)
 
-    def get_queryset(self, context):
+    def get_queryset(self):
 
         if self.config.queryset:
             ret = self.config.queryset()
@@ -206,9 +222,8 @@ class Loader:
 
         return ret
 
-    def filter_queryset(self, qs, context):
-        use_delta = context['filter_last_modified'] and not context['is_empty']
-
+    def filter_queryset(self, qs):
+        use_delta = self.context['only_delta'] and not self.context['is_empty']
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
         if use_delta and (self.config.last_modify_field and self.last_run):
@@ -218,13 +233,13 @@ class Loader:
 
     @property
     def last_run(self):
-        last_run = self.etl_task.last_run
+        # last_run = self.etl_task.last_run
         # delta is not required as last_run is set at the beginning
         # here just for safety
-        if last_run and self.etl_task.elapsed:
-            delta = datetime.timedelta(seconds=self.etl_task.elapsed)
-            return last_run - delta
-        return None
+        # if last_run and self.etl_task.elapsed:
+        #     delta = datetime.timedelta(seconds=self.etl_task.elapsed)
+        #     return last_run - delta
+        return self.etl_task.last_run
 
     def is_running(self):
         return self.etl_task.status == 'RUNNING'
@@ -236,25 +251,22 @@ class Loader:
             return True
 
         if sender.etl_task.last_success:
-            return self.etl_task.last_success.day < sender.etl_task.last_run.day
+            return self.etl_task.last_success.day > sender.etl_task.last_run.day
         return False
 
     def is_record_changed(self, record, values):
         other = type(record)(**values)
-        # for field_name, field_value in values.items():
         for field_name in self.fields_to_compare:
             if getattr(record, field_name) != getattr(other, field_name):
                 return True
         return False
 
-    def process_record(self, filters, values, context):
-        stdout = context['stdout']
-        verbosity = context['verbosity']
-
+    def process_record(self, filters, values):
+        stdout = self.context['stdout']
+        verbosity = self.context['verbosity']
         if stdout and verbosity > 2:  # pragma: no cover
             stdout.write('.')
             stdout.flush()
-
         try:
             record, created = self.model.objects.get_or_create(**filters,
                                                                defaults=values)
@@ -263,11 +275,10 @@ class Loader:
             else:
                 if self.always_update or self.is_record_changed(record, values):
                     op = UPDATED
-                    record, created = self.model.objects.update_or_create(**filters,
-                                                                          defaults=values)
+                    self.model.objects.update_or_create(**filters,
+                                                        defaults=values)
                 else:
                     op = UNCHANGED
-            self.seen.append(record.pk)
             return op
         except Exception as e:  # pragma: no cover
             logger.exception(e)
@@ -275,12 +286,21 @@ class Loader:
             raise LoaderException(f"Error in {self}: {e}",
                                   err) from e
 
-    def get_values(self, country, record, context):
+    def get_mart_values(self, record=None):
+        country = self.context['country']
         ret = {'area_code': country.business_area_code,
                'schema_name': country.schema_name,
                'country_name': country.name,
-               'source_id': record.id
+               'seen': self.context['today']
                }
+        if record:
+            ret['source_id'] = record.id
+        return ret
+
+    def get_values(self, record):
+        country = self.context['country']
+        ret = self.get_mart_values(record)
+
         for k, v in self.mapping.items():
             if v == '__self__':
                 try:
@@ -299,13 +319,21 @@ class Loader:
                 except AttributeError:  # pragma: no cover
                     pass
             elif callable(v):
-                ret[k] = v(country, record)
+                ret[k] = v(self, record)
             else:
                 ret[k] = get_attr(record, v)
-        ret['seen'] = context['today']
+
         return ret
 
-    def post_process_country(self, country, context):
+    def remove_deleted(self):
+        country = self.context['country']
+        existing = list(self.get_queryset().only('id').values_list('id', flat=True))
+        to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
+        self.results.deleted += to_delete.count()
+        to_delete.delete()
+
+    def post_process_country(self):
+        country = self.context['country']
         for mart, etools in self.tree_parents:
             kk = self.model.objects.get(schema_name=country.schema_name,
                                         source_id=mart)
@@ -313,27 +341,15 @@ class Loader:
                                                source_id=etools)
             kk.save()
         self.tree_parents = []
-
         # mark seen records
-        self.model.objects.filter(id__in=self.seen).update(seen=context['today'])
 
-    def process_country(self, country, context):
-        qs = self.filter_queryset(self.get_queryset(context), context)
-        max_records = context['max_records']
-        self.seen = []
+    def process_country(self):
+        qs = self.filter_queryset(self.get_queryset())
         for record in qs.all():
-            filters = self.config.key(country, record)
-            values = self.get_values(country, record, context)
-            op = self.process_record(filters, values, context)
-            self.results.incr(op)
-            context['records'] += 1
-            if max_records and context['records'] >= max_records:
-                break
-
-    def get_context(self, **kwargs):
-        context = {}
-        context.update(kwargs)
-        return context
+            filters = self.config.key(self, record)
+            values = self.get_values(record)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
 
     @property
     def is_locked(self):
@@ -372,6 +388,7 @@ class Loader:
         cost = time.time() - self._start
         defs = {'elapsed': cost,
                 'results': self.results.as_dict()}
+
         if retry:
             defs['status'] = 'RETRY'
             defs['results'] = str(error)
@@ -400,28 +417,37 @@ class Loader:
         if lock.acquire(blocking=False):
             return lock
 
+    def increment_counter(self, op):
+        self.results.incr(op)
+        self.context['records'] += 1
+        if self.context['max_records'] and self.context['records'] >= self.context['max_records']:
+            raise MaxRecordsException
+
+    def update_context(self, **kwargs):
+        self.context.update(kwargs)
+        return self.context
+
     def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None,
-             ignore_last_modify_field=False, run_type=RUN_UNKNOWN,
-             check_requirements=False, force_requirements=False):
+             only_delta=True, run_type=RUN_UNKNOWN,
+             force_requirements=False):
         self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
         lock = self.lock()
+        truncate = self.config.truncate
         try:
             if lock:  # pragma: no branch
                 if not ignore_dependencies:
                     for requirement in self.config.depends:
-                        if force_requirements or requirement.loader.need_refresh(self):
-                            if check_requirements:
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        if requirement.loader.need_refresh(self):
+                            if not force_requirements:
                                 raise RequiredIsMissing(requirement)
-                            logger.info(f"Loader {requirement} need refresh")
-                            if requirement.loader.is_running():
-                                raise RequiredIsRunning(requirement)
                             logger.info(f"Load required dataset {requirement}")
                             requirement.loader.load(stdout=stdout,
                                                     force_requirements=force_requirements,
-                                                    check_requirements=check_requirements,
                                                     run_type=RUN_AS_REQUIREMENT)
                         else:
                             logger.info(f"Loader {requirement} is uptodate")
@@ -429,6 +455,8 @@ class Loader:
                 connection = connections['etools']
                 if countries is None:  # pragma: no branch
                     countries = connection.get_tenants()
+                else:
+                    truncate = False
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
@@ -437,33 +465,38 @@ class Loader:
                         self.mapping[field.name] = field.name
                 if self.config.mapping:  # pragma: no branch
                     self.mapping.update(self.config.mapping)
-                today = timezone.now()
-                context = self.get_context(today=today,
-                                           countries=countries,
-                                           max_records=max_records,
-                                           verbosity=verbosity,
-                                           records=0,
-                                           filter_last_modified=not ignore_last_modify_field,
-                                           is_empty=not self.model.objects.exists(),
-                                           stdout=stdout)
+                self.update_context(today=timezone.now(),
+                                    countries=countries,
+                                    max_records=max_records,
+                                    verbosity=verbosity,
+                                    records=0,
+                                    only_delta=only_delta,
+                                    is_empty=not self.model.objects.exists(),
+                                    stdout=stdout)
                 sid = transaction.savepoint()
                 total_countries = len(countries)
                 try:
-                    self.results.context = context
+                    self.results.context = self.context
                     self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+                    if truncate:
+                        self.model.objects.truncate()
 
                     for i, country in enumerate(countries, 1):
+                        self.context['country'] = country
                         if stdout and verbosity > 0:
-                            stdout.write(f"{i:>3}/{total_countries} {country}")
+                            stdout.write(f"{i:>3}/{total_countries} {country}\n")
+                            stdout.flush()
                         connection.set_schemas([country.schema_name])
-                        self.process_country(country, context)
-                        self.post_process_country(country, context)
-                        if max_records and context['records'] >= max_records:
-                            break
+                        self.process_country()
+                        self.post_process_country()
+                        if self.config.sync_deleted_records(self):
+                            self.remove_deleted()
                     if stdout and verbosity > 0:
                         stdout.write("\n")
-                    deleted = self.model.objects.exclude(seen=today).delete()[0]
-                    self.results.deleted = deleted
+                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
+                    # self.results.deleted = deleted
+                except MaxRecordsException:
+                    pass
                 except Exception:
                     transaction.savepoint_rollback(sid)
                     raise

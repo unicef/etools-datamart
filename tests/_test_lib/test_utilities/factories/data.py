@@ -9,8 +9,8 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT,
-                                              Intervention, Location, PDIndicator, PMPIndicators, UserStats,)
+from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT, Intervention, Location,
+                                              Partner, PDIndicator, PMPIndicators, Travel, TravelActivity, UserStats,)
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -128,3 +128,39 @@ class PDIndicatorFactory(DataMartModelFactory):
 
     class Meta:
         model = PDIndicator
+
+
+class TravelFactory(DataMartModelFactory):
+    created = timezone.now()
+
+    class Meta:
+        model = Travel
+
+
+class PartnerFactory(DataMartModelFactory):
+    name = factory.Sequence(lambda n: "name%03d" % n)
+    blocked = False
+    created = timezone.now()
+    description = ""
+    manually_blocked = False
+    vision_synced = True
+    deleted_flag = False
+    hidden = False
+
+    class Meta:
+        model = Partner
+
+
+class TravelActivityFactory(DataMartModelFactory):
+    travel_reference_number = factory.Sequence(lambda n: "name%03d" % n)
+
+    # blocked = False
+    # created = timezone.now()
+    # description = ""
+    # manually_blocked = False
+    # vision_synced = True
+    # deleted_flag = False
+    # hidden = False
+
+    class Meta:
+        model = TravelActivity

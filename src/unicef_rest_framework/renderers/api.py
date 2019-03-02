@@ -18,31 +18,40 @@ class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
             return
 
         # Infer if this is a list view or not.
-        paginator = getattr(view, 'paginator', None)
-        if isinstance(data, list):
-            pass
-        elif paginator is not None and data is not None:
-            try:
-                paginator.get_results(data)
-            except (TypeError, KeyError):
-                return
-        elif not isinstance(data, list):
-            return
+        # paginator = getattr(view, 'paginator', None)
+        # if isinstance(data, list):
+        #     pass
+        # elif paginator is not None and data is not None:
+        #     try:
+        #         paginator.get_results(data)
+        #     except (TypeError, KeyError):
+        #         return
+        # elif not isinstance(data, list):
+        #     return
 
-        queryset = view.get_queryset()
+        # queryset = view.get_queryset()
         elements = []
         for backend in view.get_filter_backends():
             if hasattr(backend, 'to_html'):
-                html = backend().to_html(request, queryset, view)
+                html = backend().to_html(request, None, view)
                 if html:
                     elements.append(html)
 
         if not elements:
             return
-
         template = loader.get_template(self.filter_template)
         context = {'elements': elements}
         return template.render(context)
+
+    # def get_content(self, renderer, data, accepted_media_type, renderer_context):
+    #     view = renderer_context['view']
+    #     paginator = getattr(view, 'paginator', None)
+    #     data = data or {}
+    #     return {'total_records': data.get('count', 0),
+    #             'current_page': data.get('current_page', 1),
+    #             'total_pages': data.get('total_pages', 0),
+    #             'page_size': paginator.page_size,
+    #             }
 
     def get_context(self, data, accepted_media_type, renderer_context):
         ctx = super(URFBrowsableAPIRenderer, self).get_context(data, accepted_media_type, renderer_context)

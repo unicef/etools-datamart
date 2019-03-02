@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import collections
 from contextlib import contextmanager
 from functools import partial
 
 import pytest
+from drf_querystringfilter.filters import RexList
 from rest_framework.test import APIClient
 from test_utilities.factories import AnonUserFactory
 
@@ -37,29 +39,31 @@ def data_service(db):
 
 
 @contextmanager
-def _assert_duplicate_queries(config, connection=None):
+def _assert_duplicate_queries(config, connection=None, ignored=None):
     from django.test.utils import CaptureQueriesContext
 
     if connection is None:
         from django.db import connection
 
+    ignored = RexList(ignored or [])
     verbose = config.getoption('verbose') > 0
     with CaptureQueriesContext(connection) as context:
         yield context
-        unique = {q['sql'] for q in context.captured_queries}
-        if len(unique) != len(context.captured_queries):
+        queries = [q['sql'] for q in context.captured_queries]
+        duplicates = [item for item, count in collections.Counter(queries).items()
+                      if count > 1 and item not in ignored]
+        if duplicates:
             msg = "Duplicated query detected"
             if verbose:
-                sqls = (q['sql'] for q in context.captured_queries)
-                msg += '\n\nQueries:\n========\n\n%s' % '\n\n'.join(sqls)
+                msg += '\n\nQueries:\n========\n\n%s' % '\n\n'.join(duplicates)
             else:
                 msg += " (add -v option to show queries)"
             pytest.fail(str(msg))
 
 
 @pytest.fixture(scope='function')
-def django_assert_no_duplicate_queries(pytestconfig):
-    return partial(_assert_duplicate_queries, pytestconfig)
+def django_assert_no_duplicate_queries(pytestconfig, ignored=None):
+    return partial(_assert_duplicate_queries, pytestconfig, ignored=ignored)
 
 
 @pytest.fixture()

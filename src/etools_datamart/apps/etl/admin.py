@@ -25,9 +25,19 @@ def queue(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
         task = app.tasks.get(obj.task)
-        task.delay()
+        task.delay(run_type=RUN_QUEUED)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
+                            messages.SUCCESS)
+
+
+def force(modeladmin, request, queryset):
+    count = len(queryset)
+    for obj in queryset:
+        task = app.tasks.get(obj.task)
+        task.delay(run_type=RUN_QUEUED, ignore_dependencies=True)
+    modeladmin.message_user(request,
+                            "{0} task{1} forced".format(count, pluralize(count)),
                             messages.SUCCESS)
 
 
@@ -38,7 +48,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     'data', 'scheduling', 'unlock_task', 'queue_task')
 
     date_hierarchy = 'last_run'
-    actions = [mass_update, queue]
+    actions = [mass_update, queue, force]
 
     def _status(self, obj):
         cls = obj.status.lower()

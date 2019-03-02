@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa F405
+import decimal
 from functools import partial, partialmethod
 
 from django.db import models
@@ -8,9 +9,10 @@ from django.utils.translation import ugettext as _
 
 from unicef_security.models import User
 
-from etools_datamart.apps.etools.models import (LocationsLocation, PartnersPlannedengagement,
-                                                ReportsAppliedindicator, ReportsAppliedindicatorDisaggregation,
-                                                ReportsAppliedindicatorLocations, ReportsDisaggregation, T2FTravel,)
+from etools_datamart.apps.etools.models import (LocationsLocation, PartnersPlannedengagement, ReportsAppliedindicator,
+                                                ReportsAppliedindicatorDisaggregation, ReportsAppliedindicatorLocations,
+                                                ReportsDisaggregation, T2FTravel, T2FTravelactivity,
+                                                T2FTravelactivityLocations, T2FTravelactivityTravels,)
 
 
 def label(attr, self):
@@ -27,6 +29,121 @@ def create_alias(model, aliases):
     #     fld = opts.get_field(related)
     #     fld.related_name = business_name
     #     setattr(model, business_name, fld)
+
+
+T2FTravel_PLANNED = 'planned'
+T2FTravel_SUBMITTED = 'submitted'
+T2FTravel_REJECTED = 'rejected'
+T2FTravel_APPROVED = 'approved'
+T2FTravel_CANCELLED = 'cancelled'
+T2FTravel_SENT_FOR_PAYMENT = 'sent_for_payment'
+T2FTravel_CERTIFICATION_SUBMITTED = 'certification_submitted'
+T2FTravel_CERTIFICATION_APPROVED = 'certification_approved'
+T2FTravel_CERTIFICATION_REJECTED = 'certification_rejected'
+T2FTravel_CERTIFIED = 'certified'
+T2FTravel_COMPLETED = 'completed'
+
+T2FTravel_CHOICES = (
+    (T2FTravel_PLANNED, _('Planned')),
+    (T2FTravel_SUBMITTED, _('Submitted')),
+    (T2FTravel_REJECTED, _('Rejected')),
+    (T2FTravel_APPROVED, _('Approved')),
+    (T2FTravel_COMPLETED, _('Completed')),
+    (T2FTravel_CANCELLED, _('Cancelled')),
+    (T2FTravel_SENT_FOR_PAYMENT, _('Sent for payment')),
+    (T2FTravel_CERTIFICATION_SUBMITTED, _('Certification submitted')),
+    (T2FTravel_CERTIFICATION_APPROVED, _('Certification approved')),
+    (T2FTravel_CERTIFICATION_REJECTED, _('Certification rejected')),
+    (T2FTravel_CERTIFIED, _('Certified')),
+    (T2FTravel_COMPLETED, _('Completed')),
+)
+
+
+class PartnerType:
+    BILATERAL_MULTILATERAL = 'Bilateral / Multilateral'
+    CIVIL_SOCIETY_ORGANIZATION = 'Civil Society Organization'
+    GOVERNMENT = 'Government'
+    UN_AGENCY = 'UN Agency'
+
+    CHOICES = ((BILATERAL_MULTILATERAL, BILATERAL_MULTILATERAL),
+               (CIVIL_SOCIETY_ORGANIZATION, CIVIL_SOCIETY_ORGANIZATION),
+               (GOVERNMENT, GOVERNMENT),
+               (UN_AGENCY, UN_AGENCY))
+
+
+class PartnerOrganization:
+    EXPIRING_ASSESSMENT_LIMIT_YEAR = 4
+    CT_CP_AUDIT_TRIGGER_LEVEL = decimal.Decimal('50000.00')
+
+    CT_MR_AUDIT_TRIGGER_LEVEL = decimal.Decimal('2500.00')
+    CT_MR_AUDIT_TRIGGER_LEVEL2 = decimal.Decimal('100000.00')
+    CT_MR_AUDIT_TRIGGER_LEVEL3 = decimal.Decimal('500000.00')
+
+    RATING_HIGH = 'High'
+    RATING_SIGNIFICANT = 'Significant'
+    RATING_MEDIUM = 'Medium'
+    RATING_LOW = 'Low'
+    RATING_NOT_REQUIRED = 'Not Required'
+
+    RISK_RATINGS = (
+        (RATING_HIGH, 'High'),
+        (RATING_SIGNIFICANT, 'Significant'),
+        (RATING_MEDIUM, 'Medium'),
+        (RATING_LOW, 'Low'),
+        (RATING_NOT_REQUIRED, 'Not Required'),
+    )
+
+    MICRO_ASSESSMENT = 'MICRO ASSESSMENT'
+    HIGH_RISK_ASSUMED = 'HIGH RISK ASSUMED'
+    LOW_RISK_ASSUMED = 'LOW RISK ASSUMED'
+    NEGATIVE_AUDIT_RESULTS = 'NEGATIVE AUDIT RESULTS'
+    SIMPLIFIED_CHECKLIST = 'SIMPLIFIED CHECKLIST'
+    OTHERS = 'OTHERS'
+
+    # maybe at some point this can become a type_of_assessment can became a choice
+    TYPE_OF_ASSESSMENT = ((MICRO_ASSESSMENT, 'Micro Assessment'),
+                          (HIGH_RISK_ASSUMED, 'High Risk Assumed'),
+                          (LOW_RISK_ASSUMED, 'Low Risk Assumed'),
+                          (NEGATIVE_AUDIT_RESULTS, 'Negative Audit Results'),
+                          (SIMPLIFIED_CHECKLIST, 'Simplified Checklist'),
+                          (OTHERS, 'Others'),
+                          )
+
+    AGENCY_CHOICES = (('DPKO', 'DPKO'),
+                      ('ECA', 'ECA'),
+                      ('ECLAC', 'ECLAC'),
+                      ('ESCWA', 'ESCWA'),
+                      ('FAO', 'FAO'),
+                      ('ILO', 'ILO'),
+                      ('IOM', 'IOM'),
+                      ('OHCHR', 'OHCHR'),
+                      ('UN', 'UN'),
+                      ('UN Women', 'UN Women'),
+                      ('UNAIDS', 'UNAIDS'),
+                      ('UNDP', 'UNDP'),
+                      ('UNESCO', 'UNESCO'),
+                      ('UNFPA', 'UNFPA'),
+                      ('UN - Habitat', 'UN - Habitat'),
+                      ('UNHCR', 'UNHCR'),
+                      ('UNODC', 'UNODC'),
+                      ('UNOPS', 'UNOPS'),
+                      ('UNRWA', 'UNRWA'),
+                      ('UNSC', 'UNSC'),
+                      ('UNU', 'UNU'),
+                      ('WB', 'WB'),
+                      ('WFP', 'WFP'),
+                      ('WHO', 'WHO')
+                      )
+
+    CSO_TYPES = (('International', 'International'),
+                 ('National', 'National'),
+                 ('Community Based Organization', 'Community Based Organization'),
+                 ('Academic Institution', 'Academic Institution'),
+                 )
+
+    ASSURANCE_VOID = 'void'
+    ASSURANCE_PARTIAL = 'partial'
+    ASSURANCE_COMPLETE = 'complete'
 
 
 def patch():
@@ -208,30 +325,24 @@ def patch():
                                     'frs'])
     create_alias(PartnersIntervention, aliases)
 
-    T2FTravel.PLANNED = 'planned'
-    T2FTravel.SUBMITTED = 'submitted'
-    T2FTravel.REJECTED = 'rejected'
-    T2FTravel.APPROVED = 'approved'
-    T2FTravel.CANCELLED = 'cancelled'
-    T2FTravel.SENT_FOR_PAYMENT = 'sent_for_payment'
-    T2FTravel.CERTIFICATION_SUBMITTED = 'certification_submitted'
-    T2FTravel.CERTIFICATION_APPROVED = 'certification_approved'
-    T2FTravel.CERTIFICATION_REJECTED = 'certification_rejected'
-    T2FTravel.CERTIFIED = 'certified'
-    T2FTravel.COMPLETED = 'completed'
+    T2FTravel.PLANNED = T2FTravel_PLANNED
+    T2FTravel.SUBMITTED = T2FTravel_SUBMITTED
+    T2FTravel.REJECTED = T2FTravel_REJECTED
+    T2FTravel.APPROVED = T2FTravel_APPROVED
+    T2FTravel.CANCELLED = T2FTravel_CANCELLED
+    T2FTravel.SENT_FOR_PAYMENT = T2FTravel_SENT_FOR_PAYMENT
+    T2FTravel.CERTIFICATION_SUBMITTED = T2FTravel_CERTIFICATION_SUBMITTED
+    T2FTravel.CERTIFICATION_APPROVED = T2FTravel_CERTIFICATION_APPROVED
+    T2FTravel.CERTIFICATION_REJECTED = T2FTravel_CERTIFICATION_REJECTED
+    T2FTravel.CERTIFIED = T2FTravel_CERTIFIED
+    T2FTravel.COMPLETED = T2FTravel_COMPLETED
 
-    T2FTravel.CHOICES = (
-        (T2FTravel.PLANNED, _('Planned')),
-        (T2FTravel.SUBMITTED, _('Submitted')),
-        (T2FTravel.REJECTED, _('Rejected')),
-        (T2FTravel.APPROVED, _('Approved')),
-        (T2FTravel.COMPLETED, _('Completed')),
-        (T2FTravel.CANCELLED, _('Cancelled')),
-        (T2FTravel.SENT_FOR_PAYMENT, _('Sent for payment')),
-        (T2FTravel.CERTIFICATION_SUBMITTED, _('Certification submitted')),
-        (T2FTravel.CERTIFICATION_APPROVED, _('Certification approved')),
-        (T2FTravel.CERTIFICATION_REJECTED, _('Certification rejected')),
-        (T2FTravel.CERTIFIED, _('Certified')),
-        (T2FTravel.COMPLETED, _('Completed')),
-    )
-    T2FTravel._meta.get_field('status').choices = T2FTravel.CHOICES
+    T2FTravel._meta.get_field('status').choices = T2FTravel_CHOICES
+
+    models.ManyToManyField(LocationsLocation,
+                           through=T2FTravelactivityLocations,
+                           ).contribute_to_class(T2FTravelactivity, 'locations')
+
+    models.ManyToManyField(T2FTravel,
+                           through=T2FTravelactivityTravels,
+                           ).contribute_to_class(T2FTravelactivity, 'travels')

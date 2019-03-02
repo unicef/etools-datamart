@@ -5,6 +5,7 @@ from django.core.cache import caches
 from django.utils.http import quote_etag
 from django.utils.translation import ugettext as _
 
+from constance import config
 from humanize.i18n import ngettext
 from humanize.time import date_and_delta
 from rest_framework_extensions.cache.decorators import CacheResponse
@@ -114,7 +115,8 @@ class CacheVersionKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         version = view_instance.get_service().cache_version
         view_instance.request._request.api_info['cache-version'] = version
-        return {'cache_version': str(version)}
+        return {'cache_version': str(version),
+                'version': str(config.CACHE_VERSION)}
 
 
 class SystemFilterKeyBit(KeyBitBase):
@@ -248,3 +250,7 @@ class APICacheResponse(CacheResponse):
 
 etag = APIETAGProcessor
 cache_response = APICacheResponse
+
+
+def get_key(key):
+    return f"{key}:{config.CACHE_VERSION}x"

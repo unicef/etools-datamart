@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 
 from rest_framework.reverse import reverse
 from strategy_field.fields import StrategyClassField
+from strategy_field.utils import fqn
 
 from unicef_rest_framework.config import conf
 
@@ -33,7 +34,7 @@ class ServiceManager(models.Manager):
                                          ).first()
 
     def check_or_create(self, prefix, viewset, basename, url_name, ):
-        name = getattr(viewset, 'label', viewset.__name__)
+        name = fqn(viewset)
         source_model = ContentType.objects.get_for_model(viewset().get_queryset().model)
         service, isnew = self.model.objects.get_or_create(viewset=viewset,
                                                           defaults={

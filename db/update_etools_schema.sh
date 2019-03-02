@@ -134,10 +134,20 @@ echo "inspect db and update ORM  $INSPECT"
 echo "clean temporary files      $CLEAN"
 echo "Connection                 http://${DATABASE_USER}:${DATABASE_PASS}@${PGHOST}:${PGPORT}/${DATABASE_NAME}"
 echo
-echo "Running..."
-# 1 - restore from database dump
 
-if [ "$RESTORE" == "1" ]; then
+#echo "Confirm ? Type the year that you want to check (4 digits), followed by [ENTER]:"
+
+read -p "Continue? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "Running..."
+else
+    echo "Abort..."
+    exit 1
+fi
+
+# 1 - restore from database dump
+if [[ "$RESTORE" == "1" ]]; then
     echo "1.1 Dropping and recreating database ${DATABASE_NAME}"
     dropdb -h ${PGHOST} -p ${PGPORT} --if-exists ${DATABASE_NAME} || exit 1
     createdb -h ${PGHOST} -p ${PGPORT} ${DATABASE_NAME} || exit 1

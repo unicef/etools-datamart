@@ -7,12 +7,10 @@
         <div>
             <h2><a href="{% url "social:begin" "azuread-tenant-oauth2" %}">Login with Azure</a></h2>
         </div>
-        {% if settings.DEBUG %}
-            <div><h4>OR</h4></div>
-            <div>
-                <h4><a id="local-login" href="#">Administrative login</a></h4>
-            </div>
-        {% endif %}
+        <div><h4>OR</h4></div>
+        <div>
+            <h4><a id="local-login" href="#">Local account login</a></h4>
+        </div>
     </div>
     <div style="display: none" id="login-form">
         <form class="validate-form" method="post">

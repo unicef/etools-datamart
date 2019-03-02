@@ -3,11 +3,11 @@ from etools_datamart.apps.etools import models
 
 from .base import EToolsSerializer
 
-
-class PartnerSerializer(EToolsSerializer):
-    class Meta:
-        model = models.PartnersPartnerorganization
-        exclude = ()
+#
+# class PartnerSerializer(EToolsSerializer):
+#     class Meta:
+#         model = models.PartnersPartnerorganization
+#         exclude = ()
 
 
 class ReportsResultSerializer(EToolsSerializer):

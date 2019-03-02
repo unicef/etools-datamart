@@ -42,7 +42,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   EMAIL_HOST_USER=(str, ''),
                   EMAIL_PORT=(int, 587),
                   EMAIL_USE_TLS=(bool, True),
-                  ENABLE_LIVE_STATS=(bool, True),
+                  ENABLE_LIVE_STATS=(bool, False),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   MYSTICA_PASSWORD=(str, ''),
@@ -411,6 +411,9 @@ CONSTANCE_CONFIG = {
     'ANALYTICS_CODE': (env('ANALYTICS_CODE'), 'Google analytics code'),
     'DISABLE_SCHEMA_RESTRICTIONS': (env('DISABLE_SCHEMA_RESTRICTIONS'), 'Disable per user schema authorizations'),
     'DISABLE_SERVICE_RESTRICTIONS': (env('DISABLE_SERVICE_RESTRICTIONS'), 'Disable per user service authorizations'),
+
+    'ETL_MAX_RETRIES': (30, 'Max retries for dependent tasks', int),
+    'ETL_RETRY_COUNTDOWN': (180, 'Retry counddown in secods', int),
 }
 
 CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
@@ -631,3 +634,9 @@ def extra(r):
 SYSINFO = {"extra": {'Azure': extra}}
 
 MIGRATION_MODULES = {'dbtemplates': 'etools_datamart.custom_migrations.dbtemplates'}
+
+IMPERSONATE = {
+    'PAGINATE_COUNT': 50,
+    'REQUIRE_SUPERUSER': True,
+    'CUSTOM_USER_QUERYSET': 'etools_datamart.libs.impersonate.queryset'
+}

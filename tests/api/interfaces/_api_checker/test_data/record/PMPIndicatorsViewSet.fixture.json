@@ -2,12 +2,12 @@
     "record": {
         "master": {
             "model": "data.pmpindicators",
-            "pk": 460,
+            "pk": 1529,
             "fields": {
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "last_modify_date": "2019-01-28T16:49:10.340Z",
+                "last_modify_date": "2019-02-25T14:07:19.473Z",
                 "seen": null,
                 "source_id": null,
                 "vendor_number": null,
@@ -36,7 +36,7 @@
                 "country_id": null,
                 "partner_id": null,
                 "intervention_id": null,
-                "created": "2019-01-28T16:49:10.340Z",
+                "created": "2019-02-25T14:07:19.473Z",
                 "updated": null
             }
         },

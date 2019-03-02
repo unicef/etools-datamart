@@ -2,15 +2,15 @@
     "record": {
         "master": {
             "model": "data.userstats",
-            "pk": 131,
+            "pk": 705,
             "fields": {
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "last_modify_date": "2019-01-28T16:49:11.272Z",
+                "last_modify_date": "2019-02-25T14:07:19.718Z",
                 "seen": null,
                 "source_id": null,
-                "month": "2019-03-01",
+                "month": "2019-02-01",
                 "total": 0,
                 "unicef": 0,
                 "logins": 0,

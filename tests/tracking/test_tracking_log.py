@@ -4,14 +4,14 @@ from time import sleep
 from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 
 import pytest
+from strategy_field.utils import fqn
 from test_utilities.factories import AdminFactory, UserFactory
 
 from etools_datamart.api.endpoints import InterventionViewSet
 from etools_datamart.apps.tracking.middleware import StatsMiddleware
-from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter
+from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter, MonthlyCounter
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +33,11 @@ def django_app(django_app_mixin, system_user):
 
 
 @pytest.mark.django_db
-def test_log(enable_stats, django_app, system_user, reset_stats):
-    url = reverse("api:intervention-list", args=['v1'])
+def test_log(enable_stats, django_app, system_user, reset_stats, settings):
+    settings.ENABLE_LIVE_STATS = True
+
+    url = InterventionViewSet.get_service().endpoint
+    # url = reverse("api:intervention-list", args=['v1'])
     url = f"{url}?country_name=bolivia,chad,lebanon"
 
     res = django_app.get(url)
@@ -47,7 +50,7 @@ def test_log(enable_stats, django_app, system_user, reset_stats):
     assert log.host == 'testserver'
     assert log.user == system_user
     assert log.viewset == InterventionViewSet
-    assert log.service == 'Intervention'
+    assert log.service == fqn(InterventionViewSet)
     assert not log.cached
 
     daily = DailyCounter.objects.get(day=log.requested_at)
@@ -56,14 +59,11 @@ def test_log(enable_stats, django_app, system_user, reset_stats):
     assert daily.response_min == log.response_ms
     assert daily.response_average == log.response_ms
 
+    res = django_app.get(url)
+    assert res.status_code == 200
 
-# @pytest.mark.django_db
-# def test_threaedlog(enable_threadstats, django_app, admin_user):
-#     url = reverse("api:intervention-list", args=['v1'])
-#     url = f"{url}?country_name=bolivia,chad,lebanon"
-#
-#     res = django_app.get(url)
-#     assert res.status_code == 200
+    daily = MonthlyCounter.objects.get(day__month=log.requested_at.month, user=system_user)
+    assert daily.total == 2
 
 
 @pytest.mark.parametrize("code", [200, 500])
