@@ -53,8 +53,7 @@ class FundsReservation(DataMartModel):
                                      related_name='funds', blank=True, null=True)
 
     class Meta:
-        unique_together = (('schema_name', 'source_id'),
-                           ('schema_name', 'fr_number'))
+        unique_together = (('schema_name', 'source_id'))
         verbose_name = "Funds Reservation"
 
     class Options:

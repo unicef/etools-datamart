@@ -1,5 +1,11 @@
+1.20
+----
+* fixes FundsReservationLoader
+* fixes FAMIndicatorLoader
+
+
 1.19
--------
+----
 * add Partner endpoint
 * add extra Location fields
 * add TravelActivity endpoint

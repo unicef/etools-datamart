@@ -62,7 +62,9 @@ class FAMIndicator(DataMartModel):
     loader = FAMIndicatorLoader()
 
     class Options:
-        sync_deleted_records = lambda loader: True
+        source = AuditEngagement
+        truncate = True
+        sync_deleted_records = lambda loader: False
         mapping = dict(source_id='engagement_ptr_id')
         key = lambda loader, record: dict(country_name=loader.context['country'].name,
                                           schema_name=loader.context['country'].schema_name,
