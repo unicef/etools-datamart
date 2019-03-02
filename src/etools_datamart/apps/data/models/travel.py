@@ -1,6 +1,7 @@
 from django.db import models
 
 from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.models import Location
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.mixins import LocationMixin
 from etools_datamart.apps.etools.models import T2FTravel, T2FTravelactivity
@@ -106,7 +107,7 @@ class TravelActivity(LocationMixin, DataMartModel):
                            'location_source_id')
 
     class Options:
-        depends = (Travel,)
+        depends = (Travel, Location)
         source = T2FTravelactivity
         last_modify_field = None
         key = lambda loader, record: dict(country_name=loader.context['country'].name,
