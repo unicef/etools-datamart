@@ -144,7 +144,7 @@ RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
     && python -O -m compileall -fqb /usr/local/lib/python3.6
 
 # removes source files
-#RUN find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
+RUN find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ADD docker/wait-for-it.sh /usr/local/bin/wait-for-it.sh

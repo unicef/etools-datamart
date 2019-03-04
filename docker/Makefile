@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.20.0a11
+TARGET?=1.20.0a12
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -83,6 +83,7 @@ release:
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 	docker push ${DOCKER_IMAGE_NAME}:latest
+#	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
 
 bump:
 	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num
