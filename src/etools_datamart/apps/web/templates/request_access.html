@@ -1,0 +1,42 @@
+{% extends 'base.html' %}{% load static datamart  crispy_forms_tags %}
+{% block content %}
+
+    <div class="master-container">
+        {% if done %}
+            <div class="row" style="width: 90%">
+                <div style="text-align: center;padding: 10px">Email sent</div>
+                <div style="text-align: center;padding: 10px">Please check your UNICEF inbox</div>
+                <div style="text-align: center;padding: 10px"><a href="{% url 'login' %}">Login</a></div>
+            </div>
+        {% elif fail %}
+            <div class="row" style="width: 90%">
+            </div>
+        {% else %}
+            <div class="box">
+                <div class="right">
+                    <form class="validate-form" method="post">
+                        {% csrf_token %}
+                        {{ form.email.errors }}
+                        <div class="wrap-input100 validate-input m-b-20" data-validate="Type UNICEF email">
+                            {{ form.email }}
+                        </div>
+                        <div class="container-login100-form-btn">
+                            <button class="login100-form-btn">
+                                Send request
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="left">
+                    <div>
+                        <ul>
+                            <li>Please indicate your UNICEF email.</li>
+                            <li>If eligible you will receive your password shortly.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

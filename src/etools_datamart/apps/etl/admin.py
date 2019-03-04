@@ -4,7 +4,6 @@ from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -109,13 +108,13 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return obj.content_type.model_class().loader.is_locked
 
     locked.boolean = True
-
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        if request.method == 'POST':
-            redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
-                                                               self.opts.model_name))
-            return HttpResponseRedirect(redirect_url)
-        return self._changeform_view(request, object_id, form_url, extra_context)
+    #
+    # def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+    #     if request.method == 'POST':
+    #         redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
+    #                                                            self.opts.model_name))
+    #         return HttpResponseRedirect(redirect_url)
+    #     return self._changeform_view(request, object_id, form_url, extra_context)
 
     @action()
     def queue(self, request, pk):
@@ -137,9 +136,6 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
         def _action(request):
             obj.loader.unlock()
-            obj.update(status='FAILURE', run_type=0,
-                       last_failure=timezone.now())
-
         return _confirm_action(self, request, _action,
                                f"""Continuing will unlock selected task. ({obj.task}).
 {obj.loader.task.name} - {obj.loader.config.lock_key}

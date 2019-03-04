@@ -10,6 +10,9 @@
         <div><h4>OR</h4></div>
         <div>
             <h4><a id="local-login" href="#">Local account login</a></h4>
+            {% if config.ALLOW_EMAIL_PASSWORD %}
+            (<a href="{% url "request-access" %}">Request Access</a>)
+            {% endif %}
         </div>
     </div>
     <div style="display: none" id="login-form">

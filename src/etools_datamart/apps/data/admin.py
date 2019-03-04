@@ -50,19 +50,19 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
 
-    def get_readonly_fields(self, request, obj=None):
-        if not request.user.is_superuser or not settings.DEBUG:
-            self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
-        return self.readonly_fields
-
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        if request.method == 'POST' and not request.user.is_superuser:
-            redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
-                                                               self.opts.model_name))
-
-            self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
-            return HttpResponseRedirect(redirect_url)
-        return self._changeform_view(request, object_id, form_url, extra_context)
+    # def get_readonly_fields(self, request, obj=None):
+    #     if not request.user.is_superuser or not settings.DEBUG:
+    #         self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
+    #     return self.readonly_fields
+    #
+    # def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+    #     if request.method == 'POST' and not request.user.is_superuser:
+    #         redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
+    #                                                            self.opts.model_name))
+    #
+    #         self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
+    #         return HttpResponseRedirect(redirect_url)
+    #     return self._changeform_view(request, object_id, form_url, extra_context)
 
     @link()
     def invalidate_cache(self, request):

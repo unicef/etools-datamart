@@ -414,6 +414,7 @@ CONSTANCE_CONFIG = {
 
     'ETL_MAX_RETRIES': (30, 'Max retries for dependent tasks', int),
     'ETL_RETRY_COUNTDOWN': (180, 'Retry counddown in secods', int),
+    'ALLOW_EMAIL_PASSWORD': (False, 'Allow send local password by email', bool)
 }
 
 CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'

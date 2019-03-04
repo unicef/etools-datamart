@@ -1,14 +1,17 @@
 1.20
 ----
 * fixes FundsReservationLoader
-* fixes FAMIndicatorLoader
-
+* fixes FAMIndicatorLoader month handling
+* fixes HACTLoader
+* enable ETLLog reset
+* add ability
 
 1.19
 ----
 * add Partner endpoint
 * add extra Location fields
 * add TravelActivity endpoint
+
 
 1.18
 ----

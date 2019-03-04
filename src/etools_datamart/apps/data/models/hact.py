@@ -28,11 +28,15 @@ class HACTLoader(Loader):
                               completed_spotcheck=data['assurance_activities']['spot_checks']['completed'],
                               completed_hact_audits=data['assurance_activities']['scheduled_audit'],
                               completed_special_audits=data['assurance_activities']['special_audit'],
-                              seen=self.context['today'])
-                op = self.process_record(filters=dict(year=self.context['year'],
-                                                      area_code=country.business_area_code,
+                              seen=self.context['today'],
+                              area_code=country.business_area_code,
+                              schema_name=country.schema_name
+                              )
+                op = self.process_record(filters=dict(year=year,
+                                                      # area_code=country.business_area_code,
                                                       country_name=country.name,
-                                                      schema_name=country.schema_name),
+                                                      # schema_name=country.schema_name
+                                                      ),
                                          values=values)
                 self.increment_counter(op)
             except HactAggregatehact.DoesNotExist:  # pragma: no cover
@@ -64,6 +68,6 @@ class HACT(DataMartModel):
     class Options:
         sync_deleted_records = lambda loader: False
         truncate = False
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          year=loader.context['today'].year)
+        # key = lambda loader, record: dict(country_name=loader.context['country'].name,
+        #                                   schema_name=loader.context['country'].schema_name,
+        #                                   year=loader.context['today'].year)

@@ -110,7 +110,7 @@ class RequiredIsRunning(Exception):
         self.req = req
 
     def __str__(self):
-        return "Required datased %s is still updating" % self.req
+        return "Required dataset %s is still updating" % self.req
 
 
 class RequiredIsMissing(Exception):
@@ -119,7 +119,7 @@ class RequiredIsMissing(Exception):
         self.req = req
 
     def __str__(self):
-        return "Missing required datased %s" % self.req
+        return "Missing required dataset %s" % self.req
 
 
 class MaxRecordsException(Exception):

@@ -9,10 +9,10 @@ ENV CPLUS_INCLUDE_PATH /usr/include/gdal
 ENV C_INCLUDE_PATH /usr/include/gdal
 
 RUN apk add --no-cache --virtual .fetch-deps \
-        curl
-#        ca-certificates \
-#        openssl \
-#        tar
+        curl \
+        ca-certificates \
+        openssl \
+        tar
 
 RUN apk add --no-cache --virtual .build-deps \
         autoconf \
@@ -85,6 +85,7 @@ RUN pip install pip==18.0 pipenv --upgrade
 
 RUN set -ex \
     ls -al /code \
+    && find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
     && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS \
     && pip3 install . \
     && rm -fr /code
@@ -102,15 +103,12 @@ ENV VERSION ${VERSION}
 ENV PIPENV_PYPI_MIRROR ${PIPENV_PYPI_MIRROR}
 ENV PIPENV_ARGS ${PIPENV_ARGS}
 ENV HOME /root/
-ENV PIPSI_HOME=/usr/local/pipsi/environments
-ENV PIPSI_BIN_DIR=/usr/local/bin
 ENV PYTHONUNBUFFERED 1
 ENV USE_GUNICORN 0
-ENV GUNICORN_CMD_ARGS "-b 0.0.0.0:8000 \
---chdir /var/datamart \
---access-logfile - \
---access-logformat \"%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s\" "
-
+ENV GUNICORN_WORKERS 4
+ENV CELERY_LOGLEVEL "ERROR"
+ENV CELERY_CONCURRENCY 2
+ENV CELERY_WORKERS 1
 ENV ALLOWED_HOSTS *
 ENV CACHE_URL "redis://127.0.0.1:6379/1"
 ENV CELERY_BROKER_URL "redis://127.0.0.1:6379/2"
@@ -140,22 +138,24 @@ EXPOSE 8000
 RUN apk del .fetch-deps .build-deps .build-deps-edge .datamart-build-deps
 RUN rm -rf /var/cache/apk/* \
     && rm -fr /root/.cache/ \
-    && rm -fr /code \
     && rm -fr /usr/include/
 
 RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
-    && python -O -m compileall -fqb /usr/local/lib/python3.6/ \
-    && find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
+    && python -O -m compileall -fqb /usr/local/lib/python3.6
+
+# removes source files
+#RUN find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
 
 ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ADD docker/wait-for-it.sh /usr/local/bin/wait-for-it.sh
 
 RUN adduser -S datamart \
     && mkdir -p /var/datamart \
     && chown datamart /var/datamart/
 
-WORKDIR /var/datamart
-USER datamart
-
 ENTRYPOINT ["docker-entrypoint.sh"]
+WORKDIR /var/datamart
+
+USER datamart
 
 CMD ["datamart"]
