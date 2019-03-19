@@ -293,7 +293,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'graphene_django',
     'etools_datamart.config.admin.AdminConfig',
 
     'etools_datamart.apps.core.apps.Config',
@@ -741,3 +741,7 @@ GEONAMES_URL = env('GEONAMES_URL')
 GEONAMES_USERNAME = env('GEONAMES_USERNAME')
 
 FIELD_SIZE_LIMIT = 32000
+
+GRAPHENE = {
+    'SCHEMA': 'etools_datamart.api.schema.schema' # Where your Graphene schema lives
+}
