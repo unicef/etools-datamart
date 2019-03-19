@@ -7,8 +7,7 @@ from django.urls import reverse
 
 import pytest
 from strategy_field.utils import fqn
-from test_utilities.factories import factories_registry, PMPIndicatorFactory
-from test_utilities.perms import user_grant_permissions
+from test_utilities.factories import factories_registry
 
 
 def pytest_generate_tests(metafunc):
