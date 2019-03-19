@@ -17,7 +17,7 @@ if [[ "$*" == "test" ]];then
     if [[ ! -f "run/celery.pid" ]]; then exit 1; fi
     if [[ ! -f "run/celerybeat.pid" ]]; then exit 1; fi
 
-elif [[ "$*" == "workers" ]];then
+elif [[ "$*" == "worker" ]];then
     django-admin db-isready --wait --sleep 5 --timeout 60
     django-admin db-isready --wait --sleep 5 --timeout 300 --connection etools
     celery worker -A etools_datamart \
