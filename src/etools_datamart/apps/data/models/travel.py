@@ -1,11 +1,12 @@
 from django.db import models
 
 from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models import Location
-from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.data.models.mixins import LocationMixin
 from etools_datamart.apps.etools.models import T2FTravel, T2FTravelactivity
 from etools_datamart.apps.etools.patch import T2FTravel_CHOICES
+
+from .base import DataMartModel
+from .location import Location
+from .mixins import LocationMixin
 
 
 class Travel(DataMartModel):

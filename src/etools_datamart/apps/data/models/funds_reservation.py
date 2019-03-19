@@ -1,8 +1,9 @@
 from django.db import models
 
-from etools_datamart.apps.data.models import Intervention
-from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import FundsFundsreservationitem
+
+from .base import DataMartModel
+from .intervention import Intervention
 
 
 class FundsReservation(DataMartModel):

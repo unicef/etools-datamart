@@ -8,7 +8,7 @@ from unicef_rest_framework.models.acl import GroupAccessControl
 from ..models import Application, CacheVersion, PeriodicTask, Service, SystemFilter, UserAccessControl
 from .acl import GroupAccessControlAdmin, UserAccessControlAdmin
 from .application import ApplicationAdmin
-from .base import ListDisplayAllMixin, ReadOnlyAdminMixin
+from .base import ListDisplayAllMixin, ReadOnlyAdminMixin, TruncateTableMixin  # noqa
 from .beat import CrontabScheduleAdmin, PeriodicTaskAdmin
 from .cache import CacheVersionAdmin
 from .filter import SystemFilterAdmin
