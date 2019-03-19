@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 
 import requests
 from celery.app import default_app
+from crashlog.middleware import process_exception
 
 from unicef_rest_framework.models import Service
 
@@ -21,11 +22,15 @@ def invalidate_cache(service_id):
 
 @default_app.task()
 def preload(path):
-    User = get_user_model()
-    user = User.objects.get(username='system')
-    target = "%s%s" % (settings.ABSOLUTE_BASE_URL, path)
-    logger.info(f'Preloading {target}')
-    assert path.startswith('/')
-    response = requests.get(target,
-                            headers={'Authorization': 'Token %s' % user.auth_token})
-    return response.headers
+    try:
+        User = get_user_model()
+        user = User.objects.get(username='system')
+        target = "%s%s" % (settings.ABSOLUTE_BASE_URL, path)
+        logger.info(f'Preloading {target}')
+        assert path.startswith('/')
+        response = requests.get(target,
+                                headers={'Authorization': 'Token %s' % user.auth_token})
+        return response.headers
+    except Exception as e:
+        process_exception(e)
+        raise

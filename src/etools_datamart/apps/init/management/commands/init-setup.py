@@ -157,7 +157,7 @@ class Command(BaseCommand):
             _all = True
         ModelUser = get_user_model()
         locks = caches['lock']
-        lock = locks.lock('init-setup', timeout=60 * 5)
+        lock = locks.lock('init-setup', timeout=60 * 10)
         if not lock.acquire(blocking=False):
             self.stderr.write("Another process is running setup. Nothing to do.")
             return ""

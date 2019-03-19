@@ -3,8 +3,8 @@ from month_field.rest_framework import MonthFilterBackend
 
 from etools_datamart.apps.data import models
 
-from . import serializers
 from .. import common
+from . import serializers
 
 
 class FAMIndicatorViewSet(common.DataMartViewSet):

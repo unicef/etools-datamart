@@ -5,12 +5,14 @@ import string
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm, UserModel
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.core.mail import get_connection, send_mail
+from django.core.mail import EmailMultiAlternatives, get_connection, send_mail
 from django.core.validators import RegexValidator
 from django.http import HttpResponse
+from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.generic import FormView, TemplateView
@@ -136,3 +138,29 @@ class DatamartLoginView(LoginView):
     def get_context_data(self, **kwargs):
         kwargs['settings'] = settings
         return super().get_context_data(**kwargs)
+
+
+class PasswordResetForm2(PasswordResetForm):
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        subject = loader.render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        body = loader.render_to_string(email_template_name, context)
+        conn = get_connection('django.core.mail.backends.smtp.EmailBackend', False)
+
+        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email],
+                                               connection=conn)
+        if html_email_template_name is not None:
+            html_email = loader.render_to_string(html_email_template_name, context)
+            email_message.attach_alternative(html_email, 'text/html')
+
+        email_message.send()
+
+    def get_users(self, email):
+        email = self.cleaned_data['email']
+        synchronizer = Synchronizer(keep_records=True)
+        results = synchronizer.fetch_users("(mail eq '%s')" % email)
+        if not list(results.all()):
+            return []
+        return UserModel._default_manager.filter(**{'%s__iexact' % UserModel.get_email_field_name(): email})

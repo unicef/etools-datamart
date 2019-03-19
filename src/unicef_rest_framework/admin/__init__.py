@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+
 from django_celery_beat.models import CrontabSchedule
 
 from unicef_rest_framework.models.acl import GroupAccessControl
-from .base import APIModelAdmin  # noqa
-from .filter import SystemFilterAdmin
-from ..models import (Application,
-                      Service,
-                      CacheVersion,
-                      UserAccessControl,
-                      PeriodicTask,
-                      SystemFilter)
-from .base import ListDisplayAllMixin, ReadOnlyAdminMixin, TruncateTableMixin  # noqa
+
+from ..models import Application, CacheVersion, PeriodicTask, Service, SystemFilter, UserAccessControl
+from .acl import GroupAccessControlAdmin, UserAccessControlAdmin
 from .application import ApplicationAdmin
-from .service import ServiceAdmin
-from .cache import CacheVersionAdmin
-from .acl import UserAccessControlAdmin, GroupAccessControlAdmin
+from .base import ListDisplayAllMixin, ReadOnlyAdminMixin
 from .beat import CrontabScheduleAdmin, PeriodicTaskAdmin
+from .cache import CacheVersionAdmin
+from .filter import SystemFilterAdmin
+from .service import ServiceAdmin
+
+from .base import APIModelAdmin  # noqa; noqa
 
 __all__ = ['ApplicationAdmin',
            'GroupAccessControlAdmin',

@@ -183,6 +183,9 @@ class LoaderTask(celery.Task):
             self.loader.etl_task.save()
             self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
                        countdown=config.ETL_RETRY_COUNTDOWN)
+        except Exception as e:
+            process_exception(e)
+            raise
 
 
 class Loader:

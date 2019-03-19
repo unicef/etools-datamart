@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from etools_datamart.apps.etl import models
 
-from . import serializers
 from .. import common
+from . import serializers
 
 
 class MonitorViewSet(common.APIReadOnlyModelViewSet):

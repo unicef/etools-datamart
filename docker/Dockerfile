@@ -80,7 +80,7 @@ RUN set -o pipefail && echo "DEVELOP: ${DEVELOP}" && if [ "${DEVELOP}" == "1" ];
     && curl -L "https://github.com/unicef/etools-datamart/archive/${VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
-RUN pip install pip==18.0 pipenv --upgrade
+RUN pip install pip pipenv --upgrade
 
 
 RUN set -ex \

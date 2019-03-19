@@ -84,6 +84,7 @@ tox = "*"
 vcrpy = "*"
 yapf = "*"
 fancycompleter = {file = "https://github.com/theY4Kman/fancycompleter/archive/0.8.tar.gz"}
+flake8 = "*"
 
 [requires]
 python_version = "3.6"

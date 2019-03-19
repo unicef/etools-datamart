@@ -1,0 +1,176 @@
+FROM python:3.6.8-alpine3.8 as base
+ARG PIPENV_ARGS
+
+ENV CPLUS_INCLUDE_PATH /usr/include/gdal
+ENV C_INCLUDE_PATH /usr/include/gdal
+
+RUN apk add --no-cache --virtual .fetch-deps \
+        curl \
+        ca-certificates \
+        openssl \
+        tar
+
+RUN apk add --no-cache --virtual .build-deps \
+        autoconf \
+        automake \
+        pkgconf \
+        gcc \
+        g++ \
+        json-c-dev \
+        libtool \
+        libxml2-dev \
+        make \
+        perl
+
+RUN apk add --no-cache --virtual .build-deps-edge \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        proj4 \
+        proj4-dev \
+        protobuf-c \
+        protobuf-c-dev \
+        xf86bigfontproto-dev
+
+#RUN apk add --no-cache --virtual .postgis-rundeps \
+#        json-c
+
+RUN apk add --no-cache --virtual .postgis-rundeps-edge \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        binutils \
+        gdal-dev \
+        geos-dev \
+        geos \
+        gdal \
+        proj4
+
+RUN apk add --no-cache --virtual .etools-build-deps \
+        fontconfig-dev \
+        freetype-dev \
+        jpeg-dev \
+        json-c \
+        json-c-dev \
+        lcms2 \
+        lcms2-dev \
+        libffi-dev \
+        libjpeg-turbo-dev \
+        libressl-dev \
+        libx11 \
+        libx11-dev \
+        libxau-dev \
+        libxcb \
+        libxcb-dev \
+        libxdmcp-dev \
+        libxft \
+        libxft-dev \
+        libxrender-dev \
+        linux-headers \
+        musl-dev \
+        nghttp2-libs \
+        openjpeg-dev \
+        postgresql-dev \
+        python3-dev \
+        sqlite-libs \
+        tcl \
+        tcl-dev \
+        tiff-dev \
+        tk-dev \
+        zlib-dev
+
+#RUN apk add --no-cache --virtual .etools-run-deps \
+#        postgresql-libs
+#
+#RUN apk add --no-cache --virtual .system-run-deps \
+#        bash
+
+ADD . /code
+WORKDIR /code
+
+RUN set -ex \
+    ls -al /code \
+    && pip install pip pipenv --upgrade \
+    && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
+
+# compile all library files and removes sources
+RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
+    && python -O -m compileall -fqb /usr/local/lib/python3.6/ \
+    && find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
+
+# install app removes .pyc but keeps .py
+RUN pip3 install . \
+    && find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f
+
+#RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f
+
+FROM python:3.6.8-alpine3.8
+COPY --from=base /usr/local/lib/python3.6/ /usr/local/lib/python3.6/
+COPY --from=base /usr/local/bin /usr/local/bin
+
+ENV ALLOWED_HOSTS *
+ENV CACHE_URL "redis://127.0.0.1:6379/1"
+ENV CELERY_BROKER_URL "redis://127.0.0.1:6379/2"
+ENV CELERY_CONCURRENCY 2
+ENV CELERY_LOGLEVEL "ERROR"
+ENV CELERY_RESULT_BACKEND "redis://127.0.0.1:6379/3"
+ENV CELERY_WORKERS 1
+ENV CSRF_COOKIE_SECURE True
+ENV DATABASE_URL "postgres://postgres:@127.0.0.1:5432/etools_datamart"
+ENV DATABASE_URL_ETOOLS "postgis://postgres:@127.0.0.1:5432/etools"
+ENV DEBUG 0
+ENV DEVELOPMENT_MODE 0
+ENV DJANGO_SETTINGS_MODULE etools_datamart.config.settings
+ENV GUNICORN_WORKERS 4
+ENV HOME /root/
+ENV MEDIA_ROOT /tmp/media
+ENV PIPENV_ARGS ${PIPENV_ARGS}
+ENV PIPENV_PYPI_MIRROR ${PIPENV_PYPI_MIRROR}
+ENV PYTHONUNBUFFERED 1
+ENV RUN_MIGRATIONS "0"
+ENV SECRET_KEY "secret"
+ENV SECRET_KEY not-so-secret-key-just-for-setup
+ENV SECURE_BROWSER_XSS_FILTER True
+ENV SECURE_CONTENT_TYPE_NOSNIFF True
+ENV SECURE_FRAME_DENY True
+ENV SECURE_HSTS_INCLUDE_SUBDOMAINS True
+ENV SECURE_HSTS_PRELOAD True
+ENV SECURE_HSTS_SECONDS 1
+ENV SECURE_SSL_REDIRECT True
+ENV SENTRY_DSN ""
+ENV SESSION_COOKIE_HTTPONLY True
+ENV SESSION_COOKIE_SECURE True
+ENV STATIC_ROOT /var/datamart/static
+
+EXPOSE 8000
+
+RUN adduser -S datamart \
+    && mkdir -p /var/datamart/run /var/datamart/static \
+    && chown -R datamart /var/datamart/
+
+RUN apk add --no-cache --virtual .postgis-rundeps-edge \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        binutils \
+        gdal-dev \
+        geos-dev \
+        geos \
+        gdal \
+        proj4
+
+#RUN apk add --no-cache --virtual .datamart-run-deps \
+#        postgresql-libs
+
+RUN apk add --no-cache --virtual .system-run-deps \
+        bash
+
+RUN rm -rf /var/cache/apk/* \
+    && rm -fr /root/.cache/ \
+    && rm -fr /usr/include/
+
+ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+WORKDIR /var/datamart/
+
+USER datamart
+
+CMD ["datamart"]

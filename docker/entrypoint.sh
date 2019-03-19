@@ -10,9 +10,13 @@ if [[ $DAEMONIZE == '1' ]]; then
 fi
 
 if [[ "$*" == "test" ]];then
+    DAEMONIZE=1 docker-entrypoint.sh beat
     DAEMONIZE=1 docker-entrypoint.sh workers
     DAEMONIZE=1 docker-entrypoint.sh datamart
-    wait-for-it localhost:8000 -t 60 -- curl localhost:8000
+    wait-for-it.sh localhost:8000 -t 60 -- curl localhost:8000
+    if [[ ! -f "run/celery.pid" ]]; then exit 1; fi
+    if [[ ! -f "run/celerybeat.pid" ]]; then exit 1; fi
+
 elif [[ "$*" == "workers" ]];then
     django-admin db-isready --wait --sleep 5 --timeout 60
     django-admin db-isready --wait --sleep 5 --timeout 300 --connection etools
@@ -20,12 +24,13 @@ elif [[ "$*" == "workers" ]];then
             --loglevel=${CELERY_LOGLEVEL} \
             --concurrency=${CELERY_CONCURRENCY} \
             --purge \
-            --pidfile \
+            --pidfile run/celery.pid \
             $CELERY_EXTRA \
-            run/celery.pid
+
 
 elif [[ "$*" == "beat" ]];then
     celery beat -A etools_datamart.celery \
+            $CELERY_EXTRA \
             --loglevel=${CELERY_LOGLEVEL} \
             --pidfile run/celerybeat.pid
 
