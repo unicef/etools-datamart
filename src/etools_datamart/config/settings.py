@@ -743,5 +743,5 @@ GEONAMES_USERNAME = env('GEONAMES_USERNAME')
 FIELD_SIZE_LIMIT = 32000
 
 GRAPHENE = {
-    'SCHEMA': 'etools_datamart.api.schema.schema' # Where your Graphene schema lives
+    'SCHEMA': 'etools_datamart.api.schema'  # Where your Graphene schema lives
 }
