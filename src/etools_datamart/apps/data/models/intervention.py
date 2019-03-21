@@ -10,7 +10,7 @@ from etools_datamart.apps.etools.models import PartnersIntervention
 logger = logging.getLogger(__name__)
 
 
-class Intervention(DataMartModel):
+class InterventionAbstract(models.Model):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
     document_type = models.CharField(max_length=255, null=True)
@@ -67,6 +67,11 @@ class Intervention(DataMartModel):
     country_programme_id = models.IntegerField(blank=True, null=True)
     unicef_signatory_id = models.IntegerField(blank=True, null=True)
 
+    class Meta:
+        abstract = True
+
+
+class Intervention(InterventionAbstract, DataMartModel):
     class Meta:
         ordering = ('country_name', 'title')
         verbose_name = "Intervention"
