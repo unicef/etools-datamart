@@ -70,13 +70,6 @@ class InterventionAbstract(models.Model):
     class Meta:
         abstract = True
 
-
-class Intervention(InterventionAbstract, DataMartModel):
-    class Meta:
-        ordering = ('country_name', 'title')
-        verbose_name = "Intervention"
-        unique_together = ('schema_name', 'intervention_id')
-
     class Options:
         source = PartnersIntervention
         queryset = lambda: PartnersIntervention.objects.select_related('agreement',
@@ -122,3 +115,13 @@ class Intervention(InterventionAbstract, DataMartModel):
                        total_local='planned_budget.total_local',
                        currency='planned_budget.currency',
                        )
+
+
+class Intervention(InterventionAbstract, DataMartModel):
+    class Meta:
+        ordering = ('country_name', 'title')
+        verbose_name = "Intervention"
+        unique_together = ('schema_name', 'intervention_id')
+
+    class Options(InterventionAbstract.Options):
+        pass
