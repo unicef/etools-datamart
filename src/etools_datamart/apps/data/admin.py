@@ -150,7 +150,6 @@ class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
     date_hierarchy = 'start_date'
 
 
-
 @register(models.FAMIndicator)
 class FAMIndicatorAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month',)

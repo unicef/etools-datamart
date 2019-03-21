@@ -4,8 +4,9 @@ import logging
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.data.models.mixins import LocationMixin
+from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import PartnersIntervention
 
 logger = logging.getLogger(__name__)
@@ -128,8 +129,31 @@ class Intervention(InterventionAbstract, DataMartModel):
         pass
 
 
+class InterventionByLocationLoader(Loader):
+
+    def process_country(self):
+        qs = self.filter_queryset(self.get_queryset())
+        for intervention in qs.all():
+            for location in intervention.flat_locations.order_by('id'):
+                intervention.location = location
+                filters = self.config.key(self, intervention)
+                values = self.get_values(intervention)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
+
+
 class InterventionByLocation(LocationMixin, InterventionAbstract, DataMartModel):
+    loader = InterventionByLocationLoader()
+
     class Meta:
         ordering = ('country_name', 'title')
         verbose_name = "Intervention By Location"
         unique_together = ('schema_name', 'intervention_id', 'location_source_id')
+
+    class Options(InterventionAbstract.Options):
+        key = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          area_code=loader.context['country'].business_area_code,
+                                          intervention_id=record.pk,
+                                          location_source_id=record.location.pk)
+        mapping = add_location_mapping(InterventionAbstract.Options.mapping)
