@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.mixins import LocationMixin
 from etools_datamart.apps.etools.models import PartnersIntervention
 
 logger = logging.getLogger(__name__)
@@ -125,3 +126,10 @@ class Intervention(InterventionAbstract, DataMartModel):
 
     class Options(InterventionAbstract.Options):
         pass
+
+
+class InterventionByLocation(LocationMixin, InterventionAbstract, DataMartModel):
+    class Meta:
+        ordering = ('country_name', 'title')
+        verbose_name = "Intervention By Location"
+        unique_together = ('schema_name', 'intervention_id', 'location_source_id')
