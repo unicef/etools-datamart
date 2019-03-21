@@ -9,7 +9,8 @@ from django.utils.translation import ugettext as _
 
 from unicef_security.models import User
 
-from etools_datamart.apps.etools.models import (LocationsLocation, PartnersPlannedengagement, ReportsAppliedindicator,
+from etools_datamart.apps.etools.models import (LocationsLocation, PartnersInterventionFlatLocations,
+                                                PartnersPlannedengagement, ReportsAppliedindicator,
                                                 ReportsAppliedindicatorDisaggregation, ReportsAppliedindicatorLocations,
                                                 ReportsDisaggregation, T2FTravel, T2FTravelactivity,
                                                 T2FTravelactivityLocations, T2FTravelactivityTravels,)
@@ -230,6 +231,10 @@ def patch():
         (PartnersIntervention.SHPD, 'Simplified Humanitarian Programme Document'),
         (PartnersIntervention.SSFA, 'SSFA'),
     )
+    models.ManyToManyField(LocationsLocation,
+                           through=PartnersInterventionFlatLocations,
+                           ).contribute_to_class(PartnersIntervention, 'flat_locations')
+
     # Fix User OneToOneField
     # for model in [AuthUserGroups, UsersUserprofile]:
 
@@ -247,9 +252,9 @@ def patch():
                          on_delete=models.PROTECT).contribute_to_class(UsersUserprofile, 'user')
 
     # Fix User ManyToManyField
-    fld = models.ManyToManyField(AuthGroup,
-                                 through=AuthUserGroups,
-                                 ).contribute_to_class(AuthUser, 'groups')
+    models.ManyToManyField(AuthGroup,
+                           through=AuthUserGroups,
+                           ).contribute_to_class(AuthUser, 'groups')
 
     # Fix ReportsAppliedindicator ManyToManyField
     models.ManyToManyField(ReportsDisaggregation,
