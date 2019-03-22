@@ -9,8 +9,9 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT, Intervention, Location,
-                                              Partner, PDIndicator, PMPIndicators, Travel, TravelActivity, UserStats,)
+from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT,
+                                              Intervention, InterventionByLocation, Location, Partner,
+                                              PDIndicator, PMPIndicators, Travel, TravelActivity, UserStats,)
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -58,6 +59,25 @@ class InterventionFactory(DataMartModelFactory):
 
     class Meta:
         model = Intervention
+
+
+class InterventionByLocationFactory(DataMartModelFactory):
+    metadata = {}
+    title = factory.Sequence(lambda n: "title%03d" % n)
+    number = factory.Sequence(lambda n: "#%03d" % n)
+    partner_contribution = 10
+    unicef_cash = 10
+    in_kind_amount = 10
+    partner_contribution_local = 10
+    unicef_cash_local = 10
+    in_kind_amount_local = 10
+    total = 10
+    total_local = 10
+    currency = 'USD'
+    intervention_id = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = InterventionByLocation
 
 
 class GatewayTypeFactory(DataMartModelFactory):

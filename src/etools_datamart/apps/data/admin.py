@@ -137,6 +137,19 @@ class InterventionAdmin(DataModelAdmin, TruncateTableMixin):
     date_hierarchy = 'start_date'
 
 
+@register(models.InterventionByLocation)
+class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'title', 'document_type',
+                    'location_name', 'number', 'status')
+    list_filter = (SchemaFilter,
+                   ('document_type', AllValuesComboFilter),
+                   ('status', AllValuesComboFilter),
+                   'start_date',
+                   )
+    search_fields = ('number', 'title')
+    date_hierarchy = 'start_date'
+
+
 @register(models.FAMIndicator)
 class FAMIndicatorAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month',)

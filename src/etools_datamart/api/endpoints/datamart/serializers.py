@@ -41,6 +41,14 @@ class InterventionSerializer(InterventionSerializerFull):
                    'total', 'total_local', 'currency',)
 
 
+class InterventionByLocationSerializer(InterventionSerializerFull):
+    class Meta(DataMartSerializer.Meta):
+        model = models.InterventionByLocation
+        exclude = ('metadata', 'partner_contribution', 'unicef_cash', 'in_kind_amount',
+                   'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
+                   'total', 'total_local', 'currency',)
+
+
 class FAMIndicatorSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.FAMIndicator

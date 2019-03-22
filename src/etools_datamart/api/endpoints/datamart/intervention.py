@@ -49,3 +49,8 @@ class InterventionViewSet(common.DataMartViewSet):
 
     def get_querystringfilter_form(self, request, filter):
         return InterventionFilterForm(request.GET, filter.form_prefix)
+
+
+class InterventionByLocationViewSet(InterventionViewSet):
+    serializer_class = serializers.InterventionByLocationSerializer
+    queryset = models.InterventionByLocation.objects.all()
