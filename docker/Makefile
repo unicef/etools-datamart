@@ -84,6 +84,8 @@ release:
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 	docker push ${DOCKER_IMAGE_NAME}:latest
 	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
 	$(MAKE) bump
 
 bump:
