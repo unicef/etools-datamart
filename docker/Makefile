@@ -87,7 +87,7 @@ release:
 	$(MAKE) bump
 
 bump:
-	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num
+	cd .. && bumpversion --commit --config-file=.bumpversion.cfg num
 
 run:
 	RUN_OPTIONS="-p 8000:8000" \
