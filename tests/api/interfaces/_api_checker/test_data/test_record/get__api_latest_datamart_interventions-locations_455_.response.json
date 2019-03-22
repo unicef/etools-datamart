@@ -1,0 +1,99 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"e74b11da1b3235fab4cc70a7c192173e\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "1349"
+        ]
+    },
+    "data": {
+        "id": 455,
+        "country_name": "bolivia",
+        "schema_name": "bolivia",
+        "area_code": "",
+        "last_modify_date": "22 Mar 2019 11:36:13",
+        "seen": null,
+        "source_id": null,
+        "location_source_id": null,
+        "location_name": null,
+        "location_pcode": null,
+        "location_level": null,
+        "location_levelname": null,
+        "created": "22 Mar 2019 11:36:13",
+        "updated": null,
+        "document_type": null,
+        "number": "#003",
+        "title": "title003",
+        "status": null,
+        "start_date": null,
+        "end_date": null,
+        "submission_date": null,
+        "submission_date_prc": null,
+        "review_date_prc": null,
+        "prc_review_document": null,
+        "signed_by_unicef_date": null,
+        "signed_by_partner_date": null,
+        "population_focus": null,
+        "partner_authorized_officer_signatory_id": null,
+        "signed_pd_document": null,
+        "contingency_pd": null,
+        "unicef_signatory_first_name": null,
+        "unicef_signatory_last_name": null,
+        "unicef_signatory_email": null,
+        "partner_name": null,
+        "partner_signatory_title": null,
+        "partner_signatory_first_name": null,
+        "partner_signatory_last_name": null,
+        "partner_signatory_email": null,
+        "partner_signatory_phone": null,
+        "unicef_focal_point_first_name": null,
+        "unicef_focal_point_last_name": null,
+        "unicef_focal_point_email": null,
+        "partner_focal_point_title": null,
+        "partner_focal_point_first_name": null,
+        "partner_focal_point_last_name": null,
+        "partner_focal_point_email": null,
+        "partner_focal_point_phone": null,
+        "intervention_id": 3,
+        "agreement_id": null,
+        "country_programme_id": null,
+        "unicef_signatory_id": null
+    },
+    "content_type": null
+}

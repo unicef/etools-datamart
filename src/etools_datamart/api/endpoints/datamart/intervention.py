@@ -53,3 +53,4 @@ class InterventionViewSet(common.DataMartViewSet):
 
 class InterventionByLocationViewSet(InterventionViewSet):
     serializer_class = serializers.InterventionByLocationSerializer
+    queryset = models.InterventionByLocation.objects.all()
