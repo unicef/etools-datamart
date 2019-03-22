@@ -83,7 +83,8 @@ release:
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 	docker push ${DOCKER_IMAGE_NAME}:latest
-#	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
+	$(MAKE) bump
 
 bump:
 	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num
