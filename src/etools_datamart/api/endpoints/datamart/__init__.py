@@ -3,7 +3,7 @@
 from .famindicator import FAMIndicatorViewSet
 from .funds_reservation import FundsReservationViewSet
 from .hact import HACTViewSet
-from .intervention import InterventionViewSet
+from .intervention import InterventionByLocationViewSet, InterventionViewSet
 from .location import LocationViewSet
 from .partner import PartnerViewSet
 from .pd_indicator import PDIndicatorViewSet
