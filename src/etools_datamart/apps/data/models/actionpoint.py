@@ -38,6 +38,8 @@ class ActionPoint(LocationMixin, DataMartModel):
     # cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='reportsresult_action_points_actionpoint_cp_output_id', blank=True, null=True)
     # engagement = models.ForeignKey('AuditEngagement', models.DO_NOTHING, related_name='auditengagement_action_points_actionpoint_engagement_id', blank=True, null=True)
     # intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='partnersintervention_action_points_actionpoint_intervention_id', blank=True, null=True)
+    # location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='locationslocation_action_points_actionpoint_location_id', blank=True, null=True)
+    # office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='usersoffice_action_points_actionpoint_office_id', blank=True, null=True)
     # partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='partnerspartnerorganization_action_points_actionpoint_partner_id', blank=True, null=True)
     # section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='reportssector_action_points_actionpoint_section_id', blank=True, null=True)
     # tpm_activity = models.ForeignKey('TpmTpmactivity', models.DO_NOTHING, related_name='tpmtpmactivity_action_points_actionpoint_tpm_activity_id', blank=True, null=True)
@@ -57,4 +59,3 @@ class ActionPoint(LocationMixin, DataMartModel):
                                             section_source_id='partner.id',
                                             section_name='partner.name',
 
-                                            ))
