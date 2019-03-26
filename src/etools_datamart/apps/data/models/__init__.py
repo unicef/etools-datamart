@@ -9,4 +9,3 @@ from .pd_indicator import PDIndicator  # noqa
 from .pmp import PMPIndicators  # noqa
 from .travel import Travel, TravelActivity  # noqa
 from .user import UserStats  # noqa
-from .actionpoint import ActionPoint
