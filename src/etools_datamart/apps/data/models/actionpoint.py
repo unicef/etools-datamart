@@ -1,7 +1,7 @@
 from django.db import models
 
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.data.models.mixins import LocationMixin, add_location_mapping
+from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import ActionPointsActionpoint
 
 
