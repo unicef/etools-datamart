@@ -1,8 +1,10 @@
+from types import MethodType
+
 from django.utils.functional import cached_property
 
-from etools_datamart.apps.etools.models import PartnersPartnerorganization
+from etools_datamart.apps.etools.models import PartnersPartnerorganization, AuditSpotcheck
 
-from .utils import create_alias
+from .utils import create_alias, add_m2m
 
 PartnersPartnerorganization.CSO_TYPES = (
     ('International', 'International'),
@@ -24,3 +26,7 @@ aliases = (
     #  'planned_engagement'],
 )
 create_alias(PartnersPartnerorganization, aliases)
+PartnersPartnerorganization.spotchecks = property(lambda self: AuditSpotcheck.objects.filter(engagement_ptr__partner=self))
+# partnerspartnerorganization_audit_engagement_partner_id
+
+# add_m2m(PartnersPartnerorganization, 'spotchecks', AuditSpotcheck)
