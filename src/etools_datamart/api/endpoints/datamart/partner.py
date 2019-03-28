@@ -11,9 +11,21 @@ from etools_datamart.apps.etools.enrichment.consts import PartnerType
 from .. import common
 
 
-class PartnerSerializer(DataMartSerializer):
+class PartnerSerializerFull(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Partner
+
+
+class PartnerSerializerStd(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Partner
+        exclude = ('')
+
+
+class PartnerSerializerShort(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Partner
+        fields = ('name', 'alternate_name', 'partner_type', 'country', 'email')
 
 
 class PartnerFilterForm(forms.Form):
@@ -38,7 +50,10 @@ class PartnerFilterForm(forms.Form):
 class PartnerViewSet(common.DataMartViewSet):
     querystringfilter_form_base_class = PartnerFilterForm
 
-    serializer_class = PartnerSerializer
+    serializer_class = PartnerSerializerFull
+    serializers_fieldsets = {'std': PartnerSerializerStd,
+                             'full': PartnerSerializerFull,
+                             'short': ["title", "number", "country_name", "start_date"]}
     queryset = models.Partner.objects.all()
     filter_fields = ('partner_type', 'hidden', 'cso_type', 'rating')
     ordering_fields = ("id", "name")
