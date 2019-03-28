@@ -16,6 +16,7 @@ def add_m2m(master, name: str, detail, through):
                            through=through,
                            ).contribute_to_class(master, name)
 
+
 def add_m2m2(master, name: str, detail, through):
     models.ManyToManyField(detail,
                            through=through,

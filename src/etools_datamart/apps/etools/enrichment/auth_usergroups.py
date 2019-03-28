@@ -1,6 +1,6 @@
 from django.db import models
 
-from etools_datamart.apps.etools.models import AuthUserGroups, AuthUser
+from etools_datamart.apps.etools.models import AuthUser, AuthUserGroups
 
 f = [f for f in AuthUserGroups._meta.local_fields if f.name != 'user_id']
 AuthUserGroups._meta.local_fields = f

@@ -1,6 +1,6 @@
 from django.db import models
 
-from etools_datamart.apps.etools.models import PartnersPlannedengagement, PartnersPartnerorganization
+from etools_datamart.apps.etools.models import PartnersPartnerorganization, PartnersPlannedengagement
 
 f = [f for f in PartnersPlannedengagement._meta.local_fields if f.name != 'partner']
 PartnersPlannedengagement._meta.local_fields = f

@@ -1,7 +1,7 @@
 from django.db import models
 
-from etools_datamart.apps.etools.models import UsersUserprofile, UsersCountry, UsersUserprofileCountriesAvailable, \
-    AuthUser
+from etools_datamart.apps.etools.models import (AuthUser, UsersCountry, UsersUserprofile,
+                                                UsersUserprofileCountriesAvailable,)
 
 f = [f for f in UsersUserprofile._meta.local_fields if f.name != 'user_id']
 UsersUserprofile._meta.local_fields = f
@@ -14,4 +14,3 @@ models.OneToOneField(AuthUser,
 models.ManyToManyField(UsersCountry,
                        through=UsersUserprofileCountriesAvailable,
                        ).contribute_to_class(UsersUserprofile, 'countries_available')
-

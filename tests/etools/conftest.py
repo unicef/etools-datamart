@@ -1,4 +1,5 @@
 from django.db import connections
+
 import pytest
 
 conn = connections['etools']

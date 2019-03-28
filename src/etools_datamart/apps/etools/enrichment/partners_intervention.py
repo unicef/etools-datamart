@@ -2,8 +2,8 @@ from django.db import models
 from django.utils.functional import cached_property
 
 from etools_datamart.apps.etools.enrichment.utils import create_alias
-from etools_datamart.apps.etools.models import PartnersIntervention, LocationsLocation, \
-    PartnersInterventionFlatLocations
+from etools_datamart.apps.etools.models import (LocationsLocation, PartnersIntervention,
+                                                PartnersInterventionFlatLocations,)
 
 PartnersIntervention.total_unicef_cash = cached_property(
     lambda self: self.planned_budget.unicef_cash_local if hasattr(self, 'planned_budget') else 0)

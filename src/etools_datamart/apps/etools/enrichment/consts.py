@@ -1,4 +1,5 @@
 import decimal
+
 from django.utils.translation import gettext as _
 
 
@@ -12,7 +13,6 @@ class PartnerType:
                (CIVIL_SOCIETY_ORGANIZATION, CIVIL_SOCIETY_ORGANIZATION),
                (GOVERNMENT, GOVERNMENT),
                (UN_AGENCY, UN_AGENCY))
-
 
 
 class PartnerOrganization:
@@ -89,6 +89,7 @@ class PartnerOrganization:
     ASSURANCE_VOID = 'void'
     ASSURANCE_PARTIAL = 'partial'
     ASSURANCE_COMPLETE = 'complete'
+
 
 class T2FTravelConsts:
     PLANNED = 'planned'

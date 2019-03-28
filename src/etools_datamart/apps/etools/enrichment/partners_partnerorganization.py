@@ -1,10 +1,8 @@
-import decimal
-
 from django.utils.functional import cached_property
 
-from .utils import create_alias
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
 
+from .utils import create_alias
 
 PartnersPartnerorganization.CSO_TYPES = (
     ('International', 'International'),

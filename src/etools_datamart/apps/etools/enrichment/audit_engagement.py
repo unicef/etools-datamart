@@ -1,6 +1,6 @@
-from etools_datamart.apps.etools.models import AuditEngagement
 from django.utils.translation import gettext as _
 
+from etools_datamart.apps.etools.models import AuditEngagement
 
 AuditEngagement.TYPE_AUDIT = 'audit'
 AuditEngagement.TYPE_MICRO_ASSESSMENT = 'ma'
