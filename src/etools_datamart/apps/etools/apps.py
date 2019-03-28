@@ -7,5 +7,5 @@ class Config(AppConfig):
     verbose_name = "eTools"
 
     def ready(self):
-        from .patch import patch
-        patch()
+        from .enrichment import apply
+        apply()

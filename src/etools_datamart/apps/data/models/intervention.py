@@ -12,6 +12,21 @@ from etools_datamart.apps.etools.models import PartnersIntervention
 logger = logging.getLogger(__name__)
 
 
+class InterventionLoader(Loader):
+    def fr_currencies_ok(self, original: PartnersIntervention):
+        return original.frs__currency__count == 1 if original.frs__currency__count else None
+
+    def get_disbursement_percent(self, original: PartnersIntervention):
+        if original.frs__actual_amt_local__sum is None:
+            return None
+
+        if not (self.fr_currencies_ok(original) and original.max_fr_currency == original.planned_budget.currency):
+            return "!Error! (currencies do not match)"
+        percent = original.frs__actual_amt_local__sum / original.total_unicef_cash * 100 \
+            if original.total_unicef_cash and original.total_unicef_cash > 0 else 0
+        return "%.1f" % percent
+
+
 class InterventionAbstract(models.Model):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
@@ -68,6 +83,10 @@ class InterventionAbstract(models.Model):
     agreement_id = models.IntegerField(blank=True, null=True)
     country_programme_id = models.IntegerField(blank=True, null=True)
     unicef_signatory_id = models.IntegerField(blank=True, null=True)
+
+    # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
+
+    # loader = InterventionLoader()
 
     class Meta:
         abstract = True

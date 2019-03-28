@@ -6,7 +6,7 @@ from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleCho
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.patch import T2FTravel_CHOICES
+from etools_datamart.apps.etools.enrichment.consts import T2FTravelConsts
 
 from .. import common
 
@@ -18,7 +18,7 @@ class TravelSerializer(DataMartSerializer):
 
 class TravelFilterForm(forms.Form):
     status__in = Select2MultipleChoiceField(label='Status',
-                                            choices=T2FTravel_CHOICES,
+                                            choices=T2FTravelConsts.CHOICES,
                                             required=False)
     last_modify_date = DateRangePickerField(label='Modified between',
                                             required=False)

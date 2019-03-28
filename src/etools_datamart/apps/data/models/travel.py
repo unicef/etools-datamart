@@ -1,8 +1,8 @@
 from django.db import models
 
 from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.etools.enrichment.consts import T2FTravelConsts
 from etools_datamart.apps.etools.models import T2FTravel, T2FTravelactivity
-from etools_datamart.apps.etools.patch import T2FTravel_CHOICES
 
 from .base import DataMartModel
 from .location import Location
@@ -41,7 +41,7 @@ class Travel(DataMartModel):
     # section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='reportssector_t2f_travel_section_id', blank=True, null=True)
     section_name = models.CharField(max_length=45, blank=True, null=True, db_index=True)
     start_date = models.DateTimeField(blank=True, null=True, db_index=True)
-    status = models.CharField(max_length=50, choices=T2FTravel_CHOICES, db_index=True)
+    status = models.CharField(max_length=50, choices=T2FTravelConsts.CHOICES, db_index=True)
     submitted_at = models.DateTimeField(blank=True, null=True)
     # supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_travel_supervisor_id', blank=True, null=True)
     supervisor_email = models.CharField(max_length=200, blank=True, null=True)

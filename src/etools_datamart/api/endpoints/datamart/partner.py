@@ -6,7 +6,7 @@ from unicef_rest_framework.forms import CleareableSelect2ChoiceField, DateRangeP
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.patch import PartnerType
+from etools_datamart.apps.etools.enrichment.consts import PartnerType
 
 from .. import common
 

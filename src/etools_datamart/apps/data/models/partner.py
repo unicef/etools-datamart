@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
-from etools_datamart.apps.etools.patch import PartnerOrganization, PartnerType
+from etools_datamart.apps.etools.enrichment.consts import PartnerType, PartnerOrganization
 
 
 class Partner(DataMartModel):
