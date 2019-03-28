@@ -12,6 +12,7 @@ class ActionPoint(LocationMixin, DataMartModel):
     description = models.TextField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateTimeField(blank=True, null=True)
+    high_priority = models.BooleanField(blank=True, null=True)
 
     # Intervention
     intervention_source_id = models.IntegerField(blank=True, null=True)
@@ -24,6 +25,9 @@ class ActionPoint(LocationMixin, DataMartModel):
 
     engagement_source_id = models.IntegerField()
     engagement_type = models.CharField(max_length=64, null=True)
+
+    section_source_id = models.IntegerField()
+    section_type = models.CharField(max_length=64, null=True)
 
     section_source_id = models.IntegerField()
     section_type = models.CharField(max_length=64, null=True)
