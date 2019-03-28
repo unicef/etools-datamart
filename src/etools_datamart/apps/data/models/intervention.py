@@ -86,7 +86,7 @@ class InterventionAbstract(models.Model):
 
     # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
 
-    # loader = InterventionLoader()
+    loader = InterventionLoader()
 
     class Meta:
         abstract = True

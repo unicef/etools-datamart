@@ -204,13 +204,12 @@ class Loader:
 
     def contribute_to_class(self, model, name):
         self.model = model
-        self.config = model._etl_config
-        del model._etl_config
         if not model._meta.abstract:
             loadeables.add("{0._meta.app_label}.{0._meta.model_name}".format(model))
-        # if self.config.celery:
-        self.task = LoaderTask(self)
-        self.config.celery.tasks.register(self.task)
+            self.config = model._etl_config
+            del model._etl_config
+            self.task = LoaderTask(self)
+            self.config.celery.tasks.register(self.task)
 
         setattr(model, name, self)
 

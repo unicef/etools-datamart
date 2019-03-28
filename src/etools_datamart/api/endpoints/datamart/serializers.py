@@ -31,6 +31,7 @@ class InterventionSerializerBudget(DataMartSerializer):
 class InterventionSerializerFull(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Intervention
+        exclude = ('seen',)
 
 
 class InterventionSerializer(InterventionSerializerFull):
