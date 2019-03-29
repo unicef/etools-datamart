@@ -18,19 +18,25 @@ class ActionPoint(LocationMixin, DataMartModel):
     intervention_source_id = models.IntegerField(blank=True, null=True)
     intervention_number = models.CharField(max_length=64, null=True)
 
-    office = models.CharField(max_length=64, null=True)
+    office = models.CharField(max_length=64, blank=True, null=True)
 
-    partner_source_id = models.IntegerField()
-    partner_name = models.CharField(max_length=64, null=True)
+    partner_source_id = models.IntegerField(blank=True, null=True)
+    partner_name = models.CharField(max_length=300, blank=True, null=True)
 
-    engagement_source_id = models.IntegerField()
-    engagement_type = models.CharField(max_length=64, null=True)
+    engagement_source_id = models.IntegerField(blank=True, null=True)
+    engagement_type = models.CharField(max_length=64, blank=True, null=True)
 
-    section_source_id = models.IntegerField()
-    section_type = models.CharField(max_length=64, null=True)
+    section_source_id = models.IntegerField(blank=True, null=True)
+    section_type = models.CharField(max_length=64, blank=True, null=True)
 
-    section_source_id = models.IntegerField()
-    section_type = models.CharField(max_length=64, null=True)
+    # tpm_activity_source_id = models.IntegerField()
+    # tpm_activity = models.CharField(max_length=64, null=True)
+
+    travel_activity_source_id = models.IntegerField(blank=True, null=True)
+    travel_activity_travel_type = models.CharField(max_length=64, blank=True, null=True)
+
+    category_source_id = models.IntegerField(blank=True, null=True)
+    category_module = models.CharField(max_length=64, blank=True, null=True)
 
     # assigned_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_action_points_actionpoint_assigned_by_id')
     # assigned_to = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_action_points_actionpoint_assigned_to_id')
@@ -56,6 +62,10 @@ class ActionPoint(LocationMixin, DataMartModel):
                                             partner_name='partner.name',
                                             engagement_source_id='engagement.id',
                                             engagement_type='engagement.type',
-                                            section_source_id='partner.id',
-                                            section_name='partner.name',
+                                            section_source_id='sector.id',
+                                            section_type='sector.name',
+                                            travel_activity_source_id='travel_activity.id',
+                                            travel_activity_travel_type='travel_activity.travel_type',
+                                            category_source_id='category.id',
+                                            category_module='category.module',
 
