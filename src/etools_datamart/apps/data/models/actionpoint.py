@@ -2,13 +2,19 @@ from django.db import models
 
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
+from etools_datamart.apps.etools.enrichment.consts import ActionPointConsts, CategoryConsts
 from etools_datamart.apps.etools.models import ActionPointsActionpoint
 
 
 class ActionPoint(LocationMixin, DataMartModel):
+    author_username = models.CharField(max_length=200)
+    assigned_by_username = models.CharField(max_length=200)
+    assigned_to_username = models.CharField(max_length=200)
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=10, blank=True, null=True)
+    status = models.CharField(max_length=10,
+                              choices=ActionPointConsts.STATUSES,
+                              blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateTimeField(blank=True, null=True)
@@ -36,7 +42,9 @@ class ActionPoint(LocationMixin, DataMartModel):
     travel_activity_travel_type = models.CharField(max_length=64, blank=True, null=True)
 
     category_source_id = models.IntegerField(blank=True, null=True)
-    category_module = models.CharField(max_length=64, blank=True, null=True)
+    category_module = models.CharField(max_length=64,
+                                       choices=CategoryConsts.MODULE_CHOICES,
+                                       blank=True, null=True)
 
     # assigned_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_action_points_actionpoint_assigned_by_id')
     # assigned_to = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_action_points_actionpoint_assigned_to_id')
@@ -55,17 +63,22 @@ class ActionPoint(LocationMixin, DataMartModel):
 
     class Options:
         source = ActionPointsActionpoint
-        mapping = add_location_mapping(dict(intervention_source_id='intervention.id',
-                                            intervention_number='intervention.number',
-                                            office='office.name',
-                                            partner_source_id='partner.id',
-                                            partner_name='partner.name',
-                                            engagement_source_id='engagement.id',
-                                            engagement_type='engagement.type',
-                                            section_source_id='sector.id',
-                                            section_type='sector.name',
-                                            travel_activity_source_id='travel_activity.id',
-                                            travel_activity_travel_type='travel_activity.travel_type',
-                                            category_source_id='category.id',
-                                            category_module='category.module',
+        mapping = add_location_mapping(dict(
+            author_username='author.username',
+            assigned_by_username='assigned_by.username',
+            assigned_to_username='assigned_to.username',
+            intervention_source_id='intervention.id',
+            intervention_number='intervention.number',
+            office='office.name',
+            partner_source_id='partner.id',
+            partner_name='partner.name',
+            engagement_source_id='engagement.id',
+            engagement_type='engagement.type',
+            section_source_id='sector.id',
+            section_type='sector.name',
+            travel_activity_source_id='travel_activity.id',
+            travel_activity_travel_type='travel_activity.travel_type',
+            category_source_id='category.id',
+            category_module='category.module',
 
+        ))
