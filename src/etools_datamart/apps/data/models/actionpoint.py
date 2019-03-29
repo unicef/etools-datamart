@@ -8,7 +8,7 @@ from etools_datamart.apps.etools.models import ActionPointsActionpoint
 class ActionPoint(LocationMixin, DataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=10)
+    status = models.CharField(max_length=10, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateTimeField(blank=True, null=True)

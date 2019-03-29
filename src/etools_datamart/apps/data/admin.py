@@ -221,3 +221,16 @@ class TravelActivityAdmin(DataModelAdmin):
                     'location_name',
                     'partner_name',
                     'primary_traveler')
+
+
+
+@register(models.ActionPoint)
+class ActionPointAdmin(DataModelAdmin):
+    list_display = ('description',
+                    'due_date',
+                    'date_of_completion',
+                    'high_priority',
+                    'intervention_number',
+                    'office'
+                    )
+    list_filter = ('high_priority', 'engagement_type', 'status')
