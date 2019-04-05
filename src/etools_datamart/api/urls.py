@@ -25,6 +25,7 @@ router.register(r'etools/reports/results', endpoints.ReportsResultViewSet)
 # router.register(r'etools/t2/ftravel', endpoints.FTravelViewSet)
 router.register(r'etools/tpm/tpmvisit', endpoints.TpmTpmvisitViewSet)
 
+router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
 router.register(r'datamart/funds-reservation', endpoints.FundsReservationViewSet)

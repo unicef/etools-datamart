@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa: F401
+from .actionpoint import ActionPointViewSet
 from .famindicator import FAMIndicatorViewSet
 from .funds_reservation import FundsReservationViewSet
 from .hact import HACTViewSet
