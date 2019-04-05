@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.21.0a3
+TARGET?=1.21.0a4
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -95,10 +95,16 @@ run:
 		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
 		$(MAKE) .run
 
+stack:
+	RUN_OPTIONS="-p 8000:8000" \
+		CMD=stack \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+		$(MAKE) .run
+
 workers:
 	CONTAINER_NAME=datamart-workers \
 			ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
-			CMD=workers $(MAKE) .run
+			CMD=worker $(MAKE) .run
 
 beat:
 	CONTAINER_NAME=datamart-beat \
