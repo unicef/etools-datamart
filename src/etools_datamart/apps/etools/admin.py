@@ -19,9 +19,9 @@ class UsersUserprofileAdmin(EToolsModelAdmin):
     list_display = ('user', 'country', 'office')
 
 
-@register(models.ActionPointsActionpoint)
-class ActionPoint(TenantModelAdmin):
-    pass
+# @register(models.ActionPointsActionpoint)
+# class ActionPoint(TenantModelAdmin):
+#     pass
 
 
 @register(models.ActivitiesActivity)

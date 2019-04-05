@@ -82,7 +82,6 @@ release:
 	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
-	docker push ${DOCKER_IMAGE_NAME}:latest
 	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
