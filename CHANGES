@@ -3,6 +3,7 @@
 * Add ActionPoint endpoint
 * fixes Intervention serializers
 * fixes formats popup menu
+* Add result (Report fk) to TravelActivity endpoint
 
 
 1.20
@@ -12,6 +13,7 @@
 * fixes HACTLoader
 * enable ETLLog reset
 * add ability
+
 
 1.19
 ----

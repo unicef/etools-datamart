@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 # import django_filters
 from django import forms
-from django.forms import CharField
 
-from unicef_rest_framework.forms import DateRangePickerField
+from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
@@ -18,9 +17,18 @@ class TravelActivitySerializer(DataMartSerializer):
 
 
 class TravelActivityFilterForm(forms.Form):
-    travel_reference_number__istartswith = CharField(label='Reference Number')
-    travel_type = CharField(label='Travel Type')
-    primary_traveler__istartswith = CharField(label='Primary Traveler')
+    travel_reference_number__istartswith = forms.CharField(label='Reference Number',
+                                                           required=False)
+    travel_type = forms.CharField(label='Travel Type',
+                                  required=False)
+    result_type = Select2MultipleChoiceField(label='Result Type',
+                                             required=False,
+                                             choices=(('Activity', 'Activity'),
+                                                      ('Outcome', 'Outcome'),
+                                                      ('Output', 'Output'),
+                                                      ))
+    primary_traveler__istartswith = forms.CharField(label='Primary Traveler',
+                                                    required=False)
     start_date = DateRangePickerField(label='Started between',
                                       required=False)
 
@@ -33,5 +41,9 @@ class TravelActivityViewSet(common.DataMartViewSet):
 
     serializer_class = TravelActivitySerializer
     queryset = models.TravelActivity.objects.all()
-    filter_fields = ('travel_reference_number', 'travel_type', 'primary_traveler')
+    filter_fields = ('travel_reference_number', 'travel_type', 'primary_traveler',
+                     'result_type')
     ordering_fields = ("id", "created",)
+
+    def get_querystringfilter_form(self, request, filter):
+        return TravelActivityFilterForm(request.GET, filter.form_prefix)

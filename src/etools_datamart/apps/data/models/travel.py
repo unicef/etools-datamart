@@ -94,10 +94,16 @@ class TravelActivity(LocationMixin, DataMartModel):
     partnership_number = models.CharField(max_length=200, blank=True, null=True)
     primary_traveler = models.CharField(max_length=200, blank=True, null=True)
 
+    result_code = models.CharField(max_length=200, blank=True, null=True)
+    result_type = models.CharField(max_length=200, blank=True, null=True)
+    result_sector = models.CharField(max_length=200, blank=True, null=True)
+    result_vision_id = models.CharField(max_length=200, blank=True, null=True)
+
     # internal
     source_travel_id = models.IntegerField(null=True)
     source_partner_id = models.IntegerField(null=True)
     source_partnership_id = models.IntegerField(null=True)
+    source_result_id = models.IntegerField(null=True)
 
     loader = TravelActivityLoader()
 
@@ -120,6 +126,7 @@ class TravelActivity(LocationMixin, DataMartModel):
             'source_travel_id': 'travel.id',
             'source_partner_id': 'partner.id',
             'source_partnership_id': 'partnership.id',
+
             'location_source_id': 'location.id',
             'location_name': 'location.name',
             'location_pcode': 'location.p_code',
@@ -128,5 +135,12 @@ class TravelActivity(LocationMixin, DataMartModel):
             'travel_reference_number': 'travel.reference_number',
             'primary_traveler': 'primary_traveler.email',
             'partner_name': 'partner.name',
-            'partnership_number': 'partnership.number'
+            'partnership_number': 'partnership.number',
+
+            'result_code': 'result.code',
+            'result_type': 'result.result_type.name',
+            'result_sector': 'result.result_sector.name',
+            'result_vision_id': 'result.vision_id',
+            'source_result_id': 'result.id',
+
         }
