@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.21.0a2
+TARGET?=1.21.0a3
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -85,10 +85,10 @@ release:
 	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
-	$(MAKE) bump
+#	$(MAKE) bump
 
 bump:
-	cd .. && bumpversion --commit --config-file=.bumpversion.cfg num
+	cd .. && bumpversion --commit --tag --config-file=.bumpversion.cfg num
 
 run:
 	RUN_OPTIONS="-p 8000:8000" \
