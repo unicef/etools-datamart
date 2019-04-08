@@ -1,5 +1,3 @@
-from django.utils.functional import cached_property
-
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
 
 from .utils import create_alias
@@ -11,7 +9,7 @@ PartnersPartnerorganization.CSO_TYPES = (
     ('Academic Institution', 'Academic Institution'),
 )
 
-PartnersPartnerorganization.current_core_value_assessment = cached_property(
+PartnersPartnerorganization.current_core_value_assessment = property(
     lambda self:
     self.core_values_assessments.filter(archived=False).first())
 
