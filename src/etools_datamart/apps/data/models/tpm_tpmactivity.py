@@ -26,24 +26,25 @@ class TPMActivityLoader(Loader):
             activity.tpm_visit = tpm.tpm_visit
             activity.section = tpm.section
             for location in activity.locations.order_by('id'):
-                for unicef_focal_point in activity.intervention.unicef_focal_points.all():
-                    # activity_report
-                    try:
-                        activity.report_attachments = ",".join(AttachmentsAttachment.objects.filter(
-                            object_id=activity.id,
-                            code='activity_report',
-                            content_type=content_type
-                        ).values_list('file', flat=True)).strip()
-                    except Exception as e:
-                        process_exception(e)
-                    try:
-                        activity.attachments = ",".join(AttachmentsAttachment.objects.filter(
-                            object_id=activity.id,
-                            code='activity_attachments',
-                            content_type=content_type
-                        ).values_list('file', flat=True)).strip()
-                    except Exception as e:
-                        process_exception(e)
+                if activity.intervention:
+                    for unicef_focal_point in activity.intervention.unicef_focal_points.all():
+                        # activity_report
+                        try:
+                            activity.report_attachments = ",".join(AttachmentsAttachment.objects.filter(
+                                object_id=activity.id,
+                                code='activity_report',
+                                content_type=content_type
+                            ).values_list('file', flat=True)).strip()
+                        except Exception as e:
+                            process_exception(e)
+                        try:
+                            activity.attachments = ",".join(AttachmentsAttachment.objects.filter(
+                                object_id=activity.id,
+                                code='activity_attachments',
+                                content_type=content_type
+                            ).values_list('file', flat=True)).strip()
+                        except Exception as e:
+                            process_exception(e)
                     activity.location = location
                     activity.unicef_focal_point = unicef_focal_point
                     filters = self.config.key(self, activity)
