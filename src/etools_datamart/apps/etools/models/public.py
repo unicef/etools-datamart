@@ -196,6 +196,7 @@ class DjangoCeleryBeatPeriodictask(models.Model):
     solar = models.ForeignKey('DjangoCeleryBeatSolarschedule', models.DO_NOTHING, related_name='djangocelerybeatsolarschedule_django_celery_beat_periodictask_solar_id', blank=True, null=True)
     one_off = models.BooleanField()
     start_time = models.DateTimeField(blank=True, null=True)
+    priority = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -232,6 +233,9 @@ class DjangoCeleryResultsTaskresult(models.Model):
     traceback = models.TextField(blank=True, null=True)
     hidden = models.BooleanField()
     meta = models.TextField(blank=True, null=True)
+    task_args = models.TextField(blank=True, null=True)
+    task_kwargs = models.TextField(blank=True, null=True)
+    task_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False

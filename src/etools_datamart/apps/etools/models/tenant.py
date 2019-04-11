@@ -882,42 +882,42 @@ class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
 
 
 class PartnersPartnerorganization(models.TenantModel):
+    partner_type = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=50)
+    description = models.CharField(max_length=256)
     address = models.TextField(blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=64, blank=True, null=True)
+    vendor_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
     alternate_id = models.IntegerField(blank=True, null=True)
     alternate_name = models.CharField(max_length=255, blank=True, null=True)
-    basis_for_risk_rating = models.CharField(max_length=50)
-    blocked = models.BooleanField()
-    city = models.CharField(max_length=64, blank=True, null=True)
-    core_values_assessment_date = models.DateField(blank=True, null=True)
-    country = models.CharField(max_length=64, blank=True, null=True)
-    created = models.DateTimeField()
-    cso_type = models.CharField(max_length=50, blank=True, null=True)
-    deleted_flag = models.BooleanField()
-    description = models.CharField(max_length=256)
-    email = models.CharField(max_length=255, blank=True, null=True)
-    hact_values = models.TextField(blank=True, null=True)  # This field type is a guess.
-    hidden = models.BooleanField()
-    last_assessment_date = models.DateField(blank=True, null=True)
-    manually_blocked = models.BooleanField()
-    modified = models.DateTimeField()
-    name = models.CharField(max_length=255)
-    net_ct_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    outstanding_dct_amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    outstanding_dct_amount_more_than_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    partner_type = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=64, blank=True, null=True)
-    postal_code = models.CharField(max_length=32, blank=True, null=True)
     rating = models.CharField(max_length=50, blank=True, null=True)
-    reported_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    shared_with = models.TextField(blank=True, null=True)  # This field type is a guess.
-    short_name = models.CharField(max_length=50)
-    street_address = models.CharField(max_length=500, blank=True, null=True)
+    core_values_assessment_date = models.DateField(blank=True, null=True)
+    cso_type = models.CharField(max_length=50, blank=True, null=True)
+    vision_synced = models.BooleanField()
+    type_of_assessment = models.CharField(max_length=50, blank=True, null=True)
+    last_assessment_date = models.DateField(blank=True, null=True)
+    hidden = models.BooleanField()
+    deleted_flag = models.BooleanField()
     total_ct_cp = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     total_ct_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    blocked = models.BooleanField()
+    city = models.CharField(max_length=64, blank=True, null=True)
+    country = models.CharField(max_length=64, blank=True, null=True)
+    postal_code = models.CharField(max_length=32, blank=True, null=True)
+    shared_with = models.TextField(blank=True, null=True)  # This field type is a guess.
+    street_address = models.CharField(max_length=500, blank=True, null=True)
+    hact_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    net_ct_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    reported_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     total_ct_ytd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    type_of_assessment = models.CharField(max_length=50, blank=True, null=True)
-    vendor_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
-    vision_synced = models.BooleanField()
+    basis_for_risk_rating = models.CharField(max_length=50)
+    manually_blocked = models.BooleanField()
+    outstanding_dct_amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    outstanding_dct_amount_more_than_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1236,45 +1236,6 @@ class SnapshotActivity(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'snapshot_activity'
-
-
-class T2FCostassignment(models.TenantModel):
-    share = models.IntegerField()
-    delegate = models.BooleanField()
-    business_area = models.ForeignKey('PublicsBusinessarea', models.DO_NOTHING, related_name='publicsbusinessarea_t2f_costassignment_business_area_id', blank=True, null=True)
-    fund = models.ForeignKey('PublicsFund', models.DO_NOTHING, related_name='publicsfund_t2f_costassignment_fund_id', blank=True, null=True)
-    grant = models.ForeignKey('PublicsGrant', models.DO_NOTHING, related_name='publicsgrant_t2f_costassignment_grant_id', blank=True, null=True)
-    travel = models.ForeignKey('T2FTravel', models.DO_NOTHING, related_name='t2ftravel_t2f_costassignment_travel_id')
-    wbs = models.ForeignKey('PublicsWbs', models.DO_NOTHING, related_name='publicswbs_t2f_costassignment_wbs_id', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 't2f_costassignment'
-
-
-class T2FDeduction(models.TenantModel):
-    date = models.DateField()
-    breakfast = models.BooleanField()
-    lunch = models.BooleanField()
-    dinner = models.BooleanField()
-    accomodation = models.BooleanField()
-    no_dsa = models.BooleanField()
-    travel = models.ForeignKey('T2FTravel', models.DO_NOTHING, related_name='t2ftravel_t2f_deduction_travel_id')
-
-    class Meta:
-        managed = False
-        db_table = 't2f_deduction'
-
-
-class T2FExpense(models.TenantModel):
-    amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
-    currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='publicscurrency_t2f_expense_currency_id', blank=True, null=True)
-    travel = models.ForeignKey('T2FTravel', models.DO_NOTHING, related_name='t2ftravel_t2f_expense_travel_id')
-    type = models.ForeignKey('PublicsTravelexpensetype', models.DO_NOTHING, related_name='publicstravelexpensetype_t2f_expense_type_id', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 't2f_expense'
 
 
 class T2FItineraryitem(models.TenantModel):

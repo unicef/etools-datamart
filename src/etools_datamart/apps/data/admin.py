@@ -223,7 +223,6 @@ class TravelActivityAdmin(DataModelAdmin):
                     'primary_traveler')
 
 
-
 @register(models.ActionPoint)
 class ActionPointAdmin(DataModelAdmin):
     list_display = ('description',
@@ -234,3 +233,15 @@ class ActionPointAdmin(DataModelAdmin):
                     'office'
                     )
     list_filter = ('high_priority', 'engagement_type', 'status')
+
+
+@register(models.TPMVisit)
+class TPMVisitAdmin(DataModelAdmin):
+    pass
+
+
+@register(models.TPMActivity)
+class TPMActivityAdmin(DataModelAdmin):
+    list_display = ('date', 'is_pv',
+                    'intervention_number', 'partner_name',
+                    'result_name',)

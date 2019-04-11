@@ -1,7 +1,7 @@
 import warnings
 
 NAME = 'etools-datamart'
-VERSION = __version__ = '1.21.0a6'
+VERSION = __version__ = '1.21.0a10'
 __author__ = ''
 
 # UserWarning: The psycopg2 wheel package will be renamed from release 2.8;

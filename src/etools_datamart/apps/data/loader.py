@@ -322,6 +322,9 @@ class Loader:
                     pass
             elif callable(v):
                 ret[k] = v(self, record)
+            elif hasattr(self, 'get_%s' % v):
+                getter = getattr(self, 'get_%s' % v)
+                ret[k] = getter(record, ret)
             else:
                 ret[k] = get_attr(record, v)
 

@@ -9,6 +9,8 @@ from .location import LocationViewSet
 from .partner import PartnerViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
+from .tpm_activity import TPMActivityViewSet
+from .tpm_visit import TPMVisitViewSet
 from .travel import TravelViewSet
 from .travel_activity import TravelActivityViewSet
 from .user import UserStatsViewSet

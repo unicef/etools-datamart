@@ -4,6 +4,9 @@
 * fixes Intervention serializers
 * fixes formats popup menu
 * Add result (Report fk) to TravelActivity endpoint
+* Add InterventionByLocation
+* new LocationMixin
+* add extra location details to location field
 
 
 1.20

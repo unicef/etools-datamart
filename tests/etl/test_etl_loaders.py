@@ -23,7 +23,7 @@ def pytest_generate_tests(metafunc):
 
 def test_loader_load(loader, number_of_intervention):
     # factory = factories_registry.get(loader.model)
-    # to_delete = factory()
+    # factory()
     with freeze_time("2018-12-31", tz_offset=1):
         loader.model.objects.truncate()
         loader.unlock()

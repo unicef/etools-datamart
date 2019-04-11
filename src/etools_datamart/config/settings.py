@@ -53,6 +53,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   SECURE_FRAME_DENY=(bool, True),
                   SECURE_HSTS_PRELOAD=(bool, True),
                   SECURE_SSL_REDIRECT=(bool, True),
+                  SENTRY_DSN=(str, ''),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
                   STATIC_URL=(str, '/dm-static/'),
@@ -405,7 +406,8 @@ AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
 AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
-    'CACHE_VERSION': (1, 'Use MS Graph API to fetch user data', int),
+    'CACHE_VERSION': (1, 'Global cache version', int),
+    'CACHE_ENABLED': (True, 'Enable/Disable API cache', bool),
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
     'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
     'ANALYTICS_CODE': (env('ANALYTICS_CODE'), 'Google analytics code'),
@@ -641,3 +643,17 @@ IMPERSONATE = {
     'REQUIRE_SUPERUSER': True,
     'CUSTOM_USER_QUERYSET': 'etools_datamart.libs.impersonate.queryset'
 }
+
+SENTRY_ENABLED = env.bool('SENTRY_ENABLED', False)
+SENTRY_DSN = env('SENTRY_DSN', '')
+if SENTRY_ENABLED:
+    import bitcaster
+
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()],
+                    release=bitcaster.get_full_version(),
+                    debug=False)
+
+SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]

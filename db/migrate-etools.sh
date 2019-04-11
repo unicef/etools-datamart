@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TAG=${1:-v6.7}
+TAG=${1:-v6.9}
 
 docker run \
     -it \
@@ -9,4 +9,4 @@ docker run \
     -e DJANGO_SETTINGS_MODULE=etools.config.settings.base \
     -e DJANGO_DEBUG=true \
     unicef/etools:$TAG \
-    /bin/bash -c "django-admin migrate"
+    /bin/sh -c "django-admin migrate"

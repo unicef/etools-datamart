@@ -1,0 +1,85 @@
+FROM unicef/datamart:base2
+
+ARG BUILD_DATE
+ARG PIPENV_ARGS
+ARG VERSION
+ARG DEVELOP
+
+RUN mkdir -p /code
+ADD . /code
+WORKDIR /code
+
+RUN set -ex \
+    ls -al /code \
+    && pip3 install . \
+    && rm -fr /code
+
+LABEL org.label.name="eTools Datamart" \
+      org.label.maintainer="sapostolico@unicef.org" \
+      org.label.description="" \
+      org.label.url="https://datamart.unicef.io/" \
+      org.label.vcs-url="https://github.com/unicef/etools-datamart" \
+      org.label.version=$VERSION
+
+
+ENV VERSION ${VERSION}
+
+ENV PIPENV_PYPI_MIRROR ${PIPENV_PYPI_MIRROR}
+ENV PIPENV_ARGS ${PIPENV_ARGS}
+ENV HOME /root/
+ENV PYTHONUNBUFFERED 1
+ENV USE_GUNICORN 0
+ENV GUNICORN_WORKERS 4
+ENV CELERY_LOGLEVEL "ERROR"
+ENV CELERY_CONCURRENCY 2
+ENV CELERY_WORKERS 1
+ENV ALLOWED_HOSTS *
+ENV CACHE_URL "redis://127.0.0.1:6379/1"
+ENV CELERY_BROKER_URL "redis://127.0.0.1:6379/2"
+ENV CELERY_RESULT_BACKEND "redis://127.0.0.1:6379/3"
+ENV CSRF_COOKIE_SECURE True
+ENV DATABASE_URL "postgres://postgres:@127.0.0.1:5432/etools_datamart"
+ENV DATABASE_URL_ETOOLS "postgis://postgres:@127.0.0.1:5432/etools"
+ENV DEBUG 0
+ENV DEVELOPMENT_MODE 0
+ENV DJANGO_SETTINGS_MODULE etools_datamart.config.settings
+ENV MEDIA_ROOT /tmp/media
+ENV SECRET_KEY "secret"
+ENV SECURE_BROWSER_XSS_FILTER True
+ENV SECURE_CONTENT_TYPE_NOSNIFF True
+ENV SECURE_FRAME_DENY True
+ENV SECURE_HSTS_INCLUDE_SUBDOMAINS True
+ENV SECURE_HSTS_PRELOAD True
+ENV SECURE_HSTS_SECONDS 1
+ENV SECURE_SSL_REDIRECT True
+ENV SENTRY_DSN ""
+ENV SESSION_COOKIE_HTTPONLY True
+ENV SESSION_COOKIE_SECURE True
+ENV STATIC_ROOT /tmp/static
+
+
+EXPOSE 8000
+#RUN apk del .fetch-deps .build-deps .build-deps-edge .datamart-build-deps
+RUN rm -rf /var/cache/apk/* \
+    && rm -fr /root/.cache/ \
+    && rm -fr /usr/include/
+
+#RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
+#    && python -O -m compileall -fqb /usr/local/lib/python3.6
+
+# removes source files
+RUN find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
+
+ADD docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ADD docker/wait-for-it.sh /usr/local/bin/wait-for-it.sh
+
+RUN adduser -S datamart \
+    && mkdir -p /var/datamart \
+    && chown datamart /var/datamart/
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+WORKDIR /var/datamart
+
+USER datamart
+
+CMD ["datamart"]

@@ -4,15 +4,15 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.21.0a6
+TARGET?=1.21.0a10
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
 CONTAINER_NAME?=datamart-${TARGET}
 ORGANIZATION=unicef
 IMAGE_NAME=datamart
-DOCKER_IMAGE_NAME=${ORGANIZATION}/${IMAGE_NAME}
-DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
+DOCKER_IMAGE_NAME?=${ORGANIZATION}/${IMAGE_NAME}
+DOCKER_IMAGE?=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
@@ -26,11 +26,23 @@ help:
 	@echo "run                  run ${DOCKER_IMAGE} locally"
 
 build-base:
-	cd .. && docker build --target base \
-			-t ${DOCKER_IMAGE_NAME}:base- \
-			-f docker/${DOCKERFILE} .
+	cd .. && docker build \
+			${BUILD_OPTIONS} \
+			-t ${DOCKER_IMAGE_NAME}:base \
+			-f docker/Dockerfile.base .
 
-build:
+build-base-2:
+	cd .. && docker build \
+			${BUILD_OPTIONS} \
+			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
+			-t ${DOCKER_IMAGE} \
+			-f docker/Dockerfile.base.2 .
+
+build: build-base-2
+	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
+	docker images | grep ${DOCKER_IMAGE_NAME}
+
+build_old:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg DEVELOP=${DEVELOP} \

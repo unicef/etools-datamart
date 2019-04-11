@@ -11,7 +11,7 @@ azure-storage = "*"
 celery = "*"
 coreapi = "*"
 cryptography = "==2.4.1"
-django = "==2.2"
+django = "==2.1"
 django-adminactions = "*"
 django-adminfilters = ">=1.1"
 django-celery-beat = "==1.4.0"
@@ -60,6 +60,7 @@ redis = "*"
 social-auth-app-django = "*"
 sqlparse = "*"
 whitenoise = "*"
+sentry-sdk = "*"
 
 [dev-packages]
 bumpversion = "*"
@@ -85,6 +86,7 @@ vcrpy = "*"
 yapf = "*"
 fancycompleter = {file = "https://github.com/theY4Kman/fancycompleter/archive/0.8.tar.gz"}
 flake8 = "*"
+ipdb = "*"
 
 [requires]
 python_version = "3.6"

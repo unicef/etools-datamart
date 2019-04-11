@@ -37,6 +37,8 @@ router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
 router.register(r'datamart/travels', endpoints.TravelViewSet)
 router.register(r'datamart/travel-activities', endpoints.TravelActivityViewSet)
+router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
+router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
 router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)

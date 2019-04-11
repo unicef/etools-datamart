@@ -1,5 +1,5 @@
-
 from etools_datamart.apps.etools.enrichment.consts import T2FTravelConsts
+from etools_datamart.apps.etools.enrichment.utils import create_alias
 from etools_datamart.apps.etools.models import T2FTravel
 
 T2FTravel.PLANNED = T2FTravelConsts.PLANNED
@@ -15,3 +15,7 @@ T2FTravel.CERTIFIED = T2FTravelConsts.CERTIFIED
 T2FTravel.COMPLETED = T2FTravelConsts.COMPLETED
 
 T2FTravel._meta.get_field('status').choices = T2FTravelConsts.CHOICES
+
+aliases = (['t2ftravel_t2f_travelattachment_travel_id', 'attachments'],
+           )
+create_alias(T2FTravel, aliases)

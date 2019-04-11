@@ -9,6 +9,12 @@ from .location import Location
 from .mixins import LocationMixin
 
 
+class TravelLoader(Loader):
+    def get_attachments(self, record, values):
+        return ",\n".join(list(map(lambda x: ":".join(x),
+                                   record.attachments.values_list('type', 'file'))))
+
+
 class Travel(DataMartModel):
     additional_note = models.TextField(blank=True, null=True, )
     approved_at = models.DateTimeField(blank=True, null=True, db_index=True)
@@ -49,6 +55,10 @@ class Travel(DataMartModel):
     # traveler = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_travel_traveler_id', blank=True, null=True)
     traveler_email = models.CharField(max_length=200, blank=True, null=True, db_index=True)
 
+    attachments = models.TextField(blank=True, null=True)
+
+    loader = TravelLoader()
+
     class Meta:
         unique_together = ('schema_name', 'reference_number')
 
@@ -81,9 +91,6 @@ class TravelActivityLoader(Loader):
                     values = self.get_values(record)
                     op = self.process_record(filters, values)
                     self.increment_counter(op)
-            # else:
-            #     # TODO: remove me
-            #     print(111, "travel.py:85", record)
 
 
 class TravelActivity(LocationMixin, DataMartModel):
