@@ -19,7 +19,7 @@ class TPMActivityLoader(Loader):
         content_type = DjangoContentType.objects.get(app_label='tpm',
                                                      model='tpmactivity')
         for activity in qs.all():
-            tpm = TpmTpmactivity.objects.select_related('tpm_visit', 'section').get(activity_ptr=activity.id)
+            tpm = TpmTpmactivity.objects.defer('id').get(activity_ptr=activity.id)
             activity.activity_ptr = tpm.activity_ptr.id
             activity.additional_information = tpm.additional_information or 'N/A'
             activity.is_pv = tpm.is_pv

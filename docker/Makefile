@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.21.0a10
+TARGET?=1.21.0a11
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -31,14 +31,12 @@ build-base:
 			-t ${DOCKER_IMAGE_NAME}:base \
 			-f docker/Dockerfile.base .
 
-build-base-2:
+build:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
-			-f docker/Dockerfile.base.2 .
-
-build: build-base-2
+			-f docker/Dockerfile .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
@@ -49,7 +47,7 @@ build_old:
 			--build-arg VERSION=${TARGET} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
-			-f docker/${DOCKERFILE} .
+			-f docker/Dockerfile.flat .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
 

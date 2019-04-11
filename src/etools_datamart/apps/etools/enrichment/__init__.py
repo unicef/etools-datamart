@@ -7,6 +7,7 @@ from django.apps import apps
 
 def apply():
     # flake8: noqa: F401
+    print("Applying enrichment")
     from . import (audit_engagement, auth_user, auth_usergroups, partners_intervention,
                    partners_partnerorganization, partners_plannedengagement, reports_appliedindicator,
                    tpm_activity, tpm_visit,
