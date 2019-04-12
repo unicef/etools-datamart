@@ -23,7 +23,7 @@ router.register(r'etools/partners/plannedengagement', endpoints.Plannedengagemen
 # router.register(r'etools/reports/appliedindicator', endpoints.AppliedindicatorViewSet)
 router.register(r'etools/reports/results', endpoints.ReportsResultViewSet)
 # router.register(r'etools/t2/ftravel', endpoints.FTravelViewSet)
-router.register(r'etools/tpm/tpmvisit', endpoints.TpmTpmvisitViewSet)
+# router.register(r'etools/tpm/tpmvisit', endpoints.TpmTpmvisitViewSet)
 
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
@@ -35,6 +35,7 @@ router.register(r'datamart/interventions-locations', endpoints.InterventionByLoc
 router.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
+router.register(r'datamart/users', endpoints.EtoolsUserViewSet)
 router.register(r'datamart/travels', endpoints.TravelViewSet)
 router.register(r'datamart/travel-activities', endpoints.TravelActivityViewSet)
 router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)

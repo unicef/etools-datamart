@@ -10,6 +10,7 @@ models.OneToOneField(AuthUser,
                      related_name='profile',
                      on_delete=models.PROTECT).contribute_to_class(UsersUserprofile, 'user')
 
+
 # Fix UsersUserprofile ManyToManyField
 models.ManyToManyField(UsersCountry,
                        through=UsersUserprofileCountriesAvailable,

@@ -78,6 +78,15 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
         return ""  # pragma: no cover
 
     @link()
+    def service(self, request):
+        for s in Service.objects.all():
+            if s.managed_model == self.model:
+                url = reverse("admin:%s_%s_change" % (Service._meta.app_label,
+                                                      Service._meta.model_name), args=[s.pk])
+                return HttpResponseRedirect(url)
+        return ""  # pragma: no cover
+
+    @link()
     def queue(self, request):
         try:
             start = time()
@@ -245,3 +254,11 @@ class TPMActivityAdmin(DataModelAdmin):
     list_display = ('date', 'is_pv',
                     'intervention_number', 'partner_name',
                     'result_name',)
+
+
+@register(models.EtoolsUser)
+class EtoolsUserAdmin(DataModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    ordering = ('username',)

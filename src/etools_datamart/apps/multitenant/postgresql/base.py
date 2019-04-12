@@ -178,6 +178,10 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     def all_schemas(self):
         return sorted(set([c.schema_name for c in self.get_tenants()]))
 
+    @cached_property
+    def all_countries(self):
+        return sorted(set([c.country_name for c in self.get_tenants()]))
+
     def set_schemas(self, schemas):
         """
         Main API method to current database schema,

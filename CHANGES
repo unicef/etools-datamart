@@ -7,7 +7,7 @@
 * Add InterventionByLocation
 * new LocationMixin
 * add extra location details to location field
-
+* Add EtoolsUser endpoint
 
 1.20
 ----

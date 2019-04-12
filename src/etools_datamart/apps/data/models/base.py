@@ -64,19 +64,13 @@ class DataMartModelBase(ModelBase):
         return new_class
 
 
-class DataMartModel(models.Model, metaclass=DataMartModelBase):
-    country_name = models.CharField(max_length=100, db_index=True)
-    schema_name = models.CharField(max_length=63, db_index=True)
-    area_code = models.CharField(max_length=10, db_index=True)
+class CommonDataMartModel(models.Model, metaclass=DataMartModelBase):
+    source_id = models.IntegerField(blank=True, null=True, db_index=True)
     last_modify_date = models.DateTimeField(blank=True, auto_now=True)
     seen = models.DateTimeField(blank=True, null=True)
 
-    source_id = models.IntegerField(blank=True, null=True, db_index=True)
-
     class Meta:
         abstract = True
-
-    objects = DataMartManager()
 
     @class_property
     def service(self):
@@ -87,3 +81,14 @@ class DataMartModel(models.Model, metaclass=DataMartModelBase):
     def linked_services(self):
         from unicef_rest_framework.models import Service
         return [s for s in Service.objects.all() if s.managed_model == self]
+
+
+class DataMartModel(CommonDataMartModel, metaclass=DataMartModelBase):
+    country_name = models.CharField(max_length=100, db_index=True)
+    schema_name = models.CharField(max_length=63, db_index=True)
+    area_code = models.CharField(max_length=10, db_index=True)
+
+    class Meta:
+        abstract = True
+
+    objects = DataMartManager()

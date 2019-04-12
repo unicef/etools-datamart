@@ -525,3 +525,118 @@ class Loader:
                     logger.warning(e)
 
         return self.results
+
+
+class CommonSchemaLoader(Loader):
+    def get_mart_values(self, record=None):
+        ret = {'seen': self.context['today']}
+        if record:
+            ret['source_id'] = record.id
+        return ret
+
+    def get_values(self, record):
+        ret = self.get_mart_values(record)
+
+        for k, v in self.mapping.items():
+            if v == '__self__':
+                try:
+                    ret[k] = self.model.objects.get(source_id=getattr(record, k).id)
+                except AttributeError:
+                    ret[k] = None
+                except self.model.DoesNotExist:
+                    ret[k] = None
+                    self.tree_parents.append((record.id, getattr(record, k).id))
+
+            elif isclass(v) and issubclass(v, models.Model):
+                try:
+                    ret[k] = v.objects.get(source_id=getattr(record, k).id)
+                except AttributeError:  # pragma: no cover
+                    pass
+            elif callable(v):
+                ret[k] = v(self, record)
+            elif hasattr(self, 'get_%s' % v):
+                getter = getattr(self, 'get_%s' % v)
+                ret[k] = getter(record, ret)
+            else:
+                ret[k] = get_attr(record, v)
+
+        return ret
+
+    def load(self, *, verbosity=0, always_update=False, stdout=None,
+             ignore_dependencies=False, max_records=None, countries=None,
+             only_delta=True, run_type=RUN_UNKNOWN,
+             force_requirements=False):
+        self.on_start(run_type)
+        self.results = EtlResult()
+        logger.debug(f"Running loader {self}")
+        lock = self.lock()
+        truncate = self.config.truncate
+        try:
+            if lock:  # pragma: no branch
+                if not ignore_dependencies:
+                    for requirement in self.config.depends:
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        if requirement.loader.need_refresh(self):
+                            if not force_requirements:
+                                raise RequiredIsMissing(requirement)
+                            logger.info(f"Load required dataset {requirement}")
+                            requirement.loader.load(stdout=stdout,
+                                                    force_requirements=force_requirements,
+                                                    run_type=RUN_AS_REQUIREMENT)
+                        else:
+                            logger.info(f"Loader {requirement} is uptodate")
+                self.always_update = always_update
+                self.mapping = {}
+                mart_fields = self.model._meta.concrete_fields
+                for field in mart_fields:
+                    if field.name not in ['country_name', 'schema_name', 'area_code', 'source_id',
+                                          'id', 'last_modify_date']:
+                        self.mapping[field.name] = field.name
+                if self.config.mapping:  # pragma: no branch
+                    self.mapping.update(self.config.mapping)
+                self.update_context(today=timezone.now(),
+                                    max_records=max_records,
+                                    verbosity=verbosity,
+                                    records=0,
+                                    only_delta=only_delta,
+                                    is_empty=not self.model.objects.exists(),
+                                    stdout=stdout)
+                sid = transaction.savepoint()
+                try:
+                    self.results.context = self.context
+                    self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+                    if truncate:
+                        self.model.objects.truncate()
+                    self.process_country()
+                    if self.config.sync_deleted_records(self):
+                        self.remove_deleted()
+                    if stdout and verbosity > 0:
+                        stdout.write("\n")
+                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
+                    # self.results.deleted = deleted
+                except MaxRecordsException:
+                    pass
+                except Exception:
+                    transaction.savepoint_rollback(sid)
+                    raise
+            else:
+                logger.info(f"Unable to get lock for {self}")
+
+        except (RequiredIsMissing, RequiredIsRunning) as e:
+            self.on_end(error=e, retry=True)
+            raise
+        except BaseException as e:
+            self.on_end(e)
+            process_exception(e)
+            raise
+        else:
+            self.on_end(None)
+        finally:
+            if lock:  # pragma: no branch
+                try:
+                    lock.release()
+                except LockError as e:  # pragma: no cover
+                    logger.warning(e)
+
+        return self.results
