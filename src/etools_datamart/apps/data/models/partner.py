@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -23,7 +23,8 @@ class Partner(DataMartModel):
     deleted_flag = models.BooleanField(blank=True, null=True)
     description = models.CharField(max_length=256, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
-    hact_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    # hact_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    hact_values = JSONField(blank=True, null=True)
     hidden = models.BooleanField(db_index=True, blank=True, null=True)
     last_assessment_date = models.DateField(blank=True, null=True)
     manually_blocked = models.BooleanField(blank=True, null=True)

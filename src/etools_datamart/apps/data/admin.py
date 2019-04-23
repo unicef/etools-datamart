@@ -262,3 +262,9 @@ class EtoolsUserAdmin(DataModelAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
+
+
+@register(models.InterventionBudget)
+class InterventionBudgetAdmin(DataModelAdmin):
+    list_display = ('intervention_title', 'intervention_number',
+                    'partner_contribution', 'unicef_cash')
