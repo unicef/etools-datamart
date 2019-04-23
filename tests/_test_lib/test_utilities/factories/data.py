@@ -9,10 +9,10 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data.models import (ActionPoint, EtoolsUser, FAMIndicator, FundsReservation,
-                                              GatewayType, HACT, Intervention, InterventionByLocation,
-                                              Location, Partner, PDIndicator, PMPIndicators,
-                                              TPMActivity, TPMVisit, Travel, TravelActivity, UserStats,)
+from etools_datamart.apps.data.models import (ActionPoint, EtoolsUser, FAMIndicator, FundsReservation, GatewayType,
+                                              HACT, Intervention, InterventionBudget, InterventionByLocation,
+                                              Location, Partner, PDIndicator, PMPIndicators, TPMActivity, TPMVisit,
+                                              Travel, TravelActivity, UserStats,)
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -209,3 +209,8 @@ class EtoolsUserFactory(DataMartModelFactory):
 
     class Meta:
         model = EtoolsUser
+
+
+class InterventionBudgetFactory(DataMartModelFactory):
+    class Meta:
+        model = InterventionBudget

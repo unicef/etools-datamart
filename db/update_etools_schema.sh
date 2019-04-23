@@ -17,7 +17,7 @@ export PGPORT=5432
 export DATABASE_NAME=etools
 export DATABASE_USER=postgres
 export DATABASE_PASS=
-export BASE_SCHEMA=kenya
+export BASE_SCHEMA=lebanon
 
 help (){
     echo "$0"
@@ -49,7 +49,7 @@ SUMMARY=1
 CLEAN=1
 INSPECT=1
 
-while [ "$1" != "" ]; do
+while [[ "$1" != "" ]]; do
 case $1 in
     -o|--only)
         [[ "$2" =~ r ]] && RESTORE=1 || RESTORE=0

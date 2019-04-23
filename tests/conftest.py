@@ -1,5 +1,4 @@
 import os
-import sys
 import tempfile
 import uuid
 import warnings
@@ -48,14 +47,14 @@ def django_db_setup(request,
                     django_db_createdb,
                     django_db_modify_db_settings,
                     enable_migration_signals):
-    if not enable_migration_signals:
-        warnings.warn("Warning pre/post migrate signals are enabled \n")
-    else:
-        warnings.warn("Warning pre/post migrate signals have been disabled\n")
 
-    import django.core.management.commands.migrate
-    django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
-    django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
+    if django_db_createdb or enable_migration_signals:
+        warnings.warn("Warning: pre/post migrate signals are enabled \n")
+    else:
+        warnings.warn("Warning: pre/post migrate signals have been disabled\n")
+        import django.core.management.commands.migrate
+        django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
+        django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
 
     #
     # from pytest_django.fixtures import django_db_setup as dj_db_setup

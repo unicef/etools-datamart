@@ -14,7 +14,7 @@ def pytest_generate_tests(metafunc):
         for model_name in loadeables:
             model = apps.get_model(model_name)
             if model_name in ['data.pdindicator', 'data.location', 'data.travelactivity',
-                              'data.actionpoint', 'data.tpmactivity']:
+                              'data.actionpoint', 'data.tpmactivity', 'data.tpmvisit', ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
             else:
                 m.append(model.loader)
