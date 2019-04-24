@@ -91,7 +91,9 @@ ADMINS = (
 
 DATABASES = {
     'default': env.db(),
-    'etools': env.db('DATABASE_URL_ETOOLS', engine='etools_datamart.apps.multitenant.postgresql'),
+    'etools': env.db('DATABASE_URL_ETOOLS',
+                     engine='etools_datamart.apps.multitenant.postgresql'
+                     ),
 }
 
 DATABASE_ROUTERS = [

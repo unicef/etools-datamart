@@ -10,6 +10,7 @@ from .pd_indicator import PDIndicator  # noqa
 from .pmp import PMPIndicators  # noqa
 from .tpm_tmpvisit import TPMVisit  # noqa
 from .tpm_tpmactivity import TPMActivity  # noqa
-from .travel import Travel, TravelActivity  # noqa
+from .travel import Travel  # noqa
+from .travel_activity import TravelActivity  # noqa
 from .user import EtoolsUser  # noqa
 from .userstats import UserStats  # noqa

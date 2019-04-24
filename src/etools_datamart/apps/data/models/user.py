@@ -13,7 +13,7 @@ class EtoolsUserLoader(CommonSchemaLoader):
     def get_countries_available(self, record, values):
         try:
             return ", ".join(record.profile.countries_available.values_list('name', flat=True))
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist:  # pragma: no cover
             return ""
 
 

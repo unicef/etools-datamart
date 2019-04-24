@@ -20,7 +20,7 @@ CACHE
 celerybeat-schedule
 coverage.
 db/clean.sql
-db/db1.bz2
+db/*.bz2
 db/etools.dump
 db/public.sqldump
 db/tenant.sql

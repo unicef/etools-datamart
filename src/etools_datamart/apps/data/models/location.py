@@ -47,7 +47,7 @@ class Location(DataMartModel):
 
     class Options:
         depends = (GatewayType,)
-        # source = LocationsLocation
+        source = LocationsLocation
         queryset = lambda: LocationsLocation.objects.order_by('-parent')
         last_modify_field = 'modified'
         # sync_deleted_records = False

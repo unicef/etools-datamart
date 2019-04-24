@@ -17,33 +17,36 @@ export PGPORT=5432
 export DATABASE_NAME=etools
 export DATABASE_USER=postgres
 export DATABASE_PASS=
-export BASE_SCHEMA=lebanon
+export BASE_SCHEMA=uat
+export BACKUPFILE=2019-04-08-1600.bz2
 
 help (){
     echo "$0"
     echo " "
-    echo "  -o,--only           r=RESTORE, c=OBFUSCATE, p=PASSWORD, d=DUMP, m=MOVE, s=SUMMARY, c=CLEAN"
-    echo "  -nr,--no-restore    do not recreate database"
-    echo "  -no,--no-obfuscate  do not obfuscate sensitive data"
-    echo "  -np,--no-password   do not reset user passwords"
-    echo "  -nd,--no-dump       do not create tests dump data files"
-    echo "  -nm,--no-move       do not move testing data files to source code dir"
-    echo "  -ni,--no-inspect    do not inspect schema"
-    echo "  -ns,--no-summary    do not display summary infos"
-    echo "  -nc,--no-clean      do not clean temporary files"
-    echo "  --host              database host"
-    echo "  --port              database port"
-    echo "  --db-name           database name"
-    echo "  --db-user           database username"
-    echo "  --db-pass           database password"
-    echo "  -h,--help           this help screen"
+    echo "  -o,--only             d=DROP, o=OBFUSCATE, r=RESET_PASSWORD, d=DUMP_PUBLIC, m=MOVE, i=INSPECT, s=SUMMARY, c=CLEAN"
+    echo "  -nd,--no-drop         do not recreate database"
+    echo "  -no,--no-obfuscate    do not obfuscate sensitive data"
+    echo "  -nr,--no-password     do not reset user passwords"
+    echo "  -np,--no-dump-public  do not create tests public dump data files"
+    echo "  -nt,--no-dump-tenant  do not create tests tenant dump data files"
+    echo "  -nm,--no-move         do not move testing data files to source code dir"
+    echo "  -ni,--no-inspect      do not inspect schema"
+    echo "  -ns,--no-summary      do not display summary infos"
+    echo "  -nc,--no-clean        do not clean temporary files"
+    echo "  --host                database host"
+    echo "  --port                database port"
+    echo "  --db-name             database name"
+    echo "  --db-user             database username"
+    echo "  --db-pass             database password"
+    echo "  -h,--help             this help screen"
     exit 1
 }
 
-RESTORE=0
-OBFUSCATE=0
-PASSWORD=0
-DUMP=1
+DROP=1
+OBFUSCATE=1
+RESET_PASSWORD=1
+DUMP_PUBLIC=1
+DUMP_TENANT=1
 MOVE=1
 SUMMARY=1
 CLEAN=1
@@ -52,14 +55,15 @@ INSPECT=1
 while [[ "$1" != "" ]]; do
 case $1 in
     -o|--only)
-        [[ "$2" =~ r ]] && RESTORE=1 || RESTORE=0
+        [[ "$2" =~ d ]] && DROP=1 || DROP=0
         [[ "$2" =~ o ]] && OBFUSCATE=1 || OBFUSCATE=0
-        [[ "$2" =~ d ]] && DUMP=1 || DUMP=0
+        [[ "$2" =~ r ]] && RESET_PASSWORD=1 || RESET_PASSWORD=0
+        [[ "$2" =~ p ]] && DUMP_PUBLIC=1 || DUMP_PUBLIC=0
+        [[ "$2" =~ t ]] && DUMP_TENANT=1 || DUMP_TENANT=0
         [[ "$2" =~ m ]] && MOVE=1 || MOVE=0
-        [[ "$2" =~ p ]] && PASSWORD=1 || PASSWORD=0
-        [[ "$2" =~ s ]] && SUMMARY=1 || SUMMARY=0
-        [[ "$2" =~ c ]] && CLEAN=1 || CLEAN=0
         [[ "$2" =~ i ]] && INSPECT=1 || INSPECT=0
+        [[ "$2" =~ i ]] && SUMMARY=1 || SUMMARY=0
+        [[ "$2" =~ c ]] && CLEAN=1 || CLEAN=0
         shift
         shift
         ;;
@@ -88,16 +92,20 @@ case $1 in
         DATABASE_PASS=$1
         shift
         ;;
-    -nr|--no-restore)
-        RESTORE=0
+    -nd|--no-drop)
+        DROP=0
         shift
         ;;
     -no|--no-obfuscate)
         OBFUSCATE=0
         shift
         ;;
-    -nd|--no-dump)
-        DUMP=0
+    -np|--no-dump-public)
+        DUMP_PUBLIC=0
+        shift
+        ;;
+    -nt|--no-dump-tenant)
+        DUMP_TENANT=0
         shift
         ;;
     -nm|--no-move)
@@ -105,10 +113,14 @@ case $1 in
         shift
         ;;
     -np|--no-password)
-        PASSWORD=0
+        RESET_PASSWORD=0
         shift
         ;;
-    -ni|--no-summary)
+    -ni|--no-inspect)
+        INSPECT=0
+        shift
+        ;;
+    -ns|--no-summary)
         SUMMARY=0
         shift
         ;;
@@ -125,13 +137,15 @@ case $1 in
 esac
 done
 echo "Configuration:"
-echo "recreate database          $RESTORE"
-echo "obfuscate sensitive data   $OBFUSCATE"
-echo "reset user passwords       $PASSWORD"
-echo "create tests data files    $DUMP"
-echo "move testing data files    $MOVE"
-echo "inspect db and update ORM  $INSPECT"
-echo "clean temporary files      $CLEAN"
+echo "[d]rop and rebuild database  $DROP - restore etools db with data from dump file. db1.bz2 -> etools.dump -> DB"
+echo "[o]bfuscate sensitive data   $OBFUSCATE - obfuscate sensitive data (email, names, phones..)"
+echo "[r]eset password             $RESET_PASSWORD - set all user password as 'password' "
+echo "[p]ublic schema dump         $DUMP_PUBLIC - dump cleanded data to $CURDIR (public.sqldump, tenant.sqldump)"
+echo "[t]enant schema dump         $DUMP_TENANT - dump cleanded data to $CURDIR (public.sqldump, tenant.sqldump)"
+echo "[m]ove testing data files    $MOVE - move dump files to datamart source code"
+echo "[i]nspect db and update ORM  $INSPECT - inspect db and creates new Models code"
+echo "[s]summary                   $SUMMARY - print summary informations"
+echo "[c]lean temporary files      $CLEAN - removes temporary files (etools.dump, tenant.sql, clean.sql, public.sqldump)"
 echo "Connection                 http://${DATABASE_USER}:${DATABASE_PASS}@${PGHOST}:${PGPORT}/${DATABASE_NAME}"
 echo
 
@@ -147,14 +161,14 @@ else
 fi
 
 # 1 - restore from database dump
-if [[ "$RESTORE" == "1" ]]; then
+if [[ "$DROP" == "1" ]]; then
     echo "1.1 Dropping and recreating database ${DATABASE_NAME}"
     dropdb -h ${PGHOST} -p ${PGPORT} --if-exists ${DATABASE_NAME} || exit 1
     createdb -h ${PGHOST} -p ${PGPORT} ${DATABASE_NAME} || exit 1
 
     if [ ! -e "$CURDIR/etools.dump" ];then
         echo "1.2 Unpack database dump"
-        bzcat db1.bz2 > etools.dump
+        bzcat ${BACKUPFILE} > etools.dump
     else
         echo "1.2 datafile not unpacked: 'etools.dump' exists"
     fi
@@ -171,7 +185,7 @@ fi
 
 set -e
 
-if [ "$OBFUSCATE" == "1" ]; then
+if [[ "$OBFUSCATE" == "1" ]]; then
     # 2 - remove sensitive data
     echo "2.1 remove sensitive data (OBFUSCATE)"
     cat  clean.tpl.sql | sed "s/_SCHEMA_/${BASE_SCHEMA}/" > $CURDIR/clean.sql
@@ -180,22 +194,27 @@ else
 fi
 
 
-if [ "$PASSWORD" == "1" ]; then
+if [[ "$RESET_PASSWORD" == "1" ]]; then
     # 3 - reset all passwords
-    echo "3.1 - Reset user passwords (PASSWORD)"
+    echo "3.1 - Reset user passwords (RESET_PASSWORD)"
     DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \
     PYTHONPATH=$CURDIR/../src  \
-    django-admin shell -c \
-        "from etools_datamart.apps.etools.models import AuthUser; \
-        [u.set_password('password') for u in AuthUser.objects.filter(id__lt=50)]"
+
+    psql -h ${PGHOST} -p ${PGPORT} \
+        -qtAX \
+        -d ${DATABASE_NAME} \
+        -c "SET search_path=public;UPDATE auth_user SET password='';"
+#    django-admin shell -c \
+#        "from etools_datamart.apps.etools.models import AuthUser; \
+#        [u.set_password('password') for u in AuthUser.objects.all()]"
 else
-    echo "3.x SKIP Reset user passwords (PASSWORD)"
+    echo "3.x SKIP Reset user passwords (RESET_PASSWORD)"
 fi
 
 
-if [ "$DUMP" == "1" ]; then
+if [[ "$DUMP_PUBLIC" == "1" ]]; then
     # 4 - Dump data
-    echo "4.1 Dump public schema (DUMP)"
+    echo "4.1 Dump public schema (DUMP_PUBLIC)"
     pg_dump --inserts -O \
             -d ${DATABASE_NAME} \
             -n public \
@@ -228,27 +247,41 @@ if [ "$DUMP" == "1" ]; then
             --exclude-table-data waffle_* \
             -f $CURDIR/public.sqldump
 
+else
+    echo "4.x SKIP Dump schemas (DUMP_PUBLIC)"
+fi
+
+if [[ "$DUMP_TENANT" == "1" ]]; then
     echo "4.2 Dump tenant schema"
 
     pg_dump --inserts -O  -d ${DATABASE_NAME} \
-        -n ${BASE_SCHEMA} | sed "s/${BASE_SCHEMA}/[[schema]]/g" >$CURDIR/tenant.sql
+            --exclude-table-data django_migrations \
+            --exclude-table-data django_comments \
+            --exclude-table-data django_comment_flags \
+            --exclude-table-data locations_cartodbtable \
+            --exclude-table-data locations_locationremaphistory \
+            -n ${BASE_SCHEMA} | sed "s/${BASE_SCHEMA}/[[schema]]/g" >$CURDIR/tenant.sql
 else
-    echo "4.x SKIP Dump schemas (DUMP)"
+    echo "4.x SKIP Dump schemas (DUMP_TENANT)"
 fi
 
 
-if [ "$MOVE" == "1" ]; then
+if [[ "$MOVE" == "1" ]]; then
     echo "5.x Move dumps needed for tests(MOVE)"
-    echo "5.1 Move 'tenant.sql' to ${DUMP_DIRECTORY}"
-    cp $CURDIR/tenant.sql ${DUMP_DIRECTORY}
-    echo "5.2 Move 'public.sqldump' to ${DUMP_DIRECTORY}"
-    cp $CURDIR/public.sqldump ${DUMP_DIRECTORY}
+    if [ -f $CURDIR/tenant.sql ]; then
+        echo "5.1 Move 'tenant.sql' to ${DUMP_DIRECTORY}"
+        cp $CURDIR/tenant.sql ${DUMP_DIRECTORY}
+    fi
+    if [ -f $CURDIR/public.sqldump ]; then
+        echo "5.2 Move 'public.sqldump' to ${DUMP_DIRECTORY}"
+        cp $CURDIR/public.sqldump ${DUMP_DIRECTORY}
+    fi
 else
     echo "5.x SKIP Move schemas (MOVE)"
 fi
 
 
-if [ "$INSPECT" == "1" ]; then
+if [[ "$INSPECT" == "1" ]]; then
     echo "6.x Inspect database schema (INSPECT)"
     cd $CURDIR/..
     echo "6.1 Inspect 'public' schema"
@@ -269,7 +302,7 @@ if [ "$INSPECT" == "1" ]; then
     cd $CURDIR
 fi
 
-if [ "$SUMMARY" == "1" ]; then
+if [[ "$SUMMARY" == "1" ]]; then
     echo "7.x Summary summary (SUMMARY)"
     echo "================================================================"
 #    echo "Update your conftest.py fixtures with following values:"
@@ -287,11 +320,19 @@ if [ "$SUMMARY" == "1" ]; then
     echo $v > $PROJECT_DIR/tests/INTERVENTION
     echo "number_of_intervention = $v"
     echo "================================================================"
+
+    v=`psql -h ${PGHOST} -p ${PGPORT} \
+        -qtAX \
+        -d ${DATABASE_NAME} \
+        -c "SET search_path=${BASE_SCHEMA};SELECT COUNT(*) FROM activities_activity;"`
+    echo $v > $PROJECT_DIR/tests/ACTIVITIES
+    echo "number_of_activities = $v"
+    echo "================================================================"
 else
     echo "7.x SKIP Summary summary (SUMMARY)"
 fi
 
-if [ "$CLEAN" == "1" ]; then
+if [[ "$CLEAN" == "1" ]]; then
     echo "8.x Clean temporary files"
     cd $CURDIR
     rm -f etools.dump

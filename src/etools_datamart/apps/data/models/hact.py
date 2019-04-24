@@ -10,7 +10,8 @@ from etools_datamart.apps.etools.models import HactAggregatehact
 class HACTLoader(Loader):
 
     def get_queryset(self):
-        return HactAggregatehact.objects.filter(year=self.context['year'])
+        return self.config.source.objects.filter(year=self.context['year'])
+        # return HactAggregatehact.objects.filter(year=self.context['year'])
 
     def process_country(self):
         country = self.context['country']
@@ -66,6 +67,7 @@ class HACT(DataMartModel):
         verbose_name = "HACT"
 
     class Options:
+        source = HactAggregatehact
         sync_deleted_records = lambda loader: False
         truncate = False
         # key = lambda loader, record: dict(country_name=loader.context['country'].name,
