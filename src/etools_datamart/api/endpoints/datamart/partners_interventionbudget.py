@@ -7,8 +7,6 @@ from etools_datamart.apps.data import models
 class InterventionBudgetSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.InterventionBudget
-        exclude = ('schema_name', 'tree_id', 'lft', 'rght', 'level', 'source_id',
-                   'geom', 'point', 'latitude', 'longitude')
 
 
 class InterventionBudgetViewSet(common.DataMartViewSet):
