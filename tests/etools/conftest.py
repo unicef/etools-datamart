@@ -6,5 +6,5 @@ conn = connections['etools']
 
 
 @pytest.fixture(autouse=True)
-def setup_conn():
+def setup_conn(db):
     conn.set_schemas(["bolivia"])

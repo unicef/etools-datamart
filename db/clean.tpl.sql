@@ -6,7 +6,7 @@ SET
   last_name  = CONCAT('LAST_NAME_', id),
   username   = CONCAT('username', id);
 
-UPDATE zambia.partners_partnerorganization
+UPDATE _SCHEMA_.partners_partnerorganization
 SET
   name          = CONCAT('Partner', id),
   address       = CONCAT('Address', id),

@@ -23,7 +23,7 @@ db/clean.sql
 db/*.bz2
 db/etools.dump
 db/public.sqldump
-db/tenant.sql
+db/tenant*.sql
 djcelery.schedulers.DatabaseScheduler
 docker/.envrc
 docker/cache
