@@ -1,4 +1,4 @@
-1.21
+1.22
 ----
 * Add ActionPoint endpoint
 * fixes Intervention serializers
@@ -8,6 +8,11 @@
 * new LocationMixin
 * add extra location details to location field
 * Add EtoolsUser endpoint
+
+1.21
+----
+* == Not released ==
+
 
 1.20
 ----
