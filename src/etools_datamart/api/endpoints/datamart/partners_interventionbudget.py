@@ -7,6 +7,7 @@ from etools_datamart.apps.data import models
 class InterventionBudgetSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.InterventionBudget
+        exclude = ()
 
 
 class InterventionBudgetViewSet(common.DataMartViewSet):
