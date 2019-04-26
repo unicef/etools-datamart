@@ -105,7 +105,7 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
             queryset = self.filter_queryset(self.get_queryset())
             try:
                 obj = queryset.latest('id')
-            except (TypeError, ValueError, ValidationError, ObjectDoesNotExist):
+            except (TypeError, ValueError, ValidationError, ObjectDoesNotExist):  # pragma: no cover
                 raise Http404
             else:
                 self.check_object_permissions(self.request, obj)

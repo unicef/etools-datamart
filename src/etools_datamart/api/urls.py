@@ -32,6 +32,7 @@ router.register(r'datamart/funds-reservation', endpoints.FundsReservationViewSet
 router.register(r'datamart/hact', endpoints.HACTViewSet)
 router.register(r'datamart/interventions', endpoints.InterventionViewSet)
 router.register(r'datamart/interventions-locations', endpoints.InterventionByLocationViewSet)
+router.register(r'datamart/interventions-budget', endpoints.InterventionBudgetViewSet)
 router.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)

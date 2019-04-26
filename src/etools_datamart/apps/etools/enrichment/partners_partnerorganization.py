@@ -1,8 +1,4 @@
-from types import MethodType
-
-from django.utils.functional import cached_property
-
-from etools_datamart.apps.etools.models import PartnersPartnerorganization, AuditSpotcheck
+from etools_datamart.apps.etools.models import AuditSpotcheck, PartnersPartnerorganization
 
 from .utils import create_alias
 

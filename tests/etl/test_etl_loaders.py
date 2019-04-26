@@ -13,8 +13,14 @@ def pytest_generate_tests(metafunc):
         ids = []
         for model_name in loadeables:
             model = apps.get_model(model_name)
-            if model_name in ['data.pdindicator', 'data.location', 'data.travelactivity',
-                              'data.actionpoint', 'data.tpmactivity', 'data.tpmvisit', ]:
+            # if model_name in ['data.pdindicator', 'data.location', 'data.travelactivity',
+            #                   'data.actionpoint', 'data.tpmactivity', 'data.tpmvisit', ]:
+            if model_name in [
+                'data.pdindicator',
+                'data.location',
+                # 'data.interventionbylocation',
+                # 'data.fundsreservation',
+            ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
             else:
                 m.append(model.loader)

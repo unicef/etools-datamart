@@ -12,7 +12,8 @@ from etools_datamart.apps.etools.models import AuthUser
 class UserStatsLoader(Loader):
 
     def get_queryset(self):
-        return AuthUser.objects.filter(profile__country=self.context['country'])
+        return self.config.source.objects.filter(profile__country=self.context['country'])
+        # return AuthUser.objects.filter(profile__country=self.context['country'])
 
     def update_context(self, **kwargs):
         super().update_context(**kwargs)
@@ -57,5 +58,6 @@ class UserStats(DataMartModel):
     loader = UserStatsLoader()
 
     class Options:
+        source = AuthUser
         sync_deleted_records = lambda loader: False
         truncate = True

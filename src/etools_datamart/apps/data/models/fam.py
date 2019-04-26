@@ -11,7 +11,7 @@ from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, Aud
 
 class FAMIndicatorLoader(Loader):
     def get_values(self, record):
-        pass
+        pass  # pragma: no cover
 
     def process_country(self):
         country = self.context['country']

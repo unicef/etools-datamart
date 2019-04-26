@@ -178,13 +178,13 @@ def data_service(db):
 @pytest.fixture()
 def number_of_partnerorganization(db):
     # number of partners.PartnerOrganization records in each tenant
-    return int((Path(__file__).parent / 'PARTNERORGANIZATION').read_text())
+    return int((Path(__file__).parent / 'COUNT_PARTNERS_PARTNERORGANIZATION').read_text())
 
 
 @pytest.fixture()
 def number_of_intervention(db):
     # number of partners.Intervention
-    return int((Path(__file__).parent / 'INTERVENTION').read_text())
+    return int((Path(__file__).parent / 'COUNT_PARTNERS_INTERVENTION').read_text())
 
 
 @pytest.fixture()
