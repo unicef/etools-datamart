@@ -5,9 +5,12 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import PartnersIntervention
+
+from .base import DataMartModel
+from .location import Location
+from .mixins import add_location_mapping, LocationMixin
+from .user_office import Office
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +19,30 @@ class InterventionLoader(Loader):
     def fr_currencies_ok(self, original: PartnersIntervention):
         return original.frs__currency__count == 1 if original.frs__currency__count else None
 
-    def get_disbursement_percent(self, original: PartnersIntervention):
+    def get_locations(self, original: PartnersIntervention, values: dict):
+        # PartnersInterventionFlatLocations
+        ids = list(original.flat_locations.values_list("id", flat=True))
+        ret = list(Location.objects.filter(source_id__in=ids,
+                                           schema_name=values['schema_name']).values("id",
+                                                                                     "name",
+                                                                                     "source_id",
+                                                                                     "p_code"))
+        assert len(ids) == len(ret)
+        return ret
+
+    def get_offices(self, original: PartnersIntervention, values: dict):
+        # PartnersInterventionOffices
+        ids = list(original.offices.values_list("id", flat=True))
+        ret = list(Office.objects.filter(source_id__in=ids,
+                                         schema_name=values['schema_name']).values("id",
+                                                                                   "name",
+                                                                                   "source_id",
+                                                                                   "zonal_chief_email",
+                                                                                   "zonal_chief_source_id"))
+        assert len(ids) == len(ret)
+        return ret
+
+    def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
         if original.frs__actual_amt_local__sum is None:
             return None
 
@@ -84,14 +110,16 @@ class InterventionAbstract(models.Model):
     country_programme_id = models.IntegerField(blank=True, null=True)
     unicef_signatory_id = models.IntegerField(blank=True, null=True)
 
-    # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
+    offices = JSONField(blank=True, null=True, default=dict)
+    locations = JSONField(blank=True, null=True, default=dict)
 
-    loader = InterventionLoader()
+    # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
 
     class Meta:
         abstract = True
 
     class Options:
+        depends = (Office, Location)
         source = PartnersIntervention
         queryset = lambda: PartnersIntervention.objects.select_related('agreement',
                                                                        'partner_authorized_officer_signatory',
@@ -139,6 +167,8 @@ class InterventionAbstract(models.Model):
 
 
 class Intervention(InterventionAbstract, DataMartModel):
+    loader = InterventionLoader()
+
     class Meta:
         ordering = ('country_name', 'title')
         verbose_name = "Intervention"

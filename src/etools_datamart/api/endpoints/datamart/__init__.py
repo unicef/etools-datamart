@@ -15,4 +15,5 @@ from .tpm_visit import TPMVisitViewSet
 from .travel import TravelViewSet
 from .travel_activity import TravelActivityViewSet
 from .user import EtoolsUserViewSet
+from .user_office import OfficeViewSet
 from .userstats import UserStatsViewSet

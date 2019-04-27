@@ -13,4 +13,5 @@ from .tpm_tpmactivity import TPMActivity  # noqa
 from .travel import Travel  # noqa
 from .travel_activity import TravelActivity  # noqa
 from .user import EtoolsUser  # noqa
+from .user_office import Office  # noqa
 from .userstats import UserStats  # noqa

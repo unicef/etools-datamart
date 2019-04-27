@@ -268,3 +268,8 @@ class EtoolsUserAdmin(DataModelAdmin):
 class InterventionBudgetAdmin(DataModelAdmin):
     list_display = ('intervention_title', 'intervention_number',
                     'partner_contribution', 'unicef_cash')
+
+
+@register(models.Office)
+class OfficeAdmin(DataModelAdmin):
+    list_display = ('name', 'zonal_chief_email')

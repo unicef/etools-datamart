@@ -20,7 +20,7 @@ def index(request):
 
 @login_required
 def monitor(request):
-    context = {'tasks': EtlTask.objects.all(),
+    context = {'tasks': EtlTask.objects.order_by('task'),
                'subscriptions': request.user.subscriptions,
                'page': 'monitor'}
     return TemplateResponse(request, 'monitor.html', context)

@@ -44,7 +44,7 @@ def force(modeladmin, request, queryset):
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', 'last_run', 'run_type', '_status', 'time',
                     'last_success', 'last_failure', 'locked',
-                    'data', 'scheduling', 'unlock_task', 'queue_task'
+                    'scheduling', 'unlock_task', 'queue_task'
                     )
 
     date_hierarchy = 'last_run'

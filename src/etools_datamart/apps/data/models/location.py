@@ -19,10 +19,6 @@ class GatewayType(DataMartModel):
 
         key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           source_id=record.id)
-        # mapping = {'source_id': 'id',
-        #            'area_code': lambda loader, record: loader.context['country'].business_area_code,
-        #            'country_name': lambda loader, record: loader.context['country'].name,
-        #            }
 
 
 class Location(DataMartModel):

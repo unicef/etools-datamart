@@ -88,3 +88,13 @@ class EtlTask(models.Model):
             return PeriodicTask.objects.get(task=self.task)
         except PeriodicTask.DoesNotExist:
             pass
+
+#
+# class Offset(models.Model):
+#     table_name = models.CharField(max_length=200, null=True)
+#     schema_name = models.CharField(max_length=200, null=True)
+#     content_type = models.OneToOneField(ContentType, models.CASCADE, null=True)
+#     record_count = models.IntegerField(default=0)
+#     max_id = models.IntegerField(default=0)
+#     last_modify_date = models.DateTimeField(null=True, blank=True)
+#

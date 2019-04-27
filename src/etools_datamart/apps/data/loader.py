@@ -4,6 +4,7 @@ from inspect import isclass
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -304,7 +305,10 @@ class Loader:
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
-            if v == '__self__':
+            if hasattr(self, 'get_%s' % k):
+                getter = getattr(self, 'get_%s' % v)
+                ret[k] = getter(record, ret)
+            elif v == '__self__':
                 try:
                     ret[k] = self.model.objects.get(schema_name=country.schema_name,
                                                     source_id=getattr(record, k).id)
@@ -318,13 +322,12 @@ class Loader:
                 try:
                     ret[k] = v.objects.get(schema_name=country.schema_name,
                                            source_id=getattr(record, k).id)
+                except ObjectDoesNotExist:  # pragma: no cover
+                    ret[k] = None
                 except AttributeError:  # pragma: no cover
                     pass
             elif callable(v):
                 ret[k] = v(self, record)
-            elif hasattr(self, 'get_%s' % v):
-                getter = getattr(self, 'get_%s' % v)
-                ret[k] = getter(record, ret)
             else:
                 ret[k] = get_attr(record, v)
 

@@ -1,13 +1,15 @@
 1.22
 ----
-* Add ActionPoint endpoint
+* New endpoint datamart/actionpoints/
+* New endpoint datamart/interventions-locations/
+* New endpoint datamart/users/
+* Updates datamart/travel-activities
+* Updates datamart/travel-activities: add result_* fields
+* Updates InterventionSerializerFull: add locations and offices
 * fixes Intervention serializers
 * fixes formats popup menu
-* Add result (Report fk) to TravelActivity endpoint
-* Add InterventionByLocation
 * new LocationMixin
-* add extra location details to location field
-* Add EtoolsUser endpoint
+
 
 1.21
 ----

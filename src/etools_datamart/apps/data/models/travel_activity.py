@@ -34,6 +34,10 @@ class TravelActivity(LocationMixin, DataMartModel):
     source_partner_id = models.IntegerField(null=True)
     source_partnership_id = models.IntegerField(null=True)
 
+    result_name = models.TextField(max_length=200, blank=True, null=True)
+    result_code = models.CharField(max_length=200, blank=True, null=True)
+    result_type = models.CharField(max_length=200, blank=True, null=True)
+
     loader = TravelActivityLoader()
 
     class Meta:
@@ -63,5 +67,10 @@ class TravelActivity(LocationMixin, DataMartModel):
             'travel_reference_number': 'travel.reference_number',
             'primary_traveler': 'primary_traveler.email',
             'partner_name': 'partner.name',
-            'partnership_number': 'partnership.number'
+            'partnership_number': 'partnership.number',
+
+            'result_name': 'result.name',
+            'result_code': 'result.code',
+            'result_type': 'result.result_type.name',
+
         }

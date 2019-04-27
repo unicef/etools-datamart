@@ -18,8 +18,8 @@ def pytest_generate_tests(metafunc):
             if model_name in [
                 'data.pdindicator',
                 'data.location',
-                # 'data.interventionbylocation',
-                # 'data.fundsreservation',
+                'data.interventionbylocation',
+                'data.fundsreservation',
             ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
             else:

@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-# import django_filters
 from django import forms
 
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
-from etools_datamart.api.endpoints.datamart.serializers import InterventionSerializerBudget, InterventionSerializerFull
+from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
 from etools_datamart.apps.etools.models import PartnersIntervention
 
 from .. import common
-from . import serializers
 
 
 class InterventionFilterForm(forms.Form):
@@ -35,10 +32,43 @@ class InterventionFilterForm(forms.Form):
         super().__init__(filters, files, auto_id, prefix, initial, *args, **kwargs)
 
 
+class InterventionSerializerBudget(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Intervention
+        exclude = None
+        fields = ('number', 'title', 'status', 'start_date', 'end_date',
+                  'partner_contribution', 'unicef_cash', 'in_kind_amount',
+                  'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
+                  'total', 'total_local', 'currency',
+                  )
+
+
+class InterventionSerializerFull(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Intervention
+        exclude = ('seen',)
+
+
+class InterventionSerializer(InterventionSerializerFull):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Intervention
+        exclude = ('metadata', 'partner_contribution', 'unicef_cash', 'in_kind_amount',
+                   'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
+                   'total', 'total_local', 'currency', 'offices', 'locations')
+
+
+class InterventionByLocationSerializer(InterventionSerializerFull):
+    class Meta(DataMartSerializer.Meta):
+        model = models.InterventionByLocation
+        exclude = ('metadata', 'partner_contribution', 'unicef_cash', 'in_kind_amount',
+                   'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
+                   'total', 'total_local', 'currency',)
+
+
 class InterventionViewSet(common.DataMartViewSet):
     querystringfilter_form_base_class = InterventionFilterForm
 
-    serializer_class = serializers.InterventionSerializer
+    serializer_class = InterventionSerializer
     queryset = models.Intervention.objects.all()
     filter_fields = ('status', 'last_modify_date', 'document_type',
                      'start_date', 'submission_date',)
@@ -52,5 +82,5 @@ class InterventionViewSet(common.DataMartViewSet):
 
 
 class InterventionByLocationViewSet(InterventionViewSet):
-    serializer_class = serializers.InterventionByLocationSerializer
+    serializer_class = InterventionByLocationSerializer
     queryset = models.InterventionByLocation.objects.all()
