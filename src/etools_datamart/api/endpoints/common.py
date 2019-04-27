@@ -11,6 +11,7 @@ from dynamic_serializer.core import InvalidSerializerError
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
+from sentry_sdk import capture_exception
 from strategy_field.utils import fqn
 
 from unicef_rest_framework.ds import DynamicSerializerFilter
@@ -75,6 +76,10 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
                          self.dynamic_fields_param,
                          'cursor', CountryFilter.query_param, 'month',
                          'ordering', 'page_size', 'format', 'page']
+
+    def raise_uncaught_exception(self, exc):
+        capture_exception(exc)
+        return super().raise_uncaught_exception(exc)
 
     def handle_exception(self, exc):
         conn = connections['etools']
