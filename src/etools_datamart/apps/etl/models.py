@@ -63,6 +63,7 @@ class EtlTask(models.Model):
 
     class Meta:
         get_latest_by = 'last_run'
+        ordering = ('task',)
 
     def __str__(self):
         return f"{self.task} {self.status}"
