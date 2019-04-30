@@ -2,24 +2,24 @@
     "record": {
         "master": {
             "model": "data.interventionbylocation",
-            "pk": 455,
+            "pk": 404,
             "fields": {
+                "source_id": null,
+                "last_modify_date": "2019-04-30T16:02:36.401Z",
+                "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "last_modify_date": "2019-03-22T11:36:13.195Z",
-                "seen": null,
-                "source_id": null,
                 "location_source_id": null,
                 "location_name": null,
                 "location_pcode": null,
                 "location_level": null,
                 "location_levelname": null,
-                "created": "2019-03-22T11:36:13.196Z",
+                "created": "2019-04-30T16:02:36.401Z",
                 "updated": null,
                 "document_type": null,
-                "number": "#003",
-                "title": "title003",
+                "number": "#000",
+                "title": "title000",
                 "status": null,
                 "start_date": null,
                 "end_date": null,
@@ -60,10 +60,14 @@
                 "total": "10.00",
                 "total_local": "10.00",
                 "currency": "USD",
-                "intervention_id": 3,
+                "intervention_id": 0,
                 "agreement_id": null,
                 "country_programme_id": null,
-                "unicef_signatory_id": null
+                "unicef_signatory_id": null,
+                "offices": {},
+                "locations": {},
+                "partner_id": null,
+                "partner_source_id": null
             }
         },
         "deps": []
