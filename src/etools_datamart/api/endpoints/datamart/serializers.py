@@ -6,7 +6,7 @@ from etools_datamart.apps.data import models
 
 class DataMartSerializer(serializers.ModelSerializer):
     class Meta:
-        exclude = ('schema_name',)
+        exclude = ('schema_name', )
 
 
 class PMPIndicatorsSerializer(DataMartSerializer):

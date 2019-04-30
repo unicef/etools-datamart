@@ -10,6 +10,7 @@ from etools_datamart.apps.etools.models import PartnersIntervention
 from .base import DataMartModel
 from .location import Location
 from .mixins import add_location_mapping, LocationMixin
+from .partner import Partner
 from .user_office import Office
 
 logger = logging.getLogger(__name__)
@@ -42,15 +43,15 @@ class InterventionLoader(Loader):
         assert len(ids) == len(ret)
         return ret
 
-    def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
-        if original.frs__actual_amt_local__sum is None:
-            return None
-
-        if not (self.fr_currencies_ok(original) and original.max_fr_currency == original.planned_budget.currency):
-            return "!Error! (currencies do not match)"
-        percent = original.frs__actual_amt_local__sum / original.total_unicef_cash * 100 \
-            if original.total_unicef_cash and original.total_unicef_cash > 0 else 0
-        return "%.1f" % percent
+    # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
+    #     if original.frs__actual_amt_local__sum is None:
+    #         return None
+    #
+    #     if not (self.fr_currencies_ok(original) and original.max_fr_currency == original.planned_budget.currency):
+    #         return "!Error! (currencies do not match)"
+    #     percent = original.frs__actual_amt_local__sum / original.total_unicef_cash * 100 \
+    #         if original.total_unicef_cash and original.total_unicef_cash > 0 else 0
+    #     return "%.1f" % percent
 
 
 class InterventionAbstract(models.Model):
@@ -113,13 +114,15 @@ class InterventionAbstract(models.Model):
     offices = JSONField(blank=True, null=True, default=dict)
     locations = JSONField(blank=True, null=True, default=dict)
 
+    partner_id = models.IntegerField(blank=True, null=True)
+    partner_source_id = models.IntegerField(blank=True, null=True)
     # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
 
     class Meta:
         abstract = True
 
     class Options:
-        depends = (Office, Location)
+        depends = (Office, Location, Partner)
         source = PartnersIntervention
         queryset = lambda: PartnersIntervention.objects.select_related('agreement',
                                                                        'partner_authorized_officer_signatory',
@@ -134,6 +137,9 @@ class InterventionAbstract(models.Model):
         mapping = dict(start_date='start',
                        end_date='end',
                        partner_name='agreement.partner.name',
+                       partner_source_id='agreement.partner.id',
+                       partner_id=lambda loader, record: Partner.objects.get(source_id=record.agreement.partner.id,
+                                                                             country_name=loader.context['country']).id,
                        partner_authorized_officer_signatory_id='partner_authorized_officer_signatory.pk',
                        country_programme_id='country_programme.pk',
                        intervention_id='id',
