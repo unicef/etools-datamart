@@ -40,7 +40,7 @@ class InterventionLoader(Loader):
                                                                                    "source_id",
                                                                                    "zonal_chief_email",
                                                                                    "zonal_chief_source_id"))
-        assert len(ids) == len(ret)
+        # assert len(ids) == len(ret)
         return ret
 
     # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
