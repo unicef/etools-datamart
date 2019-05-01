@@ -184,12 +184,11 @@ class Intervention(InterventionAbstract, DataMartModel):
         pass
 
 
-class InterventionByLocationLoader(Loader):
-
+class InterventionByLocationLoader(InterventionLoader):
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for intervention in qs.all():
-            for location in intervention.flat_locations.order_by('id'):
+            for location in intervention.flat_locations.all().order_by('id'):
                 intervention.location = location
                 filters = self.config.key(self, intervention)
                 values = self.get_values(intervention)

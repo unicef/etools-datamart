@@ -13,6 +13,7 @@ import celery
 from constance import config
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
+from sentry_sdk import capture_exception
 from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.data.exceptions import LoaderException
@@ -285,6 +286,7 @@ class Loader:
             return op
         except Exception as e:  # pragma: no cover
             logger.exception(e)
+            capture_exception()
             err = process_exception(e)
             raise LoaderException(f"Error in {self}: {e}",
                                   err) from e
@@ -438,7 +440,7 @@ class Loader:
     def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None,
              only_delta=True, run_type=RUN_UNKNOWN,
-             force_requirements=False):
+             force_requirements=True):
         self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
