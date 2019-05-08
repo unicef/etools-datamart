@@ -216,3 +216,8 @@ class InterventionBudgetFactory(DataMartModelFactory):
 class OfficeFactory(DataMartModelFactory):
     class Meta:
         model = models.Office
+
+
+class SectionFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Section

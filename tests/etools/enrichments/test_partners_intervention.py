@@ -13,3 +13,8 @@ def test_intervention_location():
 def test_intervention_frs():
     i = PartnersIntervention.objects.first()
     assert i.frs.all()
+
+
+def test_intervention_sections():
+    i = PartnersIntervention.objects.first()
+    assert i.sections.all()

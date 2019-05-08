@@ -3,8 +3,8 @@ from django.db import models
 from etools_datamart.apps.etools.enrichment.utils import create_alias
 from etools_datamart.apps.etools.models import (LocationsLocation, PartnersIntervention,
                                                 PartnersInterventionFlatLocations, PartnersInterventionOffices,
-                                                PartnersInterventionPartnerFocalPoints, PartnersPartnerstaffmember,
-                                                UsersOffice,)
+                                                PartnersInterventionPartnerFocalPoints, PartnersInterventionSections,
+                                                PartnersPartnerstaffmember, ReportsSector, UsersOffice,)
 
 PartnersIntervention.total_unicef_cash = property(
     lambda self: self.planned_budget.unicef_cash_local if hasattr(self, 'planned_budget') else 0)
@@ -61,6 +61,10 @@ models.ManyToManyField(PartnersPartnerstaffmember,
 models.ManyToManyField(UsersOffice,
                        through=PartnersInterventionOffices,
                        ).contribute_to_class(PartnersIntervention, 'offices')
+
+models.ManyToManyField(ReportsSector,
+                       through=PartnersInterventionSections,
+                       ).contribute_to_class(PartnersIntervention, 'sections')
 
 aliases = (['partnersintervention_partners_interventionbudget_intervention_id',
             'planned_budget'], ['partnersintervention_funds_fundsreservationheader_intervention_id',

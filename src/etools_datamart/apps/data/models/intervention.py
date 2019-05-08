@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.models.report_sector import Section
 from etools_datamart.apps.etools.models import PartnersIntervention
 
 from .base import DataMartModel
@@ -20,6 +21,17 @@ class InterventionLoader(Loader):
     def fr_currencies_ok(self, original: PartnersIntervention):
         return original.frs__currency__count == 1 if original.frs__currency__count else None
 
+    def get_sections(self, original: PartnersIntervention, values: dict):
+        # PartnersInterventionFlatLocations
+        ids = list(original.sections.values_list("id", flat=True))
+        ret = list(Section.objects.filter(source_id__in=ids,
+                                          schema_name=values['schema_name']).values("id",
+                                                                                    "name",
+                                                                                    "source_id",
+                                                                                    "description"))
+        # assert len(ids) == len(ret)
+        return ret
+
     def get_locations(self, original: PartnersIntervention, values: dict):
         # PartnersInterventionFlatLocations
         ids = list(original.flat_locations.values_list("id", flat=True))
@@ -28,7 +40,7 @@ class InterventionLoader(Loader):
                                                                                      "name",
                                                                                      "source_id",
                                                                                      "p_code"))
-        assert len(ids) == len(ret)
+        # assert len(ids) == len(ret)
         return ret
 
     def get_offices(self, original: PartnersIntervention, values: dict):
@@ -113,9 +125,11 @@ class InterventionAbstract(models.Model):
 
     offices = JSONField(blank=True, null=True, default=dict)
     locations = JSONField(blank=True, null=True, default=dict)
+    sections = JSONField(blank=True, null=True, default=dict)
 
     partner_id = models.IntegerField(blank=True, null=True)
     partner_source_id = models.IntegerField(blank=True, null=True)
+
     # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
 
     class Meta:

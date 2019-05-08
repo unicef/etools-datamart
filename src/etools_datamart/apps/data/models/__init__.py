@@ -8,6 +8,7 @@ from .partner import Partner  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
 from .pd_indicator import PDIndicator  # noqa
 from .pmp import PMPIndicators  # noqa
+from .report_sector import Section  # noqa
 from .tpm_tmpvisit import TPMVisit  # noqa
 from .tpm_tpmactivity import TPMActivity  # noqa
 from .travel import Travel  # noqa

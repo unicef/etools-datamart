@@ -6,7 +6,7 @@
 * New endpoint datamart/users-offices/
 * Updates datamart/travel-activities
 * Updates datamart/travel-activities: add result_* fields
-* Updates InterventionSerializerFull: add locations, offices, partner_id and partner_source_id
+* Updates InterventionSerializerFull: add locations, offices, sections, partner_id and partner_source_id
 * fixes Intervention serializers
 * fixes formats popup menu
 * new LocationMixin
