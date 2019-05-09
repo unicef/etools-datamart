@@ -30,6 +30,9 @@ router.register(r'datamart/interventions-budget', endpoints.InterventionBudgetVi
 router.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
+
+router.register(r'datamart/reports/sections', endpoints.SectionViewSet)
+
 router.register(r'datamart/users', endpoints.EtoolsUserViewSet)
 router.register(r'datamart/user-offices', endpoints.OfficeViewSet)
 router.register(r'datamart/travels', endpoints.TravelViewSet)

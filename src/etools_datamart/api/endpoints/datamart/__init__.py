@@ -10,6 +10,7 @@ from .partners_interventionbudget import InterventionBudgetViewSet
 from .partners_partner import PartnerViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
+from .report_section import SectionViewSet
 from .tpm_activity import TPMActivityViewSet
 from .tpm_visit import TPMVisitViewSet
 from .travel import TravelViewSet
