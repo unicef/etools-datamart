@@ -31,7 +31,8 @@ build-base:
 			-t ${DOCKER_IMAGE_NAME}:base \
 			-f docker/Dockerfile.base .
 
-build:
+
+.build:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
@@ -39,6 +40,12 @@ build:
 			-f docker/Dockerfile .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
+
+build-test:
+	TARGET=dev $(MAKE) .build test
+
+build:
+	TARGET=dev $(MAKE) .build test
 
 build_old:
 	cd .. && docker build \
