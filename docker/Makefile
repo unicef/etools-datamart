@@ -45,7 +45,7 @@ build-test:
 	TARGET=dev $(MAKE) .build test
 
 build:
-	TARGET=dev $(MAKE) .build test
+	$(MAKE) .build test
 
 build_old:
 	cd .. && docker build \
