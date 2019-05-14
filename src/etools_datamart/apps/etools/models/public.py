@@ -9,16 +9,6 @@
 from django.db import models
 
 
-class EquitrackDomain(models.Model):
-    domain = models.CharField(unique=True, max_length=253)
-    is_primary = models.BooleanField()
-    tenant = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='userscountry_EquiTrack_domain_tenant_id')
-
-    class Meta:
-        managed = False
-        db_table = 'EquiTrack_domain'
-
-
 class AccountEmailaddress(models.Model):
     email = models.CharField(unique=True, max_length=254)
     verified = models.BooleanField()
@@ -131,6 +121,16 @@ class CategoriesCategory(models.Model):
         managed = False
         db_table = 'categories_category'
         unique_together = (('description', 'module'),)
+
+
+class CoreDomain(models.Model):
+    domain = models.CharField(unique=True, max_length=253)
+    is_primary = models.BooleanField()
+    tenant = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='userscountry_core_domain_tenant_id')
+
+    class Meta:
+        managed = False
+        db_table = 'core_domain'
 
 
 class CorsheadersCorsmodel(models.Model):
@@ -317,15 +317,6 @@ class EasyThumbnailsThumbnaildimensions(models.Model):
     class Meta:
         managed = False
         db_table = 'easy_thumbnails_thumbnaildimensions'
-
-
-class EnvironmentIssuecheckconfig(models.Model):
-    check_id = models.CharField(unique=True, max_length=100)
-    is_active = models.BooleanField()
-
-    class Meta:
-        managed = False
-        db_table = 'environment_issuecheckconfig'
 
 
 class EnvironmentTenantflag(models.Model):
@@ -633,34 +624,6 @@ class PublicsExchangerate(models.Model):
         db_table = 'publics_exchangerate'
 
 
-class PublicsFund(models.Model):
-    name = models.CharField(max_length=25)
-    deleted_at = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'publics_fund'
-
-
-class PublicsGrant(models.Model):
-    name = models.CharField(max_length=25)
-    deleted_at = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'publics_grant'
-
-
-class PublicsGrantFunds(models.Model):
-    grant = models.ForeignKey(PublicsGrant, models.DO_NOTHING, related_name='publicsgrant_publics_grant_funds_grant_id')
-    fund = models.ForeignKey(PublicsFund, models.DO_NOTHING, related_name='publicsfund_publics_grant_funds_fund_id')
-
-    class Meta:
-        managed = False
-        db_table = 'publics_grant_funds'
-        unique_together = (('fund', 'grant'),)
-
-
 class PublicsTravelagent(models.Model):
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=128)
@@ -683,26 +646,6 @@ class PublicsTravelexpensetype(models.Model):
     class Meta:
         managed = False
         db_table = 'publics_travelexpensetype'
-
-
-class PublicsWbs(models.Model):
-    name = models.CharField(max_length=25)
-    business_area = models.ForeignKey(PublicsBusinessarea, models.DO_NOTHING, related_name='publicsbusinessarea_publics_wbs_business_area_id', blank=True, null=True)
-    deleted_at = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'publics_wbs'
-
-
-class PublicsWbsGrants(models.Model):
-    wbs = models.ForeignKey(PublicsWbs, models.DO_NOTHING, related_name='publicswbs_publics_wbs_grants_wbs_id')
-    grant = models.ForeignKey(PublicsGrant, models.DO_NOTHING, related_name='publicsgrant_publics_wbs_grants_grant_id')
-
-    class Meta:
-        managed = False
-        db_table = 'publics_wbs_grants'
-        unique_together = (('grant', 'wbs'),)
 
 
 class PurchaseOrderAuditorfirm(models.Model):

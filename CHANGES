@@ -1,5 +1,6 @@
 1.22
 ----
+* Compatible with eTools 6.10
 * New endpoint datamart/actionpoints/
 * New endpoint datamart/interventions-locations/
 * New endpoint datamart/users/

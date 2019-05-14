@@ -580,21 +580,6 @@ class LocationsLocationremaphistory(models.TenantModel):
         db_table = 'locations_locationremaphistory'
 
 
-class ManagementFlaggedissue(models.TenantModel):
-    object_id = models.IntegerField()
-    date_created = models.DateTimeField()
-    date_updated = models.DateTimeField()
-    issue_category = models.CharField(max_length=32)
-    issue_id = models.CharField(max_length=100)
-    message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='djangocontenttype_management_flaggedissue_content_type_id')
-    issue_status = models.CharField(max_length=32)
-
-    class Meta:
-        managed = False
-        db_table = 'management_flaggedissue'
-
-
 class PartnersAgreement(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -766,12 +751,12 @@ class PartnersInterventionPartnerFocalPoints(models.TenantModel):
 
 class PartnersInterventionSections(models.TenantModel):
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='partnersintervention_partners_intervention_sections_intervention_id')
-    sector = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='reportssector_partners_intervention_sections_sector_id')
+    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='reportssector_partners_intervention_sections_section_id')
 
     class Meta:
         managed = False
         db_table = 'partners_intervention_sections'
-        unique_together = (('intervention', 'sector'),)
+        unique_together = (('intervention', 'section'),)
 
 
 class PartnersInterventionUnicefFocalPoints(models.TenantModel):
@@ -1173,6 +1158,8 @@ class ReportsResult(models.TenantModel):
     country_programme = models.ForeignKey(ReportsCountryprogramme, models.DO_NOTHING, related_name='reportscountryprogramme_reports_result_country_programme_id', blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    humanitarian_marker_code = models.CharField(max_length=255, blank=True, null=True)
+    humanitarian_marker_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1241,8 +1228,8 @@ class SnapshotActivity(models.TenantModel):
 class T2FItineraryitem(models.TenantModel):
     origin = models.CharField(max_length=255)
     destination = models.CharField(max_length=255)
-    departure_date = models.DateTimeField()
-    arrival_date = models.DateTimeField()
+    departure_date = models.DateField()
+    arrival_date = models.DateField()
     overnight_travel = models.BooleanField()
     mode_of_travel = models.CharField(max_length=5)
     dsa_region = models.ForeignKey('PublicsDsaregion', models.DO_NOTHING, related_name='publicsdsaregion_t2f_itineraryitem_dsa_region_id', blank=True, null=True)
@@ -1277,8 +1264,8 @@ class T2FTravel(models.TenantModel):
     report_note = models.TextField()
     misc_expenses = models.TextField()
     status = models.CharField(max_length=50)
-    start_date = models.DateTimeField(blank=True, null=True)
-    end_date = models.DateTimeField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     purpose = models.CharField(max_length=500)
     additional_note = models.TextField()
     international_travel = models.NullBooleanField()
@@ -1306,7 +1293,7 @@ class T2FTravel(models.TenantModel):
 
 class T2FTravelactivity(models.TenantModel):
     travel_type = models.CharField(max_length=64)
-    date = models.DateTimeField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
     partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='partnerspartnerorganization_t2f_travelactivity_partner_id', blank=True, null=True)
     partnership = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='partnersintervention_t2f_travelactivity_partnership_id', blank=True, null=True)
     primary_traveler = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_travelactivity_primary_traveler_id')

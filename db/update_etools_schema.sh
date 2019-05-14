@@ -57,6 +57,7 @@ CLEAN=1
 INSPECT=1
 INTERACTIVE=0
 BASE_SCHEMAS="uat,libya,chad"
+BASE_SCHEMA="uat"
 
 while [[ "$1" != "" ]]; do
 case $1 in
@@ -505,3 +506,6 @@ duration=$(( end - start ))
 
 echo "Done!!!"
 echo "Total of $duration seconds elapsed for process"
+
+
+

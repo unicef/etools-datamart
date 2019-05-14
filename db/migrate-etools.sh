@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
+set -ex
 
-TAG=${1:-v6.9}
+TAG=${1:-6.10}
+
+# from 6.9 to 6.10
+# django-admin migrate --fake core 0001
+# django-admin migrate core
+# django-admin migrate --fake reports 0016
+
 
 docker run \
     -it \
