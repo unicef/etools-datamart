@@ -222,11 +222,12 @@ class Command(BaseCommand):
                         warnings.warn(f"Unable to create default users. {e}")
 
             self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
-            SchemaAccessControl.objects.get_or_create(group=public_areas,
-                                                      schemas=get_everybody_available_areas())
+            SchemaAccessControl.objects.update_or_create(group=public_areas,
+                                                         defaults={'schemas': get_everybody_available_areas()})
 
-            SchemaAccessControl.objects.get_or_create(group=restricted_areas,
-                                                      schemas=get_restricted_areas())
+            self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
+            SchemaAccessControl.objects.update_or_create(group=restricted_areas,
+                                                         defaults={'schemas': get_restricted_areas()})
 
             from unicef_rest_framework.models import Service
             created, deleted, total = Service.objects.load_services()
