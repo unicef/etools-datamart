@@ -8,6 +8,45 @@ from etools_datamart.apps.data import models
 from .. import common
 
 
+class ActionPointSerializerV2(DataMartSerializer):
+    # action_point_reference_number
+    # action_point_url
+    # actions_taken
+    # area_code
+    # assigned_by_email
+    # assigned_by_name = serializer
+    # assigned_to_email
+    # assigned_to_name
+    # category_module
+    # country_name
+    # cp_output
+    # cp_output_id
+    # created
+    # date_of_completion
+    # description
+    # due_date
+    # fam_category
+    # high_priority
+    # location_level
+    # location_levelname
+    # location_name
+    # location_pcode
+    # module_reference_number
+    # module_task_activity_reference_number
+    # office
+    # partner_name
+    # pd_ssfa_reference_number
+    # pd_ssfa_title
+    # related_module_URL
+    # section
+    # status
+    # vendor_number
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.ActionPoint
+        exclude = None
+        fields = '__all__'
+
 class ActionPointSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
@@ -33,3 +72,7 @@ class ActionPointViewSet(common.DataMartViewSet):
     serializer_class = ActionPointSerializer
     queryset = models.ActionPoint.objects.all()
     filter_fields = ('vendor_code', 'fr_type', 'start_date')
+
+    def get_serializer(self, *args, **kwargs):
+        return super().get_serializer(*args, **kwargs)
+

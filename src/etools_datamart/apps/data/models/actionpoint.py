@@ -1,15 +1,68 @@
 from django.db import models
 
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.enrichment.consts import ActionPointConsts, CategoryConsts
-from etools_datamart.apps.etools.models import ActionPointsActionpoint
+from etools_datamart.apps.etools.models import ActionPointsActionpoint, DjangoComments, DjangoContentType
+
+
+# reference_number(self):
+# return '{}/{}/{}/APD'.format(
+#     connection.tenant.country_short_code or '',
+#     self.created.year,
+#     self.id,
+# )
+
+class ActionPointLoader(Loader):
+    def get_reference_number(self, original: ActionPointsActionpoint, values: dict):
+        country = self.context['country']
+        return '{}/{}/{}/APD'.format(country.country_short_code or '',
+                                     original.created.year,
+                                     original.id)
+
+    def get_actions_taken(self, original: ActionPointsActionpoint, values: dict):
+        ct = DjangoContentType.objects.get(app_label='action_points', model='actionpoint')
+        comments = DjangoComments.objects.filter(object_pk=original.id,
+                                                 content_type=ct)
+        return ";\n\n".join(["{} ({}): {}".format(c.user if c.user else '-', c.submit_date.strftime(
+            "%d %b %Y"), c.comment) for c in comments.all()])
+
+    # @property
+    # def engagement_subclass(self):
+    #     return self.engagement.get_subclass() if self.engagement else None
+    # @property
+    # def related_object(self):
+    #     return self.engagement_subclass or self.tpm_activity or self.travel_activity
+
+    # @property
+    # def related_object_url(self):
+    #     obj = self.related_object
+    #     if not obj:
+    #         return
+    #
+    #     return obj.get_object_url()
+    #
+    # @property
+    # def related_module(self):
+    #     if self.engagement:
+    #         return self.MODULE_CHOICES.audit
+    #     if self.tpm_activity:
+    #         return self.MODULE_CHOICES.tpm
+    #     if self.travel_activity:
+    #         return self.MODULE_CHOICES.t2f
+    #     return self.MODULE_CHOICES.apd
 
 
 class ActionPoint(LocationMixin, DataMartModel):
-    author_username = models.CharField(max_length=200)
-    assigned_by_username = models.CharField(max_length=200)
-    assigned_to_username = models.CharField(max_length=200)
+    reference_number = models.CharField(max_length=200, blank=True, null=True)
+
+    author_username = models.CharField(max_length=200, blank=True, null=True)
+    assigned_by_username = models.CharField(max_length=200, blank=True, null=True)
+    assigned_by_email = models.CharField(max_length=200, blank=True, null=True)
+    assigned_to_username = models.CharField(max_length=200, blank=True, null=True)
+    assigned_to_email = models.CharField(max_length=200, blank=True, null=True)
+
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=10,
@@ -19,6 +72,7 @@ class ActionPoint(LocationMixin, DataMartModel):
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateTimeField(blank=True, null=True)
     high_priority = models.BooleanField(blank=True, null=True)
+    cp_output = models.TextField(blank=True, null=True)
 
     # Intervention
     intervention_source_id = models.IntegerField(blank=True, null=True)
@@ -27,7 +81,8 @@ class ActionPoint(LocationMixin, DataMartModel):
     office = models.CharField(max_length=64, blank=True, null=True)
 
     partner_source_id = models.IntegerField(blank=True, null=True)
-    partner_name = models.CharField(max_length=300, blank=True, null=True)
+    partner_name = models.CharField('Partner Name',
+                                    max_length=300, blank=True, null=True)
 
     engagement_source_id = models.IntegerField(blank=True, null=True)
     engagement_type = models.CharField(max_length=64, blank=True, null=True)
@@ -42,10 +97,12 @@ class ActionPoint(LocationMixin, DataMartModel):
     travel_activity_travel_type = models.CharField(max_length=64, blank=True, null=True)
 
     category_source_id = models.IntegerField(blank=True, null=True)
-    category_module = models.CharField(max_length=64,
+    category_module = models.CharField('Related Module',
+                                       max_length=64,
                                        choices=CategoryConsts.MODULE_CHOICES,
                                        blank=True, null=True)
 
+    actions_taken = models.TextField(blank=True, null=True)
     # assigned_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_action_points_actionpoint_assigned_by_id')
     # assigned_to = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_action_points_actionpoint_assigned_to_id')
     # author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_action_points_actionpoint_author_id')
@@ -60,6 +117,7 @@ class ActionPoint(LocationMixin, DataMartModel):
     # high_priority = models.BooleanField()
     # travel_activity = models.ForeignKey('T2FTravelactivity', models.DO_NOTHING, related_name='t2ftravelactivity_action_points_actionpoint_travel_activity_id', blank=True, null=True)
     # category = models.ForeignKey('CategoriesCategory', models.DO_NOTHING, related_name='categoriescategory_action_points_actionpoint_category_id', blank=True, null=True)
+    loader = ActionPointLoader()
 
     class Options:
         source = ActionPointsActionpoint
@@ -69,13 +127,14 @@ class ActionPoint(LocationMixin, DataMartModel):
             assigned_to_username='assigned_to.username',
             intervention_source_id='intervention.id',
             intervention_number='intervention.number',
+            cp_output='cp_output.name',
             office='office.name',
             partner_source_id='partner.id',
             partner_name='partner.name',
             engagement_source_id='engagement.id',
             engagement_type='engagement.type',
-            section_source_id='sector.id',
-            section_type='sector.name',
+            section_source_id='section.id',
+            section_type='section.name',
             travel_activity_source_id='travel_activity.id',
             travel_activity_travel_type='travel_activity.travel_type',
             category_source_id='category.id',

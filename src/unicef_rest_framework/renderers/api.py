@@ -67,7 +67,8 @@ class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
         # ctx['response_headers']['filters'] = getattr(view, 'filter_fields', '')
 
         ctx['extra_actions'] = view.get_extra_action_url_map()
-        ctx['base_action'] = reverse(f'api:{view.basename}-list', args=['latest'])
+        # ctx['base_action'] = reverse(f'api:{view.basename}-list', args=['latest'])
+        ctx['base_action'] = ''
 
         if request.user.is_staff:
             try:

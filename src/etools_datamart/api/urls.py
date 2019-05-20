@@ -11,45 +11,42 @@ class ReadOnlyRouter(APIReadOnlyRouter):
     pass
 
 
-v1 = ReadOnlyRouter()
-v1.register(r'etools/audit/engagement', endpoints.EngagementViewSet)
-v1.register(r'etools/funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
-v1.register(r'etools/funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
-v1.register(r'etools/funds/grant', endpoints.GrantViewSet)
-v1.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
-v1.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
-v1.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
-v1.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
-v1.register(r'datamart/locations', endpoints.LocationViewSet)
-v1.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
-v1.register(r'datamart/funds-reservation', endpoints.FundsReservationViewSet)
-v1.register(r'datamart/hact', endpoints.HACTViewSet)
-v1.register(r'datamart/interventions', endpoints.InterventionViewSet)
-v1.register(r'datamart/interventions-locations', endpoints.InterventionByLocationViewSet)
-v1.register(r'datamart/interventions-budget', endpoints.InterventionBudgetViewSet)
-v1.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)
-v1.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
-v1.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
+router = ReadOnlyRouter()
+router.register(r'etools/audit/engagement', endpoints.EngagementViewSet)
+router.register(r'etools/funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
+router.register(r'etools/funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
+router.register(r'etools/funds/grant', endpoints.GrantViewSet)
+router.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
+router.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
+router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
+router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
+router.register(r'datamart/locations', endpoints.LocationViewSet)
+router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
+router.register(r'datamart/funds-reservation', endpoints.FundsReservationViewSet)
+router.register(r'datamart/hact', endpoints.HACTViewSet)
+router.register(r'datamart/interventions', endpoints.InterventionViewSet)
+router.register(r'datamart/interventions-locations', endpoints.InterventionByLocationViewSet)
+router.register(r'datamart/interventions-budget', endpoints.InterventionBudgetViewSet)
+router.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)
+router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
+router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
 
-v1.register(r'datamart/reports/sections', endpoints.SectionViewSet)
+router.register(r'datamart/reports/sections', endpoints.SectionViewSet)
 
-v1.register(r'datamart/users', endpoints.EtoolsUserViewSet)
-v1.register(r'datamart/user-offices', endpoints.OfficeViewSet)
-v1.register(r'datamart/travels', endpoints.TravelViewSet)
-v1.register(r'datamart/travel-activities', endpoints.TravelActivityViewSet)
-v1.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
-v1.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
-v1.register(r'datamart/partners', endpoints.PartnerViewSet)
+router.register(r'datamart/users', endpoints.EtoolsUserViewSet)
+router.register(r'datamart/user-offices', endpoints.OfficeViewSet)
+router.register(r'datamart/travels', endpoints.TravelViewSet)
+router.register(r'datamart/travel-activities', endpoints.TravelActivityViewSet)
+router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
+router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
+router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
-v1.register(r'system/monitor', endpoints.MonitorViewSet)
+router.register(r'system/monitor', endpoints.MonitorViewSet)
 
-v2 = ReadOnlyRouter()
-v2.register(r'etools/audit/engagement', endpoints.EngagementViewSet)
-
+# urlpatterns = router.urls
 
 urlpatterns = [
-    re_path(r'(?P<version>(v1))/', include(v1.urls)),
-    re_path(r'(?P<version>(v2|latest))/', include(v2.urls)),
+    re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),
 
     path(r'+swagger/', endpoints.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path(r'+redoc/', endpoints.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
