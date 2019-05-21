@@ -1,5 +1,7 @@
 from django import forms
+from rest_framework import serializers
 
+from etools_datamart.apps.etools.enrichment.consts import CategoryConsts
 from unicef_rest_framework.forms import DateRangePickerField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
@@ -9,43 +11,60 @@ from .. import common
 
 
 class ActionPointSerializerV2(DataMartSerializer):
-    # action_point_reference_number
-    # action_point_url
-    # actions_taken
-    # area_code
-    # assigned_by_email
-    # assigned_by_name = serializer
-    # assigned_to_email
-    # assigned_to_name
-    # category_module
-    # country_name
-    # cp_output
-    # cp_output_id
-    # created
-    # date_of_completion
-    # description
-    # due_date
-    # fam_category
-    # high_priority
-    # location_level
-    # location_levelname
-    # location_name
-    # location_pcode
-    # module_reference_number
-    # module_task_activity_reference_number
-    # office
-    # partner_name
-    # pd_ssfa_reference_number
-    # pd_ssfa_title
-    # related_module_URL
-    # section
-    # status
-    # vendor_number
+    section = serializers.CharField(source='section_type')
+    pd_ssfa_title = serializers.CharField(source='intervention_title')
+    pd_ssfa_reference_number = serializers.CharField(source='intervention_title')
+    fam_category = serializers.CharField(source='category_description')
+    action_point_url = serializers.SerializerMethodField()
+    related_module_url = serializers.SerializerMethodField()
+
+    def get_action_point_url(self, obj):
+        return "https://etools.unicef.org/apd/action-points/detail/%s" % obj.source_id
+
+    def get_related_module_url(self, obj):
+        if obj.category_description == CategoryConsts.MODULE_CHOICES.t2f:
+            return "https://etools.unicef.org/t2f/edit-travel/%s" % obj.source.id
+        elif obj.category_description == CategoryConsts.MODULE_CHOICES.audit:
+            raise NotImplementedError
+        elif obj.category_description == CategoryConsts.MODULE_CHOICES.tpm:
+            raise NotImplementedError
 
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
         exclude = None
-        fields = '__all__'
+        fields = ('reference_number',
+                  'created',
+                  'status',
+                  'assigned_by_name',
+                  'assigned_by_email',
+                  'assigned_to_name',
+                  'assigned_to_email',
+                  'office',
+                  'section',
+                  'due_date',
+                  'date_of_completion',
+                  'high_priority',
+                  'description',
+                  'actions_taken',
+                  'country_name',
+                  'area_code',
+                  'location_name',
+                  'location_pcode',
+                  'location_level',
+                  'location_levelname',
+                  'partner_name',
+                  'vendor_number',
+                  'cp_output',
+                  'cp_output_id',
+                  'pd_ssfa_title',
+                  'pd_ssfa_reference_number',
+                  'category_module',
+                  'module_reference_number',
+                  'module_task_activity_reference_number',
+                  'fam_category',
+                  'related_module_url',
+                  'action_point_url')
+
 
 class ActionPointSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
@@ -72,7 +91,8 @@ class ActionPointViewSet(common.DataMartViewSet):
     serializer_class = ActionPointSerializer
     queryset = models.ActionPoint.objects.all()
     filter_fields = ('vendor_code', 'fr_type', 'start_date')
+    serializers_fieldsets = {'std': ActionPointSerializer,
+                             'v2': ActionPointSerializerV2}
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)
-

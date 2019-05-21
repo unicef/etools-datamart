@@ -1,6 +1,14 @@
 import decimal
 
+from django.db import models
 from django.utils.translation import gettext as _
+from model_utils import Choices
+
+
+def enrich(model: models.Model, cls):
+    for attr, value in cls.__dict__.items():
+        if not attr.startswith('_'):
+            setattr(model, attr, value)
 
 
 class PartnerType:
@@ -121,12 +129,25 @@ class T2FTravelConsts:
 
 
 class CategoryConsts:
-    MODULE_CHOICES = (
+    MODULE_CHOICES = Choices(
         ('apd', _('Action Points')),
         ('t2f', _('Trip Management')),
         ('tpm', _('Third Party Monitoring')),
         ('audit', _('Financial Assurance')),
     )
+
+
+class AuditEngagementConsts:
+    TYPE_AUDIT = 'audit'
+    TYPE_MICRO_ASSESSMENT = 'ma'
+    TYPE_SPOT_CHECK = 'sc'
+    TYPE_SPECIAL_AUDIT = 'sa'
+
+    TYPES = ((TYPE_AUDIT, _('Audit')),
+             (TYPE_MICRO_ASSESSMENT, _('Micro Assessment')),
+             (TYPE_SPOT_CHECK, _('Spot Check')),
+             (TYPE_SPECIAL_AUDIT, _('Special Audit')),
+             )
 
 
 class ActionPointConsts:
@@ -149,3 +170,9 @@ class ActionPointConsts:
         ('status_update', _('Status Update')),
         ('reassign', _('Reassign')),
     )
+
+    MAPS = {AuditEngagementConsts.TYPE_SPOT_CHECK: 'AuditSpotcheck',
+            AuditEngagementConsts.TYPE_AUDIT: 'AuditMicroassessment',
+            AuditEngagementConsts.TYPE_MICRO_ASSESSMENT: 'AuditAudit',
+            AuditEngagementConsts.TYPE_SPECIAL_AUDIT: 'AuditSpecialaudit',
+            }
