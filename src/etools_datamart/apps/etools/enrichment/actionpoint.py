@@ -1,19 +1,12 @@
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.module_loading import import_string
 
-from model_utils import Choices
-from sentry_sdk import capture_exception
-
-from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAudit,
-                                                AuditMicroassessment, AuditSpecialaudit,
-                                                AuditSpotcheck, )
-
-from .audit_engagement import AuditEngagement
+                                                AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,)
 
 logger = logging.getLogger()
+
 
 # ActionPointsActionpoint.MODULE_CHOICES = Choices(
 #     ('apd', 'Action Points'),
@@ -30,20 +23,30 @@ logger = logging.getLogger()
 
 
 def get_related_object(self):
+    targets = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
     if self.engagement:
-        obj = None
-        try:
-            model_name = self.MAPS[self.engagement.engagement_type]
-            model = import_string('etools_datamart.apps.etools.models.%s' % model_name)
-            obj = model.objects.get(engagement_ptr=self.engagement_id)
-        except ObjectDoesNotExist as e:
-            capture_exception()
-            logger.error("Cannot retrieve related object %s "
-                         "'%s' for ActionPoint #%s in %s" % (model.__name__,
-                                                             self.engagement.engagement_type,
-                                                             self.pk,
-                                                             self.schema))
-        return obj
+        for target in targets:
+            try:
+                return target.objects.get(engagement_ptr=self.engagement_id)
+            except ObjectDoesNotExist:
+                pass
+                logger.error("Cannot retrieve related for ActionPoint #%s in %s" % (
+                    self.pk,
+                    self.schema))
+    # if self.engagement:
+    #     obj = None
+    #     try:
+    #         model_name = self.MAPS[self.engagement.engagement_type]
+    #         model = import_string('etools_datamart.apps.etools.models.%s' % model_name)
+    #         obj = model.objects.get(engagement_ptr=self.engagement_id)
+    #     except ObjectDoesNotExist as e:
+    #         capture_exception()
+    #         logger.error("Cannot retrieve related object %s "
+    #                      "'%s' for ActionPoint #%s in %s" % (model.__name__,
+    #                                                          self.engagement.engagement_type,
+    #                                                          self.pk,
+    #                                                          self.schema))
+    #     return obj
     elif self.tpm_activity:
         return self.tpm_activity
     elif self.travel_activity:

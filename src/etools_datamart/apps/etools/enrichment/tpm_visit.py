@@ -2,7 +2,7 @@ from django.db import models
 
 from etools_datamart.apps.etools.enrichment.utils import create_alias
 from etools_datamart.apps.etools.models import (TpmpartnersTpmpartnerstaffmember, TpmTpmvisit,
-                                                TpmTpmvisitTpmPartnerFocalPoints, )
+                                                TpmTpmvisitTpmPartnerFocalPoints,)
 
 models.ManyToManyField(TpmpartnersTpmpartnerstaffmember,
                        through=TpmTpmvisitTpmPartnerFocalPoints,

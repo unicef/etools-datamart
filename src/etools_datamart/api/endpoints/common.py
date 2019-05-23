@@ -1,6 +1,5 @@
-from inspect import isclass
-
 from functools import wraps
+from inspect import isclass
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
@@ -9,7 +8,7 @@ from django.http import Http404
 import coreapi
 import coreschema
 from drf_querystringfilter.exceptions import QueryFilterException
-from dynamic_serializer.core import InvalidSerializerError, DynamicSerializer
+from dynamic_serializer.core import DynamicSerializer, InvalidSerializerError
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
@@ -177,9 +176,6 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 
 class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
     def _get_serializer_from_param(self, name=None):
-        version = self.request.version
-        self.serializers_fieldsets
-
         if name is None:
             name = self.request.query_params.get(self.serializer_field_param, 'std')
 
@@ -196,4 +192,3 @@ class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
             return target
         else:  # Standard Serializer
             raise InvalidSerializerError
-

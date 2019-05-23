@@ -2,7 +2,7 @@ from django.db import models
 
 from etools_datamart.apps.etools.enrichment.utils import set_primary_key
 from etools_datamart.apps.etools.models import (ActivitiesActivity, ActivitiesActivityLocations, AuthUser,
-                                                LocationsLocation, TpmTpmactivity, TpmTpmactivityUnicefFocalPoints, )
+                                                LocationsLocation, TpmTpmactivity, TpmTpmactivityUnicefFocalPoints,)
 
 models.ManyToManyField(LocationsLocation,
                        through=ActivitiesActivityLocations,

@@ -238,11 +238,15 @@ class ActionPointAdmin(DataModelAdmin):
                     'intervention_number',
                     'engagement_type',
                     'category_module',
+                    'engagement_subclass',
+                    'related_module_class',
                     'high_priority',
                     'status',
                     'office'
                     )
-    list_filter = ('high_priority', 'engagement_type', 'status', 'category_module')
+    list_filter = ('high_priority', 'engagement_type', 'status',
+                   'related_module_class',
+                   'category_module')
 
 
 @register(models.TPMVisit)

@@ -1,11 +1,12 @@
 from django import forms
+
 from rest_framework import serializers
 
-from etools_datamart.apps.etools.enrichment.consts import CategoryConsts
 from unicef_rest_framework.forms import DateRangePickerField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
+from etools_datamart.apps.etools.enrichment.consts import CategoryConsts
 
 from .. import common
 
@@ -25,9 +26,15 @@ class ActionPointSerializerV2(DataMartSerializer):
         if obj.category_description == CategoryConsts.MODULE_CHOICES.t2f:
             return "https://etools.unicef.org/t2f/edit-travel/%s" % obj.source.id
         elif obj.category_description == CategoryConsts.MODULE_CHOICES.audit:
-            raise NotImplementedError
+            return "https://etools.unicef.org/audits/%s/overview" % obj.source.id
+            # "https://etools.unicef.org/ap/micro-assessments/%s/overview"
+            # "https://etools.unicef.org/ap/spot-checks/%s/overview"
+            # "https://etools.unicef.org/ap/special-audits/%s/overview"
+            # if obj engagement-type
+            # return "https://etools.unicef.org/t2f/edit-travel/%s" % obj.source.id
         elif obj.category_description == CategoryConsts.MODULE_CHOICES.tpm:
-            raise NotImplementedError
+            pass
+            # return "https://etools.unicef.org/t2f/edit-travel/%s" % obj.source.id
 
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint

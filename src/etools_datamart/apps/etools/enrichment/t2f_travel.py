@@ -31,4 +31,3 @@ T2FTravel.get_reference_number = get_reference_number
 @property
 def task_number(self):
     return list(self.travel.activities.values_list('id', flat=True)).index(self.id) + 1
-

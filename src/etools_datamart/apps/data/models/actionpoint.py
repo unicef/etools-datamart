@@ -1,13 +1,14 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils.functional import cached_property
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.enrichment.consts import ActionPointConsts, CategoryConsts
-from etools_datamart.apps.etools.models import ActionPointsActionpoint, DjangoComments, DjangoContentType, \
-    PartnersIntervention, AuditEngagement, AuditSpotcheck, AuditMicroassessment, AuditAudit, AuditSpecialaudit
-
+from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
+                                                AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
+                                                DjangoComments, DjangoContentType, PartnersIntervention,
+                                                T2FTravelactivity, TpmTpmactivity,)
 
 # reference_number(self):
 # return '{}/{}/{}/APD'.format(
@@ -15,6 +16,12 @@ from etools_datamart.apps.etools.models import ActionPointsActionpoint, DjangoCo
 #     self.created.year,
 #     self.id,
 # )
+ENGAGEMENTS = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
+
+RELATED_MODULES = ENGAGEMENTS + [TpmTpmactivity, T2FTravelactivity]
+
+RELATED_MODULE_NAMES = [c.__name__ for c in RELATED_MODULES]
+RELATED_MODULE_CHOICES = zip(RELATED_MODULE_NAMES, RELATED_MODULE_NAMES)
 
 
 class ActionPointLoader(Loader):
@@ -35,6 +42,35 @@ class ActionPointLoader(Loader):
                                                  content_type=ct)
         return ";\n\n".join(["{} ({}): {}".format(c.user if c.user else '-', c.submit_date.strftime(
             "%d %b %Y"), c.comment) for c in comments.all()])
+
+    def get_related_module_class(self, original: ActionPointsActionpoint, values: dict):
+        # targets = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
+        if original.engagement:
+            for target in ENGAGEMENTS:
+                try:
+                    target.objects.get(engagement_ptr=original.engagement_id)
+                    return target.__name__
+                except ObjectDoesNotExist:
+                    pass
+            return 'Error'
+        elif original.tpm_activity:
+            return 'TpmTpmactivity'
+        elif original.travel_activity:
+            return 'T2FTravelactivity'
+        return None
+
+    def get_engagement_subclass(self, original: ActionPointsActionpoint, values: dict):
+        # targets = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
+        if not original.engagement:
+            return None
+        for target in ENGAGEMENTS:
+            try:
+                target.objects.get(engagement_ptr=original.engagement_id)
+                return target.__name__
+            except ObjectDoesNotExist:
+                pass
+        raise ValueError('Cannot find subclass for ActionPoint #%s Engagement %s' % (original.id,
+                                                                                     original.engagement_id))
 
     def get_intervention_number(self, original: ActionPointsActionpoint, values: dict):
         intervention = original.intervention
@@ -112,7 +148,11 @@ class ActionPoint(LocationMixin, DataMartModel):
 
     engagement_source_id = models.IntegerField(blank=True, null=True)
     engagement_type = models.CharField(max_length=64, blank=True, null=True, db_index=True)
+    engagement_subclass = models.CharField(max_length=64, blank=True, null=True, db_index=True)
 
+    related_module_class = models.CharField(max_length=64,
+                                            choices=RELATED_MODULE_CHOICES,
+                                            blank=True, null=True, db_index=True)
     section_source_id = models.IntegerField(blank=True, null=True)
     section_type = models.CharField(max_length=64, blank=True, null=True)
 
@@ -134,7 +174,6 @@ class ActionPoint(LocationMixin, DataMartModel):
     module_task_activity_reference_number = models.CharField(max_length=300, blank=True, null=True)
     related_module_url = models.CharField(max_length=300, blank=True, null=True)
     action_point_url = models.CharField(max_length=300, blank=True, null=True)
-
 
     loader = ActionPointLoader()
 
