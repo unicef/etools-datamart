@@ -442,7 +442,7 @@ REST_FRAMEWORK = {
     'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'unicef_rest_framework.negotiation.CT',
     'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSIONING_CLASS': 'unicef_rest_framework.versioning.URFVersioning',
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
     'DATETIME_FORMAT': DATETIME_FORMAT
@@ -619,7 +619,7 @@ LOGGING_DEBUG = {
 TENANT_MODEL = 'etools.UsersCountry'
 ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 
-UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
+UNICEF_REST_FRAMEWORK_ROUTERS = 'etools_datamart.api.urls.router'
 
 SCHEMA_FILTER = {}
 SCHEMA_EXCLUDE = {'schema_name__in': env.list('IGNORED_SCHEMAS')}

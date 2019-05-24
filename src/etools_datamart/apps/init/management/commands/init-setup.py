@@ -221,11 +221,11 @@ class Command(BaseCommand):
                     except Exception as e:  # pragma: no cover
                         warnings.warn(f"Unable to create default users. {e}")
 
-            self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
+            self.stdout.write(f"Grants public schemas to group `Endpoints all access`")
             SchemaAccessControl.objects.update_or_create(group=public_areas,
                                                          defaults={'schemas': get_everybody_available_areas()})
 
-            self.stdout.write(f"Grants all schemas to group `Endpoints all access`")
+            self.stdout.write(f"Grants restricted schemas to group `Restricted areas access`")
             SchemaAccessControl.objects.update_or_create(group=restricted_areas,
                                                          defaults={'schemas': get_restricted_areas()})
 
@@ -237,8 +237,8 @@ class Command(BaseCommand):
                 GroupAccessControl.objects.get_or_create(
                     group=public_areas,
                     service=service,
-                    serializers=['*'],
-                    policy=GroupAccessControl.POLICY_ALLOW
+                    defaults={'serializers': ['*'],
+                              'policy': GroupAccessControl.POLICY_ALLOW}
                 )
             for area, users in RESTRICTED_AREAS.items():
                 for email in users:

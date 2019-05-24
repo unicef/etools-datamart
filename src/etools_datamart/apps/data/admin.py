@@ -234,14 +234,19 @@ class TravelActivityAdmin(DataModelAdmin):
 
 @register(models.ActionPoint)
 class ActionPointAdmin(DataModelAdmin):
-    list_display = ('description',
-                    'due_date',
-                    'date_of_completion',
-                    'high_priority',
+    list_display = ('reference_number',
                     'intervention_number',
+                    'engagement_type',
+                    'category_module',
+                    'engagement_subclass',
+                    'related_module_class',
+                    'high_priority',
+                    'status',
                     'office'
                     )
-    list_filter = ('high_priority', 'engagement_type', 'status')
+    list_filter = ('high_priority', 'engagement_type', 'status',
+                   'related_module_class',
+                   'category_module')
 
 
 @register(models.TPMVisit)

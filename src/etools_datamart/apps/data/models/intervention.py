@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class InterventionLoader(Loader):
-    def fr_currencies_ok(self, original: PartnersIntervention):
-        return original.frs__currency__count == 1 if original.frs__currency__count else None
+    # def fr_currencies_ok(self, original: PartnersIntervention):
+    #     return original.frs__currency__count == 1 if original.frs__currency__count else None
 
     def get_sections(self, original: PartnersIntervention, values: dict):
         # PartnersInterventionFlatLocations

@@ -46,7 +46,7 @@ router.register(r'system/monitor', endpoints.MonitorViewSet)
 # urlpatterns = router.urls
 
 urlpatterns = [
-    re_path(r'(?P<version>(v1|latest))/', include(router.urls)),
+    re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),
 
     path(r'+swagger/', endpoints.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path(r'+redoc/', endpoints.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
