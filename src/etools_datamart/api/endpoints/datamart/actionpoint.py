@@ -6,9 +6,15 @@ from unicef_rest_framework.forms import DateRangePickerField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.enrichment.consts import CategoryConsts
 
 from .. import common
+
+URLMAP = {'AuditSpotcheck': "https://etools.unicef.org/ap/spot-checks/%s/overview",
+          'AuditMicroassessment': "https://etools.unicef.org/ap/micro-assessments/%s/overview",
+          'AuditSpecialaudit': "https://etools.unicef.org/ap/special-audits/%s/overview",
+          'AuditAudit': "https://etools.unicef.org/audits/%s/overview",
+          'TpmTpmactivity': "",
+          'T2FTravelactivity': "https://etools.unicef.org/t2f/edit-travel/%s"}
 
 
 class ActionPointSerializerV2(DataMartSerializer):
@@ -23,18 +29,8 @@ class ActionPointSerializerV2(DataMartSerializer):
         return "https://etools.unicef.org/apd/action-points/detail/%s" % obj.source_id
 
     def get_related_module_url(self, obj):
-        if obj.category_description == CategoryConsts.MODULE_CHOICES.t2f:
-            return "https://etools.unicef.org/t2f/edit-travel/%s" % obj.source.id
-        elif obj.category_description == CategoryConsts.MODULE_CHOICES.audit:
-            return "https://etools.unicef.org/audits/%s/overview" % obj.source.id
-            # "https://etools.unicef.org/ap/micro-assessments/%s/overview"
-            # "https://etools.unicef.org/ap/spot-checks/%s/overview"
-            # "https://etools.unicef.org/ap/special-audits/%s/overview"
-            # if obj engagement-type
-            # return "https://etools.unicef.org/t2f/edit-travel/%s" % obj.source.id
-        elif obj.category_description == CategoryConsts.MODULE_CHOICES.tpm:
-            pass
-            # return "https://etools.unicef.org/t2f/edit-travel/%s" % obj.source.id
+        base_url = URLMAP[obj.related_module_class]
+        return base_url % obj.source.id
 
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
