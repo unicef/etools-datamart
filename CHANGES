@@ -13,6 +13,7 @@
 * fixes formats popup menu
 * new LocationMixin
 * fixes Partner.hact_values handling
+* ActionPoint - new serializer
 
 1.21
 ----
