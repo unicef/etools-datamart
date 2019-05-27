@@ -20,4 +20,13 @@ def get_reference_number(self, country):
     )
 
 
-TpmTpmvisit.get_reference_number = get_reference_number
+def _get_reference_number(self):
+    return '{}/{}/{}/TPM'.format(
+        self.get_country_instance().country_short_code or '',
+        self.created.year,
+        self.id,
+    )
+
+
+# TpmTpmvisit.get_reference_number = get_reference_number
+TpmTpmvisit.reference_number = property(_get_reference_number)

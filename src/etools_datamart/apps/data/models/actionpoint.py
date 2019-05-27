@@ -17,6 +17,7 @@ from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAu
 #     self.id,
 # )
 ENGAGEMENTS = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
+ENGAGEMENTS_NAMES = [c.__name__ for c in ENGAGEMENTS]
 
 RELATED_MODULES = ENGAGEMENTS + [TpmTpmactivity, T2FTravelactivity]
 
@@ -43,8 +44,23 @@ class ActionPointLoader(Loader):
         return ";\n\n".join(["{} ({}): {}".format(c.user if c.user else '-', c.submit_date.strftime(
             "%d %b %Y"), c.comment) for c in comments.all()])
 
+    # def get_module_task_activity_reference_number(self, original: ActionPointsActionpoint, values: dict):
+    #     if original.tpm_activity:
+    #         return original.tpm_activity.tpm_visit.reference_number
+    #
+    def get_related_module_id(self, original: ActionPointsActionpoint, values: dict):
+        module = values['related_module_class']
+        if module in ENGAGEMENTS_NAMES:
+            return original.engagement.pk
+        elif module == 'TpmTpmactivity':
+            return original.tpm_activity.tpm_visit_id
+        elif module == 'T2FTravelactivity':
+            return original.travel_activity.pk
+        elif module is None:
+            return None
+        raise ValueError(values['related_module_class'])
+
     def get_related_module_class(self, original: ActionPointsActionpoint, values: dict):
-        # targets = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
         if original.engagement:
             for target in ENGAGEMENTS:
                 try:
@@ -97,7 +113,7 @@ class ActionPointLoader(Loader):
                 original.id
             )
         elif original.tpm_activity:
-            return original.tpm_activity.tpm_visit.get_reference_number(self.context['country'])
+            return original.tpm_activity.tpm_visit.reference_number
         elif original.travel_activity:
             ta = original.travel_activity
             travel = ta.travels.filter(traveler=ta.primary_traveler).first()
@@ -110,8 +126,8 @@ class ActionPointLoader(Loader):
         if not obj:
             return 'n/a'
 
-        # if original.tpm_activity:
-        #     return 'Task No {0} for Visit {1}'.format(obj.task_number, obj.tpm_visit.reference_number)
+        if original.tpm_activity:
+            return obj.tpm_visit.reference_number
 
 
 class ActionPoint(LocationMixin, DataMartModel):
@@ -153,6 +169,7 @@ class ActionPoint(LocationMixin, DataMartModel):
     related_module_class = models.CharField(max_length=64,
                                             choices=RELATED_MODULE_CHOICES,
                                             blank=True, null=True, db_index=True)
+    related_module_id = models.IntegerField(blank=True, null=True, db_index=True)
     section_source_id = models.IntegerField(blank=True, null=True)
     section_type = models.CharField(max_length=64, blank=True, null=True)
 
@@ -172,8 +189,8 @@ class ActionPoint(LocationMixin, DataMartModel):
     actions_taken = models.TextField(blank=True, null=True)
     module_reference_number = models.CharField(max_length=300, blank=True, null=True)
     module_task_activity_reference_number = models.CharField(max_length=300, blank=True, null=True)
-    related_module_url = models.CharField(max_length=300, blank=True, null=True)
-    action_point_url = models.CharField(max_length=300, blank=True, null=True)
+    # related_module_url = models.CharField(max_length=300, blank=True, null=True)
+    # action_point_url = models.CharField(max_length=300, blank=True, null=True)
 
     loader = ActionPointLoader()
 

@@ -6,6 +6,7 @@ from pathlib import Path
 import environ
 
 from etools_datamart.libs.dbrouter import router_factory
+from etools_datamart.libs.version import get_full_version
 
 SETTINGS_DIR = Path(__file__).parent
 PACKAGE_DIR = SETTINGS_DIR.parent
@@ -408,6 +409,7 @@ AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
 AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
+    'ETOOLS_ADDRESS': ('https://etools.unicef.org', 'eTools hostname', str),
     'CACHE_VERSION': (1, 'Global cache version', int),
     'CACHE_ENABLED': (True, 'Enable/Disable API cache', bool),
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
@@ -649,13 +651,12 @@ IMPERSONATE = {
 SENTRY_ENABLED = env.bool('SENTRY_ENABLED', False)
 SENTRY_DSN = env('SENTRY_DSN', '')
 if SENTRY_ENABLED:
-    import bitcaster
-
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()],
-                    release=bitcaster.get_full_version(),
+    sentry_sdk.init(dsn=SENTRY_DSN,
+                    integrations=[DjangoIntegration()],
+                    release=get_full_version(),
                     debug=False)
 
 SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]

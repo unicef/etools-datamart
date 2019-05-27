@@ -1,5 +1,6 @@
 from django import forms
 
+from constance import config
 from rest_framework import serializers
 
 from unicef_rest_framework.forms import DateRangePickerField
@@ -9,12 +10,12 @@ from etools_datamart.apps.data import models
 
 from .. import common
 
-URLMAP = {'AuditSpotcheck': "https://etools.unicef.org/ap/spot-checks/%s/overview",
-          'AuditMicroassessment': "https://etools.unicef.org/ap/micro-assessments/%s/overview",
-          'AuditSpecialaudit': "https://etools.unicef.org/ap/special-audits/%s/overview",
-          'AuditAudit': "https://etools.unicef.org/audits/%s/overview",
-          'TpmTpmactivity': "",
-          'T2FTravelactivity': "https://etools.unicef.org/t2f/edit-travel/%s"}
+URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
+          'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
+          'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
+          'AuditAudit': "%s/audits/%s/overview/?schema=%s",
+          'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
+          'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s"}
 
 
 class ActionPointSerializerV2(DataMartSerializer):
@@ -26,11 +27,15 @@ class ActionPointSerializerV2(DataMartSerializer):
     related_module_url = serializers.SerializerMethodField()
 
     def get_action_point_url(self, obj):
-        return "https://etools.unicef.org/apd/action-points/detail/%s" % obj.source_id
+        return "%s/apd/action-points/detail/%s/?schema=%s" % (config.ETOOLS_ADDRESS,
+                                                              obj.source_id,
+                                                              obj.schema_name)
 
     def get_related_module_url(self, obj):
-        base_url = URLMAP[obj.related_module_class]
-        return base_url % obj.source.id
+        if obj.related_module_class:
+            base_url = URLMAP[obj.related_module_class]
+            return base_url % (config.ETOOLS_ADDRESS,
+                               obj.related_module_id, obj.schema_name)
 
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
@@ -72,8 +77,8 @@ class ActionPointSerializerV2(DataMartSerializer):
 class ActionPointSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
-        exclude = None
         fields = '__all__'
+        exclude = None
 
 
 class ActionPointFilterForm(forms.Form):

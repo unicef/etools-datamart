@@ -234,15 +234,16 @@ class TravelActivityAdmin(DataModelAdmin):
 
 @register(models.ActionPoint)
 class ActionPointAdmin(DataModelAdmin):
-    list_display = ('reference_number',
-                    'intervention_number',
-                    'engagement_type',
+    list_display = ('schema_name',
+                    'reference_number',
+                    # 'intervention_number',
+                    # 'engagement_type',
+                    # 'engagement_subclass',
                     'category_module',
-                    'engagement_subclass',
                     'related_module_class',
+                    'related_module_id',
                     'high_priority',
                     'status',
-                    'office'
                     )
     list_filter = ('high_priority', 'engagement_type', 'status',
                    'related_module_class',
