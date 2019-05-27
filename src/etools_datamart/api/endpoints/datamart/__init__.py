@@ -8,6 +8,7 @@ from .intervention import InterventionByLocationViewSet, InterventionViewSet
 from .location import LocationViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
 from .partners_partner import PartnerViewSet
+from .partners_staffmember import PartnerStaffMemberViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
 from .report_section import SectionViewSet

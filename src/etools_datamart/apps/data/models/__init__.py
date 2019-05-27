@@ -6,6 +6,7 @@ from .intervention import Intervention, InterventionByLocation  # noqa
 from .location import GatewayType, Location  # noqa
 from .partner import Partner  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
+from .partners_staffmember import PartnerStaffMember  # noqa
 from .pd_indicator import PDIndicator  # noqa
 from .pmp import PMPIndicators  # noqa
 from .report_sector import Section  # noqa

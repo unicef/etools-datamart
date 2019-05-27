@@ -2,6 +2,8 @@
 # import django_filters
 from django import forms
 
+from rest_framework import serializers
+
 from unicef_rest_framework.forms import CleareableSelect2ChoiceField, DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
@@ -9,6 +11,21 @@ from etools_datamart.apps.data import models
 from etools_datamart.apps.etools.enrichment.consts import PartnerType
 
 from .. import common
+
+
+class PartnerSerializerV2(DataMartSerializer):
+    email_address = serializers.EmailField(source='email')
+
+    class Meta:
+        model = models.Partner
+        fields = ('partner',
+                  'vendor_number',
+                  'position',
+                  'first_name',
+                  'last_name',
+                  'email_address',
+                  'phone_number',
+                  'active_staff')
 
 
 class PartnerSerializerFull(DataMartSerializer):

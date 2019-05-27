@@ -12,3 +12,4 @@ class Config(AppConfig):
     def ready(self):
         from etools_datamart.apps.etl.signals import data_refreshed
         data_refreshed.connect(invalidate_cache)
+        from . import checks  # noqa

@@ -621,7 +621,7 @@ LOGGING_DEBUG = {
 TENANT_MODEL = 'etools.UsersCountry'
 ETOOLS_DUMP_LOCATION = env('ETOOLS_DUMP_LOCATION')
 
-UNICEF_REST_FRAMEWORK_ROUTERS = 'etools_datamart.api.urls.router'
+UNICEF_REST_FRAMEWORK_ROUTER = 'etools_datamart.api.urls.router'
 
 SCHEMA_FILTER = {}
 SCHEMA_EXCLUDE = {'schema_name__in': env.list('IGNORED_SCHEMAS')}
@@ -650,6 +650,7 @@ IMPERSONATE = {
 
 SENTRY_ENABLED = env.bool('SENTRY_ENABLED', False)
 SENTRY_DSN = env('SENTRY_DSN', '')
+
 if SENTRY_ENABLED:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
