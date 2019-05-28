@@ -49,11 +49,12 @@ class Agreement(DataMartModel):
 
     partner_name = models.CharField(max_length=300, blank=True, null=True)
     country_programme = models.CharField(max_length=200, blank=True, null=True)
+    signed_by = models.CharField(max_length=200, blank=True, null=True)
 
     reference_number = models.CharField(max_length=100, blank=True, null=True)
     vendor_number = models.CharField(max_length=100, blank=True, null=True)
     signed_by_partner = models.CharField(max_length=100, blank=True, null=True)
-    partner_authorized_officers = models.CharField(max_length=2000, blank=True, null=True)
+    partner_authorized_officers = models.TextField(blank=True, null=True)
     agreement_amendments = models.TextField(blank=True, null=True)
 
     loader = AgreementLoader()
@@ -66,4 +67,6 @@ class Agreement(DataMartModel):
         mapping = {'partner_name': 'partner.name',
                    'vendor_number': 'partner.vendor_number',
                    'country_programme': 'country_programme.name',
+                   'signed_by': 'signed_by.name',
+                   'signed_by_partner': 'partner_manager.name'
                    }
