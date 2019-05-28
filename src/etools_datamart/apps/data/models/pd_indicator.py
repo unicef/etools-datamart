@@ -14,6 +14,8 @@ class PDIndicatorLoader(Loader):
         for k, v in values.items():
             if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
                 if v is not None:
+                    if ',' in v:
+                        v = v.replace(',', '.')
                     values[k] = Decimal(v)
         return values
 
