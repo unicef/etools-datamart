@@ -284,3 +284,9 @@ class OfficeAdmin(DataModelAdmin):
 @register(models.Section)
 class SectionAdmin(DataModelAdmin):
     list_display = ('name', 'description', 'alternate_name',)
+
+
+@register(models.Agreement)
+class AgreementAdmin(DataModelAdmin):
+    list_display = ('agreement_type', 'reference_number', 'agreement_number', 'partner_name',)
+    list_filter = ('agreement_type', 'status')

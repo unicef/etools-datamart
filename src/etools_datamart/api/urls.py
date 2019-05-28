@@ -19,7 +19,7 @@ router.register(r'etools/funds/grant', endpoints.GrantViewSet)
 router.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
 router.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
-router.register(r'etools/partners/contacts', endpoints.PartnerStaffMemberViewSet)
+
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
@@ -31,6 +31,9 @@ router.register(r'datamart/interventions-budget', endpoints.InterventionBudgetVi
 router.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)
 router.register(r'datamart/pmp-indicators', endpoints.PMPIndicatorsViewSet)
 router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
+
+router.register(r'datamart/partners/contacts', endpoints.PartnerStaffMemberViewSet)
+router.register(r'datamart/partners/agreements', endpoints.PartnerAgreementViewSet)
 
 router.register(r'datamart/reports/sections', endpoints.SectionViewSet)
 

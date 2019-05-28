@@ -177,3 +177,31 @@ class ActionPointConsts:
             AuditEngagementConsts.TYPE_MICRO_ASSESSMENT: 'AuditAudit',
             AuditEngagementConsts.TYPE_SPECIAL_AUDIT: 'AuditSpecialaudit',
             }
+
+
+class PartnersAgreementConst:
+    PCA = 'PCA'
+    MOU = 'MOU'
+    SSFA = 'SSFA'
+    AGREEMENT_TYPES = (
+        (PCA, "Programme Cooperation Agreement"),
+        (SSFA, 'Small Scale Funding Agreement'),
+        (MOU, 'Memorandum of Understanding'),
+    )
+
+    DRAFT = "draft"
+    SIGNED = "signed"
+    ENDED = "ended"
+    SUSPENDED = "suspended"
+    TERMINATED = "terminated"
+    STATUS_CHOICES = (
+        (DRAFT, "Draft"),
+        (SIGNED, "Signed"),
+        (ENDED, "Ended"),
+        (SUSPENDED, "Suspended"),
+        (TERMINATED, "Terminated"),
+    )
+    AUTO_TRANSITIONS = {
+        DRAFT: [SIGNED],
+        SIGNED: [ENDED],
+    }
