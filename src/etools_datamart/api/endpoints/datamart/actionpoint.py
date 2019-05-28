@@ -32,7 +32,7 @@ class ActionPointSerializerV2(DataMartSerializer):
                                                               obj.schema_name)
 
     def get_related_module_url(self, obj):
-        if obj.related_module_class:
+        if obj.related_module_class and obj.related_module_id:
             base_url = URLMAP[obj.related_module_class]
             return base_url % (config.ETOOLS_ADDRESS,
                                obj.related_module_id, obj.schema_name)
