@@ -47,12 +47,17 @@ class PDIndicator(LocationMixin, DataMartModel):
     numerator_label = models.CharField(max_length=256, blank=True, null=True)
 
     # target = models.TextField()  # This field type is a guess.
-    target_denominator = models.IntegerField(blank=True, null=True)
-    target_numerator = models.IntegerField(blank=True, null=True)
+    target_denominator = models.DecimalField(blank=True, null=True,
+                                             max_digits=10, decimal_places=3)
+
+    target_numerator = models.DecimalField(blank=True, null=True,
+                                           max_digits=10, decimal_places=3)
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
-    baseline_denominator = models.IntegerField(blank=True, null=True)
-    baseline_numerator = models.IntegerField(blank=True, null=True)
+    baseline_denominator = models.DecimalField(blank=True, null=True,
+                                               max_digits=8, decimal_places=3)
+    baseline_numerator = models.DecimalField(blank=True, null=True,
+                                             max_digits=8, decimal_places=3)
 
     # from lower_result
     lower_result_name = models.CharField(max_length=500, blank=True, null=True)
@@ -134,7 +139,8 @@ class PDIndicator(LocationMixin, DataMartModel):
                    'location_level': 'location.level',
                    'location_levelname': 'location.gateway.name',
                    'location': lambda loader, record: Location.objects.filter(source_id=record.id,
-                                                                              schema_name=loader.context['country'].schema_name).first(),
+                                                                              schema_name=loader.context[
+                                                                                  'country'].schema_name).first(),
 
                    'source_disaggregation_id': 'disaggregation.id',
                    'source_location_id': 'location.id',
