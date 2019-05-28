@@ -1,2 +1,11 @@
-<table><tr>{% for v in headers %}<th>{{ v }}</th>{% endfor %}{% for row in data %}
-<tr>{% for k,v in row.items %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</table>
+WEB
+1
+{{host}}{{url}}{{qs}}
+
+Selection=AllTables
+Formatting=html
+PreFormattedTextToColumns=True
+ConsecutiveDelimitersAsOne=True
+SingleBlockTextImport=False
+DisableDateRecognition=False
+DisableRedirections=True

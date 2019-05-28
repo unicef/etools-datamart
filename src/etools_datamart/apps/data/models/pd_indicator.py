@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models import Location
 from etools_datamart.apps.data.models.base import DataMartModel
@@ -6,6 +8,14 @@ from etools_datamart.apps.etools.models import models, ReportsAppliedindicator
 
 
 class PDIndicatorLoader(Loader):
+
+    def get_values(self, record):
+        values = super().get_values(record)
+        for k, v in values.items():
+            if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
+                if v is not None:
+                    values[k] = Decimal(v)
+        return values
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())

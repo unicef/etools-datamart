@@ -1,9 +1,12 @@
 import logging
 
+from django.conf import settings
 from django.template import loader
 
 from crashlog.middleware import process_exception
 from rest_framework.renderers import BaseRenderer
+
+from unicef_rest_framework.utils import get_query_string
 
 logger = logging.getLogger(__name__)
 
@@ -26,26 +29,26 @@ class IQYRenderer(BaseRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         response = renderer_context['response']
+        request = renderer_context['request']
+        view = renderer_context['view']
+        try:
+            filename = view.get_service().name
+        except Exception:
+            filename = self.__class__.__name__
+        response['Content-Disposition'] = u'attachment; filename="%s.iqy"' % filename
         if response.status_code != 200:
             return ''
         try:
+            qs = get_query_string(request.query_params, {'format': 'iqy'},
+                                  remove=['format', '_display'])
+            url = f"{request.path}".replace('/iqy/', '/')
+
+            c = dict(host=settings.ABSOLUTE_BASE_URL, request=request, qs=qs, url=url)
             model = renderer_context['view'].queryset.model
             opts = model._meta
             template = self.get_template(opts)
-            if data and 'results' in data:
-                data = data['results']
-            if data:
-                c = {'data': data,
-                     'model': model,
-                     'opts': opts,
-                     'headers': [labelize(v) for v in data[0].keys()]}
-            else:
-                c = {'data': {},
-                     'model': model,
-                     'opts': opts,
-                     'headers': []}
             return template.render(c)
         except Exception as e:
             process_exception(e)
             logger.exception(e)
-            raise Exception('Error processing request') from e
+            raise Exception('Error processing request %s' % e) from e
