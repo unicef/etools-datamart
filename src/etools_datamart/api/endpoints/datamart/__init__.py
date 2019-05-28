@@ -6,6 +6,7 @@ from .funds_reservation import FundsReservationViewSet
 from .hact import HACTViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
 from .location import LocationViewSet
+from .partners_agreement import PartnerAgreementViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
 from .partners_partner import PartnerViewSet
 from .partners_staffmember import PartnerStaffMemberViewSet
