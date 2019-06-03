@@ -10,7 +10,7 @@ class PartnerStaffMember(DataMartModel):
     title = models.CharField(max_length=64, blank=True, null=True)
     first_name = models.CharField(max_length=64, blank=True, null=True)
     last_name = models.CharField(max_length=64, blank=True, null=True)
-    email = models.CharField(unique=True, max_length=128, blank=True, null=True)
+    email = models.CharField(max_length=128, blank=True, null=True)
     phone = models.CharField(max_length=64, blank=True, null=True)
     partner = models.CharField(max_length=255, blank=True, null=True)
     vendor_number = models.CharField(max_length=100, blank=True, null=True)
