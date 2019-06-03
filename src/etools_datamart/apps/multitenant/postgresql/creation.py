@@ -99,11 +99,15 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA {schema};
 SET default_tablespace = '';
 """
         public_dump = Path(settings.ETOOLS_DUMP_LOCATION) / "public.sqldump"
-        tenant_dump = Path(settings.ETOOLS_DUMP_LOCATION) / "tenant.sql"
+        # tenant_dump = Path(settings.ETOOLS_DUMP_LOCATION) / "tenant.sql"
         if not public_dump.exists():
             raise ProgrammingError(f"'{public_dump}' not not found")
-        if not tenant_dump.exists():
-            raise ProgrammingError(f"'{tenant_dump}' not not found")
+        # if not tenant_dump.exists():
+        #     raise ProgrammingError(f"'{tenant_dump}' not not found")
+        for i, schema in enumerate(settings.TEST_SCHEMAS, 1):
+            tenant_dump = Path(settings.ETOOLS_DUMP_LOCATION) / ("tenant%s.sql" % i)
+            if not tenant_dump.exists():
+                raise ProgrammingError(f"'{tenant_dump}' not not found")
 
         if verbosity >= 1:
             print("Restoring %s" % public_dump)
@@ -130,10 +134,9 @@ SET default_tablespace = '';
         except Exception as e:
             raise Exception(f"Error creating schema 'public'") from e
 
-        if not settings.TEST_SCHEMAS:
-            raise ProgrammingError("settings.TEST_SCHEMAS must be a valid schema list")
+        for i, schema in enumerate(settings.TEST_SCHEMAS, 1):
+            tenant_dump = Path(settings.ETOOLS_DUMP_LOCATION) / ("tenant%s.sql" % i)
 
-        for schema in settings.TEST_SCHEMAS:
             if verbosity >= 1:
                 print("Creating schema %s" % schema)
 

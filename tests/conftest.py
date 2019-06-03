@@ -1,5 +1,4 @@
 import os
-import sys
 import tempfile
 import uuid
 import warnings
@@ -19,29 +18,23 @@ def pytest_configure(config):
 # warnings.simplefilter('once', DeprecationWarning)
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
-warnings.simplefilter('ignore', UserWarning)
+# warnings.simplefilter('ignore', UserWarning)
 warnings.simplefilter('ignore', RuntimeWarning, lineno=1421)
 
 
 @pytest.fixture(scope="session")
-def disable_migration_signals(request):
-    return request.config.option.disable_migration_signals
-    # FIXME: pdb
-    # import pdb; pdb.set_trace()
-    # if 'disable_migration_signals' in request.config.items():
-    #     return request.config.getvalue("disable_migration_signals")
-    #
-    # return request.config.inicfg.get('disable_migration_signals') == 'true'
+def enable_migration_signals(request):
+    return request.config.option.enable_migration_signals
 
 
 def pytest_addoption(parser):
     group = parser.getgroup("django")
     group._addoption(
-        "--disable-migration-signals",
+        "--enable-migration-signals",
         action="store_true",
-        dest="disable_migration_signals",
+        dest="enable_migration_signals",
         default=False,
-        help="disable pre/post migration signals",
+        help="re-enable pre/post migration signals",
     )
 
 
@@ -53,12 +46,16 @@ def django_db_setup(request,
                     django_db_keepdb,
                     django_db_createdb,
                     django_db_modify_db_settings,
-                    disable_migration_signals):
-    if not django_db_createdb and django_db_keepdb and disable_migration_signals:
-        sys.stdout.write("Warning pre/post migrate signals have been dosabled\n")
+                    enable_migration_signals):
+
+    if django_db_createdb or enable_migration_signals:
+        warnings.warn("Warning: pre/post migrate signals are enabled \n")
+    else:
+        warnings.warn("Warning: pre/post migrate signals have been disabled\n")
         import django.core.management.commands.migrate
         django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
+
     #
     # from pytest_django.fixtures import django_db_setup as dj_db_setup
     # dj_db_setup(request,
@@ -181,13 +178,13 @@ def data_service(db):
 @pytest.fixture()
 def number_of_partnerorganization(db):
     # number of partners.PartnerOrganization records in each tenant
-    return int((Path(__file__).parent / 'PARTNERORGANIZATION').read_text())
+    return int((Path(__file__).parent / 'COUNT_PARTNERS_PARTNERORGANIZATION').read_text())
 
 
 @pytest.fixture()
 def number_of_intervention(db):
     # number of partners.Intervention
-    return int((Path(__file__).parent / 'INTERVENTION').read_text())
+    return int((Path(__file__).parent / 'COUNT_PARTNERS_INTERVENTION').read_text())
 
 
 @pytest.fixture()

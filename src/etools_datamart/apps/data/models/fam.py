@@ -1,5 +1,6 @@
 from django.db import models
 
+from month_field import Month
 from month_field.models import MonthField
 
 from etools_datamart.apps.data.loader import Loader
@@ -9,14 +10,20 @@ from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, Aud
 
 
 class FAMIndicatorLoader(Loader):
+    def get_values(self, record):
+        pass  # pragma: no cover
 
     def process_country(self):
         country = self.context['country']
         start_date = self.context['today'].date()
+        month = Month.from_date(start_date)
+        FAMIndicator.objects.filter(
+            month=month.as_date(), schema_name=country.schema_name)
         engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
         for model in engagements:
             realname = "_".join(model._meta.db_table.split('_')[1:])
             values = self.get_mart_values(country)
+            # prepare all fields
             for status, status_display in AuditEngagement.STATUSES:
                 filter_dict = {
                     'engagement_ptr__status': status,
@@ -26,10 +33,7 @@ class FAMIndicatorLoader(Loader):
                 field_name = f"{realname}_{status_display}".replace(" ", "_").lower()
                 value = model.objects.filter(**filter_dict).count()
                 values[field_name] = value
-            op = self.process_record(filters=dict(month=start_date,
-                                                  country_name=country.name,
-                                                  area_code=country.business_area_code,
-                                                  schema_name=country.schema_name),
+            op = self.process_record(filters=dict(month=month, country_name=country.name),
                                      values=values)
             self.increment_counter(op)
 
@@ -62,8 +66,9 @@ class FAMIndicator(DataMartModel):
     loader = FAMIndicatorLoader()
 
     class Options:
-        sync_deleted_records = lambda loader: True
-        mapping = dict(source_id='engagement_ptr_id')
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.engagement_ptr_id)
+        source = AuditEngagement
+        sync_deleted_records = lambda loader: False
+        # mapping = dict(source_id='engagement_ptr_id')
+        # key = lambda loader, record: dict(country_name=loader.context['country'].name,
+        #                                   schema_name=loader.context['country'].schema_name,
+        #                                   source_id=record.engagement_ptr.id)

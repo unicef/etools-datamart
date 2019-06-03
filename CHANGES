@@ -1,8 +1,43 @@
+1.22
+----
+* Compatible with eTools 6.10
+* New endpoint datamart/actionpoints/
+* New endpoint datamart/interventions-locations/
+* New endpoint datamart/users/
+* New endpoint datamart/users-offices/
+* New endpoint datamart/reports/sections/
+* New endpoint datamart/partners/contacts/
+* New endpoint datamart/partners/agreements/
+* Updates datamart/travel-activities
+* Updates datamart/travel-activities: add result_* fields
+* Updates InterventionSerializerFull: add locations, offices, sections, partner_id and partner_source_id
+* fixes Intervention serializers
+* fixes formats popup menu
+* new LocationMixin
+* fixes Partner.hact_values handling
+* ActionPoint - new serializer (v2)
+* Fixes PDIndicator
+
+1.21
+----
+* == Not released ==
+
+
+1.20
+----
+* fixes FundsReservationLoader
+* fixes FAMIndicatorLoader month handling
+* fixes HACTLoader
+* enable ETLLog reset
+* add ability
+
+
 1.19
--------
+----
 * add Partner endpoint
 * add extra Location fields
 * add TravelActivity endpoint
+
 
 1.18
 ----

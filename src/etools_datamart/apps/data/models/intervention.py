@@ -4,13 +4,69 @@ import logging
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.models.report_sector import Section
 from etools_datamart.apps.etools.models import PartnersIntervention
+
+from .base import DataMartModel
+from .location import Location
+from .mixins import add_location_mapping, LocationMixin
+from .partner import Partner
+from .user_office import Office
 
 logger = logging.getLogger(__name__)
 
 
-class Intervention(DataMartModel):
+class InterventionLoader(Loader):
+    # def fr_currencies_ok(self, original: PartnersIntervention):
+    #     return original.frs__currency__count == 1 if original.frs__currency__count else None
+
+    def get_sections(self, original: PartnersIntervention, values: dict):
+        # PartnersInterventionFlatLocations
+        ids = list(original.sections.values_list("id", flat=True))
+        ret = list(Section.objects.filter(source_id__in=ids,
+                                          schema_name=values['schema_name']).values("id",
+                                                                                    "name",
+                                                                                    "source_id",
+                                                                                    "description"))
+        # assert len(ids) == len(ret)
+        return ret
+
+    def get_locations(self, original: PartnersIntervention, values: dict):
+        # PartnersInterventionFlatLocations
+        ids = list(original.flat_locations.values_list("id", flat=True))
+        ret = list(Location.objects.filter(source_id__in=ids,
+                                           schema_name=values['schema_name']).values("id",
+                                                                                     "name",
+                                                                                     "source_id",
+                                                                                     "p_code"))
+        # assert len(ids) == len(ret)
+        return ret
+
+    def get_offices(self, original: PartnersIntervention, values: dict):
+        # PartnersInterventionOffices
+        ids = list(original.offices.values_list("id", flat=True))
+        ret = list(Office.objects.filter(source_id__in=ids,
+                                         schema_name=values['schema_name']).values("id",
+                                                                                   "name",
+                                                                                   "source_id",
+                                                                                   "zonal_chief_email",
+                                                                                   "zonal_chief_source_id"))
+        # assert len(ids) == len(ret)
+        return ret
+
+    # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
+    #     if original.frs__actual_amt_local__sum is None:
+    #         return None
+    #
+    #     if not (self.fr_currencies_ok(original) and original.max_fr_currency == original.planned_budget.currency):
+    #         return "!Error! (currencies do not match)"
+    #     percent = original.frs__actual_amt_local__sum / original.total_unicef_cash * 100 \
+    #         if original.total_unicef_cash and original.total_unicef_cash > 0 else 0
+    #     return "%.1f" % percent
+
+
+class InterventionAbstract(models.Model):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(null=True)
     document_type = models.CharField(max_length=255, null=True)
@@ -67,12 +123,20 @@ class Intervention(DataMartModel):
     country_programme_id = models.IntegerField(blank=True, null=True)
     unicef_signatory_id = models.IntegerField(blank=True, null=True)
 
+    offices = JSONField(blank=True, null=True, default=dict)
+    locations = JSONField(blank=True, null=True, default=dict)
+    sections = JSONField(blank=True, null=True, default=dict)
+
+    partner_id = models.IntegerField(blank=True, null=True)
+    partner_source_id = models.IntegerField(blank=True, null=True)
+
+    # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
+
     class Meta:
-        ordering = ('country_name', 'title')
-        verbose_name = "Intervention"
-        unique_together = ('schema_name', 'intervention_id')
+        abstract = True
 
     class Options:
+        depends = (Office, Location, Partner)
         source = PartnersIntervention
         queryset = lambda: PartnersIntervention.objects.select_related('agreement',
                                                                        'partner_authorized_officer_signatory',
@@ -87,6 +151,9 @@ class Intervention(DataMartModel):
         mapping = dict(start_date='start',
                        end_date='end',
                        partner_name='agreement.partner.name',
+                       partner_source_id='agreement.partner.id',
+                       partner_id=lambda loader, record: Partner.objects.get(source_id=record.agreement.partner.id,
+                                                                             country_name=loader.context['country']).id,
                        partner_authorized_officer_signatory_id='partner_authorized_officer_signatory.pk',
                        country_programme_id='country_programme.pk',
                        intervention_id='id',
@@ -117,3 +184,44 @@ class Intervention(DataMartModel):
                        total_local='planned_budget.total_local',
                        currency='planned_budget.currency',
                        )
+
+
+class Intervention(InterventionAbstract, DataMartModel):
+    loader = InterventionLoader()
+
+    class Meta:
+        ordering = ('country_name', 'title')
+        verbose_name = "Intervention"
+        unique_together = ('schema_name', 'intervention_id')
+
+    class Options(InterventionAbstract.Options):
+        pass
+
+
+class InterventionByLocationLoader(InterventionLoader):
+    def process_country(self):
+        qs = self.filter_queryset(self.get_queryset())
+        for intervention in qs.all():
+            for location in intervention.flat_locations.all().order_by('id'):
+                intervention.location = location
+                filters = self.config.key(self, intervention)
+                values = self.get_values(intervention)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
+
+
+class InterventionByLocation(LocationMixin, InterventionAbstract, DataMartModel):
+    loader = InterventionByLocationLoader()
+
+    class Meta:
+        ordering = ('country_name', 'title')
+        verbose_name = "Intervention By Location"
+        unique_together = ('schema_name', 'intervention_id', 'location_source_id')
+
+    class Options(InterventionAbstract.Options):
+        key = lambda loader, record: dict(country_name=loader.context['country'].name,
+                                          schema_name=loader.context['country'].schema_name,
+                                          area_code=loader.context['country'].business_area_code,
+                                          intervention_id=record.pk,
+                                          location_source_id=record.location.pk)
+        mapping = add_location_mapping(InterventionAbstract.Options.mapping)

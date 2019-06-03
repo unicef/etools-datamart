@@ -50,19 +50,19 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
 
-    def get_readonly_fields(self, request, obj=None):
-        if not request.user.is_superuser or not settings.DEBUG:
-            self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
-        return self.readonly_fields
-
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        if request.method == 'POST' and not request.user.is_superuser:
-            redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
-                                                               self.opts.model_name))
-
-            self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
-            return HttpResponseRedirect(redirect_url)
-        return self._changeform_view(request, object_id, form_url, extra_context)
+    # def get_readonly_fields(self, request, obj=None):
+    #     if not request.user.is_superuser or not settings.DEBUG:
+    #         self.readonly_fields = [field.name for field in obj.__class__._meta.fields]
+    #     return self.readonly_fields
+    #
+    # def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+    #     if request.method == 'POST' and not request.user.is_superuser:
+    #         redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
+    #                                                            self.opts.model_name))
+    #
+    #         self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
+    #         return HttpResponseRedirect(redirect_url)
+    #     return self._changeform_view(request, object_id, form_url, extra_context)
 
     @link()
     def invalidate_cache(self, request):
@@ -75,6 +75,15 @@ class DataModelAdmin(TruncateTableMixin, ModelAdmin):
         for s in Service.objects.all():
             if s.managed_model == self.model:
                 return HttpResponseRedirect(s.endpoint)
+        return ""  # pragma: no cover
+
+    @link()
+    def service(self, request):
+        for s in Service.objects.all():
+            if s.managed_model == self.model:
+                url = reverse("admin:%s_%s_change" % (Service._meta.app_label,
+                                                      Service._meta.model_name), args=[s.pk])
+                return HttpResponseRedirect(url)
         return ""  # pragma: no cover
 
     @link()
@@ -128,6 +137,19 @@ class PMPIndicatorsAdmin(DataModelAdmin, TruncateTableMixin):
 @register(models.Intervention)
 class InterventionAdmin(DataModelAdmin, TruncateTableMixin):
     list_display = ('country_name', 'title', 'document_type', 'number', 'status')
+    list_filter = (SchemaFilter,
+                   ('document_type', AllValuesComboFilter),
+                   ('status', AllValuesComboFilter),
+                   'start_date',
+                   )
+    search_fields = ('number', 'title')
+    date_hierarchy = 'start_date'
+
+
+@register(models.InterventionByLocation)
+class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'title', 'document_type',
+                    'location_name', 'number', 'status')
     list_filter = (SchemaFilter,
                    ('document_type', AllValuesComboFilter),
                    ('status', AllValuesComboFilter),
@@ -208,3 +230,63 @@ class TravelActivityAdmin(DataModelAdmin):
                     'location_name',
                     'partner_name',
                     'primary_traveler')
+
+
+@register(models.ActionPoint)
+class ActionPointAdmin(DataModelAdmin):
+    list_display = ('schema_name',
+                    'reference_number',
+                    # 'intervention_number',
+                    # 'engagement_type',
+                    # 'engagement_subclass',
+                    'category_module',
+                    'related_module_class',
+                    'related_module_id',
+                    'high_priority',
+                    'status',
+                    )
+    list_filter = ('high_priority', 'engagement_type', 'status',
+                   'related_module_class',
+                   'category_module')
+
+
+@register(models.TPMVisit)
+class TPMVisitAdmin(DataModelAdmin):
+    pass
+
+
+@register(models.TPMActivity)
+class TPMActivityAdmin(DataModelAdmin):
+    list_display = ('date', 'is_pv',
+                    'intervention_number', 'partner_name',
+                    'result_name',)
+
+
+@register(models.EtoolsUser)
+class EtoolsUserAdmin(DataModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    ordering = ('username',)
+
+
+@register(models.InterventionBudget)
+class InterventionBudgetAdmin(DataModelAdmin):
+    list_display = ('intervention_title', 'intervention_number',
+                    'partner_contribution', 'unicef_cash')
+
+
+@register(models.Office)
+class OfficeAdmin(DataModelAdmin):
+    list_display = ('name', 'zonal_chief_email')
+
+
+@register(models.Section)
+class SectionAdmin(DataModelAdmin):
+    list_display = ('name', 'description', 'alternate_name',)
+
+
+@register(models.Agreement)
+class AgreementAdmin(DataModelAdmin):
+    list_display = ('agreement_type', 'reference_number', 'agreement_number', 'partner_name',)
+    list_filter = ('agreement_type', 'status')

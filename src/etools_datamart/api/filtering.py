@@ -2,6 +2,7 @@ from django.core.cache import caches
 from django.db import connections
 from django.db.models import Q
 from django.template import loader
+from django.utils.functional import cached_property
 
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import BaseFilterBackend
@@ -137,60 +138,7 @@ class TenantCountryFilter(CountryFilter):
         return queryset
 
 
-# class CountryNameProcessor:
-#     def ssprocess_country_name(self, efilters, eexclude, field, value, request,
-#                                op, param, negate, **payload):
-#         filters = {}
-#         if value:
-#             value = process_country_value(value)
-#             if not request.user.is_superuser:
-#                 user_schemas = get_etools_allowed_schemas(request.user)
-#                 if not user_schemas.issuperset(value):
-#                     raise NotAuthorizedSchema(",".join(sorted(value - user_schemas)))
-#             filters['country_name__iregex'] = r'(' + '|'.join(value) + ')'
-#         else:
-#             if not request.user.is_superuser:
-#                 allowed = get_etools_allowed_schemas(request.user)
-#                 if not allowed:  # pragma: no cover
-#                     raise PermissionDenied("You don't have enabled schemas")
-#                 filters['country_name__iregex'] = r'(' + '|'.join(allowed) + ')'
 #
-#         if negate:
-#             return {}, filters
-#         else:
-#             return filters, {}
-
-
-# class CountryNameProcessorTenantModel(CountryNameProcessor):
-#     pass
-
-#
-# class MonthProcessor:
-#     def process_month(self, filters, exclude, field, value, **payload):
-#         if value:
-#             try:
-#                 if '-' in value:
-#                     m, y = value.split('-')
-#                 else:
-#                     m = value
-#                     y = datetime.now().year
-#
-#                 if m in months:
-#                     m = months.index(m) + 1
-#                 elif m in list(map(str, range(1,13))):
-#                     m = m
-#                 elif value == 'current':
-#                     m = datetime.now().month
-#                     y = datetime.now().year
-#                 else:  # pragma: no cover
-#                     raise InvalidQueryValueError('month', value)
-#
-#                 filters['month__month'] = int(m)
-#                 filters['month__year'] = int(y)
-#             except ValueError:  # pragma: no cover
-#                 raise InvalidQueryValueError('month', value)
-#         return filters, exclude
-
 
 class SetHeaderMixin:
     # must be the first one
@@ -208,30 +156,47 @@ class DatamartQueryStringFilterBackend(SetHeaderMixin,
                                        ):
     pass
 
-# class TenantQueryStringFilterBackend(SetHeaderMixin,
-#                                      CoreAPIQueryStringFilterBackend,
-#                                      MonthProcessor,
-#                                      CountryNameProcessorTenantModel,
-#                                      ):
-#     def filter_queryset(self, request, queryset, view):
-#         value = request.GET.get('country_name', None)
-#         assert queryset.model._meta.app_label == 'etools'
-#         conn = connections['etools']
-#         if not value:
-#             if request.user.is_superuser:
-#                 conn.set_all_schemas()
-#             else:
-#                 allowed = get_etools_allowed_schemas(request.user)
-#                 if not allowed:
-#                     raise PermissionDenied("You don't have enabled schemas")
-#                 conn.set_schemas(get_etools_allowed_schemas(request.user))
-#         else:
-#             # value = set(value.split(","))
-#             # validate_schemas(*value)
-#             schemas = process_country_value(value)
-#             if not request.user.is_superuser:
-#                 user_schemas = get_etools_allowed_schemas(request.user)
-#                 if not user_schemas.issuperset(schemas):
-#                     raise NotAuthorizedSchema(",".join(sorted(schemas - user_schemas)))
-#             conn.set_schemas(schemas)
-#         return queryset
+
+class CountryNameFilter(BaseFilterBackend):
+    query_param = 'country_name'
+    template = 'api/country_filter.html'
+
+    def get_query(self, request):
+        if f"{self.query_param}!" in request.GET:
+            return True, ",".join(request.GET.getlist(f"{self.query_param}!", ""))
+        elif self.query_param in request.GET:
+            return False, ",".join(request.GET.getlist(self.query_param, ""))
+
+        return "", ""
+
+    @cached_property
+    def all_countries(self):
+        return sorted(UsersCountry.objects.values_list('name', flat=True))
+
+    def get_query_args(self, request):
+        negate, value = self.get_query(request)
+        if not value:
+            if request.user.is_superuser:
+                self.query_args = []
+            else:
+                self.query_args = self.all_countries
+        else:
+            self.query_args = value.split(',')
+        self.negate = negate
+
+    def filter_queryset(self, request, queryset, view):
+        self.get_query_args(request)
+        if self.query_args:
+            if self.negate:
+                queryset = queryset.exclude(country_name__in=self.query_args)
+            else:
+                queryset = queryset.filter(country_name__in=self.query_args)
+        return queryset
+
+    def to_html(self, request, queryset, view):
+        self.get_query_args(request)
+        template = loader.get_template(self.template)
+        context = {'countries': self.all_countries,
+                   'selection': self.query_args,
+                   'header': 'aaaaaa'}
+        return template.render(context, request)

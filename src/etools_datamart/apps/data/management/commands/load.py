@@ -118,7 +118,6 @@ class Command(BaseCommand):
             model_names = [t.loader.model_name for t in qs]
 
         if countries:
-
             connection = connections['etools']
             schemas = [c for c in connection.get_tenants() if c.schema_name in countries.split(',')]
         else:

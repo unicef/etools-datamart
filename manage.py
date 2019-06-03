@@ -24,8 +24,8 @@ if __name__ == '__main__':
     args = [a for a in sys.argv if a != '--pdb']
 
     try:
-        import etools_datamart
-        print(f"Datamart version {etools_datamart.VERSION}")
+        # import etools_datamart
+        # print(f"Datamart version {etools_datamart.VERSION}")
         execute_from_command_line(args)
     except Exception:
         if debug_on_error:

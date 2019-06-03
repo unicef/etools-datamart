@@ -8,8 +8,8 @@ from unicef_rest_framework.forms import DatePickerField, Select2MultipleChoiceFi
 from etools_datamart.apps.data import models
 from etools_datamart.apps.etools.models import PartnersIntervention, PartnersPartnerorganization
 
-from . import serializers
 from .. import common
+from . import serializers
 
 
 class PMPIndicatorFilterForm(forms.Form):

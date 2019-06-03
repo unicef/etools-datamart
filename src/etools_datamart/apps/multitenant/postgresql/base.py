@@ -75,8 +75,16 @@ sql: {sql}
             # if not sql.strip().startswith('SELECT'):
             #     return super(TenantCursor, self).execute(sql, params)
 
+            # cleanup field 'id', it does not exists in
+            # in django inherited table.
             p = Parser(sql)
             tenant_sql = p.with_schemas(*self.db.schemas)
+            # master_table = p.tables[0]
+            # if '%s."id"' % master_table in sql:
+            #     # FIXME: pdb
+            #     import ipdb; ipdb.set_trace()
+            #     sql = sql.replace('."id"', '."*"')
+
             msg = f"""
 
 schemas: {self.db.schemas}
@@ -177,6 +185,10 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     @cached_property
     def all_schemas(self):
         return sorted(set([c.schema_name for c in self.get_tenants()]))
+
+    @cached_property
+    def all_countries(self):
+        return sorted(set([c.country_name for c in self.get_tenants()]))
 
     def set_schemas(self, schemas):
         """

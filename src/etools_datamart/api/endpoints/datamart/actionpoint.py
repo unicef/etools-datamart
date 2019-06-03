@@ -1,0 +1,106 @@
+from django import forms
+
+from constance import config
+from rest_framework import serializers
+
+from unicef_rest_framework.forms import DateRangePickerField
+
+from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
+from etools_datamart.apps.data import models
+
+from .. import common
+
+URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
+          'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
+          'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
+          'AuditAudit': "%s/audits/%s/overview/?schema=%s",
+          'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
+          'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s"}
+
+
+class ActionPointSerializerV2(DataMartSerializer):
+    section = serializers.CharField(source='section_type')
+    pd_ssfa_title = serializers.CharField(source='intervention_title')
+    pd_ssfa_reference_number = serializers.CharField(source='intervention_title')
+    fam_category = serializers.CharField(source='category_description')
+    action_point_url = serializers.SerializerMethodField()
+    related_module_url = serializers.SerializerMethodField()
+
+    def get_action_point_url(self, obj):
+        return "%s/apd/action-points/detail/%s/?schema=%s" % (config.ETOOLS_ADDRESS,
+                                                              obj.source_id,
+                                                              obj.schema_name)
+
+    def get_related_module_url(self, obj):
+        if obj.related_module_class and obj.related_module_id:
+            base_url = URLMAP[obj.related_module_class]
+            return base_url % (config.ETOOLS_ADDRESS,
+                               obj.related_module_id, obj.schema_name)
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.ActionPoint
+        exclude = None
+        fields = ('reference_number',
+                  'created',
+                  'status',
+                  'assigned_by_name',
+                  'assigned_by_email',
+                  'assigned_to_name',
+                  'assigned_to_email',
+                  'office',
+                  'section',
+                  'due_date',
+                  'date_of_completion',
+                  'high_priority',
+                  'description',
+                  'actions_taken',
+                  'country_name',
+                  'area_code',
+                  'location_name',
+                  'location_pcode',
+                  'location_level',
+                  'location_levelname',
+                  'partner_name',
+                  'vendor_number',
+                  'cp_output',
+                  'cp_output_id',
+                  'pd_ssfa_title',
+                  'pd_ssfa_reference_number',
+                  'category_module',
+                  'module_reference_number',
+                  'module_task_activity_reference_number',
+                  'fam_category',
+                  'related_module_url',
+                  'action_point_url')
+
+
+class ActionPointSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.ActionPoint
+        fields = '__all__'
+        exclude = None
+
+
+class ActionPointFilterForm(forms.Form):
+    last_modify_date = DateRangePickerField(label='Modified between',
+                                            required=False)
+
+    start_date = DateRangePickerField(label='Started between',
+                                      required=False)
+    submission_date = DateRangePickerField(label='Submitted between',
+                                           required=False)
+
+    # document_type__in = Select2MultipleChoiceField(label='Document Type',
+    #                                                choices=PartnersIntervention.INTERVENTION_TYPES,
+    #                                                required=False)
+
+
+class ActionPointViewSet(common.DataMartViewSet):
+    serializer_class = ActionPointSerializer
+    queryset = models.ActionPoint.objects.all()
+    filter_fields = ('vendor_code', 'fr_type', 'start_date')
+    serializers_fieldsets = {'std': ActionPointSerializer,
+                             'v2': ActionPointSerializerV2}
+
+    def get_serializer(self, *args, **kwargs):
+        return super().get_serializer(*args, **kwargs)

@@ -102,6 +102,9 @@ class Month:
     def __hash__(self):
         return hash(self.datestring())
 
+    def as_date(self):
+        return self._date
+
     def datestring(self):
         return self.first_day().isoformat()
 

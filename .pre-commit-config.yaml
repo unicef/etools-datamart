@@ -28,25 +28,22 @@ repos:
         exclude: manage.py
         stages: [commit]
 
-#    -   id: end-of-file-fixer
     -   id: flake8
         args:
-        - src/
-        - tests/
         - --config=setup.cfg
+#        - src/
+#        - tests/
         stages: [commit]
 
     -   id: check-merge-conflict
         stages: [commit]
 
-#    -   id: check-case-conflict
--   repo: git://github.com/Yelp/detect-secrets
-    rev: 0.9.1
-    hooks:
-    -   id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
-        exclude: (tests/.*|.*/tenant.sql|Pipfile.lock)
-        stages: [push]
+#-   repo: git://github.com/Yelp/detect-secrets
+#    rev: 0.9.1
+#    hooks:
+#    -   id: detect-secrets
+#        args: ['--baseline', '.secrets.baseline']
+#        stages: [push]
 
 -   repo: https://github.com/saxix/pch
     rev: 5c9a8e2

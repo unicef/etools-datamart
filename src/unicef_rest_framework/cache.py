@@ -145,7 +145,7 @@ class IsStaffKeyBit(KeyBitBase):
 
 class DevelopKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
-        if 'disable-cache' in request.GET:
+        if 'disable-cache' in request.GET or not config.CACHE_ENABLED:
             return {'dev': str(time.time())}
         if request.META.get('HTTP_X_DM_CACHE') == 'disabled':
             return {'dev': str(time.time())}
@@ -210,15 +210,20 @@ class APICacheResponse(CacheResponse):
                                request,
                                args,
                                kwargs):
-        key = self.calculate_key(
-            view_instance=view_instance,
-            view_method=view_method,
-            request=request,
-            args=args,
-            kwargs=kwargs
-        )
         cache = caches[self.cache_name]
-        response = cache.get(key)
+        if config.CACHE_ENABLED:
+            key = self.calculate_key(
+                view_instance=view_instance,
+                view_method=view_method,
+                request=request,
+                args=args,
+                kwargs=kwargs
+            )
+            response = cache.get(key)
+        else:
+            response = None
+            key = '--'
+
         if not response:
             view_instance.request._request.api_info['cache-hit'] = False
             response = view_method(view_instance, request, *args, **kwargs)
@@ -233,15 +238,6 @@ class APICacheResponse(CacheResponse):
         view_instance.store('cache-ttl', view_instance.get_service().cache_ttl)
         view_instance.store('service', view_instance.get_service())
         view_instance.store('view', fqn(view_instance))
-        # view_instance.store('_filters', request._filters)
-        # conn = connections['etools']
-        # view_instance.store('_schemas', conn.schemas)
-        # view_instance.store('_countries', conn.schemas)
-
-        # view_instance.request._request.api_info['cache-ttl'] = view_instance.get_service().cache_ttl
-        # view_instance.request._request.api_info['service'] = view_instance.get_service()
-        # view_instance.request._request.api_info['view'] = fqn(view_instance)
-
         if not hasattr(response, '_closable_objects'):  # pragma: no cover
             response._closable_objects = []
 

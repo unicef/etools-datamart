@@ -28,11 +28,22 @@ def get_git_changeset():
     return timestamp.strftime('%Y%m%d%H%M%S')
 
 
+@functools.lru_cache(1)
+def get_git_status(clean='', dirty='*'):
+    import subprocess
+    try:
+        uncommited = subprocess.check_output(['git', 'status', '-s'],
+                                             stderr=None)
+        return dirty if uncommited else clean
+    except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no-cover
+        return ''
+
+
 def get_full_version():  # pragma: no cover
     from etools_datamart import VERSION
     commit = get_git_changeset()
     if commit:
-        return f"{VERSION} - {commit}"
+        return f"{VERSION} - {commit} {get_git_status()}"
     return VERSION
 #
 #

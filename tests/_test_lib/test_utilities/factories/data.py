@@ -9,8 +9,7 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data.models import (FAMIndicator, FundsReservation, GatewayType, HACT, Intervention, Location,
-                                              Partner, PDIndicator, PMPIndicators, Travel, TravelActivity, UserStats,)
+from etools_datamart.apps.data import models
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -23,13 +22,13 @@ class HACTFactory(DataMartModelFactory):
     country_name = factory.SelfAttribute('schema_name')
 
     class Meta:
-        model = HACT
+        model = models.HACT
 
 
 class PMPIndicatorFactory(DataMartModelFactory):
     # schema_name = factory.Iterator(connections['etools'].get_tenants())
     class Meta:
-        model = PMPIndicators
+        model = models.PMPIndicators
         django_get_or_create = ('country_name',)
 
 
@@ -38,7 +37,7 @@ class FAMIndicatorFactory(DataMartModelFactory):
     last_modify_date = timezone.now()
 
     class Meta:
-        model = FAMIndicator
+        model = models.FAMIndicator
 
 
 class InterventionFactory(DataMartModelFactory):
@@ -57,14 +56,33 @@ class InterventionFactory(DataMartModelFactory):
     intervention_id = factory.Sequence(lambda n: n)
 
     class Meta:
-        model = Intervention
+        model = models.Intervention
+
+
+class InterventionByLocationFactory(DataMartModelFactory):
+    metadata = {}
+    title = factory.Sequence(lambda n: "title%03d" % n)
+    number = factory.Sequence(lambda n: "#%03d" % n)
+    partner_contribution = 10
+    unicef_cash = 10
+    in_kind_amount = 10
+    partner_contribution_local = 10
+    unicef_cash_local = 10
+    in_kind_amount_local = 10
+    total = 10
+    total_local = 10
+    currency = 'USD'
+    intervention_id = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = models.InterventionByLocation
 
 
 class GatewayTypeFactory(DataMartModelFactory):
     name = factory.Sequence(lambda n: "name%03d" % n)
 
     class Meta:
-        model = GatewayType
+        model = models.GatewayType
         django_get_or_create = ('name',)
 
 
@@ -80,7 +98,7 @@ class LocationFactory(DataMartModelFactory):
     is_active = True
 
     class Meta:
-        model = Location
+        model = models.Location
         django_get_or_create = ('name',)
 
 
@@ -96,7 +114,7 @@ class UserStatsFactory(DataMartModelFactory):
     month = FuzzyMonth()
 
     class Meta:
-        model = UserStats
+        model = models.UserStats
         django_get_or_create = ('month', 'country_name')
 
 
@@ -119,7 +137,7 @@ class FundsReservationFactory(DataMartModelFactory):
     source_intervention_id = 1
 
     class Meta:
-        model = FundsReservation
+        model = models.FundsReservation
 
 
 class PDIndicatorFactory(DataMartModelFactory):
@@ -127,14 +145,14 @@ class PDIndicatorFactory(DataMartModelFactory):
     is_high_frequency = True
 
     class Meta:
-        model = PDIndicator
+        model = models.PDIndicator
 
 
 class TravelFactory(DataMartModelFactory):
     created = timezone.now()
 
     class Meta:
-        model = Travel
+        model = models.Travel
 
 
 class PartnerFactory(DataMartModelFactory):
@@ -148,7 +166,7 @@ class PartnerFactory(DataMartModelFactory):
     hidden = False
 
     class Meta:
-        model = Partner
+        model = models.Partner
 
 
 class TravelActivityFactory(DataMartModelFactory):
@@ -163,4 +181,43 @@ class TravelActivityFactory(DataMartModelFactory):
     # hidden = False
 
     class Meta:
-        model = TravelActivity
+        model = models.TravelActivity
+
+
+class ActionPointFactory(DataMartModelFactory):
+    class Meta:
+        model = models.ActionPoint
+
+
+class TPMActivityFactory(DataMartModelFactory):
+    class Meta:
+        model = models.TPMActivity
+
+
+class TPMVisitFactory(DataMartModelFactory):
+    class Meta:
+        model = models.TPMVisit
+
+
+class EtoolsUserFactory(DataMartModelFactory):
+    is_superuser = False
+    username = factory.Sequence(lambda n: "username%03d" % n)
+    email = factory.Sequence(lambda n: "email%03d@example.com" % n)
+
+    class Meta:
+        model = models.EtoolsUser
+
+
+class InterventionBudgetFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionBudget
+
+
+class OfficeFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Office
+
+
+class SectionFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Section

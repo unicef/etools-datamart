@@ -1,10 +1,34 @@
+import json
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from sentry_sdk import capture_exception
+
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType
 from etools_datamart.apps.etools.models import PartnersPartnerorganization
-from etools_datamart.apps.etools.patch import PartnerOrganization, PartnerType
+
+
+class PartnerLoader(Loader):
+    # def get_shared_with(self, record, values):
+    #     try:
+    #
+    #         data = json.dumps(record.shared_with)
+    #     except:
+    #         data = {}
+    #     return data
+
+    def get_hact_values(self, record, values):
+        try:
+
+            data = json.dumps(record.hact_values)
+        except Exception:
+            capture_exception()
+            data = {}
+        return data
 
 
 class Partner(DataMartModel):
@@ -62,8 +86,9 @@ class Partner(DataMartModel):
         unique_together = (('schema_name', 'name', 'vendor_number'),
                            ('schema_name', 'vendor_number'),)
 
+    loader = PartnerLoader()
+
     class Options:
         source = PartnersPartnerorganization
-        # key = lambda loader, record: dict(country_name=loader.context['country'].name,
-        #                                   schema_name=loader.context['country'].schema_name,
-        #                                   source_id=record.id)
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+                                          source_id=record.id)

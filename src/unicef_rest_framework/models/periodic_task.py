@@ -1,6 +1,6 @@
 from django_celery_beat import models
 
-from unicef_rest_framework.models import Service
+from .service import Service
 
 
 class PeriodicTask(models.PeriodicTask):

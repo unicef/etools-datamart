@@ -1,0 +1,90 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"378230a901d1f7a8ce3cfe3ef71abb27\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "900"
+        ]
+    },
+    "data": {
+        "id": 301,
+        "source_id": null,
+        "last_modify_date": "23 Apr 2019 12:03:22",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "address": null,
+        "alternate_id": null,
+        "alternate_name": null,
+        "basis_for_risk_rating": null,
+        "blocked": false,
+        "city": null,
+        "core_values_assessment_date": null,
+        "country": null,
+        "created": "23 Apr 2019 11:46:10",
+        "cso_type": null,
+        "deleted_flag": false,
+        "description": "",
+        "email": null,
+        "hact_values": null,
+        "hidden": false,
+        "last_assessment_date": null,
+        "manually_blocked": false,
+        "modified": null,
+        "name": "name300",
+        "net_ct_cy": null,
+        "outstanding_dct_amount_6_to_9_months_usd": null,
+        "outstanding_dct_amount_more_than_9_months_usd": null,
+        "partner_type": null,
+        "phone_number": null,
+        "postal_code": null,
+        "rating": null,
+        "reported_cy": null,
+        "shared_with": null,
+        "short_name": null,
+        "street_address": null,
+        "total_ct_cp": null,
+        "total_ct_cy": null,
+        "total_ct_ytd": null,
+        "type_of_assessment": null,
+        "vendor_number": null,
+        "vision_synced": true
+    },
+    "content_type": null
+}

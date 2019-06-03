@@ -6,6 +6,7 @@ from pathlib import Path
 import environ
 
 from etools_datamart.libs.dbrouter import router_factory
+from etools_datamart.libs.version import get_full_version
 
 SETTINGS_DIR = Path(__file__).parent
 PACKAGE_DIR = SETTINGS_DIR.parent
@@ -53,6 +54,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   SECURE_FRAME_DENY=(bool, True),
                   SECURE_HSTS_PRELOAD=(bool, True),
                   SECURE_SSL_REDIRECT=(bool, True),
+                  SENTRY_DSN=(str, ''),
                   SESSION_COOKIE_SECURE=(bool, True),
                   STATIC_ROOT=(str, '/tmp/static'),
                   STATIC_URL=(str, '/dm-static/'),
@@ -90,7 +92,9 @@ ADMINS = (
 
 DATABASES = {
     'default': env.db(),
-    'etools': env.db('DATABASE_URL_ETOOLS', engine='etools_datamart.apps.multitenant.postgresql'),
+    'etools': env.db('DATABASE_URL_ETOOLS',
+                     engine='etools_datamart.apps.multitenant.postgresql'
+                     ),
 }
 
 DATABASE_ROUTERS = [
@@ -405,7 +409,9 @@ AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
 AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
-    'CACHE_VERSION': (1, 'Use MS Graph API to fetch user data', int),
+    'ETOOLS_ADDRESS': ('https://etools.unicef.org', 'eTools hostname', str),
+    'CACHE_VERSION': (1, 'Global cache version', int),
+    'CACHE_ENABLED': (True, 'Enable/Disable API cache', bool),
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
     'DEFAULT_GROUP': ('Guests', 'Default group new users belong to', 'select_group'),
     'ANALYTICS_CODE': (env('ANALYTICS_CODE'), 'Google analytics code'),
@@ -414,6 +420,7 @@ CONSTANCE_CONFIG = {
 
     'ETL_MAX_RETRIES': (30, 'Max retries for dependent tasks', int),
     'ETL_RETRY_COUNTDOWN': (180, 'Retry counddown in secods', int),
+    'ALLOW_EMAIL_PASSWORD': (False, 'Allow send local password by email', bool)
 }
 
 CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
@@ -437,7 +444,7 @@ REST_FRAMEWORK = {
     'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'unicef_rest_framework.negotiation.CT',
     'DEFAULT_PAGINATION_CLASS': 'unicef_rest_framework.pagination.APIPagination',
     'DEFAULT_METADATA_CLASS': 'etools_datamart.api.metadata.SimpleMetadataWithFilters',
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSIONING_CLASS': 'unicef_rest_framework.versioning.URFVersioning',
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
     'DATETIME_FORMAT': DATETIME_FORMAT
@@ -640,3 +647,17 @@ IMPERSONATE = {
     'REQUIRE_SUPERUSER': True,
     'CUSTOM_USER_QUERYSET': 'etools_datamart.libs.impersonate.queryset'
 }
+
+SENTRY_ENABLED = env.bool('SENTRY_ENABLED', False)
+SENTRY_DSN = env('SENTRY_DSN', '')
+
+if SENTRY_ENABLED:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(dsn=SENTRY_DSN,
+                    integrations=[DjangoIntegration()],
+                    release=get_full_version(),
+                    debug=False)
+
+SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]

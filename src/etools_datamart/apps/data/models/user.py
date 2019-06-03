@@ -1,61 +1,86 @@
-from datetime import datetime
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
-from month_field.models import MonthField
-
-from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.loader import CommonSchemaLoader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import AuthUser
 
 
-class UserStatsLoader(Loader):
+class EtoolsUserLoader(CommonSchemaLoader):
+    def get_groups(self, record, values):
+        return ", ".join(record.groups.values_list('name', flat=True))
 
-    def get_queryset(self):
-        return AuthUser.objects.filter(profile__country=self.context['country'])
-
-    def update_context(self, **kwargs):
-        super().update_context(**kwargs)
-        today = self.context['today']
-        self.context.update(first_of_month=datetime(today.year, today.month, 1))
-        return self.context
-
-    def process_country(self):
-        country = self.context['country']
-        first_of_month = self.context['first_of_month']
-        # base = AuthUser.objects.filter(profile__country=country)
-        base = self.get_queryset()
-        values = {
-            'total': base.count(),
-            'unicef': base.filter(email__endswith='@unicef.org').count(),
-            'logins': base.filter(
-                last_login__month=first_of_month.month).count(),
-            'unicef_logins': base.filter(
-                last_login__month=first_of_month.month,
-                email__endswith='@unicef.org').count(),
-            'seen': self.context['today']
-        }
-        op = self.process_record(filters=dict(month=first_of_month,
-                                              country_name=country.name,
-                                              schema_name=country.schema_name, ),
-                                 values=values)
-        self.increment_counter(op)
+    def get_countries_available(self, record, values):
+        try:
+            return ", ".join(record.profile.countries_available.values_list('name', flat=True))
+        except ObjectDoesNotExist:  # pragma: no cover
+            return ""
 
 
-class UserStats(DataMartModel):
-    month = MonthField("Month Value")
-    total = models.IntegerField("Total users", default=0)
-    unicef = models.IntegerField("UNICEF uswers", default=0)
-    logins = models.IntegerField("Number of logins", default=0)
-    unicef_logins = models.IntegerField("Number of UNICEF logins", default=0)
+class EtoolsUser(DataMartModel):
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.BooleanField(blank=True, null=True)
+    username = models.CharField(unique=True, max_length=150)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.CharField(unique=True, max_length=254)
+    is_staff = models.BooleanField(blank=True, null=True)
+    is_active = models.BooleanField(blank=True, null=True)
+    date_joined = models.DateTimeField(blank=True, null=True)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    created = models.DateTimeField(blank=True, null=True)
+    modified = models.DateTimeField(blank=True, null=True)
+
+    job_title = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=255, blank=True, null=True)
+    partner_staff_member = models.IntegerField(blank=True, null=True)
+    guid = models.CharField(unique=True, max_length=40, blank=True, null=True)
+    org_unit_code = models.CharField(max_length=32, blank=True, null=True)
+    org_unit_name = models.CharField(max_length=64, blank=True, null=True)
+    post_number = models.CharField(max_length=32, blank=True, null=True)
+    post_title = models.CharField(max_length=64, blank=True, null=True)
+    staff_id = models.CharField(max_length=32, blank=True, null=True)
+    vendor_number = models.CharField(unique=True, max_length=32, blank=True, null=True)
+
+    # country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_userprofile_country_id', blank=True, null=True)
+    # office = models.ForeignKey(UsersOffice, models.DO_NOTHING, related_name='usersoffice_users_userprofile_office_id', blank=True, null=True)
+    # country_override = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_userprofile_country_override_id', blank=True, null=True)
+    # oic = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_users_userprofile_oic_id', blank=True, null=True)
+    # supervisor = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='authuser_users_userprofile_supervisor_id', blank=True, null=True)
+
+    groups = models.TextField(blank=True, null=True)
+    countries_available = models.TextField(blank=True, null=True)
+    country_name = models.CharField(max_length=100, blank=True, null=True)
+    country_override = models.CharField(max_length=100, blank=True, null=True)
+    office = models.CharField(max_length=100, blank=True, null=True)
+    supervisor = models.CharField(max_length=100, blank=True, null=True)
+    oic = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
-        ordering = ('-month', 'country_name')
-        unique_together = ('country_name', 'month')
-        verbose_name = "User Access Statistics"
+        pass
 
-    loader = UserStatsLoader()
+    loader = EtoolsUserLoader()
 
     class Options:
+        source = AuthUser
         sync_deleted_records = lambda loader: False
         truncate = True
+        key = lambda loader, record: dict(source_id=record.id)
+
+        mapping = dict(job_title='profile.job_title',
+                       phone_number='profile.phone_number',
+                       partner_staff_member='profile.partner_staff_member',
+                       guid='profile.guid',
+                       org_unit_code='profile.org_unit_code',
+                       org_unit_name='profile.org_unit_name',
+                       post_number='profile.post_number',
+                       post_title='profile.post_title',
+                       staff_id='profile.staff_id',
+                       vendor_number='profile.vendor_number',
+                       country_name='profile.country.name',
+                       office='profile.office.name',
+                       country_override='profile.country_override.name',
+                       oic='profile.oic.office',
+                       supervisor='profile.oic.office',
+
+                       )

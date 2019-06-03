@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models import Location
 from etools_datamart.apps.data.models.base import DataMartModel
@@ -6,6 +8,16 @@ from etools_datamart.apps.etools.models import models, ReportsAppliedindicator
 
 
 class PDIndicatorLoader(Loader):
+
+    def get_values(self, record):
+        values = super().get_values(record)
+        for k, v in values.items():
+            if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
+                if v is not None:
+                    if isinstance(v, str) and ',' in v:
+                        v = v.replace(',', '.')
+                    values[k] = Decimal(v)
+        return values
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
@@ -47,12 +59,17 @@ class PDIndicator(LocationMixin, DataMartModel):
     numerator_label = models.CharField(max_length=256, blank=True, null=True)
 
     # target = models.TextField()  # This field type is a guess.
-    target_denominator = models.IntegerField(blank=True, null=True)
-    target_numerator = models.IntegerField(blank=True, null=True)
+    target_denominator = models.DecimalField(blank=True, null=True,
+                                             max_digits=10, decimal_places=3)
+
+    target_numerator = models.DecimalField(blank=True, null=True,
+                                           max_digits=10, decimal_places=3)
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
-    baseline_denominator = models.IntegerField(blank=True, null=True)
-    baseline_numerator = models.IntegerField(blank=True, null=True)
+    baseline_denominator = models.DecimalField(blank=True, null=True,
+                                               max_digits=8, decimal_places=3)
+    baseline_numerator = models.DecimalField(blank=True, null=True,
+                                             max_digits=8, decimal_places=3)
 
     # from lower_result
     lower_result_name = models.CharField(max_length=500, blank=True, null=True)
@@ -134,7 +151,8 @@ class PDIndicator(LocationMixin, DataMartModel):
                    'location_level': 'location.level',
                    'location_levelname': 'location.gateway.name',
                    'location': lambda loader, record: Location.objects.filter(source_id=record.id,
-                                                                              schema_name=loader.context['country'].schema_name).first(),
+                                                                              schema_name=loader.context[
+                                                                                  'country'].schema_name).first(),
 
                    'source_disaggregation_id': 'disaggregation.id',
                    'source_location_id': 'location.id',

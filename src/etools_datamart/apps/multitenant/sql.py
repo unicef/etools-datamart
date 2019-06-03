@@ -211,7 +211,7 @@ class Parser:
             self.parse()
 
         if self.is_count:
-            ret = "SELECT COUNT(id) FROM ("
+            ret = "SELECT COUNT(*) FROM ("
             ret += " UNION ALL ".join([self.set_schema(s, fields='id') for s in schemas])
             ret += ") as __count"
             return ret

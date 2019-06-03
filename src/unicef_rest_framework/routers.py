@@ -27,7 +27,12 @@ class APIRootView(views.APIView):
         ret = OrderedDict()
         namespace = request.resolver_match.namespace
         for key, url_name in self.api_root_dict.items():
-            hidden = Service.objects.get(suffix=key).hidden
+            try:
+                hidden = Service.objects.get(suffix=key).hidden
+            except Service.DoesNotExist:
+                hidden = True
+                Service.objects.load_services()
+
             if hidden:
                 if request.user.is_superuser:
                     key = f" * {key}"

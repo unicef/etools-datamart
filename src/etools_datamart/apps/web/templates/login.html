@@ -9,12 +9,22 @@
         </div>
         <div><h4>OR</h4></div>
         <div>
-            <h4><a id="local-login" href="#">Local account login</a></h4>
+            <h4><a id="local-login" href="{% url 'login' %}?local=1">Local account login</a></h4>
+{#            {% if config.ALLOW_EMAIL_PASSWORD %}#}
+{#                (<a href="{% url "request-access" %}">Request Access</a>)#}
+{#            {% endif %}#}
         </div>
     </div>
     <div style="display: none" id="login-form">
         <form class="validate-form" method="post">
             {% csrf_token %}
+            {% if form.errors %}
+                <div style="padding: 5px;color:red">
+                    {% for k, e in form.errors.items %}
+                        {{ e }}
+                    {% endfor %}
+                </div>
+            {% endif %}
             <span class="login100-form-title p-b-34">Account Login</span>
             <div class="wrap-input100 validate-input m-b-20" data-validate="Type user name">
                 <input id="first-name" class="input100" type="text" name="username" placeholder="User name">
@@ -38,10 +48,21 @@
     </div>
     <script src="{% static 'jquery-3.3.1.min.js' %}"></script>
     <script>
-        $('#local-login').on("click", function () {
+        var getUrlVars = function () {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for (var i = 0; i < hashes.length; i++) {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        };
+        var args = getUrlVars();
+        if (args.local) {
             $('#login-menu').hide();
             $('#login-form').show();
-        });
+        }
     </script>
 
 {% endblock %}

@@ -49,11 +49,11 @@ class EtlTask(models.Model):
     task = models.CharField(max_length=200, unique=True)
     last_run = models.DateTimeField(null=True, help_text="last execution time")
     status = models.CharField(max_length=200)
-    elapsed = models.IntegerField(null=True)
-    run_type = models.IntegerField(choices=RUN_TYPES, default=RUN_UNKNOWN)
-    last_success = models.DateTimeField(null=True, help_text="last successully execution time")
-    last_failure = models.DateTimeField(null=True, help_text="last failure execution time")
-    last_changes = models.DateTimeField(null=True, help_text="last time data have been changed")
+    elapsed = models.IntegerField(null=True, blank=True)
+    run_type = models.IntegerField(choices=RUN_TYPES, default=RUN_UNKNOWN, blank=True)
+    last_success = models.DateTimeField(null=True, blank=True, help_text="last successully execution time")
+    last_failure = models.DateTimeField(null=True, blank=True, help_text="last failure execution time")
+    last_changes = models.DateTimeField(null=True, blank=True, help_text="last time data have been changed")
     table_name = models.CharField(max_length=200, null=True)
     content_type = models.OneToOneField(ContentType, models.CASCADE, null=True)
 
@@ -63,6 +63,7 @@ class EtlTask(models.Model):
 
     class Meta:
         get_latest_by = 'last_run'
+        ordering = ('task',)
 
     def __str__(self):
         return f"{self.task} {self.status}"
@@ -88,3 +89,13 @@ class EtlTask(models.Model):
             return PeriodicTask.objects.get(task=self.task)
         except PeriodicTask.DoesNotExist:
             pass
+
+#
+# class Offset(models.Model):
+#     table_name = models.CharField(max_length=200, null=True)
+#     schema_name = models.CharField(max_length=200, null=True)
+#     content_type = models.OneToOneField(ContentType, models.CASCADE, null=True)
+#     record_count = models.IntegerField(default=0)
+#     max_id = models.IntegerField(default=0)
+#     last_modify_date = models.DateTimeField(null=True, blank=True)
+#

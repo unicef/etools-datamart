@@ -4,15 +4,15 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.19
+TARGET?=1.22
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
 CONTAINER_NAME?=datamart-${TARGET}
 ORGANIZATION=unicef
 IMAGE_NAME=datamart
-DOCKER_IMAGE_NAME=${ORGANIZATION}/${IMAGE_NAME}
-DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${TARGET}
+DOCKER_IMAGE_NAME?=${ORGANIZATION}/${IMAGE_NAME}
+DOCKER_IMAGE?=${DOCKER_IMAGE_NAME}:${TARGET}
 DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
@@ -26,18 +26,35 @@ help:
 	@echo "run                  run ${DOCKER_IMAGE} locally"
 
 build-base:
-	cd .. && docker build --target base \
-			-t ${DOCKER_IMAGE_NAME}:base- \
-			-f docker/${DOCKERFILE} .
+	cd .. && docker build \
+			${BUILD_OPTIONS} \
+			-t ${DOCKER_IMAGE_NAME}:base \
+			-f docker/Dockerfile.base .
+
+
+.build:
+	cd .. && docker build \
+			${BUILD_OPTIONS} \
+			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
+			-t ${DOCKER_IMAGE} \
+			-f docker/Dockerfile .
+	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
+	docker images | grep ${DOCKER_IMAGE_NAME}
+
+build-test:
+	TARGET=dev $(MAKE) .build test
 
 build:
+	$(MAKE) .build test
+
+build_old:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg VERSION=${TARGET} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
-			-f docker/${DOCKERFILE} .
+			-f docker/Dockerfile.flat .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
@@ -82,20 +99,31 @@ release:
 	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:latest
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
-	docker push ${DOCKER_IMAGE_NAME}:latest
+
+deploy:
+	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
+#	$(MAKE) bump
 
 bump:
-	cd .. && bumpversion --tag --config-file=.bumpversion.cfg num
+	cd .. && bumpversion --commit --tag --config-file=.bumpversion.cfg num
 
 run:
 	RUN_OPTIONS="-p 8000:8000" \
 		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
 		$(MAKE) .run
 
+stack:
+	RUN_OPTIONS="-p 8000:8000" \
+		CMD=stack \
+		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+		$(MAKE) .run
+
 workers:
 	CONTAINER_NAME=datamart-workers \
 			ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
-			CMD=workers $(MAKE) .run
+			CMD=worker $(MAKE) .run
 
 beat:
 	CONTAINER_NAME=datamart-beat \

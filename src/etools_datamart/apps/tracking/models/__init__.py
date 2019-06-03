@@ -1,4 +1,3 @@
 # -*- coding: utf-8 -*-
+from .counters import DailyCounter, MonthlyCounter, PathCounter, UserCounter  # noqa; noqa
 from .log import APIRequestLog  # noqa
-from .counters import (DailyCounter, UserCounter,  # noqa
-                       MonthlyCounter, PathCounter)  # noqa

@@ -139,11 +139,13 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         service = Service.objects.get(pk=pk)
         return HttpResponseRedirect(service.endpoint)
 
-    # @action()
-    # def crontab_expire(self, request, pk):
-    #     base = reverse("admin:django_celery_beat_crontabschedule_add")
-    #     url = f"{base}?"
-    #     return HttpResponseRedirect(url)
+    @action()
+    def data(self, request, pk):
+        service = Service.objects.get(pk=pk)
+        model = service.managed_model
+        url = reverse('admin:%s_%s_changelist' % (model._meta.app_label,
+                                                  model._meta.model_name))
+        return HttpResponseRedirect(url)
 
     @action()
     def invalidate_cache(self, request, pk):

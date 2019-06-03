@@ -19,10 +19,6 @@ class GatewayType(DataMartModel):
 
         key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           source_id=record.id)
-        # mapping = {'source_id': 'id',
-        #            'area_code': lambda loader, record: loader.context['country'].business_area_code,
-        #            'country_name': lambda loader, record: loader.context['country'].name,
-        #            }
 
 
 class Location(DataMartModel):
@@ -47,7 +43,7 @@ class Location(DataMartModel):
 
     class Options:
         depends = (GatewayType,)
-        # source = LocationsLocation
+        source = LocationsLocation
         queryset = lambda: LocationsLocation.objects.order_by('-parent')
         last_modify_field = 'modified'
         # sync_deleted_records = False

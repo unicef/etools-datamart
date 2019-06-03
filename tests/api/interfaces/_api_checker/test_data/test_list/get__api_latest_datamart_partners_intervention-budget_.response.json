@@ -1,0 +1,136 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"a62db6db299e979cf4fd5b22321592a8\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "a62db6db299e979cf4fd5b22321592a8"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "1491"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 201,
+                "source_id": null,
+                "last_modify_date": "18 Apr 2019 10:36:51",
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "created": null,
+                "modified": null,
+                "partner_contribution": null,
+                "unicef_cash": null,
+                "in_kind_amount": null,
+                "partner_contribution_local": null,
+                "unicef_cash_local": null,
+                "in_kind_amount_local": null,
+                "total": null,
+                "total_local": null,
+                "currency": null,
+                "intervention_title": null,
+                "intervention_number": null,
+                "intervention_source_id": null,
+                "intervention": 615
+            },
+            {
+                "id": 202,
+                "source_id": null,
+                "last_modify_date": "18 Apr 2019 10:36:51",
+                "country_name": "chad",
+                "schema_name": "chad",
+                "area_code": "",
+                "created": null,
+                "modified": null,
+                "partner_contribution": null,
+                "unicef_cash": null,
+                "in_kind_amount": null,
+                "partner_contribution_local": null,
+                "unicef_cash_local": null,
+                "in_kind_amount_local": null,
+                "total": null,
+                "total_local": null,
+                "currency": null,
+                "intervention_title": null,
+                "intervention_number": null,
+                "intervention_source_id": null,
+                "intervention": 616
+            },
+            {
+                "id": 203,
+                "source_id": null,
+                "last_modify_date": "18 Apr 2019 10:36:51",
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "area_code": "",
+                "created": null,
+                "modified": null,
+                "partner_contribution": null,
+                "unicef_cash": null,
+                "in_kind_amount": null,
+                "partner_contribution_local": null,
+                "unicef_cash_local": null,
+                "in_kind_amount_local": null,
+                "total": null,
+                "total_local": null,
+                "currency": null,
+                "intervention_title": null,
+                "intervention_number": null,
+                "intervention_source_id": null,
+                "intervention": 617
+            }
+        ]
+    },
+    "content_type": null
+}

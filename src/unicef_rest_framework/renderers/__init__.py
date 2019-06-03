@@ -1,10 +1,10 @@
 from .api import URFBrowsableAPIRenderer  # noqa
+from .csv import CSVRenderer  # noqa
+from .html import HTMLRenderer  # noqa
+from .iqy import IQYRenderer  # noqa
+from .json import JSONRenderer  # noqa
 from .microsoft.json import MSJSONRenderer  # noqa
 from .microsoft.xml import MSXmlRenderer  # noqa
-from .xls import XLSXRenderer  # noqa
-from .html import HTMLRenderer  # noqa
 from .pdf import PDFRenderer  # noqa
 from .txt import TextRenderer  # noqa
-from .iqy import IQYRenderer  # noqa
-from .csv import CSVRenderer  # noqa
-from .json import JSONRenderer  # noqa
+from .xls import XLSXRenderer  # noqa

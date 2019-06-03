@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from unicef_security import models
 
-from . import serializers
 from .. import common
+from . import serializers
 
 
 class RegionViewSet(common.APIReadOnlyModelViewSet):

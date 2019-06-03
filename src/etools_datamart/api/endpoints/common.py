@@ -1,4 +1,5 @@
 from functools import wraps
+from inspect import isclass
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
@@ -7,10 +8,11 @@ from django.http import Http404
 import coreapi
 import coreschema
 from drf_querystringfilter.exceptions import QueryFilterException
-from dynamic_serializer.core import InvalidSerializerError
+from dynamic_serializer.core import DynamicSerializer, InvalidSerializerError
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
+from sentry_sdk import capture_exception
 from strategy_field.utils import fqn
 
 from unicef_rest_framework.ds import DynamicSerializerFilter
@@ -76,6 +78,10 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
                          'cursor', CountryFilter.query_param, 'month',
                          'ordering', 'page_size', 'format', 'page']
 
+    def raise_uncaught_exception(self, exc):
+        capture_exception(exc)
+        return super().raise_uncaught_exception(exc)
+
     def handle_exception(self, exc):
         conn = connections['etools']
         if isinstance(exc, (QueryFilterException,)):
@@ -105,7 +111,7 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
             queryset = self.filter_queryset(self.get_queryset())
             try:
                 obj = queryset.latest('id')
-            except (TypeError, ValueError, ValidationError, ObjectDoesNotExist):
+            except (TypeError, ValueError, ValidationError, ObjectDoesNotExist):  # pragma: no cover
                 raise Http404
             else:
                 self.check_object_permissions(self.request, obj)
@@ -169,4 +175,20 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 
 
 class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
-    pass
+    def _get_serializer_from_param(self, name=None):
+        if name is None:
+            name = self.request.query_params.get(self.serializer_field_param, 'std')
+
+        if name == 'std':
+            return self._default_serializer
+
+        target = self.serializers_fieldsets.get(name, None)
+        if isinstance(target, DynamicSerializer):
+            field_list = target.get_fields(self)
+            return self._build_serializer_from_fields(field_list)
+        elif isinstance(target, (list, tuple)):
+            return self._build_serializer_from_fields(target)
+        elif isclass(target):  # Serializer class
+            return target
+        else:  # Standard Serializer
+            raise InvalidSerializerError

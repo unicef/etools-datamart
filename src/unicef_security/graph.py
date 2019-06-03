@@ -144,6 +144,12 @@ class SyncResult:
         self.skipped = []
         self.keep_records = keep_records
 
+    def all(self):
+        for e in self.created:
+            yield (e, True)
+        for e in self.updated:
+            yield (e, False)
+
     def log(self, *result):
         if len(result) == 2:
             obj = {True: result[0],
@@ -180,10 +186,12 @@ NotSet = object()
 
 
 class Synchronizer:
-    def __init__(self, user_model=None, mapping=None, echo=None, id=None, secret=None):
+    def __init__(self, user_model=None, mapping=None, echo=None, id=None, secret=None,
+                 keep_records=False
+                 ):
         self.id = id or GRAPH_CLIENT_ID
         self.secret = secret or GRAPH_CLIENT_SECRET
-
+        self.keep_records = keep_records
         self.user_model = user_model or get_user_model()
         self.field_map = dict(mapping or DJANGOUSERMAP)
         self.user_pk_fields = self.field_map.pop('_pk')
@@ -326,7 +334,7 @@ class Synchronizer:
 
     def syncronize(self, max_records=None, callback=None):
         logger.debug("Start Azure user synchronization")
-        results = SyncResult()
+        results = SyncResult(keep_records=self.keep_records)
         try:
             for i, user_info in enumerate(iter(self)):
                 pk, values = self.get_record(user_info)
