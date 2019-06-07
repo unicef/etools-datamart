@@ -494,7 +494,7 @@ class Loader:
                     for i, country in enumerate(countries, 1):
                         self.context['country'] = country
                         if stdout and verbosity > 0:
-                            stdout.write(f"{i:>3}/{total_countries} {country}\n")
+                            stdout.write(f"{i:>3}/{total_countries} {country} ({country.schema_name})\n")
                             stdout.flush()
                         connection.set_schemas([country.schema_name])
                         self.process_country()
