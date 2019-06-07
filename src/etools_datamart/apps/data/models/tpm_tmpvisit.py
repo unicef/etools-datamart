@@ -4,8 +4,10 @@ from crashlog.middleware import process_exception
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import (AttachmentsAttachment, DjangoContentType, TpmTpmactivity,
-                                                TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,)
+                                                TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
+                                                TpmTpmvisitTpmPartnerFocalPoints,)
 
 
 class TPMVisitLoader(Loader):
@@ -25,6 +27,7 @@ class TPMVisitLoader(Loader):
 
             visit.end_date = tpm_activities.aggregate(date__max=models.Max('activity_ptr__date'))['date__max']
 
+            # unicef_focal_points
             unicef_focal_points = []
             for a in tpm_activities.only('activity_ptr_id'):
                 qs = TpmTpmactivityUnicefFocalPoints.objects.filter(tpmactivity_id=a.activity_ptr_id)
@@ -32,6 +35,13 @@ class TPMVisitLoader(Loader):
 
             visit.unicef_focal_points = ",".join(unicef_focal_points)
 
+            # unicef_focal_points
+            tpm_focal_points = []
+            # for a in tpm_activities.only('activity_ptr_id'):
+            qs = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=visit)
+            tpm_focal_points.extend(qs.values_list('tpmpartnerstaffmember__user__email', flat=True))
+
+            visit.tpm_focal_points = ",".join(tpm_focal_points)
             try:
                 visit.report_attachments = ",".join(AttachmentsAttachment.objects.filter(
                     object_id=visit.id,
@@ -54,7 +64,7 @@ class TPMVisitLoader(Loader):
             self.increment_counter(op)
 
 
-class TPMVisit(DataMartModel):
+class TPMVisit(LocationMixin, DataMartModel):
     deleted_at = models.DateTimeField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
@@ -75,8 +85,8 @@ class TPMVisit(DataMartModel):
     date_of_tpm_report_rejected = models.DateField(blank=True, null=True)
     date_of_unicef_approved = models.DateField(blank=True, null=True)
     partner_name = models.CharField(max_length=120, blank=True, null=True)
-    partner_vendor_number = models.CharField(max_length=120, blank=True, null=True)
-    cancel_comment = models.TextField()
+    vendor_number = models.CharField(max_length=120, blank=True, null=True)
+    cancel_comment = models.TextField(blank=True, null=True)
     author_name = models.CharField(max_length=120, blank=True, null=True)
 
     attachments = models.TextField(blank=True, null=True)
@@ -84,25 +94,47 @@ class TPMVisit(DataMartModel):
 
     source_partner_id = models.IntegerField(blank=True, null=True, db_index=True)
 
-    # @property
-    # def start_date(self):
-    #     # TODO: Rewrite to reduce number of SQL queries.
-    #     return self.tpm_activities.aggregate(
-    #         models.Min('date'))['date__min']
-    #
-    # @property
-    # def end_date(self):
-    #     # TODO: Rewrite to reduce number of SQL queries.
-    #     return self.tpm_activities.aggregate(
-    #         models.Max('date'))['date__max']
-    #
-    # @property
-    # def unicef_focal_points(self):
-    #     return set(itertools.chain(*map(
-    #         lambda a: a.unicef_focal_points.all(),
-    #         self.tpm_activities.all()
-    #     )))
-    #
+    visit_reference_number = models.CharField(max_length=300, blank=True, null=True)
+    task_reference_number = models.CharField(max_length=300, blank=True, null=True)
+    # visit_information = models.TextField(blank=True, null=True)
+    visit_status = models.CharField(max_length=300, blank=True, null=True)
+    visit_start_date = models.DateField(blank=True, null=True)
+    visit_end_date = models.DateField(blank=True, null=True)
+    tpm_name = models.CharField(max_length=300, blank=True, null=True)
+    tpm_focal_points = models.TextField(blank=True, null=True)
+
+    # created = models.CharField(max_length=300, blank=True, null=True)
+    # date_of_assigned = models.DateField(blank=True, null=True)
+    # date_of_cancelled = models.DateField(blank=True, null=True)
+    # date_of_tpm_accepted = models.DateField(blank=True, null=True)
+    # date_of_tpm_rejected = models.DateField(blank=True, null=True)
+    # date_of_tpm_reported = models.DateField(blank=True, null=True)
+    # date_of_tpm_report_rejected = models.DateField(blank=True, null=True)
+    # date_of_unicef_approved = models.DateField(blank=True, null=True)
+    # deleted_at = models.DateTimeField(blank=True, null=True)
+    # partner_name = models.CharField(max_length=300, blank=True, null=True)
+    # vendor_number = models.CharField(max_length=300, blank=True, null=True)
+    pd_ssfa_title = models.CharField(max_length=300, blank=True, null=True)
+    pd_ssfa_reference_number = models.CharField(max_length=300, blank=True, null=True)
+    cp_output = models.CharField(max_length=300, blank=True, null=True)
+    cp_output_id = models.CharField(max_length=300, blank=True, null=True)
+    section = models.CharField(max_length=300, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    country_name = models.CharField(max_length=300, blank=True, null=True)
+    schema_name = models.CharField(max_length=300, blank=True, null=True)
+    area_code = models.CharField(max_length=300, blank=True, null=True)
+    # location_name = models.CharField(max_length=300, blank=True, null=True)
+    # location_pcode = models.CharField(max_length=300, blank=True, null=True)
+    # location_level = models.CharField(max_length=300, blank=True, null=True)
+    # location_levelname = models.CharField(max_length=300, blank=True, null=True)
+    additional_information = models.CharField(max_length=300, blank=True, null=True)
+    # unicef_focal_points = models.TextField(blank=True, null=True)
+    office = models.CharField(max_length=300, blank=True, null=True)
+    is_pv = models.CharField(max_length=300, blank=True, null=True)
+    # attachments = models.CharField(max_length=300, blank=True, null=True)
+    # report_attachment = models.CharField(max_length=300, blank=True, null=True)
+    visit_url = models.CharField(max_length=300, blank=True, null=True)
+
     loader = TPMVisitLoader()
 
     class Options:
@@ -111,7 +143,9 @@ class TPMVisit(DataMartModel):
         sync_deleted_records = lambda a: False
 
         source = TpmTpmvisit
-        mapping = dict(author_name='author.name',
-                       partner_name='partner.name',
-                       partner_vendor_number='partner.vendor_number',
-                       )
+        mapping = add_location_mapping(dict(
+            author_name='author.name',
+            visit_reference_number='reference_number',
+            partner_name='tpm_partner.name',
+            vendor_number='tpm_partner.vendor_number',
+        ))
