@@ -905,8 +905,6 @@ class UsersCountry(models.Model):
     country_short_code = models.CharField(max_length=10)
     vision_sync_enabled = models.BooleanField()
     vision_last_synced = models.DateTimeField(blank=True, null=True)
-    threshold_tae_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
-    threshold_tre_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     local_currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='publicscurrency_users_country_local_currency_id', blank=True, null=True)
     long_name = models.CharField(max_length=255)
 
