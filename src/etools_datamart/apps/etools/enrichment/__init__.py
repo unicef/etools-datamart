@@ -9,7 +9,7 @@ def apply():
     # flake8: noqa: F401
     from . import (actionpoint, audit_engagement, auth_user, auth_usergroups, partners_intervention,
                    partners_partnerorganization, partners_plannedengagement, reports_appliedindicator,
-                   tpm_activity, tpm_visit, partners_agreement,
+                   tpm_activity, tpm_visit, partners_agreement, reports_lowerresult,
                    t2f_travel, t2f_travelactivity, users_userprofile, utils, )  # noqa
     from . import consts
 
