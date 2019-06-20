@@ -61,6 +61,7 @@ social-auth-app-django = "*"
 sqlparse = "*"
 whitenoise = "*"
 sentry-sdk = "*"
+django-deprecate-fields = "*"
 
 [dev-packages]
 bumpversion = "*"
