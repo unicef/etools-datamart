@@ -9,7 +9,7 @@ from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.report_sector import Section
 from etools_datamart.apps.etools.models import (PartnersAgreementamendment, PartnersIntervention,
                                                 PartnersInterventionplannedvisits,
-                                                ReportsAppliedindicator, ReportsLowerresult, )
+                                                ReportsAppliedindicator, ReportsLowerresult,)
 
 from .base import DataMartModel
 from .location import Location
@@ -125,10 +125,10 @@ class InterventionLoader(Loader):
             # member is PartnersPartnerstaffmember
             ret.append("{0.last_name} {0.first_name} ({0.email}) {0.phone}".format(member))
             data.append(dict(last_name=member.last_name,
-                         first_name=member.first_name,
-                         email=member.email,
-                         phone=member.phone,
-                         ))
+                             first_name=member.first_name,
+                             email=member.email,
+                             phone=member.phone,
+                             ))
 
         values['partner_focal_points_data'] = data
         return ", ".join(ret)
@@ -146,13 +146,12 @@ class InterventionLoader(Loader):
             # member is PartnersPartnerstaffmember
             ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
             data.append(dict(last_name=member.last_name,
-                         first_name=member.first_name,
-                         email=member.email,
-                         ))
+                             first_name=member.first_name,
+                             email=member.email,
+                             ))
 
         values['unicef_focal_points_data'] = data
         return ", ".join(ret)
-
 
     # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
     #     if original.frs__actual_amt_local__sum is None:
