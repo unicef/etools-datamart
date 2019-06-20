@@ -307,8 +307,12 @@ class Loader:
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
-            if hasattr(self, 'get_%s' % k):
-                getter = getattr(self, 'get_%s' % v)
+            if v is None:
+                ret[k] = None
+            elif v == 'i':
+                continue
+            elif v == '-' or hasattr(self, 'get_%s' % k):
+                getter = getattr(self, 'get_%s' % k)
                 ret[k] = getter(record, ret)
             elif v == '__self__':
                 try:
