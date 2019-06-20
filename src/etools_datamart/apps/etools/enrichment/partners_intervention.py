@@ -91,3 +91,18 @@ aliases = (['partnersintervention_partners_interventionbudget_intervention_id',
 
            )
 create_alias(PartnersIntervention, aliases)
+
+
+def reference_number(self):
+    if self.document_type != PartnersIntervention.SSFA:
+        number = '{agreement}/{type}{year}{id}'.format(
+            agreement=self.agreement.base_number,
+            type=self.document_type,
+            year=self.reference_number_year,
+            id=self.id
+        )
+        return number
+    return self.agreement.base_number
+
+
+PartnersIntervention.reference_number = property(reference_number)

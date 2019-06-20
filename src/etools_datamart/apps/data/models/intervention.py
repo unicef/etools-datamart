@@ -133,6 +133,9 @@ class InterventionLoader(Loader):
         values['partner_focal_points_data'] = data
         return ", ".join(ret)
 
+    def get_cp_outputs(self, original: PartnersIntervention, values: dict):
+        return [rl.cp_output.id for rl in original.result_links.all()]
+
     def get_unicef_focal_points(self, original: PartnersIntervention, values: dict):
         # ret = []
         # for member in original.unicef_focal_points.all():
@@ -171,8 +174,11 @@ class InterventionAbstract(models.Model):
     agreement_id = models.IntegerField(blank=True, null=True)
     clusters = models.TextField(blank=True, null=True)
     contingency_pd = models.NullBooleanField(null=True)
-    cp_output = models.CharField(max_length=300, blank=True, null=True)
-    cp_output_id = models.IntegerField(blank=True, null=True)
+    # cp_output = models.CharField(max_length=300, blank=True, null=True)
+    # cp_output_id = models.IntegerField(blank=True, null=True)
+    cp_outputs = models.TextField(blank=True, null=True)
+    cp_outputs_data = JSONField(blank=True, null=True, default=dict)
+
     cso_type = models.CharField(max_length=300, blank=True, null=True)
     country_programme = models.CharField(max_length=300, blank=True, null=True)
     country_programme_id = models.IntegerField(blank=True, null=True)
@@ -189,7 +195,7 @@ class InterventionAbstract(models.Model):
     last_amendment_date = models.DateField(blank=True, null=True)
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True, default=dict)
-    metadata = JSONField()
+    metadata = JSONField(blank=True, null=True, default=dict)
     number = models.CharField(max_length=64, null=True)
     number_of_attachments = models.IntegerField(blank=True, null=True)
     number_of_amendments = models.IntegerField(blank=True, null=True)
@@ -219,6 +225,7 @@ class InterventionAbstract(models.Model):
     population_focus = models.CharField(max_length=130, null=True)
     prc_review_document = models.CharField(max_length=1024, null=True)
     review_date_prc = models.DateField(null=True)
+    reference_number = models.CharField(max_length=100, null=True)
     sections = JSONField(blank=True, null=True, default=dict)
     signed_by_partner_date = models.DateField(null=True)
     signed_by_unicef_date = models.DateField(null=True)
@@ -267,8 +274,7 @@ class InterventionAbstract(models.Model):
             contingency_pd='=',
             country_programme='country_programme.name',
             country_programme_id='country_programme.pk',
-            cp_output_id=None,
-            cp_output=None,
+            cp_outputs='-',
             created='=',
             cso_type=None,
             currency='planned_budget.currency',

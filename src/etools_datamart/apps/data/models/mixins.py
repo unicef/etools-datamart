@@ -1,6 +1,12 @@
 from django.db import models
 
 
+def extend(base, other):
+    ret = dict(base)
+    ret.update(**other)
+    return ret
+
+
 def add_location_mapping(base):
     ret = dict(base)
     ret.update(**{'location_source_id': 'location.id',

@@ -272,8 +272,8 @@ class EtoolsUserAdmin(DataModelAdmin):
 
 @register(models.InterventionBudget)
 class InterventionBudgetAdmin(DataModelAdmin):
-    list_display = ('intervention_title', 'intervention_number',
-                    'partner_contribution', 'unicef_cash')
+    list_display = ('title', 'number',
+                    'budget_cso_contribution', 'budget_unicef_cash')
 
 
 @register(models.Office)
