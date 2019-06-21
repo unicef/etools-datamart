@@ -1,6 +1,12 @@
 1.23
 ----
-*
+* new InterventionBudget endpoint
+* updated InterventionByLocation endpoint
+* updated Intervention endpoint
+* new v2 intervention serializer
+* new PartnerContact endpoint
+* new PartnerAgreement endpoint
+* new ActionPoint endpoint
 
 
 1.22
