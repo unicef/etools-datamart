@@ -19,6 +19,7 @@ router.register(r'etools/funds/grant', endpoints.GrantViewSet)
 router.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
 router.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
+router.register(r'etools/workspaces/', endpoints.WorkspaceViewSet)
 
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
