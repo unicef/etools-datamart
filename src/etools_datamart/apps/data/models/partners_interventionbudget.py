@@ -1,14 +1,14 @@
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.intervention import InterventionAbstract, InterventionLoader
 from etools_datamart.apps.data.models.mixins import extend
-from etools_datamart.apps.etools.models import models, PartnersInterventionbudget, PartnersIntervention, \
-    FundsFundsreservationheader
+from etools_datamart.apps.etools.models import (FundsFundsreservationheader, models,
+                                                PartnersIntervention, PartnersInterventionbudget,)
 
 
 class InterventionBudgetLoader(InterventionLoader):
     def get_fr_numbers(self, original: PartnersIntervention, values: dict):
         ret = FundsFundsreservationheader.objects.filter(intervention=original).values_list('fr_number',
-                                                                                      flat=True)
+                                                                                            flat=True)
         return ", ".join(ret)
 
 

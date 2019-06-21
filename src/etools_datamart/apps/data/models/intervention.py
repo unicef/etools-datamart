@@ -9,7 +9,7 @@ from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.report_sector import Section
 from etools_datamart.apps.etools.models import (PartnersAgreementamendment, PartnersIntervention,
                                                 PartnersInterventionplannedvisits,
-                                                ReportsAppliedindicator, ReportsLowerresult, ReportsResult)
+                                                ReportsAppliedindicator, ReportsLowerresult,)
 
 from .base import DataMartModel
 from .location import Location
@@ -135,7 +135,6 @@ class InterventionLoader(Loader):
 
     def get_cp_outputs(self, original: PartnersIntervention, values: dict):
         return ", ".join([rl.name for rl in original.result_links.all()])
-
 
     def get_unicef_focal_points(self, original: PartnersIntervention, values: dict):
         # ret = []
