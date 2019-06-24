@@ -100,6 +100,14 @@ class InterventionSerializerV2(DataMartSerializer):
                   )
 
 
+class InterventionSerializerPlain(serializers.ModelSerializer):
+    class Meta:
+        model = models.Intervention
+        exclude = ('fr_numbers_data', 'cp_outputs_data', 'partner_focal_points_data',
+                   'sections_data', 'unicef_focal_points_data',
+                   'partner_focal_points_data')
+
+
 class InterventionSerializerFull(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Intervention
@@ -132,6 +140,7 @@ class InterventionViewSet(common.DataMartViewSet):
     serializers_fieldsets = {'std': None,
                              'full': InterventionSerializerFull,
                              'v2': InterventionSerializerV2,
+                             'plain': InterventionSerializerPlain,
                              'short': ["title", "number", "country_name", "start_date"]}
 
     def get_querystringfilter_form(self, request, filter):
