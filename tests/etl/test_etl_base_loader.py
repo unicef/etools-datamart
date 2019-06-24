@@ -24,7 +24,7 @@ def test_load_requiredismissing(loader1):
         # we do not want wait the full load only to detect the error
         with mock.patch('%s.update_context' % fqn(loader1), side_effect=Exception('missing to raise RequiredIsMissing')):
             with pytest.raises(RequiredIsMissing):
-                loader1.load(max_records=2, force_requirements=True)
+                loader1.load(max_records=2, force_requirements=False)
 
 
 def test_load_requiredisrunning(loader1):
