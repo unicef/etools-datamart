@@ -306,7 +306,7 @@ INSTALLED_APPS = [
     'drf_querystringfilter',
     'crispy_forms',
     'dbtemplates',
-
+    'django_migration_linter',
     'drf_yasg',
     'adminfilters',
     'django_db_logging',

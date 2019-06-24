@@ -1,3 +1,5 @@
+from django.contrib.postgres.fields import JSONField
+
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.intervention import InterventionAbstract, InterventionLoader
 from etools_datamart.apps.data.models.mixins import extend
@@ -7,8 +9,17 @@ from etools_datamart.apps.etools.models import (FundsFundsreservationheader, mod
 
 class InterventionBudgetLoader(InterventionLoader):
     def get_fr_numbers(self, original: PartnersIntervention, values: dict):
-        ret = FundsFundsreservationheader.objects.filter(intervention=original).values_list('fr_number',
-                                                                                            flat=True)
+        data = []
+        ret = []
+        for fr in FundsFundsreservationheader.objects.filter(intervention=original):
+            ret.append(fr.fr_number)
+            data.append(dict(fr_number=fr.fr_number,
+                             vendor_code=fr.first_name,
+                             fr_type=fr.fr_type,
+                             currency=fr.currency,
+                             ))
+
+        values['fr_numbers_data'] = data
         return ", ".join(ret)
 
 
@@ -21,6 +32,7 @@ class InterventionBudget(InterventionAbstract, DataMartModel):
     budget_unicef_cash = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     budget_unicef_supply = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     fr_numbers = models.TextField(max_length=100, blank=True, null=True)
+    fr_numbers_data = JSONField(blank=True, null=True, default=dict)
 
     loader = InterventionBudgetLoader()
 
