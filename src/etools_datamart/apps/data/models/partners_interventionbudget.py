@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import JSONField
 
+from etools_datamart.apps.data.models import Location
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.intervention import InterventionAbstract, InterventionLoader
 from etools_datamart.apps.data.models.mixins import extend
@@ -38,6 +39,7 @@ class InterventionBudget(InterventionAbstract, DataMartModel):
 
     class Options(InterventionAbstract.Options):
         model = PartnersInterventionbudget
+        depends = (Location,)
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(
                              budget_cso_contribution='partner_contribution',
