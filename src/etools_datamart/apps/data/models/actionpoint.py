@@ -9,7 +9,7 @@ from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAu
                                                 AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
                                                 DjangoComments, DjangoContentType, PartnersIntervention,
                                                 T2FTravelactivity, TpmTpmactivity,)
-
+from .intervention import Intervention
 # reference_number(self):
 # return '{}/{}/{}/APD'.format(
 #     connection.tenant.country_short_code or '',
@@ -196,6 +196,7 @@ class ActionPoint(LocationMixin, DataMartModel):
 
     class Options:
         source = ActionPointsActionpoint
+        depends = (Intervention,)
         mapping = add_location_mapping(dict(
             assigned_by_name='assigned_by.get_display_name',
             assigned_to_name='assigned_to.get_display_name',

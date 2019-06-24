@@ -6,12 +6,12 @@ from unittest import mock
 import pytest
 
 from etools_datamart.apps.data.loader import EtlResult, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.data.models import FundsReservation
+from etools_datamart.apps.data.models import FundsReservation, ActionPoint
 
 
 @pytest.fixture()
 def loader1(db):
-    loader = FundsReservation.loader
+    loader = ActionPoint.loader
     loader.config.lock_key = str(time.time())
     return loader
 
@@ -19,7 +19,7 @@ def loader1(db):
 def test_load_requiredismissing(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
         with pytest.raises(RequiredIsMissing):
-            loader1.load(max_records=2)
+            loader1.load(max_records=2, force_requirements=True)
 
 
 def test_load_requiredisrunning(loader1):

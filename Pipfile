@@ -45,7 +45,7 @@ djangorestframework-yaml = "*"
 drf-dynamic-serializer = ">=1.2.0"
 drf-extensions = "*"
 drf-renderer-xlsx = "*"
-drf-yasg = {version = "*",extras = ["validation"]}
+drf-yasg = {version = "==1.15.0",extras = ["validation"]}
 gunicorn = "*"
 humanize = "*"
 markdown = "*"

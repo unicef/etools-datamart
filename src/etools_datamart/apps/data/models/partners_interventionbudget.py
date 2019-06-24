@@ -14,7 +14,7 @@ class InterventionBudgetLoader(InterventionLoader):
         for fr in FundsFundsreservationheader.objects.filter(intervention=original):
             ret.append(fr.fr_number)
             data.append(dict(fr_number=fr.fr_number,
-                             vendor_code=fr.first_name,
+                             vendor_code=fr.vendor_code,
                              fr_type=fr.fr_type,
                              currency=fr.currency,
                              ))

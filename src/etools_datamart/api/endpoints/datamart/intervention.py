@@ -108,12 +108,13 @@ class InterventionSerializerV2(DataMartSerializer):
                                                                obj.schema_name)
 
 
-class InterventionSerializerPlain(serializers.ModelSerializer):
+class InterventionSerializerPlain(InterventionSerializerV2):
     class Meta:
         model = models.Intervention
-        exclude = ('fr_numbers_data', 'cp_outputs_data', 'partner_focal_points_data',
+        exclude = ('cp_outputs_data',
+                   'partner_focal_points_data',
                    'sections_data', 'unicef_focal_points_data',
-                   'partner_focal_points_data')
+                   )
 
 
 class InterventionSerializerFull(DataMartSerializer):

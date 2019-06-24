@@ -86,7 +86,7 @@ def test_add_schema1():
 def test_count_multitenant():
     p = Parser('SELECT COUNT(*) FROM "t1"')
     assert p.with_schemas("b",
-                          "c") == 'SELECT COUNT(id) FROM ' \
+                          "c") == 'SELECT COUNT(*) FROM ' \
                                   '(SELECT id, \'b\' AS __schema FROM "b"."t1" ' \
                                   'UNION ALL ' \
                                   'SELECT id, \'c\' AS __schema FROM "c"."t1") as __count'
