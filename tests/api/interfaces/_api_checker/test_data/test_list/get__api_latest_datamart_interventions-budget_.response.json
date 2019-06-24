@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1527"
+            "927"
         ]
     },
     "data": {
@@ -62,15 +62,11 @@
         "previous": null,
         "results": [
             {
-                "id": 201,
-                "source_id": null,
-                "last_modify_date": "18 Apr 2019 10:36:51",
-                "seen": null,
-                "country_name": "bolivia",
-                "schema_name": "bolivia",
-                "area_code": "",
-                "created": null,
-                "modified": null,
+                "number": null,
+                "title": null,
+                "status": null,
+                "start_date": null,
+                "end_date": null,
                 "partner_contribution": null,
                 "unicef_cash": null,
                 "in_kind_amount": null,
@@ -79,22 +75,14 @@
                 "in_kind_amount_local": null,
                 "total": null,
                 "total_local": null,
-                "currency": null,
-                "intervention_title": null,
-                "intervention_number": null,
-                "intervention_source_id": null,
-                "intervention": 615
+                "currency": null
             },
             {
-                "id": 202,
-                "source_id": null,
-                "last_modify_date": "18 Apr 2019 10:36:51",
-                "seen": null,
-                "country_name": "chad",
-                "schema_name": "chad",
-                "area_code": "",
-                "created": null,
-                "modified": null,
+                "number": null,
+                "title": null,
+                "status": null,
+                "start_date": null,
+                "end_date": null,
                 "partner_contribution": null,
                 "unicef_cash": null,
                 "in_kind_amount": null,
@@ -103,22 +91,14 @@
                 "in_kind_amount_local": null,
                 "total": null,
                 "total_local": null,
-                "currency": null,
-                "intervention_title": null,
-                "intervention_number": null,
-                "intervention_source_id": null,
-                "intervention": 616
+                "currency": null
             },
             {
-                "id": 203,
-                "source_id": null,
-                "last_modify_date": "18 Apr 2019 10:36:51",
-                "seen": null,
-                "country_name": "lebanon",
-                "schema_name": "lebanon",
-                "area_code": "",
-                "created": null,
-                "modified": null,
+                "number": null,
+                "title": null,
+                "status": null,
+                "start_date": null,
+                "end_date": null,
                 "partner_contribution": null,
                 "unicef_cash": null,
                 "in_kind_amount": null,
@@ -127,11 +107,7 @@
                 "in_kind_amount_local": null,
                 "total": null,
                 "total_local": null,
-                "currency": null,
-                "intervention_title": null,
-                "intervention_number": null,
-                "intervention_source_id": null,
-                "intervention": 617
+                "currency": null
             }
         ]
     },

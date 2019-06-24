@@ -40,6 +40,12 @@ class FAMIndicatorFactory(DataMartModelFactory):
         model = models.FAMIndicator
 
 
+class AgreementFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.Agreement
+
+
 class InterventionFactory(DataMartModelFactory):
     metadata = {}
     title = factory.Sequence(lambda n: "title%03d" % n)

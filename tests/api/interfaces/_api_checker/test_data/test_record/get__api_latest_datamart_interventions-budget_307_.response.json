@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"7e9e0ca6554712349e300c821b9bddf4\""
+            "\"4ead6a6a670840c95d7ad2835315e914\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,19 +39,15 @@
         ],
         "content-length": [
             "Content-Length",
-            "482"
+            "280"
         ]
     },
     "data": {
-        "id": 204,
-        "source_id": null,
-        "last_modify_date": "18 Apr 2019 10:36:51",
-        "seen": null,
-        "country_name": "bolivia",
-        "schema_name": "bolivia",
-        "area_code": "",
-        "created": null,
-        "modified": null,
+        "number": null,
+        "title": null,
+        "status": null,
+        "start_date": null,
+        "end_date": null,
         "partner_contribution": null,
         "unicef_cash": null,
         "in_kind_amount": null,
@@ -60,11 +56,7 @@
         "in_kind_amount_local": null,
         "total": null,
         "total_local": null,
-        "currency": null,
-        "intervention_title": null,
-        "intervention_number": null,
-        "intervention_source_id": null,
-        "intervention": 618
+        "currency": null
     },
     "content_type": null
 }
