@@ -22,6 +22,7 @@ def test_whoami(django_app, admin_user):
     assert res.status_code == 200
 
 
+@pytest.mark.django_db
 def test_whoami_anon(django_app):
     res = django_app.get(reverse('whoami'))
     assert res.status_code == 200
