@@ -9,7 +9,9 @@ from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAu
                                                 AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
                                                 DjangoComments, DjangoContentType, PartnersIntervention,
                                                 T2FTravelactivity, TpmTpmactivity,)
+
 from .intervention import Intervention
+
 # reference_number(self):
 # return '{}/{}/{}/APD'.format(
 #     connection.tenant.country_short_code or '',

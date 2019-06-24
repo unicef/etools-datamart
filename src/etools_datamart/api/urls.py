@@ -1,7 +1,8 @@
 from django.urls import include, path, re_path
 
-from etools_datamart.api.endpoints import schema_view
 from unicef_rest_framework.routers import APIReadOnlyRouter
+
+from etools_datamart.api.endpoints import schema_view
 
 from . import endpoints
 
@@ -55,7 +56,7 @@ urlpatterns = [
     re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),
 
     re_path(r'\+sw(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
-         name='schema-json'),
+            name='schema-json'),
 
     path(r'+swagger/', endpoints.schema_view.with_ui('swagger', cache_timeout=0),
          name='schema-swagger-ui'),
