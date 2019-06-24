@@ -1,5 +1,6 @@
 from django import forms
 
+from constance import config
 from rest_framework import serializers
 
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
@@ -36,7 +37,7 @@ class InterventionFilterForm(forms.Form):
 
 class InterventionSerializerV2(DataMartSerializer):
     # vendor_number = serializers.CharField(source='vendor_number')
-    pd_ssfa_type = serializers.CharField(source='doocument_type')
+    pd_ssfa_type = serializers.CharField(source='document_type')
     pd_ssfa_reference_number = serializers.CharField(source='reference_number')
     pd_ssfa_title = serializers.CharField(source='title')
     pd_ssfa_status = serializers.CharField(source='status')
@@ -44,6 +45,8 @@ class InterventionSerializerV2(DataMartSerializer):
     pd_ssfa_end_date = serializers.CharField(source='end_date')
     pd_ssfa_submission_date = serializers.CharField(source='submission_date')
     pd_ssfa_submission_date_prc = serializers.CharField(source='submission_date_prc')
+    pd_ssfa_last_modify_date = serializers.DateTimeField(source='last_modify_date')
+    pd_ssfa_url = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Intervention
@@ -55,8 +58,8 @@ class InterventionSerializerV2(DataMartSerializer):
                   'schema_name',
                   'area_code',
                   'agreement_reference_number',  # agreement.reference_number
-                  'pd_ssfa_type',  # doocument_type
-                  'reference_number',  # reference_number
+                  'pd_ssfa_type',  # document_type
+                  'pd_ssfa_reference_number',  # reference_number
                   'pd_ssfa_title',  # title
                   'offices',  # offices (m2m)
                   'unicef_focal_points',  # unicef_focal_points (m2m)
@@ -71,18 +74,18 @@ class InterventionSerializerV2(DataMartSerializer):
                   'country_programme_id',  # country_programme_id
                   'clusters',
                   'sections',
-                  'cp_output',
-                  'cp_output_id',
+                  'cp_outputs',
+                  # 'cp_output_id',
                   'planned_programmatic_visits',
-                  'submission_date',  # submission_date
-                  'submission_date_prc',  # submission_date_prc
+                  'pd_ssfa_submission_date',  # submission_date
+                  'pd_ssfa_submission_date_prc',  # submission_date_prc
                   'review_date_prc',
                   'prc_review_document',
                   'partner_signatory_name',
-                  'partner_signatory_email',
+                  # 'partner_signatory_email',
                   'signed_by_partner_date',  # signed_by_partner_date
                   'unicef_signatory_name',  # unicef_signatory.username
-                  'unicef_signatory_email',  # unicef_signatory.mail
+                  # 'unicef_signatory_email',  # unicef_signatory.mail
                   'signed_by_unicef_date',  # signed_by_unicef_date
                   'days_from_prc_review_to_signature',
                   'days_from_submission_to_signature',
@@ -92,12 +95,17 @@ class InterventionSerializerV2(DataMartSerializer):
                   'last_amendment_date',
                   'fr_number',
                   'number_of_attachments',
-                  'attachment_type',
+                  'attachment_types',
                   'created',  # created
                   'updated',  # updated
                   'pd_ssfa_last_modify_date',
                   'pd_ssfa_url',
                   )
+
+    def get_pd_ssfa_url(self, obj):
+        return "%s/pmp/interventions/%s/details/?schema=%s" % (config.ETOOLS_ADDRESS,
+                                                               obj.source_id,
+                                                               obj.schema_name)
 
 
 class InterventionSerializerPlain(serializers.ModelSerializer):

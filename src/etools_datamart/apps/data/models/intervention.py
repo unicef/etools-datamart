@@ -83,6 +83,14 @@ class InterventionLoader(Loader):
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])
 
+    def get_unicef_signatory_name(self, original: PartnersIntervention, values: dict):
+        if original.unicef_signatory:
+            return "{0.username} ({0.email})".format(original.unicef_signatory)
+
+    def get_partner_signatory_name(self, original: PartnersIntervention, values: dict):
+        if original.partner_authorized_officer_signatory:
+            return "{0.last_name} {0.first_name} ({0.email})".format(original.partner_authorized_officer_signatory)
+
     def get_offices(self, original: PartnersIntervention, values: dict):
         # PartnersInterventionOffices
         data = []
@@ -213,9 +221,10 @@ class InterventionAbstract(models.Model):
     # partner_focal_point_title = models.CharField(max_length=64, null=True)
     partner_id = models.IntegerField(blank=True, null=True)
     partner_name = models.CharField(max_length=200, null=True)
-    partner_signatory_email = models.CharField(max_length=128, null=True)
-    partner_signatory_first_name = models.CharField(max_length=64, null=True)
-    partner_signatory_last_name = models.CharField(max_length=64, null=True)
+    partner_signatory_name = models.CharField(max_length=300, null=True)
+    # partner_signatory_email = models.CharField(max_length=128, null=True)
+    # partner_signatory_first_name = models.CharField(max_length=64, null=True)
+    # partner_signatory_last_name = models.CharField(max_length=64, null=True)
     partner_signatory_phone = models.CharField(max_length=64, null=True)
     partner_signatory_title = models.CharField(max_length=64, null=True)
     partner_source_id = models.IntegerField(blank=True, null=True)
@@ -243,10 +252,10 @@ class InterventionAbstract(models.Model):
     unicef_focal_points = models.TextField(blank=True, null=True)
     unicef_focal_points_data = JSONField(blank=True, null=True, default=dict)
 
-    unicef_signatory_email = models.CharField(max_length=254, null=True)
-    unicef_signatory_first_name = models.CharField(max_length=30, null=True)
-    unicef_signatory_id = models.IntegerField(blank=True, null=True)
-    unicef_signatory_last_name = models.CharField(max_length=30, null=True)
+    unicef_signatory_name = models.CharField(max_length=500, null=True)
+    # unicef_signatory_first_name = models.CharField(max_length=30, null=True)
+    # unicef_signatory_id = models.IntegerField(blank=True, null=True)
+    # unicef_signatory_last_name = models.CharField(max_length=30, null=True)
     updated = models.DateTimeField(null=True)
 
     # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
@@ -300,11 +309,11 @@ class InterventionAbstract(models.Model):
             partner_focal_points_data='i',
             partner_id=None,
             partner_name='agreement.partner.name',
-            partner_signatory_email='partner_authorized_officer_signatory.email',
-            partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
-            partner_signatory_last_name='partner_authorized_officer_signatory.last_name',
-            partner_signatory_phone='partner_authorized_officer_signatory.phone',
-            partner_signatory_title='partner_authorized_officer_signatory.title',
+            # partner_signatory_email='partner_authorized_officer_signatory.email',
+            # partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
+            # partner_signatory_last_name='partner_authorized_officer_signatory.last_name',
+            # partner_signatory_phone='partner_authorized_officer_signatory.phone',
+            # partner_signatory_title='partner_authorized_officer_signatory.title',
             partner_source_id='agreement.partner.id',
             partner_type='agreement.partner.type',
             partner_vendor_number='agreement.partner.vendor_number',
@@ -318,10 +327,10 @@ class InterventionAbstract(models.Model):
             unicef_cash='planned_budget.unicef_cash',
             unicef_cash_local='planned_budget.unicef_cash_local',
             unicef_focal_points='-',
-            unicef_signatory_email='unicef_signatory.email',
-            unicef_signatory_first_name='unicef_signatory.first_name',
-            unicef_signatory_id='unicef_signatory.pk',
-            unicef_signatory_last_name='unicef_signatory.last_name',
+            # unicef_signatory_email='unicef_signatory.email',
+            # unicef_signatory_first_name='unicef_signatory.first_name',
+            # unicef_signatory_id='unicef_signatory.pk',
+            # unicef_signatory_last_name='unicef_signatory.last_name',
             updated='modified',
         )
 
