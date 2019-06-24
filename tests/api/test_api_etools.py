@@ -2,9 +2,9 @@
 import pytest
 from rest_framework.reverse import reverse
 
-from etools_datamart.api.endpoints import AgreementViewSet
+from etools_datamart.api.endpoints import AssessmentViewSet
 from etools_datamart.api.urls import router
-from etools_datamart.apps.etools.models import PartnersAgreement
+from etools_datamart.apps.etools.models import PartnersAssessment
 from etools_datamart.apps.multitenant.postgresql.utils import current_schema
 
 
@@ -61,9 +61,9 @@ def test_retrieve_requires_one_schema(client):
 
 
 def test_retrieve_id(client):
-    url = AgreementViewSet.get_service().endpoint
+    url = AssessmentViewSet.get_service().endpoint
     with current_schema('bolivia'):
-        target = PartnersAgreement.objects.first()
+        target = PartnersAssessment.objects.first()
     res = client.get(f"{url}{target.pk}/?country_name=bolivia")
     assert res.status_code == 200, res
     assert res.json()
