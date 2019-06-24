@@ -4,9 +4,10 @@ from io import StringIO
 from unittest import mock
 
 import pytest
+from strategy_field.utils import fqn
 
 from etools_datamart.apps.data.loader import EtlResult, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.data.models import FundsReservation, ActionPoint
+from etools_datamart.apps.data.models import ActionPoint
 
 
 @pytest.fixture()
@@ -18,8 +19,12 @@ def loader1(db):
 
 def test_load_requiredismissing(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
-        with pytest.raises(RequiredIsMissing):
-            loader1.load(max_records=2, force_requirements=True)
+        # update_context() is mocked onky to prevent not needed long running test
+        # because update_context() is invoked only if RequiredIsMissing is not raised
+        # and we do not want wait to detect test error
+        with mock.patch('%s.update_context' % fqn(loader1), side_effect=Exception('missing to raise RequiredIsMissing')):
+            with pytest.raises(RequiredIsMissing):
+                loader1.load(max_records=2, force_requirements=True)
 
 
 def test_load_requiredisrunning(loader1):

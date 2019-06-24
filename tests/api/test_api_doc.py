@@ -3,7 +3,7 @@ from rest_framework.reverse import reverse
 
 
 def test_swagger_json(django_app, db):
-    res = django_app.get(reverse('api:schema-json'))
+    res = django_app.get(reverse('api:schema-json', args=['.json']))
     assert res.status_code == 200
 
 
