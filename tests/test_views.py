@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.urls import reverse
 
+import pytest
+
 from etools_datamart.apps.etl.models import EtlTask
 
 
@@ -14,6 +16,7 @@ def test_login(django_app, admin_user):
     assert res.status_code == 200
 
 
+@pytest.mark.django_db
 def test_whoami(django_app, admin_user):
     res = django_app.get(reverse('whoami'), user=admin_user)
     assert res.status_code == 200
