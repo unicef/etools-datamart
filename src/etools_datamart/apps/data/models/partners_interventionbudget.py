@@ -35,6 +35,9 @@ class InterventionBudget(InterventionAbstract, DataMartModel):
     fr_numbers = models.TextField(max_length=100, blank=True, null=True)
     fr_numbers_data = JSONField(blank=True, null=True, default=dict)
 
+    locations = models.TextField(blank=True, null=True)
+    locations_data = JSONField(blank=True, null=True, default=dict)
+
     loader = InterventionBudgetLoader()
 
     class Options(InterventionAbstract.Options):

@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.interventionbudget",
-                "pk": 304,
+                "pk": 797,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-06-24T10:18:52.656Z",
+                    "last_modify_date": "2019-06-25T11:01:55.454Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -32,8 +32,6 @@
                     "in_kind_amount_local": null,
                     "intervention_id": null,
                     "last_amendment_date": null,
-                    "locations": null,
-                    "locations_data": {},
                     "metadata": {},
                     "number": null,
                     "number_of_attachments": null,
@@ -84,15 +82,17 @@
                     "budget_unicef_cash": null,
                     "budget_unicef_supply": null,
                     "fr_numbers": null,
-                    "fr_numbers_data": {}
+                    "fr_numbers_data": {},
+                    "locations": null,
+                    "locations_data": {}
                 }
             },
             {
                 "model": "data.interventionbudget",
-                "pk": 305,
+                "pk": 798,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-06-24T10:18:52.664Z",
+                    "last_modify_date": "2019-06-25T11:01:55.458Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -118,8 +118,6 @@
                     "in_kind_amount_local": null,
                     "intervention_id": null,
                     "last_amendment_date": null,
-                    "locations": null,
-                    "locations_data": {},
                     "metadata": {},
                     "number": null,
                     "number_of_attachments": null,
@@ -170,15 +168,17 @@
                     "budget_unicef_cash": null,
                     "budget_unicef_supply": null,
                     "fr_numbers": null,
-                    "fr_numbers_data": {}
+                    "fr_numbers_data": {},
+                    "locations": null,
+                    "locations_data": {}
                 }
             },
             {
                 "model": "data.interventionbudget",
-                "pk": 306,
+                "pk": 799,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-06-24T10:18:52.667Z",
+                    "last_modify_date": "2019-06-25T11:01:55.461Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -204,8 +204,6 @@
                     "in_kind_amount_local": null,
                     "intervention_id": null,
                     "last_amendment_date": null,
-                    "locations": null,
-                    "locations_data": {},
                     "metadata": {},
                     "number": null,
                     "number_of_attachments": null,
@@ -256,7 +254,9 @@
                     "budget_unicef_cash": null,
                     "budget_unicef_supply": null,
                     "fr_numbers": null,
-                    "fr_numbers_data": {}
+                    "fr_numbers_data": {},
+                    "locations": null,
+                    "locations_data": {}
                 }
             }
         ],

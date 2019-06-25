@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"90932927ab039485a39b9c512b6a4bcc\""
+            "\"aa0f04a7e1fa59a34923e0d568f23ad3\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,13 +39,13 @@
         ],
         "content-length": [
             "Content-Length",
-            "1484"
+            "1501"
         ]
     },
     "data": {
-        "id": 613,
+        "id": 564,
         "source_id": null,
-        "last_modify_date": "24 Jun 2019 10:18:52",
+        "last_modify_date": "25 Jun 2019 11:01:58",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
@@ -61,7 +61,7 @@
         "cso_type": null,
         "country_programme": null,
         "country_programme_id": null,
-        "created": "24 Jun 2019 10:18:52",
+        "created": "25 Jun 2019 11:01:58",
         "days_from_prc_review_to_signature": null,
         "days_from_submission_to_signature": null,
         "document_type": null,
@@ -69,7 +69,6 @@
         "fr_number": null,
         "intervention_id": 3,
         "last_amendment_date": null,
-        "locations_data": {},
         "number": "#003",
         "number_of_attachments": null,
         "number_of_amendments": null,
@@ -103,7 +102,9 @@
         "unicef_focal_points": null,
         "unicef_focal_points_data": {},
         "unicef_signatory_name": null,
-        "updated": null
+        "updated": null,
+        "locations": null,
+        "locations_data": {}
     },
     "content_type": null
 }

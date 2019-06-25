@@ -6,10 +6,8 @@ from django.db import models
 from django.db.models import F
 
 from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.report_sector import Section
 from etools_datamart.apps.etools.models import (PartnersAgreementamendment, PartnersIntervention,
-                                                PartnersInterventionplannedvisits,
-                                                ReportsAppliedindicator, ReportsLowerresult,)
+                                                PartnersInterventionplannedvisits, ReportsAppliedindicator,)
 
 from .base import DataMartModel
 from .location import Location
@@ -59,15 +57,14 @@ class InterventionLoader(Loader):
             return (i2 - i1).days
 
     def get_sections(self, original: PartnersIntervention, values: dict):
-        # PartnersInterventionFlatLocations
-        ids = list(original.sections.values_list("id", flat=True))
-        ret = list(Section.objects.filter(source_id__in=ids,
-                                          schema_name=values['schema_name']).values("id",
-                                                                                    "name",
-                                                                                    "source_id",
-                                                                                    "description"))
-        # assert len(ids) == len(ret)
-        return ret
+        data = []
+        for section in original.sections.all():
+            data.append(dict(source_id=section.id,
+                             name=section.name,
+                             description=section.description,
+                             ))
+        values['sections_data'] = data
+        return ", ".join([l['name'] for l in data])
 
     def get_locations(self, original: PartnersIntervention, values: dict):
         # PartnersInterventionFlatLocations
@@ -99,32 +96,17 @@ class InterventionLoader(Loader):
                              name=office.name,
                              zonal_chief_email=getattr(office.zonal_chief, 'email', ''),
                              ))
-        # ids = list(original.offices.values_list("id", flat=True))
-        # ret = list(Office.objects.filter(source_id__in=ids,
-        #                                  schema_name=values['schema_name']).values("id",
-        #                                                                            "name",
-        #                                                                            "source_id",
-        #                                                                            "zonal_chief_email",
-        #                                                                            "zonal_chief_source_id"))
-        # values['offices_data'] = {}
-        # assert len(ids) == len(ret)
         values['offices_data'] = data
         return ", ".join([l['name'] for l in data])
 
     def get_clusters(self, original: PartnersIntervention, values: dict):
-        qs = ReportsLowerresult.objects.filter(result_link__intervention=original)
-        # qs = PartnersInterventionresultlink.objects.filter(intervention=original)
-        # for lower_result in qs.all():
-        # all_lower_results = [lower_result for link in original.result_links.all()
-        #                      for lower_result in link.ll_results.all()
-        #                      ]
 
         qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=original)
         clusters = set()
         for applied_indicator in qs.all():
             if applied_indicator.cluster_name:
                 clusters.add(applied_indicator.cluster_name)
-        return clusters
+        return ", ".join(clusters)
 
     def get_partner_focal_points(self, original: PartnersIntervention, values: dict):
         data = []
@@ -145,16 +127,9 @@ class InterventionLoader(Loader):
         return ", ".join([rl.name for rl in original.result_links.all()])
 
     def get_unicef_focal_points(self, original: PartnersIntervention, values: dict):
-        # ret = []
-        # for member in original.unicef_focal_points.all():
-        #     # member is PartnersPartnerstaffmember
-        #     ret.append("{0.last_name} {0.first_name} {0.email}".format(member))
-        # values['unicef_focal_points_data'] = {}
-        # return "\n".join(ret)
         data = []
         ret = []
         for member in original.unicef_focal_points.all():
-            # member is PartnersPartnerstaffmember
             ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
             data.append(dict(last_name=member.last_name,
                              first_name=member.first_name,
@@ -201,8 +176,6 @@ class InterventionAbstract(models.Model):
     in_kind_amount_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     intervention_id = models.IntegerField(blank=True, null=True)
     last_amendment_date = models.DateField(blank=True, null=True)
-    locations = models.TextField(blank=True, null=True)
-    locations_data = JSONField(blank=True, null=True, default=dict)
     metadata = JSONField(blank=True, null=True, default=dict)
     number = models.CharField(max_length=64, null=True)
     number_of_attachments = models.IntegerField(blank=True, null=True)
@@ -327,6 +300,7 @@ class InterventionAbstract(models.Model):
             unicef_cash='planned_budget.unicef_cash',
             unicef_cash_local='planned_budget.unicef_cash_local',
             unicef_focal_points='-',
+            unicef_focal_points_data='i',
             # unicef_signatory_email='unicef_signatory.email',
             # unicef_signatory_first_name='unicef_signatory.first_name',
             # unicef_signatory_id='unicef_signatory.pk',
@@ -336,6 +310,9 @@ class InterventionAbstract(models.Model):
 
 
 class Intervention(InterventionAbstract, DataMartModel):
+    locations = models.TextField(blank=True, null=True)
+    locations_data = JSONField(blank=True, null=True, default=dict)
+
     loader = InterventionLoader()
 
     class Meta:
@@ -348,6 +325,10 @@ class Intervention(InterventionAbstract, DataMartModel):
 
 
 class InterventionByLocationLoader(InterventionLoader):
+    def get_locations(self, original: PartnersIntervention, values: dict):
+        values['locations_data'] = None
+        return None
+
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for intervention in qs.all():

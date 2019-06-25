@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.intervention",
-                "pk": 610,
+                "pk": 561,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-06-24T10:18:51.058Z",
+                    "last_modify_date": "2019-06-25T11:01:54.229Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -22,7 +22,7 @@
                     "cso_type": null,
                     "country_programme": null,
                     "country_programme_id": null,
-                    "created": "2019-06-24T10:18:51.058Z",
+                    "created": "2019-06-25T11:01:54.229Z",
                     "currency": "USD",
                     "days_from_prc_review_to_signature": null,
                     "days_from_submission_to_signature": null,
@@ -33,8 +33,6 @@
                     "in_kind_amount_local": "10.00",
                     "intervention_id": 0,
                     "last_amendment_date": null,
-                    "locations": null,
-                    "locations_data": {},
                     "metadata": {},
                     "number": "#000",
                     "number_of_attachments": null,
@@ -76,15 +74,17 @@
                     "unicef_focal_points": null,
                     "unicef_focal_points_data": {},
                     "unicef_signatory_name": null,
-                    "updated": null
+                    "updated": null,
+                    "locations": null,
+                    "locations_data": {}
                 }
             },
             {
                 "model": "data.intervention",
-                "pk": 611,
+                "pk": 562,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-06-24T10:18:51.066Z",
+                    "last_modify_date": "2019-06-25T11:01:54.235Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -100,7 +100,7 @@
                     "cso_type": null,
                     "country_programme": null,
                     "country_programme_id": null,
-                    "created": "2019-06-24T10:18:51.066Z",
+                    "created": "2019-06-25T11:01:54.235Z",
                     "currency": "USD",
                     "days_from_prc_review_to_signature": null,
                     "days_from_submission_to_signature": null,
@@ -111,8 +111,6 @@
                     "in_kind_amount_local": "10.00",
                     "intervention_id": 1,
                     "last_amendment_date": null,
-                    "locations": null,
-                    "locations_data": {},
                     "metadata": {},
                     "number": "#001",
                     "number_of_attachments": null,
@@ -154,15 +152,17 @@
                     "unicef_focal_points": null,
                     "unicef_focal_points_data": {},
                     "unicef_signatory_name": null,
-                    "updated": null
+                    "updated": null,
+                    "locations": null,
+                    "locations_data": {}
                 }
             },
             {
                 "model": "data.intervention",
-                "pk": 612,
+                "pk": 563,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-06-24T10:18:51.069Z",
+                    "last_modify_date": "2019-06-25T11:01:54.237Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -178,7 +178,7 @@
                     "cso_type": null,
                     "country_programme": null,
                     "country_programme_id": null,
-                    "created": "2019-06-24T10:18:51.069Z",
+                    "created": "2019-06-25T11:01:54.237Z",
                     "currency": "USD",
                     "days_from_prc_review_to_signature": null,
                     "days_from_submission_to_signature": null,
@@ -189,8 +189,6 @@
                     "in_kind_amount_local": "10.00",
                     "intervention_id": 2,
                     "last_amendment_date": null,
-                    "locations": null,
-                    "locations_data": {},
                     "metadata": {},
                     "number": "#002",
                     "number_of_attachments": null,
@@ -232,7 +230,9 @@
                     "unicef_focal_points": null,
                     "unicef_focal_points_data": {},
                     "unicef_signatory_name": null,
-                    "updated": null
+                    "updated": null,
+                    "locations": null,
+                    "locations_data": {}
                 }
             }
         ],

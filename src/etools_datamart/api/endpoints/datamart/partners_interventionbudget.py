@@ -3,8 +3,8 @@ from django import forms
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints import common
-from etools_datamart.api.endpoints.datamart.intervention import InterventionSerializerV2
-from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
+from etools_datamart.api.endpoints.datamart.intervention import (InterventionSerializer, InterventionSerializerFull,
+                                                                 InterventionSerializerPlain, InterventionSerializerV2,)
 from etools_datamart.apps.data import models
 from etools_datamart.apps.etools.models import PartnersIntervention
 
@@ -32,17 +32,13 @@ class InterventionFilterForm(forms.Form):
         super().__init__(filters, files, auto_id, prefix, initial, *args, **kwargs)
 
 
-class InterventionBudgetSerializerV2(InterventionSerializerV2):
-    # vendor_number = serializers.CharField(source='vendor_number')
-    # pd_ssfa_type = serializers.CharField(source='doocument_type')
-    # pd_ssfa_reference_number = serializers.CharField(source='reference_number')
-    # pd_ssfa_title = serializers.CharField(source='title')
-    # pd_ssfa_status = serializers.CharField(source='status')
-    # pd_ssfa_start_date = serializers.CharField(source='start_date')
-    # pd_ssfa_end_date = serializers.CharField(source='end_date')
-    # pd_ssfa_submission_date = serializers.CharField(source='submission_date')
-    # pd_ssfa_submission_date_prc = serializers.CharField(source='submission_date_prc')
+class InterventionBudgetSerializer(InterventionSerializer):
+    class Meta:
+        model = models.InterventionBudget
+        exclude = InterventionSerializer.Meta.exclude
 
+
+class InterventionBudgetSerializerV2(InterventionSerializerV2):
     class Meta:
         model = models.InterventionBudget
         fields = InterventionSerializerV2.Meta.fields + (
@@ -54,31 +50,16 @@ class InterventionBudgetSerializerV2(InterventionSerializerV2):
             'fr_numbers')
 
 
-class InterventionBudgetSerializerFull(DataMartSerializer):
+class InterventionBudgetSerializerFull(InterventionSerializerFull):
     class Meta:
         model = models.InterventionBudget
-        exclude = ()
+        exclude = InterventionSerializerFull.Meta.exclude
 
 
-class InterventionBudgetSerializer(DataMartSerializer):
+class InterventionBudgetSerializerPlain(InterventionSerializerPlain):
     class Meta:
         model = models.InterventionBudget
-        fields = ('number', 'title', 'status', 'start_date', 'end_date',
-                  'partner_contribution', 'unicef_cash', 'in_kind_amount',
-                  'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
-                  'total', 'total_local', 'currency',
-                  )
-
-
-class InterventionBudgetSerializerPlain(InterventionBudgetSerializerV2):
-    class Meta:
-        model = models.InterventionBudget
-        exclude = ('fr_numbers_data',
-                   'cp_outputs_data',
-                   'partner_focal_points_data',
-                   'sections_data',
-                   'unicef_focal_points_data',
-                   )
+        exclude = InterventionSerializerPlain.Meta.exclude
 
 
 class InterventionBudgetViewSet(common.DataMartViewSet):

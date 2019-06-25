@@ -112,8 +112,11 @@ class InterventionSerializerPlain(InterventionSerializerV2):
     class Meta:
         model = models.Intervention
         exclude = ('cp_outputs_data',
+                   'locations_data',
+                   'offices_data',
                    'partner_focal_points_data',
-                   'sections_data', 'unicef_focal_points_data',
+                   'sections_data',
+                   'unicef_focal_points_data',
                    )
 
 
@@ -128,7 +131,7 @@ class InterventionSerializer(InterventionSerializerFull):
         model = models.Intervention
         exclude = ('metadata', 'partner_contribution', 'unicef_cash', 'in_kind_amount',
                    'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
-                   'total', 'total_local', 'currency', 'offices', 'locations')
+                   'total', 'total_local', 'currency', 'offices')
 
 
 class InterventionByLocationSerializer(InterventionSerializerFull):
@@ -136,7 +139,7 @@ class InterventionByLocationSerializer(InterventionSerializerFull):
         model = models.InterventionByLocation
         exclude = ('metadata', 'partner_contribution', 'unicef_cash', 'in_kind_amount',
                    'partner_contribution_local', 'unicef_cash_local', 'in_kind_amount_local',
-                   'total', 'total_local', 'currency',)
+                   'total', 'total_local', 'currency')
 
 
 class InterventionViewSet(common.DataMartViewSet):
@@ -156,6 +159,37 @@ class InterventionViewSet(common.DataMartViewSet):
         return InterventionFilterForm(request.GET, filter.form_prefix)
 
 
+class InterventionByLocationSerializerV2(InterventionSerializerV2):
+    class Meta(DataMartSerializer.Meta):
+        model = models.InterventionByLocation
+        exclude = None
+        fields = InterventionSerializerV2.Meta.fields + ('location_name',
+                                                         'location_pcode',
+                                                         'location_level',
+                                                         'location_levelname')
+
+
+class InterventionByLocationSerializerPlain(serializers.ModelSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.InterventionByLocation
+        exclude = ('cp_outputs_data',
+                   'offices_data',
+                   'partner_focal_points_data',
+                   'sections_data',
+                   'unicef_focal_points_data')
+
+
+class InterventionByLocationSerializerFull(serializers.ModelSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.InterventionByLocation
+        exclude = ('seen',)
+
+
 class InterventionByLocationViewSet(InterventionViewSet):
     serializer_class = InterventionByLocationSerializer
     queryset = models.InterventionByLocation.objects.all()
+    serializers_fieldsets = {'std': None,
+                             'v2': InterventionByLocationSerializerV2,
+                             'plain': InterventionByLocationSerializerPlain,
+                             'full': InterventionByLocationSerializerFull,
+                             }

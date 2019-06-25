@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"c049c16bfe3794405a8429813346db36\""
+            "\"b9494cf4f8185d0aa5570be078cc3c68\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -23,11 +23,11 @@
         ],
         "view": [
             "view",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet"
+            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
         ],
         "service": [
             "service",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet"
+            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
         ],
         "cache-hit": [
             "cache-hit",
@@ -39,22 +39,17 @@
         ],
         "content-length": [
             "Content-Length",
-            "1633"
+            "1661"
         ]
     },
     "data": {
-        "id": 503,
+        "id": 800,
         "source_id": null,
-        "last_modify_date": "24 Jun 2019 10:18:53",
+        "last_modify_date": "25 Jun 2019 11:01:59",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
         "area_code": "",
-        "location_source_id": null,
-        "location_name": null,
-        "location_pcode": null,
-        "location_level": null,
-        "location_levelname": null,
         "agreement_reference_number": null,
         "amendment_types": null,
         "attachment_types": null,
@@ -66,20 +61,16 @@
         "cso_type": null,
         "country_programme": null,
         "country_programme_id": null,
-        "created": "24 Jun 2019 10:18:53",
         "days_from_prc_review_to_signature": null,
         "days_from_submission_to_signature": null,
         "document_type": null,
         "end_date": null,
         "fr_number": null,
-        "intervention_id": 3,
+        "intervention_id": null,
         "last_amendment_date": null,
-        "locations": null,
-        "locations_data": {},
-        "number": "#003",
+        "number": null,
         "number_of_attachments": null,
         "number_of_amendments": null,
-        "offices": null,
         "offices_data": {},
         "partner_authorized_officer_signatory_id": null,
         "partner_focal_points": null,
@@ -106,11 +97,22 @@
         "status": null,
         "submission_date": null,
         "submission_date_prc": null,
-        "title": "title003",
+        "title": null,
         "unicef_focal_points": null,
         "unicef_focal_points_data": {},
         "unicef_signatory_name": null,
-        "updated": null
+        "updated": null,
+        "created": null,
+        "modified": null,
+        "budget_cso_contribution": null,
+        "budget_currency": null,
+        "budget_total": null,
+        "budget_unicef_cash": null,
+        "budget_unicef_supply": null,
+        "fr_numbers": null,
+        "fr_numbers_data": {},
+        "locations": null,
+        "locations_data": {}
     },
     "content_type": null
 }
