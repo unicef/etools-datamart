@@ -336,6 +336,11 @@ class InterventionByLocationLoader(InterventionLoader):
                 intervention.location = location
                 filters = self.config.key(self, intervention)
                 values = self.get_values(intervention)
+                # removes fields inherited by InterventionLoader
+                # FIXME: Loader inherotance should follow Model inheritance
+                # and have a common InterventioAbstractLoader
+                values.pop('locations_data')
+                values.pop('locations')
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
