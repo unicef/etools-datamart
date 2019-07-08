@@ -13,9 +13,16 @@ from .. import common
 URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
           'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
           'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
-          'AuditAudit': "%s/audits/%s/overview/?schema=%s",
+          'AuditAudit': "%s/ap/audits/%s/overview/?schema=%s",
           'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
           'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s"}
+
+MODULEMAP = {'AuditSpotcheck': "fam",
+             'AuditMicroassessment': "fam",
+             'AuditSpecialaudit': "fam",
+             'AuditAudit': "fam",
+             'TpmTpmactivity': "tpm",
+             'T2FTravelactivity': "trips"}
 
 
 class ActionPointSerializerV2(DataMartSerializer):
@@ -25,11 +32,16 @@ class ActionPointSerializerV2(DataMartSerializer):
     fam_category = serializers.CharField(source='category_description')
     action_point_url = serializers.SerializerMethodField()
     related_module_url = serializers.SerializerMethodField()
+    related_module = serializers.SerializerMethodField()
 
     def get_action_point_url(self, obj):
         return "%s/apd/action-points/detail/%s/?schema=%s" % (config.ETOOLS_ADDRESS,
                                                               obj.source_id,
                                                               obj.schema_name)
+
+    def get_related_module(self, obj):
+        if obj.related_module_class and obj.related_module_id:
+            return MODULEMAP[obj.related_module_class]
 
     def get_related_module_url(self, obj):
         if obj.related_module_class and obj.related_module_id:
@@ -77,8 +89,7 @@ class ActionPointSerializerV2(DataMartSerializer):
 class ActionPointSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
-        fields = '__all__'
-        exclude = None
+        exclude = ('related_module_class',)
 
 
 class ActionPointFilterForm(forms.Form):

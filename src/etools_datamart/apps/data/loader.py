@@ -261,7 +261,16 @@ class Loader:
     def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
-            if getattr(record, field_name) != getattr(other, field_name):
+            if (getattr(record, field_name) != getattr(other, field_name)):
+                verbosity = self.context['verbosity']
+                if verbosity > 2:  # pragma: no cover
+                    stdout = self.context['stdout']
+                    stdout.write("Detected field changed '%s': %s->%s\n" %
+                                 (field_name,
+                                  getattr(record, field_name),
+                                  getattr(other, field_name)))
+                    stdout.flush()
+
                 return True
         return False
 
@@ -272,6 +281,7 @@ class Loader:
             stdout.write('.')
             stdout.flush()
         try:
+
             record, created = self.model.objects.get_or_create(**filters,
                                                                defaults=values)
             if created:
