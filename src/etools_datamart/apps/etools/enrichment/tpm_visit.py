@@ -1,8 +1,8 @@
 from django.db import models
 
 from etools_datamart.apps.etools.enrichment.utils import create_alias
-from etools_datamart.apps.etools.models import (TpmpartnersTpmpartnerstaffmember, TpmTpmvisit,
-                                                TpmTpmvisitTpmPartnerFocalPoints,)
+from etools_datamart.apps.etools.models import (TpmpartnersTpmpartnerstaffmember, TpmTpmactivity,
+                                                TpmTpmvisit, TpmTpmvisitTpmPartnerFocalPoints,)
 
 models.ManyToManyField(TpmpartnersTpmpartnerstaffmember,
                        through=TpmTpmvisitTpmPartnerFocalPoints,
@@ -28,5 +28,20 @@ def _get_reference_number(self):
     )
 
 
+def _get_activities(self):
+    return TpmTpmactivity.objects.filter(tpm_visit=self)
+
+
+def _get_start_date(self):
+    return self.activities.aggregate(date__min=models.Max('activity_ptr__date'))['date__min']
+
+
+def _get_end_date(self):
+    return self.activities.aggregate(date__max=models.Max('activity_ptr__date'))['date__max']
+
+
 # TpmTpmvisit.get_reference_number = get_reference_number
 TpmTpmvisit.reference_number = property(_get_reference_number)
+TpmTpmvisit.activities = property(_get_activities)
+TpmTpmvisit.start_date = property(_get_start_date)
+TpmTpmvisit.end_date = property(_get_end_date)

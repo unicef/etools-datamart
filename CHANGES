@@ -3,6 +3,7 @@
 * new InterventionBudget endpoint
 * updated InterventionByLocation endpoint
 * updated Intervention endpoint
+* updated TPMActivity endpoint
 * new v2 intervention serializer
 * new PartnerContact endpoint
 * new PartnerAgreement endpoint

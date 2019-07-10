@@ -82,6 +82,7 @@ class ActionPointSerializerV2(DataMartSerializer):
                   'module_reference_number',
                   'module_task_activity_reference_number',
                   'fam_category',
+                  'related_module',
                   'related_module_url',
                   'action_point_url')
 

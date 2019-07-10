@@ -5,7 +5,7 @@ from crashlog.middleware import process_exception
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
-from etools_datamart.apps.etools.models import (AttachmentsAttachment, DjangoContentType, TpmTpmactivity,
+from etools_datamart.apps.etools.models import (AttachmentsAttachment, DjangoContentType,
                                                 TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
                                                 TpmTpmvisitTpmPartnerFocalPoints,)
 
@@ -17,16 +17,17 @@ class TPMVisitLoader(Loader):
         content_type = DjangoContentType.objects.get(app_label='tpm',
                                                      model='tpmvisit')
         for visit in qs.all():
-            tpm_activities = TpmTpmactivity.objects.filter(tpm_visit=visit)
+            # tpm_activities = TpmTpmactivity.objects.filter(tpm_visit=visit)
+            tpm_activities = visit.activities
             # source = ActivitiesActivity.objects.filter(activitiesactivity_tpm_tpmactivity_activity_ptr_id__tpm_visit=visit)
 
-            try:
-                visit.start_date = tpm_activities.aggregate(date__min=models.Max('activity_ptr__date'))['date__min']
-            except KeyError:
-                pass
-
-            visit.end_date = tpm_activities.aggregate(date__max=models.Max('activity_ptr__date'))['date__max']
-
+            # try:
+            #     visit.start_date = tpm_activities.aggregate(date__min=models.Max('activity_ptr__date'))['date__min']
+            # except KeyError:
+            #     pass
+            #
+            # visit.end_date = tpm_activities.aggregate(date__max=models.Max('activity_ptr__date'))['date__max']
+            #
             # unicef_focal_points
             unicef_focal_points = []
             for a in tpm_activities.only('activity_ptr_id'):

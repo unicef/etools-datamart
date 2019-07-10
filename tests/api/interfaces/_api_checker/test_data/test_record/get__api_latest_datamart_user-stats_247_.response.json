@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"7e9e0ca6554712349e300c821b9bddf4\""
+            "\"e28ddc9d137cdcf9ceba712ef814830d\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -23,11 +23,11 @@
         ],
         "view": [
             "view",
-            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
+            "etools_datamart.api.endpoints.datamart.userstats.UserStatsViewSet"
         ],
         "service": [
             "service",
-            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
+            "etools_datamart.api.endpoints.datamart.userstats.UserStatsViewSet"
         ],
         "cache-hit": [
             "cache-hit",
@@ -39,31 +39,21 @@
         ],
         "content-length": [
             "Content-Length",
-            "470"
+            "190"
         ]
     },
     "data": {
-        "id": 204,
+        "id": 247,
+        "month": "Feb 2019",
         "source_id": null,
-        "last_modify_date": "18 Apr 2019 10:36:51",
+        "last_modify_date": "10 Jul 2019 09:23:39",
+        "seen": null,
         "country_name": "bolivia",
-        "schema_name": "bolivia",
         "area_code": "",
-        "created": null,
-        "modified": null,
-        "partner_contribution": null,
-        "unicef_cash": null,
-        "in_kind_amount": null,
-        "partner_contribution_local": null,
-        "unicef_cash_local": null,
-        "in_kind_amount_local": null,
-        "total": null,
-        "total_local": null,
-        "currency": null,
-        "intervention_title": null,
-        "intervention_number": null,
-        "intervention_source_id": null,
-        "intervention": 618
+        "total": 0,
+        "unicef": 0,
+        "logins": 0,
+        "unicef_logins": 0
     },
     "content_type": null
 }
