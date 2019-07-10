@@ -97,8 +97,8 @@ class ActionPointFilterForm(forms.Form):
     last_modify_date = DateRangePickerField(label='Modified between',
                                             required=False)
 
-    start_date = DateRangePickerField(label='Started between',
-                                      required=False)
+    date_of_completion = DateRangePickerField(label='Date of completion',
+                                              required=False)
     submission_date = DateRangePickerField(label='Submitted between',
                                            required=False)
 
