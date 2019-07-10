@@ -10,7 +10,7 @@ def apply():
     from . import (actionpoint, audit_engagement, auth_user, auth_usergroups, partners_intervention,
                    partners_partnerorganization, partners_plannedengagement, reports_appliedindicator,
                    tpm_activity, tpm_visit, partners_agreement, reports_lowerresult,
-                   t2f_travel, t2f_travelactivity, users_userprofile, utils, )  # noqa
+                   t2f_travel, t2f_travelactivity, users_userprofile, utils, tpm_partner)  # noqa
     from . import consts
 
     app_models = apps.get_app_config('etools').get_models()

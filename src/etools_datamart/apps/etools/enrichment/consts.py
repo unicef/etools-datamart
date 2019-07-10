@@ -179,6 +179,28 @@ class ActionPointConsts:
             }
 
 
+class TpmTpmvisitConst:
+    DRAFT = 'draft'
+    ASSIGNED = 'assigned'
+    CANCELLED = 'cancelled'
+    ACCEPTED = 'tpm_accepted'
+    REJECTED = 'tpm_rejected'
+    REPORTED = 'tpm_reported'
+    REPORT_REJECTED = 'tpm_report_rejected'
+    UNICEF_APPROVED = 'unicef_approved'
+
+    STATUSES = Choices(
+        (DRAFT, _('Draft')),
+        (ASSIGNED, _('Assigned')),
+        (CANCELLED, _('Cancelled')),
+        (ACCEPTED, _('TPM Accepted')),
+        (REJECTED, _('TPM Rejected')),
+        (REPORTED, _('TPM Reported')),
+        (REPORT_REJECTED, _('Sent Back to TPM')),
+        (UNICEF_APPROVED, _('UNICEF Approved')),
+    )
+
+
 class PartnersAgreementConst:
     PCA = 'PCA'
     MOU = 'MOU'

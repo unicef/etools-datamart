@@ -23,11 +23,11 @@ TpmTpmactivity._meta.pk = pk
 TpmTpmactivity._meta.auto_field = pk
 
 
-def get_reference_number(self, country):
-    return self.tpm_visit.get_reference_number(country)
+def get_reference_number(self):
+    return self.tpm_visit.reference_number
 
 
-TpmTpmactivity.reference_number = get_reference_number
+TpmTpmactivity.reference_number = property(get_reference_number)
 TpmTpmactivity.activity = property(lambda self: self.activity_ptr)
 
 set_primary_key(TpmTpmactivity, 'activity_ptr')

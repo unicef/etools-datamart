@@ -2,44 +2,44 @@
     "record": {
         "master": {
             "model": "data.location",
-            "pk": 2016,
+            "pk": 11976,
             "fields": {
+                "source_id": null,
+                "last_modify_date": "2019-07-10T09:23:34.661Z",
+                "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "last_modify_date": "2019-02-25T14:07:17.871Z",
-                "seen": null,
-                "source_id": null,
-                "name": "name396",
+                "name": "name399",
                 "latitude": null,
                 "longitude": null,
                 "p_code": "",
                 "point": null,
-                "gateway": 2086,
+                "gateway": 834,
                 "geom": null,
-                "level": 396,
+                "level": 399,
                 "lft": 1,
                 "parent": null,
                 "rght": 1,
                 "tree_id": 1,
-                "created": "2019-02-25T13:41:50.628Z",
-                "modified": "2019-02-25T13:41:50.628Z",
+                "created": "2019-07-10T09:07:42.656Z",
+                "modified": "2019-07-10T09:07:42.656Z",
                 "is_active": true
             }
         },
         "deps": [
             {
                 "model": "data.gatewaytype",
-                "pk": 2086,
+                "pk": 834,
                 "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2019-07-10T09:23:34.647Z",
+                    "seen": null,
                     "country_name": "Chad",
                     "schema_name": "Chad",
                     "area_code": "",
-                    "last_modify_date": "2019-02-25T14:07:17.861Z",
-                    "seen": null,
-                    "name": "name396",
-                    "admin_level": null,
-                    "source_id": null
+                    "name": "name399",
+                    "admin_level": null
                 }
             }
         ]

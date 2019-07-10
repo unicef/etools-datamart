@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.partner",
-            "pk": 301,
+            "pk": 1165,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-04-23T12:03:22.941Z",
+                "last_modify_date": "2019-07-10T09:23:41.098Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2019-04-23T11:46:10.529Z",
+                "created": "2019-07-10T09:07:42.658Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",

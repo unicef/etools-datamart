@@ -2,6 +2,8 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.functional import cached_property
 
+from dynamic_serializer.core import get_attr
+
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import AttachmentsAttachment, DjangoContentType, TpmTpmactivity
@@ -11,17 +13,48 @@ class TPMActivityLoader(Loader):
     @cached_property
     def _ct(self):
         return DjangoContentType.objects.get(app_label='tpm',
-                                             model='tpmvisit')
+                                             model='tpmactivity')
 
     # def get_pd_ssfa_reference_number(self, original: TpmTpmactivity, values: dict):
     #     return reference_number(original.activity.intervention)
 
-    def get_attachments(self, original: TpmTpmactivity, values: dict):
+    def get_visit_reference_number(self, original: TpmTpmactivity, values: dict):
+        return 'Visit ({} to {} at {} - {})'.format(
+            original.visit.tpm_partner, ', '.join(filter(
+                lambda x: x,
+                original.visit.tpm_activities.values_list('activity_ptr__partner__name', flat=True)
+            )),
+            original.visit.start_date, original.visit.end_date
+        )
+
+    def get_visit_url(self, original: TpmTpmactivity, values: dict):
+        return 'tpm/visits/%s/details' % original.id
+
+    def get_report_attachments(self, original: TpmTpmactivity, values: dict):
         attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
-                                                           code='activity_attachments',
+                                                           code='activity_report',
                                                            content_type=self._ct,
                                                            ).order_by('id').values_list('file', flat=True)
         return ", ".join(attachments)
+
+    def get_attachments(self, original: TpmTpmactivity, values: dict):
+        attachments = (AttachmentsAttachment.objects
+                       .select_related('uploaded_by', 'file_type')
+                       .filter(object_id=original.tpm_visit.id,
+                               code='activity_attachments',
+                               content_type=self._ct,
+                               ).order_by('id'))
+        ret = []
+        for a in attachments:
+            ret.append(dict(
+                file=a.file,
+                file_type=a.file_type,
+                code=a.code,
+                uploaded_by=get_attr(a, 'uploaded_by.email')
+            ))
+
+        values['attachments_data'] = attachments
+        return ", ".join([a.file for a in attachments])
 
     def get_offices(self, original: TpmTpmactivity, values: dict):
         locs = []
@@ -47,10 +80,12 @@ class TPMActivityLoader(Loader):
         # staffmembers = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=original.tpm_visit)
         ret = []
         for member in original.visit.tpm_partner_focal_points.all():
-            ret.append(member.user.email)
+            ret.append(dict(email=member.user.email,
+                            first_name=member.user.first_name,
+                            last_name=member.user.last_name, ))
 
         values['tpm_focal_points_data'] = ret
-        return ",".join(ret)
+        return ",".join([m['email'] for m in ret])
 
     def get_locations(self, original: TpmTpmactivity, values: dict):
         # PartnersInterventionFlatLocations
@@ -127,12 +162,13 @@ class TPMActivity(DataMartModel):
     approval_comment = models.TextField(blank=True, null=True)
     area_code = models.CharField(max_length=500, blank=True, null=True)
     attachments = models.TextField(blank=True, null=True)
+    attachments_data = JSONField(blank=True, null=True)
     author_name = models.CharField(max_length=120, blank=True, null=True)
     cancel_comment = models.TextField(blank=True, null=True)
     country_name = models.CharField(max_length=500, blank=True, null=True)
     cp_output = models.CharField(max_length=500, blank=True, null=True)
     cp_output_id = models.CharField(max_length=500, blank=True, null=True)
-    created = models.DateField(blank=True, null=True)
+    # created = models.DateField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     date_of_assigned = models.DateField(blank=True, null=True)
     date_of_cancelled = models.DateField(blank=True, null=True)
@@ -157,11 +193,12 @@ class TPMActivity(DataMartModel):
     pd_ssfa_reference_number = models.CharField(max_length=500, blank=True, null=True)
     pd_ssfa_title = models.CharField(max_length=500, blank=True, null=True)
     reject_comment = models.TextField(blank=True, null=True)
-    report_attachment = models.CharField(max_length=500, blank=True, null=True)
+    report_attachments = models.TextField(blank=True, null=True)
+    report_attachments_data = JSONField(blank=True, null=True)
     schema_name = models.CharField(max_length=500, blank=True, null=True)
     section = models.CharField(max_length=500, blank=True, null=True)
-    source_partner_id = models.IntegerField(blank=True, null=True, db_index=True)
-    start_date = models.DateTimeField(blank=True, null=True)
+    # source_partner_id = models.IntegerField(blank=True, null=True, db_index=True)
+    # start_date = models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=20, blank=True, null=True)
     task_reference_number = models.CharField(max_length=500, blank=True, null=True)
     # tpm_focal_point_email = models.CharField(max_length=500, blank=True, null=True)
@@ -173,6 +210,7 @@ class TPMActivity(DataMartModel):
     # unicef_focal_point_name = models.CharField(max_length=500, blank=True, null=True)
     unicef_focal_points = models.TextField(blank=True, null=True)
     # vendor_number = models.CharField(max_length=500, blank=True, null=True)
+    visit_created = models.DateTimeField(blank=True, null=True)
     visit_end_date = models.CharField(max_length=500, blank=True, null=True)
     visit_information = models.TextField(blank=True, null=True)
     visit_reference_number = models.CharField(max_length=500, blank=True, null=True)
@@ -224,24 +262,26 @@ class TPMActivity(DataMartModel):
                        pd_ssfa_reference_number="activity.intervention.reference_number",
                        pd_ssfa_title="activity.intervention.title",
                        reject_comment="reject_comment",
-                       report_attachment="=",
+                       report_attachments="=",
                        # schema_name="=",
                        section="section.name",
-                       source_partner_id="=",
-                       start_date="tpm_visit.start_date",
+                       # source_partner_id="=",
+                       # start_date="tpm_visit.start_date",
                        status="tpm_visit.status",
-                       task_reference_number="=",
+                       task_reference_number="reference_number",
                        # tpm_focal_point_email="=",
                        # tpm_focal_point_name="=",
                        tpm_focal_points="-",
-                       tpm_name="=",
+                       tpm_focal_points_data="i",
+                       tpm_name="tpm_visit.tpm_partner.name",
                        # unicef_focal_point_email="=",
                        # unicef_focal_point_name="=",
                        unicef_focal_points="=",
                        # vendor_number="=",
+                       visit_created="tpm_visit.created",
                        visit_end_date="tpm_visit.end_date",
                        visit_information="tpm_visit.visit_information",
-                       visit_reference_number="tpm_visit.reference_number",
+                       visit_reference_number="-",
                        visit_start_date="tpm_visit.start_date",
                        visit_status="tpm_visit.status",
                        visit_url="=",

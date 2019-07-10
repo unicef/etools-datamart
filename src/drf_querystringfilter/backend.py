@@ -171,8 +171,11 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         op = parts[-1]
                     else:
                         op = ''
+                    # TODO: remove me
+                    print(111, "backend.py:175", 111111, filter_field_name)
+                    processor = getattr(self, 'process_{}'.format(filter_field_name),
+                                        getattr(view, 'drfqs_filter_{}'.format(filter_field_name), None))
 
-                    processor = getattr(self, 'process_{}'.format(filter_field_name), None)
                     if (filter_field_name not in filter_fields) and (not processor):
                         self.unknown_arguments.append((fieldname_arg, filter_field_name))
                         continue
