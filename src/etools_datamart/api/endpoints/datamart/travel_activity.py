@@ -29,11 +29,8 @@ class TravelActivityFilterForm(forms.Form):
                                                       ))
     primary_traveler__istartswith = forms.CharField(label='Primary Traveler',
                                                     required=False)
-    start_date = DateRangePickerField(label='Started between',
+    date = DateRangePickerField(label='Date between',
                                       required=False)
-
-    end_date = DateRangePickerField(label='Ended between',
-                                    required=False)
 
 
 class TravelActivityViewSet(common.DataMartViewSet):
@@ -42,7 +39,7 @@ class TravelActivityViewSet(common.DataMartViewSet):
     serializer_class = TravelActivitySerializer
     queryset = models.TravelActivity.objects.all()
     filter_fields = ('travel_reference_number', 'travel_type', 'primary_traveler',
-                     'result_type')
+                     'result_type', 'date')
     ordering_fields = ("id", "created",)
 
     def get_querystringfilter_form(self, request, filter):
