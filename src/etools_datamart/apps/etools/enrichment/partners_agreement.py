@@ -16,8 +16,14 @@ def get_amendments(self):
     return PartnersAgreementamendment.objects.filter(agreement=self)
 
 
+def get_base_number(self):
+    return self.agreement_number.split('-')[0]
+
+
 PartnersAgreement.reference_number = property(reference_number)
 PartnersAgreement.amendments = property(get_amendments)
+PartnersAgreement.base_number = property(get_base_number)
+
 add_m2m(PartnersAgreement,
         'authorized_officers',
         PartnersPartnerstaffmember,

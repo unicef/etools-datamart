@@ -2,7 +2,8 @@ from django.db import models
 
 from etools_datamart.apps.etools.enrichment.utils import set_primary_key
 from etools_datamart.apps.etools.models import (ActivitiesActivity, ActivitiesActivityLocations, AuthUser,
-                                                LocationsLocation, TpmTpmactivity, TpmTpmactivityUnicefFocalPoints,)
+                                                LocationsLocation, TpmTpmactivity, TpmTpmactivityOffices,
+                                                TpmTpmactivityUnicefFocalPoints, UsersOffice,)
 
 models.ManyToManyField(LocationsLocation,
                        through=ActivitiesActivityLocations,
@@ -11,6 +12,11 @@ models.ManyToManyField(LocationsLocation,
 models.ManyToManyField(AuthUser,
                        through=TpmTpmactivityUnicefFocalPoints,
                        ).contribute_to_class(TpmTpmactivity, 'unicef_focal_points')
+
+models.ManyToManyField(UsersOffice,
+                       through=TpmTpmactivityOffices,
+                       ).contribute_to_class(TpmTpmactivity, 'offices')
+
 
 pk = TpmTpmactivity._meta.get_field('activity_ptr')
 TpmTpmactivity._meta.pk = pk

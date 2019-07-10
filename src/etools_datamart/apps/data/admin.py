@@ -257,7 +257,7 @@ class TPMVisitAdmin(DataModelAdmin):
 
 @register(models.TPMActivity)
 class TPMActivityAdmin(DataModelAdmin):
-    list_display = ('date', 'partner_name', )
+    list_display = ('date', 'partner_name', 'pd_ssfa_title', 'schema_name')
 
 
 @register(models.EtoolsUser)

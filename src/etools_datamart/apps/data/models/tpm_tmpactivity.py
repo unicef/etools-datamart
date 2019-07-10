@@ -1,20 +1,74 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-
-from crashlog.middleware import process_exception
+from django.utils.functional import cached_property
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.etools.models import (AttachmentsAttachment, DjangoContentType,
-                                                TpmTpmactivity, TpmTpmactivityUnicefFocalPoints, )
+from etools_datamart.apps.etools.models import AttachmentsAttachment, DjangoContentType, TpmTpmactivity
 
 
 class TPMActivityLoader(Loader):
+    @cached_property
+    def _ct(self):
+        return DjangoContentType.objects.get(app_label='tpm',
+                                             model='tpmvisit')
+
+    # def get_pd_ssfa_reference_number(self, original: TpmTpmactivity, values: dict):
+    #     return reference_number(original.activity.intervention)
+
+    def get_attachments(self, original: TpmTpmactivity, values: dict):
+        attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
+                                                           code='activity_attachments',
+                                                           content_type=self._ct,
+                                                           ).order_by('id').values_list('file', flat=True)
+        return ", ".join(attachments)
+
+    def get_offices(self, original: TpmTpmactivity, values: dict):
+        locs = []
+        for office in original.offices.select_related('zonal_chief').order_by('id'):
+            locs.append(dict(
+                source_id=office.id,
+                name=office.name,
+                zonal_chief=getattr(office.zonal_chief, 'email', None)
+            ))
+        values['offices_data'] = locs
+        return ", ".join([l['name'] for l in locs])
+
+    def get_unicef_focal_points(self, original: TpmTpmactivity, values: dict):
+        # TpmTpmactivityUnicefFocalPoints
+        ret = []
+        for i in original.unicef_focal_points.all():
+            ret.append(i.email)
+
+        return ", ".join(ret)
+
+    def get_tpm_focal_points(self, original: TpmTpmactivity, values: dict):
+        # tpm_partner : TpmpartnersTpmpartner =
+        # staffmembers = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=original.tpm_visit)
+        ret = []
+        for member in original.visit.tpm_partner_focal_points.all():
+            ret.append(member.user.email)
+
+        values['tpm_focal_points_data'] = ret
+        return ",".join(ret)
+
+    def get_locations(self, original: TpmTpmactivity, values: dict):
+        # PartnersInterventionFlatLocations
+        locs = []
+        # intervention: PartnersIntervention = original.activity.intervention
+        for location in original.activity.locations.select_related('gateway').order_by('id'):
+            locs.append(dict(
+                source_id=location.id,
+                name=location.name,
+                pcode=location.p_code,
+                level=location.level,
+                levelname=location.gateway.name
+            ))
+        values['locations_data'] = locs
+        return ", ".join([l['name'] for l in locs])
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
-        content_type = DjangoContentType.objects.get(app_label='tpm',
-                                                     model='tpmvisit')
         for tpm_activity in qs.all().order_by('activity_ptr'):
             # base = activity.activity_ptr
             tpm_activity.visit = tpm_activity.tpm_visit
@@ -72,7 +126,7 @@ class TPMActivity(DataMartModel):
     additional_information = models.CharField(max_length=500, blank=True, null=True)
     approval_comment = models.TextField(blank=True, null=True)
     area_code = models.CharField(max_length=500, blank=True, null=True)
-    attachments = models.CharField(max_length=500, blank=True, null=True)
+    attachments = models.TextField(blank=True, null=True)
     author_name = models.CharField(max_length=120, blank=True, null=True)
     cancel_comment = models.TextField(blank=True, null=True)
     country_name = models.CharField(max_length=500, blank=True, null=True)
@@ -88,15 +142,16 @@ class TPMActivity(DataMartModel):
     date_of_tpm_reported = models.DateField(blank=True, null=True)
     date_of_unicef_approved = models.DateField(blank=True, null=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
-    end_date = models.DateTimeField(blank=True, null=True)
+    # end_date = models.DateTimeField(blank=True, null=True)
     is_pv = models.BooleanField(max_length=500, blank=True, null=True)
     locations = models.TextField(blank=True, null=True)
-    locations_date = JSONField(blank=True, null=True, default=dict)
-    location_level = models.CharField(max_length=500, blank=True, null=True)
-    location_levelname = models.CharField(max_length=500, blank=True, null=True)
-    location_name = models.CharField(max_length=500, blank=True, null=True)
-    location_pcode = models.CharField(max_length=500, blank=True, null=True)
-    office = models.CharField(max_length=500, blank=True, null=True)
+    locations_data = JSONField(blank=True, null=True, default=dict)
+    # location_level = models.CharField(max_length=500, blank=True, null=True)
+    # location_levelname = models.CharField(max_length=500, blank=True, null=True)
+    # location_name = models.CharField(max_length=500, blank=True, null=True)
+    # location_pcode = models.CharField(max_length=500, blank=True, null=True)
+    offices = models.TextField(blank=True, null=True)
+    offices_data = JSONField(blank=True, null=True)
     partner_name = models.CharField(max_length=120, blank=True, null=True)
     partner_vendor_number = models.CharField(max_length=120, blank=True, null=True)
     pd_ssfa_reference_number = models.CharField(max_length=500, blank=True, null=True)
@@ -109,14 +164,15 @@ class TPMActivity(DataMartModel):
     start_date = models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=20, blank=True, null=True)
     task_reference_number = models.CharField(max_length=500, blank=True, null=True)
-    tpm_focal_point_email = models.CharField(max_length=500, blank=True, null=True)
-    tpm_focal_point_name = models.CharField(max_length=500, blank=True, null=True)
-    tpm_focal_points = models.CharField(max_length=500, blank=True, null=True)
+    # tpm_focal_point_email = models.CharField(max_length=500, blank=True, null=True)
+    # tpm_focal_point_name = models.CharField(max_length=500, blank=True, null=True)
+    tpm_focal_points = models.TextField(blank=True, null=True)
+    tpm_focal_points_data = JSONField(blank=True, null=True)
     tpm_name = models.CharField(max_length=500, blank=True, null=True)
-    unicef_focal_point_email = models.CharField(max_length=500, blank=True, null=True)
-    unicef_focal_point_name = models.CharField(max_length=500, blank=True, null=True)
+    # unicef_focal_point_email = models.CharField(max_length=500, blank=True, null=True)
+    # unicef_focal_point_name = models.CharField(max_length=500, blank=True, null=True)
     unicef_focal_points = models.TextField(blank=True, null=True)
-    vendor_number = models.CharField(max_length=500, blank=True, null=True)
+    # vendor_number = models.CharField(max_length=500, blank=True, null=True)
     visit_end_date = models.CharField(max_length=500, blank=True, null=True)
     visit_information = models.TextField(blank=True, null=True)
     visit_reference_number = models.CharField(max_length=500, blank=True, null=True)
@@ -138,11 +194,11 @@ class TPMActivity(DataMartModel):
         mapping = dict(additional_information='additional_information',
                        approval_comment="tpm_visit.approval_comment",
                        # attachments="=",
-                       author_name="author.name",
+                       author_name="tpm_visit.author.name",
                        cancel_comment="=",
                        # country_name="=",
-                       cp_output="activity.cp_output",
-                       cp_output_id="activity.cp_output.id",
+                       cp_output="activity.cp_output.name",
+                       cp_output_id="activity.cp_output.vision_id",
                        # created="=",
                        date="activity.date",
                        date_of_assigned="tpm_visit.date_of_assigned",
@@ -153,37 +209,40 @@ class TPMActivity(DataMartModel):
                        date_of_tpm_reported="tpm_visit.date_of_tpm_reported",
                        date_of_unicef_approved="tpm_visit.date_of_unicef_approved",
                        deleted_at="tpm_visit.deleted_at",
-                       end_date="tpm_visit.end_date",
+                       # end_date="tpm_visit.end_date",
                        is_pv="is_pv",
-                       location_level="=",
-                       location_levelname="=",
-                       location_name="=",
-                       location_pcode="=",
-                       office="=",
-                       partner_name="visit.tpm_partner.name",
-                       partner_vendor_number="visit.tpm_partner.vendor_number",
-                       pd_ssfa_reference_number="intervention.reference_number",
-                       pd_ssfa_title="intervention.title",
+                       locations="-",
+                       locations_data="i",
+                       # location_level="=",
+                       # location_levelname="=",
+                       # location_name="=",
+                       # location_pcode="=",
+                       offices="-",
+                       offices_data="i",
+                       partner_name="activity.partner.name",
+                       partner_vendor_number="activity.partner.vendor_number",
+                       pd_ssfa_reference_number="activity.intervention.reference_number",
+                       pd_ssfa_title="activity.intervention.title",
                        reject_comment="reject_comment",
                        report_attachment="=",
                        # schema_name="=",
                        section="section.name",
                        source_partner_id="=",
-                       start_date="=",
-                       status="=",
+                       start_date="tpm_visit.start_date",
+                       status="tpm_visit.status",
                        task_reference_number="=",
-                       tpm_focal_point_email="=",
-                       tpm_focal_point_name="=",
-                       tpm_focal_points="=",
+                       # tpm_focal_point_email="=",
+                       # tpm_focal_point_name="=",
+                       tpm_focal_points="-",
                        tpm_name="=",
-                       unicef_focal_point_email="=",
-                       unicef_focal_point_name="=",
+                       # unicef_focal_point_email="=",
+                       # unicef_focal_point_name="=",
                        unicef_focal_points="=",
-                       vendor_number="=",
-                       visit_end_date="=",
+                       # vendor_number="=",
+                       visit_end_date="tpm_visit.end_date",
                        visit_information="tpm_visit.visit_information",
-                       visit_reference_number="=",
-                       visit_start_date="=",
-                       visit_status="=",
+                       visit_reference_number="tpm_visit.reference_number",
+                       visit_start_date="tpm_visit.start_date",
+                       visit_status="tpm_visit.status",
                        visit_url="=",
                        )

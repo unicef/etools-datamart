@@ -190,6 +190,10 @@ class LoaderTask(celery.Task):
             raise
 
 
+def equal(a, b):
+    return a == b
+
+
 class Loader:
     def __init__(self) -> None:
         self.config = None
@@ -261,7 +265,10 @@ class Loader:
     def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
-            if (getattr(record, field_name) != getattr(other, field_name)):
+            new = getattr(other, field_name)
+            current = getattr(record, field_name)
+
+            if not equal(current, new):
                 verbosity = self.context['verbosity']
                 if verbosity > 2:  # pragma: no cover
                     stdout = self.context['stdout']

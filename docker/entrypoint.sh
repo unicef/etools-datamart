@@ -48,6 +48,7 @@ elif [[ "$*" == "datamart" ]];then
         $GUNICORN_EXTRA \
         --workers=${GUNICORN_WORKERS} \
         --chdir /var/datamart \
+        --timeout ${GUNICORN_TIMEOUT} \
         --access-logfile - \
         --access-logformat "%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s" \
         etools_datamart.config.wsgi
