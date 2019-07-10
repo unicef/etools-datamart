@@ -31,6 +31,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
+                  EXPLORER_TOKEN=(str, 'EXPLORER_DATAMART_TOKEN'),
                   IGNORED_SCHEMAS=(str, ["public", "uat", "frg"]),
                   DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
@@ -292,6 +293,7 @@ INSTALLED_APPS = [
     'impersonate',
     'admin_extra_urls',
     'adminactions',
+    'explorer',
     'unicef_rest_framework.apps.Config',
     'rest_framework',
     'rest_framework.authtoken',
@@ -469,7 +471,16 @@ JWT_AUTH = {
     'JWT_ALGORITHM': 'RS256',
 
 }
-
+# django-sql-explorer
+EXPLORER_CONNECTIONS = { 'Default': 'default',
+                         'eTools': 'etools'}
+EXPLORER_DEFAULT_CONNECTION = 'default'
+EXPLORER_ASYNC_SCHEMA = True
+EXPLORER_CONNECTION_NAME = 'default'
+EXPLORER_PERMISSION_VIEW = lambda u: u.is_superuser
+EXPLORER_PERMISSION_CHANGE = lambda u: u.is_superuser
+EXPLORER_TOKEN = env('EXPLORER_TOKEN')
+EXPLORER_FROM_EMAIL = 'datamart@unicef.io'
 # social auth
 # WARNINGS: UNICEF pipeline does not work if other provider
 # are added to UNICEF AD. Dio not change below settings

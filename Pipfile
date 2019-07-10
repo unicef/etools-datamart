@@ -63,6 +63,7 @@ whitenoise = "*"
 sentry-sdk = "*"
 django-deprecate-fields = "*"
 django-migration-linter = "*"
+django-sql-explorer = "*"
 
 [dev-packages]
 bumpversion = "*"
