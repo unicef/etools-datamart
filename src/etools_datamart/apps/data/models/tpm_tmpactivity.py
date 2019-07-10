@@ -18,14 +18,8 @@ class TPMActivityLoader(Loader):
     # def get_pd_ssfa_reference_number(self, original: TpmTpmactivity, values: dict):
     #     return reference_number(original.activity.intervention)
 
-    def get_visit_reference_number(self, original: TpmTpmactivity, values: dict):
-        return 'Visit ({} to {} at {} - {})'.format(
-            original.visit.tpm_partner, ', '.join(filter(
-                lambda x: x,
-                original.visit.tpm_activities.values_list('activity_ptr__partner__name', flat=True)
-            )),
-            original.visit.start_date, original.visit.end_date
-        )
+    def get_task_reference_number(self, original: TpmTpmactivity, values: dict):
+        return "Task #{}.{}".format(original.tpm_visit.id, original.id)
 
     def get_visit_url(self, original: TpmTpmactivity, values: dict):
         return 'tpm/visits/%s/details' % original.id
@@ -268,7 +262,7 @@ class TPMActivity(DataMartModel):
                        # source_partner_id="=",
                        # start_date="tpm_visit.start_date",
                        status="tpm_visit.status",
-                       task_reference_number="reference_number",
+                       task_reference_number="-",
                        # tpm_focal_point_email="=",
                        # tpm_focal_point_name="=",
                        tpm_focal_points="-",
@@ -281,7 +275,7 @@ class TPMActivity(DataMartModel):
                        visit_created="tpm_visit.created",
                        visit_end_date="tpm_visit.end_date",
                        visit_information="tpm_visit.visit_information",
-                       visit_reference_number="-",
+                       visit_reference_number="tpm_visit.reference_number",
                        visit_start_date="tpm_visit.start_date",
                        visit_status="tpm_visit.status",
                        visit_url="=",
