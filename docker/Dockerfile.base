@@ -25,7 +25,7 @@ RUN apk add --no-cache --virtual .build-deps \
 RUN apk add --no-cache --virtual .build-deps-edge \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        proj4-dev \
+        proj-dev \
         protobuf-c-dev
 
 RUN apk add --no-cache --virtual .postgis-rundeps \
@@ -39,7 +39,7 @@ RUN apk add --no-cache --virtual .postgis-rundeps-edge \
         geos-dev \
         gdal-dev \
         gdal \
-        proj4 \
+        proj \
         protobuf-c
 
 RUN apk add --no-cache --virtual .datamart-build-deps \

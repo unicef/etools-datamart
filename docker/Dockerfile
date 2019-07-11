@@ -1,4 +1,4 @@
-FROM unicef/datamart:base
+FROM unicef/datamart-base:1.3
 
 ARG BUILD_DATE
 ARG PIPENV_ARGS

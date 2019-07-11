@@ -1,5 +1,7 @@
 1.23
 ----
+* new Engagements endpoint
+* new Trips endpoint
 * new InterventionBudget endpoint
 * updated InterventionByLocation endpoint
 * updated Intervention endpoint

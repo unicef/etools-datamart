@@ -5,7 +5,7 @@ DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
 TARGET?=1.23.0a7
-BASE=1.2base
+BASE=1.3
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -30,7 +30,7 @@ build-base:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--no-cache \
-			-t ${DOCKER_IMAGE_NAME}:base \
+			-t ${DOCKER_IMAGE_NAME}-base:${BASE} \
 			-f docker/Dockerfile.base .
 
 
