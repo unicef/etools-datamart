@@ -288,3 +288,20 @@ class SectionAdmin(DataModelAdmin):
 class AgreementAdmin(DataModelAdmin):
     list_display = ('agreement_type', 'reference_number', 'agreement_number', 'partner_name',)
     list_filter = ('agreement_type', 'status')
+
+
+@register(models.Trip)
+class TripAdmin(DataModelAdmin):
+    list_display = ('traveler_name', 'partner_name', 'vendor_number', 'end_date',)
+    list_filter = ('start_date', 'end_date')
+
+
+@register(models.Engagement)
+class EngagementAdmin(DataModelAdmin):
+    list_display = ('agreement', 'engagement_type', 'status', 'start_date',)
+    list_filter = ('engagement_type', 'status', 'start_date')
+
+
+@register(models.Grant)
+class GrantAdmin(DataModelAdmin):
+    list_display = ('name', 'donor', 'expiry')

@@ -3,6 +3,7 @@
 from .actionpoint import ActionPointViewSet
 from .audit_engagement import EngagementViewSet
 from .famindicator import FAMIndicatorViewSet
+from .funds_grant import GrantViewSet
 from .funds_reservation import FundsReservationViewSet
 from .hact import HACTViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet

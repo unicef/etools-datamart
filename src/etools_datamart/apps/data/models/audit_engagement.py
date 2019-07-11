@@ -18,8 +18,6 @@ attachment_codes = {AuditAudit: 'audit_final_report',
 
 
 class EngagementlLoader(Loader):
-    def get_queryset(self):
-        pass
 
     def get_content_type(self, sub_type):
         mapping = {AuditAudit: 'audit',
