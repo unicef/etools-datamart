@@ -1,4 +1,5 @@
 from .actionpoint import ActionPoint  # noqa
+from .audit_engagement import Engagement  # noqa
 from .fam import FAMIndicator  # noqa
 from .funds_reservation import FundsReservation  # noqa
 from .hact import HACT  # noqa

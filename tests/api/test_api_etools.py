@@ -32,7 +32,7 @@ def test_list(client, url, format, schema):
 
 
 def test_list_with_no_schema_search_all_schemas(client):
-    url = reverse("api:auditengagement-list", args=['latest'])
+    url = reverse("api:partnersassessment-list", args=['latest'])
     res = client.get(url)
     assert res.status_code == 200, res.content
 
@@ -46,7 +46,7 @@ def test_retrieve(client, url, format):
 
 
 def test_retrieve_requires_only_one_schema(client):
-    url = reverse("api:auditengagement-detail", args=['latest', '_lastest_'])
+    url = reverse("api:partnersassessment-detail", args=['latest', '_lastest_'])
     url = f"{url}?country_name=bolivia,chad"
     res = client.get(url)
     assert res.status_code == 400, res.content
@@ -54,7 +54,7 @@ def test_retrieve_requires_only_one_schema(client):
 
 
 def test_retrieve_requires_one_schema(client):
-    url = reverse("api:auditengagement-detail", args=['latest', '_lastest_'])
+    url = reverse("api:partnersassessment-detail", args=['latest', '_lastest_'])
     res = client.get(url)
     assert res.status_code == 400
     assert res.json()['error'] == "country_name parameter is mandatory"

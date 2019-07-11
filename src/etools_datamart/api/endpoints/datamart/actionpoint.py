@@ -94,23 +94,16 @@ class ActionPointSerializer(DataMartSerializer):
 
 
 class ActionPointFilterForm(forms.Form):
-    last_modify_date = DateRangePickerField(label='Modified between',
-                                            required=False)
+    created = DateRangePickerField(label='Created between', required=False)
 
     date_of_completion = DateRangePickerField(label='Date of completion',
                                               required=False)
-    submission_date = DateRangePickerField(label='Submitted between',
-                                           required=False)
-
-    # document_type__in = Select2MultipleChoiceField(label='Document Type',
-    #                                                choices=PartnersIntervention.INTERVENTION_TYPES,
-    #                                                required=False)
 
 
 class ActionPointViewSet(common.DataMartViewSet):
     serializer_class = ActionPointSerializer
     queryset = models.ActionPoint.objects.all()
-    filter_fields = ('vendor_code', 'fr_type', 'start_date')
+    filter_fields = ('created', 'date_of_completion',)
     serializers_fieldsets = {'std': ActionPointSerializer,
                              'v2': ActionPointSerializerV2}
 

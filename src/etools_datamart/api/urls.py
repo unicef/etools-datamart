@@ -14,7 +14,6 @@ class ReadOnlyRouter(APIReadOnlyRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r'etools/audit/engagement', endpoints.EngagementViewSet)
 router.register(r'etools/funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
 router.register(r'etools/funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
 router.register(r'etools/funds/grant', endpoints.GrantViewSet)
@@ -23,6 +22,7 @@ router.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
 router.register(r'etools/workspaces', endpoints.WorkspaceViewSet)
 
+router.register(r'datamart/audit/engagements', endpoints.EngagementViewSet)
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
