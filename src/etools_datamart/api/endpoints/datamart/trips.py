@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # import django_filters
-from constance import config
 from django import forms
+
+from constance import config
 from rest_framework import serializers
 
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField

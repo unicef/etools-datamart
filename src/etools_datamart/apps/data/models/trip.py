@@ -62,6 +62,7 @@ class ModeOfTravel:
         (RAIL, 'Rail')
     )
 
+
 class Trip(DataMartModel):
     PLANNED = 'planned'
     SUBMITTED = 'submitted'

@@ -472,8 +472,8 @@ JWT_AUTH = {
 
 }
 # django-sql-explorer
-EXPLORER_CONNECTIONS = { 'Default': 'default',
-                         'eTools': 'etools'}
+EXPLORER_CONNECTIONS = {'Default': 'default',
+                        'eTools': 'etools'}
 EXPLORER_DEFAULT_CONNECTION = 'default'
 EXPLORER_ASYNC_SCHEMA = True
 EXPLORER_CONNECTION_NAME = 'default'
@@ -650,7 +650,8 @@ def extra(r):
 
 SYSINFO = {"extra": {'Azure': extra}}
 
-MIGRATION_MODULES = {'dbtemplates': 'etools_datamart.custom_migrations.dbtemplates'}
+MIGRATION_MODULES = {'dbtemplates': 'etools_datamart.custom_migrations.dbtemplates',
+                     'explorer': 'etools_datamart.custom_migrations.explorer', }
 
 IMPERSONATE = {
     'PAGINATE_COUNT': 50,
