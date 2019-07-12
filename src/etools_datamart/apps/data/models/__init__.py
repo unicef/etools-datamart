@@ -4,6 +4,7 @@ from .fam import FAMIndicator  # noqa
 from .funds_grant import Grant  # noqa
 from .funds_reservation import FundsReservation  # noqa
 from .hact import HACT  # noqa
+from .hact_detail import HACTDetail  # noqa
 from .intervention import Intervention, InterventionByLocation  # noqa
 from .location import GatewayType, Location  # noqa
 from .partner import Partner  # noqa

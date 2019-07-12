@@ -328,9 +328,12 @@ class Loader:
                 ret[k] = None
             elif v == 'i':
                 continue
+            elif v and hasattr(self, v) and callable(getattr(self, v)):
+                getter = getattr(self, v)
+                ret[k] = getter(record, ret, field_name=k)
             elif v == '-' or hasattr(self, 'get_%s' % k):
                 getter = getattr(self, 'get_%s' % k)
-                ret[k] = getter(record, ret)
+                ret[k] = getter(record, ret, field_name=k)
             elif v == '__self__':
                 try:
                     ret[k] = self.model.objects.get(schema_name=country.schema_name,

@@ -305,3 +305,8 @@ class EngagementAdmin(DataModelAdmin):
 @register(models.Grant)
 class GrantAdmin(DataModelAdmin):
     list_display = ('name', 'donor', 'expiry')
+
+
+@register(models.HACTDetail)
+class HACTDetailAdmin(DataModelAdmin):
+    list_display = ('schema_name', 'partner_name',)
