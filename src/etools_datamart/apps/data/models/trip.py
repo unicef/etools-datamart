@@ -88,7 +88,7 @@ class Trip(DataMartModel):
     cancellation_note = models.TextField(blank=True, null=True)
     certification_note = models.TextField(blank=True, null=True)
     completed_at = models.DateTimeField(blank=True, null=True)
-    cp_output = models.CharField(max_length=300, blank=True, null=True)
+    cp_output = models.TextField(blank=True, null=True)
     cp_output_id = models.CharField(max_length=300, blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     currency_code = models.CharField(max_length=10, blank=True, null=True)
