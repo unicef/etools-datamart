@@ -307,6 +307,11 @@ class GrantAdmin(DataModelAdmin):
     list_display = ('name', 'donor', 'expiry')
 
 
-@register(models.HACTDetail)
+@register(models.HACTHistory)
 class HACTDetailAdmin(DataModelAdmin):
-    list_display = ('schema_name', 'partner_name',)
+    list_display = ('schema_name', 'year', 'partner_name',
+                    'approach_threshold', 'expiring_threshold',
+                    'sc_follow_up'
+                    )
+    list_filter = ('year', 'approach_threshold', 'expiring_threshold',
+                   'sc_follow_up')

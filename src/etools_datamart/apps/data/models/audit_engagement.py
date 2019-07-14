@@ -29,7 +29,7 @@ class EngagementlLoader(Loader):
         return DjangoContentType.objects.get(app_label='audit',
                                              model=mapping[sub_type])
 
-    def get_engagement_attachments(self, original: AuditEngagement, values: dict):
+    def get_engagement_attachments(self, original: AuditEngagement, values: dict, **kwargs):
         # audit_engagement
         ret = AttachmentsAttachment.objects.filter(
             object_id=original.id,
@@ -38,7 +38,7 @@ class EngagementlLoader(Loader):
 
         return ", ".join(ret)
 
-    def get_report_attachments(self, original: AuditEngagement, values: dict):
+    def get_report_attachments(self, original: AuditEngagement, values: dict, **kwargs):
         # audit_report
         ret = AttachmentsAttachment.objects.filter(
             object_id=original.id,
@@ -47,14 +47,14 @@ class EngagementlLoader(Loader):
 
         return ", ".join(ret)
 
-    def get_final_report(self, original: AuditEngagement, values: dict):
+    def get_final_report(self, original: AuditEngagement, values: dict, **kwargs):
         if getattr(original._impl, 'final_report', None):
             return AttachmentsAttachment.objects.get(
                 object_id=original.id,
                 code=attachment_codes[original.sub_type],
                 content_type=self.get_content_type(original.sub_type)).file
 
-    def get_authorized_officers(self, original: AuditEngagement, values: dict):
+    def get_authorized_officers(self, original: AuditEngagement, values: dict, **kwargs):
         ret = []
         for o in original.authorized_officers.all():
             ret.append({'last_name': o.last_name,
@@ -65,7 +65,7 @@ class EngagementlLoader(Loader):
         values['authorized_officers_data'] = ret
         return ", ".join([o['email'] for o in ret])
 
-    def get_staff_members(self, original: AuditEngagement, values: dict):
+    def get_staff_members(self, original: AuditEngagement, values: dict, **kwargs):
         ret = []
         for o in original.staff_members.all():
             ret.append({'last_name': o.user.last_name,

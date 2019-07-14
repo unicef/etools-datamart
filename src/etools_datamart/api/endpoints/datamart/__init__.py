@@ -5,7 +5,8 @@ from .audit_engagement import EngagementViewSet
 from .famindicator import FAMIndicatorViewSet
 from .funds_grant import GrantViewSet
 from .funds_reservation import FundsReservationViewSet
-from .hact import HACTViewSet
+from .hact_aggregate import HACTAggreagateViewSet
+from .hact_history import HACTHistoryViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
 from .location import LocationViewSet
 from .partners_agreement import PartnerAgreementViewSet

@@ -8,7 +8,7 @@ from .base import DataMartModel
 
 
 class TravelLoader(Loader):
-    def get_attachments(self, record, values):
+    def get_attachments(self, record, values, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
                                    record.attachments.values_list('type', 'file'))))
 
