@@ -7,10 +7,10 @@ from etools_datamart.apps.etools.models import AuthUser
 
 
 class EtoolsUserLoader(CommonSchemaLoader):
-    def get_groups(self, record, values):
+    def get_groups(self, record, values, **kwargs):
         return ", ".join(record.groups.values_list('name', flat=True))
 
-    def get_countries_available(self, record, values):
+    def get_countries_available(self, record, values, **kwargs):
         try:
             return ", ".join(record.profile.countries_available.values_list('name', flat=True))
         except ObjectDoesNotExist:  # pragma: no cover

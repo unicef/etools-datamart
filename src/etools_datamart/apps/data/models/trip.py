@@ -21,14 +21,14 @@ class TravelLoader(Loader):
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
-    def get_is_second_traveler(self, original: T2FTravel, values: dict):
+    def get_is_second_traveler(self, original: T2FTravel, values: dict, **kwargs):
         return original.traveler != original.activity.primary_traveler
 
-    def get_attachments(self, original: T2FTravel, values: dict):
+    def get_attachments(self, original: T2FTravel, values: dict, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
                                    original.attachments.values_list('type', 'file'))))
 
-    def get_locations(self, original: T2FTravel, values: dict):
+    def get_locations(self, original: T2FTravel, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention

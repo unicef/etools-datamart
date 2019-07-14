@@ -9,7 +9,7 @@ from etools_datamart.apps.etools.models import (FundsFundsreservationheader, mod
 
 
 class InterventionBudgetLoader(InterventionLoader):
-    def get_fr_numbers(self, original: PartnersIntervention, values: dict):
+    def get_fr_numbers(self, original: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
         for fr in FundsFundsreservationheader.objects.filter(intervention=original):

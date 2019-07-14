@@ -16,8 +16,10 @@ def users(db):
     UserFactory(username="admin", is_superuser=True, is_staff=True)
 
 
-@pytest.mark.parametrize("user", ("admin", "user1"))
-def test_api_web_index(user):
+@pytest.mark.parametrize("username", ("admin", "user1"))
+def test_api_web_index(username):
+    user = User.objects.get(username=username)
+
     client = APIClient()
     client.force_authenticate(user)
     res = client.get('/api/latest/')

@@ -22,7 +22,7 @@ class InterventionLoader(Loader):
     # def fr_currencies_ok(self, original: PartnersIntervention):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
 
-    def get_planned_programmatic_visits(self, original: PartnersIntervention, values: dict):
+    def get_planned_programmatic_visits(self, original: PartnersIntervention, values: dict, **kwargs):
         qs = PartnersInterventionplannedvisits.objects.filter(intervention=original)
         qs = qs.filter(year=self.context['today'].year)
         qs = qs.annotate(
@@ -31,12 +31,12 @@ class InterventionLoader(Loader):
         if record:
             return record.planned
 
-    def get_attachment_types(self, original: PartnersIntervention, values: dict):
+    def get_attachment_types(self, original: PartnersIntervention, values: dict, **kwargs):
         qs = original.attachments.all()
         values['number_of_attachments'] = qs.count()
         return ", ".join(qs.values_list('type__name', flat=True))
 
-    def get_amendment_types(self, original: PartnersIntervention, values: dict):
+    def get_amendment_types(self, original: PartnersIntervention, values: dict, **kwargs):
         qs = PartnersAgreementamendment.objects.filter(agreement=original.agreement).order_by('signed_date')
         values['number_of_amendments'] = qs.count()
         if qs:
@@ -44,19 +44,19 @@ class InterventionLoader(Loader):
         types = [str(t) for t in qs.values_list('types', flat=True)]
         return ", ".join(types)
 
-    def get_days_from_prc_review_to_signature(self, original: PartnersIntervention, values: dict):
+    def get_days_from_prc_review_to_signature(self, original: PartnersIntervention, values: dict, **kwargs):
         i1 = original.review_date_prc
         i2 = original.signed_by_partner_date
         if i1 and i2:
             return (i2 - i1).days
 
-    def get_days_from_submission_to_signature(self, original: PartnersIntervention, values: dict):
+    def get_days_from_submission_to_signature(self, original: PartnersIntervention, values: dict, **kwargs):
         i1 = original.submission_date
         i2 = original.signed_by_unicef_date
         if i1 and i2:
             return (i2 - i1).days
 
-    def get_sections(self, original: PartnersIntervention, values: dict):
+    def get_sections(self, original: PartnersIntervention, values: dict, **kwargs):
         data = []
         for section in original.sections.all():
             data.append(dict(source_id=section.id,
@@ -66,7 +66,7 @@ class InterventionLoader(Loader):
         values['sections_data'] = data
         return ", ".join([l['name'] for l in data])
 
-    def get_locations(self, original: PartnersIntervention, values: dict):
+    def get_locations(self, original: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
         for location in original.flat_locations.select_related('gateway').order_by('id'):
@@ -80,15 +80,15 @@ class InterventionLoader(Loader):
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])
 
-    def get_unicef_signatory_name(self, original: PartnersIntervention, values: dict):
+    def get_unicef_signatory_name(self, original: PartnersIntervention, values: dict, **kwargs):
         if original.unicef_signatory:
             return "{0.username} ({0.email})".format(original.unicef_signatory)
 
-    def get_partner_signatory_name(self, original: PartnersIntervention, values: dict):
+    def get_partner_signatory_name(self, original: PartnersIntervention, values: dict, **kwargs):
         if original.partner_authorized_officer_signatory:
             return "{0.last_name} {0.first_name} ({0.email})".format(original.partner_authorized_officer_signatory)
 
-    def get_offices(self, original: PartnersIntervention, values: dict):
+    def get_offices(self, original: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionOffices
         data = []
         for office in original.offices.select_related('zonal_chief').order_by('id'):
@@ -99,7 +99,7 @@ class InterventionLoader(Loader):
         values['offices_data'] = data
         return ", ".join([l['name'] for l in data])
 
-    def get_clusters(self, original: PartnersIntervention, values: dict):
+    def get_clusters(self, original: PartnersIntervention, values: dict, **kwargs):
 
         qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=original)
         clusters = set()
@@ -108,7 +108,7 @@ class InterventionLoader(Loader):
                 clusters.add(applied_indicator.cluster_name)
         return ", ".join(clusters)
 
-    def get_partner_focal_points(self, original: PartnersIntervention, values: dict):
+    def get_partner_focal_points(self, original: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
         for member in original.partner_focal_points.all():
@@ -123,10 +123,10 @@ class InterventionLoader(Loader):
         values['partner_focal_points_data'] = data
         return ", ".join(ret)
 
-    def get_cp_outputs(self, original: PartnersIntervention, values: dict):
+    def get_cp_outputs(self, original: PartnersIntervention, values: dict, **kwargs):
         return ", ".join([rl.name for rl in original.result_links.all()])
 
-    def get_unicef_focal_points(self, original: PartnersIntervention, values: dict):
+    def get_unicef_focal_points(self, original: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
         for member in original.unicef_focal_points.all():
@@ -325,7 +325,7 @@ class Intervention(InterventionAbstract, DataMartModel):
 
 
 class InterventionByLocationLoader(InterventionLoader):
-    def get_locations(self, original: PartnersIntervention, values: dict):
+    def get_locations(self, original: PartnersIntervention, values: dict, **kwargs):
         values['locations_data'] = None
         return None
 

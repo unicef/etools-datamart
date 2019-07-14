@@ -21,7 +21,7 @@ class PartnerLoader(Loader):
     #         data = {}
     #     return data
 
-    def get_hact_values(self, record, values):
+    def get_hact_values(self, record, values, **kwargs):
         try:
 
             data = json.dumps(record.hact_values)

@@ -18,20 +18,20 @@ class TPMActivityLoader(Loader):
     # def get_pd_ssfa_reference_number(self, original: TpmTpmactivity, values: dict):
     #     return reference_number(original.activity.intervention)
 
-    def get_task_reference_number(self, original: TpmTpmactivity, values: dict):
+    def get_task_reference_number(self, original: TpmTpmactivity, values: dict, **kwargs):
         return "Task #{}.{}".format(original.tpm_visit.id, original.id)
 
-    def get_visit_url(self, original: TpmTpmactivity, values: dict):
+    def get_visit_url(self, original: TpmTpmactivity, values: dict, **kwargs):
         return 'tpm/visits/%s/details' % original.id
 
-    def get_report_attachments(self, original: TpmTpmactivity, values: dict):
+    def get_report_attachments(self, original: TpmTpmactivity, values: dict, **kwargs):
         attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
                                                            code='activity_report',
                                                            content_type=self._ct,
                                                            ).order_by('id').values_list('file', flat=True)
         return ", ".join(attachments)
 
-    def get_attachments(self, original: TpmTpmactivity, values: dict):
+    def get_attachments(self, original: TpmTpmactivity, values: dict, **kwargs):
         attachments = (AttachmentsAttachment.objects
                        .select_related('uploaded_by', 'file_type')
                        .filter(object_id=original.tpm_visit.id,
@@ -50,7 +50,7 @@ class TPMActivityLoader(Loader):
         values['attachments_data'] = attachments
         return ", ".join([a.file for a in attachments])
 
-    def get_offices(self, original: TpmTpmactivity, values: dict):
+    def get_offices(self, original: TpmTpmactivity, values: dict, **kwargs):
         locs = []
         for office in original.offices.select_related('zonal_chief').order_by('id'):
             locs.append(dict(
@@ -61,7 +61,7 @@ class TPMActivityLoader(Loader):
         values['offices_data'] = locs
         return ", ".join([l['name'] for l in locs])
 
-    def get_unicef_focal_points(self, original: TpmTpmactivity, values: dict):
+    def get_unicef_focal_points(self, original: TpmTpmactivity, values: dict, **kwargs):
         # TpmTpmactivityUnicefFocalPoints
         ret = []
         for i in original.unicef_focal_points.all():
@@ -69,7 +69,7 @@ class TPMActivityLoader(Loader):
 
         return ", ".join(ret)
 
-    def get_tpm_focal_points(self, original: TpmTpmactivity, values: dict):
+    def get_tpm_focal_points(self, original: TpmTpmactivity, values: dict, **kwargs):
         # tpm_partner : TpmpartnersTpmpartner =
         # staffmembers = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=original.tpm_visit)
         ret = []
@@ -81,7 +81,7 @@ class TPMActivityLoader(Loader):
         values['tpm_focal_points_data'] = ret
         return ",".join([m['email'] for m in ret])
 
-    def get_locations(self, original: TpmTpmactivity, values: dict):
+    def get_locations(self, original: TpmTpmactivity, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention

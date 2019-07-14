@@ -41,7 +41,6 @@ class FAMIndicatorFactory(DataMartModelFactory):
 
 
 class AgreementFactory(DataMartModelFactory):
-
     class Meta:
         model = models.Agreement
 
@@ -227,3 +226,23 @@ class OfficeFactory(DataMartModelFactory):
 class SectionFactory(DataMartModelFactory):
     class Meta:
         model = models.Section
+
+
+class TripFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Trip
+
+
+class EngagementFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Engagement
+
+
+class GrantFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Grant
+
+
+class HACTHistoryFactory(DataMartModelFactory):
+    class Meta:
+        model = models.HACTHistory
