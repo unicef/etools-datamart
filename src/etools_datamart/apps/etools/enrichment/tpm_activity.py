@@ -18,17 +18,20 @@ models.ManyToManyField(UsersOffice,
                        ).contribute_to_class(TpmTpmactivity, 'offices')
 
 
-pk = TpmTpmactivity._meta.get_field('activity_ptr')
-TpmTpmactivity._meta.pk = pk
-TpmTpmactivity._meta.auto_field = pk
+# pk = TpmTpmactivity._meta.get_field('activity_ptr')
+# TpmTpmactivity._meta.pk = pk
+# TpmTpmactivity._meta.auto_field = pk
 
 
 def get_reference_number(self):
     return self.tpm_visit.reference_number
 
 
+# TpmTpmactivity.id = property(lambda self: self.activity_ptr_id)
+# TpmTpmactivity.pk = property(lambda self: self.activity_ptr_id)
+
 TpmTpmactivity.reference_number = property(get_reference_number)
-TpmTpmactivity.activity = property(lambda self: self.activity_ptr)
+# TpmTpmactivity.activity = property(lambda self: self.activity_ptr)
 
 set_primary_key(TpmTpmactivity, 'activity_ptr')
 

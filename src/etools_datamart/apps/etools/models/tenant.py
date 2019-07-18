@@ -972,6 +972,7 @@ class ReportsAppliedindicator(models.TenantModel):
     assumptions = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
     indicator = models.ForeignKey('ReportsIndicatorblueprint', models.DO_NOTHING, related_name='reportsindicatorblueprint_reports_appliedindicator_indicator_id', blank=True, null=True)
+    # lower_result == PD Result == LowerResult
     lower_result = models.ForeignKey('ReportsLowerresult', models.DO_NOTHING, related_name='reportslowerresult_reports_appliedindicator_lower_result_id')
     means_of_verification = models.CharField(max_length=255, blank=True, null=True)
     cluster_indicator_id = models.IntegerField(blank=True, null=True)

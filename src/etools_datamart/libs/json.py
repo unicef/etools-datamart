@@ -1,20 +1,23 @@
 import decimal
 import json
 import sys
+from datetime import datetime
 
 from pygments import formatters, highlight, lexers
 
 
-class DecimalEncoder(json.JSONEncoder):
+class SmartEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return float(o)
-        return super(DecimalEncoder, self).default(o)
+        elif isinstance(o, (datetime,)):
+            return str(o)
+        return super(SmartEncoder, self).default(o)
 
 
-def print(obj, *args):
+def print_json(obj, *args):
     if isinstance(obj, (dict, list, tuple)):
-        formatted_json = json.dumps(obj, sort_keys=True, indent=4, cls=DecimalEncoder)
+        formatted_json = json.dumps(obj, sort_keys=True, indent=4, cls=SmartEncoder)
     else:
         formatted_json = str(obj)
 

@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "5064"
+            "5370"
         ]
     },
     "data": {
@@ -62,9 +62,9 @@
         "previous": null,
         "results": [
             {
-                "id": 799,
+                "id": 793,
                 "source_id": null,
-                "last_modify_date": "10 Jul 2019 09:23:28",
+                "last_modify_date": "22 Jul 2019 06:29:33",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -97,6 +97,9 @@
                 "partner_id": null,
                 "partner_name": null,
                 "partner_signatory_name": null,
+                "partner_signatory_email": null,
+                "partner_signatory_first_name": null,
+                "partner_signatory_last_name": null,
                 "partner_signatory_phone": null,
                 "partner_signatory_title": null,
                 "partner_source_id": null,
@@ -134,9 +137,9 @@
                 "locations_data": {}
             },
             {
-                "id": 800,
+                "id": 794,
                 "source_id": null,
-                "last_modify_date": "10 Jul 2019 09:23:28",
+                "last_modify_date": "22 Jul 2019 06:29:33",
                 "seen": null,
                 "country_name": "chad",
                 "schema_name": "chad",
@@ -169,6 +172,9 @@
                 "partner_id": null,
                 "partner_name": null,
                 "partner_signatory_name": null,
+                "partner_signatory_email": null,
+                "partner_signatory_first_name": null,
+                "partner_signatory_last_name": null,
                 "partner_signatory_phone": null,
                 "partner_signatory_title": null,
                 "partner_source_id": null,
@@ -206,9 +212,9 @@
                 "locations_data": {}
             },
             {
-                "id": 801,
+                "id": 795,
                 "source_id": null,
-                "last_modify_date": "10 Jul 2019 09:23:28",
+                "last_modify_date": "22 Jul 2019 06:29:33",
                 "seen": null,
                 "country_name": "lebanon",
                 "schema_name": "lebanon",
@@ -241,6 +247,9 @@
                 "partner_id": null,
                 "partner_name": null,
                 "partner_signatory_name": null,
+                "partner_signatory_email": null,
+                "partner_signatory_first_name": null,
+                "partner_signatory_last_name": null,
                 "partner_signatory_phone": null,
                 "partner_signatory_title": null,
                 "partner_source_id": null,

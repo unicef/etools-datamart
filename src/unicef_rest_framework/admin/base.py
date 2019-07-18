@@ -22,9 +22,7 @@ class ReadOnlyAdminMixin:
 class TruncateTableMixin(ExtraUrlMixin):
 
     def _truncate(self, request):
-        from django.db import connection
-        cursor = connection.cursor()
-        cursor.execute('TRUNCATE TABLE "{0}" CASCADE '.format(self.model._meta.db_table))
+        self.model.objects.truncate()
 
     @link(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
     def truncate(self, request):
@@ -51,5 +49,5 @@ class APIModelAdmin(ListDisplayAllMixin, ReadOnlyAdminMixin, admin.ModelAdmin):
     # def has_delete_permission(self, request, obj=None):
     #     return False
 
-        # def has_change_permission(self, request, obj=None):
-        # return obj is None
+    # def has_change_permission(self, request, obj=None):
+    # return obj is None

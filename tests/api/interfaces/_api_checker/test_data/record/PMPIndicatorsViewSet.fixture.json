@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.pmpindicators",
-            "pk": 604,
+            "pk": 601,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-10T09:23:38.781Z",
+                "last_modify_date": "2019-07-22T06:29:55.789Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -36,7 +36,7 @@
                 "country_id": null,
                 "partner_id": null,
                 "intervention_id": null,
-                "created": "2019-07-10T09:23:38.781Z",
+                "created": "2019-07-22T06:29:55.790Z",
                 "updated": null
             }
         },

@@ -25,11 +25,29 @@ class TPMActivityLoader(Loader):
         return 'tpm/visits/%s/details' % original.id
 
     def get_report_attachments(self, original: TpmTpmactivity, values: dict, **kwargs):
-        attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
-                                                           code='activity_report',
-                                                           content_type=self._ct,
-                                                           ).order_by('id').values_list('file', flat=True)
-        return ", ".join(attachments)
+        # attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
+        #                                                    code='activity_report',
+        #                                                    content_type=self._ct,
+        #                                                    ).order_by('id').values_list('file', flat=True)
+        #
+        # values['report_attachments_data'] = attachments
+        attachments = (AttachmentsAttachment.objects
+                       .select_related('uploaded_by', 'file_type')
+                       .filter(object_id=original.tpm_visit.id,
+                               code='activity_report',
+                               content_type=self._ct,
+                               ).order_by('id'))
+        ret = []
+        for a in attachments:
+            ret.append(dict(
+                file=a.file,
+                file_type=a.file_type,
+                code=a.code,
+                uploaded_by=get_attr(a, 'uploaded_by.email')
+            ))
+
+        values['report_attachments_data'] = ret
+        return ", ".join([a.file for a in attachments])
 
     def get_attachments(self, original: TpmTpmactivity, values: dict, **kwargs):
         attachments = (AttachmentsAttachment.objects
@@ -47,7 +65,7 @@ class TPMActivityLoader(Loader):
                 uploaded_by=get_attr(a, 'uploaded_by.email')
             ))
 
-        values['attachments_data'] = attachments
+        values['attachments_data'] = ret
         return ", ".join([a.file for a in attachments])
 
     def get_offices(self, original: TpmTpmactivity, values: dict, **kwargs):
@@ -85,7 +103,8 @@ class TPMActivityLoader(Loader):
         # PartnersInterventionFlatLocations
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention
-        for location in original.activity.locations.select_related('gateway').order_by('id'):
+        # for location in original.activity.locations.select_related('gateway').order_by('id'):
+        for location in original.activity.locations.order_by('id'):
             locs.append(dict(
                 source_id=location.id,
                 name=location.name,
@@ -96,54 +115,15 @@ class TPMActivityLoader(Loader):
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])
 
+    def get_queryset(self):
+        return TpmTpmactivity.objects.select_related('activity_ptr')
+
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
-        for tpm_activity in qs.all().order_by('activity_ptr'):
-            # base = activity.activity_ptr
+        for tpm_activity in qs.all():
+            tpm_activity.id = tpm_activity.activity_ptr_id
+            tpm_activity.activity = tpm_activity.activity_ptr
             tpm_activity.visit = tpm_activity.tpm_visit
-            tpm_activity.id = tpm_activity.activity.id
-            # tpm_activity.activity = tpm_activity.activity_ptr
-            # tpm_activities = TpmTpmactivity.objects.filter(tpm_visit=visit).order_by('activity_ptr_id')
-            # source = ActivitiesActivity.objects.filter(activitiesactivity_tpm_tpmactivity_activity_ptr_id__tpm_visit=visit)
-            # for activity in TpmTpmactivity.objects.filter(tpm_visit=visit):
-            #     TODO: remove me
-            # print(111, "tpm_tmpvisit.py:22", activity)
-
-            # visit.tpm_activity = tpm_activities.first()
-            # if not visit.tpm_activity:
-            #     continue
-
-            # visit.activity = visit.tpm_activity.activity_ptr
-            # try:
-            #     tpm_activity.start_date = tpm_activities.aggregate(date__min=models.Max('activity_ptr__date'))['date__min']
-            # except KeyError:
-            #     pass
-            #
-            # tpm_activity.end_date = tpm_activities.aggregate(date__max=models.Max('activity_ptr__date'))['date__max']
-            #
-            # unicef_focal_points = []
-            # for a in tpm_activities.only('activity_ptr_id'):
-            #     qs = TpmTpmactivityUnicefFocalPoints.objects.filter(tpmactivity_id=a.activity_ptr_id)
-            #     unicef_focal_points.extend(qs.values_list('user__email', flat=True))
-
-            # tpm_activity.unicef_focal_points = ",".join(unicef_focal_points)
-
-            # try:
-            #     tpm_activity.report_attachments = ",".join(AttachmentsAttachment.objects.filter(
-            #         object_id=visit.id,
-            #         code='activity_report',
-            #         content_type=content_type
-            #     ).values_list('file', flat=True)).strip()
-            # except Exception as e:
-            #     process_exception(e)
-            # try:
-            #     visit.attachments = ",".join(AttachmentsAttachment.objects.filter(
-            #         object_id=visit.id,
-            #         code='activity_attachments',
-            #         content_type=content_type
-            #     ).values_list('file', flat=True)).strip()
-            # except Exception as e:
-            #     process_exception(e)
 
             filters = self.config.key(self, tpm_activity)
             values = self.get_values(tpm_activity)
@@ -227,7 +207,7 @@ class TPMActivity(DataMartModel):
                        approval_comment="tpm_visit.approval_comment",
                        # attachments="=",
                        author_name="tpm_visit.author.name",
-                       cancel_comment="=",
+                       cancel_comment="tpm_visit.cancel_comment",
                        # country_name="=",
                        cp_output="activity.cp_output.name",
                        cp_output_id="activity.cp_output.vision_id",
@@ -255,7 +235,7 @@ class TPMActivity(DataMartModel):
                        partner_vendor_number="activity.partner.vendor_number",
                        pd_ssfa_reference_number="activity.intervention.reference_number",
                        pd_ssfa_title="activity.intervention.title",
-                       reject_comment="reject_comment",
+                       reject_comment="activity.reject_comment",
                        report_attachments="=",
                        # schema_name="=",
                        section="section.name",

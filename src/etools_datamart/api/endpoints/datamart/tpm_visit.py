@@ -47,7 +47,7 @@ class TPMVisitSerializerV2(DataMartSerializer):
             "office",
             "is_pv",
             "attachments",
-            "report_attachment",
+            "report_attachments",
             "visit_url",
 
         )

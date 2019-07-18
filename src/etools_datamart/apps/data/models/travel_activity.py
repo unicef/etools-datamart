@@ -2,12 +2,11 @@ from django.db import models
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.data.models.mixins import LocationMixin
+from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import T2FTravelactivity
 
 
 class TravelActivityLoader(Loader):
-
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for record in qs.order_by('id', '-date'):
@@ -55,15 +54,15 @@ class TravelActivity(LocationMixin, DataMartModel):
                                           source_id=record.id,
                                           location_source_id=record.location.id,
                                           )
-        mapping = {
+        mapping = add_location_mapping({
             'source_travel_id': 'travel.id',
             'source_partner_id': 'partner.id',
             'source_partnership_id': 'partnership.id',
-            'location_source_id': 'location.id',
-            'location_name': 'location.name',
-            'location_pcode': 'location.p_code',
-            'location_level': 'location.level',
-            'location_levelname': 'location.gateway.name',
+            # 'location_source_id': 'location.id',
+            # 'location_name': 'location.name',
+            # 'location_pcode': 'location.p_code',
+            # 'location_level': 'location.level',
+            # 'location_levelname': 'location.gateway.name',
             'travel_reference_number': 'travel.reference_number',
             'primary_traveler': 'primary_traveler.email',
             'partner_name': 'partner.name',
@@ -73,4 +72,4 @@ class TravelActivity(LocationMixin, DataMartModel):
             'result_code': 'result.code',
             'result_type': 'result.result_type.name',
 
-        }
+        })

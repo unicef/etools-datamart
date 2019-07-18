@@ -14,6 +14,7 @@ from .partners_staffmember import PartnerStaffMember  # noqa
 from .pd_indicator import PDIndicator  # noqa
 from .pmp import PMPIndicators  # noqa
 from .report_sector import Section  # noqa
+from .reports_indicator import ReportIndicator  # noqa
 from .tpm_tmpactivity import TPMActivity  # noqa
 from .tpm_tmpvisit import TPMVisit  # noqa
 from .travel import Travel  # noqa

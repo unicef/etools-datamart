@@ -1,6 +1,8 @@
 1.23
 ----
-* updates FundsReservetion endpoint
+* new FundReservation&Header endpoint
+* new Grant endpoint
+* new InterventionIndicators endpoint
 * new HACT History endpoint
 * new HACT aggregate endpoint
 * new Engagements endpoint

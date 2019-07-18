@@ -49,6 +49,9 @@ def get_item(d, target, default: object = 'N/A', sep='|'):
 
 
 class HACTDetailLoader(Loader):
+    def get_source_partner(self, record, values, field_name):
+        return json.loads(record.partner_values)
+
     def get_source_history(self, record, values, field_name):
         return json.loads(record.partner_values)
 
@@ -78,8 +81,6 @@ class HACTDetailLoader(Loader):
 
     def get_values(self, record):
         self.data1 = dict(json.loads(record.partner_values))
-        # data = record.partner.hact_values
-        ret = super().get_values(record)
         hact_values = dict(
             approach_threshold=get_item(self.data1, 'Approach Threshold', None),
             audits_completed=get_item(self.data1, 'Audit Completed'),
@@ -112,6 +113,8 @@ class HACTDetailLoader(Loader):
             # sc_planned_year=get_item(self.data1, ''),
             shared_ip=get_item(self.data1, 'Shared IP'),
         )
+        self.mapping.update(hact_values)
+        ret = super().get_values(record)
         ret.update(hact_values)
         return ret
 
@@ -186,12 +189,12 @@ class HACTHistory(DataMartModel):
                        partner_type='partner.partner_type',
                        vendor_number='partner.vendor_number',
                        partner_source_id='partner.id',
-                       # shared_ip='partner.shared_ip',
+                       shared_ip='N/A',
                        assessment_type='partner.type_of_assessment',
                        year='year',
                        risk_rating='partner.rating',
                        liqu_1oct_30sep='partner.reported_cy',
                        ct_jan_dec='partner.total_ct_ytd',
                        source_history='-',
-                       source_partner='hact_values'
+                       source_partner='-'
                        )

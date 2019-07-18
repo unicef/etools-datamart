@@ -27,7 +27,7 @@ class Location(DataMartModel):
     longitude = models.FloatField(blank=True, null=True)
     p_code = models.CharField(max_length=32)
     point = PointField(blank=True, null=True)
-    gateway = models.ForeignKey(GatewayType, models.DO_NOTHING)
+    gateway = models.ForeignKey(GatewayType, models.DO_NOTHING, blank=True, null=True)
     geom = MultiPolygonField(blank=True, null=True)
     level = models.IntegerField()
     lft = models.IntegerField()

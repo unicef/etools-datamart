@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
-from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -195,7 +194,20 @@ def equal(a, b):
     return a == b
 
 
+def has_attr(obj, attr):
+    """Recursive get object's attribute. May use dot notation."""
+    none = object()
+    if '.' not in attr:
+        ret = getattr(obj, attr, none)
+    else:
+        L = attr.split('.')
+        ret = has_attr(getattr(obj, L[0], none), '.'.join(L[1:]))
+    return ret != none
+
+
 class Loader:
+    noop = object()
+
     def __init__(self) -> None:
         self.config = None
         self.context = {}
@@ -289,7 +301,6 @@ class Loader:
             stdout.write('.')
             stdout.flush()
         try:
-
             record, created = self.model.objects.get_or_create(**filters,
                                                                defaults=values)
             if created:
@@ -325,16 +336,24 @@ class Loader:
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
+            if k in ret:
+                continue
             if v is None:
                 ret[k] = None
+            elif v == 'N/A':
+                ret[k] = 'N/A'
             elif v == 'i':
                 continue
             elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
                 getter = getattr(self, v)
-                ret[k] = getter(record, ret, field_name=k)
+                _value = getter(record, ret, field_name=k)
+                if _value != self.noop:
+                    ret[k] = _value
             elif v == '-' or hasattr(self, 'get_%s' % k):
                 getter = getattr(self, 'get_%s' % k)
-                ret[k] = getter(record, ret, field_name=k)
+                _value = getter(record, ret, field_name=k)
+                if _value != self.noop:
+                    ret[k] = _value
             elif v == '__self__':
                 try:
                     ret[k] = self.model.objects.get(schema_name=country.schema_name,
@@ -355,8 +374,16 @@ class Loader:
                     pass
             elif callable(v):
                 ret[k] = v(self, record)
-            else:
+            elif v == '=' and has_attr(record, k):
+                ret[k] = get_attr(record, k)
+            # elif has_attr(record, k):
+            #     ret[k] = get_attr(record, k)
+            elif not isinstance(v, str):
+                ret[k] = v
+            elif has_attr(record, v):
                 ret[k] = get_attr(record, v)
+            else:
+                raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
 
         return ret
 
@@ -462,7 +489,6 @@ class Loader:
         self.context.update(kwargs)
         return self.context
 
-    @atomic
     def load(self, *, verbosity=0, always_update=False, stdout=None,
              ignore_dependencies=False, max_records=None, countries=None,
              only_delta=True, run_type=RUN_UNKNOWN,

@@ -124,6 +124,7 @@ class InterventionLoader(Loader):
         return ", ".join(ret)
 
     def get_cp_outputs(self, original: PartnersIntervention, values: dict, **kwargs):
+        values['cp_outputs_data'] = list(original.result_links.values("name", "code"))
         return ", ".join([rl.name for rl in original.result_links.all()])
 
     def get_unicef_focal_points(self, original: PartnersIntervention, values: dict, **kwargs):
@@ -195,9 +196,9 @@ class InterventionAbstract(models.Model):
     partner_id = models.IntegerField(blank=True, null=True)
     partner_name = models.CharField(max_length=200, null=True)
     partner_signatory_name = models.CharField(max_length=300, null=True)
-    # partner_signatory_email = models.CharField(max_length=128, null=True)
-    # partner_signatory_first_name = models.CharField(max_length=64, null=True)
-    # partner_signatory_last_name = models.CharField(max_length=64, null=True)
+    partner_signatory_email = models.CharField(max_length=128, null=True)
+    partner_signatory_first_name = models.CharField(max_length=64, null=True)
+    partner_signatory_last_name = models.CharField(max_length=64, null=True)
     partner_signatory_phone = models.CharField(max_length=64, null=True)
     partner_signatory_title = models.CharField(max_length=64, null=True)
     partner_source_id = models.IntegerField(blank=True, null=True)
@@ -282,11 +283,11 @@ class InterventionAbstract(models.Model):
             partner_focal_points_data='i',
             partner_id=None,
             partner_name='agreement.partner.name',
-            # partner_signatory_email='partner_authorized_officer_signatory.email',
-            # partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
-            # partner_signatory_last_name='partner_authorized_officer_signatory.last_name',
-            # partner_signatory_phone='partner_authorized_officer_signatory.phone',
-            # partner_signatory_title='partner_authorized_officer_signatory.title',
+            partner_signatory_email='partner_authorized_officer_signatory.email',
+            partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
+            partner_signatory_last_name='partner_authorized_officer_signatory.last_name',
+            partner_signatory_phone='partner_authorized_officer_signatory.phone',
+            partner_signatory_title='partner_authorized_officer_signatory.title',
             partner_source_id='agreement.partner.id',
             partner_type='agreement.partner.type',
             partner_vendor_number='agreement.partner.vendor_number',

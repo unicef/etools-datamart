@@ -9,6 +9,15 @@ from etools_datamart.apps.etools.models import (FundsFundsreservationheader, mod
 
 
 class InterventionBudgetLoader(InterventionLoader):
+    def process_country(self):
+        qs = self.filter_queryset(PartnersInterventionbudget.objects.all())
+        for record in qs.all():
+            record.intervention.budget = record
+            filters = self.config.key(self, record.intervention)
+            values = self.get_values(record.intervention)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
+
     def get_fr_numbers(self, original: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
@@ -45,9 +54,9 @@ class InterventionBudget(InterventionAbstract, DataMartModel):
         depends = (Location,)
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(
-                             budget_cso_contribution='partner_contribution',
-                             budget_unicef_cash='unicef_cash',
-                             budget_total='total',
-                             budget_currency='currency',
-                             budget_unicef_supply='in_kind_amount',
+                             budget_cso_contribution='total_partner_contribution',
+                             budget_unicef_cash='budget.unicef_cash',
+                             budget_total='budget.total',
+                             budget_currency='budget.currency',
+                             budget_unicef_supply='budget.in_kind_amount',
                          ))

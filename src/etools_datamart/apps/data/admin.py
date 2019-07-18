@@ -33,6 +33,12 @@ class DatamartChangeList(ChangeList):
 class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     actions = [mass_update, export_as_csv, export_as_xls]
 
+    def get_list_display(self, request):
+        ret = self.list_display
+        if ret == ('pk',):
+            return [f.name for f in self.model._meta.fields]
+        return ret
+
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
             self.list_filter = (SchemaFilter,) + self.list_filter
@@ -315,3 +321,9 @@ class HACTDetailAdmin(DataModelAdmin):
                     )
     list_filter = ('year', 'approach_threshold', 'expiring_threshold',
                    'sc_follow_up')
+
+
+@register(models.ReportIndicator)
+class ReportIndicatorAdmin(DataModelAdmin):
+    list_display = ('pk',)
+    list_filter = ()

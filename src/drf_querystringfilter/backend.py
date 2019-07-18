@@ -171,8 +171,6 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         op = parts[-1]
                     else:
                         op = ''
-                    # TODO: remove me
-                    print(111, "backend.py:175", 111111, filter_field_name)
                     processor = getattr(self, 'process_{}'.format(filter_field_name),
                                         getattr(view, 'drfqs_filter_{}'.format(filter_field_name), None))
 

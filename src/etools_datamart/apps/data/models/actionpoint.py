@@ -201,7 +201,9 @@ class ActionPoint(LocationMixin, DataMartModel):
         depends = (Intervention,)
         mapping = add_location_mapping(dict(
             assigned_by_name='assigned_by.get_display_name',
+            assigned_by_email='assigned_by.email',
             assigned_to_name='assigned_to.get_display_name',
+            assigned_to_email='assigned_to.email',
             author_username='author.username',
             category_description='category.description',
             category_module='category.module',

@@ -246,3 +246,8 @@ class GrantFactory(DataMartModelFactory):
 class HACTHistoryFactory(DataMartModelFactory):
     class Meta:
         model = models.HACTHistory
+
+
+class ReportIndicatorFactory(DataMartModelFactory):
+    class Meta:
+        model = models.ReportIndicator
