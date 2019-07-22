@@ -5,9 +5,13 @@ from django.utils.translation import gettext as _
 from dynamic_serializer.core import get_attr
 
 from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.etools.models import T2FTravel, T2FTravelactivity
+from etools_datamart.apps.etools.models import T2FTravel, T2FTravelactivity, T2FTravelattachment
 
 from .base import DataMartModel
+
+
+class TravelAttachment(object):
+    pass
 
 
 class TravelLoader(Loader):
@@ -28,6 +32,12 @@ class TravelLoader(Loader):
         return ",\n".join(list(map(lambda x: ":".join(x),
                                    original.attachments.values_list('type', 'file'))))
 
+    def get_hact_visit_report(self, original: T2FTravel, values: dict, **kwargs):
+        return "Yes" if T2FTravelattachment.objects.filter(
+            travel=original,
+            type__istartswith="HACT Programme Monitoring",
+        ).exists() else ""
+
     def get_locations(self, original: T2FTravel, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
@@ -43,9 +53,9 @@ class TravelLoader(Loader):
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])
 
-    # def get_attachments2(self, record, values):
-    # return ",\n".join(list(map(lambda x: ":".join(x),
-    #                            record.attachments.values_list('type', 'file'))))
+    def get_trip_attachments(self, record, values, **kwargs):
+        return ",\n".join(list(map(lambda x: ":".join(x),
+                               record.attachments.values_list('type', 'file'))))
 
 
 class ModeOfTravel:
@@ -162,6 +172,8 @@ class Trip(DataMartModel):
             locations_data="i",
             office_name="office.name",
             partner_name="activity.partner.name",
+            pd_ssfa_reference_number='N/A',
+            pd_ssfa_title='N/A',
             primary_traveler="activity.primary_traveler.email",
             section_name="section.name",
             supervisor_email='supervisor.email',
@@ -170,9 +182,11 @@ class Trip(DataMartModel):
             traveler_email='traveler.email',
             traveler_name=lambda loader, record: "%s %s" % (record.traveler.last_name,
                                                             record.traveler.first_name),
+            trip_attachments="-",
             trip_activity_date="activity.date",
             trip_activity_reference_number="activity.reference_number",
             trip_activity_type="activity.travel_type",
             trip_url=lambda loader, record: 't2f/edit-travel/%s' % record.id,
             vendor_number="activity.partner.vendor_number",
+            source_activity_id='activity.id'
         )

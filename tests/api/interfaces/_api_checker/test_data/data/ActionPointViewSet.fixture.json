@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.actionpoint",
-                "pk": 215,
+                "pk": 397,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-10T08:44:56.839Z",
+                    "last_modify_date": "2019-07-22T06:29:20.268Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -16,6 +16,7 @@
                     "location_pcode": null,
                     "location_level": null,
                     "location_levelname": null,
+                    "location": null,
                     "reference_number": null,
                     "author_username": null,
                     "assigned_by_name": null,
@@ -58,10 +59,10 @@
             },
             {
                 "model": "data.actionpoint",
-                "pk": 216,
+                "pk": 398,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-10T08:44:56.844Z",
+                    "last_modify_date": "2019-07-22T06:29:20.311Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -71,6 +72,7 @@
                     "location_pcode": null,
                     "location_level": null,
                     "location_levelname": null,
+                    "location": null,
                     "reference_number": null,
                     "author_username": null,
                     "assigned_by_name": null,
@@ -113,10 +115,10 @@
             },
             {
                 "model": "data.actionpoint",
-                "pk": 217,
+                "pk": 399,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-10T08:44:56.846Z",
+                    "last_modify_date": "2019-07-22T06:29:20.329Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -126,6 +128,7 @@
                     "location_pcode": null,
                     "location_level": null,
                     "location_levelname": null,
+                    "location": null,
                     "reference_number": null,
                     "author_username": null,
                     "assigned_by_name": null,

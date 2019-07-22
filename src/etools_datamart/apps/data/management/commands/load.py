@@ -49,6 +49,11 @@ class Command(BaseCommand):
                             nargs='*', help='exclude.')
 
         parser.add_argument(
+            '--truncate', action='store_true',
+            help="Truncate table before load",
+        )
+
+        parser.add_argument(
             '--all', action='store_true',
             help="Run all loaders.",
         )
@@ -108,6 +113,7 @@ class Command(BaseCommand):
         records = options['records']
         countries = options['countries']
         no_delta = options['no_delta']
+        truncate = options['truncate']
 
         if debug:
             setup_logging(self.verbosity)
@@ -143,6 +149,10 @@ class Command(BaseCommand):
                         if self.verbosity > 1:
                             self.stdout.write(f"Unlock {model_name}")
                         model.loader.unlock()
+                    if truncate:
+                        if self.verbosity > 0:
+                            self.stdout.write(f"Truncating {model_name}")
+                            model.objects.truncate()
                     res = model.loader.load(always_update=options['ignore_changes'],
                                             ignore_dependencies=options['no_deps'],
                                             verbosity=self.verbosity,

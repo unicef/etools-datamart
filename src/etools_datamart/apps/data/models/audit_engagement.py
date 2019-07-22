@@ -47,12 +47,38 @@ class EngagementlLoader(Loader):
 
         return ", ".join(ret)
 
+    # def get_audited_expenditure(self, original: AuditEngagement, values: dict, **kwargs):
+    #     if getattr(original._impl, 'total_amount_tested', None):
+    #         values['total_amount_of_ineligible_expenditure'] = original._impl.total_amount_of_ineligible_expenditure
+    #     audited_expenditure
+
+    # def get_spotcheck_total_amount_tested(self, original: AuditEngagement, values: dict, **kwargs):
+    #     if getattr(original._impl, 'total_amount_tested', None):
+    #         values['total_amount_of_ineligible_expenditure'] = original._impl.total_amount_of_ineligible_expenditure
+    #         values['spotcheck_final_report'] = original._impl.final_report
+    #         values['spotcheck_internal_controls'] = original._impl.internal_controls
+    #         return original._impl.total_amount_tested
+    #     else:
+    #         values['spotcheck_total_amount_of_ineligible_expenditure'] = None
+    #         values['spotcheck_final_report'] = None
+    #         values['spotcheck_internal_controls'] = None
+
     def get_final_report(self, original: AuditEngagement, values: dict, **kwargs):
         if getattr(original._impl, 'final_report', None):
             return AttachmentsAttachment.objects.get(
                 object_id=original.id,
                 code=attachment_codes[original.sub_type],
                 content_type=self.get_content_type(original.sub_type)).file
+
+    def get_values(self, record, ):
+        values = {}
+        # if getattr(record._impl, 'total_amount_tested', None):
+        # values['spotcheck_total_amount_tested'] = record._impl.total_amount_tested
+        # values['total_amount_of_ineligible_expenditure'] = record._impl.total_amount_of_ineligible_expenditure
+        # values['spotcheck_final_report'] = record._impl.final_report
+        # values['spotcheck_internal_controls'] = record._impl.internal_controls
+        self.mapping.update(**values)
+        return super(EngagementlLoader, self).get_values(record)
 
     def get_authorized_officers(self, original: AuditEngagement, values: dict, **kwargs):
         ret = []
@@ -214,7 +240,7 @@ class Engagement(DataMartModel):
         sync_deleted_records = lambda a: False
 
         mapping = dict(
-            # active_pd="-",
+            active_pd="N/A",
             agreement="agreement.order_number",  # PurchaseOrder
             authorized_officers="-",
             engagement_attachments='-',
@@ -223,4 +249,12 @@ class Engagement(DataMartModel):
             partner_name="partner.name",
             po_item="po_item.number",  # PurchaseOrderItem
             final_report="-",
+            spotcheck_total_amount_tested='_impl.total_amount_tested',
+            spotcheck_total_amount_of_ineligible_expenditure='_impl.total_amount_of_ineligible_expenditure',
+            spotcheck_final_report='_impl.final_report',
+            spotcheck_internal_controls='_impl.internal_controls',
+            audited_expenditure='_impl.audited_expenditure',
+            financial_findings='_impl.financial_findings',
+            audit_opinion='_impl.audit_opinion',
+
         )

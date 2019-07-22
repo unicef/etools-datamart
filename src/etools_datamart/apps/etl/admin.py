@@ -106,9 +106,12 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return naturaldelta(obj.elapsed)
 
     def locked(self, obj):
-        return obj.content_type.model_class().loader.is_locked
+        try:
+            return obj.content_type.model_class().loader.is_locked
+        except Exception as e:
+            return 'Error: %s' % e
 
-    locked.boolean = True
+    # locked.boolean = True
     #
     # def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
     #     if request.method == 'POST':

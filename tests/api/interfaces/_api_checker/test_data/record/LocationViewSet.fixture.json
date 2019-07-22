@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.location",
-            "pk": 11976,
+            "pk": 799,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-10T09:23:34.661Z",
+                "last_modify_date": "2019-07-22T06:29:41.108Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -15,25 +15,25 @@
                 "longitude": null,
                 "p_code": "",
                 "point": null,
-                "gateway": 834,
+                "gateway": 799,
                 "geom": null,
                 "level": 399,
                 "lft": 1,
                 "parent": null,
                 "rght": 1,
                 "tree_id": 1,
-                "created": "2019-07-10T09:07:42.656Z",
-                "modified": "2019-07-10T09:07:42.656Z",
+                "created": "2019-07-22T06:12:44.616Z",
+                "modified": "2019-07-22T06:12:44.616Z",
                 "is_active": true
             }
         },
         "deps": [
             {
                 "model": "data.gatewaytype",
-                "pk": 834,
+                "pk": 799,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-10T09:23:34.647Z",
+                    "last_modify_date": "2019-07-22T06:29:41.056Z",
                     "seen": null,
                     "country_name": "Chad",
                     "schema_name": "Chad",

@@ -2,16 +2,17 @@
     "record": {
         "master": {
             "model": "data.tpmvisit",
-            "pk": 410,
+            "pk": 400,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-10T09:23:40.301Z",
+                "last_modify_date": "2019-07-22T06:29:58.147Z",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
                 "location_pcode": null,
                 "location_level": null,
                 "location_levelname": null,
+                "location": null,
                 "deleted_at": null,
                 "created": null,
                 "modified": null,
@@ -34,7 +35,7 @@
                 "cancel_comment": null,
                 "author_name": null,
                 "attachments": null,
-                "report_attachment": null,
+                "report_attachments": null,
                 "source_partner_id": null,
                 "visit_reference_number": null,
                 "task_reference_number": null,

@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.interventionbudget",
-            "pk": 802,
+            "pk": 796,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-10T09:23:38.271Z",
+                "last_modify_date": "2019-07-22T06:29:54.752Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -45,6 +45,9 @@
                 "partner_id": null,
                 "partner_name": null,
                 "partner_signatory_name": null,
+                "partner_signatory_email": null,
+                "partner_signatory_first_name": null,
+                "partner_signatory_last_name": null,
                 "partner_signatory_phone": null,
                 "partner_signatory_title": null,
                 "partner_source_id": null,

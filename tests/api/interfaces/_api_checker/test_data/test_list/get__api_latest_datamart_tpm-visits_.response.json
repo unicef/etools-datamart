@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "3507"
+            "3558"
         ]
     },
     "data": {
@@ -62,9 +62,9 @@
         "previous": null,
         "results": [
             {
-                "id": 407,
+                "id": 397,
                 "source_id": null,
-                "last_modify_date": "10 Jul 2019 09:23:31",
+                "last_modify_date": "22 Jul 2019 06:29:36",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
@@ -93,7 +93,7 @@
                 "cancel_comment": null,
                 "author_name": null,
                 "attachments": null,
-                "report_attachment": null,
+                "report_attachments": null,
                 "source_partner_id": null,
                 "visit_reference_number": null,
                 "task_reference_number": null,
@@ -113,12 +113,13 @@
                 "additional_information": null,
                 "office": null,
                 "is_pv": null,
-                "visit_url": null
+                "visit_url": null,
+                "location": null
             },
             {
-                "id": 408,
+                "id": 398,
                 "source_id": null,
-                "last_modify_date": "10 Jul 2019 09:23:31",
+                "last_modify_date": "22 Jul 2019 06:29:36",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
@@ -147,7 +148,7 @@
                 "cancel_comment": null,
                 "author_name": null,
                 "attachments": null,
-                "report_attachment": null,
+                "report_attachments": null,
                 "source_partner_id": null,
                 "visit_reference_number": null,
                 "task_reference_number": null,
@@ -167,12 +168,13 @@
                 "additional_information": null,
                 "office": null,
                 "is_pv": null,
-                "visit_url": null
+                "visit_url": null,
+                "location": null
             },
             {
-                "id": 409,
+                "id": 399,
                 "source_id": null,
-                "last_modify_date": "10 Jul 2019 09:23:31",
+                "last_modify_date": "22 Jul 2019 06:29:36",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
@@ -201,7 +203,7 @@
                 "cancel_comment": null,
                 "author_name": null,
                 "attachments": null,
-                "report_attachment": null,
+                "report_attachments": null,
                 "source_partner_id": null,
                 "visit_reference_number": null,
                 "task_reference_number": null,
@@ -221,7 +223,8 @@
                 "additional_information": null,
                 "office": null,
                 "is_pv": null,
-                "visit_url": null
+                "visit_url": null,
+                "location": null
             }
         ]
     },

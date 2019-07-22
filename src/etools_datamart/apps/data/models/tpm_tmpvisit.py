@@ -91,7 +91,7 @@ class TPMVisit(LocationMixin, DataMartModel):
     author_name = models.CharField(max_length=120, blank=True, null=True)
 
     attachments = models.TextField(blank=True, null=True)
-    report_attachment = models.TextField(blank=True, null=True)
+    report_attachments = models.TextField(blank=True, null=True)
 
     source_partner_id = models.IntegerField(blank=True, null=True, db_index=True)
 
@@ -146,7 +146,15 @@ class TPMVisit(LocationMixin, DataMartModel):
         source = TpmTpmvisit
         mapping = add_location_mapping(dict(
             author_name='author.name',
-            visit_reference_number='reference_number',
             partner_name='tpm_partner.name',
+            source_partner_id='tpm_partner.id',
+            task_reference_number='N/A',
+            tpm_name='N/A',
+            # pd_ssfa_title='N/A',
+            # pd_ssfa_reference_number='N/A',
             vendor_number='tpm_partner.vendor_number',
+            visit_reference_number='reference_number',
+            visit_status='status',
+            visit_start_date='start_date',
+            visit_end_date='end_date',
         ))

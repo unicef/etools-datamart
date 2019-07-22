@@ -42,13 +42,15 @@ class FundsReservation(DataMartModel):
     modified = models.DateTimeField()
     donor = models.CharField(max_length=256, blank=True, null=True)
     donor_code = models.CharField(max_length=30, blank=True, null=True)
+    completed_flag = models.BooleanField(default=False)
+    intervention_title = models.CharField(max_length=256, blank=True, null=True)
 
     # extras
     pd_ssfa_number = models.CharField(max_length=64, null=True)
+
     # internals
     source_id = models.IntegerField()
     source_intervention_id = models.IntegerField()
-
     intervention = models.ForeignKey(Intervention,
                                      models.SET_NULL,
                                      related_name='funds', blank=True, null=True)
@@ -66,27 +68,67 @@ class FundsReservation(DataMartModel):
         #                                   schema_name=loader.context['country'].schema_name,
         #                                   fr_number=record.fund_reservation.fr_number)
 
-        mapping = dict(vendor_code='fund_reservation.vendor_code',
-                       fr_number='fund_reservation.fr_number',
-                       document_date='fund_reservation.document_date',
-                       pd_ssfa_number='fund_reservation.number',
-                       fr_type='fund_reservation.fr_type',
-                       currency='fund_reservation.currency',
-                       document_text='fund_reservation.document_text',
-                       start_date='fund_reservation.start_date',
-                       end_date='fund_reservation.end_date',
-                       actual_amt='fund_reservation.actual_amt',
-                       intervention_amt='fund_reservation.intervention_amt',
-                       outstanding_amt='fund_reservation.outstanding_amt',
-                       total_amt='fund_reservation.total_amt',
-                       actual_amt_local='fund_reservation.actual_amt_local',
-                       outstanding_amt_local='fund_reservation.outstanding_amt_local',
-                       multi_curr_flag='fund_reservation.multi_curr_flag',
+        mapping = dict(
+            vendor_code='fund_reservation.vendor_code',
+            fr_number='fund_reservation.fr_number',
+            document_date='fund_reservation.document_date',
+            pd_ssfa_number='fund_reservation.number',
+            fr_type='fund_reservation.fr_type',
+            currency='fund_reservation.currency',
+            document_text='fund_reservation.document_text',
+            start_date='fund_reservation.start_date',
+            end_date='fund_reservation.end_date',
+            actual_amt='fund_reservation.actual_amt',
+            intervention_amt='fund_reservation.intervention_amt',
+            outstanding_amt='fund_reservation.outstanding_amt',
+            total_amt='fund_reservation.total_amt',
+            actual_amt_local='fund_reservation.actual_amt_local',
+            outstanding_amt_local='fund_reservation.outstanding_amt_local',
+            multi_curr_flag='fund_reservation.multi_curr_flag',
 
-                       source_id='id',
-                       source_intervention_id='fund_reservation.id',
-                       intervention=lambda loader, record: Intervention.objects.filter(
-                           schema_name=loader.context['country'].schema_name,
-                           intervention_id=record.fund_reservation.id).first(),
+            source_id='id',
+            source_intervention_id='fund_reservation.id',
+            # intervention=lambda loader, record: Intervention.objects.filter(
+            #     schema_name=loader.context['country'].schema_name,
+            #     intervention_id=record.fund_reservation.id).first(),
 
-                       )
+            last_modify_date="=",
+            seen="=",
+            country_name="=",
+            schema_name="=",
+            area_code="=",
+            # vendor_code="=",
+            # fr_number="=",
+            # document_date="=",
+            # fr_type="=",
+            # currency="=",
+            # document_text="=",
+            # start_date="=",
+            # end_date="=",
+            # actual_amt="=",
+            # intervention_amt="=",
+            # outstanding_amt="=",
+            # total_amt="=",
+            # actual_amt_local="=",
+            # outstanding_amt_local="=",
+            total_amt_local="=",
+            # multi_curr_flag="=",
+            fr_ref_number="fund_reservation.fr_ref_number",
+            line_item="=",
+            wbs="fund_reservation.wbs",
+            grant_number="=",
+            fund="fund_reservation.fund",
+            overall_amount="fund_reservation.overall_amount",
+            overall_amount_dc="fund_reservation.overal_amount_dc",
+            due_date="fund_reservation.due_date",
+            line_item_text="fund_reservation.line_item_text",
+            created="=",
+            modified="=",
+            donor="fund_reservation.donor",
+            donor_code="fund_reservation.donor.code",
+            # pd_ssfa_number="=",
+            # source_id="=",
+            # intervention_source_id="intervention_id",
+            intervention_title="intervention.title"
+
+        )

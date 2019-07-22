@@ -20,6 +20,7 @@ def pytest_generate_tests(metafunc):
                 'data.location',
                 'data.interventionbylocation',
                 'data.fundsreservation',
+                'data.reportindicator',
             ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
             else:
