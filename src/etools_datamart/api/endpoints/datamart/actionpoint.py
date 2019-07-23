@@ -99,11 +99,17 @@ class ActionPointFilterForm(forms.Form):
     date_of_completion = DateRangePickerField(label='Date of completion',
                                               required=False)
 
+    due_date = DateRangePickerField(label='Due Date',
+                                    required=False)
+
+    high_priority = DateRangePickerField(label='Due Date',
+                                         required=False)
+
 
 class ActionPointViewSet(common.DataMartViewSet):
     serializer_class = ActionPointSerializer
     queryset = models.ActionPoint.objects.all()
-    filter_fields = ('created', 'date_of_completion',)
+    filter_fields = ('created', 'date_of_completion', 'due_date')
     serializers_fieldsets = {'std': ActionPointSerializer,
                              'v2': ActionPointSerializerV2}
 

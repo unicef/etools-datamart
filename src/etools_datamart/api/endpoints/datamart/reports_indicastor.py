@@ -9,13 +9,14 @@ class IndicatorSerializer(DataMartSerializer):
     # last_modify_date = serializers.DateTimeField(format=settings.DATETIME_FORMAT)
     class Meta(DataMartSerializer.Meta):
         model = models.ReportIndicator
+        exclude = None
         fields = (
             "pd_sffa_reference_number",
-            "cp_output",
-            "cp_output_id",
-            "pd_output_name",
-            "pd_output_section",
-            "pd_output_indicator_title",
+            # "cp_output",
+            # "cp_output_id",
+            # "pd_output_name",
+            # "pd_output_section",
+            # "pd_output_indicator_title",
             "cluster_indicator_id",
             "cluster_indicator_title",
             "cluster_name",
@@ -27,10 +28,10 @@ class IndicatorSerializer(DataMartSerializer):
             "country_name",
             "schema_name",
             "area_code",
-            "location_name",
-            "location_pcode",
-            "location_level",
-            "location_levelname",
+            # "location_name",
+            # "location_pcode",
+            # "location_level",
+            # "location_levelname",
             "unit",
             "label",
             "denominator_label",
@@ -39,10 +40,10 @@ class IndicatorSerializer(DataMartSerializer):
             "numerator_label",
             "baseline_numerator",
             "target_numerator",
-            "disaggregation_name",
-            "disaggregation_active",
-            "source_disaggregation_id",
-            "pd_output_indicator",
+            # "disaggregation_name",
+            # "disaggregation_active",
+            # "source_disaggregation_id",
+            # "pd_output_indicator",
             "last_modify_date")
 
 
