@@ -41,6 +41,7 @@ router.register(r'datamart/partners/contacts', endpoints.PartnerStaffMemberViewS
 router.register(r'datamart/partners/agreements', endpoints.PartnerAgreementViewSet)
 
 router.register(r'datamart/reports/sections', endpoints.SectionViewSet)
+router.register(r'datamart/reports/indicators', endpoints.IndicatorViewSet)
 
 router.register(r'datamart/users', endpoints.EtoolsUserViewSet)
 router.register(r'datamart/user-offices', endpoints.OfficeViewSet)

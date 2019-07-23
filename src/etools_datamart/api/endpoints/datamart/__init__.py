@@ -16,6 +16,7 @@ from .partners_staffmember import PartnerStaffMemberViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
 from .report_section import SectionViewSet
+from .reports_indicastor import IndicatorViewSet
 from .tpm_activity import TPMActivityViewSet
 from .tpm_visit import TPMVisitViewSet
 from .travel import TravelViewSet
