@@ -10,7 +10,6 @@ class IndicatorSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.ReportIndicator
         fields = (
-            "intervention_indicators",
             "pd_sffa_reference_number",
             "cp_output",
             "cp_output_id",
