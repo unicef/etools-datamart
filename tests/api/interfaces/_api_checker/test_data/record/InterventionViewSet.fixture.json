@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.intervention",
-            "pk": 1014,
+            "pk": 1069,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-22T06:29:45.033Z",
+                "last_modify_date": "2019-07-22T10:50:21.206Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -21,7 +21,7 @@
                 "cso_type": null,
                 "country_programme": null,
                 "country_programme_id": null,
-                "created": "2019-07-22T06:29:45.033Z",
+                "created": "2019-07-22T10:50:21.206Z",
                 "currency": "USD",
                 "days_from_prc_review_to_signature": null,
                 "days_from_submission_to_signature": null,

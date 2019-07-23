@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.tpmvisit",
-            "pk": 400,
+            "pk": 404,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-22T06:29:58.147Z",
+                "last_modify_date": "2019-07-22T10:50:23.811Z",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
@@ -44,10 +44,6 @@
                 "visit_end_date": null,
                 "tpm_name": null,
                 "tpm_focal_points": null,
-                "pd_ssfa_title": null,
-                "pd_ssfa_reference_number": null,
-                "cp_output": null,
-                "cp_output_id": null,
                 "section": null,
                 "date": null,
                 "country_name": "bolivia",

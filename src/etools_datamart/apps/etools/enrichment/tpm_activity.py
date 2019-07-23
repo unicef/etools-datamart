@@ -38,3 +38,19 @@ set_primary_key(TpmTpmactivity, 'activity_ptr')
 TpmTpmactivity.task_number = property(lambda self:
                                       list(self.tpm_visit.tpm_activities.values_list('id', flat=True)).index(
                                           self.id) + 1)
+
+
+def fix_related_names(model, names):
+    for field_name, related_name in names:
+        field = model._meta.get_field(field_name)
+        # field.remote_field.related_query_name = related_name
+        related_model = field.remote_field.model
+        old_reverse = getattr(related_model, field.related_query_name())
+        setattr(related_model, related_name, old_reverse)
+        assert getattr(related_model(), related_name)
+
+
+related = (['tpm_visit', 'activities'],
+           )
+
+fix_related_names(TpmTpmactivity, related)

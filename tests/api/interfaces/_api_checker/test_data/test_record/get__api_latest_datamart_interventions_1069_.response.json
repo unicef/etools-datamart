@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"89614b657e2de427b3a8f5d2babe3ce8\""
+            "\"cb765c7d63dbc0221cb01b742f5025b9\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -23,11 +23,11 @@
         ],
         "view": [
             "view",
-            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
+            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
         ],
         "service": [
             "service",
-            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
+            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
         ],
         "cache-hit": [
             "cache-hit",
@@ -39,13 +39,13 @@
         ],
         "content-length": [
             "Content-Length",
-            "1763"
+            "1606"
         ]
     },
     "data": {
-        "id": 796,
+        "id": 1069,
         "source_id": null,
-        "last_modify_date": "22 Jul 2019 06:29:54",
+        "last_modify_date": "22 Jul 2019 10:50:21",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
@@ -61,14 +61,15 @@
         "cso_type": null,
         "country_programme": null,
         "country_programme_id": null,
+        "created": "22 Jul 2019 10:50:21",
         "days_from_prc_review_to_signature": null,
         "days_from_submission_to_signature": null,
         "document_type": null,
         "end_date": null,
         "fr_number": null,
-        "intervention_id": null,
+        "intervention_id": 508,
         "last_amendment_date": null,
-        "number": null,
+        "number": "#508",
         "number_of_attachments": null,
         "number_of_amendments": null,
         "offices_data": {},
@@ -100,20 +101,11 @@
         "status": null,
         "submission_date": null,
         "submission_date_prc": null,
-        "title": null,
+        "title": "title508",
         "unicef_focal_points": null,
         "unicef_focal_points_data": {},
         "unicef_signatory_name": null,
         "updated": null,
-        "created": null,
-        "modified": null,
-        "budget_cso_contribution": null,
-        "budget_currency": null,
-        "budget_total": null,
-        "budget_unicef_cash": null,
-        "budget_unicef_supply": null,
-        "fr_numbers": null,
-        "fr_numbers_data": {},
         "locations": null,
         "locations_data": {}
     },

@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "3558"
+            "3288"
         ]
     },
     "data": {
@@ -62,9 +62,9 @@
         "previous": null,
         "results": [
             {
-                "id": 397,
+                "id": 401,
                 "source_id": null,
-                "last_modify_date": "22 Jul 2019 06:29:36",
+                "last_modify_date": "22 Jul 2019 10:50:19",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
@@ -102,10 +102,6 @@
                 "visit_end_date": null,
                 "tpm_name": null,
                 "tpm_focal_points": null,
-                "pd_ssfa_title": null,
-                "pd_ssfa_reference_number": null,
-                "cp_output": null,
-                "cp_output_id": null,
                 "section": null,
                 "date": null,
                 "country_name": "bolivia",
@@ -117,9 +113,9 @@
                 "location": null
             },
             {
-                "id": 398,
+                "id": 402,
                 "source_id": null,
-                "last_modify_date": "22 Jul 2019 06:29:36",
+                "last_modify_date": "22 Jul 2019 10:50:19",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
@@ -157,10 +153,6 @@
                 "visit_end_date": null,
                 "tpm_name": null,
                 "tpm_focal_points": null,
-                "pd_ssfa_title": null,
-                "pd_ssfa_reference_number": null,
-                "cp_output": null,
-                "cp_output_id": null,
                 "section": null,
                 "date": null,
                 "country_name": "chad",
@@ -172,9 +164,9 @@
                 "location": null
             },
             {
-                "id": 399,
+                "id": 403,
                 "source_id": null,
-                "last_modify_date": "22 Jul 2019 06:29:36",
+                "last_modify_date": "22 Jul 2019 10:50:19",
                 "seen": null,
                 "location_source_id": null,
                 "location_name": null,
@@ -212,10 +204,6 @@
                 "visit_end_date": null,
                 "tpm_name": null,
                 "tpm_focal_points": null,
-                "pd_ssfa_title": null,
-                "pd_ssfa_reference_number": null,
-                "cp_output": null,
-                "cp_output_id": null,
                 "section": null,
                 "date": null,
                 "country_name": "lebanon",

@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"663114b70ca6c114fe6f81d853a3c18d\""
+            "\"ddc880afd956d9800b98c022b70b7b72\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -43,9 +43,9 @@
         ]
     },
     "data": {
-        "id": 598,
+        "id": 602,
         "source_id": null,
-        "last_modify_date": "22 Jul 2019 06:29:59",
+        "last_modify_date": "22 Jul 2019 10:50:23",
         "seen": null,
         "country_name": "bolivia",
         "area_code": "",
@@ -57,7 +57,7 @@
         "city": null,
         "core_values_assessment_date": null,
         "country": null,
-        "created": "22 Jul 2019 06:12:44",
+        "created": "22 Jul 2019 10:38:28",
         "cso_type": null,
         "deleted_flag": false,
         "description": "",

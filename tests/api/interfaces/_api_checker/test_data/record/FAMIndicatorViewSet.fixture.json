@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.famindicator",
-            "pk": 1021,
+            "pk": 1022,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-22T06:29:42.661Z",
+                "last_modify_date": "2019-07-22T10:50:20.782Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",

@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"4cc34b1871bb60449800c15e41f1da25\""
+            "\"d068f8563d22fcacdb4750d43311eed3\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -23,11 +23,11 @@
         ],
         "view": [
             "view",
-            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+            "etools_datamart.api.endpoints.datamart.userstats.UserStatsViewSet"
         ],
         "service": [
             "service",
-            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+            "etools_datamart.api.endpoints.datamart.userstats.UserStatsViewSet"
         ],
         "cache-hit": [
             "cache-hit",
@@ -39,22 +39,21 @@
         ],
         "content-length": [
             "Content-Length",
-            "245"
+            "190"
         ]
     },
     "data": {
-        "id": 799,
-        "last_modify_date": "22 Jul 2019 06:29:41",
+        "id": 242,
+        "month": "Mar 2019",
+        "source_id": null,
+        "last_modify_date": "22 Jul 2019 10:50:23",
         "seen": null,
         "country_name": "bolivia",
         "area_code": "",
-        "name": "name399",
-        "p_code": "",
-        "created": "22 Jul 2019 06:12:44",
-        "modified": "22 Jul 2019 06:12:44",
-        "is_active": true,
-        "gateway": 799,
-        "parent": null
+        "total": 0,
+        "unicef": 0,
+        "logins": 0,
+        "unicef_logins": 0
     },
     "content_type": null
 }
