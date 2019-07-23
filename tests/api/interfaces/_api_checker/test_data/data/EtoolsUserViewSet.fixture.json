@@ -6,7 +6,7 @@
                 "pk": 401,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-22T10:50:19.152Z",
+                    "last_modify_date": "2019-07-23T12:28:10.394Z",
                     "seen": null,
                     "schema_name": "bolivia",
                     "area_code": "",
@@ -46,7 +46,7 @@
                 "pk": 402,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-22T10:50:19.158Z",
+                    "last_modify_date": "2019-07-23T12:28:10.401Z",
                     "seen": null,
                     "schema_name": "chad",
                     "area_code": "",
@@ -86,7 +86,7 @@
                 "pk": 403,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-22T10:50:19.160Z",
+                    "last_modify_date": "2019-07-23T12:28:10.404Z",
                     "seen": null,
                     "schema_name": "lebanon",
                     "area_code": "",

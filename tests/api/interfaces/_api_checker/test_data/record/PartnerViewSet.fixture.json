@@ -5,7 +5,7 @@
             "pk": 602,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-22T10:50:23.973Z",
+                "last_modify_date": "2019-07-23T12:28:15.498Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2019-07-22T10:38:28.726Z",
+                "created": "2019-07-23T12:16:41.613Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",

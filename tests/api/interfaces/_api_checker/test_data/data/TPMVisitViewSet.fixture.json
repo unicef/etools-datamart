@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.tpmvisit",
-                "pk": 401,
+                "pk": 203,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-22T10:50:19.372Z",
+                    "last_modify_date": "2019-07-23T12:11:51.794Z",
                     "seen": null,
                     "location_source_id": null,
                     "location_name": null,
@@ -45,23 +45,19 @@
                     "visit_end_date": null,
                     "tpm_name": null,
                     "tpm_focal_points": null,
-                    "section": null,
-                    "date": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
                     "area_code": null,
-                    "additional_information": null,
-                    "office": null,
-                    "is_pv": null,
-                    "visit_url": null
+                    "activities": null,
+                    "activities_data": null
                 }
             },
             {
                 "model": "data.tpmvisit",
-                "pk": 402,
+                "pk": 204,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-22T10:50:19.377Z",
+                    "last_modify_date": "2019-07-23T12:11:51.800Z",
                     "seen": null,
                     "location_source_id": null,
                     "location_name": null,
@@ -100,23 +96,19 @@
                     "visit_end_date": null,
                     "tpm_name": null,
                     "tpm_focal_points": null,
-                    "section": null,
-                    "date": null,
                     "country_name": "chad",
                     "schema_name": "chad",
                     "area_code": null,
-                    "additional_information": null,
-                    "office": null,
-                    "is_pv": null,
-                    "visit_url": null
+                    "activities": null,
+                    "activities_data": null
                 }
             },
             {
                 "model": "data.tpmvisit",
-                "pk": 403,
+                "pk": 205,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-07-22T10:50:19.379Z",
+                    "last_modify_date": "2019-07-23T12:11:51.804Z",
                     "seen": null,
                     "location_source_id": null,
                     "location_name": null,
@@ -155,15 +147,11 @@
                     "visit_end_date": null,
                     "tpm_name": null,
                     "tpm_focal_points": null,
-                    "section": null,
-                    "date": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
                     "area_code": null,
-                    "additional_information": null,
-                    "office": null,
-                    "is_pv": null,
-                    "visit_url": null
+                    "activities": null,
+                    "activities_data": null
                 }
             }
         ],
