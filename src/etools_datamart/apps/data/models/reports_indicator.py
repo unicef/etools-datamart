@@ -12,6 +12,14 @@ def get_pd_output_names(obj: PartnersIntervention):
 
 
 class ReportIndicatorLoader(LocationLoadertMixin, Loader):
+    def get_baseline_denominator(self, record, values, field_name):
+        value = record.baseline.get('d')
+        return value
+
+    def get_baseline_numerator(self, record, values, field_name):
+        value = record.baseline.get('v')
+        return value
+
     def get_target_value(self, record, values, field_name):
         values['target_denominator'] = record.target.get('d')
         values['target_numerator'] = record.target.get('v')
@@ -59,7 +67,7 @@ class ReportIndicatorLoader(LocationLoadertMixin, Loader):
                       .order_by('modified'))
         ret = []
         for pd_output in ll_results.all():
-            ret.append(dict(last_modify_date=pd_output.modified,
+            ret.append(dict(last_modify_date=str(pd_output.modified),
                             name=pd_output.name,
                             ))
         values['pd_outputs_data'] = ret
@@ -77,8 +85,10 @@ class ReportIndicatorLoader(LocationLoadertMixin, Loader):
 class ReportIndicator(LocationInlineMixin, DataMartModel):
     assumptions = models.TextField(null=True, blank=True, )
     baseline = JSONField(default=dict, blank=True, null=True)
-    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=3)
-    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=3)
+    # baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=3)
+    # baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=3)
+    baseline_denominator = models.IntegerField(blank=True, null=True)
+    baseline_numerator = models.IntegerField(blank=True, null=True)
     cluster_indicator_id = models.PositiveIntegerField(blank=True, null=True, )
     cluster_indicator_title = models.CharField(max_length=1024, blank=True, null=True, )
     cluster_name = models.CharField(max_length=512, blank=True, null=True, )
@@ -100,7 +110,7 @@ class ReportIndicator(LocationInlineMixin, DataMartModel):
     pd_outputs = models.TextField(blank=True, null=True)
     pd_outputs_data = JSONField(blank=True, null=True)
     # pd_output_indicator_last_modify_date = models.DateField(blank=True, null=True)
-    # pd_output_indicator_title = models.CharField(max_length=256, blank=True, null=True)
+    pd_output_indicator_title = models.CharField(max_length=256, blank=True, null=True)
     # pd_output_name = models.CharField(max_length=256, blank=True, null=True)
     # pd_output_section = models.CharField(max_length=256, blank=True, null=True)
     pd_sffa_reference_number = models.CharField(max_length=256, blank=True, null=True)
@@ -110,8 +120,10 @@ class ReportIndicator(LocationInlineMixin, DataMartModel):
     # source_disaggregation_id = models.IntegerField(blank=True, null=True)
     # source_location_id = models.IntegerField(blank=True, null=True)
     target = JSONField(default=dict, blank=True, null=True)
-    target_denominator = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
-    target_numerator = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    # target_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    # target_numerator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    target_denominator = models.IntegerField(blank=True, null=True)
+    target_numerator = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=1024, blank=True, null=True)
     total = models.IntegerField(null=True, blank=True, default=0, )
     unit = models.CharField(max_length=10, blank=True, null=True)
@@ -140,8 +152,8 @@ class ReportIndicator(LocationInlineMixin, DataMartModel):
     class Options:
         source = ReportsAppliedindicator
         mapping = dict(
-            baseline_denominator=lambda loader, record: record.baseline['d'],
-            baseline_numerator=lambda loader, record: record.baseline['v'],
+            baseline_denominator='-',
+            baseline_numerator='-',
             cluster_indicator_id="=",
             cluster_indicator_title="=",
             cluster_name="=",
