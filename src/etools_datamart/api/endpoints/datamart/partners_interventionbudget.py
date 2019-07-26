@@ -63,6 +63,8 @@ class InterventionBudgetSerializerPlain(InterventionSerializerPlain):
 
 
 class InterventionBudgetViewSet(common.DataMartViewSet):
+    querystringfilter_form_base_class = InterventionFilterForm
+
     serializer_class = InterventionBudgetSerializer
     queryset = models.InterventionBudget.objects.all()
     serializers_fieldsets = {'std': None,

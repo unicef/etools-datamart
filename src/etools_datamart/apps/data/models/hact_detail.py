@@ -76,7 +76,7 @@ class HACTDetailLoader(Loader):
     def get_sc_planned_year(self, record, values, field_name):
         ret = 0
         for i in range(1, 4):
-            ret += get_item(self.data1, 'Spot Checks Planned Q%s' % i, 0)
+            ret += get_item(self.data1, 'Spot Checks Planned Q%s' % i, 0) or 0
         return ret
 
     def get_values(self, record):

@@ -3,7 +3,7 @@ from django import forms
 from constance import config
 from rest_framework import serializers
 
-from unicef_rest_framework.forms import DateRangePickerField
+from unicef_rest_framework.forms import CleareableSelect2ChoiceField, DateRangePickerField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
@@ -102,8 +102,10 @@ class ActionPointFilterForm(forms.Form):
     due_date = DateRangePickerField(label='Due Date',
                                     required=False)
 
-    high_priority = DateRangePickerField(label='Due Date',
-                                         required=False)
+    high_priority = CleareableSelect2ChoiceField(required=False,
+                                                 choices=((None, 'All'),
+                                                          (False, 'False'),
+                                                          (True, 'True'),))
 
 
 class ActionPointViewSet(common.DataMartViewSet):
@@ -112,6 +114,7 @@ class ActionPointViewSet(common.DataMartViewSet):
     filter_fields = ('created', 'date_of_completion', 'due_date')
     serializers_fieldsets = {'std': ActionPointSerializer,
                              'v2': ActionPointSerializerV2}
+    querystringfilter_form_base_class = ActionPointFilterForm
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)
