@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
@@ -11,18 +13,28 @@ def get_pd_output_names(obj: PartnersIntervention):
     return [ll.name for rl in obj.result_links.all() for ll in rl.ll_results.all()]
 
 
+class SafeDecimal(Decimal):
+
+    def __new__(cls, value="0", context=None):
+        if value is None:
+            return None
+        if isinstance(value, str) and ',' in value:
+            value = value.replace(',', '.')
+        return Decimal.__new__(cls, value, context)
+
+
 class ReportIndicatorLoader(LocationLoadertMixin, Loader):
     def get_baseline_denominator(self, record, values, field_name):
-        value = record.baseline.get('d')
+        value = SafeDecimal(record.baseline.get('d'))
         return value
 
     def get_baseline_numerator(self, record, values, field_name):
-        value = record.baseline.get('v')
+        value = SafeDecimal(record.baseline.get('v'))
         return value
 
     def get_target_value(self, record, values, field_name):
-        values['target_denominator'] = record.target.get('d')
-        values['target_numerator'] = record.target.get('v')
+        values['target_denominator'] = SafeDecimal(record.target.get('d'))
+        values['target_numerator'] = SafeDecimal(record.target.get('v'))
 
     def get_disaggregations(self, record, values, field_name):
         ret = []
@@ -85,10 +97,10 @@ class ReportIndicatorLoader(LocationLoadertMixin, Loader):
 class ReportIndicator(LocationInlineMixin, DataMartModel):
     assumptions = models.TextField(null=True, blank=True, )
     baseline = JSONField(default=dict, blank=True, null=True)
-    # baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=3)
-    # baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=3)
-    baseline_denominator = models.IntegerField(blank=True, null=True)
-    baseline_numerator = models.IntegerField(blank=True, null=True)
+    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    # baseline_denominator = models.IntegerField(blank=True, null=True)
+    # baseline_numerator = models.IntegerField(blank=True, null=True)
     cluster_indicator_id = models.PositiveIntegerField(blank=True, null=True, )
     cluster_indicator_title = models.CharField(max_length=1024, blank=True, null=True, )
     cluster_name = models.CharField(max_length=512, blank=True, null=True, )
@@ -120,10 +132,10 @@ class ReportIndicator(LocationInlineMixin, DataMartModel):
     # source_disaggregation_id = models.IntegerField(blank=True, null=True)
     # source_location_id = models.IntegerField(blank=True, null=True)
     target = JSONField(default=dict, blank=True, null=True)
-    # target_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
-    # target_numerator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
-    target_denominator = models.IntegerField(blank=True, null=True)
-    target_numerator = models.IntegerField(blank=True, null=True)
+    target_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    target_numerator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    # target_denominator = models.IntegerField(blank=True, null=True)
+    # target_numerator = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=1024, blank=True, null=True)
     total = models.IntegerField(null=True, blank=True, default=0, )
     unit = models.CharField(max_length=10, blank=True, null=True)
