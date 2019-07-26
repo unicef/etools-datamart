@@ -60,7 +60,7 @@ class TPMActivityLoader(Loader):
         for a in attachments:
             ret.append(dict(
                 file=a.file,
-                file_type=a.file_type,
+                file_type=a.file_type.name,
                 code=a.code,
                 uploaded_by=get_attr(a, 'uploaded_by.email')
             ))
