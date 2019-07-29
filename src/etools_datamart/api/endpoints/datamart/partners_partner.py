@@ -36,7 +36,7 @@ class PartnerSerializerFull(DataMartSerializer):
 class PartnerSerializerStd(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Partner
-        exclude = ('')
+        exclude = ('planned_engagement',)
 
 
 class PartnerSerializerShort(DataMartSerializer):

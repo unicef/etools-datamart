@@ -2,6 +2,8 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from crashlog.middleware import process_exception
+
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType
@@ -9,14 +11,25 @@ from etools_datamart.apps.etools.models import PartnersPartnerorganization
 
 
 class PartnerLoader(Loader):
-    pass
-    # def get_shared_with(self, record, values):
-    #     try:
-    #
-    #         data = json.dumps(record.shared_with)
-    #     except:
-    #         data = {}
-    #     return data
+
+    def get_queryset(self):
+        return PartnersPartnerorganization.objects.select_related('planned_engagement').all()
+
+    def get_planned_engagement(self, record, valuess, **kwargs):
+        try:
+            rec = record.planned_engagement
+            data = {'spot_check_planned_q1': rec.spot_check_planned_q1,
+                    'spot_check_planned_q2': rec.spot_check_planned_q2,
+                    'spot_check_planned_q3': rec.spot_check_planned_q3,
+                    'spot_check_planned_q4': rec.spot_check_planned_q4,
+                    'scheduled_audit': rec.scheduled_audit,
+                    'special_audit': rec.special_audit,
+                    'spot_check_follow_up': rec.spot_check_follow_up,
+                    }
+        except Exception as e:
+            process_exception(e)
+            data = {}
+        return data
 
     # def get_hact_values(self, record, values, **kwargs):
     #     try:
@@ -83,6 +96,9 @@ class Partner(DataMartModel):
     min_req_programme_visits = models.IntegerField(default=0, blank=True, null=True)
     hact_min_requirements = JSONField(default=dict, blank=True, null=True)
     min_req_spot_checks = models.IntegerField(default=0, blank=True, null=True)
+
+    # O2O
+    planned_engagement = JSONField(default=dict, blank=True, null=True)
 
     class Meta:
         unique_together = (('schema_name', 'name', 'vendor_number'),
