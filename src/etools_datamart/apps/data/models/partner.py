@@ -1,10 +1,6 @@
-import json
-
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from sentry_sdk import capture_exception
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
@@ -13,6 +9,7 @@ from etools_datamart.apps.etools.models import PartnersPartnerorganization
 
 
 class PartnerLoader(Loader):
+    pass
     # def get_shared_with(self, record, values):
     #     try:
     #
@@ -21,14 +18,14 @@ class PartnerLoader(Loader):
     #         data = {}
     #     return data
 
-    def get_hact_values(self, record, values, **kwargs):
-        try:
-
-            data = json.dumps(record.hact_values)
-        except Exception:
-            capture_exception()
-            data = {}
-        return data
+    # def get_hact_values(self, record, values, **kwargs):
+    #     try:
+    #
+    #         data = json.dumps(record.hact_values)
+    #     except Exception:
+    #         capture_exception()
+    #         data = {}
+    #     return data
 
 
 class Partner(DataMartModel):
@@ -47,7 +44,7 @@ class Partner(DataMartModel):
     deleted_flag = models.BooleanField(blank=True, null=True)
     description = models.CharField(max_length=256, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
-    hact_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    hact_values = JSONField(blank=True, null=True)  # This field type is a guess.
     hidden = models.BooleanField(db_index=True, blank=True, null=True)
     last_assessment_date = models.DateField(blank=True, null=True)
     manually_blocked = models.BooleanField(blank=True, null=True)
@@ -81,6 +78,11 @@ class Partner(DataMartModel):
     type_of_assessment = models.CharField(max_length=50, blank=True, null=True)
     vendor_number = models.CharField(max_length=30, blank=True, null=True, db_index=True, )
     vision_synced = models.BooleanField(blank=True, null=True)
+
+    # Model property
+    min_req_programme_visits = models.IntegerField(default=0, blank=True, null=True)
+    hact_min_requirements = JSONField(default=dict, blank=True, null=True)
+    min_req_spot_checks = models.IntegerField(default=0, blank=True, null=True)
 
     class Meta:
         unique_together = (('schema_name', 'name', 'vendor_number'),
