@@ -2,18 +2,28 @@
 # import django_filters
 from django import forms
 
+from rest_framework import serializers
+
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
 
-from .. import common
+from ..common import DataMartViewSet
 
 
 class EngagementSerializer(DataMartSerializer):
+    partner_name = serializers.SerializerMethodField()
+
     class Meta(DataMartSerializer.Meta):
         model = models.Engagement
         exclude = ('seen', 'source_id',)
+
+    def get_partner_name(self, obj):
+        try:
+            return obj.partner['name']
+        except KeyError:
+            return 'N/A'
 
 
 class EngagementFilterForm(forms.Form):
@@ -30,7 +40,7 @@ class EngagementFilterForm(forms.Form):
                                     required=False)
 
 
-class EngagementViewSet(common.DataMartViewSet):
+class EngagementViewSet(DataMartViewSet):
     querystringfilter_form_base_class = EngagementFilterForm
 
     serializer_class = EngagementSerializer

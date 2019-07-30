@@ -7,8 +7,10 @@ from model_utils import Choices
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.models import (AttachmentsAttachment, AuditAudit, AuditEngagement,
-                                                AuditMicroassessment, AuditSpecialaudit,
+                                                AuditEngagementActivePd, AuditMicroassessment, AuditSpecialaudit,
                                                 AuditSpotcheck, DjangoContentType,)
+
+from .partner import Partner
 
 attachment_codes = {AuditAudit: 'audit_final_report',
                     AuditMicroassessment: 'micro_assessment_final_report',
@@ -18,6 +20,11 @@ attachment_codes = {AuditAudit: 'audit_final_report',
 
 
 class EngagementlLoader(Loader):
+
+    def get_queryset(self):
+        return AuditEngagement.objects.select_related('partner',
+                                                      'agreement',
+                                                      'po_item').all()
 
     def get_content_type(self, sub_type):
         mapping = {AuditAudit: 'audit',
@@ -90,6 +97,41 @@ class EngagementlLoader(Loader):
                         })
         values['authorized_officers_data'] = ret
         return ", ".join([o['email'] for o in ret])
+
+    def get_active_pd(self, original: AuditEngagement, values: dict, **kwargs):
+        ret = []
+        for o in (AuditEngagementActivePd.objects
+                  .select_related('intervention')
+                  .filter(engagement=original)):
+            ret.append({'title': o.intervention.title,
+                        'number': o.intervention.number,
+                        'status': o.intervention.status,
+                        'document_type': o.intervention.document_type,
+                        })
+
+        values['active_pd_data'] = ret
+        return ", ".join([o['number'] for o in ret])
+
+    def get_partner(self, original: AuditEngagement, values: dict, **kwargs):
+        try:
+            p = Partner.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=original.partner.id)
+            return {'name': p.name,
+                    'id': p.id,
+                    'source_id': p.source_id}
+        except Partner.DoesNotExist:
+            return {'name': 'N/A',
+                    'id': 'N/A',
+                    'source_id': 'N/A'}
+
+    def get_partner_id(self, original: AuditEngagement, values: dict, **kwargs):
+        try:
+            return Partner.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=original.partner.id).pk
+        except Partner.DoesNotExist:
+            return None
 
     def get_staff_members(self, original: AuditEngagement, values: dict, **kwargs):
         ret = []
@@ -166,6 +208,7 @@ class Engagement(DataMartModel):
 
     # Base fields
     active_pd = models.TextField(blank=True, null=True)
+    active_pd_data = JSONField(blank=True, null=True)
     additional_supporting_documentation_provided = models.DecimalField(blank=True, null=True, decimal_places=2,
                                                                        max_digits=20)
     agreement = models.CharField(max_length=300, blank=True, null=True)
@@ -189,7 +232,10 @@ class Engagement(DataMartModel):
     joint_audit = models.BooleanField(default=False, blank=True, null=True)
     justification_provided_and_accepted = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
     partner_contacted_at = models.DateField(blank=True, null=True, db_index=True)
-    partner_name = models.CharField(max_length=300, blank=True, null=True)
+    partner = JSONField(blank=True, null=True, default=dict)
+    # partner_name = models.CharField(max_length=300, blank=True, null=True)
+    # partner_id = models.IntegerField(blank=True, null=True)
+    # partner_source_id = models.IntegerField(blank=True, null=True)
     po_item = models.IntegerField(blank=True, null=True)
     report_attachments = models.TextField(blank=True, null=True)
     staff_members = models.TextField(blank=True, null=True)
@@ -238,15 +284,19 @@ class Engagement(DataMartModel):
     class Options:
         source = AuditEngagement
         sync_deleted_records = lambda a: False
-
+        depends = (Partner,)
         mapping = dict(
-            active_pd="N/A",
+            active_pd="-",
+            active_pd_data="i",
             agreement="agreement.order_number",  # PurchaseOrder
             authorized_officers="-",
             engagement_attachments='-',
             report_attachments='-',
             staff_members='-',
-            partner_name="partner.name",
+            partner="-",
+            # partner_name="partner.name",
+            # partner_source_id="partner.id",
+            # partner_id="-",
             po_item="po_item.number",  # PurchaseOrderItem
             final_report="-",
             spotcheck_total_amount_tested='_impl.total_amount_tested',

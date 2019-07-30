@@ -2,9 +2,10 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from etools_datamart.apps.etools.enrichment.utils import set_primary_key
-from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditEngagementAuthorizedOfficers,
-                                                AuditEngagementStaffMembers, AuditMicroassessment,
-                                                AuditSpecialaudit, AuditSpotcheck, PartnersPartnerstaffmember,
+from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditEngagementActivePd,
+                                                AuditEngagementAuthorizedOfficers, AuditEngagementStaffMembers,
+                                                AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
+                                                PartnersIntervention, PartnersPartnerstaffmember,
                                                 PurchaseOrderAuditorstaffmember,)
 
 # AuditEngagement.TYPE_AUDIT = 'audit'
@@ -48,3 +49,7 @@ models.ManyToManyField(PartnersPartnerstaffmember,
 models.ManyToManyField(PurchaseOrderAuditorstaffmember,
                        through=AuditEngagementStaffMembers,
                        ).contribute_to_class(AuditEngagement, 'staff_members')
+
+models.ManyToManyField(PartnersIntervention,
+                       through=AuditEngagementActivePd,
+                       ).contribute_to_class(AuditEngagement, 'active_pd')
