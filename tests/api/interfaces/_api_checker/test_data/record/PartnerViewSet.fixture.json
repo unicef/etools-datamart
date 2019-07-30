@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.partner",
-            "pk": 602,
+            "pk": 1513,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-23T12:28:15.498Z",
+                "last_modify_date": "2019-07-30T12:02:43.568Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2019-07-23T12:16:41.613Z",
+                "created": "2019-07-30T12:02:27.367Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -28,7 +28,7 @@
                 "last_assessment_date": null,
                 "manually_blocked": false,
                 "modified": null,
-                "name": "name300",
+                "name": "name003",
                 "net_ct_cy": null,
                 "outstanding_dct_amount_6_to_9_months_usd": null,
                 "outstanding_dct_amount_more_than_9_months_usd": null,
@@ -45,7 +45,11 @@
                 "total_ct_ytd": null,
                 "type_of_assessment": null,
                 "vendor_number": null,
-                "vision_synced": true
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0,
+                "planned_engagement": {}
             }
         },
         "deps": []

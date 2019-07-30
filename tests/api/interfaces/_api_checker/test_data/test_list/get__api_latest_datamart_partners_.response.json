@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "2784"
+            "3096"
         ]
     },
     "data": {
@@ -103,7 +103,11 @@
                 "total_ct_ytd": null,
                 "type_of_assessment": null,
                 "vendor_number": null,
-                "vision_synced": true
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0,
+                "planned_engagement": {}
             },
             {
                 "id": 600,
@@ -147,7 +151,11 @@
                 "total_ct_ytd": null,
                 "type_of_assessment": null,
                 "vendor_number": null,
-                "vision_synced": true
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0,
+                "planned_engagement": {}
             },
             {
                 "id": 601,
@@ -191,7 +199,11 @@
                 "total_ct_ytd": null,
                 "type_of_assessment": null,
                 "vendor_number": null,
-                "vision_synced": true
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0,
+                "planned_engagement": {}
             }
         ]
     },
