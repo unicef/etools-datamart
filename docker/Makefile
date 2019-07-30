@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.23.0rc6
+TARGET?=1.23.0rc7
 BASE=1.3
 # below vars are used internally
 BUILD_OPTIONS?=--squash
@@ -35,6 +35,7 @@ build-base:
 
 
 .build:
+	cd .. && ./manage.py makemigrations data --check --dry-run
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
