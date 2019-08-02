@@ -234,6 +234,8 @@ class TripFactory(DataMartModelFactory):
 
 
 class EngagementFactory(DataMartModelFactory):
+    partner = {"id": 100}
+
     class Meta:
         model = models.Engagement
 

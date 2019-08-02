@@ -70,7 +70,7 @@ class PartnerViewSet(common.DataMartViewSet):
     serializer_class = PartnerSerializerFull
     serializers_fieldsets = {'std': PartnerSerializerStd,
                              'full': PartnerSerializerFull,
-                             'short': ["title", "number", "country_name", "start_date"]}
+                             'short': ["short_name", "vendor_number"]}
     queryset = models.Partner.objects.all()
     filter_fields = ('partner_type', 'hidden', 'cso_type', 'rating')
     ordering_fields = ("id", "name")

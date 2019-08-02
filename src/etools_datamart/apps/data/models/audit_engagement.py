@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -216,6 +216,7 @@ class Engagement(DataMartModel):
     authorized_officers = models.TextField(blank=True, null=True)
     authorized_officers_data = JSONField(blank=True, null=True)
     cancel_comment = models.TextField(blank=True, null=True)
+    created = models.DateField(blank=True, null=True)
     date_of_cancel = models.DateField(null=True, blank=True)
     date_of_comments_by_ip = models.DateField(blank=True, null=True)
     date_of_comments_by_unicef = models.DateField(blank=True, null=True)
@@ -231,6 +232,7 @@ class Engagement(DataMartModel):
     explanation_for_additional_information = models.TextField(blank=True, null=True)
     joint_audit = models.BooleanField(default=False, blank=True, null=True)
     justification_provided_and_accepted = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
+    modified = models.DateField(blank=True, null=True)
     partner_contacted_at = models.DateField(blank=True, null=True, db_index=True)
     partner = JSONField(blank=True, null=True, default=dict)
     # partner_name = models.CharField(max_length=300, blank=True, null=True)
@@ -247,6 +249,9 @@ class Engagement(DataMartModel):
 
     # final_report is shared across all Engagement types
     final_report = models.CharField(max_length=300, blank=True, null=True)
+
+    shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
+                                blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
 
     # SpotCheck
     spotcheck_total_amount_tested = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)

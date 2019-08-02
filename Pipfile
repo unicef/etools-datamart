@@ -37,6 +37,7 @@ django-regex = "*"
 django-storages = {extras = ["azure"],version = "*"}
 django-strategy-field = "*"
 django-sysinfo = "==1.4"
+djangorestframework="==3.9.4"
 djangorestframework-csv = "*"
 djangorestframework-gis = "*"
 djangorestframework-jwt = "*"

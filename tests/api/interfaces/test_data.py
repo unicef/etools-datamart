@@ -2,13 +2,22 @@
 import os
 from functools import wraps
 
+from django.urls import resolve
+
 import pytest
+from drf_api_checker.exceptions import StatusCodeError
+from drf_api_checker.fs import get_filename
 from drf_api_checker.pytest import contract
 from drf_api_checker.recorder import BASE_DATADIR, Recorder
+from drf_api_checker.utils import _write, load_response, serialize_response
 from rest_framework.test import APIClient
 from test_utilities.factories import factories_registry, UserFactory
 
 from etools_datamart.api.urls import router
+
+
+def clean_url2(method, url, data):
+    return f"{method}_{url.strip('.').replace('/', '_')}_{str(data)}"
 
 
 class MyRecorder(Recorder):
@@ -18,6 +27,46 @@ class MyRecorder(Recorder):
         client = APIClient()
         client.force_authenticate(user)
         return client
+
+    def get_response_filename(self, method, url, data):
+        return get_filename(self.data_dir, clean_url2(method, url, data) + '.response.json')
+
+    def _assertCALL(self, url, *, allow_empty=False, check_headers=True, check_status=True,
+                    expect_errors=False, name=None, method='get', data=None):
+        """
+        check url for response changes
+
+        :param url: url to check
+        :param allow_empty: if True ignore empty response and 404 errors
+        :param check_headers: check response headers
+        :param check_status: check response status code
+        :raises: ValueError
+        :raises: AssertionError
+        """
+        self.view = resolve(url).func.cls
+        m = getattr(self.client, method.lower())
+        self.filename = self.get_response_filename(method, name or url, data)
+        response = m(url, data=data)
+        assert response.accepted_renderer
+        payload = response.data
+        if not allow_empty and not payload:
+            raise ValueError(f"View {self.view} returned and empty json. Check your test")
+
+        if response.status_code > 299 and not expect_errors:
+            raise ValueError(f"View {self.view} unexpected response. {response.status_code} - {response.content}")
+
+        if not allow_empty and response.status_code == 404:
+            raise ValueError(f"View {self.view} returned 404 status code. Check your test")
+
+        if not os.path.exists(self.filename) or os.environ.get('API_CHECKER_RESET', False):
+            _write(self.filename, serialize_response(response))
+
+        stored = load_response(self.filename)
+        if (check_status) and response.status_code != stored.status_code:
+            raise StatusCodeError(self.view, response.status_code, stored.status_code)
+        if check_headers:
+            self._assert_headers(response, stored)
+        self.compare(payload, stored.data, self.filename, view=self.view)
 
 
 def frozenfixture2(use_request=False):
@@ -80,7 +129,7 @@ def data(db, request):
 @contract(recorder_class=MyRecorder)
 def test_list(viewset, serializer, data):
     url = f"{viewset.get_service().endpoint}"
-    return [url, {'serializer': serializer}]
+    return [url, {'-serializer': serializer}]
 
 
 @frozenfixture2()
