@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.intervention",
-            "pk": 1069,
+            "pk": 1117,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-23T12:28:12.783Z",
+                "last_modify_date": "2019-08-02T12:38:51.874Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -21,7 +21,7 @@
                 "cso_type": null,
                 "country_programme": null,
                 "country_programme_id": null,
-                "created": "2019-07-23T12:28:12.783Z",
+                "created": null,
                 "currency": "USD",
                 "days_from_prc_review_to_signature": null,
                 "days_from_submission_to_signature": null,
@@ -77,6 +77,7 @@
                 "unicef_focal_points_data": {},
                 "unicef_signatory_name": null,
                 "updated": null,
+                "last_pv_date": null,
                 "locations": null,
                 "locations_data": {}
             }

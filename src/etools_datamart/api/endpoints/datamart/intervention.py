@@ -10,6 +10,7 @@ from etools_datamart.apps.data import models
 from etools_datamart.apps.etools.models import PartnersIntervention
 
 from .. import common
+from .location import LocationSerializerPos
 
 
 class InterventionFilterForm(forms.Form):
@@ -185,11 +186,21 @@ class InterventionByLocationSerializerFull(serializers.ModelSerializer):
         exclude = ('seen',)
 
 
+class InterventionByLocationSerializerGeo(serializers.ModelSerializer):
+    location = LocationSerializerPos()
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.InterventionByLocation
+        exclude = ('seen', 'location_source_id',
+                   'location_name', 'location_pcode', 'location_level', 'location_levelname')
+
+
 class InterventionByLocationViewSet(InterventionViewSet):
     serializer_class = InterventionByLocationSerializer
     queryset = models.InterventionByLocation.objects.all()
     serializers_fieldsets = {'std': None,
                              'v2': InterventionByLocationSerializerV2,
+                             'geo': InterventionByLocationSerializerGeo,
                              'plain': InterventionByLocationSerializerPlain,
                              'full': InterventionByLocationSerializerFull,
                              }

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import sys
+import time
 
 from django.apps import apps
 from django.core.management import BaseCommand
@@ -8,6 +9,7 @@ from django.db import connections
 
 from etools_datamart.apps.data.loader import loadeables, RUN_COMMAND
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.libs.time import strfelapsed
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +80,11 @@ class Command(BaseCommand):
         parser.add_argument(
             '--debug', action='store_true',
             help="maximum logging level",
+        )
+
+        parser.add_argument(
+            '--elapsed', action='store_true',
+            help="measure elapsed time",
         )
 
         parser.add_argument(
@@ -153,6 +160,10 @@ class Command(BaseCommand):
                         if self.verbosity > 0:
                             self.stdout.write(f"Truncating {model_name}")
                             model.objects.truncate()
+                    elapsed = ""
+                    if options['elapsed']:
+                        start_time = time.time()
+
                     res = model.loader.load(always_update=options['ignore_changes'],
                                             ignore_dependencies=options['no_deps'],
                                             verbosity=self.verbosity,
@@ -161,11 +172,16 @@ class Command(BaseCommand):
                                             countries=schemas,
                                             only_delta=not no_delta,
                                             stdout=sys.stdout)
+                    if options['elapsed']:
+                        elapsed_time = time.time() - start_time
+                        elapsed = "in %s" % strfelapsed(elapsed_time)
+
                     self.stdout.write(f"{model_name:20}: "
                                       f"  created: {res.created:<3}"
                                       f"  updated: {res.updated:<3}"
                                       f"  unchanged: {res.unchanged:<3}"
-                                      f"  deleted: {res.deleted:<3}\n"
+                                      f"  deleted: {res.deleted:<3}"
+                                      f" {elapsed}\n"
                                       )
             except KeyboardInterrupt:
                 return "Interrupted"

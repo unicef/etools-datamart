@@ -12,6 +12,25 @@ def enrich(model: models.Model, cls):
             setattr(model, attr, value)
 
 
+class TravelType:
+    PROGRAMME_MONITORING = 'Programmatic Visit'
+    SPOT_CHECK = 'Spot Check'
+    ADVOCACY = 'Advocacy'
+    TECHNICAL_SUPPORT = 'Technical Support'
+    MEETING = 'Meeting'
+    STAFF_DEVELOPMENT = 'Staff Development'
+    STAFF_ENTITLEMENT = 'Staff Entitlement'
+    CHOICES = (
+        (PROGRAMME_MONITORING, 'Programmatic Visit'),
+        (SPOT_CHECK, 'Spot Check'),
+        (ADVOCACY, 'Advocacy'),
+        (TECHNICAL_SUPPORT, 'Technical Support'),
+        (MEETING, 'Meeting'),
+        (STAFF_DEVELOPMENT, 'Staff Development'),
+        (STAFF_ENTITLEMENT, 'Staff Entitlement'),
+    )
+
+
 class PartnerType:
     BILATERAL_MULTILATERAL = 'Bilateral / Multilateral'
     CIVIL_SOCIETY_ORGANIZATION = 'Civil Society Organization'

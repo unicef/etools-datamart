@@ -198,6 +198,7 @@ class GatewayTypeAdmin(DataModelAdmin):
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude')
     readonly_fields = ('parent', 'gateway')
+    list_filter = ('level',)
 
 
 @register(models.FundsReservation)

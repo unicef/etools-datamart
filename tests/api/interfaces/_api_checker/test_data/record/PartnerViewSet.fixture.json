@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.partner",
-            "pk": 1513,
+            "pk": 602,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-07-30T12:02:43.568Z",
+                "last_modify_date": "2019-08-02T12:38:54.598Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2019-07-30T12:02:27.367Z",
+                "created": "2019-08-02T12:27:43.976Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -28,7 +28,7 @@
                 "last_assessment_date": null,
                 "manually_blocked": false,
                 "modified": null,
-                "name": "name003",
+                "name": "name300",
                 "net_ct_cy": null,
                 "outstanding_dct_amount_6_to_9_months_usd": null,
                 "outstanding_dct_amount_more_than_9_months_usd": null,

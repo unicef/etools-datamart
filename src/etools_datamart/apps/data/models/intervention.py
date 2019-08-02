@@ -6,8 +6,10 @@ from django.db import models
 from django.db.models import F
 
 from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.etools.enrichment.consts import TravelType
 from etools_datamart.apps.etools.models import (PartnersAgreementamendment, PartnersIntervention,
-                                                PartnersInterventionplannedvisits, ReportsAppliedindicator,)
+                                                PartnersInterventionplannedvisits,
+                                                ReportsAppliedindicator, T2FTravelactivity,)
 
 from .base import DataMartModel
 from .location import Location
@@ -19,6 +21,16 @@ logger = logging.getLogger(__name__)
 
 
 class InterventionLoader(Loader):
+    def get_queryset(self):
+        return PartnersIntervention.objects.select_related('agreement',
+                                                           'agreement__partner',
+                                                           ).prefetch_related('sections',
+                                                                              'flat_locations',
+                                                                              'offices',
+                                                                              'unicef_focal_points',
+                                                                              'partner_focal_points',
+                                                                              'result_links')
+
     # def fr_currencies_ok(self, original: PartnersIntervention):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
 
@@ -79,6 +91,14 @@ class InterventionLoader(Loader):
             ))
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])
+
+    def get_last_pv_date(self, original: PartnersIntervention, values: dict, **kwargs):
+        ta = T2FTravelactivity.objects.filter(partnership__pk=original.pk,
+                                              travel_type=TravelType.PROGRAMME_MONITORING,
+                                              travels__status='completed',
+                                              date__isnull=False,
+                                              ).order_by('date').last()
+        return ta.date if ta else None
 
     def get_unicef_signatory_name(self, original: PartnersIntervention, values: dict, **kwargs):
         if original.unicef_signatory:
@@ -166,7 +186,7 @@ class InterventionAbstract(models.Model):
     cso_type = models.CharField(max_length=300, blank=True, null=True)
     country_programme = models.CharField(max_length=300, blank=True, null=True)
     country_programme_id = models.IntegerField(blank=True, null=True)
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(blank=True, null=True)
     currency = models.CharField(max_length=4, blank=True, null=True)
     days_from_prc_review_to_signature = models.IntegerField(blank=True, null=True)
     days_from_submission_to_signature = models.IntegerField(blank=True, null=True)
@@ -231,6 +251,7 @@ class InterventionAbstract(models.Model):
     # unicef_signatory_id = models.IntegerField(blank=True, null=True)
     # unicef_signatory_last_name = models.CharField(max_length=30, null=True)
     updated = models.DateTimeField(null=True)
+    last_pv_date = models.DateField(null=True, blank=True)
 
     # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
 
@@ -270,6 +291,7 @@ class InterventionAbstract(models.Model):
             in_kind_amount_local='planned_budget.in_kind_amount_local',
             intervention_id='id',
             last_amendment_date='i',
+            last_pv_date='-',
             locations_data='i',
             locations='-',
             number_of_amendments='i',

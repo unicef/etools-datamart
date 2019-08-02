@@ -18,6 +18,7 @@ from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.data.exceptions import LoaderException
 from etools_datamart.celery import app
+from etools_datamart.libs.time import strfelapsed
 
 loadeables = set()
 locks = caches['lock']
@@ -248,7 +249,7 @@ class Loader:
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
         if use_delta and (self.config.last_modify_field and self.last_run):
-            logger.info("Loader {self}: use deltas")
+            logger.debug(f"Loader {self}: use deltas")
             qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.last_run})
         return qs
 
@@ -272,7 +273,8 @@ class Loader:
             return True
 
         if sender.etl_task.last_success:
-            return self.etl_task.last_success.day > sender.etl_task.last_run.day
+            return self.etl_task.last_success.date() > sender.etl_task.last_run.date()
+
         return False
 
     def is_record_changed(self, record, values):
@@ -546,10 +548,24 @@ class Loader:
                     for i, country in enumerate(countries, 1):
                         self.context['country'] = country
                         if stdout and verbosity > 0:
-                            stdout.write(f"{i:>3}/{total_countries} {country} ({country.schema_name})\n")
+                            stdout.write(f"{i:>3}/{total_countries} "
+                                         f"{country.name:<25} "
+                                         f"{country.schema_name:<25}")
                             stdout.flush()
+
                         connection.set_schemas([country.schema_name])
+                        start_time = time.time()
+
                         self.process_country()
+                        elapsed_time = time.time() - start_time
+                        elapsed = strfelapsed(elapsed_time)
+                        if stdout and verbosity > 0:
+                            stdout.write(f"   in {elapsed}\n")
+                            stdout.flush()
+
+                        if stdout and verbosity > 2:
+                            stdout.write("\n")
+                            stdout.flush()
                         self.post_process_country()
                         if self.config.sync_deleted_records(self):
                             self.remove_deleted()

@@ -22,14 +22,14 @@ class GatewayType(DataMartModel):
 
 
 class Location(DataMartModel):
-    name = models.CharField(max_length=254)
+    name = models.CharField(max_length=254, db_index=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     p_code = models.CharField(max_length=32)
     point = PointField(blank=True, null=True)
     gateway = models.ForeignKey(GatewayType, models.DO_NOTHING, blank=True, null=True)
     geom = MultiPolygonField(blank=True, null=True)
-    level = models.IntegerField()
+    level = models.IntegerField(db_index=True)
     lft = models.IntegerField()
     parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
     rght = models.IntegerField()
