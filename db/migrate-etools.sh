@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-TAG=${1:-6.10}
+TAG=${1:-7.2}
 
 # from 6.9 to 6.10
 # django-admin migrate --fake core 0001

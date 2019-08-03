@@ -69,8 +69,8 @@ class TPMVisit(LocationMixin, DataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
 
-    start_date = models.DateTimeField(blank=True, null=True)
-    end_date = models.DateTimeField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     unicef_focal_points = models.TextField(blank=True, null=True)
 
     status = models.CharField(max_length=20, blank=True, null=True)

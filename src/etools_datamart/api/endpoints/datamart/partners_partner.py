@@ -36,12 +36,13 @@ class PartnerSerializerFull(DataMartSerializer):
 class PartnerSerializerStd(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Partner
-        exclude = ('planned_engagement',)
+        exclude = ('planned_engagement', 'last_pv_date')
 
 
 class PartnerSerializerShort(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Partner
+        exclude = None
         fields = ('name', 'alternate_name', 'partner_type', 'country', 'email')
 
 
@@ -70,7 +71,8 @@ class PartnerViewSet(common.DataMartViewSet):
     serializer_class = PartnerSerializerFull
     serializers_fieldsets = {'std': PartnerSerializerStd,
                              'full': PartnerSerializerFull,
-                             'short': ["short_name", "vendor_number"]}
+                             'short': PartnerSerializerShort
+                             }
     queryset = models.Partner.objects.all()
     filter_fields = ('partner_type', 'hidden', 'cso_type', 'rating')
     ordering_fields = ("id", "name")

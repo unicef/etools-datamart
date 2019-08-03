@@ -67,6 +67,7 @@ class Command(BaseCommand):
         # connection.mode = SINGLE_TENANT
         # state.schemas = [schema, "public"]
         connection.schema_name = schema
+        from etools_datamart.apps.etools.enrichment._related import names
         with connection.cursor() as cursor:
             # cursor.execute(raw_sql(f"SET search_path={schema}"))
             yield "# flake8: noqa F405."
@@ -95,6 +96,7 @@ class Command(BaseCommand):
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
+                model_name = table2model(table_name)
                 try:
                     try:
                         relations = connection.introspection.get_relations(cursor, table_name)
@@ -117,7 +119,7 @@ class Command(BaseCommand):
 
                 yield ''
                 yield ''
-                yield 'class %s(%s):' % (table2model(table_name), basemodel)
+                yield 'class %s(%s):' % (model_name, basemodel)
 
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
@@ -195,7 +197,13 @@ class Command(BaseCommand):
                         field_type,
                     )
                     if field_type.startswith('ForeignKey(') or field_type.startswith('OneToOneField('):
-                        _related_name = f'{table2model(relations[column_name][1]).lower()}_{table_name}_{column_name}'
+                        # _related_name = f'{table2model(relations[column_name][1]).lower()}_{table_name}_{column_name}'
+                        _related_name = f'{model_name}.{att_name}'
+
+                        if _related_name in names:
+                            _related_name = names[_related_name]
+                        else:
+                            _related_name = _related_name.replace('.', '_')
                         field_desc += ', models.DO_NOTHING'
                         field_desc += f", related_name='{_related_name}'"
 
@@ -322,7 +330,8 @@ class Command(BaseCommand):
                     # so we build the string rather than interpolate the tuple
                     fields = [column_to_field_name[c] for c in cols if len(cols) > 1]
                     if fields:
-                        tup = '(' + ', '.join(sorted(["'%s'" % column_to_field_name[c] for c in cols if len(cols) > 1])) + ')'
+                        tup = '(' + ', '.join(
+                            sorted(["'%s'" % column_to_field_name[c] for c in cols if len(cols) > 1])) + ')'
                         unique_together.add(tup)
         meta = ["",
                 "    class Meta:",

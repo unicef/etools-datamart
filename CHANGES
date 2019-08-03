@@ -1,5 +1,6 @@
 1.23
 ----
+* Compatible with eTools 7.2
 * new FundReservation&Header endpoint
 * new Grant endpoint
 * new InterventionIndicators endpoint
@@ -11,6 +12,7 @@
 * updated InterventionByLocation endpoint
 * updated Intervention endpoint
 * updated TPMActivity endpoint
+* updated Partner endpoint
 * new v2 intervention serializer
 * new PartnerContact endpoint
 * new PartnerAgreement endpoint

@@ -1,19 +1,51 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
+from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
 from crashlog.middleware import process_exception
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType
-from etools_datamart.apps.etools.models import PartnersPartnerorganization
+from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType, TravelType
+from etools_datamart.apps.etools.models import PartnersPartnerorganization, T2FTravelactivity
 
 
 class PartnerLoader(Loader):
 
     def get_queryset(self):
         return PartnersPartnerorganization.objects.select_related('planned_engagement').all()
+
+    def get_last_pv_date(self, record, valuess, **kwargs):
+        # FIXME: improves this
+        activity = T2FTravelactivity.objects.filter(partnership__agreement__partner=record,
+                                                    travel_type=TravelType.PROGRAMME_MONITORING,
+                                                    date__isnull=False,
+                                                    travels__status='completed',
+                                                    travels__traveler=F(
+                                                        'primary_traveler'),
+                                                    ).first()
+        if activity:
+            return activity.date
+        # i = PartnersIntervention.objects.filter(agreement__partner=self,
+        #                                         travel_activities__travel_type=TravelType.PROGRAMME_MONITORING,
+        #                                         travel_activities__date__isnull=False,
+        #                                         travel_activities__travels__status='completed',
+        #                                         travel_activities__travels__traveler=F(
+        #                                             'travel_activities__primary_traveler'),
+        #                                         )
+        # agreement = record.agreements.filter(
+        #     interventions__travel_activities__travel_type=TravelType.PROGRAMME_MONITORING,
+        #     interventions__travel_activities__travels__traveler=F(
+        #         'interventions__travel_activities__primary_traveler'),
+        #     interventions__travel_activities__date__isnull=False,
+        #     interventions__travel_activities__travels__status='completed').first()
+        #
+        # if agreement:
+        #     return (agreement.interventions
+        #             .order_by('travel_activities__date')
+        #             .values_list('travel_activities__date', flat=True)
+        #             .first())
 
     def get_planned_engagement(self, record, valuess, **kwargs):
         try:
@@ -99,6 +131,8 @@ class Partner(DataMartModel):
 
     # O2O
     planned_engagement = JSONField(default=dict, blank=True, null=True)
+
+    last_pv_date = models.DateField(blank=True, null=True, db_index=True)
 
     class Meta:
         unique_together = (('schema_name', 'name', 'vendor_number'),

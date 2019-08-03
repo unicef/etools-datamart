@@ -292,8 +292,8 @@ class InterventionAbstract(models.Model):
             intervention_id='id',
             last_amendment_date='i',
             last_pv_date='-',
-            locations_data='i',
-            locations='-',
+            # locations_data='i',
+            # locations='-',
             number_of_amendments='i',
             number_of_attachments='i',
             offices='-',
@@ -344,14 +344,13 @@ class Intervention(InterventionAbstract, DataMartModel):
         unique_together = ('schema_name', 'intervention_id')
 
     class Options(InterventionAbstract.Options):
-        pass
+        mapping = dict(**InterventionAbstract.Options.mapping,
+                       locations_data='i',
+                       locations='-',
+                       )
 
 
 class InterventionByLocationLoader(InterventionLoader):
-    def get_locations(self, original: PartnersIntervention, values: dict, **kwargs):
-        values['locations_data'] = None
-        return None
-
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for intervention in qs.all():
@@ -362,8 +361,8 @@ class InterventionByLocationLoader(InterventionLoader):
                 # removes fields inherited by InterventionLoader
                 # FIXME: Loader inherotance should follow Model inheritance
                 # and have a common InterventioAbstractLoader
-                values.pop('locations_data')
-                values.pop('locations')
+                # values.pop('locations_data')
+                # values.pop('locations')
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 

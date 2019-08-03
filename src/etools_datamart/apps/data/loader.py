@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from inspect import isclass
@@ -191,7 +192,13 @@ class LoaderTask(celery.Task):
             raise
 
 
+def _compare_json(dict1, dict2):
+    return json.dumps(dict1, sort_keys=True, indent=0) == json.dumps(dict2, sort_keys=True, indent=0)
+
+
 def equal(a, b):
+    if isinstance(a, (dict, list, tuple)):
+        return _compare_json(a, b)
     return a == b
 
 

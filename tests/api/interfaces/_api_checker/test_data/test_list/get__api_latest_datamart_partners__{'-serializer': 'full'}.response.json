@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "3096"
+            "3156"
         ]
     },
     "data": {
@@ -107,7 +107,8 @@
                 "min_req_programme_visits": 0,
                 "hact_min_requirements": {},
                 "min_req_spot_checks": 0,
-                "planned_engagement": {}
+                "planned_engagement": {},
+                "last_pv_date": null
             },
             {
                 "id": 600,
@@ -155,7 +156,8 @@
                 "min_req_programme_visits": 0,
                 "hact_min_requirements": {},
                 "min_req_spot_checks": 0,
-                "planned_engagement": {}
+                "planned_engagement": {},
+                "last_pv_date": null
             },
             {
                 "id": 601,
@@ -203,7 +205,8 @@
                 "min_req_programme_visits": 0,
                 "hact_min_requirements": {},
                 "min_req_spot_checks": 0,
-                "planned_engagement": {}
+                "planned_engagement": {},
+                "last_pv_date": null
             }
         ]
     },

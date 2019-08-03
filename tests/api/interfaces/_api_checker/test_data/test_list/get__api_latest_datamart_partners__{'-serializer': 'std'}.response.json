@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "3096"
+            "3093"
         ]
     },
     "data": {
@@ -67,6 +67,7 @@
                 "last_modify_date": "02 Aug 2019 12:38:50",
                 "seen": null,
                 "country_name": "bolivia",
+                "schema_name": "bolivia",
                 "area_code": "",
                 "address": null,
                 "alternate_id": null,
@@ -106,8 +107,7 @@
                 "vision_synced": true,
                 "min_req_programme_visits": 0,
                 "hact_min_requirements": {},
-                "min_req_spot_checks": 0,
-                "planned_engagement": {}
+                "min_req_spot_checks": 0
             },
             {
                 "id": 600,
@@ -115,6 +115,7 @@
                 "last_modify_date": "02 Aug 2019 12:38:50",
                 "seen": null,
                 "country_name": "chad",
+                "schema_name": "chad",
                 "area_code": "",
                 "address": null,
                 "alternate_id": null,
@@ -154,8 +155,7 @@
                 "vision_synced": true,
                 "min_req_programme_visits": 0,
                 "hact_min_requirements": {},
-                "min_req_spot_checks": 0,
-                "planned_engagement": {}
+                "min_req_spot_checks": 0
             },
             {
                 "id": 601,
@@ -163,6 +163,7 @@
                 "last_modify_date": "02 Aug 2019 12:38:50",
                 "seen": null,
                 "country_name": "lebanon",
+                "schema_name": "lebanon",
                 "area_code": "",
                 "address": null,
                 "alternate_id": null,
@@ -202,8 +203,7 @@
                 "vision_synced": true,
                 "min_req_programme_visits": 0,
                 "hact_min_requirements": {},
-                "min_req_spot_checks": 0,
-                "planned_engagement": {}
+                "min_req_spot_checks": 0
             }
         ]
     },

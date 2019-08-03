@@ -139,6 +139,8 @@ class Command(BaseCommand):
             for model_name in sorted(list(loadeables)):
                 self.stdout.write(model_name)
         else:
+            if options['elapsed']:
+                global_start_time = time.time()
             try:
                 for model_name in model_names:
                     if self.verbosity > 0:
@@ -166,7 +168,7 @@ class Command(BaseCommand):
 
                     res = model.loader.load(always_update=options['ignore_changes'],
                                             ignore_dependencies=options['no_deps'],
-                                            verbosity=self.verbosity,
+                                            verbosity=self.verbosity - 1,
                                             run_type=RUN_COMMAND,
                                             max_records=records,
                                             countries=schemas,
@@ -176,12 +178,17 @@ class Command(BaseCommand):
                         elapsed_time = time.time() - start_time
                         elapsed = "in %s" % strfelapsed(elapsed_time)
 
-                    self.stdout.write(f"{model_name:20}: "
-                                      f"  created: {res.created:<3}"
-                                      f"  updated: {res.updated:<3}"
-                                      f"  unchanged: {res.unchanged:<3}"
-                                      f"  deleted: {res.deleted:<3}"
+                    self.stdout.write(f"{model_name:30}: "
+                                      f"  created: {res.created:>6}"
+                                      f"  updated: {res.updated:>6}"
+                                      f"  unchanged: {res.unchanged:>6}"
+                                      f"  deleted: {res.deleted:>6}"
                                       f" {elapsed}\n"
                                       )
+                if options['elapsed']:
+                    global_elapsed_time = time.time() - global_start_time
+                    global_elapsed = "in %s" % strfelapsed(global_elapsed_time)
+                    self.stdout.write(f"Loadig total time: {global_elapsed}")
+
             except KeyboardInterrupt:
                 return "Interrupted"

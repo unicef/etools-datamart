@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "207"
+            "351"
         ]
     },
     "data": {
@@ -62,16 +62,25 @@
         "previous": null,
         "results": [
             {
-                "short_name": null,
-                "vendor_number": null
+                "name": "name297",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
             },
             {
-                "short_name": null,
-                "vendor_number": null
+                "name": "name298",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
             },
             {
-                "short_name": null,
-                "vendor_number": null
+                "name": "name299",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
             }
         ]
     },

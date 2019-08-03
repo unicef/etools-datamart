@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"7ae6f5c01870d6f6cded5670cec80a09\""
+            "\"5a248286b1ff29aadae4ba83cae36561\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -48,6 +48,7 @@
         "last_modify_date": "02 Aug 2019 12:38:54",
         "seen": null,
         "country_name": "bolivia",
+        "schema_name": "bolivia",
         "area_code": "",
         "address": null,
         "alternate_id": null,
@@ -87,8 +88,7 @@
         "vision_synced": true,
         "min_req_programme_visits": 0,
         "hact_min_requirements": {},
-        "min_req_spot_checks": 0,
-        "planned_engagement": {}
+        "min_req_spot_checks": 0
     },
     "content_type": null
 }

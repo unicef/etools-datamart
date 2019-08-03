@@ -226,7 +226,7 @@ class TravelAdmin(DataModelAdmin):
 class PartnerAdmin(DataModelAdmin):
     list_display = ('name', 'partner_type', 'vendor_number', 'cso_type', 'rating')
     date_hierarchy = 'created'
-    list_filter = ('partner_type', 'hidden', 'cso_type', 'rating')
+    list_filter = ('partner_type', 'last_pv_date', 'hidden', 'cso_type', 'rating')
     search_fields = ('vendor_number', 'name',)
 
 

@@ -183,7 +183,8 @@ class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
             name = self.request.query_params.get(self.serializer_field_param, 'std')
 
         if name == 'std':
-            return self._default_serializer
+            # return self._default_serializer
+            return self.serializers_fieldsets.get('std', self._default_serializer) or self._default_serializer
 
         target = self.serializers_fieldsets.get(name, None)
         if isinstance(target, DynamicSerializer):
