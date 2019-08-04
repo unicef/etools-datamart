@@ -23,8 +23,9 @@ from . import models
 def queue(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
-        task = app.tasks.get(obj.task)
-        task.delay(run_type=RUN_QUEUED)
+        modeladmin.queue(request, obj.pk)
+        # task = app.tasks.get(obj.task)
+        # task.delay(run_type=RUN_QUEUED)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
                             messages.SUCCESS)

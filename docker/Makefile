@@ -124,6 +124,24 @@ production:
 		--check-image \
 		datamart-prod:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
 
+	lazo rancher \
+		-b https://elgaucho.unicef.io/v3 \
+		--auth ${RANCHER_GAUCHO_AUTH}
+		upgrade \
+		-c rke-cluster-etdw \
+		-p datamart-prod \
+		--check-image \
+		datamart-prod:celery ${DOCKER_IMAGE_NAME}:${TARGET}
+
+	lazo rancher \
+		-b https://elgaucho.unicef.io/v3 \
+		--auth ${RANCHER_GAUCHO_AUTH}
+		upgrade \
+		-c rke-cluster-etdw \
+		-p datamart-prod \
+		--check-image \
+		datamart-prod:beat ${DOCKER_IMAGE_NAME}:${TARGET}
+
 	curl -X POST -H 'Content-type: application/json' \
 		--data '{"text":"Datamart ${TARGET} released in production"}' \
 		https://hooks.slack.com/services/${SLACK_BOT_TOKEN}
