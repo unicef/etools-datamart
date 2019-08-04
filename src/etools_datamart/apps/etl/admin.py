@@ -12,10 +12,10 @@ from admin_extra_urls.mixins import _confirm_action
 from adminactions.mass_update import mass_update
 from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
-from humanize import naturaldelta
 
 from etools_datamart.apps.data.loader import RUN_QUEUED
 from etools_datamart.celery import app
+from etools_datamart.libs.time import strfelapsed
 
 from . import models
 
@@ -103,7 +103,9 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return False
 
     def time(self, obj):
-        return naturaldelta(obj.elapsed)
+        return strfelapsed(obj.elapsed)
+
+    time.admin_order_field = 'elapsed'
 
     def locked(self, obj):
         try:

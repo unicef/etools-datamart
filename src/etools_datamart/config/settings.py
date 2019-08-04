@@ -448,7 +448,8 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'unicef_rest_framework.versioning.URFVersioning',
     'SEARCH_PARAM': 'search',
     'ORDERING_PARAM': 'ordering',
-    'DATETIME_FORMAT': DATETIME_FORMAT
+    'DATETIME_FORMAT': DATETIME_FORMAT,
+    # 'DATE_FORMAT': DATE_FORMAT,
 }
 
 JWT_AUTH = {
@@ -672,3 +673,5 @@ if SENTRY_ENABLED:
                     debug=False)
 
 SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]
+
+FORMAT_MODULE_PATH = 'etools_datamart.locale'

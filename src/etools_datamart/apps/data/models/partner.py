@@ -27,25 +27,6 @@ class PartnerLoader(Loader):
                                                     ).first()
         if activity:
             return activity.date
-        # i = PartnersIntervention.objects.filter(agreement__partner=self,
-        #                                         travel_activities__travel_type=TravelType.PROGRAMME_MONITORING,
-        #                                         travel_activities__date__isnull=False,
-        #                                         travel_activities__travels__status='completed',
-        #                                         travel_activities__travels__traveler=F(
-        #                                             'travel_activities__primary_traveler'),
-        #                                         )
-        # agreement = record.agreements.filter(
-        #     interventions__travel_activities__travel_type=TravelType.PROGRAMME_MONITORING,
-        #     interventions__travel_activities__travels__traveler=F(
-        #         'interventions__travel_activities__primary_traveler'),
-        #     interventions__travel_activities__date__isnull=False,
-        #     interventions__travel_activities__travels__status='completed').first()
-        #
-        # if agreement:
-        #     return (agreement.interventions
-        #             .order_by('travel_activities__date')
-        #             .values_list('travel_activities__date', flat=True)
-        #             .first())
 
     def get_planned_engagement(self, record, valuess, **kwargs):
         try:
@@ -62,15 +43,6 @@ class PartnerLoader(Loader):
             process_exception(e)
             data = {}
         return data
-
-    # def get_hact_values(self, record, values, **kwargs):
-    #     try:
-    #
-    #         data = json.dumps(record.hact_values)
-    #     except Exception:
-    #         capture_exception()
-    #         data = {}
-    #     return data
 
 
 class Partner(DataMartModel):
