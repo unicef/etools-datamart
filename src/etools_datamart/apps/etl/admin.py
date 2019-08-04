@@ -68,19 +68,22 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     actions = [mass_update, queue, force]
 
     def _last_run(self, obj):
-        dt = formats.date_format(obj.last_run, 'DATETIME_FORMAT')
-        css = get_css(obj)
-        return mark_safe('<span class="%s">%s</span>' % (css, dt))
+        if obj.last_run:
+            dt = formats.date_format(obj.last_run, 'DATETIME_FORMAT')
+            css = get_css(obj)
+            return mark_safe('<span class="%s">%s</span>' % (css, dt))
 
     def _last_success(self, obj):
-        dt = formats.date_format(obj.last_success, 'DATETIME_FORMAT')
-        css = get_css(obj)
-        return mark_safe('<span class="%s">%s</span>' % (css, dt))
+        if obj.last_success:
+            dt = formats.date_format(obj.last_success, 'DATETIME_FORMAT')
+            css = get_css(obj)
+            return mark_safe('<span class="%s">%s</span>' % (css, dt))
 
     def _last_failure(self, obj):
-        dt = formats.date_format(obj.last_failure, 'DATE_FORMAT')
-        css = get_css(obj)
-        return mark_safe('<span class="%s">%s</span>' % (css, dt))
+        if obj.last_failure:
+            dt = formats.date_format(obj.last_failure, 'DATE_FORMAT')
+            css = get_css(obj)
+            return mark_safe('<span class="%s">%s</span>' % (css, dt))
 
     def _status(self, obj):
         css = get_css(obj)
