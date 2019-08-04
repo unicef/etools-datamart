@@ -8,7 +8,7 @@ from .base import DataMartModel
 
 
 class TravelLoader(Loader):
-    def get_attachments(self, record, values):
+    def get_attachments(self, record, values, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
                                    record.attachments.values_list('type', 'file'))))
 
@@ -25,7 +25,7 @@ class Travel(DataMartModel):
     created = models.DateTimeField(blank=True, null=True, db_index=True)
     currency_code = models.CharField(max_length=5, blank=True, null=True)
     # currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='publicscurrency_t2f_travel_currency_id', blank=True, null=True)
-    end_date = models.DateTimeField(blank=True, null=True, db_index=True)
+    end_date = models.DateField(blank=True, null=True, db_index=True)
     estimated_travel_cost = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=4)
     first_submission_date = models.DateTimeField(blank=True, null=True)
     hidden = models.BooleanField(blank=True, null=True, )
@@ -44,7 +44,7 @@ class Travel(DataMartModel):
     report_note = models.TextField(blank=True, null=True, )
     # section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='reportssector_t2f_travel_section_id', blank=True, null=True)
     section_name = models.CharField(max_length=45, blank=True, null=True, db_index=True)
-    start_date = models.DateTimeField(blank=True, null=True, db_index=True)
+    start_date = models.DateField(blank=True, null=True, db_index=True)
     status = models.CharField(max_length=50, choices=T2FTravelConsts.CHOICES, db_index=True)
     submitted_at = models.DateTimeField(blank=True, null=True)
     # supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_travel_supervisor_id', blank=True, null=True)

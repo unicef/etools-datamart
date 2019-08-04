@@ -12,6 +12,25 @@ def enrich(model: models.Model, cls):
             setattr(model, attr, value)
 
 
+class TravelType:
+    PROGRAMME_MONITORING = 'Programmatic Visit'
+    SPOT_CHECK = 'Spot Check'
+    ADVOCACY = 'Advocacy'
+    TECHNICAL_SUPPORT = 'Technical Support'
+    MEETING = 'Meeting'
+    STAFF_DEVELOPMENT = 'Staff Development'
+    STAFF_ENTITLEMENT = 'Staff Entitlement'
+    CHOICES = (
+        (PROGRAMME_MONITORING, 'Programmatic Visit'),
+        (SPOT_CHECK, 'Spot Check'),
+        (ADVOCACY, 'Advocacy'),
+        (TECHNICAL_SUPPORT, 'Technical Support'),
+        (MEETING, 'Meeting'),
+        (STAFF_DEVELOPMENT, 'Staff Development'),
+        (STAFF_ENTITLEMENT, 'Staff Entitlement'),
+    )
+
+
 class PartnerType:
     BILATERAL_MULTILATERAL = 'Bilateral / Multilateral'
     CIVIL_SOCIETY_ORGANIZATION = 'Civil Society Organization'
@@ -177,6 +196,28 @@ class ActionPointConsts:
             AuditEngagementConsts.TYPE_MICRO_ASSESSMENT: 'AuditAudit',
             AuditEngagementConsts.TYPE_SPECIAL_AUDIT: 'AuditSpecialaudit',
             }
+
+
+class TpmTpmvisitConst:
+    DRAFT = 'draft'
+    ASSIGNED = 'assigned'
+    CANCELLED = 'cancelled'
+    ACCEPTED = 'tpm_accepted'
+    REJECTED = 'tpm_rejected'
+    REPORTED = 'tpm_reported'
+    REPORT_REJECTED = 'tpm_report_rejected'
+    UNICEF_APPROVED = 'unicef_approved'
+
+    STATUSES = Choices(
+        (DRAFT, _('Draft')),
+        (ASSIGNED, _('Assigned')),
+        (CANCELLED, _('Cancelled')),
+        (ACCEPTED, _('TPM Accepted')),
+        (REJECTED, _('TPM Rejected')),
+        (REPORTED, _('TPM Reported')),
+        (REPORT_REJECTED, _('Sent Back to TPM')),
+        (UNICEF_APPROVED, _('UNICEF Approved')),
+    )
 
 
 class PartnersAgreementConst:

@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from inspect import isclass
@@ -18,6 +19,7 @@ from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.data.exceptions import LoaderException
 from etools_datamart.celery import app
+from etools_datamart.libs.time import strfelapsed
 
 loadeables = set()
 locks = caches['lock']
@@ -190,7 +192,30 @@ class LoaderTask(celery.Task):
             raise
 
 
+def _compare_json(dict1, dict2):
+    return json.dumps(dict1, sort_keys=True, indent=0) == json.dumps(dict2, sort_keys=True, indent=0)
+
+
+def equal(a, b):
+    if isinstance(a, (dict, list, tuple)):
+        return _compare_json(a, b)
+    return a == b
+
+
+def has_attr(obj, attr):
+    """Recursive get object's attribute. May use dot notation."""
+    none = object()
+    if '.' not in attr:
+        ret = getattr(obj, attr, none)
+    else:
+        L = attr.split('.')
+        ret = has_attr(getattr(obj, L[0], none), '.'.join(L[1:]))
+    return ret != none
+
+
 class Loader:
+    noop = object()
+
     def __init__(self) -> None:
         self.config = None
         self.context = {}
@@ -231,7 +256,7 @@ class Loader:
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
         if use_delta and (self.config.last_modify_field and self.last_run):
-            logger.info("Loader {self}: use deltas")
+            logger.debug(f"Loader {self}: use deltas")
             qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.last_run})
         return qs
 
@@ -255,13 +280,26 @@ class Loader:
             return True
 
         if sender.etl_task.last_success:
-            return self.etl_task.last_success.day > sender.etl_task.last_run.day
+            return self.etl_task.last_success.date() > sender.etl_task.last_run.date()
+
         return False
 
     def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
-            if getattr(record, field_name) != getattr(other, field_name):
+            new = getattr(other, field_name)
+            current = getattr(record, field_name)
+
+            if not equal(current, new):
+                verbosity = self.context['verbosity']
+                if verbosity > 2:  # pragma: no cover
+                    stdout = self.context['stdout']
+                    stdout.write("Detected field changed '%s': %s->%s\n" %
+                                 (field_name,
+                                  getattr(record, field_name),
+                                  getattr(other, field_name)))
+                    stdout.flush()
+
                 return True
         return False
 
@@ -307,9 +345,24 @@ class Loader:
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
-            if hasattr(self, 'get_%s' % k):
-                getter = getattr(self, 'get_%s' % v)
-                ret[k] = getter(record, ret)
+            if k in ret:
+                continue
+            if v is None:
+                ret[k] = None
+            elif v == 'N/A':
+                ret[k] = 'N/A'
+            elif v == 'i':
+                continue
+            elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
+                getter = getattr(self, v)
+                _value = getter(record, ret, field_name=k)
+                if _value != self.noop:
+                    ret[k] = _value
+            elif v == '-' or hasattr(self, 'get_%s' % k):
+                getter = getattr(self, 'get_%s' % k)
+                _value = getter(record, ret, field_name=k)
+                if _value != self.noop:
+                    ret[k] = _value
             elif v == '__self__':
                 try:
                     ret[k] = self.model.objects.get(schema_name=country.schema_name,
@@ -330,8 +383,16 @@ class Loader:
                     pass
             elif callable(v):
                 ret[k] = v(self, record)
-            else:
+            elif v == '=' and has_attr(record, k):
+                ret[k] = get_attr(record, k)
+            # elif has_attr(record, k):
+            #     ret[k] = get_attr(record, k)
+            elif not isinstance(v, str):
+                ret[k] = v
+            elif has_attr(record, v):
                 ret[k] = get_attr(record, v)
+            else:
+                raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
 
         return ret
 
@@ -494,10 +555,24 @@ class Loader:
                     for i, country in enumerate(countries, 1):
                         self.context['country'] = country
                         if stdout and verbosity > 0:
-                            stdout.write(f"{i:>3}/{total_countries} {country}\n")
+                            stdout.write(f"{i:>3}/{total_countries} "
+                                         f"{country.name:<25} "
+                                         f"{country.schema_name:<25}")
                             stdout.flush()
+
                         connection.set_schemas([country.schema_name])
+                        start_time = time.time()
+
                         self.process_country()
+                        elapsed_time = time.time() - start_time
+                        elapsed = strfelapsed(elapsed_time)
+                        if stdout and verbosity > 0:
+                            stdout.write(f"   in {elapsed}\n")
+                            stdout.flush()
+
+                        if stdout and verbosity > 2:
+                            stdout.write("\n")
+                            stdout.flush()
                         self.post_process_country()
                         if self.config.sync_deleted_records(self):
                             self.remove_deleted()

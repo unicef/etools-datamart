@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.partner",
-                "pk": 298,
+                "pk": 599,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-04-23T12:03:19.644Z",
+                    "last_modify_date": "2019-08-02T12:38:50.679Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -19,7 +19,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2019-04-23T11:46:10.529Z",
+                    "created": "2019-08-02T12:27:43.976Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -46,15 +46,19 @@
                     "total_ct_ytd": null,
                     "type_of_assessment": null,
                     "vendor_number": null,
-                    "vision_synced": true
+                    "vision_synced": true,
+                    "min_req_programme_visits": 0,
+                    "hact_min_requirements": {},
+                    "min_req_spot_checks": 0,
+                    "planned_engagement": {}
                 }
             },
             {
                 "model": "data.partner",
-                "pk": 299,
+                "pk": 600,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-04-23T12:03:19.649Z",
+                    "last_modify_date": "2019-08-02T12:38:50.684Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -67,7 +71,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2019-04-23T11:46:10.529Z",
+                    "created": "2019-08-02T12:27:43.976Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -94,15 +98,19 @@
                     "total_ct_ytd": null,
                     "type_of_assessment": null,
                     "vendor_number": null,
-                    "vision_synced": true
+                    "vision_synced": true,
+                    "min_req_programme_visits": 0,
+                    "hact_min_requirements": {},
+                    "min_req_spot_checks": 0,
+                    "planned_engagement": {}
                 }
             },
             {
                 "model": "data.partner",
-                "pk": 300,
+                "pk": 601,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-04-23T12:03:19.652Z",
+                    "last_modify_date": "2019-08-02T12:38:50.686Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -115,7 +123,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2019-04-23T11:46:10.529Z",
+                    "created": "2019-08-02T12:27:43.976Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -142,7 +150,11 @@
                     "total_ct_ytd": null,
                     "type_of_assessment": null,
                     "vendor_number": null,
-                    "vision_synced": true
+                    "vision_synced": true,
+                    "min_req_programme_visits": 0,
+                    "hact_min_requirements": {},
+                    "min_req_spot_checks": 0,
+                    "planned_engagement": {}
                 }
             }
         ],

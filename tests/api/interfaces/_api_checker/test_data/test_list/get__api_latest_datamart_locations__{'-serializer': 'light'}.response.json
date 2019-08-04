@@ -1,0 +1,85 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"e3fea213e28ce892638e1e22af822fd4\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "e3fea213e28ce892638e1e22af822fd4"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "294"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "country_name": "bolivia",
+                "area_code": "",
+                "p_code": "",
+                "name": "name495"
+            },
+            {
+                "country_name": "chad",
+                "area_code": "",
+                "p_code": "",
+                "name": "name496"
+            },
+            {
+                "country_name": "lebanon",
+                "area_code": "",
+                "p_code": "",
+                "name": "name497"
+            }
+        ]
+    },
+    "content_type": null
+}

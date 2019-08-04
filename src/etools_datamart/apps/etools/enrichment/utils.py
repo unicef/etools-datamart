@@ -8,6 +8,7 @@ def label(attr, self):
 
 
 def create_alias(model, aliases):
+    return
     for related, business_name in aliases:
         r = getattr(model, related)
         setattr(model, business_name, r)

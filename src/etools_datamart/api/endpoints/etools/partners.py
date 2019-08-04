@@ -12,10 +12,10 @@ class AssessmentViewSet(common.APIMultiTenantReadOnlyModelViewSet):
     queryset = models.PartnersAssessment.objects.all()
 
 
-class AgreementViewSet(common.APIMultiTenantReadOnlyModelViewSet):
-    serializer_class = serializers.AgreementSerializer
-    queryset = models.PartnersAgreement.objects.all()
-
+# class AgreementViewSet(common.APIMultiTenantReadOnlyModelViewSet):
+#     serializer_class = serializers.AgreementSerializer
+#     queryset = models.PartnersAgreement.objects.all()
+#
 #
 # class PartnersInterventionViewSet(common.APIMultiTenantReadOnlyModelViewSet):
 #     serializer_class = serializers.PartnersInterventionSerializer

@@ -2,6 +2,8 @@ from django.urls import include, path, re_path
 
 from unicef_rest_framework.routers import APIReadOnlyRouter
 
+from etools_datamart.api.endpoints import schema_view
+
 from . import endpoints
 
 app_name = 'api'
@@ -12,19 +14,22 @@ class ReadOnlyRouter(APIReadOnlyRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r'etools/audit/engagement', endpoints.EngagementViewSet)
 router.register(r'etools/funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
 router.register(r'etools/funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
 router.register(r'etools/funds/grant', endpoints.GrantViewSet)
-router.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
+# router.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
 router.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
 router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
+router.register(r'etools/workspaces', endpoints.WorkspaceViewSet)
 
+router.register(r'datamart/funds/grants', endpoints.GrantViewSet)
+router.register(r'datamart/audit/engagements', endpoints.EngagementViewSet)
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
 router.register(r'datamart/funds-reservation', endpoints.FundsReservationViewSet)
-router.register(r'datamart/hact', endpoints.HACTViewSet)
+router.register(r'datamart/hact/aggregate', endpoints.HACTAggreagateViewSet)
+router.register(r'datamart/hact/history', endpoints.HACTHistoryViewSet)
 router.register(r'datamart/interventions', endpoints.InterventionViewSet)
 router.register(r'datamart/interventions-locations', endpoints.InterventionByLocationViewSet)
 router.register(r'datamart/interventions-budget', endpoints.InterventionBudgetViewSet)
@@ -36,11 +41,13 @@ router.register(r'datamart/partners/contacts', endpoints.PartnerStaffMemberViewS
 router.register(r'datamart/partners/agreements', endpoints.PartnerAgreementViewSet)
 
 router.register(r'datamart/reports/sections', endpoints.SectionViewSet)
+router.register(r'datamart/reports/indicators', endpoints.IndicatorViewSet)
 
 router.register(r'datamart/users', endpoints.EtoolsUserViewSet)
 router.register(r'datamart/user-offices', endpoints.OfficeViewSet)
 router.register(r'datamart/travels', endpoints.TravelViewSet)
 router.register(r'datamart/travel-activities', endpoints.TravelActivityViewSet)
+router.register(r'datamart/t2f/trips', endpoints.TripViewSet)
 router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
 router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
 router.register(r'datamart/partners', endpoints.PartnerViewSet)
@@ -52,6 +59,11 @@ router.register(r'system/monitor', endpoints.MonitorViewSet)
 urlpatterns = [
     re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),
 
-    path(r'+swagger/', endpoints.schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path(r'+redoc/', endpoints.schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    re_path(r'\+sw(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
+            name='schema-json'),
+
+    path(r'+swagger/', endpoints.schema_view.with_ui('swagger', cache_timeout=0),
+         name='schema-swagger-ui'),
+    path(r'+redoc/', endpoints.schema_view.with_ui('redoc', cache_timeout=0),
+         name='schema-redoc'),
 ]

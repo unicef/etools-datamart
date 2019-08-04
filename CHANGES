@@ -1,3 +1,25 @@
+1.23
+----
+* Compatible with eTools 7.2
+* new FundReservation&Header endpoint
+* new Grant endpoint
+* new InterventionIndicators endpoint
+* new HACT History endpoint
+* new HACT aggregate endpoint
+* new Engagements endpoint
+* new Trips endpoint
+* new InterventionBudget endpoint
+* updated InterventionByLocation endpoint
+* updated Intervention endpoint
+* updated TPMActivity endpoint
+* updated Partner endpoint
+* new v2 intervention serializer
+* new PartnerContact endpoint
+* new PartnerAgreement endpoint
+* new ActionPoint endpoint
+* new Workspaces endpoint
+
+
 1.22
 ----
 * Compatible with eTools 6.10
@@ -17,6 +39,7 @@
 * fixes Partner.hact_values handling
 * ActionPoint - new serializer (v2)
 * Fixes PDIndicator
+
 
 1.21
 ----

@@ -3,7 +3,7 @@ from django import forms
 from constance import config
 from rest_framework import serializers
 
-from unicef_rest_framework.forms import DateRangePickerField
+from unicef_rest_framework.forms import CleareableSelect2ChoiceField, DateRangePickerField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
@@ -13,9 +13,16 @@ from .. import common
 URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
           'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
           'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
-          'AuditAudit': "%s/audits/%s/overview/?schema=%s",
+          'AuditAudit': "%s/ap/audits/%s/overview/?schema=%s",
           'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
           'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s"}
+
+MODULEMAP = {'AuditSpotcheck': "fam",
+             'AuditMicroassessment': "fam",
+             'AuditSpecialaudit': "fam",
+             'AuditAudit': "fam",
+             'TpmTpmactivity': "tpm",
+             'T2FTravelactivity': "trips"}
 
 
 class ActionPointSerializerV2(DataMartSerializer):
@@ -25,11 +32,16 @@ class ActionPointSerializerV2(DataMartSerializer):
     fam_category = serializers.CharField(source='category_description')
     action_point_url = serializers.SerializerMethodField()
     related_module_url = serializers.SerializerMethodField()
+    related_module = serializers.SerializerMethodField()
 
     def get_action_point_url(self, obj):
         return "%s/apd/action-points/detail/%s/?schema=%s" % (config.ETOOLS_ADDRESS,
                                                               obj.source_id,
                                                               obj.schema_name)
+
+    def get_related_module(self, obj):
+        if obj.related_module_class and obj.related_module_id:
+            return MODULEMAP[obj.related_module_class]
 
     def get_related_module_url(self, obj):
         if obj.related_module_class and obj.related_module_id:
@@ -70,6 +82,7 @@ class ActionPointSerializerV2(DataMartSerializer):
                   'module_reference_number',
                   'module_task_activity_reference_number',
                   'fam_category',
+                  'related_module',
                   'related_module_url',
                   'action_point_url')
 
@@ -77,30 +90,31 @@ class ActionPointSerializerV2(DataMartSerializer):
 class ActionPointSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
-        fields = '__all__'
-        exclude = None
+        exclude = ('related_module_class',)
 
 
 class ActionPointFilterForm(forms.Form):
-    last_modify_date = DateRangePickerField(label='Modified between',
-                                            required=False)
+    created = DateRangePickerField(label='Created between', required=False)
 
-    start_date = DateRangePickerField(label='Started between',
-                                      required=False)
-    submission_date = DateRangePickerField(label='Submitted between',
-                                           required=False)
+    date_of_completion = DateRangePickerField(label='Date of completion',
+                                              required=False)
 
-    # document_type__in = Select2MultipleChoiceField(label='Document Type',
-    #                                                choices=PartnersIntervention.INTERVENTION_TYPES,
-    #                                                required=False)
+    due_date = DateRangePickerField(label='Due Date',
+                                    required=False)
+
+    high_priority = CleareableSelect2ChoiceField(required=False,
+                                                 choices=((None, 'All'),
+                                                          (False, 'False'),
+                                                          (True, 'True'),))
 
 
 class ActionPointViewSet(common.DataMartViewSet):
     serializer_class = ActionPointSerializer
     queryset = models.ActionPoint.objects.all()
-    filter_fields = ('vendor_code', 'fr_type', 'start_date')
+    filter_fields = ('created', 'date_of_completion', 'due_date')
     serializers_fieldsets = {'std': ActionPointSerializer,
                              'v2': ActionPointSerializerV2}
+    querystringfilter_form_base_class = ActionPointFilterForm
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)

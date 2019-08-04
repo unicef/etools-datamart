@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "2784"
+            "3096"
         ]
     },
     "data": {
@@ -62,9 +62,9 @@
         "previous": null,
         "results": [
             {
-                "id": 298,
+                "id": 599,
                 "source_id": null,
-                "last_modify_date": "23 Apr 2019 12:03:19",
+                "last_modify_date": "02 Aug 2019 12:38:50",
                 "seen": null,
                 "country_name": "bolivia",
                 "area_code": "",
@@ -76,7 +76,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "23 Apr 2019 11:46:10",
+                "created": "02 Aug 2019 12:27:43",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -103,12 +103,16 @@
                 "total_ct_ytd": null,
                 "type_of_assessment": null,
                 "vendor_number": null,
-                "vision_synced": true
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0,
+                "planned_engagement": {}
             },
             {
-                "id": 299,
+                "id": 600,
                 "source_id": null,
-                "last_modify_date": "23 Apr 2019 12:03:19",
+                "last_modify_date": "02 Aug 2019 12:38:50",
                 "seen": null,
                 "country_name": "chad",
                 "area_code": "",
@@ -120,7 +124,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "23 Apr 2019 11:46:10",
+                "created": "02 Aug 2019 12:27:43",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -147,12 +151,16 @@
                 "total_ct_ytd": null,
                 "type_of_assessment": null,
                 "vendor_number": null,
-                "vision_synced": true
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0,
+                "planned_engagement": {}
             },
             {
-                "id": 300,
+                "id": 601,
                 "source_id": null,
-                "last_modify_date": "23 Apr 2019 12:03:19",
+                "last_modify_date": "02 Aug 2019 12:38:50",
                 "seen": null,
                 "country_name": "lebanon",
                 "area_code": "",
@@ -164,7 +172,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "23 Apr 2019 11:46:10",
+                "created": "02 Aug 2019 12:27:43",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -191,7 +199,11 @@
                 "total_ct_ytd": null,
                 "type_of_assessment": null,
                 "vendor_number": null,
-                "vision_synced": true
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0,
+                "planned_engagement": {}
             }
         ]
     },

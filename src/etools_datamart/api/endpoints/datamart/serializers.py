@@ -17,9 +17,3 @@ class PMPIndicatorsSerializer(DataMartSerializer):
 class FAMIndicatorSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.FAMIndicator
-
-
-class HACTSerializer(DataMartSerializer):
-    # last_modify_date = serializers.DateTimeField(format=settings.DATETIME_FORMAT)
-    class Meta(DataMartSerializer.Meta):
-        model = models.HACT

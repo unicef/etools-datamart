@@ -1,8 +1,12 @@
+from django.db import models
 from django.utils.translation import gettext as _
 
 from etools_datamart.apps.etools.enrichment.utils import set_primary_key
-from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
-                                                AuditSpecialaudit, AuditSpotcheck,)
+from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditEngagementActivePd,
+                                                AuditEngagementAuthorizedOfficers, AuditEngagementStaffMembers,
+                                                AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
+                                                PartnersIntervention, PartnersPartnerstaffmember,
+                                                PurchaseOrderAuditorstaffmember,)
 
 # AuditEngagement.TYPE_AUDIT = 'audit'
 # AuditEngagement.TYPE_MICRO_ASSESSMENT = 'ma'
@@ -37,3 +41,15 @@ set_primary_key(AuditSpotcheck, 'engagement_ptr')
 set_primary_key(AuditMicroassessment, 'engagement_ptr')
 set_primary_key(AuditAudit, 'engagement_ptr')
 set_primary_key(AuditSpecialaudit, 'engagement_ptr')
+
+models.ManyToManyField(PartnersPartnerstaffmember,
+                       through=AuditEngagementAuthorizedOfficers,
+                       ).contribute_to_class(AuditEngagement, 'authorized_officers')
+
+models.ManyToManyField(PurchaseOrderAuditorstaffmember,
+                       through=AuditEngagementStaffMembers,
+                       ).contribute_to_class(AuditEngagement, 'staff_members')
+
+models.ManyToManyField(PartnersIntervention,
+                       through=AuditEngagementActivePd,
+                       ).contribute_to_class(AuditEngagement, 'active_pd')

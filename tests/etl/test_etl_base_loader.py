@@ -4,22 +4,27 @@ from io import StringIO
 from unittest import mock
 
 import pytest
+from strategy_field.utils import fqn
 
 from etools_datamart.apps.data.loader import EtlResult, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.data.models import FundsReservation
+from etools_datamart.apps.data.models import ActionPoint, Partner
 
 
 @pytest.fixture()
 def loader1(db):
-    loader = FundsReservation.loader
+    loader = ActionPoint.loader
     loader.config.lock_key = str(time.time())
     return loader
 
 
 def test_load_requiredismissing(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
-        with pytest.raises(RequiredIsMissing):
-            loader1.load(max_records=2)
+        # update_context() is mocked only to prevent not needed long running test
+        # because update_context() is invoked only if RequiredIsMissing is not raised
+        # we do not want wait the full load only to detect the error
+        with mock.patch('%s.update_context' % fqn(loader1), side_effect=Exception('missing to raise RequiredIsMissing')):
+            with pytest.raises(RequiredIsMissing):
+                loader1.load(max_records=2, force_requirements=False)
 
 
 def test_load_requiredisrunning(loader1):
@@ -32,7 +37,7 @@ def test_load_requiredisrunning(loader1):
 def test_load_requiredsuccess(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
         with mock.patch('etools_datamart.apps.data.models.Intervention.loader.load', lambda *a, **kw: True):
-            loader1.load(force_requirements=True, max_records=2)
+            loader1.load(max_records=2)
 
 
 def test_load_requiredready(loader1):
@@ -48,19 +53,20 @@ def test_load_always_update(loader1):
     assert ret.updated == 2
 
 
-def test_load_no_changes(loader1):
-    with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: False):
-        loader1.model.objects.truncate()
-        loader1.load(max_records=2, only_delta=False)
-        ret = loader1.load(max_records=2, only_delta=False)
+@pytest.mark.django_db
+def test_load_no_changes():
+    loader1 = Partner.loader
+    loader1.model.objects.truncate()
+    loader1.load(max_records=2, only_delta=False)
+    ret = loader1.load(max_records=2, only_delta=False)
     assert ret.unchanged == 2
 
 
 def test_load_exception(loader1):
-    with mock.patch('etools_datamart.apps.data.models.FundsReservation.loader.process_country',
+    with mock.patch('%s.process_country' % fqn(loader1),
                     side_effect=Exception()):
         with pytest.raises(Exception):
-            loader1.load(max_records=2)
+            loader1.load(max_records=2, )
 
 
 def test_load_ignore_dependencies(loader1):
@@ -81,8 +87,7 @@ def test_load_verbosity(loader1):
 
 
 def test_load_error(loader1):
-    with mock.patch('etools_datamart.apps.data.models.FundsReservation.loader.results',
-                    EtlResult(error="error")):
+    with mock.patch('%s.results' % fqn(loader1), EtlResult(error="error"), create=True):
         loader1.on_end()
 
 

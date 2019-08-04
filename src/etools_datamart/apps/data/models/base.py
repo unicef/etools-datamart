@@ -1,5 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import connections, models
 from django.db.models import QuerySet
 from django.db.models.base import ModelBase
 from django.db.models.manager import BaseManager
@@ -30,8 +30,14 @@ class DataMartQuerySet(QuerySet):
 
 class DataMartManager(BaseManager.from_queryset(DataMartQuerySet)):
 
-    def truncate(self):
-        self.raw('TRUNCATE TABLE {0} CASCADE'.format(self.model._meta.db_table))
+    def truncate(self, reset=True):
+        if reset:
+            restart = 'RESTART IDENTITY'
+        else:
+            restart = ''
+        with connections['default'].cursor() as cursor:
+            cursor.execute('TRUNCATE TABLE "{0}" {1} CASCADE;'.format(self.model._meta.db_table,
+                                                                      restart))
 
 
 class DataMartModelBase(ModelBase):

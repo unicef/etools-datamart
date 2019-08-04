@@ -22,11 +22,11 @@ class AssessmentSerializer(EToolsSerializer):
         exclude = ()
 
 
-class AgreementSerializer(EToolsSerializer):
-    class Meta:
-        model = models.PartnersAgreement
-        exclude = ()
-
+# class AgreementSerializer(EToolsSerializer):
+#     class Meta:
+#         model = models.PartnersAgreement
+#         exclude = ()
+#
 #
 # class PartnersInterventionSerializer(serializers.ModelSerializer):
 #     class Meta:

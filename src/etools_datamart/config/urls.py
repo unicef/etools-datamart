@@ -24,6 +24,8 @@ urlpatterns = [
 
     path(r'sys/info/', http_basic_login(sysinfo), name='sys-info'),
     path(r'sys/version/<name>/', http_basic_login(version), name='sys-version'),
+    path(r'explorer/', include('explorer.urls')),
+
 
 ]
 

@@ -40,6 +40,11 @@ class FAMIndicatorFactory(DataMartModelFactory):
         model = models.FAMIndicator
 
 
+class AgreementFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Agreement
+
+
 class InterventionFactory(DataMartModelFactory):
     metadata = {}
     title = factory.Sequence(lambda n: "title%03d" % n)
@@ -221,3 +226,30 @@ class OfficeFactory(DataMartModelFactory):
 class SectionFactory(DataMartModelFactory):
     class Meta:
         model = models.Section
+
+
+class TripFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Trip
+
+
+class EngagementFactory(DataMartModelFactory):
+    partner = {"id": 100}
+
+    class Meta:
+        model = models.Engagement
+
+
+class GrantFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Grant
+
+
+class HACTHistoryFactory(DataMartModelFactory):
+    class Meta:
+        model = models.HACTHistory
+
+
+class ReportIndicatorFactory(DataMartModelFactory):
+    class Meta:
+        model = models.ReportIndicator

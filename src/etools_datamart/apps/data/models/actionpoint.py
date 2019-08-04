@@ -10,6 +10,8 @@ from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAu
                                                 DjangoComments, DjangoContentType, PartnersIntervention,
                                                 T2FTravelactivity, TpmTpmactivity,)
 
+from .intervention import Intervention
+
 # reference_number(self):
 # return '{}/{}/{}/APD'.format(
 #     connection.tenant.country_short_code or '',
@@ -27,7 +29,7 @@ RELATED_MODULE_CHOICES = zip(RELATED_MODULE_NAMES, RELATED_MODULE_NAMES)
 
 class ActionPointLoader(Loader):
 
-    def get_reference_number(self, original: ActionPointsActionpoint, values: dict):
+    def get_reference_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         country = self.context['country']
         return '{}/{}/{}/APD'.format(country.country_short_code or '',
                                      original.created.year,
@@ -37,7 +39,7 @@ class ActionPointLoader(Loader):
     #     if original.engagement:
     #         return original.engagement.engagement_type
 
-    def get_actions_taken(self, original: ActionPointsActionpoint, values: dict):
+    def get_actions_taken(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         ct = DjangoContentType.objects.get(app_label='action_points', model='actionpoint')
         comments = DjangoComments.objects.filter(object_pk=original.id,
                                                  content_type=ct)
@@ -48,7 +50,7 @@ class ActionPointLoader(Loader):
     #     if original.tpm_activity:
     #         return original.tpm_activity.tpm_visit.reference_number
     #
-    def get_related_module_id(self, original: ActionPointsActionpoint, values: dict):
+    def get_related_module_id(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         module = values['related_module_class']
         if module in ENGAGEMENTS_NAMES:
             return original.engagement.pk
@@ -60,7 +62,7 @@ class ActionPointLoader(Loader):
             return None
         raise ValueError(values['related_module_class'])
 
-    def get_related_module_class(self, original: ActionPointsActionpoint, values: dict):
+    def get_related_module_class(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         if original.engagement:
             for target in ENGAGEMENTS:
                 try:
@@ -75,7 +77,7 @@ class ActionPointLoader(Loader):
             return 'T2FTravelactivity'
         return None
 
-    def get_engagement_subclass(self, original: ActionPointsActionpoint, values: dict):
+    def get_engagement_subclass(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         # targets = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
         if not original.engagement:
             return None
@@ -88,7 +90,7 @@ class ActionPointLoader(Loader):
         raise ValueError('Cannot find subclass for ActionPoint #%s Engagement %s' % (original.id,
                                                                                      original.engagement_id))
 
-    def get_intervention_number(self, original: ActionPointsActionpoint, values: dict):
+    def get_intervention_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         intervention = original.intervention
         if intervention:
             agreement_base_number = intervention.agreement.agreement_number.split('-')[0]
@@ -102,7 +104,7 @@ class ActionPointLoader(Loader):
                 return number
             return agreement_base_number
 
-    def get_module_reference_number(self, original: ActionPointsActionpoint, values: dict):
+    def get_module_reference_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         if original.engagement:
             engagement_code = 'a' if original.engagement.engagement_type == AuditEngagement.TYPE_AUDIT else original.engagement.engagement_type
             return '{}/{}/{}/{}/{}'.format(
@@ -121,7 +123,7 @@ class ActionPointLoader(Loader):
                 return
             return travel.reference_number
 
-    def get_module_task_activity_reference_number(self, original: ActionPointsActionpoint, values: dict):
+    def get_module_task_activity_reference_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         obj = original.related_object
         if not obj:
             return 'n/a'
@@ -196,9 +198,12 @@ class ActionPoint(LocationMixin, DataMartModel):
 
     class Options:
         source = ActionPointsActionpoint
+        depends = (Intervention,)
         mapping = add_location_mapping(dict(
             assigned_by_name='assigned_by.get_display_name',
+            assigned_by_email='assigned_by.email',
             assigned_to_name='assigned_to.get_display_name',
+            assigned_to_email='assigned_to.email',
             author_username='author.username',
             category_description='category.description',
             category_module='category.module',

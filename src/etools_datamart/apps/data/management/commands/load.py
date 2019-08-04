@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import sys
+import time
 
 from django.apps import apps
 from django.core.management import BaseCommand
@@ -8,6 +9,7 @@ from django.db import connections
 
 from etools_datamart.apps.data.loader import loadeables, RUN_COMMAND
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.libs.time import strfelapsed
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +51,11 @@ class Command(BaseCommand):
                             nargs='*', help='exclude.')
 
         parser.add_argument(
+            '--truncate', action='store_true',
+            help="Truncate table before load",
+        )
+
+        parser.add_argument(
             '--all', action='store_true',
             help="Run all loaders.",
         )
@@ -73,6 +80,11 @@ class Command(BaseCommand):
         parser.add_argument(
             '--debug', action='store_true',
             help="maximum logging level",
+        )
+
+        parser.add_argument(
+            '--elapsed', action='store_true',
+            help="measure elapsed time",
         )
 
         parser.add_argument(
@@ -108,6 +120,7 @@ class Command(BaseCommand):
         records = options['records']
         countries = options['countries']
         no_delta = options['no_delta']
+        truncate = options['truncate']
 
         if debug:
             setup_logging(self.verbosity)
@@ -126,6 +139,8 @@ class Command(BaseCommand):
             for model_name in sorted(list(loadeables)):
                 self.stdout.write(model_name)
         else:
+            if options['elapsed']:
+                global_start_time = time.time()
             try:
                 for model_name in model_names:
                     if self.verbosity > 0:
@@ -143,19 +158,37 @@ class Command(BaseCommand):
                         if self.verbosity > 1:
                             self.stdout.write(f"Unlock {model_name}")
                         model.loader.unlock()
+                    if truncate:
+                        if self.verbosity > 0:
+                            self.stdout.write(f"Truncating {model_name}")
+                            model.objects.truncate()
+                    elapsed = ""
+                    if options['elapsed']:
+                        start_time = time.time()
+
                     res = model.loader.load(always_update=options['ignore_changes'],
                                             ignore_dependencies=options['no_deps'],
-                                            verbosity=self.verbosity,
+                                            verbosity=self.verbosity - 1,
                                             run_type=RUN_COMMAND,
                                             max_records=records,
                                             countries=schemas,
                                             only_delta=not no_delta,
                                             stdout=sys.stdout)
-                    self.stdout.write(f"{model_name:20}: "
-                                      f"  created: {res.created:<3}"
-                                      f"  updated: {res.updated:<3}"
-                                      f"  unchanged: {res.unchanged:<3}"
-                                      f"  deleted: {res.deleted:<3}\n"
+                    if options['elapsed']:
+                        elapsed_time = time.time() - start_time
+                        elapsed = "in %s" % strfelapsed(elapsed_time)
+
+                    self.stdout.write(f"{model_name:30}: "
+                                      f"  created: {res.created:>6}"
+                                      f"  updated: {res.updated:>6}"
+                                      f"  unchanged: {res.unchanged:>6}"
+                                      f"  deleted: {res.deleted:>6}"
+                                      f" {elapsed}\n"
                                       )
+                if options['elapsed']:
+                    global_elapsed_time = time.time() - global_start_time
+                    global_elapsed = "in %s" % strfelapsed(global_elapsed_time)
+                    self.stdout.write(f"Loadig total time: {global_elapsed}")
+
             except KeyboardInterrupt:
                 return "Interrupted"

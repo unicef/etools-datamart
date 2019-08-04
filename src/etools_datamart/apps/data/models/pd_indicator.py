@@ -3,7 +3,7 @@ from decimal import Decimal
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models import Location
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.data.models.mixins import LocationMixin
+from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import models, ReportsAppliedindicator
 
 
@@ -93,15 +93,6 @@ class PDIndicator(LocationMixin, DataMartModel):
     disaggregation_name = models.CharField(max_length=255)
     disaggregation_active = models.BooleanField(default=False)
 
-    # from location
-    # location_name = models.CharField(max_length=254, blank=True, null=True)
-    # location_pcode = models.CharField(max_length=32, blank=True, null=True)
-    # location_level = models.CharField(max_length=32, blank=True, null=True)
-
-    # internals
-    location = models.ForeignKey(Location, blank=True, null=True,
-                                 on_delete=models.SET_NULL)
-
     # origin
     source_disaggregation_id = models.IntegerField(blank=True, null=True)
     source_location_id = models.IntegerField(blank=True, null=True)
@@ -124,36 +115,63 @@ class PDIndicator(LocationMixin, DataMartModel):
                                           source_location_id=record.location.pk,
                                           source_disaggregation_id=record.disaggregation.pk)
 
-        mapping = {'title': 'indicator.title',
-                   # 'description': 'indicator.description',
-                   # 'code': 'indicator.code',
-                   # 'subdomain': 'indicator.subdomain',
-                   # 'disaggregatable': 'indicator.disaggregatable',
-                   'unit': 'indicator.unit',
-                   # 'calculation_formula_across_locations': 'indicator.calculation_formula_across_locations`',
-                   # 'calculation_formula_across_periods': 'indicator.calculation_formula_across_periods`',
+        mapping = add_location_mapping(dict(
+            title='indicator.title',
+            unit='indicator.unit',
+            target_denominator=lambda loader, record: record.target['d'],
+            target_numerator=lambda loader, record: record.target['v'],
+            baseline_denominator=lambda loader, record: record.baseline['d'],
+            baseline_numerator=lambda loader, record: record.baseline['v'],
 
-                   'target_denominator': lambda loader, record: record.target['d'],
-                   'target_numerator': lambda loader, record: record.target['v'],
-                   'baseline_denominator': lambda loader, record: record.baseline['d'],
-                   'baseline_numerator': lambda loader, record: record.baseline['v'],
+            display_type='indicator.display_type`',
+            section_name='section.name',
+            lower_result_name='lower_result.name',
+            result_link_intervention='lower_result.result_link.intervention.pk',
 
-                   'display_type': 'indicator.display_type`',
-                   'section_name': 'section.name',
-                   'lower_result_name': 'lower_result.name',
-                   'result_link_intervention': 'lower_result.result_link.intervention.pk',
+            disaggregation_name='disaggregation.name',
+            disaggregation_active='disaggregation.active',
 
-                   'disaggregation_name': 'disaggregation.name',
-                   'disaggregation_active': 'disaggregation.active',
+            location_name='location.name',
+            location_pcode='location.p_code',
+            location_level='location.level',
+            location_levelname='location.gateway.name',
+            location=lambda loader, record: Location.objects.filter(source_id=record.id,
+                                                                    schema_name=loader.context[
+                                                                        'country'].schema_name).first(),
 
-                   'location_name': 'location.name',
-                   'location_pcode': 'location.p_code',
-                   'location_level': 'location.level',
-                   'location_levelname': 'location.gateway.name',
-                   'location': lambda loader, record: Location.objects.filter(source_id=record.id,
-                                                                              schema_name=loader.context[
-                                                                                  'country'].schema_name).first(),
+            source_disaggregation_id='disaggregation.id',
+            source_location_id='location.id',
 
-                   'source_disaggregation_id': 'disaggregation.id',
-                   'source_location_id': 'location.id',
-                   }
+            # ----
+            # baseline_denominator="N/A",
+            # baseline_numerator="N/A",
+            cluster_indicator_id="=",
+            cluster_indicator_title="=",
+            cluster_name="=",
+            # cp_output="lower_result.result_link.cp_output.name",
+            # cp_output_id="N/A",
+            denominator_label="=",
+            # disaggregation_active="N/A",
+            # disaggregation_name="N/A",
+            is_active="=",
+            is_high_frequency="=",
+            label="=",
+            # location_level="N/A",
+            # location_levelname="N/A",
+            # location_name="N/A",
+            # location_pcode="N/A",
+            means_of_verification="=",
+            measurement_specifications="=",
+            numerator_label="=",
+            # pd_output == lower_result.result_link.
+            # pd_output_indicator_last_modify_date="N/A",
+            # pd_output_indicator_title="N/A",
+            # pd_output_name="N/A",
+            # pd_output_section="N/A",
+            # pd_sffa_reference_number="N/A",
+            # response_plan_name="N/A",
+            # source_disaggregation_id="N/A",
+            # target_denominator="N/A",
+            # target_numerator="N/A",
+            # unit="N/A",
+        ))

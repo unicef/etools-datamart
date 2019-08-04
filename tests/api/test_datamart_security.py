@@ -6,7 +6,7 @@ from test_utilities.factories import AdminFactory, UserFactory, UserStatsFactory
 
 from unicef_rest_framework.test_utils import user_allow_country, user_allow_service
 
-from etools_datamart.api.endpoints import HACTViewSet, PartnerViewSet, UserStatsViewSet
+from etools_datamart.api.endpoints import HACTAggreagateViewSet, PartnerViewSet, UserStatsViewSet
 
 
 @pytest.fixture()
@@ -103,8 +103,8 @@ def test_access(db, user_type, op, query, code, allowed):
     user = user_type()
     client = APIClient()
     client.force_authenticate(user)
-    url = HACTViewSet.get_service().endpoint
-    with user_allow_service(user, HACTViewSet):
+    url = HACTAggreagateViewSet.get_service().endpoint
+    with user_allow_service(user, HACTAggreagateViewSet):
         with user_allow_country(user, allowed):
             res = client.get(f"{url}?country_name{op}{query}")
     assert res.status_code == code, res.content

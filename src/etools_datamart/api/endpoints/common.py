@@ -1,6 +1,7 @@
 from functools import wraps
 from inspect import isclass
 
+from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import connections
 from django.http import Http404
@@ -175,12 +176,15 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 
 
 class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
+    querystringfilter_form_base_class = forms.Form
+
     def _get_serializer_from_param(self, name=None):
         if name is None:
             name = self.request.query_params.get(self.serializer_field_param, 'std')
 
         if name == 'std':
-            return self._default_serializer
+            # return self._default_serializer
+            return self.serializers_fieldsets.get('std', self._default_serializer) or self._default_serializer
 
         target = self.serializers_fieldsets.get(name, None)
         if isinstance(target, DynamicSerializer):
@@ -192,3 +196,6 @@ class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
             return target
         else:  # Standard Serializer
             raise InvalidSerializerError
+
+    def get_querystringfilter_form(self, request, filter):
+        return self.querystringfilter_form_base_class(request.GET, filter.form_prefix)

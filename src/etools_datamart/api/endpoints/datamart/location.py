@@ -18,6 +18,13 @@ class LocationSerializerGIS(GeoModelSerializer):
         exclude = ('schema_name', 'tree_id', 'lft', 'rght', 'level', 'source_id')
 
 
+class LocationSerializerPos(serializers.ModelSerializer):
+    class Meta:
+        model = models.Location
+        exclude = None
+        fields = ('latitude', 'longitude', 'name', 'point')
+
+
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Location
@@ -34,4 +41,5 @@ class LocationViewSet(common.DataMartViewSet):
                              'light': ('country_name', 'area_code', 'p_code', 'name'),
                              'gis': LocationSerializerGIS,
                              'geo': LocationSerializerGeoJson,
+                             'latlng': LocationSerializerPos,
                              }

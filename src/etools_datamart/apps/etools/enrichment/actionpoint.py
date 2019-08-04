@@ -30,9 +30,9 @@ def get_related_object(self):
                 return target.objects.get(engagement_ptr=self.engagement_id)
             except ObjectDoesNotExist:
                 pass
-                logger.error("Cannot retrieve related for ActionPoint #%s in %s" % (
-                    self.pk,
-                    self.schema))
+                # logger.error("Cannot retrieve related for ActionPoint #%s in %s" % (
+                #     self.pk,
+                #     self.schema))
     # if self.engagement:
     #     obj = None
     #     try:

@@ -1,0 +1,85 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"af31155424c5e98a227bc738e4e90aed\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "af31155424c5e98a227bc738e4e90aed"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "279"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "latitude": null,
+                "longitude": null,
+                "name": "name495",
+                "point": null
+            },
+            {
+                "latitude": null,
+                "longitude": null,
+                "name": "name496",
+                "point": null
+            },
+            {
+                "latitude": null,
+                "longitude": null,
+                "name": "name497",
+                "point": null
+            }
+        ]
+    },
+    "content_type": null
+}

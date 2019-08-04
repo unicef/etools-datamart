@@ -1042,7 +1042,9 @@ CREATE TABLE [[schema]].funds_fundsreservationheader (
     actual_amt_local numeric(20,2) NOT NULL,
     outstanding_amt_local numeric(20,2) NOT NULL,
     total_amt_local numeric(20,2) NOT NULL,
-    multi_curr_flag boolean NOT NULL
+    multi_curr_flag boolean NOT NULL,
+    completed_flag boolean NOT NULL,
+    delegated boolean NOT NULL
 );
 
 
@@ -5214,13 +5216,37 @@ INSERT INTO [[schema]].django_migrations VALUES (702, 'management', '0002_auto_2
 INSERT INTO [[schema]].django_migrations VALUES (703, 'partners', '0036_auto_20190418_1832', '2019-05-14 09:40:08.103138+00');
 INSERT INTO [[schema]].django_migrations VALUES (704, 't2f', '0015_auto_20190326_1425', '2019-05-14 09:40:09.022731+00');
 INSERT INTO [[schema]].django_migrations VALUES (705, 'users', '0010_auto_20190423_1920', '2019-05-14 09:40:09.291007+00');
+INSERT INTO [[schema]].django_migrations VALUES (706, 'action_points', '0009_auto_20190523_1146', '2019-06-14 16:06:37.150542+00');
+INSERT INTO [[schema]].django_migrations VALUES (707, 'auth', '0010_alter_group_name_max_length', '2019-06-14 16:06:37.217153+00');
+INSERT INTO [[schema]].django_migrations VALUES (708, 'auth', '0011_update_proxy_permissions', '2019-06-14 16:06:37.253123+00');
+INSERT INTO [[schema]].django_migrations VALUES (709, 'core', '0003_auto_20190424_1448', '2019-06-14 16:06:37.311311+00');
+INSERT INTO [[schema]].django_migrations VALUES (710, 'funds', '0010_fundsreservationheader_completed_flag', '2019-06-14 16:06:37.451044+00');
+INSERT INTO [[schema]].django_migrations VALUES (711, 'locations', '0007_auto_20190122_1428', '2019-06-14 16:06:37.53161+00');
+INSERT INTO [[schema]].django_migrations VALUES (712, 'locations', '0008_auto_20190422_1537', '2019-06-14 16:06:38.051611+00');
+INSERT INTO [[schema]].django_migrations VALUES (713, 'partners', '0037_auto_20190502_1407', '2019-06-14 16:06:38.342323+00');
+INSERT INTO [[schema]].django_migrations VALUES (714, 'publics', '0005_delete_dsarateupload', '2019-06-14 16:06:38.389419+00');
+INSERT INTO [[schema]].django_migrations VALUES (715, 'reports', '0017_auto_20190424_1509', '2019-06-14 16:06:38.725636+00');
+INSERT INTO [[schema]].django_migrations VALUES (716, 'users', '0011_auto_20190425_1838', '2019-06-14 16:06:38.860323+00');
+INSERT INTO [[schema]].django_migrations VALUES (717, 'users', '0012_auto_20190513_1804', '2019-06-14 16:06:38.936026+00');
+INSERT INTO [[schema]].django_migrations VALUES (718, 'vision', '0004_visionsynclog_business_area_code', '2019-06-14 16:06:38.998341+00');
+INSERT INTO [[schema]].django_migrations VALUES (719, 'activities', '0003_auto_20190722_1417', '2019-08-03 14:41:57.580431+00');
+INSERT INTO [[schema]].django_migrations VALUES (720, 'django_celery_beat', '0009_periodictask_headers', '2019-08-03 14:41:57.630964+00');
+INSERT INTO [[schema]].django_migrations VALUES (721, 'django_celery_beat', '0010_auto_20190429_0326', '2019-08-03 14:41:57.986875+00');
+INSERT INTO [[schema]].django_migrations VALUES (722, 'django_celery_beat', '0011_auto_20190508_0153', '2019-08-03 14:41:58.052221+00');
+INSERT INTO [[schema]].django_migrations VALUES (723, 'django_celery_results', '0004_auto_20190516_0412', '2019-08-03 14:41:58.21077+00');
+INSERT INTO [[schema]].django_migrations VALUES (724, 'funds', '0011_fundsreservationheader_delegated', '2019-08-03 14:41:58.465044+00');
+INSERT INTO [[schema]].django_migrations VALUES (725, 'partners', '0038_auto_20190620_2024', '2019-08-03 14:41:58.572306+00');
+INSERT INTO [[schema]].django_migrations VALUES (726, 'post_office', '0008_attachment_headers', '2019-08-03 14:41:58.674032+00');
+INSERT INTO [[schema]].django_migrations VALUES (727, 'publics', '0006_auto_20190625_1547', '2019-08-03 14:41:58.736261+00');
+INSERT INTO [[schema]].django_migrations VALUES (728, 'purchase_order', '0007_auto_20190625_1437', '2019-08-03 14:41:58.789031+00');
+INSERT INTO [[schema]].django_migrations VALUES (729, 'tpmpartners', '0005_auto_20190625_1437', '2019-08-03 14:41:58.862197+00');
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 705, true);
+SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 729, true);
 
 
 --
@@ -12156,12 +12182,9 @@ INSERT INTO [[schema]].unicef_attachments_filetype VALUES (9, 3, 'face_form', 'F
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (10, 5, 'other', 'Other', 'audit_engagement');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (11, 0, 'report', 'Report', 'audit_report');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (14, 1, 'other', 'Other', 'audit_report');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (15, 0, 'pca', 'PCA', 'audit_engagement');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (16, 1, 'pd', 'PD', 'audit_engagement');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (17, 2, 'workplan', 'Workplan', 'audit_engagement');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (18, 7, 'other', 'Other', 'tpm');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (19, 0, 'report', 'Report', 'tpm_report');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (21, 8, 'pca', 'PCA', 'tpm');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (22, 9, 'signed_pd/ssfa', 'Signed PD/SSFA', 'tpm');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (23, 10, 'prc_submission', 'PRC Submission', 'tpm');
 INSERT INTO [[schema]].unicef_attachments_filetype VALUES (24, 11, 'other', 'Other', 'tpm_report');
@@ -14039,13 +14062,6 @@ CREATE INDEX index_locations_on_name_trigram ON [[schema]].locations_location US
 
 
 --
--- Name: locations_cartodbtable_3cfbd988; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX locations_cartodbtable_3cfbd988 ON [[schema]].locations_cartodbtable USING btree (rght);
-
-
---
 -- Name: locations_cartodbtable_61737a71; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -14067,20 +14083,6 @@ CREATE INDEX locations_cartodbtable_6be37982 ON [[schema]].locations_cartodbtabl
 
 
 --
--- Name: locations_cartodbtable_c9e9a848; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX locations_cartodbtable_c9e9a848 ON [[schema]].locations_cartodbtable USING btree (level);
-
-
---
--- Name: locations_cartodbtable_caf7cc51; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX locations_cartodbtable_caf7cc51 ON [[schema]].locations_cartodbtable USING btree (lft);
-
-
---
 -- Name: locations_gatewaytype_name_6a01c5a6210b012_like; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -14095,13 +14097,6 @@ CREATE INDEX locations_location_1e9cd8d4 ON [[schema]].locations_location USING 
 
 
 --
--- Name: locations_location_3cfbd988; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX locations_location_3cfbd988 ON [[schema]].locations_location USING btree (rght);
-
-
---
 -- Name: locations_location_656442a0; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -14113,20 +14108,6 @@ CREATE INDEX locations_location_656442a0 ON [[schema]].locations_location USING 
 --
 
 CREATE INDEX locations_location_6be37982 ON [[schema]].locations_location USING btree (parent_id);
-
-
---
--- Name: locations_location_c9e9a848; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX locations_location_c9e9a848 ON [[schema]].locations_location USING btree (level);
-
-
---
--- Name: locations_location_caf7cc51; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX locations_location_caf7cc51 ON [[schema]].locations_location USING btree (lft);
 
 
 --
@@ -14564,13 +14545,6 @@ CREATE INDEX reports_result_031ba7c4 ON [[schema]].reports_result USING btree (c
 
 
 --
--- Name: reports_result_3cfbd988; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX reports_result_3cfbd988 ON [[schema]].reports_result USING btree (rght);
-
-
---
 -- Name: reports_result_5b1d2adf; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -14589,20 +14563,6 @@ CREATE INDEX reports_result_656442a0 ON [[schema]].reports_result USING btree (t
 --
 
 CREATE INDEX reports_result_6be37982 ON [[schema]].reports_result USING btree (parent_id);
-
-
---
--- Name: reports_result_c9e9a848; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX reports_result_c9e9a848 ON [[schema]].reports_result USING btree (level);
-
-
---
--- Name: reports_result_caf7cc51; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX reports_result_caf7cc51 ON [[schema]].reports_result USING btree (lft);
 
 
 --
@@ -15084,14 +15044,6 @@ ALTER TABLE ONLY [[schema]].action_points_actionpoint
 
 
 --
--- Name: action_points_actionpoint action_poi_travel_activity_id_67662b24_fk_t2f_travelactivity_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].action_points_actionpoint
-    ADD CONSTRAINT action_poi_travel_activity_id_67662b24_fk_t2f_travelactivity_id FOREIGN KEY (travel_activity_id) REFERENCES [[schema]].t2f_travelactivity(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: action_points_actionpoint action_points_ac_category_id_b36e1bb5_fk_categories_category_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -15121,6 +15073,14 @@ ALTER TABLE ONLY [[schema]].action_points_actionpoint
 
 ALTER TABLE ONLY [[schema]].action_points_actionpoint
     ADD CONSTRAINT action_points_action_cp_output_id_206572a6_fk_reports_result_id FOREIGN KEY (cp_output_id) REFERENCES [[schema]].reports_result(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: action_points_actionpoint action_points_action_travel_activity_id_67662b24_fk_t2f_trave; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].action_points_actionpoint
+    ADD CONSTRAINT action_points_action_travel_activity_id_67662b24_fk_t2f_trave FOREIGN KEY (travel_activity_id) REFERENCES [[schema]].t2f_travelactivity(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -15196,11 +15156,11 @@ ALTER TABLE ONLY [[schema]].activities_activity
 
 
 --
--- Name: activities_activity activities_intervention_id_7ba52d0e_fk_partners_intervention_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+-- Name: activities_activity activities_activity_intervention_id_7ba52d0e_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].activities_activity
-    ADD CONSTRAINT activities_intervention_id_7ba52d0e_fk_partners_intervention_id FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT activities_activity_intervention_id_7ba52d0e_fk_partners_ FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

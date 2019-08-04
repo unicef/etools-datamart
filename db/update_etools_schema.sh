@@ -483,13 +483,8 @@ fi
 
 if [[ "$INSPECT" == "1" ]]; then
     inspect
-fi
-
-
-if [[ "$CLEAN" == "1" ]]; then
-    clean
 else
-    echo "8.x SKIP Clean temporary files"
+    echo "6.x SKIP nspect db and update ORM (INSPECT)"
 fi
 
 
@@ -497,6 +492,12 @@ if [[ "$SUMMARY" == "1" ]]; then
     summary
 else
     echo "7.x SKIP Summary summary (SUMMARY)"
+fi
+
+if [[ "$CLEAN" == "1" ]]; then
+    clean
+else
+    echo "8.x SKIP Clean temporary files"
 fi
 
 

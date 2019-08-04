@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.actionpoint",
-            "pk": 4,
+            "pk": 414,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-05-28T09:43:41.910Z",
+                "last_modify_date": "2019-08-02T12:38:50.983Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -15,6 +15,7 @@
                 "location_pcode": null,
                 "location_level": null,
                 "location_levelname": null,
+                "location": null,
                 "reference_number": null,
                 "author_username": null,
                 "assigned_by_name": null,

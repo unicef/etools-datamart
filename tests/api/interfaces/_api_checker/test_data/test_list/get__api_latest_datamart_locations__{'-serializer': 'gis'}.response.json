@@ -1,0 +1,121 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"1d8b75a006985f57eb41f0abe2b93b0d\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "1d8b75a006985f57eb41f0abe2b93b0d"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "999"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 6581,
+                "last_modify_date": "02 Aug 2019 12:38:46",
+                "seen": null,
+                "country_name": "bolivia",
+                "area_code": "",
+                "name": "name495",
+                "latitude": null,
+                "longitude": null,
+                "p_code": "",
+                "point": null,
+                "geom": null,
+                "created": "02 Aug 2019 12:27:43",
+                "modified": "02 Aug 2019 12:27:43",
+                "is_active": true,
+                "gateway": 1027,
+                "parent": null
+            },
+            {
+                "id": 6582,
+                "last_modify_date": "02 Aug 2019 12:38:46",
+                "seen": null,
+                "country_name": "chad",
+                "area_code": "",
+                "name": "name496",
+                "latitude": null,
+                "longitude": null,
+                "p_code": "",
+                "point": null,
+                "geom": null,
+                "created": "02 Aug 2019 12:27:43",
+                "modified": "02 Aug 2019 12:27:43",
+                "is_active": true,
+                "gateway": 1028,
+                "parent": null
+            },
+            {
+                "id": 6583,
+                "last_modify_date": "02 Aug 2019 12:38:46",
+                "seen": null,
+                "country_name": "lebanon",
+                "area_code": "",
+                "name": "name497",
+                "latitude": null,
+                "longitude": null,
+                "p_code": "",
+                "point": null,
+                "geom": null,
+                "created": "02 Aug 2019 12:27:43",
+                "modified": "02 Aug 2019 12:27:43",
+                "is_active": true,
+                "gateway": 1029,
+                "parent": null
+            }
+        ]
+    },
+    "content_type": null
+}

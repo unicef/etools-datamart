@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa: F401
 from .actionpoint import ActionPointViewSet
+from .audit_engagement import EngagementViewSet
 from .famindicator import FAMIndicatorViewSet
+from .funds_grant import GrantViewSet
 from .funds_reservation import FundsReservationViewSet
-from .hact import HACTViewSet
+from .hact_aggregate import HACTAggreagateViewSet
+from .hact_history import HACTHistoryViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
 from .location import LocationViewSet
 from .partners_agreement import PartnerAgreementViewSet
@@ -13,10 +16,12 @@ from .partners_staffmember import PartnerStaffMemberViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
 from .report_section import SectionViewSet
+from .reports_indicastor import IndicatorViewSet
 from .tpm_activity import TPMActivityViewSet
 from .tpm_visit import TPMVisitViewSet
 from .travel import TravelViewSet
 from .travel_activity import TravelActivityViewSet
+from .trips import TripViewSet
 from .user import EtoolsUserViewSet
 from .user_office import OfficeViewSet
 from .userstats import UserStatsViewSet

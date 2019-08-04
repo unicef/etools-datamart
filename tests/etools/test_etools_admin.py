@@ -93,8 +93,8 @@ def test_select_schema(django_app, admin_user):
     assert res.status_code == 302
 
 
-def test_changelist2(django_app, admin_user):
-    url = reverse("admin:etools_partnersagreement_changelist")
-    url = f"{url}?country_name=bolivia,chad,lebanon"
-    res = django_app.get(url, user=admin_user)
-    assert res.status_code == 200
+# def test_changelist2(django_app, admin_user):
+#     url = reverse("admin:etools_partnersagreement_changelist")
+#     url = f"{url}?country_name=bolivia,chad,lebanon"
+#     res = django_app.get(url, user=admin_user)
+#     assert res.status_code == 200

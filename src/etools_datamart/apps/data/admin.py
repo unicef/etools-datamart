@@ -33,6 +33,12 @@ class DatamartChangeList(ChangeList):
 class DataModelAdmin(TruncateTableMixin, ModelAdmin):
     actions = [mass_update, export_as_csv, export_as_xls]
 
+    def get_list_display(self, request):
+        ret = self.list_display
+        if ret == ('pk',):
+            return [f.name for f in self.model._meta.fields]
+        return ret
+
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
             self.list_filter = (SchemaFilter,) + self.list_filter
@@ -192,6 +198,7 @@ class GatewayTypeAdmin(DataModelAdmin):
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude')
     readonly_fields = ('parent', 'gateway')
+    list_filter = ('level',)
 
 
 @register(models.FundsReservation)
@@ -219,7 +226,7 @@ class TravelAdmin(DataModelAdmin):
 class PartnerAdmin(DataModelAdmin):
     list_display = ('name', 'partner_type', 'vendor_number', 'cso_type', 'rating')
     date_hierarchy = 'created'
-    list_filter = ('partner_type', 'hidden', 'cso_type', 'rating')
+    list_filter = ('partner_type', 'last_pv_date', 'hidden', 'cso_type', 'rating')
     search_fields = ('vendor_number', 'name',)
 
 
@@ -257,9 +264,7 @@ class TPMVisitAdmin(DataModelAdmin):
 
 @register(models.TPMActivity)
 class TPMActivityAdmin(DataModelAdmin):
-    list_display = ('date', 'is_pv',
-                    'intervention_number', 'partner_name',
-                    'result_name',)
+    list_display = ('date', 'partner_name', 'pd_ssfa_title', 'schema_name')
 
 
 @register(models.EtoolsUser)
@@ -272,8 +277,8 @@ class EtoolsUserAdmin(DataModelAdmin):
 
 @register(models.InterventionBudget)
 class InterventionBudgetAdmin(DataModelAdmin):
-    list_display = ('intervention_title', 'intervention_number',
-                    'partner_contribution', 'unicef_cash')
+    list_display = ('title', 'number',
+                    'budget_cso_contribution', 'budget_unicef_cash')
 
 
 @register(models.Office)
@@ -290,3 +295,36 @@ class SectionAdmin(DataModelAdmin):
 class AgreementAdmin(DataModelAdmin):
     list_display = ('agreement_type', 'reference_number', 'agreement_number', 'partner_name',)
     list_filter = ('agreement_type', 'status')
+
+
+@register(models.Trip)
+class TripAdmin(DataModelAdmin):
+    list_display = ('traveler_name', 'partner_name', 'vendor_number', 'end_date',)
+    list_filter = ('start_date', 'end_date')
+
+
+@register(models.Engagement)
+class EngagementAdmin(DataModelAdmin):
+    list_display = ('agreement', 'engagement_type', 'status', 'start_date',)
+    list_filter = ('engagement_type', 'status', 'start_date')
+
+
+@register(models.Grant)
+class GrantAdmin(DataModelAdmin):
+    list_display = ('name', 'donor', 'expiry')
+
+
+@register(models.HACTHistory)
+class HACTDetailAdmin(DataModelAdmin):
+    list_display = ('schema_name', 'year', 'partner_name',
+                    'approach_threshold', 'expiring_threshold',
+                    'sc_follow_up'
+                    )
+    list_filter = ('year', 'approach_threshold', 'expiring_threshold',
+                   'sc_follow_up')
+
+
+@register(models.ReportIndicator)
+class ReportIndicatorAdmin(DataModelAdmin):
+    list_display = ('pk',)
+    list_filter = ()

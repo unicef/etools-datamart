@@ -9,10 +9,10 @@ from etools_datamart.apps.etools.models import PartnersAgreement
 
 
 class AgreementLoader(Loader):
-    def get_agreement_amendments(self, original: PartnersAgreement, values: dict):
+    def get_agreement_amendments(self, original: PartnersAgreement, values: dict, **kwargs):
         return ",".join([a.number for a in original.amendments])
 
-    def get_partner_authorized_officers(self, original: PartnersAgreement, values: dict):
+    def get_partner_authorized_officers(self, original: PartnersAgreement, values: dict, **kwargs):
         # PartnersPartnerstaffmember.objects.filter(agreement_authorizations=original)
         officers = []
         for authorized in original.authorized_officers.all():

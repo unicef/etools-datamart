@@ -4,7 +4,8 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.22
+TARGET?=1.23
+BASE=1.3
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -28,11 +29,13 @@ help:
 build-base:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
-			-t ${DOCKER_IMAGE_NAME}:base \
+			--no-cache \
+			-t ${DOCKER_IMAGE_NAME}-base:${BASE} \
 			-f docker/Dockerfile.base .
 
 
 .build:
+	cd .. && ./manage.py makemigrations data --check --dry-run
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
@@ -104,7 +107,26 @@ deploy:
 	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
-#	$(MAKE) bump
+	curl -X POST -H 'Content-type: application/json' \
+		--data '{"text":"Datamart ${TARGET} released in dev"}' \
+		https://hooks.slack.com/services/${SLACK_BOT_TOKEN}
+
+staging:
+	echo "="
+
+production:
+	lazo rancher \
+		-b https://elgaucho.unicef.io/v3 \
+		--auth ${RANCHER_GAUCHO_AUTH}
+		upgrade \
+		-c rke-cluster-etdw \
+		-p datamart-prod \
+		--check-image \
+		datamart-prod:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
+
+	curl -X POST -H 'Content-type: application/json' \
+		--data '{"text":"Datamart ${TARGET} released in production"}' \
+		https://hooks.slack.com/services/${SLACK_BOT_TOKEN}
 
 bump:
 	cd .. && bumpversion --commit --tag --config-file=.bumpversion.cfg num

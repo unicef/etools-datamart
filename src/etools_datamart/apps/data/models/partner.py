@@ -1,32 +1,46 @@
-import json
-
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
+from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
-from sentry_sdk import capture_exception
+from crashlog.middleware import process_exception
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType
-from etools_datamart.apps.etools.models import PartnersPartnerorganization
+from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType, TravelType
+from etools_datamart.apps.etools.models import PartnersPartnerorganization, T2FTravelactivity
 
 
 class PartnerLoader(Loader):
-    # def get_shared_with(self, record, values):
-    #     try:
-    #
-    #         data = json.dumps(record.shared_with)
-    #     except:
-    #         data = {}
-    #     return data
 
-    def get_hact_values(self, record, values):
+    def get_queryset(self):
+        return PartnersPartnerorganization.objects.select_related('planned_engagement').all()
+
+    def get_last_pv_date(self, record, valuess, **kwargs):
+        # FIXME: improves this
+        activity = T2FTravelactivity.objects.filter(partnership__agreement__partner=record,
+                                                    travel_type=TravelType.PROGRAMME_MONITORING,
+                                                    date__isnull=False,
+                                                    travels__status='completed',
+                                                    travels__traveler=F(
+                                                        'primary_traveler'),
+                                                    ).first()
+        if activity:
+            return activity.date
+
+    def get_planned_engagement(self, record, valuess, **kwargs):
         try:
-
-            data = json.dumps(record.hact_values)
-        except Exception:
-            capture_exception()
+            rec = record.planned_engagement
+            data = {'spot_check_planned_q1': rec.spot_check_planned_q1,
+                    'spot_check_planned_q2': rec.spot_check_planned_q2,
+                    'spot_check_planned_q3': rec.spot_check_planned_q3,
+                    'spot_check_planned_q4': rec.spot_check_planned_q4,
+                    'scheduled_audit': rec.scheduled_audit,
+                    'special_audit': rec.special_audit,
+                    'spot_check_follow_up': rec.spot_check_follow_up,
+                    }
+        except Exception as e:
+            process_exception(e)
             data = {}
         return data
 
@@ -47,7 +61,7 @@ class Partner(DataMartModel):
     deleted_flag = models.BooleanField(blank=True, null=True)
     description = models.CharField(max_length=256, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
-    hact_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    hact_values = JSONField(blank=True, null=True)  # This field type is a guess.
     hidden = models.BooleanField(db_index=True, blank=True, null=True)
     last_assessment_date = models.DateField(blank=True, null=True)
     manually_blocked = models.BooleanField(blank=True, null=True)
@@ -81,6 +95,16 @@ class Partner(DataMartModel):
     type_of_assessment = models.CharField(max_length=50, blank=True, null=True)
     vendor_number = models.CharField(max_length=30, blank=True, null=True, db_index=True, )
     vision_synced = models.BooleanField(blank=True, null=True)
+
+    # Model property
+    min_req_programme_visits = models.IntegerField(default=0, blank=True, null=True)
+    hact_min_requirements = JSONField(default=dict, blank=True, null=True)
+    min_req_spot_checks = models.IntegerField(default=0, blank=True, null=True)
+
+    # O2O
+    planned_engagement = JSONField(default=dict, blank=True, null=True)
+
+    last_pv_date = models.DateField(blank=True, null=True, db_index=True)
 
     class Meta:
         unique_together = (('schema_name', 'name', 'vendor_number'),
