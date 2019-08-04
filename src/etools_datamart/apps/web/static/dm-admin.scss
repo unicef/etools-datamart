@@ -3,15 +3,21 @@
 }
 
 .failure {
-  color: #d2625d;
+  color: #d23434;
 }
 
 .error {
-  color: #d2625d;
+  color: #d23434;
+}
+
+.warn {
+  color: #d5a71c;
 }
 
 .results {
-  .success, .error, .failure, .running {
-    font-weight: bold;
+  .field-_status {
+    .success, .error, .failure, .warn {
+      font-weight: bold;
+    }
   }
 }

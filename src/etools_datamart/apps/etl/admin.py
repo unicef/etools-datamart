@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
 from django.urls import reverse
+from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -41,35 +44,62 @@ def force(modeladmin, request, queryset):
                             messages.SUCCESS)
 
 
+def get_css(obj):
+    css = ''
+    if obj.status in ['FAILURE', 'ERROR']:
+        css = 'error'
+    elif obj.last_failure:
+        css = 'error'
+    elif obj.last_run.date() < datetime.today().date():
+        css = 'warn'
+    elif obj.status == 'SUCCESS':
+        css = 'success'
+    return css
+
+
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', 'last_run', 'run_type', '_status', 'time',
-                    'last_success', 'last_failure', 'locked',
-                    'scheduling', 'unlock_task', 'queue_task'
+    list_display = ('task', '_last_run', 'run_type', '_status', 'time',
+                    '_last_success', 'last_failure',
+                    'crontab', 'unlock_task', 'queue_task'
                     )
 
     date_hierarchy = 'last_run'
     actions = [mass_update, queue, force]
 
+    def _last_run(self, obj):
+        dt = formats.date_format(obj.last_run, 'DATETIME_FORMAT')
+        css = get_css(obj)
+        return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
+    def _last_success(self, obj):
+        dt = formats.date_format(obj.last_success, 'DATETIME_FORMAT')
+        css = get_css(obj)
+        return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
+    def _last_failure(self, obj):
+        dt = formats.date_format(obj.last_failure, 'DATE_FORMAT')
+        css = get_css(obj)
+        return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
     def _status(self, obj):
-        cls = obj.status.lower()
-        if obj.status == 'SUCCESS':
-            pass
-        return mark_safe('<span class="%s">%s</span>' % (cls, obj.status))
+        css = get_css(obj)
+        return mark_safe('<span class="%s">%s</span>' % (css, obj.status))
 
     _status.verbse_name = 'status'
 
-    def scheduling(self, obj):
+    def crontab(self, obj):
         opts = PeriodicTask._meta
+        label = 'cron'
+
         if obj.periodic_task:
             pt = obj.periodic_task
             url = reverse('admin:%s_%s_change' % (opts.app_label,
                                                   opts.model_name), args=[pt.id])
             url = f"{url}?name={obj.task}&task={obj.task}"
-            label = (pt.crontab or pt.solar or pt.interval)
+            # label = (pt.crontab or pt.solar or pt.interval)
         else:
             url = reverse('admin:%s_%s_add' % (opts.app_label, opts.model_name))
-            label = 'Schedule'
 
         return format_html(f'<a href="{url}">{label}</a>')
 
@@ -87,15 +117,23 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                                              opts.model_name), args=[obj.id])
         return format_html(f'<a href="{url}">queue</a>')
 
-    queue_task.verbse_name = 'queue'
+    queue_task.verbose_name = 'queue'
 
     def unlock_task(self, obj):
+        locked = obj.content_type.model_class().loader.is_locked
+        if locked:
+            css = 'error'
+            label = 'unlock'
+        else:
+            css = 'success'
+            label = 'force unlock'
+
         opts = self.model._meta
         url = reverse('admin:%s_%s_unlock' % (opts.app_label,
                                               opts.model_name), args=[obj.id])
-        return format_html(f'<a href="{url}">unlock</a>')
+        return format_html(f'<a href="{url}"><span class="{css}">{label}</span></a>')
 
-    queue_task.verbse_name = 'unlock'
+    unlock_task.verbose_name = 'unlock'
 
     def has_add_permission(self, request):
         return False
@@ -108,11 +146,11 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     time.admin_order_field = 'elapsed'
 
-    def locked(self, obj):
-        try:
-            return obj.content_type.model_class().loader.is_locked
-        except Exception as e:
-            return 'Error: %s' % e
+    # def locked(self, obj):
+    #     try:
+    #         return obj.content_type.model_class().loader.is_locked
+    #     except Exception as e:
+    #         return 'Error: %s' % e
 
     # locked.boolean = True
     #
@@ -128,6 +166,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         obj = self.get_object(request, pk)
         try:
             obj.status = 'QUEUED'
+            obj.elapsed = None
             obj.save()
             task = app.tasks.get(obj.task)
             task.delay(run_type=RUN_QUEUED)
@@ -139,10 +178,12 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     @action()
     def unlock(self, request, pk):
+
         obj = self.get_object(request, pk)
 
         def _action(request):
             obj.loader.unlock()
+
         return _confirm_action(self, request, _action,
                                f"""Continuing will unlock selected task. ({obj.task}).
 {obj.loader.task.name} - {obj.loader.config.lock_key}

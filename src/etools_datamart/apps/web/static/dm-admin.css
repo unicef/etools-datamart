@@ -1,17 +1,14 @@
 .success {
-  color: #00b600;
-}
+  color: #00b600; }
 
 .failure {
-  color: #d2625d;
-}
+  color: #d23434; }
 
 .error {
-  color: #d2625d;
-}
+  color: #d23434; }
 
-.results .success, .results .error, .results .failure, .results .running {
-  font-weight: bold;
-}
+.warn {
+  color: #d5a71c; }
 
-/*# sourceMappingURL=dm-admin.css.map */
+.results .field-_status .success, .results .field-_status .error, .results .field-_status .failure, .results .field-_status .warn {
+  font-weight: bold; }

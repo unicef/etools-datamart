@@ -17,8 +17,12 @@
   color: #d2625d;
 }
 
+.warn {
+  color: #e9b71f;
+}
+
 .results {
-  .success, .error, .failure {
+  .success, .error, .failure, .warn {
     font-weight: bold;
   }
 }
