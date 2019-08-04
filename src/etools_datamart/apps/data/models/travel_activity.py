@@ -23,7 +23,7 @@ class TravelActivityLoader(Loader):
 class TravelActivity(LocationMixin, DataMartModel):
     travel_reference_number = models.CharField(max_length=200, blank=True, null=True)
     travel_type = models.CharField(max_length=200, blank=True, null=True)
-    date = models.DateTimeField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
     partner_name = models.CharField(max_length=200, blank=True, null=True)
     partnership_number = models.CharField(max_length=200, blank=True, null=True)
     primary_traveler = models.CharField(max_length=200, blank=True, null=True)
