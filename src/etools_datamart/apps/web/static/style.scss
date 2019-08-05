@@ -51,7 +51,7 @@ body, html {
 
 .master-container {
   width: 100%;
-  min-height: 94vh;
+  //min-height: 94vh;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -63,28 +63,28 @@ body, html {
   padding: 15px;
 }
 
-.box {
-  width: 1170px;
-  background: #fff;
-  overflow: hidden;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  flex-direction: row-reverse;
-}
+//.box {
+//  width: 1170px;
+//  background: #fff;
+//  overflow: hidden;
+//  display: -webkit-box;
+//  display: -webkit-flex;
+//  display: -moz-box;
+//  display: -ms-flexbox;
+//  display: flex;
+//  flex-wrap: wrap;
+//  align-items: stretch;
+//  flex-direction: row-reverse;
+//}
 
 .right {
-  width: 50%;
+  //width: 50%;
   //display: -webkit-box;
   //display: -webkit-flex;
   //display: -moz-box;
   //display: -ms-flexbox;
   //display: flex;
-  flex-wrap: wrap;
+  //flex-wrap: wrap;
 
   form, #login-menu {
     padding: 100px 0 0 65px;
@@ -155,13 +155,59 @@ ul.index-menu {
 
 /* [ login more ]*/
 
+@media only screen and (min-width: 100px) {
+  .left {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 500px) {
+  .left {
+    display: block;
+    width: 100%;
+
+    img {
+      display: block;
+      height: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  .right {
+    display: block;
+    vertical-align: top;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .left {
+    width: 100%;
+    align-content: center;
+
+    img {
+      display: block;
+      height: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  .right {
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .left {
+    width: 50%;
+  }
+}
+
 .left {
-  width: 50%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  z-index: 1;
+  //width: 50%;
+  //background-repeat: no-repeat;
+  //background-size: cover;
+  //background-position: center;
+  //position: relative;
+  //z-index: 1;
   //&:before {
   //  content: "";
   //  display: block;

@@ -9,7 +9,8 @@ from .intervention import Intervention
 
 class FundsReservationLoader(Loader):
     def get_intervention(self, record, values, **kwargs):
-        return Intervention.objects.filter(source_id=record.fund_reservation.intervention.pk)
+        if record.und_reservation.intervention:
+            return Intervention.objects.filter(source_id=record.fund_reservation.intervention.pk)
 
 
 class FundsReservation(DataMartModel):

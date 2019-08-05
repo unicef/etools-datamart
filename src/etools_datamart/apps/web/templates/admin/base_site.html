@@ -32,10 +32,10 @@
     {% endif %}
 {% endblock %}
 {% block nav-global %}{% endblock %}
-{#{% block footer %}#}
-{#    <div id="footer">#}
-{#        <div style="float:right">#}
-{#            <a href="javascript:document.cookie='old_index_style={{ index_style }}; path=/';window.location.reload(true);">Switch index</a>#}
-{#        </div>#}
-{#    </div>#}
-{#{% endblock %}#}
+{% block footer %}
+    <div id="footer">
+        <div style="float:right">
+            Version: {% version %}
+        </div>
+    </div>
+{% endblock %}

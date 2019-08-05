@@ -34,7 +34,6 @@ body, html {
 
 .master-container {
   width: 100%;
-  min-height: 94vh;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -45,37 +44,26 @@ body, html {
   align-items: center;
   padding: 15px; }
 
-.box {
-  width: 1170px;
-  background: #fff;
-  overflow: hidden;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  flex-direction: row-reverse; }
+.right form, .right #login-menu {
+  padding: 100px 0 0 65px; }
 
-.right {
-  width: 50%;
-  flex-wrap: wrap; }
-  .right form, .right #login-menu {
-    padding: 100px 0 0 65px; }
-  .right .center {
-    width: 100%;
-    text-align: center; }
-  .right h1 {
-    width: 100%;
-    font-size: 24pt;
-    text-align: center; }
-  .right h2 {
-    font-size: 16pt; }
-  .right h1, .right h2, .right h3, .right h4 {
-    margin: 20px; }
-  .right a {
-    text-decoration: none; }
+.right .center {
+  width: 100%;
+  text-align: center; }
+
+.right h1 {
+  width: 100%;
+  font-size: 24pt;
+  text-align: center; }
+
+.right h2 {
+  font-size: 16pt; }
+
+.right h1, .right h2, .right h3, .right h4 {
+  margin: 20px; }
+
+.right a {
+  text-decoration: none; }
 
 ul.index-menu {
   padding: 20px 0 0 65px;
@@ -98,13 +86,36 @@ ul.index-menu {
   height: 30px; }
 
 /* [ login more ]*/
-.left {
-  width: 50%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  z-index: 1; }
+@media only screen and (min-width: 100px) {
+  .left {
+    display: none; } }
+
+@media only screen and (min-width: 500px) {
+  .left {
+    display: block;
+    width: 100%; }
+    .left img {
+      display: block;
+      height: 300px;
+      margin-left: auto;
+      margin-right: auto; }
+  .right {
+    display: block;
+    vertical-align: top; } }
+
+@media only screen and (min-width: 768px) {
+  .left {
+    width: 100%;
+    align-content: center; }
+    .left img {
+      display: block;
+      height: 300px;
+      margin-left: auto;
+      margin-right: auto; } }
+
+@media only screen and (min-width: 1024px) {
+  .left {
+    width: 50%; } }
 
 .m-b-20 {
   margin-bottom: 20px; }
