@@ -63,6 +63,8 @@ def get_css(obj):
         pass
     elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
         css = 'error'
+    elif 'RETRY' in obj.status:
+        css = 'warn'
     elif obj.last_failure:
         css = 'error'
     elif obj.last_run and (obj.last_run.date() < datetime.today().date()):
