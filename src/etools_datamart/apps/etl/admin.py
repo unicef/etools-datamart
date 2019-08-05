@@ -16,7 +16,7 @@ from adminactions.mass_update import mass_update
 from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 
-from etools_datamart.apps.data.loader import RUN_QUEUED
+from etools_datamart.apps.data.loader import RUN_QUEUED, RUN_UNKNOWN
 from etools_datamart.celery import app
 from etools_datamart.libs.time import strfelapsed
 
@@ -26,21 +26,26 @@ from . import models
 def queue(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
-        modeladmin.queue(request, obj.pk)
-        # task = app.tasks.get(obj.task)
-        # task.delay(run_type=RUN_QUEUED)
+        modeladmin.queue(request, obj.pk, message=False)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
                             messages.SUCCESS)
 
 
-def force(modeladmin, request, queryset):
+def truncate(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
-        task = app.tasks.get(obj.task)
-        task.delay(run_type=RUN_QUEUED, ignore_dependencies=True)
+        obj.loader.model.objects.truncate()
+        obj.loader.unlock()
+        obj.status = 'NO DATA'
+        obj.last_run = None
+        obj.run_type = RUN_UNKNOWN
+        obj.last_success = None
+        obj.last_failure = None
+        obj.time = None
+        obj.save()
     modeladmin.message_user(request,
-                            "{0} task{1} forced".format(count, pluralize(count)),
+                            "{0} table{1} truncated".format(count, pluralize(count)),
                             messages.SUCCESS)
 
 
@@ -48,7 +53,7 @@ def get_css(obj):
     css = ''
     if obj.status in ['RUNNING']:
         pass
-    elif obj.status in ['FAILURE', 'ERROR']:
+    elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
         css = 'error'
     elif obj.last_failure:
         css = 'error'
@@ -62,12 +67,12 @@ def get_css(obj):
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', '_last_run', 'run_type', '_status', 'time',
-                    '_last_success', 'last_failure',
+                    '_last_success', '_last_failure',
                     'crontab', 'unlock_task', 'queue_task', 'data'
                     )
 
     date_hierarchy = 'last_run'
-    actions = [mass_update, queue, force]
+    actions = [mass_update, queue, truncate]
 
     def _last_run(self, obj):
         if obj.last_run:
@@ -170,7 +175,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #     return self._changeform_view(request, object_id, form_url, extra_context)
 
     @action()
-    def queue(self, request, pk):
+    def queue(self, request, pk, message=True):
         obj = self.get_object(request, pk)
         try:
             obj.status = 'QUEUED'
@@ -178,7 +183,8 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             obj.save()
             task = app.tasks.get(obj.task)
             task.delay(run_type=RUN_QUEUED)
-            self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
+            if message:
+                self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             process_exception(e)
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
