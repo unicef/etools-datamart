@@ -10,7 +10,12 @@ from .intervention import Intervention
 class FundsReservationLoader(Loader):
     def get_intervention(self, record, values, **kwargs):
         if record.fund_reservation.intervention:
-            return Intervention.objects.filter(source_id=record.fund_reservation.intervention.pk)
+            try:
+                return Intervention.objects.get(
+                    schema_name=self.context['country'].schema_name,
+                    source_id=record.fund_reservation.intervention.pk)
+            except Intervention.DoesNotExist:
+                pass
 
 
 class FundsReservation(DataMartModel):
