@@ -16,6 +16,8 @@ from adminactions.mass_update import mass_update
 from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 
+from unicef_rest_framework.models import Service
+
 from etools_datamart.apps.data.loader import RUN_QUEUED, RUN_UNKNOWN
 from etools_datamart.celery import app
 from etools_datamart.libs.time import strfelapsed
@@ -34,8 +36,14 @@ def queue(modeladmin, request, queryset):
 
 def truncate(modeladmin, request, queryset):
     count = len(queryset)
+
     for obj in queryset:
+        try:
+            Service.objects.get_for_model(obj.loader.model).invalidate_cache()
+        except Service.DoesNotExist:
+            pass
         obj.loader.model.objects.truncate()
+        obj.loader.model.invalidate_cache()
         obj.loader.unlock()
         obj.status = 'NO DATA'
         obj.last_run = None
@@ -57,7 +65,7 @@ def get_css(obj):
         css = 'error'
     elif obj.last_failure:
         css = 'error'
-    elif obj.last_run.date() < datetime.today().date():
+    elif obj.last_run and (obj.last_run.date() < datetime.today().date()):
         css = 'warn'
     elif obj.status == 'SUCCESS':
         css = 'success'
