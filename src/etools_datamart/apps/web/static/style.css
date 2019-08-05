@@ -88,7 +88,10 @@ ul.index-menu {
 /* [ login more ]*/
 @media only screen and (min-width: 100px) {
   .left {
-    display: none; } }
+    display: none; }
+  .right {
+    display: block;
+    vertical-align: top; } }
 
 @media only screen and (min-width: 500px) {
   .left {
@@ -98,20 +101,12 @@ ul.index-menu {
       display: block;
       height: 300px;
       margin-left: auto;
-      margin-right: auto; }
-  .right {
-    display: block;
-    vertical-align: top; } }
+      margin-right: auto; } }
 
 @media only screen and (min-width: 768px) {
   .left {
     width: 100%;
-    align-content: center; }
-    .left img {
-      display: block;
-      height: 300px;
-      margin-left: auto;
-      margin-right: auto; } }
+    align-content: center; } }
 
 @media only screen and (min-width: 1024px) {
   .left {

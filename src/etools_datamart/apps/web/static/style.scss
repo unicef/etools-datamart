@@ -159,6 +159,10 @@ ul.index-menu {
   .left {
     display: none;
   }
+  .right {
+    display: block;
+    vertical-align: top;
+  }
 }
 
 @media only screen and (min-width: 500px) {
@@ -173,23 +177,12 @@ ul.index-menu {
       margin-right: auto;
     }
   }
-  .right {
-    display: block;
-    vertical-align: top;
-  }
 }
 
 @media only screen and (min-width: 768px) {
   .left {
     width: 100%;
     align-content: center;
-
-    img {
-      display: block;
-      height: 300px;
-      margin-left: auto;
-      margin-right: auto;
-    }
   }
   .right {
   }
