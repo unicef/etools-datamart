@@ -9,7 +9,7 @@ from .intervention import Intervention
 
 class FundsReservationLoader(Loader):
     def get_intervention(self, record, values, **kwargs):
-        if record.und_reservation.intervention:
+        if record.fund_reservation.intervention:
             return Intervention.objects.filter(source_id=record.fund_reservation.intervention.pk)
 
 
