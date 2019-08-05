@@ -28,7 +28,7 @@ class FundsReservation(DataMartModel):
                                           blank=True, null=True)
     multi_curr_flag = models.BooleanField()
     completed_flag = models.BooleanField(default=None, blank=True, null=True)
-    # delegated = models.BooleanField(default=None, blank=True, null=True)
+    delegated = models.BooleanField(default=None, blank=True, null=True)
 
     # item
     fr_ref_number = models.CharField(max_length=30)
