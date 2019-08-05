@@ -1,9 +1,21 @@
 from django.db import models
 
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.etools.models import FundsFundsreservationitem
 
 from .base import DataMartModel
 from .intervention import Intervention
+
+
+class FundsReservationLoader(Loader):
+    def get_intervention(self, record, values, **kwargs):
+        if record.fund_reservation.intervention:
+            try:
+                return Intervention.objects.get(
+                    schema_name=self.context['country'].schema_name,
+                    source_id=record.fund_reservation.intervention.pk)
+            except Intervention.DoesNotExist:
+                pass
 
 
 class FundsReservation(DataMartModel):
@@ -52,9 +64,11 @@ class FundsReservation(DataMartModel):
     # internals
     source_id = models.IntegerField()
     source_intervention_id = models.IntegerField()
-    # intervention = models.ForeignKey(Intervention,
-    #                                  models.SET_NULL,
-    #                                  related_name='funds', blank=True, null=True)
+    intervention = models.ForeignKey(Intervention,
+                                     models.SET_NULL,
+                                     related_name='funds', blank=True, null=True)
+
+    loader = FundsReservationLoader()
 
     class Meta:
         unique_together = (('schema_name', 'source_id'),)
@@ -89,6 +103,7 @@ class FundsReservation(DataMartModel):
             multi_curr_flag='fund_reservation.multi_curr_flag',
             completed_flag='fund_reservation.completed_flag',
             intervention_title="fund_reservation.intervention.title",
+            delegated="fund_reservation.intervention.delegated",
 
             source_id='id',
             source_intervention_id='fund_reservation.id',

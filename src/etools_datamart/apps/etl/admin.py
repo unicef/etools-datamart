@@ -5,7 +5,7 @@ from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -16,7 +16,9 @@ from adminactions.mass_update import mass_update
 from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 
-from etools_datamart.apps.data.loader import RUN_QUEUED
+from unicef_rest_framework.models import Service
+
+from etools_datamart.apps.data.loader import RUN_QUEUED, RUN_UNKNOWN
 from etools_datamart.celery import app
 from etools_datamart.libs.time import strfelapsed
 
@@ -26,31 +28,44 @@ from . import models
 def queue(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
-        modeladmin.queue(request, obj.pk)
-        # task = app.tasks.get(obj.task)
-        # task.delay(run_type=RUN_QUEUED)
+        modeladmin.queue(request, obj.pk, message=False)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
                             messages.SUCCESS)
 
 
-def force(modeladmin, request, queryset):
+def truncate(modeladmin, request, queryset):
     count = len(queryset)
+
     for obj in queryset:
-        task = app.tasks.get(obj.task)
-        task.delay(run_type=RUN_QUEUED, ignore_dependencies=True)
+        try:
+            Service.objects.get_for_model(obj.loader.model).invalidate_cache()
+        except Service.DoesNotExist:
+            pass
+        obj.loader.model.objects.truncate()
+        obj.loader.model.invalidate_cache()
+        obj.loader.unlock()
+        obj.status = 'NO DATA'
+        obj.last_run = None
+        obj.run_type = RUN_UNKNOWN
+        obj.last_success = None
+        obj.last_failure = None
+        obj.time = None
+        obj.save()
     modeladmin.message_user(request,
-                            "{0} task{1} forced".format(count, pluralize(count)),
+                            "{0} table{1} truncated".format(count, pluralize(count)),
                             messages.SUCCESS)
 
 
 def get_css(obj):
     css = ''
-    if obj.status in ['FAILURE', 'ERROR']:
+    if obj.status in ['RUNNING']:
+        pass
+    elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
         css = 'error'
     elif obj.last_failure:
         css = 'error'
-    elif obj.last_run.date() < datetime.today().date():
+    elif obj.last_run and (obj.last_run.date() < datetime.today().date()):
         css = 'warn'
     elif obj.status == 'SUCCESS':
         css = 'success'
@@ -60,12 +75,12 @@ def get_css(obj):
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', '_last_run', 'run_type', '_status', 'time',
-                    '_last_success', 'last_failure',
-                    'crontab', 'unlock_task', 'queue_task'
+                    '_last_success', '_last_failure',
+                    'crontab', 'unlock_task', 'queue_task', 'data'
                     )
 
     date_hierarchy = 'last_run'
-    actions = [mass_update, queue, force]
+    actions = [mass_update, queue, truncate]
 
     def _last_run(self, obj):
         if obj.last_run:
@@ -107,10 +122,13 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return format_html(f'<a href="{url}">{label}</a>')
 
     def data(self, obj):
-        model = obj.content_type.model_class()
+        model = obj.loader.model
         opts = model._meta
-        url = reverse('admin:%s_%s_changelist' % (opts.app_label, opts.model_name))
-        return format_html(f'<a href="{url}">data</a>')
+        try:
+            url = reverse('admin:%s_%s_changelist' % (opts.app_label, opts.model_name))
+            return format_html(f'<a href="{url}">data</a>')
+        except NoReverseMatch:
+            return '-'
 
     data.verbse_name = 'data'
 
@@ -165,7 +183,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #     return self._changeform_view(request, object_id, form_url, extra_context)
 
     @action()
-    def queue(self, request, pk):
+    def queue(self, request, pk, message=True):
         obj = self.get_object(request, pk)
         try:
             obj.status = 'QUEUED'
@@ -173,7 +191,8 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             obj.save()
             task = app.tasks.get(obj.task)
             task.delay(run_type=RUN_QUEUED)
-            self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
+            if message:
+                self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             process_exception(e)
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)

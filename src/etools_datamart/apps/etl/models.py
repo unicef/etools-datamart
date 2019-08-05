@@ -45,6 +45,7 @@ class EtlTask(models.Model):
                 ('FAILURE', 'FAILURE'),
                 ('SUCCESS', 'SUCCESS'),
                 ('ERROR', 'ERROR'),
+                # ('NODATA', 'NO DATA'),
                 )
     task = models.CharField(max_length=200, unique=True)
     last_run = models.DateTimeField(null=True, help_text="last execution time")
