@@ -5,7 +5,7 @@ from django.contrib import admin, messages
 from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -63,7 +63,7 @@ def get_css(obj):
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', '_last_run', 'run_type', '_status', 'time',
                     '_last_success', 'last_failure',
-                    'crontab', 'unlock_task', 'queue_task'
+                    'crontab', 'unlock_task', 'queue_task', 'data'
                     )
 
     date_hierarchy = 'last_run'
@@ -109,10 +109,13 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return format_html(f'<a href="{url}">{label}</a>')
 
     def data(self, obj):
-        model = obj.content_type.model_class()
+        model = obj.loader.model
         opts = model._meta
-        url = reverse('admin:%s_%s_changelist' % (opts.app_label, opts.model_name))
-        return format_html(f'<a href="{url}">data</a>')
+        try:
+            url = reverse('admin:%s_%s_changelist' % (opts.app_label, opts.model_name))
+            return format_html(f'<a href="{url}">data</a>')
+        except NoReverseMatch:
+            return '-'
 
     data.verbse_name = 'data'
 
