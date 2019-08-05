@@ -2,10 +2,6 @@
 ----
 * improves Admin functionalities
 * updates FundsReservation endpoints
-
-
-1.23.1
-------
 * fixes FundsReservation ETL
 
 

@@ -1,9 +1,15 @@
 from django.db import models
 
+from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.etools.models import FundsFundsreservationitem
 
 from .base import DataMartModel
 from .intervention import Intervention
+
+
+class FundsReservationLoader(Loader):
+    def get_intervention(self, record, values, **kwargs):
+        return Intervention.objects.filter(source_id=record.fund_reservation.intervention.pk)
 
 
 class FundsReservation(DataMartModel):
@@ -52,9 +58,9 @@ class FundsReservation(DataMartModel):
     # internals
     source_id = models.IntegerField()
     source_intervention_id = models.IntegerField()
-    # intervention = models.ForeignKey(Intervention,
-    #                                  models.SET_NULL,
-    #                                  related_name='funds', blank=True, null=True)
+    intervention = models.ForeignKey(Intervention,
+                                     models.SET_NULL,
+                                     related_name='funds', blank=True, null=True)
 
     class Meta:
         unique_together = (('schema_name', 'source_id'),)
