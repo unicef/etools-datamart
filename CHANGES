@@ -3,6 +3,9 @@
 * improves Admin functionalities
 * updates FundsReservation endpoints
 * fixes FundsReservation ETL
+* updates EtlTask management
+* add ability to fully reset data
+
 
 
 1.23
