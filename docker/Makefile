@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.24.0a
+TARGET?=1.23.1
 BASE=1.3
 # below vars are used internally
 BUILD_OPTIONS?=--squash
@@ -123,24 +123,6 @@ production:
 		-p datamart-prod \
 		--check-image \
 		datamart-prod:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
-
-	lazo rancher \
-		-b https://elgaucho.unicef.io/v3 \
-		--auth ${RANCHER_GAUCHO_AUTH}
-		upgrade \
-		-c rke-cluster-etdw \
-		-p datamart-prod \
-		--check-image \
-		datamart-prod:celery ${DOCKER_IMAGE_NAME}:${TARGET}
-
-	lazo rancher \
-		-b https://elgaucho.unicef.io/v3 \
-		--auth ${RANCHER_GAUCHO_AUTH}
-		upgrade \
-		-c rke-cluster-etdw \
-		-p datamart-prod \
-		--check-image \
-		datamart-prod:beat ${DOCKER_IMAGE_NAME}:${TARGET}
 
 	curl -X POST -H 'Content-type: application/json' \
 		--data '{"text":"Datamart ${TARGET} released in production"}' \
