@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "2499"
+            "2583"
         ]
     },
     "data": {
@@ -93,6 +93,7 @@
                 "module_task_activity_reference_number": null,
                 "fam_category": null,
                 "related_module": null,
+                "related_module_class": null,
                 "related_module_url": null,
                 "action_point_url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=bolivia"
             },
@@ -128,6 +129,7 @@
                 "module_task_activity_reference_number": null,
                 "fam_category": null,
                 "related_module": null,
+                "related_module_class": null,
                 "related_module_url": null,
                 "action_point_url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=chad"
             },
@@ -163,6 +165,7 @@
                 "module_task_activity_reference_number": null,
                 "fam_category": null,
                 "related_module": null,
+                "related_module_class": null,
                 "related_module_url": null,
                 "action_point_url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=lebanon"
             }

@@ -34,6 +34,13 @@ class InterventionLoader(Loader):
     # def fr_currencies_ok(self, original: PartnersIntervention):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
 
+    def get_partner_id(self, original: PartnersIntervention, values: dict, **kwargs):
+        try:
+            return Partner.objects.get(schema_name=self.context['country'].schema_name,
+                                       source_id=original.agreement.partner.id).pk
+        except Partner.DoesNotExist:
+            return None
+
     def get_planned_programmatic_visits(self, original: PartnersIntervention, values: dict, **kwargs):
         qs = PartnersInterventionplannedvisits.objects.filter(intervention=original)
         qs = qs.filter(year=self.context['today'].year)
@@ -303,7 +310,7 @@ class InterventionAbstract(models.Model):
             partner_contribution_local='planned_budget.partner_contribution_local',
             partner_focal_points='-',
             partner_focal_points_data='i',
-            partner_id=None,
+            partner_id='-',
             partner_name='agreement.partner.name',
             partner_signatory_email='partner_authorized_officer_signatory.email',
             partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
