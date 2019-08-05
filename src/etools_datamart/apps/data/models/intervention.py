@@ -37,7 +37,7 @@ class InterventionLoader(Loader):
     def get_partner_id(self, original: PartnersIntervention, values: dict, **kwargs):
         try:
             return Partner.objects.get(schema_name=self.context['country'].schema_name,
-                                       source_id=original.agreement.partner.id)
+                                       source_id=original.agreement.partner.id).pk
         except Partner.DoesNotExist:
             return None
 
