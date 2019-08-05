@@ -35,7 +35,11 @@ class InterventionLoader(Loader):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
 
     def get_partner_id(self, original: PartnersIntervention, values: dict, **kwargs):
-        return Partner.objects.get(source_id=original.agreement.partner.id)
+        try:
+            return Partner.objects.get(schema_name=self.context['country'].schema_name,
+                                       source_id=original.agreement.partner.id)
+        except Partner.DoesNotExist:
+            return None
 
     def get_planned_programmatic_visits(self, original: PartnersIntervention, values: dict, **kwargs):
         qs = PartnersInterventionplannedvisits.objects.filter(intervention=original)
