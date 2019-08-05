@@ -91,7 +91,11 @@ ul.index-menu {
     display: none; }
   .right {
     display: block;
-    vertical-align: top; } }
+    vertical-align: top; }
+  .master-container {
+    min-height: 94vh;
+    display: flex;
+    align-items: start; } }
 
 @media only screen and (min-width: 500px) {
   .left {
@@ -110,7 +114,11 @@ ul.index-menu {
 
 @media only screen and (min-width: 1024px) {
   .left {
-    width: 50%; } }
+    width: 50%; }
+  .right {
+    width: 50%; }
+  .master-container {
+    min-height: 94vh; } }
 
 .m-b-20 {
   margin-bottom: 20px; }

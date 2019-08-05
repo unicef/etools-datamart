@@ -163,6 +163,11 @@ ul.index-menu {
     display: block;
     vertical-align: top;
   }
+  .master-container {
+    min-height: 94vh;
+     display: flex;
+    align-items: start;
+  }
 }
 
 @media only screen and (min-width: 500px) {
@@ -191,6 +196,12 @@ ul.index-menu {
 @media only screen and (min-width: 1024px) {
   .left {
     width: 50%;
+  }
+  .right {
+    width: 50%;
+  }
+  .master-container {
+    min-height: 94vh;
   }
 }
 
