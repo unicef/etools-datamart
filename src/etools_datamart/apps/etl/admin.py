@@ -46,7 +46,9 @@ def force(modeladmin, request, queryset):
 
 def get_css(obj):
     css = ''
-    if obj.status in ['FAILURE', 'ERROR']:
+    if obj.status in ['RUNNING']:
+        pass
+    elif obj.status in ['FAILURE', 'ERROR']:
         css = 'error'
     elif obj.last_failure:
         css = 'error'

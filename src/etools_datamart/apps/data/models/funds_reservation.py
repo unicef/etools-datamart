@@ -62,6 +62,8 @@ class FundsReservation(DataMartModel):
                                      models.SET_NULL,
                                      related_name='funds', blank=True, null=True)
 
+    loader = FundsReservationLoader()
+
     class Meta:
         unique_together = (('schema_name', 'source_id'),)
         verbose_name = "Funds Reservation"
@@ -95,6 +97,7 @@ class FundsReservation(DataMartModel):
             multi_curr_flag='fund_reservation.multi_curr_flag',
             completed_flag='fund_reservation.completed_flag',
             intervention_title="fund_reservation.intervention.title",
+            delegated="fund_reservation.intervention.delegated",
 
             source_id='id',
             source_intervention_id='fund_reservation.id',
