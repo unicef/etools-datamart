@@ -30,7 +30,8 @@ RUN apk add --no-cache --virtual .build-deps-edge \
 
 RUN apk add --no-cache --virtual .postgis-rundeps \
         json-c \
-        libuuid
+        libuuid \
+        libxml2
 
 
 RUN apk add --no-cache --virtual .postgis-rundeps-edge \
@@ -42,8 +43,15 @@ RUN apk add --no-cache --virtual .postgis-rundeps-edge \
         gdal-dev \
         gdal \
         gosu \
+        libmagic \
+        libpq \
+        libuuid \
+        libxslt \
+        libzmq \
+        jpeg \
         proj \
-        protobuf-c
+        protobuf-c \
+        zlib
 
 RUN apk add --no-cache --virtual .datamart-build-deps \
         freetype-dev \
