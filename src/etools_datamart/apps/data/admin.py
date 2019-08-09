@@ -155,7 +155,7 @@ class InterventionAdmin(DataModelAdmin, TruncateTableMixin):
 @register(models.InterventionByLocation)
 class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
     list_display = ('country_name', 'title', 'document_type',
-                    'location_name', 'number', 'status')
+                    'location', 'number', 'status')
     list_filter = (SchemaFilter,
                    ('document_type', AllValuesComboFilter),
                    ('status', AllValuesComboFilter),
@@ -192,14 +192,17 @@ class HACTAdmin(DataModelAdmin):
 @register(models.GatewayType)
 class GatewayTypeAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'admin_level', 'source_id')
+    search_fields = ('name',)
 
 
 @register(models.Location)
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude')
-    readonly_fields = ('parent', 'gateway')
+    # readonly_fields = ('parent', 'gateway')
     list_filter = ('level',)
-
+    search_fields = ('name',)
+    autocomplete_fields = ('parent', 'gateway')
+    # raw_id_fields = ('parent', )
 
 @register(models.FundsReservation)
 class FundsReservationAdmin(DataModelAdmin):
