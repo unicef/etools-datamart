@@ -1,3 +1,8 @@
+1.26
+----
+* fixes Intervention  endpoint
+
+
 1.25
 ----
 * restored `related_module_class` in ActionPoint
