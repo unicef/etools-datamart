@@ -24,6 +24,7 @@ class GatewayType(DataMartModel):
     def __str__(self):
         return self.name
 
+
 class LocationManager(DataMartManager):
     def batch_update_centroid(self):
         sql = '''UPDATE "%s" SET point = ST_Centroid(geom)

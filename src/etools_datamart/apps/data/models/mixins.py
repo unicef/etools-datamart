@@ -17,7 +17,7 @@ def add_location_mapping(base):
                   'location_pcode': 'location.p_code',
                   'location_level': 'location.level',
                   'location_levelname': 'location.gateway.name',
-                  'location': lambda loader, record: Location.objects.filter(source_id=record.id,
+                  'location': lambda loader, record: Location.objects.filter(source_id=record.location.id,
                                                                              schema_name=loader.context[
                                                                                  'country'].schema_name).first(),
 
