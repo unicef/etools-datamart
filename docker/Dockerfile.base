@@ -29,7 +29,9 @@ RUN apk add --no-cache --virtual .build-deps-edge \
         protobuf-c-dev
 
 RUN apk add --no-cache --virtual .postgis-rundeps \
-        json-c
+        json-c \
+        libuuid
+
 
 RUN apk add --no-cache --virtual .postgis-rundeps-edge \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
@@ -39,6 +41,7 @@ RUN apk add --no-cache --virtual .postgis-rundeps-edge \
         geos-dev \
         gdal-dev \
         gdal \
+        gosu \
         proj \
         protobuf-c
 

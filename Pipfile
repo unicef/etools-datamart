@@ -65,6 +65,7 @@ sentry-sdk = "*"
 django-deprecate-fields = "*"
 django-migration-linter = "*"
 django-sql-explorer = "*"
+uwsgi = "*"
 
 [dev-packages]
 bumpversion = "*"
