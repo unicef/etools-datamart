@@ -1,3 +1,11 @@
+2.0
+---
+* improves performance
+* bug fixes
+* server start as unprivileged user
+* upgrade to python 3.7
+
+
 1.26
 ----
 * fixes Intervention  endpoint
