@@ -163,6 +163,7 @@ class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
                    )
     search_fields = ('number', 'title')
     date_hierarchy = 'start_date'
+    autocomplete_fields = ('location',)
 
 
 @register(models.FAMIndicator)
@@ -203,6 +204,7 @@ class LocationAdmin(DataModelAdmin):
     search_fields = ('name',)
     autocomplete_fields = ('parent', 'gateway')
     # raw_id_fields = ('parent', )
+
 
 @register(models.FundsReservation)
 class FundsReservationAdmin(DataModelAdmin):
