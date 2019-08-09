@@ -1,3 +1,10 @@
+2.0
+---
+* improves performance
+* bug fixes
+* server start as unprivileged user
+* upgrade to python 3.7
+
 1.25
 ----
 * restored `related_module_class` in ActionPoint
