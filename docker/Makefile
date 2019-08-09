@@ -38,6 +38,9 @@ build-base:
 	cd .. && ./manage.py makemigrations data --check --dry-run
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
+			--build-arg BASE_IMAGE=${BASE} \
+			--build-arg DEVELOP=${DEVELOP} \
+			--build-arg VERSION=${TARGET} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/Dockerfile .

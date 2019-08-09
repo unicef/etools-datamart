@@ -19,7 +19,7 @@ RUN set -o pipefail && \
     echo "${VERSION}-develop"; \
     else \
     echo "Download package: https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" \
-    && curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1 \
+    && curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
 
 FROM unicef/datamart-base:${BASE_IMAGE}
@@ -33,6 +33,7 @@ ARG DEVELOP
 #RUN mkdir -p /code
 #ADD . /code
 #WORKDIR /code
+WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
@@ -111,7 +112,7 @@ ENV UWSGI_PROTOCOL=http \
     UWSGI_ENABLE_THREADS=true \
     UWSGI_LAZY_APPS=true \
     UWSGI_SINGLE_INTERPRETER=true \
-    UWSGI_STATIC_MAP="/static=/tmp/static"
+    UWSGI_STATIC_MAP="/static=${STATIC_ROOT}"
 
 EXPOSE 8000
 
