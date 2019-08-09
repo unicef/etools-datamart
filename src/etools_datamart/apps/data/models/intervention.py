@@ -5,10 +5,12 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import F
 
+from crashlog.middleware import process_exception
+
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.etools.enrichment.consts import TravelType
-from etools_datamart.apps.etools.models import (PartnersAgreementamendment, PartnersIntervention,
-                                                PartnersInterventionplannedvisits,
+from etools_datamart.apps.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
+                                                PartnersIntervention, PartnersInterventionplannedvisits,
                                                 ReportsAppliedindicator, T2FTravelactivity,)
 
 from .base import DataMartModel
@@ -150,6 +152,16 @@ class InterventionLoader(Loader):
         values['partner_focal_points_data'] = data
         return ", ".join(ret)
 
+    def get_fr_number(self, original: PartnersIntervention, values: dict, **kwargs):
+        try:
+            return FundsFundsreservationheader.objects.get(intervention=original,
+                                                           end_date__isnull=True).fr_number
+        except FundsFundsreservationheader.MultipleObjectsReturned as e:
+            process_exception(e)
+            return None
+        except FundsFundsreservationheader.DoesNotExist:
+            return None
+
     def get_cp_outputs(self, original: PartnersIntervention, values: dict, **kwargs):
         values['cp_outputs_data'] = list(original.result_links.values("name", "code"))
         return ", ".join([rl.name for rl in original.result_links.all()])
@@ -288,12 +300,12 @@ class InterventionAbstract(models.Model):
             country_programme_id='country_programme.pk',
             cp_outputs='-',
             created='=',
-            cso_type=None,
+            cso_type='agreement.partner.cso_type',
             currency='planned_budget.currency',
             days_from_submission_to_signature='-',
             days_from_prc_review_to_signature='-',
             end_date='end',
-            fr_number=None,
+            fr_number='-',
             in_kind_amount='planned_budget.in_kind_amount',
             in_kind_amount_local='planned_budget.in_kind_amount_local',
             intervention_id='id',
