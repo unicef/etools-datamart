@@ -5,7 +5,6 @@ from crashlog.middleware import process_exception
 
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
-from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import (AttachmentsAttachment, DjangoContentType,
                                                 TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
                                                 TpmTpmvisitTpmPartnerFocalPoints,)
@@ -64,7 +63,7 @@ class TPMVisitLoader(Loader):
             self.increment_counter(op)
 
 
-class TPMVisit(LocationMixin, DataMartModel):
+class TPMVisit(DataMartModel):
     deleted_at = models.DateTimeField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
@@ -145,7 +144,7 @@ class TPMVisit(LocationMixin, DataMartModel):
         sync_deleted_records = lambda a: False
 
         source = TpmTpmvisit
-        mapping = add_location_mapping(dict(
+        mapping = dict(
             author_name='author.name',
             partner_name='tpm_partner.name',
             source_partner_id='tpm_partner.id',
@@ -159,4 +158,4 @@ class TPMVisit(LocationMixin, DataMartModel):
             visit_status='status',
             visit_start_date='start_date',
             visit_end_date='end_date',
-        ))
+        )

@@ -4,20 +4,10 @@ mkdir -p /var/datamart/log
 mkdir -p /var/datamart/conf
 mkdir -p /var/datamart/run
 
-#if [[ $DAEMONIZE == '1' ]]; then
-#    CELERY_EXTRA='--detach'
-#    GUNICORN_EXTRA='--daemon'
-#fi
+chown datamart:datamart -R /var/datamart/
 
-if [[ "$*" == "test" ]];then
-    DAEMONIZE=1 docker-entrypoint.sh beat
-    DAEMONIZE=1 docker-entrypoint.sh workers
-    DAEMONIZE=1 docker-entrypoint.sh datamart
-    wait-for-it.sh localhost:8000 -t 60 -- curl localhost:8000
-    if [[ ! -f "run/celery.pid" ]]; then exit 1; fi
-    if [[ ! -f "run/celerybeat.pid" ]]; then exit 1; fi
 
-elif [[ "$*" == "worker" ]];then
+if [[ "$*" == "worker" ]];then
     django-admin db-isready --wait --sleep 5 --timeout 60
     django-admin db-isready --wait --sleep 5 --timeout 300 --connection etools
     exec gosu datamart celery worker -A etools_datamart \
@@ -25,7 +15,7 @@ elif [[ "$*" == "worker" ]];then
             --concurrency=${CELERY_CONCURRENCY} \
             --purge \
             --pidfile run/celery.pid \
-            $CELERY_EXTRA \
+            $CELERY_EXTRA
 
 
 elif [[ "$*" == "beat" ]];then

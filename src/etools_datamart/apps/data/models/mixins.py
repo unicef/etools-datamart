@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
+from crashlog.middleware import process_exception
+
 from .location import Location
 
 
@@ -10,6 +12,17 @@ def extend(base, other):
     return ret
 
 
+def _get_location(loader, record):
+    try:
+        if record.location:
+            return Location.objects.filter(source_id=record.location.id,
+                                           schema_name=loader.context[
+                                               'country'].schema_name).first()
+    except Exception as e:
+        process_exception(e)
+    return None
+
+
 def add_location_mapping(base):
     ret = dict(base)
     ret.update(**{'location_source_id': 'location.id',
@@ -17,10 +30,7 @@ def add_location_mapping(base):
                   'location_pcode': 'location.p_code',
                   'location_level': 'location.level',
                   'location_levelname': 'location.gateway.name',
-                  'location': lambda loader, record: Location.objects.filter(source_id=record.location.id,
-                                                                             schema_name=loader.context[
-                                                                                 'country'].schema_name).first(),
-
+                  'location': _get_location
                   })
     return ret
 

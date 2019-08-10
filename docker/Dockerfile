@@ -118,9 +118,9 @@ EXPOSE 8000
 
 ADD docker/*.sh /usr/local/bin/
 
-RUN adduser -S datamart \
-    && mkdir -p /var/datamart \
-    && chown datamart /var/datamart/
+
+RUN addgroup --gid 1024 datamart \
+    && adduser --disabled-password --ingroup datamart -S datamart
 
 ENTRYPOINT ["entrypoint.sh"]
 WORKDIR /var/datamart
