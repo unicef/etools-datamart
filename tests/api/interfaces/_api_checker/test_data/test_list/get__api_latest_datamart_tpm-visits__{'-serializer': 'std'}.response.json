@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "3108"
+            "2709"
         ]
     },
     "data": {
@@ -62,15 +62,10 @@
         "previous": null,
         "results": [
             {
-                "id": 401,
+                "id": 603,
                 "source_id": null,
-                "last_modify_date": "02 Aug 2019 12:38:50",
+                "last_modify_date": "10 Aug 2019 21:14:59",
                 "seen": null,
-                "location_source_id": null,
-                "location_name": null,
-                "location_pcode": null,
-                "location_level": null,
-                "location_levelname": null,
                 "deleted_at": null,
                 "created": null,
                 "modified": null,
@@ -105,19 +100,13 @@
                 "country_name": "bolivia",
                 "area_code": null,
                 "activities": null,
-                "activities_data": null,
-                "location": null
+                "activities_data": null
             },
             {
-                "id": 402,
+                "id": 604,
                 "source_id": null,
-                "last_modify_date": "02 Aug 2019 12:38:50",
+                "last_modify_date": "10 Aug 2019 21:14:59",
                 "seen": null,
-                "location_source_id": null,
-                "location_name": null,
-                "location_pcode": null,
-                "location_level": null,
-                "location_levelname": null,
                 "deleted_at": null,
                 "created": null,
                 "modified": null,
@@ -152,19 +141,13 @@
                 "country_name": "chad",
                 "area_code": null,
                 "activities": null,
-                "activities_data": null,
-                "location": null
+                "activities_data": null
             },
             {
-                "id": 403,
+                "id": 605,
                 "source_id": null,
-                "last_modify_date": "02 Aug 2019 12:38:50",
+                "last_modify_date": "10 Aug 2019 21:14:59",
                 "seen": null,
-                "location_source_id": null,
-                "location_name": null,
-                "location_pcode": null,
-                "location_level": null,
-                "location_levelname": null,
                 "deleted_at": null,
                 "created": null,
                 "modified": null,
@@ -199,8 +182,7 @@
                 "country_name": "lebanon",
                 "area_code": null,
                 "activities": null,
-                "activities_data": null,
-                "location": null
+                "activities_data": null
             }
         ]
     },

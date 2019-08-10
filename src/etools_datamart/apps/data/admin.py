@@ -264,7 +264,7 @@ class ActionPointAdmin(DataModelAdmin):
 
 @register(models.TPMVisit)
 class TPMVisitAdmin(DataModelAdmin):
-    pass
+    list_display = ('start_date', 'end_date', 'partner_name')
 
 
 @register(models.TPMActivity)

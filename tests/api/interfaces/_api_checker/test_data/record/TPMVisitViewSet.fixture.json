@@ -2,17 +2,11 @@
     "record": {
         "master": {
             "model": "data.tpmvisit",
-            "pk": 404,
+            "pk": 606,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-08-02T12:38:54.465Z",
+                "last_modify_date": "2019-08-10T21:15:00.135Z",
                 "seen": null,
-                "location_source_id": null,
-                "location_name": null,
-                "location_pcode": null,
-                "location_level": null,
-                "location_levelname": null,
-                "location": null,
                 "deleted_at": null,
                 "created": null,
                 "modified": null,
