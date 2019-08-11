@@ -4,7 +4,7 @@
 * bug fixes
 * server start as unprivileged user
 * upgrade to python 3.7
-
+* dependencies upgrade
 
 1.26
 ----
