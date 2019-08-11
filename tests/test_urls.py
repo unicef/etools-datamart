@@ -17,9 +17,6 @@ def list_urls(urllist, depth=0, urls=None):
     _urls = urls or list()
     for entry in urllist:
         _urls.append(entry.pattern.regex.pattern)
-        # _urls.append("||".join([getattr(entry, "name", "-"),
-        #                         entry.pattern.regex.pattern,
-        #                         name(entry.callback)]))
 
         if hasattr(entry, 'url_patterns'):
             list_urls(entry.url_patterns, depth + 1, _urls)

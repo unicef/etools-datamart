@@ -83,9 +83,9 @@ RUN pip install pip pipenv --upgrade
 RUN cd /code \
     && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
 
-RUN find /usr/local/lib/python3.6/ -name *.pyc | xargs rm -f \
-    && python -O -m compileall -fqb /usr/local/lib/python3.6 \
-    && find /usr/local/lib/python3.6/ -name *.py | xargs rm -f
+#RUN find /usr/local/lib/python3.7/ -name *.pyc | xargs rm -f \
+#    && python -O -m compileall -fqb /usr/local/lib/python3.7 \
+#    && find /usr/local/lib/python3.7/ -name *.py | xargs rm -f
 
 RUN apk del .fetch-deps .build-deps .build-deps-edge .datamart-build-deps \
     && rm -rf /var/cache/apk/* \
