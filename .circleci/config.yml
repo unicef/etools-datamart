@@ -30,7 +30,7 @@ jobs:
                   curl \
                   gdal-bin \
                   python-dev \
-                  postgresql-client-9.6
+                  postgresql-client
 
       - run:
           name: Create databases
