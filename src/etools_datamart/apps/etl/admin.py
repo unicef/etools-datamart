@@ -43,7 +43,6 @@ def truncate(modeladmin, request, queryset):
         except Service.DoesNotExist:
             pass
         obj.loader.model.objects.truncate()
-        obj.loader.model.invalidate_cache()
         obj.loader.unlock()
         obj.status = 'NO DATA'
         obj.last_run = None
