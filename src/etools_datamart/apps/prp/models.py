@@ -1,11 +1,12 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2019-08-14 09:42:03.279444
+# Generated on 2019-08-14 20:09:11.491908
 from django.contrib.gis.db import models
 
+from etools_datamart.apps.core.readonly import ReadOnlyModel
 
-class AccountUser(models.Model):
-    id = models.AutoField()
+
+class AccountUser(ReadOnlyModel):
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.BooleanField()
@@ -17,25 +18,27 @@ class AccountUser(models.Model):
     last_name = models.CharField(max_length=64)
     organization = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(max_length=255)
-    partner = models.ForeignKey('PartnerPartner', models.PROTECT, related_name='+', blank=True, null=True)
+    partner = models.ForeignKey('prp.PartnerPartner', models.PROTECT, related_name='+', blank=True, null=True)
     position = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'account_user'
+        app_label = 'prp'
 
 
-class AccountUserGroups(models.Model):
+class AccountUserGroups(ReadOnlyModel):
     user_id = models.IntegerField()
-    group = models.ForeignKey('AuthGroup', models.PROTECT, related_name='+')
+    group = models.ForeignKey('prp.AuthGroup', models.PROTECT, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'account_user_groups'
         unique_together = (('user_id', 'group'),)
+        app_label = 'prp'
 
 
-class AccountUserUserPermissions(models.Model):
+class AccountUserUserPermissions(ReadOnlyModel):
     user_id = models.IntegerField()
     permission_id = models.IntegerField()
 
@@ -43,10 +46,10 @@ class AccountUserUserPermissions(models.Model):
         managed = False
         db_table = 'account_user_user_permissions'
         unique_together = (('user_id', 'permission_id'),)
+        app_label = 'prp'
 
 
-class AccountUserprofile(models.Model):
-    id = models.AutoField()
+class AccountUserprofile(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     user_id = models.IntegerField()
@@ -54,17 +57,19 @@ class AccountUserprofile(models.Model):
     class Meta:
         managed = False
         db_table = 'account_userprofile'
+        app_label = 'prp'
 
 
-class AuthGroup(models.Model):
+class AuthGroup(ReadOnlyModel):
     name = models.CharField(unique=True, max_length=80)
 
     class Meta:
         managed = False
         db_table = 'auth_group'
+        app_label = 'prp'
 
 
-class AuthGroupPermissions(models.Model):
+class AuthGroupPermissions(ReadOnlyModel):
     group = models.ForeignKey(AuthGroup, models.PROTECT, related_name='+')
     permission_id = models.IntegerField()
 
@@ -72,20 +77,21 @@ class AuthGroupPermissions(models.Model):
         managed = False
         db_table = 'auth_group_permissions'
         unique_together = (('group', 'permission_id'),)
+        app_label = 'prp'
 
 
-class AuthPermission(models.Model):
-    id = models.AutoField()
+class AuthPermission(ReadOnlyModel):
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.PROTECT, related_name='+')
+    content_type = models.ForeignKey('prp.DjangoContentType', models.PROTECT, related_name='+')
     codename = models.CharField(max_length=100)
 
     class Meta:
         managed = False
         db_table = 'auth_permission'
+        app_label = 'prp'
 
 
-class AuthtokenToken(models.Model):
+class AuthtokenToken(ReadOnlyModel):
     key = models.CharField(primary_key=True, max_length=40)
     created = models.DateTimeField()
     user_id = models.IntegerField(unique=True)
@@ -93,25 +99,25 @@ class AuthtokenToken(models.Model):
     class Meta:
         managed = False
         db_table = 'authtoken_token'
+        app_label = 'prp'
 
 
-class ClusterCluster(models.Model):
-    id = models.AutoField()
+class ClusterCluster(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
     type = models.CharField(max_length=32)
     imported_type = models.TextField(blank=True, null=True)
-    response_plan = models.ForeignKey('CoreResponseplan', models.PROTECT, related_name='+', blank=True, null=True)
+    response_plan = models.ForeignKey('prp.CoreResponseplan', models.PROTECT, related_name='+', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'cluster_cluster'
+        app_label = 'prp'
 
 
-class ClusterClusteractivity(models.Model):
-    id = models.AutoField()
+class ClusterClusteractivity(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -123,20 +129,21 @@ class ClusterClusteractivity(models.Model):
         managed = False
         db_table = 'cluster_clusteractivity'
         unique_together = (('external_id', 'external_source'),)
+        app_label = 'prp'
 
 
-class ClusterClusteractivityLocations(models.Model):
+class ClusterClusteractivityLocations(ReadOnlyModel):
     clusteractivity_id = models.IntegerField()
-    location = models.ForeignKey('CoreLocation', models.PROTECT, related_name='+')
+    location = models.ForeignKey('prp.CoreLocation', models.PROTECT, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'cluster_clusteractivity_locations'
         unique_together = (('clusteractivity_id', 'location'),)
+        app_label = 'prp'
 
 
-class ClusterClusterobjective(models.Model):
-    id = models.AutoField()
+class ClusterClusterobjective(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -148,20 +155,21 @@ class ClusterClusterobjective(models.Model):
         managed = False
         db_table = 'cluster_clusterobjective'
         unique_together = (('external_id', 'external_source'),)
+        app_label = 'prp'
 
 
-class ClusterClusterobjectiveLocations(models.Model):
+class ClusterClusterobjectiveLocations(ReadOnlyModel):
     clusterobjective_id = models.IntegerField()
-    location = models.ForeignKey('CoreLocation', models.PROTECT, related_name='+')
+    location = models.ForeignKey('prp.CoreLocation', models.PROTECT, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'cluster_clusterobjective_locations'
         unique_together = (('clusterobjective_id', 'location'),)
+        app_label = 'prp'
 
 
-class CoreCartodbtable(models.Model):
-    id = models.AutoField()
+class CoreCartodbtable(ReadOnlyModel):
     domain = models.CharField(max_length=254)
     table_name = models.CharField(max_length=254)
     lft = models.IntegerField()
@@ -179,10 +187,10 @@ class CoreCartodbtable(models.Model):
     class Meta:
         managed = False
         db_table = 'core_cartodbtable'
+        app_label = 'prp'
 
 
-class CoreCountry(models.Model):
-    id = models.AutoField()
+class CoreCountry(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     name = models.CharField(max_length=100)
@@ -192,10 +200,10 @@ class CoreCountry(models.Model):
     class Meta:
         managed = False
         db_table = 'core_country'
+        app_label = 'prp'
 
 
-class CoreGatewaytype(models.Model):
-    id = models.AutoField()
+class CoreGatewaytype(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     name = models.CharField(max_length=64)
@@ -206,9 +214,10 @@ class CoreGatewaytype(models.Model):
     class Meta:
         managed = False
         db_table = 'core_gatewaytype'
+        app_label = 'prp'
 
 
-class CoreLocation(models.Model):
+class CoreLocation(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=255)
@@ -229,9 +238,10 @@ class CoreLocation(models.Model):
         managed = False
         db_table = 'core_location'
         unique_together = (('title', 'p_code'),)
+        app_label = 'prp'
 
 
-class CorePrprole(models.Model):
+class CorePrprole(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -239,16 +249,17 @@ class CorePrprole(models.Model):
     role = models.CharField(max_length=32)
     cluster_id = models.IntegerField(blank=True, null=True)
     user_id = models.IntegerField()
-    workspace = models.ForeignKey('CoreWorkspace', models.PROTECT, related_name='+', blank=True, null=True)
+    workspace = models.ForeignKey('prp.CoreWorkspace', models.PROTECT, related_name='+', blank=True, null=True)
     is_active = models.BooleanField()
 
     class Meta:
         managed = False
         db_table = 'core_prprole'
         unique_together = (('external_id', 'external_source'),)
+        app_label = 'prp'
 
 
-class CoreResponseplan(models.Model):
+class CoreResponseplan(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -257,16 +268,17 @@ class CoreResponseplan(models.Model):
     plan_type = models.CharField(max_length=5)
     start = models.DateField(blank=True, null=True)
     end = models.DateField(blank=True, null=True)
-    workspace = models.ForeignKey('CoreWorkspace', models.PROTECT, related_name='+')
+    workspace = models.ForeignKey('prp.CoreWorkspace', models.PROTECT, related_name='+')
     plan_custom_type_label = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'core_responseplan'
         unique_together = (('title', 'plan_type', 'workspace'),)
+        app_label = 'prp'
 
 
-class CoreWorkspace(models.Model):
+class CoreWorkspace(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -281,9 +293,10 @@ class CoreWorkspace(models.Model):
     class Meta:
         managed = False
         db_table = 'core_workspace'
+        app_label = 'prp'
 
 
-class CoreWorkspaceCountries(models.Model):
+class CoreWorkspaceCountries(ReadOnlyModel):
     workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='+')
     country_id = models.IntegerField()
 
@@ -291,23 +304,25 @@ class CoreWorkspaceCountries(models.Model):
         managed = False
         db_table = 'core_workspace_countries'
         unique_together = (('workspace', 'country_id'),)
+        app_label = 'prp'
 
 
-class DjangoAdminLog(models.Model):
+class DjangoAdminLog(ReadOnlyModel):
     action_time = models.DateTimeField()
     object_id = models.TextField(blank=True, null=True)
     object_repr = models.CharField(max_length=200)
     action_flag = models.SmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.PROTECT, related_name='+', blank=True, null=True)
+    content_type = models.ForeignKey('prp.DjangoContentType', models.PROTECT, related_name='+', blank=True, null=True)
     user_id = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'django_admin_log'
+        app_label = 'prp'
 
 
-class DjangoContentType(models.Model):
+class DjangoContentType(ReadOnlyModel):
     app_label = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
 
@@ -315,9 +330,10 @@ class DjangoContentType(models.Model):
         managed = False
         db_table = 'django_content_type'
         unique_together = (('app_label', 'model'),)
+        app_label = 'prp'
 
 
-class DjangoMigrations(models.Model):
+class DjangoMigrations(ReadOnlyModel):
     app = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     applied = models.DateTimeField()
@@ -325,18 +341,20 @@ class DjangoMigrations(models.Model):
     class Meta:
         managed = False
         db_table = 'django_migrations'
+        app_label = 'prp'
 
 
-class DjangoSite(models.Model):
+class DjangoSite(ReadOnlyModel):
     domain = models.CharField(unique=True, max_length=100)
     name = models.CharField(max_length=50)
 
     class Meta:
         managed = False
         db_table = 'django_site'
+        app_label = 'prp'
 
 
-class IndicatorDisaggregation(models.Model):
+class IndicatorDisaggregation(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -349,9 +367,10 @@ class IndicatorDisaggregation(models.Model):
         managed = False
         db_table = 'indicator_disaggregation'
         unique_together = (('name', 'response_plan'),)
+        app_label = 'prp'
 
 
-class IndicatorDisaggregationvalue(models.Model):
+class IndicatorDisaggregationvalue(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -364,9 +383,10 @@ class IndicatorDisaggregationvalue(models.Model):
         managed = False
         db_table = 'indicator_disaggregationvalue'
         unique_together = (('disaggregation', 'value'),)
+        app_label = 'prp'
 
 
-class IndicatorIndicatorblueprint(models.Model):
+class IndicatorIndicatorblueprint(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -385,9 +405,10 @@ class IndicatorIndicatorblueprint(models.Model):
         managed = False
         db_table = 'indicator_indicatorblueprint'
         unique_together = (('external_id', 'external_source'),)
+        app_label = 'prp'
 
 
-class IndicatorIndicatorlocationdata(models.Model):
+class IndicatorIndicatorlocationdata(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     disaggregation = models.TextField()  # This field type is a guess.
@@ -396,15 +417,16 @@ class IndicatorIndicatorlocationdata(models.Model):
     disaggregation_reported_on = models.TextField()  # This field type is a guess.
     percentage_allocated = models.DecimalField(max_digits=5, decimal_places=2)
     is_locked = models.BooleanField()
-    indicator_report = models.ForeignKey('IndicatorIndicatorreport', models.PROTECT, related_name='+')
+    indicator_report = models.ForeignKey('prp.IndicatorIndicatorreport', models.PROTECT, related_name='+')
     location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'indicator_indicatorlocationdata'
+        app_label = 'prp'
 
 
-class IndicatorIndicatorreport(models.Model):
+class IndicatorIndicatorreport(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     title = models.CharField(max_length=2048)
@@ -421,17 +443,18 @@ class IndicatorIndicatorreport(models.Model):
     review_date = models.DateField(blank=True, null=True)
     sent_back_feedback = models.TextField(blank=True, null=True)
     parent = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
-    progress_report = models.ForeignKey('UnicefProgressreport', models.PROTECT, related_name='+', blank=True, null=True)
-    reportable = models.ForeignKey('IndicatorReportable', models.PROTECT, related_name='+')
-    reporting_entity = models.ForeignKey('IndicatorReportingentity', models.PROTECT, related_name='+')
-    project = models.ForeignKey('PartnerPartnerproject', models.PROTECT, related_name='+', blank=True, null=True)
+    progress_report = models.ForeignKey('prp.UnicefProgressreport', models.PROTECT, related_name='+', blank=True, null=True)
+    reportable = models.ForeignKey('prp.IndicatorReportable', models.PROTECT, related_name='+')
+    reporting_entity = models.ForeignKey('prp.IndicatorReportingentity', models.PROTECT, related_name='+')
+    project = models.ForeignKey('prp.PartnerPartnerproject', models.PROTECT, related_name='+', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'indicator_indicatorreport'
+        app_label = 'prp'
 
 
-class IndicatorReportable(models.Model):
+class IndicatorReportable(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -465,9 +488,10 @@ class IndicatorReportable(models.Model):
     class Meta:
         managed = False
         db_table = 'indicator_reportable'
+        app_label = 'prp'
 
 
-class IndicatorReportableDisaggregations(models.Model):
+class IndicatorReportableDisaggregations(ReadOnlyModel):
     reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='+')
     disaggregation = models.ForeignKey(IndicatorDisaggregation, models.PROTECT, related_name='+')
 
@@ -475,9 +499,10 @@ class IndicatorReportableDisaggregations(models.Model):
         managed = False
         db_table = 'indicator_reportable_disaggregations'
         unique_together = (('reportable', 'disaggregation'),)
+        app_label = 'prp'
 
 
-class IndicatorReportablelocationgoal(models.Model):
+class IndicatorReportablelocationgoal(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     target = models.TextField()  # This field type is a guess.
@@ -491,9 +516,10 @@ class IndicatorReportablelocationgoal(models.Model):
         managed = False
         db_table = 'indicator_reportablelocationgoal'
         unique_together = (('reportable', 'location'),)
+        app_label = 'prp'
 
 
-class IndicatorReportingentity(models.Model):
+class IndicatorReportingentity(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     title = models.CharField(unique=True, max_length=256)
@@ -501,9 +527,10 @@ class IndicatorReportingentity(models.Model):
     class Meta:
         managed = False
         db_table = 'indicator_reportingentity'
+        app_label = 'prp'
 
 
-class PartnerPartner(models.Model):
+class PartnerPartner(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -534,9 +561,10 @@ class PartnerPartner(models.Model):
         managed = False
         db_table = 'partner_partner'
         unique_together = (('title', 'vendor_number'),)
+        app_label = 'prp'
 
 
-class PartnerPartnerClusters(models.Model):
+class PartnerPartnerClusters(ReadOnlyModel):
     partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
     cluster_id = models.IntegerField()
 
@@ -544,9 +572,10 @@ class PartnerPartnerClusters(models.Model):
         managed = False
         db_table = 'partner_partner_clusters'
         unique_together = (('partner', 'cluster_id'),)
+        app_label = 'prp'
 
 
-class PartnerPartneractivity(models.Model):
+class PartnerPartneractivity(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     title = models.CharField(max_length=2048)
@@ -557,9 +586,10 @@ class PartnerPartneractivity(models.Model):
     class Meta:
         managed = False
         db_table = 'partner_partneractivity'
+        app_label = 'prp'
 
 
-class PartnerPartneractivityLocations(models.Model):
+class PartnerPartneractivityLocations(ReadOnlyModel):
     partneractivity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='+')
     location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
 
@@ -567,24 +597,26 @@ class PartnerPartneractivityLocations(models.Model):
         managed = False
         db_table = 'partner_partneractivity_locations'
         unique_together = (('partneractivity', 'location'),)
+        app_label = 'prp'
 
 
-class PartnerPartneractivityprojectcontext(models.Model):
+class PartnerPartneractivityprojectcontext(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=3)
     activity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='+')
-    project = models.ForeignKey('PartnerPartnerproject', models.PROTECT, related_name='+')
+    project = models.ForeignKey('prp.PartnerPartnerproject', models.PROTECT, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'partner_partneractivityprojectcontext'
         unique_together = (('project', 'activity'),)
+        app_label = 'prp'
 
 
-class PartnerPartnerproject(models.Model):
+class PartnerPartnerproject(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -608,9 +640,10 @@ class PartnerPartnerproject(models.Model):
     class Meta:
         managed = False
         db_table = 'partner_partnerproject'
+        app_label = 'prp'
 
 
-class PartnerPartnerprojectAdditionalPartners(models.Model):
+class PartnerPartnerprojectAdditionalPartners(ReadOnlyModel):
     partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
     partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
 
@@ -618,9 +651,10 @@ class PartnerPartnerprojectAdditionalPartners(models.Model):
         managed = False
         db_table = 'partner_partnerproject_additional_partners'
         unique_together = (('partnerproject', 'partner'),)
+        app_label = 'prp'
 
 
-class PartnerPartnerprojectClusters(models.Model):
+class PartnerPartnerprojectClusters(ReadOnlyModel):
     partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
     cluster_id = models.IntegerField()
 
@@ -628,9 +662,10 @@ class PartnerPartnerprojectClusters(models.Model):
         managed = False
         db_table = 'partner_partnerproject_clusters'
         unique_together = (('partnerproject', 'cluster_id'),)
+        app_label = 'prp'
 
 
-class PartnerPartnerprojectLocations(models.Model):
+class PartnerPartnerprojectLocations(ReadOnlyModel):
     partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
     location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
 
@@ -638,9 +673,10 @@ class PartnerPartnerprojectLocations(models.Model):
         managed = False
         db_table = 'partner_partnerproject_locations'
         unique_together = (('partnerproject', 'location'),)
+        app_label = 'prp'
 
 
-class PartnerPartnerprojectfunding(models.Model):
+class PartnerPartnerprojectfunding(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     required_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
@@ -655,39 +691,42 @@ class PartnerPartnerprojectfunding(models.Model):
     class Meta:
         managed = False
         db_table = 'partner_partnerprojectfunding'
+        app_label = 'prp'
 
 
-class UnicefLowerleveloutput(models.Model):
+class UnicefLowerleveloutput(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
     title = models.CharField(max_length=512)
     active = models.BooleanField()
-    cp_output = models.ForeignKey('UnicefPdresultlink', models.PROTECT, related_name='+')
+    cp_output = models.ForeignKey('prp.UnicefPdresultlink', models.PROTECT, related_name='+')
     external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'unicef_lowerleveloutput'
         unique_together = (('external_id', 'external_business_area_code'),)
+        app_label = 'prp'
 
 
-class UnicefPdresultlink(models.Model):
+class UnicefPdresultlink(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
     title = models.CharField(max_length=512)
     external_cp_output_id = models.IntegerField()
-    programme_document = models.ForeignKey('UnicefProgrammedocument', models.PROTECT, related_name='+')
+    programme_document = models.ForeignKey('prp.UnicefProgrammedocument', models.PROTECT, related_name='+')
     external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'unicef_pdresultlink'
         unique_together = (('external_id', 'external_business_area_code', 'external_cp_output_id'),)
+        app_label = 'prp'
 
 
-class UnicefPerson(models.Model):
+class UnicefPerson(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -700,9 +739,10 @@ class UnicefPerson(models.Model):
     class Meta:
         managed = False
         db_table = 'unicef_person'
+        app_label = 'prp'
 
 
-class UnicefProgrammedocument(models.Model):
+class UnicefProgrammedocument(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -735,9 +775,10 @@ class UnicefProgrammedocument(models.Model):
         managed = False
         db_table = 'unicef_programmedocument'
         unique_together = (('external_id', 'external_business_area_code', 'workspace'),)
+        app_label = 'prp'
 
 
-class UnicefProgrammedocumentPartnerFocalPoint(models.Model):
+class UnicefProgrammedocumentPartnerFocalPoint(ReadOnlyModel):
     programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
     person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
 
@@ -745,19 +786,21 @@ class UnicefProgrammedocumentPartnerFocalPoint(models.Model):
         managed = False
         db_table = 'unicef_programmedocument_partner_focal_point'
         unique_together = (('programmedocument', 'person'),)
+        app_label = 'prp'
 
 
-class UnicefProgrammedocumentSections(models.Model):
+class UnicefProgrammedocumentSections(ReadOnlyModel):
     programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    section = models.ForeignKey('UnicefSection', models.PROTECT, related_name='+')
+    section = models.ForeignKey('prp.UnicefSection', models.PROTECT, related_name='+')
 
     class Meta:
         managed = False
         db_table = 'unicef_programmedocument_sections'
         unique_together = (('programmedocument', 'section'),)
+        app_label = 'prp'
 
 
-class UnicefProgrammedocumentUnicefFocalPoint(models.Model):
+class UnicefProgrammedocumentUnicefFocalPoint(ReadOnlyModel):
     programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
     person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
 
@@ -765,9 +808,10 @@ class UnicefProgrammedocumentUnicefFocalPoint(models.Model):
         managed = False
         db_table = 'unicef_programmedocument_unicef_focal_point'
         unique_together = (('programmedocument', 'person'),)
+        app_label = 'prp'
 
 
-class UnicefProgrammedocumentUnicefOfficers(models.Model):
+class UnicefProgrammedocumentUnicefOfficers(ReadOnlyModel):
     programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
     person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
 
@@ -775,9 +819,10 @@ class UnicefProgrammedocumentUnicefOfficers(models.Model):
         managed = False
         db_table = 'unicef_programmedocument_unicef_officers'
         unique_together = (('programmedocument', 'person'),)
+        app_label = 'prp'
 
 
-class UnicefProgressreport(models.Model):
+class UnicefProgressreport(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     partner_contribution_to_date = models.TextField(blank=True, null=True)
@@ -806,9 +851,10 @@ class UnicefProgressreport(models.Model):
         managed = False
         db_table = 'unicef_progressreport'
         unique_together = (('programme_document', 'report_type', 'report_number'),)
+        app_label = 'prp'
 
 
-class UnicefProgressreportattachment(models.Model):
+class UnicefProgressreportattachment(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     file = models.CharField(max_length=500)
@@ -818,9 +864,10 @@ class UnicefProgressreportattachment(models.Model):
     class Meta:
         managed = False
         db_table = 'unicef_progressreportattachment'
+        app_label = 'prp'
 
 
-class UnicefReportingperioddates(models.Model):
+class UnicefReportingperioddates(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -836,9 +883,10 @@ class UnicefReportingperioddates(models.Model):
         managed = False
         db_table = 'unicef_reportingperioddates'
         unique_together = (('external_id', 'external_business_area_code', 'report_type', 'programme_document'),)
+        app_label = 'prp'
 
 
-class UnicefSection(models.Model):
+class UnicefSection(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
@@ -847,3 +895,4 @@ class UnicefSection(models.Model):
     class Meta:
         managed = False
         db_table = 'unicef_section'
+        app_label = 'prp'

@@ -5,14 +5,41 @@ import warnings
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from django.db import connection, connections, DEFAULT_DB_ALIAS
+from django.db.backends.utils import truncate_name
+from django.db.models import Model
+
 import pytest
 from _pytest.fixtures import SubRequest
+
+
+def _setup_models():
+    from django.apps import apps
+    from etools_datamart.apps.core.readonly import ReadOnlyModel
+
+    for m in apps.get_models():
+        # if m._meta.proxy:
+        #     opts = m._meta.proxy_for_model._meta
+        # else:
+        #     opts = m._meta
+        #
+        # if opts.app_label not in ('content_types',):
+            # db_table = ('{0.app_label}_{0.model_name}'.format(opts)).lower()
+            # m._meta.db_table = truncate_name(db_table, connection.ops.max_name_length())
+            # m._meta.db_tablespace = ''
+        if issubclass(m, ReadOnlyModel):
+            setattr(m, 'save', Model.save)
+            if not m._meta.managed:
+                m._meta.managed = True
+
 
 
 def pytest_configure(config):
     # enable this to remove deprecations
     os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
     os.environ['STATIC_ROOT'] = tempfile.gettempdir()
+    if not config.option.help:
+        _setup_models()
 
 
 # warnings.simplefilter('once', DeprecationWarning)
@@ -20,7 +47,6 @@ def pytest_configure(config):
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
 # warnings.simplefilter('ignore', UserWarning)
 warnings.simplefilter('ignore', RuntimeWarning, lineno=1421)
-
 
 @pytest.fixture(scope="session")
 def enable_migration_signals(request):
@@ -103,6 +129,8 @@ def django_db_setup(request,
         UserAccessControl.objects.all().delete()
         APIRequestLog.objects.truncate()
         UserFactory(username='system', is_superuser=True)
+        from django.contrib.sites.models import Site
+        Site.objects.get_or_create(domain='example.com', name='example.com')
         assert Service.objects.exists()
         assert not APIRequestLog.objects.exists()
 
