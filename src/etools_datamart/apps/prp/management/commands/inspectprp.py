@@ -5,7 +5,7 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
-from django.core.management import CommandError
+from django.core.management import call_command, CommandError
 from django.core.management.commands.inspectdb import Command as BaseCommand
 from django.db import connections
 
@@ -18,8 +18,8 @@ INGNORED_TABLES = RegexList([
     'post_office_.*',
     'django_session',
     'drfpasswordless_.*',
-    'auth_.*',
     'djcelery_.*',
+    'unicef_notification_.*',
     'celery_.*',
     'social_auth_.*'
     # Tenant
@@ -56,11 +56,14 @@ class Command(BaseCommand):
                     output.write("%s\n" % line)
             self.handle_admin()
             self.handle_api()
+            self.handle_urls()
+            call_command('check')
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
     def handle_model_admin(self, model_name):
         yield ""
+        yield "@register(models.%s)" % model_name
         yield "class %sAdmin(DatamartSourceModelAdmin, ModelAdmin):" % model_name
         yield "    list_filter = []"
         yield ""
@@ -70,9 +73,10 @@ class Command(BaseCommand):
         if output_file.exists():
             output_file.rename(output_file.with_suffix('.bak'))
         with output_file.open('w') as output:
-            output.write("from django.contrib.admin import ModelAdmin\n\n")
+            output.write("from django.contrib.admin import register, ModelAdmin\n\n")
             output.write("from etools_datamart.apps.core.admin_mixins "
-                         "import DatamartSourceModelAdmin\n\n")
+                         "import DatamartSourceModelAdmin\n")
+            output.write("from . import models\n\n")
 
             for model_name in self.prp_models:
                 for line in self.handle_model_admin(model_name):
@@ -103,6 +107,18 @@ class Command(BaseCommand):
         yield "class %sViewSet(URFReadOnlyModelViewSet):" % model_name
         yield "    serializer_class = %sSerializer" % model_name
         yield "    queryset = models.%s.objects.all()" % model_name
+
+    def handle_urls(self):
+        output_file = Path(__file__).parent.parent.parent / 'api_urls.py'
+        if output_file.exists():
+            output_file.rename(output_file.with_suffix('.bak'))
+        with output_file.open('w') as output:
+            output.write("from etools_datamart.api.urls import router\n\n")
+            output.write("from . import api\n\n")
+
+            for model_name in self.prp_models:
+                line = "router.register(r'prp/%s', api.%sViewSet)" % (model_name.lower(), model_name)
+                output.write("%s\n" % line)
 
     def handle_inspection(self, options):
         connection = connections[options['database']]

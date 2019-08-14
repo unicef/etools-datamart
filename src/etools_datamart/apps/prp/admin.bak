@@ -1,7 +1,6 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import register, ModelAdmin
 
 from etools_datamart.apps.core.admin_mixins import DatamartSourceModelAdmin
-
 from . import models
 
 
@@ -283,3 +282,4 @@ class UnicefReportingperioddatesAdmin(DatamartSourceModelAdmin, ModelAdmin):
 @register(models.UnicefSection)
 class UnicefSectionAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
+
