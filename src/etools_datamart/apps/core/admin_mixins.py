@@ -1,0 +1,32 @@
+from django.db import models
+
+from admin_extra_urls.extras import ExtraUrlMixin
+
+
+class ReadOnlyMixin:
+    actions = None
+
+    def get_readonly_fields(self, request, obj=None):
+        return [field.name for field in self.model._meta.fields]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class DisplayAllMixin:
+    def get_list_display(self, request):  # pragma: no cover
+        if self.list_display == ('__str__',):
+            return [field.name for field in self.model._meta.fields
+                    if not isinstance(field, models.ForeignKey)]
+        return self.list_display
+
+
+class DatamartSourceModelAdmin(ReadOnlyMixin, ExtraUrlMixin, DisplayAllMixin):
+    pass
+
+
+class DatamartModelAdmin(ExtraUrlMixin, DisplayAllMixin):
+    pass
