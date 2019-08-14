@@ -4,11 +4,13 @@ from django.contrib.admin import ListFilter, ModelAdmin
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
-from django.db import connections, models
+from django.db import connections
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from admin_extra_urls.extras import ExtraUrlMixin
+
+from etools_datamart.apps.core.admin_mixins import DisplayAllMixin, ReadOnlyMixin
 
 
 class TenantChangeList(ChangeList):
@@ -69,27 +71,6 @@ class SchemaFilter(ListFilter):
         else:
             queryset = queryset.filter_schemas(None)
         return queryset
-
-
-class ReadOnlyMixin:
-    actions = None
-
-    def get_readonly_fields(self, request, obj=None):
-        return [field.name for field in self.model._meta.fields]
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
-class DisplayAllMixin:
-    def get_list_display(self, request):  # pragma: no cover
-        if self.list_display == ('__str__',):
-            return [field.name for field in self.model._meta.fields
-                    if not isinstance(field, models.ForeignKey)]
-        return self.list_display
 
 
 class EToolsModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
