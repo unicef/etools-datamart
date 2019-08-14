@@ -100,12 +100,16 @@ DATABASES = {
     'prp': env.db('DATABASE_URL_PRP')
 
 }
+DATABASES['default']['CONN_MAX_AGE'] = 60
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
-    # router_factory('default', ['default'], syncdb=True),
+    # router_factory('default', ['data', 'unicef_rest_framework',
+    #                            'etl', 'security', 'unicef_security',
+    #                            'auth', 'authtoken', 'contenttypes',
+    #                            'django_db_logging'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
-    router_factory('prp', ['prp'], syncdb=False),
+    router_factory('prp', ['prp'], syncdb=True),
 ]
 
 LOGIN_URL = '/login/'
@@ -297,7 +301,7 @@ INSTALLED_APPS = [
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',
-    'adminactions',
+    # 'adminactions',
     'explorer',
     'unicef_rest_framework.apps.Config',
     'rest_framework',

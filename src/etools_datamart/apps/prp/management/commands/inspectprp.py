@@ -22,7 +22,6 @@ INGNORED_TABLES = RegexList([
     'unicef_notification_.*',
     'celery_.*',
     'social_auth_.*'
-    # Tenant
 ])
 REVERSE_RELATION_NAMES = {
     # '{model_name}.{att_name}': 'related_name'
@@ -37,7 +36,10 @@ class Command(BaseCommand):
     db_module = 'django.contrib.gis.db'
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument(
+            '--app_label', default='prp', type=str,
+            help='application name',
+        )
 
     def handle(self, *args, **options):
         options['database'] = 'prp'
@@ -124,6 +126,7 @@ class Command(BaseCommand):
         connection = connections[options['database']]
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
+        app_label = options.get('app_label')
 
         def table2model(table_name):
             return re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
@@ -133,6 +136,7 @@ class Command(BaseCommand):
             yield "# This is an auto-generated PRP model module."
             yield "# Generated on %s" % datetime.now()
             yield 'from %s import models' % self.db_module
+            yield 'from etools_datamart.apps.core.readonly import ReadOnlyModel'
             known_models = []
             table_info = connection.introspection.get_table_list(cursor)
 
@@ -171,7 +175,7 @@ class Command(BaseCommand):
 
                 yield ''
                 yield ''
-                yield 'class %s(models.Model):' % table2model(table_name)
+                yield 'class %s(ReadOnlyModel):' % table2model(table_name)
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
@@ -188,7 +192,8 @@ class Command(BaseCommand):
 
                     used_column_names.append(att_name)
                     column_to_field_name[column_name] = att_name
-
+                    if column_name == 'id':
+                        continue
                     # Add primary_key and unique, if necessary.
                     if column_name == primary_key_column:
                         extra_params['primary_key'] = True
@@ -216,7 +221,11 @@ class Command(BaseCommand):
                         if rel_to in known_models:
                             field_type = f"{ftype}({rel_to}"
                         else:
-                            field_type = f"{ftype}('{rel_to}'"
+                            if rel_to == 'self':
+                                field_type = f"{ftype}('self'"
+                            else:
+                                field_type = f"{ftype}('{app_label}.{rel_to}'"
+
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.
@@ -243,7 +252,8 @@ class Command(BaseCommand):
                     field_desc = '%s = %s%s' % (
                         att_name,
                         # Custom fields will have a dotted path
-                        '' if '.' in field_type else 'models.',
+                        # '' if '.' in field_type else 'models.',
+                        'models.',
                         field_type,
                     )
                     # if field_type.startswith('ForeignKey('):
@@ -272,3 +282,4 @@ class Command(BaseCommand):
                 is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
                 for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition):
                     yield meta_line
+                yield '        app_label = %r' % app_label

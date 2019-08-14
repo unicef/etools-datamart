@@ -3,9 +3,8 @@ from django.urls import include, path, re_path
 from unicef_rest_framework.routers import APIReadOnlyRouter
 
 from etools_datamart.api.endpoints import schema_view
-# urlpatterns = router.urls
-from etools_datamart.apps.prp import api_urls  # noqa
 
+# urlpatterns = router.urls
 from . import endpoints
 
 app_name = 'api'
@@ -56,6 +55,10 @@ router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 
+try:
+    from etools_datamart.apps.prp import api_urls  # isort:skip noqa
+except ImportError:
+    pass
 
 urlpatterns = [
     re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),
