@@ -71,6 +71,7 @@ def django_db_setup(request,
                     django_db_createdb,
                     django_db_modify_db_settings,
                     enable_migration_signals):
+
     if django_db_createdb or enable_migration_signals:
         warnings.warn("Warning: pre/post migrate signals are enabled \n")
     else:
