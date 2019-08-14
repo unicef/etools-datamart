@@ -1,0 +1,843 @@
+# flake8: noqa F405.
+# This is an auto-generated PRP model module.
+# Generated on 2019-08-14 09:09:56.075175
+from django.contrib.gis.db import models
+
+
+class AccountUser(models.Model):
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.BooleanField()
+    username = models.CharField(unique=True, max_length=150)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    date_joined = models.DateTimeField()
+    first_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
+    organization = models.CharField(max_length=255, blank=True, null=True)
+    email = models.CharField(unique=True, max_length=255)
+    partner = models.ForeignKey('PartnerPartner', models.PROTECT, related_name='+', blank=True, null=True)
+    position = models.CharField(max_length=64, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'account_user'
+
+
+class AccountUserGroups(models.Model):
+    user = models.ForeignKey(AccountUser, models.PROTECT, related_name='+')
+    group = models.ForeignKey('AuthGroup', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'account_user_groups'
+        unique_together = (('user', 'group'),)
+
+
+class AccountUserUserPermissions(models.Model):
+    user = models.ForeignKey(AccountUser, models.PROTECT, related_name='+')
+    permission = models.ForeignKey('AuthPermission', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'account_user_user_permissions'
+        unique_together = (('user', 'permission'),)
+
+
+class AccountUserprofile(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    user = models.OneToOneField(AccountUser, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'account_userprofile'
+
+
+class AuthGroup(models.Model):
+    name = models.CharField(unique=True, max_length=80)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_group'
+
+
+class AuthGroupPermissions(models.Model):
+    group = models.ForeignKey(AuthGroup, models.PROTECT, related_name='+')
+    permission = models.ForeignKey('AuthPermission', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'auth_group_permissions'
+        unique_together = (('group', 'permission'),)
+
+
+class AuthPermission(models.Model):
+    name = models.CharField(max_length=255)
+    content_type = models.ForeignKey('DjangoContentType', models.PROTECT, related_name='+')
+    codename = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_permission'
+        unique_together = (('content_type', 'codename'),)
+
+
+class AuthtokenToken(models.Model):
+    key = models.CharField(primary_key=True, max_length=40)
+    created = models.DateTimeField()
+    user = models.OneToOneField(AccountUser, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'authtoken_token'
+
+
+class ClusterCluster(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    type = models.CharField(max_length=32)
+    imported_type = models.TextField(blank=True, null=True)
+    response_plan = models.ForeignKey('CoreResponseplan', models.PROTECT, related_name='+', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'cluster_cluster'
+        unique_together = (('type', 'imported_type', 'response_plan'), ('external_id', 'external_source'),)
+
+
+class ClusterClusteractivity(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    title = models.TextField()
+    cluster_objective = models.ForeignKey('ClusterClusterobjective', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'cluster_clusteractivity'
+        unique_together = (('external_id', 'external_source'),)
+
+
+class ClusterClusteractivityLocations(models.Model):
+    clusteractivity = models.ForeignKey(ClusterClusteractivity, models.PROTECT, related_name='+')
+    location = models.ForeignKey('CoreLocation', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'cluster_clusteractivity_locations'
+        unique_together = (('clusteractivity', 'location'),)
+
+
+class ClusterClusterobjective(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    title = models.TextField()
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'cluster_clusterobjective'
+        unique_together = (('external_id', 'external_source'),)
+
+
+class ClusterClusterobjectiveLocations(models.Model):
+    clusterobjective = models.ForeignKey(ClusterClusterobjective, models.PROTECT, related_name='+')
+    location = models.ForeignKey('CoreLocation', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'cluster_clusterobjective_locations'
+        unique_together = (('clusterobjective', 'location'),)
+
+
+class CoreCartodbtable(models.Model):
+    domain = models.CharField(max_length=254)
+    table_name = models.CharField(max_length=254)
+    lft = models.IntegerField()
+    rght = models.IntegerField()
+    tree_id = models.IntegerField()
+    level = models.IntegerField()
+    country = models.ForeignKey('CoreCountry', models.PROTECT, related_name='+')
+    location_type = models.ForeignKey('CoreGatewaytype', models.PROTECT, related_name='+')
+    parent = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
+    display_name = models.CharField(max_length=254)
+    name_col = models.CharField(max_length=254)
+    parent_code_col = models.CharField(max_length=254)
+    pcode_col = models.CharField(max_length=254)
+
+    class Meta:
+        managed = False
+        db_table = 'core_cartodbtable'
+
+
+class CoreCountry(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    name = models.CharField(max_length=100)
+    country_short_code = models.CharField(max_length=10, blank=True, null=True)
+    long_name = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'core_country'
+
+
+class CoreGatewaytype(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    name = models.CharField(unique=True, max_length=64)
+    admin_level = models.SmallIntegerField()
+    country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='+')
+    display_name = models.CharField(max_length=64, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'core_gatewaytype'
+        unique_together = (('country', 'admin_level'),)
+
+
+class CoreLocation(models.Model):
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=255)
+    latitude = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
+    p_code = models.CharField(max_length=32, blank=True, null=True)
+    geom = models.GeometryField(blank=True, null=True)
+    point = models.GeometryField(blank=True, null=True)
+    carto_db_table = models.ForeignKey(CoreCartodbtable, models.PROTECT, related_name='+', blank=True, null=True)
+    gateway = models.ForeignKey(CoreGatewaytype, models.PROTECT, related_name='+')
+    parent = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
+    level = models.IntegerField()
+    lft = models.IntegerField()
+    rght = models.IntegerField()
+    tree_id = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'core_location'
+        unique_together = (('title', 'p_code'),)
+
+
+class CorePrprole(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    role = models.CharField(max_length=32)
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='+', blank=True, null=True)
+    user = models.ForeignKey(AccountUser, models.PROTECT, related_name='+')
+    workspace = models.ForeignKey('CoreWorkspace', models.PROTECT, related_name='+', blank=True, null=True)
+    is_active = models.BooleanField()
+
+    class Meta:
+        managed = False
+        db_table = 'core_prprole'
+        unique_together = (('external_id', 'external_source'),)
+
+
+class CoreResponseplan(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=255)
+    plan_type = models.CharField(max_length=5)
+    start = models.DateField(blank=True, null=True)
+    end = models.DateField(blank=True, null=True)
+    workspace = models.ForeignKey('CoreWorkspace', models.PROTECT, related_name='+')
+    plan_custom_type_label = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'core_responseplan'
+        unique_together = (('title', 'plan_type', 'workspace'),)
+
+
+class CoreWorkspace(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=255)
+    workspace_code = models.CharField(unique=True, max_length=8)
+    business_area_code = models.CharField(max_length=10, blank=True, null=True)
+    latitude = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
+    initial_zoom = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'core_workspace'
+
+
+class CoreWorkspaceCountries(models.Model):
+    workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='+')
+    country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'core_workspace_countries'
+        unique_together = (('workspace', 'country'),)
+
+
+class DjangoAdminLog(models.Model):
+    action_time = models.DateTimeField()
+    object_id = models.TextField(blank=True, null=True)
+    object_repr = models.CharField(max_length=200)
+    action_flag = models.SmallIntegerField()
+    change_message = models.TextField()
+    content_type = models.ForeignKey('DjangoContentType', models.PROTECT, related_name='+', blank=True, null=True)
+    user = models.ForeignKey(AccountUser, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'django_admin_log'
+
+
+class DjangoContentType(models.Model):
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'django_content_type'
+        unique_together = (('app_label', 'model'),)
+
+
+class DjangoMigrations(models.Model):
+    app = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    applied = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_migrations'
+
+
+class DjangoSite(models.Model):
+    domain = models.CharField(unique=True, max_length=100)
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        managed = False
+        db_table = 'django_site'
+
+
+class IndicatorDisaggregation(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=255)
+    active = models.BooleanField()
+    response_plan = models.ForeignKey(CoreResponseplan, models.PROTECT, related_name='+', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_disaggregation'
+        unique_together = (('name', 'response_plan'),)
+
+
+class IndicatorDisaggregationvalue(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    value = models.CharField(max_length=128)
+    active = models.BooleanField()
+    disaggregation = models.ForeignKey(IndicatorDisaggregation, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_disaggregationvalue'
+        unique_together = (('disaggregation', 'value'),)
+
+
+class IndicatorIndicatorblueprint(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    title = models.TextField()
+    unit = models.CharField(max_length=10)
+    description = models.CharField(max_length=3072, blank=True, null=True)
+    code = models.CharField(unique=True, max_length=50, blank=True, null=True)
+    subdomain = models.CharField(max_length=255, blank=True, null=True)
+    disaggregatable = models.BooleanField()
+    calculation_formula_across_periods = models.CharField(max_length=10)
+    calculation_formula_across_locations = models.CharField(max_length=10)
+    display_type = models.CharField(max_length=10)
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_indicatorblueprint'
+        unique_together = (('external_id', 'external_source'),)
+
+
+class IndicatorIndicatorlocationdata(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    disaggregation = models.TextField()  # This field type is a guess.
+    num_disaggregation = models.IntegerField()
+    level_reported = models.IntegerField()
+    disaggregation_reported_on = models.TextField()  # This field type is a guess.
+    percentage_allocated = models.DecimalField(max_digits=5, decimal_places=2)
+    is_locked = models.BooleanField()
+    indicator_report = models.ForeignKey('IndicatorIndicatorreport', models.PROTECT, related_name='+')
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_indicatorlocationdata'
+
+
+class IndicatorIndicatorreport(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    title = models.CharField(max_length=2048)
+    time_period_start = models.DateField()
+    time_period_end = models.DateField()
+    due_date = models.DateField()
+    submission_date = models.DateField(blank=True, null=True)
+    frequency = models.CharField(max_length=3)
+    total = models.TextField()  # This field type is a guess.
+    remarks = models.TextField(blank=True, null=True)
+    report_status = models.CharField(max_length=3)
+    overall_status = models.CharField(max_length=3)
+    narrative_assessment = models.TextField(blank=True, null=True)
+    review_date = models.DateField(blank=True, null=True)
+    sent_back_feedback = models.TextField(blank=True, null=True)
+    parent = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
+    progress_report = models.ForeignKey('UnicefProgressreport', models.PROTECT, related_name='+', blank=True, null=True)
+    reportable = models.ForeignKey('IndicatorReportable', models.PROTECT, related_name='+')
+    reporting_entity = models.ForeignKey('IndicatorReportingentity', models.PROTECT, related_name='+')
+    project = models.ForeignKey('PartnerPartnerproject', models.PROTECT, related_name='+', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_indicatorreport'
+
+
+class IndicatorReportable(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    target = models.TextField()  # This field type is a guess.
+    baseline = models.TextField()  # This field type is a guess.
+    in_need = models.TextField(blank=True, null=True)  # This field type is a guess.
+    assumptions = models.TextField(blank=True, null=True)
+    means_of_verification = models.CharField(max_length=255, blank=True, null=True)
+    comments = models.TextField(blank=True, null=True)
+    measurement_specifications = models.TextField(blank=True, null=True)
+    label = models.TextField(blank=True, null=True)
+    numerator_label = models.CharField(max_length=256, blank=True, null=True)
+    denominator_label = models.CharField(max_length=256, blank=True, null=True)
+    start_date_of_reporting_period = models.DateField(blank=True, null=True)
+    is_cluster_indicator = models.BooleanField()
+    is_unicef_hf_indicator = models.BooleanField()
+    contributes_to_partner = models.BooleanField()
+    total = models.TextField()  # This field type is a guess.
+    context_code = models.CharField(max_length=50, blank=True, null=True)
+    object_id = models.IntegerField()
+    frequency = models.CharField(max_length=3)
+    cs_dates = models.TextField(blank=True, null=True)  # This field type is a guess.
+    location_admin_refs = models.TextField(blank=True, null=True)  # This field type is a guess.
+    active = models.BooleanField()
+    blueprint = models.ForeignKey(IndicatorIndicatorblueprint, models.PROTECT, related_name='+', blank=True, null=True)
+    ca_indicator_used_by_reporting_entity = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
+    content_type = models.ForeignKey(DjangoContentType, models.PROTECT, related_name='+')
+    parent_indicator = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_reportable'
+
+
+class IndicatorReportableDisaggregations(models.Model):
+    reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='+')
+    disaggregation = models.ForeignKey(IndicatorDisaggregation, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_reportable_disaggregations'
+        unique_together = (('reportable', 'disaggregation'),)
+
+
+class IndicatorReportablelocationgoal(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    target = models.TextField()  # This field type is a guess.
+    baseline = models.TextField()  # This field type is a guess.
+    in_need = models.TextField(blank=True, null=True)  # This field type is a guess.
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
+    reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='+')
+    is_active = models.BooleanField()
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_reportablelocationgoal'
+        unique_together = (('reportable', 'location'),)
+
+
+class IndicatorReportingentity(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    title = models.CharField(unique=True, max_length=256)
+
+    class Meta:
+        managed = False
+        db_table = 'indicator_reportingentity'
+
+
+class PartnerPartner(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=255)
+    short_title = models.CharField(max_length=50)
+    alternate_title = models.CharField(max_length=255, blank=True, null=True)
+    partner_type = models.CharField(max_length=3)
+    shared_partner = models.CharField(max_length=3)
+    cso_type = models.CharField(max_length=3, blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=32, blank=True, null=True)
+    last_assessment_date = models.DateField(blank=True, null=True)
+    core_values_assessment_date = models.DateField(blank=True, null=True)
+    street_address = models.CharField(max_length=512, blank=True, null=True)
+    city = models.CharField(max_length=64, blank=True, null=True)
+    postal_code = models.CharField(max_length=32, blank=True, null=True)
+    country_code = models.CharField(max_length=2, blank=True, null=True)
+    total_ct_cp = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    total_ct_cy = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    vendor_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
+    alternate_id = models.IntegerField(blank=True, null=True)
+    rating = models.CharField(max_length=50, blank=True, null=True)
+    basis_for_risk_rating = models.CharField(max_length=50, blank=True, null=True)
+    ocha_external_id = models.CharField(unique=True, max_length=128, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partner'
+        unique_together = (('title', 'vendor_number'),)
+
+
+class PartnerPartnerClusters(models.Model):
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partner_clusters'
+        unique_together = (('partner', 'cluster'),)
+
+
+class PartnerPartneractivity(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    title = models.CharField(max_length=2048)
+    cluster_activity = models.ForeignKey(ClusterClusteractivity, models.PROTECT, related_name='+', blank=True, null=True)
+    cluster_objective = models.ForeignKey(ClusterClusterobjective, models.PROTECT, related_name='+', blank=True, null=True)
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partneractivity'
+
+
+class PartnerPartneractivityLocations(models.Model):
+    partneractivity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='+')
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partneractivity_locations'
+        unique_together = (('partneractivity', 'location'),)
+
+
+class PartnerPartneractivityprojectcontext(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.CharField(max_length=3)
+    activity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='+')
+    project = models.ForeignKey('PartnerPartnerproject', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partneractivityprojectcontext'
+        unique_together = (('project', 'activity'),)
+
+
+class PartnerPartnerproject(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    external_source = models.TextField(blank=True, null=True)
+    code = models.TextField(unique=True, blank=True, null=True)
+    type = models.CharField(max_length=3, blank=True, null=True)
+    title = models.CharField(max_length=1024)
+    description = models.TextField(blank=True, null=True)
+    additional_information = models.CharField(max_length=255, blank=True, null=True)
+    custom_fields = models.TextField()  # This field type is a guess.
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.CharField(max_length=3)
+    agency_name = models.TextField(blank=True, null=True)
+    agency_type = models.TextField(blank=True, null=True)
+    prioritization = models.TextField(blank=True, null=True)
+    total_budget = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    funding_source = models.TextField(blank=True, null=True)
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partnerproject'
+
+
+class PartnerPartnerprojectAdditionalPartners(models.Model):
+    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partnerproject_additional_partners'
+        unique_together = (('partnerproject', 'partner'),)
+
+
+class PartnerPartnerprojectClusters(models.Model):
+    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partnerproject_clusters'
+        unique_together = (('partnerproject', 'cluster'),)
+
+
+class PartnerPartnerprojectLocations(models.Model):
+    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partnerproject_locations'
+        unique_together = (('partnerproject', 'location'),)
+
+
+class PartnerPartnerprojectfunding(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    required_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
+    internal_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
+    cerf_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
+    cbpf_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
+    bilateral_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
+    unicef_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
+    wfp_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
+    project = models.OneToOneField(PartnerPartnerproject, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'partner_partnerprojectfunding'
+
+
+class UnicefLowerleveloutput(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    title = models.CharField(max_length=512)
+    active = models.BooleanField()
+    cp_output = models.ForeignKey('UnicefPdresultlink', models.PROTECT, related_name='+')
+    external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_lowerleveloutput'
+        unique_together = (('external_id', 'external_business_area_code'),)
+
+
+class UnicefPdresultlink(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    title = models.CharField(max_length=512)
+    external_cp_output_id = models.IntegerField()
+    programme_document = models.ForeignKey('UnicefProgrammedocument', models.PROTECT, related_name='+')
+    external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_pdresultlink'
+        unique_together = (('external_id', 'external_business_area_code', 'external_cp_output_id'),)
+
+
+class UnicefPerson(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    name = models.CharField(max_length=128, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=64, blank=True, null=True)
+    email = models.CharField(unique=True, max_length=255)
+    active = models.BooleanField()
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_person'
+
+
+class UnicefProgrammedocument(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    agreement = models.CharField(max_length=255)
+    document_type = models.CharField(max_length=3)
+    reference_number = models.CharField(max_length=255)
+    title = models.CharField(max_length=512)
+    unicef_office = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.CharField(max_length=256)
+    contributing_to_cluster = models.BooleanField()
+    frequency = models.CharField(max_length=3)
+    budget = models.DecimalField(max_digits=64, decimal_places=2, blank=True, null=True)
+    budget_currency = models.CharField(max_length=16)
+    cso_contribution = models.DecimalField(max_digits=64, decimal_places=2)
+    cso_contribution_currency = models.CharField(max_length=16)
+    total_unicef_cash = models.DecimalField(max_digits=64, decimal_places=2)
+    total_unicef_cash_currency = models.CharField(max_length=16)
+    in_kind_amount = models.DecimalField(max_digits=64, decimal_places=2)
+    in_kind_amount_currency = models.CharField(max_length=16)
+    funds_received_to_date = models.DecimalField(max_digits=64, decimal_places=2)
+    funds_received_to_date_currency = models.CharField(max_length=16, blank=True, null=True)
+    amendments = models.TextField()  # This field type is a guess.
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+    workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='+')
+    external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_programmedocument'
+        unique_together = (('external_id', 'external_business_area_code', 'workspace'),)
+
+
+class UnicefProgrammedocumentPartnerFocalPoint(models.Model):
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
+    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_programmedocument_partner_focal_point'
+        unique_together = (('programmedocument', 'person'),)
+
+
+class UnicefProgrammedocumentSections(models.Model):
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
+    section = models.ForeignKey('UnicefSection', models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_programmedocument_sections'
+        unique_together = (('programmedocument', 'section'),)
+
+
+class UnicefProgrammedocumentUnicefFocalPoint(models.Model):
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
+    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_programmedocument_unicef_focal_point'
+        unique_together = (('programmedocument', 'person'),)
+
+
+class UnicefProgrammedocumentUnicefOfficers(models.Model):
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
+    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_programmedocument_unicef_officers'
+        unique_together = (('programmedocument', 'person'),)
+
+
+class UnicefProgressreport(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    partner_contribution_to_date = models.TextField(blank=True, null=True)
+    challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
+    proposed_way_forward = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=3)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    due_date = models.DateField()
+    submission_date = models.DateField(blank=True, null=True)
+    review_date = models.DateField(blank=True, null=True)
+    review_overall_status = models.CharField(max_length=3, blank=True, null=True)
+    sent_back_feedback = models.TextField(blank=True, null=True)
+    report_number = models.IntegerField()
+    report_type = models.CharField(max_length=3)
+    is_final = models.BooleanField()
+    narrative = models.TextField(blank=True, null=True)
+    programme_document = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
+    submitted_by = models.ForeignKey(AccountUser, models.PROTECT, related_name='+', blank=True, null=True)
+    submitting_user = models.ForeignKey(AccountUser, models.PROTECT, related_name='+', blank=True, null=True)
+    reviewed_by_email = models.CharField(max_length=256, blank=True, null=True)
+    reviewed_by_external_id = models.IntegerField(blank=True, null=True)
+    reviewed_by_name = models.CharField(max_length=256, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_progressreport'
+        unique_together = (('programme_document', 'report_type', 'report_number'),)
+
+
+class UnicefProgressreportattachment(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    file = models.CharField(max_length=500)
+    type = models.CharField(max_length=5)
+    progress_report = models.ForeignKey(UnicefProgressreport, models.PROTECT, related_name='+')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_progressreportattachment'
+
+
+class UnicefReportingperioddates(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    report_type = models.CharField(max_length=3)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    due_date = models.DateField(blank=True, null=True)
+    description = models.CharField(max_length=512, blank=True, null=True)
+    programme_document = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
+    external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_reportingperioddates'
+        unique_together = (('external_id', 'external_business_area_code', 'report_type', 'programme_document'),)
+
+
+class UnicefSection(models.Model):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    external_id = models.CharField(max_length=32, blank=True, null=True)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_section'
