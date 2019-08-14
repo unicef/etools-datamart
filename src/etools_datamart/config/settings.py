@@ -105,6 +105,7 @@ DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
     # router_factory('default', ['default'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
+    router_factory('prp', ['prp'], syncdb=False),
 ]
 
 LOGIN_URL = '/login/'
