@@ -15,6 +15,8 @@ from test_utilities.factories import factories_registry, UserFactory
 
 from etools_datamart.api.urls import router
 
+# from etools_datamart.apps.prp import api_urls  # isort:skip noqa
+
 
 def clean_url2(method, url, data):
     return f"{method}_{url.strip('.').replace('/', '_')}_{str(data)}"
@@ -104,13 +106,11 @@ def pytest_generate_tests(metafunc, *args):
         params = []
         ids = []
         for prefix, viewset, basenametry in router.registry:
-            if prefix.startswith('datamart/'):
+            if prefix.startswith('prp/'):
                 sers = viewset.serializers_fieldsets.keys()
                 for ser in sers:
                     params.append([viewset, ser])
-                    ids.append(f'{viewset.__name__}-{ser}')
-                # params.append(viewset)
-                # ids.append(f'{viewset.__name__}')
+                    ids.append(f'{prefix}/{viewset.__name__}-{ser}')
         metafunc.parametrize("viewset,serializer", params, ids=ids)
 
 

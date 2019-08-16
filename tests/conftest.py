@@ -5,8 +5,6 @@ import warnings
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from django.db import connection, connections, DEFAULT_DB_ALIAS
-from django.db.backends.utils import truncate_name
 from django.db.models import Model
 
 import pytest
@@ -24,14 +22,13 @@ def _setup_models():
         #     opts = m._meta
         #
         # if opts.app_label not in ('content_types',):
-            # db_table = ('{0.app_label}_{0.model_name}'.format(opts)).lower()
-            # m._meta.db_table = truncate_name(db_table, connection.ops.max_name_length())
-            # m._meta.db_tablespace = ''
+        # db_table = ('{0.app_label}_{0.model_name}'.format(opts)).lower()
+        # m._meta.db_table = truncate_name(db_table, connection.ops.max_name_length())
+        # m._meta.db_tablespace = ''
         if issubclass(m, ReadOnlyModel):
             setattr(m, 'save', Model.save)
             if not m._meta.managed:
                 m._meta.managed = True
-
 
 
 def pytest_configure(config):
@@ -47,6 +44,7 @@ def pytest_configure(config):
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
 # warnings.simplefilter('ignore', UserWarning)
 warnings.simplefilter('ignore', RuntimeWarning, lineno=1421)
+
 
 @pytest.fixture(scope="session")
 def enable_migration_signals(request):
@@ -73,7 +71,6 @@ def django_db_setup(request,
                     django_db_createdb,
                     django_db_modify_db_settings,
                     enable_migration_signals):
-
     if django_db_createdb or enable_migration_signals:
         warnings.warn("Warning: pre/post migrate signals are enabled \n")
     else:
