@@ -26,6 +26,7 @@ jobs:
             apt-get update
             apt-get install -y \
                   libc-bin \
+                  git \
                   gcc \
                   curl \
                   gdal-bin \
