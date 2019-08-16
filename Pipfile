@@ -66,6 +66,7 @@ django-deprecate-fields = "*"
 django-migration-linter = "*"
 django-sql-explorer = "*"
 uwsgi = "*"
+packaging = "*"
 
 [dev-packages]
 bumpversion = "*"

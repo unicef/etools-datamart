@@ -19,6 +19,8 @@ INGNORED_TABLES = RegexList([
     'django_session',
     'drfpasswordless_.*',
     'djcelery_.*',
+    'django_migrations',
+    'django_admin_log',
     'unicef_notification_.*',
     'celery_.*',
     'social_auth_.*'

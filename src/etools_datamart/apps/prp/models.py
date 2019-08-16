@@ -307,21 +307,6 @@ class CoreWorkspaceCountries(ReadOnlyModel):
         app_label = 'prp'
 
 
-class DjangoAdminLog(ReadOnlyModel):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.SmallIntegerField()
-    change_message = models.TextField()
-    content_type = models.ForeignKey('prp.DjangoContentType', models.PROTECT, related_name='+', blank=True, null=True)
-    user_id = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_admin_log'
-        app_label = 'prp'
-
-
 class DjangoContentType(ReadOnlyModel):
     app_label = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
@@ -330,17 +315,6 @@ class DjangoContentType(ReadOnlyModel):
         managed = False
         db_table = 'django_content_type'
         unique_together = (('app_label', 'model'),)
-        app_label = 'prp'
-
-
-class DjangoMigrations(ReadOnlyModel):
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_migrations'
         app_label = 'prp'
 
 

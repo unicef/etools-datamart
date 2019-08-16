@@ -78,6 +78,7 @@ build_old:
 			-e CSRF_COOKIE_SECURE=false \
 			-e DATABASE_URL=${DATABASE_URL} \
 			-e DATABASE_URL_ETOOLS=${DATABASE_URL_ETOOLS} \
+			-e DATABASE_URL_PRP=${DATABASE_URL_PRP} \
 			-e DEBUG=false \
 			-e DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \
 			-e SECURE_BROWSER_XSS_FILTER=0 \

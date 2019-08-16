@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d8539e8f98589a29381b8f7dbd1de2b87eff6d25d085a73a196b374937dd6303"
+            "sha256": "33c7557810b2b3deb387e19e4c352e9cb21682f8c409a4aabd92f167dc5cc9db"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1079,11 +1079,11 @@
         },
         "drf-renderer-xlsx": {
             "hashes": [
-                "sha256:9ca353f3e58d2166d219d53e93403df7bdbe12b26a81319cdfe61dc017a57d6e",
-                "sha256:a7149d1c920a9bc0f1a83c532c98d07a69a15ccefdbac363e0c51f80ef76fbde"
+                "sha256:4c3dec2a95758f475095acef6f2fcd3093a47e142452e052c1e370fb5ca223d0",
+                "sha256:d159fd99cd4bb39cb32dd123629ca585bee56cccc6d9b3ec4e2cb7448981e736"
             ],
             "index": "pypi",
-            "version": "==0.3.2"
+            "version": "==0.3.3"
         },
         "drf-yasg": {
             "extras": [
@@ -1267,6 +1267,14 @@
             ],
             "index": "pypi",
             "version": "==2.6.2"
+        },
+        "packaging": {
+            "hashes": [
+                "sha256:a7ac867b97fdc07ee80a8058fe4435ccd274ecc3b0ed61d852d7d53055528cf9",
+                "sha256:c491ca87294da7cc01902edbe30a5bc6c4c28172b5138ab4e4aa1b9d7bfaeafe"
+            ],
+            "index": "pypi",
+            "version": "==19.1"
         },
         "pillow": {
             "hashes": [
@@ -1534,11 +1542,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:d491aa6399eaa3eded433972751a9770180730fd8b4c225b0b7f49c4fa2af70b",
-                "sha256:d68003cdffbbfcadaa2c445b72e1050b0a44406f94199866f192986c016b23f5"
+                "sha256:2a80ff5e2d1bb2e8c745876015fe0c9f2e19c5c6a9da4c28ec06251f1e5f9f9c",
+                "sha256:9eba140e6f9c02f58f6c62f40f1284ceb442c77e704a414efbe5e8401988b483"
             ],
             "index": "pypi",
-            "version": "==0.10.2"
+            "version": "==0.11.0"
         },
         "six": {
             "hashes": [
@@ -1986,6 +1994,7 @@
                 "sha256:a7ac867b97fdc07ee80a8058fe4435ccd274ecc3b0ed61d852d7d53055528cf9",
                 "sha256:c491ca87294da7cc01902edbe30a5bc6c4c28172b5138ab4e4aa1b9d7bfaeafe"
             ],
+            "index": "pypi",
             "version": "==19.1"
         },
         "parso": {
