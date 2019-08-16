@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"75c08b82e564c8c576a5358c25d52aaf\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "763"
+        ]
+    },
+    "data": {
+        "id": 302,
+        "source_id": null,
+        "last_modify_date": "15 Aug 2019 21:53:42",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "vendor_number": null,
+        "partner_name": null,
+        "partner_type": null,
+        "pd_ssfa_ref": null,
+        "pd_ssfa_status": null,
+        "pd_ssfa_start_date": null,
+        "pd_ssfa_creation_date": null,
+        "pd_ssfa_end_date": null,
+        "cash_contribution": null,
+        "supply_contribution": null,
+        "total_budget": null,
+        "unicef_budget": null,
+        "currency": null,
+        "partner_contribution": null,
+        "unicef_cash": null,
+        "in_kind_amount": null,
+        "total": null,
+        "fr_numbers_against_pd_ssfa": null,
+        "fr_currencies": null,
+        "sum_of_all_fr_planned_amount": null,
+        "core_value_attached": null,
+        "partner_link": null,
+        "intervention_link": null,
+        "country_id": null,
+        "partner_id": null,
+        "intervention_id": null,
+        "created": "15 Aug 2019 21:53:42",
+        "updated": null
+    },
+    "content_type": null
+}
