@@ -110,18 +110,8 @@ class CoreWorkspaceCountriesAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
-@register(models.DjangoAdminLog)
-class DjangoAdminLogAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
 @register(models.DjangoContentType)
 class DjangoContentTypeAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.DjangoMigrations)
-class DjangoMigrationsAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 

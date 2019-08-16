@@ -1,6 +1,6 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2019-08-14 20:09:11.491908
+# Generated on 2019-08-16 20:47:36.158959
 from django.contrib.gis.db import models
 
 from etools_datamart.apps.core.readonly import ReadOnlyModel

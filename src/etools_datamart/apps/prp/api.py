@@ -235,17 +235,6 @@ class CoreWorkspaceCountriesViewSet(URFReadOnlyModelViewSet):
     queryset = models.CoreWorkspaceCountries.objects.all()
 
 
-class DjangoAdminLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.DjangoAdminLog
-        exclude = ()
-
-
-class DjangoAdminLogViewSet(URFReadOnlyModelViewSet):
-    serializer_class = DjangoAdminLogSerializer
-    queryset = models.DjangoAdminLog.objects.all()
-
-
 class DjangoContentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.DjangoContentType
@@ -255,17 +244,6 @@ class DjangoContentTypeSerializer(serializers.ModelSerializer):
 class DjangoContentTypeViewSet(URFReadOnlyModelViewSet):
     serializer_class = DjangoContentTypeSerializer
     queryset = models.DjangoContentType.objects.all()
-
-
-class DjangoMigrationsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.DjangoMigrations
-        exclude = ()
-
-
-class DjangoMigrationsViewSet(URFReadOnlyModelViewSet):
-    serializer_class = DjangoMigrationsSerializer
-    queryset = models.DjangoMigrations.objects.all()
 
 
 class DjangoSiteSerializer(serializers.ModelSerializer):

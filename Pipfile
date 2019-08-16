@@ -93,6 +93,7 @@ yapf = "*"
 fancycompleter = {file = "https://github.com/theY4Kman/fancycompleter/archive/0.8.tar.gz"}
 flake8 = "*"
 ipdb = "*"
+sync = "*"
 
 [requires]
 python_version = "3.7"

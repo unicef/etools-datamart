@@ -79,7 +79,7 @@ class Command(BaseCommand):
         with output_file.open('w') as output:
             output.write("from django.contrib.admin import register, ModelAdmin\n\n")
             output.write("from etools_datamart.apps.core.admin_mixins "
-                         "import DatamartSourceModelAdmin\n")
+                         "import DatamartSourceModelAdmin\n\n")
             output.write("from . import models\n\n")
 
             for model_name in self.prp_models:
@@ -91,7 +91,7 @@ class Command(BaseCommand):
         if output_file.exists():
             output_file.rename(output_file.with_suffix('.bak'))
         with output_file.open('w') as output:
-            output.write("from unicef_rest_framework.views import URFReadOnlyModelViewSet\n")
+            output.write("from unicef_rest_framework.views import URFReadOnlyModelViewSet\n\n")
             output.write("from etools_datamart.api.endpoints.etools import serializers\n")
             output.write("from etools_datamart.apps.prp import models\n")
 
@@ -137,7 +137,7 @@ class Command(BaseCommand):
             yield "# flake8: noqa F405."
             yield "# This is an auto-generated PRP model module."
             yield "# Generated on %s" % datetime.now()
-            yield 'from %s import models' % self.db_module
+            yield 'from %s import models\n' % self.db_module
             yield 'from etools_datamart.apps.core.readonly import ReadOnlyModel'
             known_models = []
             table_info = connection.introspection.get_table_list(cursor)
