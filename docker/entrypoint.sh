@@ -28,7 +28,7 @@ elif [[ "$*" == "datamart" ]];then
     rm -f /var/datamart/run/*
 
     django-admin diffsettings --output unified
-    django-admin makemigrations --check --dry-run
+#    django-admin makemigrations --check --dry-run
 
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
