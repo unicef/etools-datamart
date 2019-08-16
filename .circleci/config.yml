@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: python:3.6.7-slim
+      - image: python:3.7-slim
         environment:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
@@ -30,7 +30,7 @@ jobs:
                   curl \
                   gdal-bin \
                   python-dev \
-                  postgresql-client-9.6
+                  postgresql-client
 
       - run:
           name: Create databases
@@ -51,7 +51,7 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install tox
-            tox -e py36-d22
+            tox -e py37-d22
       - store_artifacts:
           path: ~build/coverage
           destination: coverage

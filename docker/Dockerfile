@@ -1,12 +1,38 @@
-FROM unicef/datamart-base:1.3
+ARG BASE_IMAGE
+
+FROM byrnedo/alpine-curl:0.1.7 as loader
+
+ARG BUILD_DATE
+ARG VERSION
+ARG DEVELOP
+ARG GITHUB_TOKEN
+#
+ENV DEVELOP=${DEVELOP}
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+ENV DATAMART_VERSION=${VERSION}
+
+RUN mkdir -p /code
+COPY . /code
+WORKDIR /code
+RUN set -o pipefail && \
+    if [ "${DEVELOP}" = "1" ]; then \
+    echo "${VERSION}-develop"; \
+    else \
+    echo "Download package: https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" \
+    && curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
+    fi
+
+FROM unicef/datamart-base:${BASE_IMAGE}
+COPY --from=loader /code /code
 
 ARG BUILD_DATE
 ARG PIPENV_ARGS
 ARG VERSION
 ARG DEVELOP
 
-RUN mkdir -p /code
-ADD . /code
+#RUN mkdir -p /code
+#ADD . /code
+#WORKDIR /code
 WORKDIR /code
 
 RUN set -ex \
@@ -59,18 +85,44 @@ ENV PIPENV_PYPI_MIRROR=${PIPENV_PYPI_MIRROR}, \
     SESSION_COOKIE_SECURE=True \
     STATIC_ROOT=/tmp/static
 
+ENV UWSGI_PROTOCOL=http \
+    UWSGI_WORKERS=4 \
+    UWSGI_AUTO_PROCNAME=true \
+    UWSGI_BUFFER_SIZE=32768 \
+    UWSGI_DIE_ON_TERM=true \
+    UWSGI_DISABLE_LOGGING=false \
+    UWSGI_DISABLE_WRITE_EXCEPTION=true \
+    UWSGI_FREEBIND=true \
+    UWSGI_HTTP_TIMEOUT=30 \
+    UWSGI_IGNORE_SIGPIPE=true \
+    UWSGI_IGNORE_WRITE_ERRORS=true \
+    UWSGI_LIMIT_POST=20971520 \
+    UWSGI_LOG_X_FORWARDED_FOR=false \
+    UWSGI_MEMORY_REPORT=true \
+    UWSGI_NEED_APP=true \
+    UWSGI_POST_BUFFERING=65536 \
+    UWSGI_PROCNAME_PREFIX_SPACED="[Datamart]" \
+    UWSGI_RELOAD_ON_RSS=600 \
+    UWSGI_THREADS=4 \
+    UWSGI_THUNDER_LOCK=true \
+    UWSGI_VACUUM=true \
+    UWSGI_MODULE="etools_datamart.config.wsgi:application" \
+    UWSGI_HTTP_SOCKET=0.0.0.0:8000 \
+    UWSGI_MASTER=true \
+    UWSGI_ENABLE_THREADS=true \
+    UWSGI_LAZY_APPS=true \
+    UWSGI_SINGLE_INTERPRETER=true \
+    UWSGI_STATIC_MAP="/static=${STATIC_ROOT}"
 
 EXPOSE 8000
 
 ADD docker/*.sh /usr/local/bin/
 
-RUN adduser -S datamart \
-    && mkdir -p /var/datamart \
-    && chown datamart /var/datamart/
+
+RUN addgroup --gid 1024 datamart \
+    && adduser --disabled-password --ingroup datamart -S datamart
 
 ENTRYPOINT ["entrypoint.sh"]
 WORKDIR /var/datamart
-
-USER datamart
 
 CMD ["datamart"]

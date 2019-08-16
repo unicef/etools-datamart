@@ -251,6 +251,6 @@
   "^$",
   "^\\.(?P<format>[a-z0-9]+)/?$",
   "\\+sw(?P<format>\\.json|\\.yaml)$",
-  "^\\+swagger\\/$",
-  "^\\+redoc\\/$"
+  "^\\+swagger/$",
+  "^\\+redoc/$"
 ]

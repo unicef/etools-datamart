@@ -42,8 +42,9 @@ def truncate(modeladmin, request, queryset):
             Service.objects.get_for_model(obj.loader.model).invalidate_cache()
         except Service.DoesNotExist:
             pass
+        except Exception as e:
+            process_exception(e)
         obj.loader.model.objects.truncate()
-        obj.loader.model.invalidate_cache()
         obj.loader.unlock()
         obj.status = 'NO DATA'
         obj.last_run = None
@@ -89,24 +90,27 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             dt = formats.date_format(obj.last_run, 'DATETIME_FORMAT')
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+    _last_run.admin_order_field = 'last_run'
 
     def _last_success(self, obj):
         if obj.last_success:
             dt = formats.date_format(obj.last_success, 'DATETIME_FORMAT')
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+    _last_success.admin_order_field = 'last_success'
 
     def _last_failure(self, obj):
         if obj.last_failure:
             dt = formats.date_format(obj.last_failure, 'DATE_FORMAT')
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+    _last_failure.admin_order_field = 'last_failure'
 
     def _status(self, obj):
         css = get_css(obj)
         return mark_safe('<span class="%s">%s</span>' % (css, obj.status))
 
-    _status.verbse_name = 'status'
+    _status.verbose_name = 'status'
 
     def crontab(self, obj):
         opts = PeriodicTask._meta
@@ -131,8 +135,6 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             return format_html(f'<a href="{url}">data</a>')
         except NoReverseMatch:
             return '-'
-
-    data.verbse_name = 'data'
 
     def queue_task(self, obj):
         opts = self.model._meta

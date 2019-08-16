@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "2082"
+            "1809"
         ]
     },
     "data": {
@@ -84,10 +84,6 @@
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": null,
-                "location_name": null,
-                "location_pcode": null,
-                "location_level": null,
-                "location_levelname": null,
                 "unicef_focal_points": null,
                 "attachments": null
             },
@@ -114,10 +110,6 @@
                 "country_name": "chad",
                 "schema_name": "chad",
                 "area_code": null,
-                "location_name": null,
-                "location_pcode": null,
-                "location_level": null,
-                "location_levelname": null,
                 "unicef_focal_points": null,
                 "attachments": null
             },
@@ -144,10 +136,6 @@
                 "country_name": "lebanon",
                 "schema_name": "lebanon",
                 "area_code": null,
-                "location_name": null,
-                "location_pcode": null,
-                "location_level": null,
-                "location_levelname": null,
                 "unicef_focal_points": null,
                 "attachments": null
             }

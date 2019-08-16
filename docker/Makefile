@@ -4,8 +4,8 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=1.26
-BASE=1.3
+TARGET?=2.0.0a6
+BASE=2.0
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -38,6 +38,9 @@ build-base:
 	cd .. && ./manage.py makemigrations data --check --dry-run
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
+			--build-arg BASE_IMAGE=${BASE} \
+			--build-arg DEVELOP=${DEVELOP} \
+			--build-arg VERSION=${TARGET} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/Dockerfile .
@@ -65,7 +68,6 @@ build_old:
 .run:
 	cd .. && docker run \
 	 		--rm \
-	 		--name=${CONTAINER_NAME} \
 			-e ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
 			-e CACHE_URL=redis://192.168.66.66:6379/1 \
 			-e CACHE_URL_API=redis://192.168.66.66:6379/2 \

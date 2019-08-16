@@ -112,3 +112,9 @@ class TpmTpmvisitAdmin(TenantModelAdmin):
 class UsersCountryAdmin(EToolsModelAdmin):
     list_display = ('name', 'schema_name', 'business_area_code', 'country_short_code')
     search_fields = ('name', 'schema_name', 'business_area_code')
+
+
+@register(models.LocationsLocation)
+class LocationsLocationAdmin(TenantModelAdmin):
+    list_display = ('name', 'latitude', 'longitude')
+    search_fields = ('name', )
