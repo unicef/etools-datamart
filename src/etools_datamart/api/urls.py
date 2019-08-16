@@ -4,6 +4,7 @@ from unicef_rest_framework.routers import APIReadOnlyRouter
 
 from etools_datamart.api.endpoints import schema_view
 
+# urlpatterns = router.urls
 from . import endpoints
 
 app_name = 'api'
@@ -54,7 +55,7 @@ router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 
-# urlpatterns = router.urls
+from etools_datamart.apps.prp import api_urls  # noqa isort:skip
 
 urlpatterns = [
     re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),

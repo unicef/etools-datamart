@@ -35,6 +35,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   IGNORED_SCHEMAS=(str, ["public", "uat", "frg"]),
                   DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
+                  DATABASE_URL_PRP=(str, "postgis://postgres:@127.0.0.1:5432/prp"),
                   DEBUG=(bool, False),
                   DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
                   DISABLE_SERVICE_RESTRICTIONS=(bool, False),
@@ -96,12 +97,19 @@ DATABASES = {
     'etools': env.db('DATABASE_URL_ETOOLS',
                      engine='etools_datamart.apps.multitenant.postgresql'
                      ),
+    'prp': env.db('DATABASE_URL_PRP')
+
 }
+DATABASES['default']['CONN_MAX_AGE'] = 60
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
-    # router_factory('default', ['default'], syncdb=True),
+    # router_factory('default', ['data', 'unicef_rest_framework',
+    #                            'etl', 'security', 'unicef_security',
+    #                            'auth', 'authtoken', 'contenttypes',
+    #                            'django_db_logging'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
+    router_factory('prp', ['prp'], syncdb=True),
 ]
 
 LOGIN_URL = '/login/'
@@ -289,10 +297,11 @@ INSTALLED_APPS = [
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
+    'etools_datamart.apps.prp',
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',
-    'adminactions',
+    # 'adminactions',
     'explorer',
     'unicef_rest_framework.apps.Config',
     'rest_framework',

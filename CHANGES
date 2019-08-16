@@ -1,5 +1,6 @@
 2.0
 ---
+* add PRP source endpoints
 * improves performance
 * bug fixes
 * server start as unprivileged user

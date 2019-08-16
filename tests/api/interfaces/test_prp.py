@@ -55,13 +55,11 @@ def pytest_generate_tests(metafunc, *args):
         params = []
         ids = []
         for prefix, viewset, basenametry in router.registry:
-            if prefix.startswith('datamart/'):
+            if prefix.startswith('prp/'):
                 sers = viewset.serializers_fieldsets.keys()
                 for ser in sers:
                     params.append([viewset, ser])
-                    ids.append(f'{viewset.__name__}-{ser}')
-                # params.append(viewset)
-                # ids.append(f'{viewset.__name__}')
+                    ids.append(f'{prefix}/{viewset.__name__}-{ser}')
         metafunc.parametrize("viewset,serializer", params, ids=ids)
 
 
