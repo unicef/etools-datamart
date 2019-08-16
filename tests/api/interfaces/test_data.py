@@ -126,7 +126,7 @@ def data(db, request):
 
 
 @contract(recorder_class=MyRecorder, headers=False)
-def test_list(prefix, viewset, serializer, data):
+def test_list(viewset, serializer, data):
     url = f"{viewset.get_service().endpoint}"
     return [url, {'-serializer': serializer}]
 
