@@ -25,6 +25,14 @@ INGNORED_TABLES = RegexList([
     'celery_.*',
     'social_auth_.*'
 ])
+NO_API = RegexList([
+    'AccountUserGroups',
+    'AccountUserUserPermissions',
+    'AccountUserprofile',
+    'Auth.*',
+    'Django.*'
+])
+
 REVERSE_RELATION_NAMES = {
     # '{model_name}.{att_name}': 'related_name'
 }
@@ -58,9 +66,8 @@ class Command(BaseCommand):
             with output_file.open('w') as output:
                 for line in self.handle_inspection(options):
                     output.write("%s\n" % line)
-            self.handle_admin()
-            self.handle_api()
-            self.handle_urls()
+            self.handle_admin(options)
+            self.handle_api(options)
             call_command('check')
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
@@ -72,12 +79,12 @@ class Command(BaseCommand):
         yield "    list_filter = []"
         yield ""
 
-    def handle_admin(self):
+    def handle_admin(self, options):
         output_file = Path(__file__).parent.parent.parent / 'admin.py'
         if output_file.exists():
             output_file.rename(output_file.with_suffix('.bak'))
         with output_file.open('w') as output:
-            output.write("from django.contrib.admin import register, ModelAdmin\n\n")
+            output.write("from django.contrib.admin import ModelAdmin, register\n\n")
             output.write("from etools_datamart.apps.core.admin_mixins "
                          "import DatamartSourceModelAdmin\n\n")
             output.write("from . import models\n\n")
@@ -86,18 +93,34 @@ class Command(BaseCommand):
                 for line in self.handle_model_admin(model_name):
                     output.write("%s\n" % line)
 
-    def handle_api(self):
-        output_file = Path(__file__).parent.parent.parent / 'api.py'
-        if output_file.exists():
-            output_file.rename(output_file.with_suffix('.bak'))
-        with output_file.open('w') as output:
-            output.write("from unicef_rest_framework.views import URFReadOnlyModelViewSet\n\n")
-            output.write("from etools_datamart.api.endpoints.etools import serializers\n")
-            output.write("from etools_datamart.apps.prp import models\n")
+    def handle_api(self, options):
+        verbosity = options['verbosity']
 
-            for model_name in self.prp_models:
-                for line in self.handle_viewset(model_name):
-                    output.write("%s\n" % line)
+        api_file = Path(__file__).parent.parent.parent / 'api.py'
+        urls_file = Path(__file__).parent.parent.parent / 'api_urls.py'
+        if urls_file.exists():
+            urls_file.rename(urls_file.with_suffix('.bak'))
+        if api_file.exists():
+            api_file.rename(api_file.with_suffix('.bak'))
+        with urls_file.open('w') as urls:
+            urls.write("from etools_datamart.api.urls import router\n\n")
+            urls.write("from . import api\n\n")
+            with api_file.open('w') as api:
+                api.write("from unicef_rest_framework.views import URFReadOnlyModelViewSet\n\n")
+                api.write("from etools_datamart.api.endpoints.etools import serializers\n")
+                api.write("from etools_datamart.apps.prp import models\n")
+
+                for model_name in self.prp_models:
+                    if model_name not in NO_API:
+                        if verbosity >= 2:
+                            self.stdout.write("Generating endpoint for %s" % model_name)
+                        for line in self.handle_viewset(model_name):
+                            api.write("%s\n" % line)
+                        line = "router.register(r'prp/%s', api.%sViewSet)" % (model_name.lower(), model_name)
+                        urls.write("%s\n" % line)
+                    else:
+                        if verbosity >= 1:
+                            self.stdout.write("Ignoring endpoint for %s" % model_name)
 
     def handle_viewset(self, model_name):
         yield ""
@@ -112,17 +135,17 @@ class Command(BaseCommand):
         yield "    serializer_class = %sSerializer" % model_name
         yield "    queryset = models.%s.objects.all()" % model_name
 
-    def handle_urls(self):
-        output_file = Path(__file__).parent.parent.parent / 'api_urls.py'
-        if output_file.exists():
-            output_file.rename(output_file.with_suffix('.bak'))
-        with output_file.open('w') as output:
-            output.write("from etools_datamart.api.urls import router\n\n")
-            output.write("from . import api\n\n")
-
-            for model_name in self.prp_models:
-                line = "router.register(r'prp/%s', api.%sViewSet)" % (model_name.lower(), model_name)
-                output.write("%s\n" % line)
+    # def handle_urls(self):
+    #     output_file = Path(__file__).parent.parent.parent / 'api_urls.py'
+    #     if output_file.exists():
+    #         output_file.rename(output_file.with_suffix('.bak'))
+    #     with output_file.open('w') as output:
+    #         output.write("from etools_datamart.api.urls import router\n\n")
+    #         output.write("from . import api\n\n")
+    #
+    #         for model_name in self.prp_models:
+    #             line = "router.register(r'prp/%s', api.%sViewSet)" % (model_name.lower(), model_name)
+    #             output.write("%s\n" % line)
 
     def handle_inspection(self, options):
         connection = connections[options['database']]

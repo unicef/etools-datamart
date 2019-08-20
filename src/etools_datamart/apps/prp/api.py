@@ -15,28 +15,6 @@ class AccountUserViewSet(URFReadOnlyModelViewSet):
     queryset = models.AccountUser.objects.all()
 
 
-class AccountUserGroupsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AccountUserGroups
-        exclude = ()
-
-
-class AccountUserGroupsViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AccountUserGroupsSerializer
-    queryset = models.AccountUserGroups.objects.all()
-
-
-class AccountUserUserPermissionsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AccountUserUserPermissions
-        exclude = ()
-
-
-class AccountUserUserPermissionsViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AccountUserUserPermissionsSerializer
-    queryset = models.AccountUserUserPermissions.objects.all()
-
-
 class AccountUserprofileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AccountUserprofile
@@ -46,50 +24,6 @@ class AccountUserprofileSerializer(serializers.ModelSerializer):
 class AccountUserprofileViewSet(URFReadOnlyModelViewSet):
     serializer_class = AccountUserprofileSerializer
     queryset = models.AccountUserprofile.objects.all()
-
-
-class AuthGroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AuthGroup
-        exclude = ()
-
-
-class AuthGroupViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AuthGroupSerializer
-    queryset = models.AuthGroup.objects.all()
-
-
-class AuthGroupPermissionsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AuthGroupPermissions
-        exclude = ()
-
-
-class AuthGroupPermissionsViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AuthGroupPermissionsSerializer
-    queryset = models.AuthGroupPermissions.objects.all()
-
-
-class AuthPermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AuthPermission
-        exclude = ()
-
-
-class AuthPermissionViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AuthPermissionSerializer
-    queryset = models.AuthPermission.objects.all()
-
-
-class AuthtokenTokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AuthtokenToken
-        exclude = ()
-
-
-class AuthtokenTokenViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AuthtokenTokenSerializer
-    queryset = models.AuthtokenToken.objects.all()
 
 
 class ClusterClusterSerializer(serializers.ModelSerializer):
@@ -233,28 +167,6 @@ class CoreWorkspaceCountriesSerializer(serializers.ModelSerializer):
 class CoreWorkspaceCountriesViewSet(URFReadOnlyModelViewSet):
     serializer_class = CoreWorkspaceCountriesSerializer
     queryset = models.CoreWorkspaceCountries.objects.all()
-
-
-class DjangoContentTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.DjangoContentType
-        exclude = ()
-
-
-class DjangoContentTypeViewSet(URFReadOnlyModelViewSet):
-    serializer_class = DjangoContentTypeSerializer
-    queryset = models.DjangoContentType.objects.all()
-
-
-class DjangoSiteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.DjangoSite
-        exclude = ()
-
-
-class DjangoSiteViewSet(URFReadOnlyModelViewSet):
-    serializer_class = DjangoSiteSerializer
-    queryset = models.DjangoSite.objects.all()
 
 
 class IndicatorDisaggregationSerializer(serializers.ModelSerializer):
