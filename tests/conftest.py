@@ -60,6 +60,13 @@ def pytest_addoption(parser):
         default=False,
         help="re-enable pre/post migration signals",
     )
+    group._addoption(
+        "--record-new-urls",
+        action="store_true",
+        dest="record_new_urls",
+        default=False,
+        help="",
+    )
 
 
 @pytest.yield_fixture(scope='session')
