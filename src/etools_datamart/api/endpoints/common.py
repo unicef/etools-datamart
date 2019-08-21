@@ -179,11 +179,12 @@ class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
     querystringfilter_form_base_class = forms.Form
 
     def _get_serializer_from_param(self, name=None):
-        if name is None:
+        if self.request:
             name = self.request.query_params.get(self.serializer_field_param, 'std')
+        else:
+            name = 'std'
 
         if name == 'std':
-            # return self._default_serializer
             return self.serializers_fieldsets.get('std', self._default_serializer) or self._default_serializer
 
         target = self.serializers_fieldsets.get(name, None)

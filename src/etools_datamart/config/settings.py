@@ -459,6 +459,8 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'ordering',
     'DATETIME_FORMAT': DATETIME_FORMAT,
     # 'DATE_FORMAT': DATE_FORMAT,
+    'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.endpoints.openapi.DatamartAutoSchema',
+
 }
 
 JWT_AUTH = {
@@ -532,8 +534,9 @@ IGNORE_DEFAULT_SCOPE = True
 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': env('ABSOLUTE_BASE_URL') + env('API_PREFIX'),
-    'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
-    'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
+    # 'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
+    # 'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
+    'DISPLAY_OPERATION_ID': False,
     'SECURITY_DEFINITIONS': {
         'basic': {
             'type': 'basic'

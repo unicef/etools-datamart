@@ -39,7 +39,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1170"
+            "1198"
         ]
     },
     "data": {
@@ -80,6 +80,7 @@
         "engagement_source_id": null,
         "engagement_type": null,
         "engagement_subclass": null,
+        "related_module_class": null,
         "related_module_id": null,
         "section_source_id": null,
         "section_type": null,
