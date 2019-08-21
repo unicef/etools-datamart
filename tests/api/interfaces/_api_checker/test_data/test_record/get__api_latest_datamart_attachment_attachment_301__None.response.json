@@ -39,12 +39,12 @@
         ],
         "content-length": [
             "Content-Length",
-            "551"
+            "524"
         ]
     },
     "data": {
         "id": 301,
-        "url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=bolivia",
+        "url": "https://etools.unicef.orgNone?schema=bolivia",
         "source_id": null,
         "last_modify_date": "21 Aug 2019 21:23:34",
         "seen": null,

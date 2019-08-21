@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1794"
+            "1713"
         ]
     },
     "data": {
@@ -63,7 +63,7 @@
         "results": [
             {
                 "id": 298,
-                "url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=bolivia",
+                "url": "https://etools.unicef.orgNone?schema=bolivia",
                 "source_id": null,
                 "last_modify_date": "21 Aug 2019 21:23:34",
                 "seen": null,
@@ -92,7 +92,7 @@
             },
             {
                 "id": 299,
-                "url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=chad",
+                "url": "https://etools.unicef.orgNone?schema=chad",
                 "source_id": null,
                 "last_modify_date": "21 Aug 2019 21:23:34",
                 "seen": null,
@@ -121,7 +121,7 @@
             },
             {
                 "id": 300,
-                "url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=lebanon",
+                "url": "https://etools.unicef.orgNone?schema=lebanon",
                 "source_id": null,
                 "last_modify_date": "21 Aug 2019 21:23:34",
                 "seen": null,
