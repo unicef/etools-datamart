@@ -15,9 +15,9 @@ class AttachmentSerializerFull(DataMartSerializer):
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
-        return "%s/apd/action-points/detail/%s/?schema=%s" % (config.ETOOLS_ADDRESS,
-                                                              obj.source_id,
-                                                              obj.schema_name)
+        return "%s%s?schema=%s" % (config.ETOOLS_ADDRESS,
+                                   obj.file_link,
+                                   obj.schema_name)
 
     class Meta(DataMartSerializer.Meta):
         model = models.Attachment
