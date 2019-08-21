@@ -17,6 +17,7 @@ from humanize import naturaldelta
 
 from unicef_rest_framework.models import Service
 
+from etools_datamart.apps.core.admin_mixins import DisplayAllMixin
 from etools_datamart.apps.multitenant.admin import SchemaFilter
 from etools_datamart.config import settings
 from etools_datamart.libs.truncate import TruncateTableMixin
@@ -30,14 +31,14 @@ class DatamartChangeList(ChangeList):
     pass
 
 
-class DataModelAdmin(TruncateTableMixin, ModelAdmin):
+class DataModelAdmin(TruncateTableMixin, DisplayAllMixin, ModelAdmin):
     actions = [mass_update, export_as_csv, export_as_xls]
 
-    def get_list_display(self, request):
-        ret = self.list_display
-        if ret == ('pk',):
-            return [f.name for f in self.model._meta.fields]
-        return ret
+    # def get_list_display(self, request):
+    #     ret = self.list_display
+    #     if ret == ('pk',):
+    #         return [f.name for f in self.model._meta.fields]
+    #     return ret
 
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
@@ -331,5 +332,11 @@ class HACTDetailAdmin(DataModelAdmin):
 
 @register(models.ReportIndicator)
 class ReportIndicatorAdmin(DataModelAdmin):
-    list_display = ('pk',)
+    list_display = ('__str__',)
+    list_filter = ()
+
+
+@register(models.Attachment)
+class AttachmentAdmin(DataModelAdmin):
+    list_display = ('__str__',)
     list_filter = ()

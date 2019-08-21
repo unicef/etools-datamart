@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa: F401
 from .actionpoint import ActionPointViewSet
+from .attachment import AttachmentViewSet
 from .audit_engagement import EngagementViewSet
 from .famindicator import FAMIndicatorViewSet
 from .funds_grant import GrantViewSet

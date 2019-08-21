@@ -27,6 +27,7 @@ INGNORED_TABLES = RegexList([
 ])
 NO_API = RegexList([
     'AccountUserGroups',
+    'AccountUser',
     'AccountUserUserPermissions',
     'AccountUserprofile',
     'Auth.*',

@@ -5,6 +5,8 @@ import pytest
 
 from etools_datamart.api.urls import urlpatterns
 
+CONTRACT_FILE = Path(__file__).parent / 'test_urls.json'
+
 
 def name(func):
     if func is None:
@@ -33,6 +35,9 @@ def get_urls(data_file):
 
 
 def pytest_generate_tests(metafunc):
+    # if metafunc.config.option.record_new_urls:
+    #     CONTRACT_FILE.delete()
+
     if 'current_url' in metafunc.fixturenames:
         current = list_urls(urlpatterns)
         metafunc.parametrize("current_url", current)
@@ -41,12 +46,20 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("contract_url", contract)
 
 
-CONTRACT_FILE = Path(__file__).parent / 'test_urls.json'
-
-
 @pytest.fixture(scope='module')
-def contract():
-    return get_urls(CONTRACT_FILE)
+def contract(request):
+    yield get_urls(CONTRACT_FILE)
+    if request.config.option.record_new_urls:
+        if ADDED:
+            if MISSING:
+                pass
+            else:
+                CONTRACT_FILE.rename(CONTRACT_FILE.with_suffix('.bak'))
+
+
+CREATE_CONTRACT_FILE = False
+MISSING = False
+ADDED = False
 
 
 @pytest.fixture(scope='module')
@@ -54,14 +67,22 @@ def current():
     return list_urls(urlpatterns)
 
 
-def test_addedd(contract, current_url):
+def test_addedd(request, contract, current_url):
+    global ADDED
     if current_url not in contract:
-        pytest.fail("API ADDED: '%s' is a new url and contract file '%s' must be recreated" % (current_url,
-                                                                                               CONTRACT_FILE))
+        if request.config.option.record_new_urls:
+            ADDED = True
+            pytest.fail("API ADDED: '%s' is a new url and contract file '%s' must be recreated" % (current_url,
+                                                                                                   CONTRACT_FILE))
+        else:
+            pytest.fail("API ADDED: '%s' is a new url and contract file '%s' must be recreated" % (current_url,
+                                                                                                   CONTRACT_FILE))
 
 
 def test_missing(current, contract_url):
+    global MISSING
     if contract_url not in current:
+        MISSING = True
         pytest.fail("API REMOVED: '%s' endpoint has been removed" % contract_url)
 
 # def test_urls():

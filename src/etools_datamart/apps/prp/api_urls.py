@@ -2,8 +2,6 @@ from etools_datamart.api.urls import router
 
 from . import api
 
-router.register(r'prp/accountuser', api.AccountUserViewSet)
-router.register(r'prp/accountuserprofile', api.AccountUserprofileViewSet)
 router.register(r'prp/clustercluster', api.ClusterClusterViewSet)
 router.register(r'prp/clusterclusteractivity', api.ClusterClusteractivityViewSet)
 router.register(r'prp/clusterclusteractivitylocations', api.ClusterClusteractivityLocationsViewSet)
