@@ -6,6 +6,7 @@ from django.template import loader
 from crashlog.middleware import process_exception
 from rest_framework.renderers import BaseRenderer
 
+from unicef_rest_framework.renderers.mixin import ContentDispositionMixin
 from unicef_rest_framework.utils import get_query_string
 
 logger = logging.getLogger(__name__)
@@ -15,7 +16,7 @@ def labelize(v):
     return v.replace("_", " ").title()
 
 
-class IQYRenderer(BaseRenderer):
+class IQYRenderer(ContentDispositionMixin, BaseRenderer):
     media_type = 'text/plain'
     format = 'iqy'
     charset = 'utf-8'
@@ -30,12 +31,13 @@ class IQYRenderer(BaseRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         response = renderer_context['response']
         request = renderer_context['request']
-        view = renderer_context['view']
-        try:
-            filename = view.get_service().name
-        except Exception:
-            filename = self.__class__.__name__
-        response['Content-Disposition'] = u'attachment; filename="%s.iqy"' % filename
+        # view = renderer_context['view']
+        # try:
+        #     filename = view.get_service().name
+        # except Exception:
+        #     filename = self.__class__.__name__
+        # response['Content-Disposition'] = u'attachment; filename="%s.iqy"' % filename
+        self.process_response(renderer_context)
         if response.status_code != 200:
             return ''
         try:
