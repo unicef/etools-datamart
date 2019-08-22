@@ -301,7 +301,7 @@ INSTALLED_APPS = [
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',
-    # 'adminactions',
+    'adminactions',
     'explorer',
     'unicef_rest_framework.apps.Config',
     'rest_framework',

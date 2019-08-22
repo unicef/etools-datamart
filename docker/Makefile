@@ -158,6 +158,8 @@ beat:
 
 test:
 	RUN_OPTIONS="-e DEBUG=0 \
+	 			 -e SENTRY_DSN=https://bc20b97f5c824ebd8a709238a2379870@sentry.io/1434933 \
+	 			 -e SENTRY_ENABLED=true \
 				 -e X_FRAME_OPTIONS=DENY \
 				 -e SESSION_COOKIE_SECURE=1 \
 				 -e CSRF_COOKIE_SECURE=1 \
