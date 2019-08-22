@@ -6,6 +6,8 @@
 * server start as unprivileged user
 * upgrade to python 3.7
 * dependencies upgrade
+* new attachments/attachment endpoint
+
 
 1.26
 ----
