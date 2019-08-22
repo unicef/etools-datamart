@@ -678,9 +678,11 @@ SENTRY_DSN = env('SENTRY_DSN', '')
 if SENTRY_ENABLED:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.redis import RedisIntegration
 
     sentry_sdk.init(dsn=SENTRY_DSN,
-                    integrations=[DjangoIntegration()],
+                    integrations=[DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
                     release=get_full_version(),
                     debug=False)
 
