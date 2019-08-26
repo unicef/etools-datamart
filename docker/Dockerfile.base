@@ -29,6 +29,7 @@ RUN apk add --no-cache --virtual .build-deps-edge \
         protobuf-c-dev
 
 RUN apk add --no-cache --virtual .postgis-rundeps \
+        mailcap \
         json-c \
         libuuid \
         libxml2
