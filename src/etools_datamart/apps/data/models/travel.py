@@ -65,9 +65,8 @@ class Travel(DataMartModel):
         source = T2FTravel
         # queryset = lambda: FundsFundsreservationitem.objects.select_related('fund_reservation')
         # last_modify_field = 'modified'
-        # key = lambda loader, record: dict(country_name=loader.context['country'].name,
-        #                                   schema_name=loader.context['country'].schema_name,
-        #                                   reference_number=record.reference_number)
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+                                          reference_number=record.reference_number)
 
         mapping = dict(office_name='office.name',
                        section_name='section.name',

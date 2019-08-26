@@ -14,7 +14,7 @@ class TravelAttachment(object):
     pass
 
 
-class TravelLoader(Loader):
+class TripLoader(Loader):
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for t2f_travel_activity in qs.all().order_by('id'):
@@ -148,7 +148,7 @@ class Trip(DataMartModel):
     vendor_number = models.CharField(max_length=300, blank=True, null=True)
 
     source_activity_id = models.IntegerField(blank=True, null=True)
-    loader = TravelLoader()
+    loader = TripLoader()
 
     class Meta:
         pass
