@@ -286,9 +286,7 @@ class InterventionAbstract(models.Model):
                                                                        'country_programme',
                                                                        'partnersintervention_partners_interventionbudget_intervention_id'
                                                                        )
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          area_code=loader.context['country'].business_area_code,
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           intervention_id=record.pk)
         mapping = dict(
             agreement_reference_number='agreement.reference_number',
@@ -398,9 +396,7 @@ class InterventionByLocation(LocationMixin, InterventionAbstract, DataMartModel)
         unique_together = ('schema_name', 'intervention_id', 'location_source_id')
 
     class Options(InterventionAbstract.Options):
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          area_code=loader.context['country'].business_area_code,
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           intervention_id=record.pk,
                                           location_source_id=record.location.pk)
         mapping = add_location_mapping(InterventionAbstract.Options.mapping)

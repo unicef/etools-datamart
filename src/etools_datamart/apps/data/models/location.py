@@ -11,8 +11,8 @@ class GatewayType(DataMartModel):
     admin_level = models.SmallIntegerField(blank=True, null=True)
 
     class Meta:
-        unique_together = (('schema_name', 'name'),
-                           ('schema_name', 'admin_level'))
+        unique_together = (('schema_name', 'source_id'),
+                           )
 
     class Options:
         source = LocationsGatewaytype
