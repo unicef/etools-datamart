@@ -1,12 +1,35 @@
 ARG BASE_IMAGE
 
-FROM byrnedo/alpine-curl:0.1.7 as loader
+#FROM byrnedo/alpine-curl:0.1.7 as loader
+#
+#ARG BUILD_DATE
+#ARG VERSION
+#ARG DEVELOP
+#ARG GITHUB_TOKEN
+
+#ENV DEVELOP=${DEVELOP}
+#ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+#ENV DATAMART_VERSION=${VERSION}
+#
+#RUN mkdir -p /code
+#COPY . /code
+#WORKDIR /code
+#RUN set -o pipefail && \
+#    if [ "${DEVELOP}" = "1" ]; then \
+#    echo "${VERSION}-develop"; \
+#    else \
+#    echo "Download package: https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" \
+#    && curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
+#    fi
+
+FROM unicef/datamart-base:${BASE_IMAGE}
+#COPY --from=loader /code /code
 
 ARG BUILD_DATE
+ARG PIPENV_ARGS
 ARG VERSION
 ARG DEVELOP
-ARG GITHUB_TOKEN
-#
+
 ENV DEVELOP=${DEVELOP}
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 ENV DATAMART_VERSION=${VERSION}
@@ -19,20 +42,8 @@ RUN set -o pipefail && \
     echo "${VERSION}-develop"; \
     else \
     echo "Download package: https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" \
-    && curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
+    && curl -L -u "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
     fi
-
-FROM unicef/datamart-base:${BASE_IMAGE}
-COPY --from=loader /code /code
-
-ARG BUILD_DATE
-ARG PIPENV_ARGS
-ARG VERSION
-ARG DEVELOP
-
-#RUN mkdir -p /code
-#ADD . /code
-#WORKDIR /code
 WORKDIR /code
 
 RUN set -ex \
