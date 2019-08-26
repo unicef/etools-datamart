@@ -83,6 +83,9 @@ RUN pip install pip pipenv --upgrade
 RUN cd /code \
     && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
 
+# need to removes some code not py3.7 compliant
+RUN rm -fr /usr/local/lib/python3.7/site-packages/psycopg2/tests/*
+# before compile site-packages
 RUN find /usr/local/lib/python3.7/ -name *.pyc | xargs rm -f \
     && python -O -m compileall -fqb /usr/local/lib/python3.7 \
     && find /usr/local/lib/python3.7/ -name *.py | xargs rm -f
