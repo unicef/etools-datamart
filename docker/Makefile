@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.0.0a24
+TARGET?=2.0.0a25
 BASE=2.0
 # below vars are used internally
 BUILD_OPTIONS?=--squash
