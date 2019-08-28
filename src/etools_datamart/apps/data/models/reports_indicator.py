@@ -1,8 +1,7 @@
-from decimal import Decimal
-
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
+from etools_datamart.apps.data.fields import SafeDecimal
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.data.models.mixins import LocationInlineMixin, LocationLoadertMixin
@@ -11,16 +10,6 @@ from etools_datamart.apps.etools.models import PartnersIntervention, ReportsAppl
 
 def get_pd_output_names(obj: PartnersIntervention):
     return [ll.name for rl in obj.result_links.all() for ll in rl.ll_results.all()]
-
-
-class SafeDecimal(Decimal):
-
-    def __new__(cls, value="0", context=None):
-        if value is None:
-            return None
-        if isinstance(value, str) and ',' in value:
-            value = value.replace(',', '.')
-        return Decimal.__new__(cls, value, context)
 
 
 class ReportIndicatorLoader(LocationLoadertMixin, Loader):
