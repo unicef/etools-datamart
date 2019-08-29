@@ -13,7 +13,6 @@ if [[ "$*" == "worker" ]];then
     exec gosu datamart celery worker -A etools_datamart \
             --loglevel=${CELERY_LOGLEVEL} \
             --concurrency=${CELERY_CONCURRENCY} \
-            --purge \
             --pidfile run/celery.pid \
             $CELERY_EXTRA
 

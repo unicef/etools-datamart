@@ -101,7 +101,7 @@ DATABASES = {
 
 }
 
-DATABASES['default'] = {**DATABASES['default'], **{'OPTIONS': {'CONN_MAX_AGE': 120}}}
+DATABASES['default']['CONN_MAX_AGE'] = 60
 
 t = {'OPTIONS': {'AUTOCOMMIT': False}}
 
