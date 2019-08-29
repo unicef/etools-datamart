@@ -12,7 +12,6 @@ if [[ "$*" == "worker" ]];then
     django-admin db-isready --wait --sleep 5 --timeout 300 --connection etools
     exec gosu datamart celery worker \
             -A etools_datamart \
-            -O \
             --events \
             --max-tasks-per-child=1 \
             --loglevel=${CELERY_LOGLEVEL} \
