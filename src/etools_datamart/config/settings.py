@@ -100,7 +100,14 @@ DATABASES = {
     'prp': env.db('DATABASE_URL_PRP')
 
 }
-DATABASES['default']['CONN_MAX_AGE'] = 60
+
+
+DATABASES['default']['OPTIONS']['CONN_MAX_AGE'] = 120
+
+# disable transactions
+# https://docs.djangoproject.com/en/2.2/topics/db/transactions/#deactivating-transaction-management
+DATABASES['etools']['OPTIONS']['AUTOCOMMIT'] = False
+DATABASES['prp']['OPTIONS']['AUTOCOMMIT'] = False
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from functools import lru_cache
 
+from django.db import transaction
+
 import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
@@ -96,6 +98,7 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
     def store(self, key, value):
         self.request._request.api_info[key] = value
 
+    @transaction.non_atomic_requests
     def dispatch(self, request, *args, **kwargs):
         request._view = self
         if hasattr(request, 'api_info'):

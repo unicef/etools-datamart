@@ -3,8 +3,6 @@ from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
-from crashlog.middleware import process_exception
-
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models.base import DataMartModel
 from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType, TravelType
@@ -39,8 +37,7 @@ class PartnerLoader(Loader):
                     'special_audit': rec.special_audit,
                     'spot_check_follow_up': rec.spot_check_follow_up,
                     }
-        except Exception as e:
-            process_exception(e)
+        except Exception:
             data = {}
         return data
 
