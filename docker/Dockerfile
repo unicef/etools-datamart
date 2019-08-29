@@ -127,7 +127,7 @@ ENV UWSGI_PROTOCOL=http \
 EXPOSE 8000
 
 ADD docker/*.sh /usr/local/bin/
-
+ADD docker/circus.conf /etc/
 
 RUN addgroup --gid 1024 datamart \
     && adduser --disabled-password --ingroup datamart -S datamart

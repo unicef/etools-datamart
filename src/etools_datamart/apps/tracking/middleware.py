@@ -81,7 +81,6 @@ def log_request(**kwargs):
 def record_to_kwargs(request, response):
     user = None
     api_info = getattr(request, 'api_info')
-
     if request.user and request.user.is_authenticated:
         user = request.user
 

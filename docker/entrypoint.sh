@@ -23,6 +23,11 @@ elif [[ "$*" == "beat" ]];then
             --loglevel=${CELERY_LOGLEVEL} \
             --pidfile run/celerybeat.pid
 
+elif [[ "$*" == "w2" ]];then
+    django-admin db-isready --wait --timeout 60
+    django-admin init-setup --all --verbosity 2
+    exec gosu datamart circusd /etc/circus.conf
+
 elif [[ "$*" == "datamart" ]];then
     rm -f /var/datamart/run/*
 

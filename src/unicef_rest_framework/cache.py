@@ -145,7 +145,7 @@ class IsStaffKeyBit(KeyBitBase):
 
 class DevelopKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
-        if 'disable-cache' in request.GET or not config.CACHE_ENABLED:
+        if not config.CACHE_ENABLED:
             return {'dev': str(time.time())}
         if request.META.get('HTTP_X_DM_CACHE') == 'disabled':
             return {'dev': str(time.time())}
@@ -231,7 +231,8 @@ class APICacheResponse(CacheResponse):
             response.render()  # should be rendered, before picklining while storing to cache
 
             if not response.status_code >= 400 or self.cache_errors:  # pragma: no cover
-                cache.set(key, response, parse_ttl(view_instance.get_service().cache_ttl or '1y'))
+                expire = parse_ttl(view_instance.get_service().cache_ttl or '1y')
+                cache.set(key, response, expire)
         else:
             view_instance.request._request.api_info['cache-hit'] = True
 

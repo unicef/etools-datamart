@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
+from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -180,7 +181,8 @@ class LoaderTask(celery.Task):
         try:
             kwargs.setdefault('ignore_dependencies', False)
             kwargs.setdefault('force_requirements', True)
-            return self.loader.load(**kwargs)
+            with atomic():
+                return self.loader.load(**kwargs)
         except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
             st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
             self.loader.etl_task.status = st

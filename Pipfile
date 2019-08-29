@@ -67,6 +67,7 @@ django-migration-linter = "*"
 django-sql-explorer = "*"
 uwsgi = "*"
 packaging = "*"
+circus = "*"
 
 [dev-packages]
 bumpversion = "*"
