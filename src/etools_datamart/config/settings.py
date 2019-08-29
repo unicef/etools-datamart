@@ -101,13 +101,13 @@ DATABASES = {
 
 }
 
+DATABASES['default'] = {**DATABASES['default'], **{'OPTIONS': {'CONN_MAX_AGE': 120}}}
 
-DATABASES['default']['OPTIONS']['CONN_MAX_AGE'] = 120
+t = {'OPTIONS': {'AUTOCOMMIT': False}}
 
 # disable transactions
-# https://docs.djangoproject.com/en/2.2/topics/db/transactions/#deactivating-transaction-management
-DATABASES['etools']['OPTIONS']['AUTOCOMMIT'] = False
-DATABASES['prp']['OPTIONS']['AUTOCOMMIT'] = False
+DATABASES['etools'] = {**DATABASES['etools'], **t}
+DATABASES['prp'] = {**DATABASES['prp'], **t}
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
@@ -687,6 +687,7 @@ if SENTRY_ENABLED:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.celery import CeleryIntegration
+
     # from sentry_sdk.integrations.redis import RedisIntegration
 
     sentry_sdk.init(dsn=SENTRY_DSN,
