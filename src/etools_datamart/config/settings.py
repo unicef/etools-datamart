@@ -102,12 +102,9 @@ DATABASES = {
 }
 
 DATABASES['default']['CONN_MAX_AGE'] = 60
+DATABASES['etools']['AUTOCOMMIT'] = False
+DATABASES['prp']['AUTOCOMMIT'] = False
 
-t = {'OPTIONS': {'AUTOCOMMIT': False}}
-
-# disable transactions
-DATABASES['etools'] = {**DATABASES['etools'], **t}
-DATABASES['prp'] = {**DATABASES['prp'], **t}
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
