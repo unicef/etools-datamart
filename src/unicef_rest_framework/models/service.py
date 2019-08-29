@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import F
 from django.utils.functional import cached_property
 
+from concurrency.api import disable_concurrency
 from rest_framework.reverse import reverse
 from strategy_field.fields import StrategyClassField
 from strategy_field.utils import fqn
@@ -46,11 +47,12 @@ class ServiceManager(models.Manager):
                                                               'source_model': source_model
                                                           })
 
-        service.url_name = url_name
-        service.basename = basename
-        service.suffix = prefix
-        service.source_model = source_model
-        service.save()
+        with disable_concurrency(service):
+            service.url_name = url_name
+            service.basename = basename
+            service.suffix = prefix
+            service.source_model = source_model
+            service.save()
         service.viewset.get_service.cache_clear()
         return service, isnew
 

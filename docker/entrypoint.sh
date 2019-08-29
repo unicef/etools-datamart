@@ -10,9 +10,13 @@ chown datamart:datamart -R /var/datamart/
 if [[ "$*" == "worker" ]];then
     django-admin db-isready --wait --sleep 5 --timeout 60
     django-admin db-isready --wait --sleep 5 --timeout 300 --connection etools
-    exec gosu datamart celery worker -A etools_datamart \
+    exec gosu datamart celery worker \
+            -A etools_datamart \
+            -O \
+            --events \
+            --max-tasks-per-child=1 \
             --loglevel=${CELERY_LOGLEVEL} \
-            --concurrency=${CELERY_CONCURRENCY} \
+            --autoscale=${CELERY_AUTOSCALE} \
             --pidfile run/celery.pid \
             $CELERY_EXTRA
 
