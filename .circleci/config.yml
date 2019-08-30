@@ -25,13 +25,19 @@ jobs:
             mkdir -p /usr/share/man/man7
             apt-get update
             apt-get install -y \
-                  libc-bin \
-                  git \
-                  gcc \
+                  build-base \
                   curl \
+                  gcc \
                   gdal-bin \
+                  git \
+                  krb5-dev \
+                  libc-bin \
+                  libffi-dev \
+                  linux-headers \
+                  openssl-dev \
+                  postgresql-client \
                   python-dev \
-                  postgresql-client
+                  zeromq-dev
 
       - run:
           name: Create databases
