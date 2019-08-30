@@ -234,13 +234,13 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         from etools_datamart.celery import app
         i = app.control.inspect()
         running = i.active()
+        founds = []
         if running:
-            founds = []
             for worker, tasks in running.items():
                 for task in tasks:
                     founds.append(task['name'])
                     models.EtlTask.objects.filter(task=task['name']).update(task_id=task['id'])
-            models.EtlTask.objects.exclude(task__in=founds).update(task_id=None)
+        models.EtlTask.objects.exclude(task__in=founds).update(task_id=None)
 
     @action()
     def queue(self, request, pk, message=True):
