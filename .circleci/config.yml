@@ -3,6 +3,16 @@ jobs:
   build:
     working_directory: ~/code
     docker:
+      - image: redis:alpine
+      - image: rabbitmq:3.7-alpine
+        environment:
+           RABBITMQ_DEFAULT_VHOST: "datamart"
+      - image: mdillon/postgis:9.6
+        environment:
+          POSTGRES_USER: postgres
+          PGUSER: postgres
+          POSTGRES_DB: etools_datamart
+          POSTGRES_PASSWORD: postgres
       - image: python:3.7-slim
         environment:
           PGHOST: 127.0.0.1
@@ -10,13 +20,9 @@ jobs:
           DATABASE_URL: "postgis://postgres:postgres@127.0.0.1:5432/etools_datamart"
           DATABASE_URL_ETOOLS: "postgis://postgres:postgres@127.0.0.1:5432/etools"
           RELEASE_MATCH: "release/*"
-      - image: redis:alpine
-      - image: mdillon/postgis:9.6
-        environment:
-          POSTGRES_USER: postgres
-          PGUSER: postgres
-          POSTGRES_DB: etools_datamart
-          POSTGRES_PASSWORD: postgres
+          CELERY_BROKER_URL: "amqp://guest:guest@127.0.0.1/datamart"
+          CELERY_RESULT_BACKEND: "amqp://guest:guest@127.0.0.1/datamart"
+
     steps:
       - run:
           name: Install dependencies
@@ -25,18 +31,13 @@ jobs:
             mkdir -p /usr/share/man/man7
             apt-get update
             apt-get install -y \
-                  build-base \
-                  curl \
-                  gcc \
-                  gdal-bin \
-                  git \
-                  krb5-dev \
                   libc-bin \
-                  libffi-dev \
-                  openssl-dev \
-                  postgresql-client \
+                  git \
+                  gcc \
+                  curl \
+                  gdal-bin \
                   python-dev \
-                  zeromq-dev
+                  postgresql-client
 
       - run:
           name: Create databases
