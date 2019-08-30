@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from django.db.transaction import get_connection, TransactionManagementError
 from django.utils import timezone
 
 from celery import states
@@ -71,9 +70,6 @@ class Camera(Polaroid):
         elif task.state == states.RETRY:
             defaults['task_id'] = None
             defaults['last_failure'] = timezone.now()
-        print("{0.name:>25} {0.state}".format(task))
-        if get_connection().in_atomic_block:
-            raise TransactionManagementError("Cannot use DurableAtomic inside Atomic")
         self.TaskState.objects.filter(task=task.name).update(**defaults)
 
     def on_shutter(self, state):
