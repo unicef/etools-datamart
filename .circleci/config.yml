@@ -3,16 +3,6 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: redis:alpine
-      - image: rabbitmq:3.7-alpine
-        environment:
-           RABBITMQ_DEFAULT_VHOST: "datamart"
-      - image: mdillon/postgis:9.6
-        environment:
-          POSTGRES_USER: postgres
-          PGUSER: postgres
-          POSTGRES_DB: etools_datamart
-          POSTGRES_PASSWORD: postgres
       - image: python:3.7-slim
         environment:
           PGHOST: 127.0.0.1
@@ -23,6 +13,16 @@ jobs:
           CELERY_BROKER_URL: "amqp://guest:guest@127.0.0.1/datamart"
           CELERY_RESULT_BACKEND: "amqp://guest:guest@127.0.0.1/datamart"
 
+      - image: redis:alpine
+      - image: rabbitmq:3.7-alpine
+        environment:
+           RABBITMQ_DEFAULT_VHOST: "datamart"
+      - image: mdillon/postgis:9.6
+        environment:
+          POSTGRES_USER: postgres
+          PGUSER: postgres
+          POSTGRES_DB: etools_datamart
+          POSTGRES_PASSWORD: postgres
     steps:
       - run:
           name: Install dependencies
