@@ -48,7 +48,8 @@ RUN_TYPES = ((RUN_UNKNOWN, ""),
 
 
 class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'total', 'status', 'context', 'error', 'retry']
+    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'processed', 'total_records',
+                 'status', 'context', 'error', 'retry']
 
     def __init__(self, updated=0, created=0, unchanged=0, deleted=0,
                  status='SUCCESS', context=None, error=None, retry=False, **kwargs):
@@ -60,14 +61,15 @@ class EtlResult:
         self.status = status
         self.error = error
         self.context = context or {}
-        self.total = 0
+        self.processed = 0
+        self.total_records = 0
 
     def __repr__(self):
         return repr(self.as_dict())
 
     def incr(self, counter):
         setattr(self, counter, getattr(self, counter) + 1)
-        self.total += 1
+        self.processed += 1
 
     # def add(self, counter, value):
     #     setattr(self, counter, getattr(self, counter) + value)
@@ -78,7 +80,9 @@ class EtlResult:
                 'unchanged': self.unchanged,
                 'deleted': self.deleted,
                 'status': self.status,
-                'error': self.error}
+                'error': self.error,
+                'processed': self.processed,
+                'total_records': self.total_records}
 
     # def __add__(self, other):
     #     if isinstance(other, EtlResult):
@@ -471,6 +475,7 @@ class Loader:
     def on_end(self, error=None, retry=False):
         from etools_datamart.apps.subscriptions.models import Subscription
         from django.utils import timezone
+        self.results.total_records = self.model.objects.count()
 
         cost = time.time() - self._start
         defs = {'elapsed': cost,

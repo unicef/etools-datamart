@@ -102,13 +102,22 @@ def df(value):
 
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', '_task_id', '_last_run', '_status', 'time',
+    list_display = ('task', '_task_id', '_last_run', '_status',
+                    '_total', 'time',
                     '_last_success', '_last_failure',
                     'unlock_task', 'queue_task', 'data'
                     )
 
     date_hierarchy = 'last_run'
     actions = [mass_update, queue, truncate, unlock]
+
+    def _total(self, obj):
+        try:
+            a = obj.results.get('processed', '-')
+            b = obj.results.get('total_records', '-')
+            return "%s/%s" % (a, b)
+        except Exception:
+            return '?'
 
     def _task_id(self, obj):
         return (obj.task_id or '')[:8]
