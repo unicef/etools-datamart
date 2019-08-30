@@ -33,7 +33,6 @@ jobs:
                   krb5-dev \
                   libc-bin \
                   libffi-dev \
-                  linux-headers \
                   openssl-dev \
                   postgresql-client \
                   python-dev \

@@ -139,11 +139,11 @@ run:
 		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
 		$(MAKE) .run
 
-stack:
-	RUN_OPTIONS="-p 8000:8000" \
-		CMD=stack \
-		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
-		$(MAKE) .run
+#stack:
+#	RUN_OPTIONS="-p 8000:8000" \
+#		CMD=stack \
+#		ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
+#		$(MAKE) .run
 
 workers:
 	CONTAINER_NAME=datamart-workers \
