@@ -118,6 +118,15 @@ class RequiredIsRunning(Exception):
         return "Required dataset %s is still updating" % self.req
 
 
+class RequiredIsQueued(Exception):
+
+    def __init__(self, req, *args: object) -> None:
+        self.req = req
+
+    def __str__(self):
+        return "Required dataset has been queued %s" % self.req
+
+
 class RequiredIsMissing(Exception):
 
     def __init__(self, req, *args: object) -> None:
@@ -183,7 +192,7 @@ class LoaderTask(celery.Task):
             kwargs.setdefault('force_requirements', True)
             with atomic():
                 return self.loader.load(**kwargs)
-        except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
+        except (RequiredIsRunning, RequiredIsMissing, RequiredIsQueued) as e:  # pragma: no cover
             st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
             self.loader.etl_task.status = st
             self.loader.etl_task.save()
@@ -277,12 +286,16 @@ class Loader:
 
     def need_refresh(self, sender):
         if not self.etl_task.last_success:
+            logger.error('%s: Refresh needed due no successfully run' % self)
             return True
         if self.etl_task.status != 'SUCCESS':
+            logger.error('%s: Refresh needed because last failure' % self)
             return True
 
         if sender.etl_task.last_success:
-            return self.etl_task.last_success.date() > sender.etl_task.last_run.date()
+            if self.etl_task.last_success.date() > sender.etl_task.last_run.date():
+                logger.error('%s: Refresh needed because last success too old' % self)
+                return True
 
         return False
 
@@ -605,7 +618,6 @@ class Loader:
                     lock.release()
                 except LockError as e:  # pragma: no cover
                     logger.warning(e)
-
         return self.results
 
 
@@ -684,24 +696,25 @@ class CommonSchemaLoader(Loader):
                                     only_delta=only_delta,
                                     is_empty=not self.model.objects.exists(),
                                     stdout=stdout)
-                sid = transaction.savepoint()
-                try:
-                    self.results.context = self.context
-                    self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
-                    if truncate:
-                        self.model.objects.truncate()
-                    self.process_country()
-                    if self.config.sync_deleted_records(self):
-                        self.remove_deleted()
-                    if stdout and verbosity > 0:
-                        stdout.write("\n")
-                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
-                    # self.results.deleted = deleted
-                except MaxRecordsException:
-                    pass
-                except Exception:
-                    transaction.savepoint_rollback(sid)
-                    raise
+                with atomic():
+                    sid = transaction.savepoint()
+                    try:
+                        self.results.context = self.context
+                        self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+                        if truncate:
+                            self.model.objects.truncate()
+                        self.process_country()
+                        if self.config.sync_deleted_records(self):
+                            self.remove_deleted()
+                        if stdout and verbosity > 0:
+                            stdout.write("\n")
+                        # deleted = self.model.objects.exclude(seen=today).delete()[0]
+                        # self.results.deleted = deleted
+                    except MaxRecordsException:
+                        pass
+                    except Exception:
+                        transaction.savepoint_rollback(sid)
+                        raise
             else:
                 logger.info(f"Unable to get lock for {self}")
 

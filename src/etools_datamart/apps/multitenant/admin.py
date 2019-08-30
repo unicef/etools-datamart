@@ -74,7 +74,15 @@ class SchemaFilter(ListFilter):
 
 
 class EToolsModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
-    pass
+
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        if request.method == 'POST':
+            redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
+                                                               self.opts.model_name))
+
+            self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
+            return HttpResponseRedirect(redirect_url)
+        return self._changeform_view(request, object_id, form_url, extra_context)
 
 
 class TenantModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
