@@ -1,5 +1,4 @@
 import json
-import logging
 import time
 from inspect import isclass
 
@@ -7,11 +6,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
-from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.functional import cached_property
 
 import celery
+from celery.utils.log import get_task_logger
 from constance import config
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
@@ -25,7 +24,8 @@ from etools_datamart.libs.time import strfelapsed
 loadeables = set()
 locks = caches['lock']
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 CREATED = 'created'
 UPDATED = 'updated'
@@ -190,8 +190,7 @@ class LoaderTask(celery.Task):
         try:
             kwargs.setdefault('ignore_dependencies', False)
             kwargs.setdefault('force_requirements', True)
-            with atomic():
-                return self.loader.load(**kwargs)
+            return self.loader.load(**kwargs)
         except (RequiredIsRunning, RequiredIsMissing, RequiredIsQueued) as e:  # pragma: no cover
             st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
             self.loader.etl_task.status = st
@@ -286,15 +285,15 @@ class Loader:
 
     def need_refresh(self, sender):
         if not self.etl_task.last_success:
-            logger.error('%s: Refresh needed due no successfully run' % self)
+            logger.info('%s: Refresh needed due no successfully run' % self)
             return True
         if self.etl_task.status != 'SUCCESS':
-            logger.error('%s: Refresh needed because last failure' % self)
+            logger.info('%s: Refresh needed because last failure' % self)
             return True
 
         if sender.etl_task.last_success:
             if self.etl_task.last_success.date() > sender.etl_task.last_run.date():
-                logger.error('%s: Refresh needed because last success too old' % self)
+                logger.info('%s: Refresh needed because last success too old' % self)
                 return True
 
         return False
@@ -696,25 +695,24 @@ class CommonSchemaLoader(Loader):
                                     only_delta=only_delta,
                                     is_empty=not self.model.objects.exists(),
                                     stdout=stdout)
-                with atomic():
-                    sid = transaction.savepoint()
-                    try:
-                        self.results.context = self.context
-                        self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
-                        if truncate:
-                            self.model.objects.truncate()
-                        self.process_country()
-                        if self.config.sync_deleted_records(self):
-                            self.remove_deleted()
-                        if stdout and verbosity > 0:
-                            stdout.write("\n")
-                        # deleted = self.model.objects.exclude(seen=today).delete()[0]
-                        # self.results.deleted = deleted
-                    except MaxRecordsException:
-                        pass
-                    except Exception:
-                        transaction.savepoint_rollback(sid)
-                        raise
+                sid = transaction.savepoint()
+                try:
+                    self.results.context = self.context
+                    self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+                    if truncate:
+                        self.model.objects.truncate()
+                    self.process_country()
+                    if self.config.sync_deleted_records(self):
+                        self.remove_deleted()
+                    if stdout and verbosity > 0:
+                        stdout.write("\n")
+                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
+                    # self.results.deleted = deleted
+                except MaxRecordsException:
+                    pass
+                except Exception:
+                    transaction.savepoint_rollback(sid)
+                    raise
             else:
                 logger.info(f"Unable to get lock for {self}")
 
