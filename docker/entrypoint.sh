@@ -42,7 +42,7 @@ elif [[ "$*" == "datamart" ]];then
     django-admin init-setup --all --verbosity 2
     django-admin db-isready --wait --timeout 300 --connection etools
     exec gosu datamart uwsgi \
-        --static-map /dm-static=${STATIC_ROOT}
+        --static-map ${STATIC_URL}=${STATIC_ROOT}
 
 #    gunicorn -b 0.0.0.0:8000 \
 #        $GUNICORN_EXTRA \
