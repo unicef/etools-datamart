@@ -96,7 +96,7 @@ def get_css(obj):
 def df(value):
     # formats.date_format(obj.last_success, 'DATETIME_FORMAT')
     if value:
-        return value.strftime("%b %d, %H:%I")
+        return value.strftime("%b %d, %H:%M")
         # dateformat.format(value, 'b d, H:i')
 
 
