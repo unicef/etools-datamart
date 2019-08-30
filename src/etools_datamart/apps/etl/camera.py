@@ -73,8 +73,7 @@ class Camera(Polaroid):
         print("{0.name:>25} {0.state}".format(task))
         if get_connection().in_atomic_block:
             raise TransactionManagementError("Cannot use DurableAtomic inside Atomic")
-        self.TaskState.objects.update_or_create(task=task.name,
-                                                defaults=defaults)
+        self.TaskState.objects.filter(task=task.name).update(**defaults)
 
     def on_shutter(self, state):
         for i, task in enumerate(state.tasks.items()):

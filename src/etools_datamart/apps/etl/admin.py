@@ -174,18 +174,19 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     queue_task.verbose_name = 'queue'
 
     def unlock_task(self, obj):
-        locked = obj.content_type.model_class().loader.is_locked
-        if locked:
-            css = 'error'
-            label = 'unlock'
-        else:
-            css = 'success'
-            label = 'force unlock'
+        if obj.content_type:
+            locked = obj.content_type.model_class().loader.is_locked
+            if locked:
+                css = 'error'
+                label = 'unlock'
+            else:
+                css = 'success'
+                label = 'force unlock'
 
-        opts = self.model._meta
-        url = reverse('admin:%s_%s_unlock' % (opts.app_label,
-                                              opts.model_name), args=[obj.id])
-        return format_html(f'<a href="{url}"><span class="{css}">{label}</span></a>')
+            opts = self.model._meta
+            url = reverse('admin:%s_%s_unlock' % (opts.app_label,
+                                                  opts.model_name), args=[obj.id])
+            return format_html(f'<a href="{url}"><span class="{css}">{label}</span></a>')
 
     unlock_task.verbose_name = 'unlock'
 
