@@ -6,7 +6,7 @@ from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
 from django.urls import NoReverseMatch, reverse
-from django.utils import formats
+from django.utils import dateformat, formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -93,19 +93,27 @@ def get_css(obj):
     return css
 
 
+def df(value):
+    # formats.date_format(obj.last_success, 'DATETIME_FORMAT')
+    return dateformat.format(value, 'b d, H:m')
+
+
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', '_last_run', 'run_type', '_status', 'time',
+    list_display = ('task', '_task_id', '_last_run', '_status', 'time',
                     '_last_success', '_last_failure',
-                    'crontab', 'unlock_task', 'queue_task', 'data'
+                    'unlock_task', 'queue_task', 'data'
                     )
 
     date_hierarchy = 'last_run'
     actions = [mass_update, queue, truncate, unlock]
 
+    def _task_id(self, obj):
+        return (obj.task_id or '')[:8]
+
     def _last_run(self, obj):
         if obj.last_run:
-            dt = formats.date_format(obj.last_run, 'DATETIME_FORMAT')
+            dt = df(obj.last_run)
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
 
@@ -113,7 +121,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     def _last_success(self, obj):
         if obj.last_success:
-            dt = formats.date_format(obj.last_success, 'DATETIME_FORMAT')
+            dt = df(obj.last_success)
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
 
@@ -206,6 +214,34 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #                                                            self.opts.model_name))
     #         return HttpResponseRedirect(redirect_url)
     #     return self._changeform_view(request, object_id, form_url, extra_context)
+
+    @link()
+    def check_running(self, request, message=True):
+        # {'celery@gundam.local': [{'id': '7a570647-89cd-4c47-84e4-c8569ef48f28',
+        #                           'name': 'load_data_hact',
+        #                           'args': '()',
+        #                           'kwargs': '{}',
+        #                           'type': 'load_data_hact',
+        #                           'hostname': 'celery@gundam.local',
+        #                           'time_start': 1567185669.1479037,
+        #                           'acknowledged': True,
+        #                           'delivery_info': {'exchange': '',
+        #                                             'routing_key': 'default',
+        #                                             'priority': 0,
+        #                                             'redelivered': None},
+        #                           'worker_pid': 40223}]}
+        from etools_datamart.celery import app
+        i = app.control.inspect()
+        running = i.active()
+        if running:
+            founds = []
+            for worker, tasks in running.items():
+                for task in tasks:
+                    founds.append(task['name'])
+                    models.EtlTask.objects.filter(task=task['name']).update(task_id=task['id'])
+            models.EtlTask.objects.exclude(task__in=founds).update(task_id=None)
+
+        print(111, "camera.py:94", i.active())
 
     @action()
     def queue(self, request, pk, message=True):

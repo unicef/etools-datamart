@@ -188,6 +188,8 @@ class LoaderTask(celery.Task):
     def run(self, *args, **kwargs):
         logger.debug(kwargs)
         try:
+            if self.loader.etl_task.task_id:
+                return EtlResult()
             kwargs.setdefault('ignore_dependencies', False)
             kwargs.setdefault('force_requirements', True)
             return self.loader.load(**kwargs)

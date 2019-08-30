@@ -11,6 +11,7 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.template.response import TemplateResponse
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
+from adminactions.mass_update import mass_update
 
 from unicef_rest_framework.models import Service, UserAccessControl
 from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl
@@ -58,6 +59,7 @@ class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
     search_fields = ('group', 'service',)
     form = GroupACLAdminForm
     autocomplete_fields = ('group',)
+    actions = [mass_update]
 
     # filter_horizontal = ('services',)
 

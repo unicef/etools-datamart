@@ -13,8 +13,6 @@ from etools_datamart.libs.time import fromtimestamp
 WORKER_UPDATE_FREQ = 60  # limit worker timestamp write freq.
 SUCCESS_STATES = frozenset([states.SUCCESS])
 
-NOT_SAVED_ATTRIBUTES = frozenset(['name', 'args', 'kwargs', 'eta'])
-
 logger = get_logger(__name__)
 debug = logger.debug
 
@@ -38,11 +36,6 @@ class Camera(Polaroid):
     def TaskState(self):
         """Return the data model to store task state in."""
         return symbol_by_name('etools_datamart.apps.etl.models.EtlTask')
-
-    # @property
-    # def WorkerState(self):
-    #     """Return the data model to store worker state in."""
-    #     return symbol_by_name('celery_mon.models.WorkerState')
 
     def django_setup(self):
         import django
@@ -87,5 +80,4 @@ class Camera(Polaroid):
         for i, task in enumerate(state.tasks.items()):
             self.handle_task(task)
 
-    def on_cleanup(self):
-        pass
+    # def on_cleanup(self):
