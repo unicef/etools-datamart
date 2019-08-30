@@ -497,6 +497,7 @@ class Loader:
                     for service in self.config.model.linked_services:
                         service.invalidate_cache()
                         Subscription.objects.notify(self.config.model)
+        self.unlock()
         self.etl_task.update(**defs)
 
     def lock(self):
