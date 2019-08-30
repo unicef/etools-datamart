@@ -95,7 +95,7 @@ def get_css(obj):
 
 def df(value):
     # formats.date_format(obj.last_success, 'DATETIME_FORMAT')
-    if value:
+    if value is not None:
         return value.strftime("%b %d, %H:%M")
         # dateformat.format(value, 'b d, H:i')
 
@@ -235,6 +235,9 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         #                           'worker_pid': 40223}]}
         from etools_datamart.celery import app
         i = app.control.inspect()
+        s = i.stats()
+        if not s:
+            self.message_user(request, "Warning unable to get celery control", messages.ERROR)
         running = i.active()
         founds = []
         if running:

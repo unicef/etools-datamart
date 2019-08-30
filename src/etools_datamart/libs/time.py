@@ -9,7 +9,9 @@ def strfelapsed(seconds):
     if seconds:
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
-        return "%02d:%02d:%02d" % (hours, minutes, seconds)
+    else:
+        hours = minutes = seconds = 0
+    return "%02d:%02d:%02d" % (hours, minutes, seconds)
 
 
 def make_aware(value):
