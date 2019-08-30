@@ -40,8 +40,8 @@ elif [[ "$*" == "datamart" ]];then
     django-admin check --deploy
     django-admin init-setup --all --verbosity 2
     django-admin db-isready --wait --timeout 300 --connection etools
-    exec gosu datamart uwsgi \
-        --static-map ${STATIC_URL}=${STATIC_ROOT}
+    echo "uwsgi --static-map ${STATIC_URL}=${STATIC_ROOT}"
+    exec gosu datamart uwsgi --static-map ${STATIC_URL}=${STATIC_ROOT}
 else
     exec "$@"
 fi

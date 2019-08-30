@@ -32,6 +32,7 @@ build-base:
 			--no-cache \
 			-t ${DOCKER_IMAGE_NAME}-base:${BASE} \
 			-f docker/Dockerfile.base .
+	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 	docker push ${DOCKER_IMAGE_NAME}-base:${BASE}
 
 
