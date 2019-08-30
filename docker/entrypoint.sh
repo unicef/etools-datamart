@@ -28,7 +28,7 @@ elif [[ "$*" == "beat" ]];then
 
 elif [[ "$*" == "w2" ]];then
     django-admin db-isready --wait --timeout 60
-    exec gosu datamart circusd /etc/circus.conf
+    exec gosu datamart circusd /etc/circus.conf --log-output=-
 
 elif [[ "$*" == "datamart" ]];then
     rm -f /var/datamart/run/*
