@@ -56,16 +56,17 @@ class Camera(Polaroid):
             'last_run': fromtimestamp(task.timestamp),
             'results': task.result or task.exception,
             'traceback': task.traceback,
-            'elapsed': task.runtime
         }
         if task.state == states.STARTED:
-            pass
+            defaults['elapsed'] = None
         elif task.state == states.SUCCESS:
             defaults['last_success'] = timezone.now()
             defaults['last_failure'] = None
+            defaults['elapsed'] = task.runtime
             defaults['task_id'] = None
         elif task.state == states.FAILURE:
             defaults['last_failure'] = timezone.now()
+            defaults['elapsed'] = task.runtime
             defaults['task_id'] = None
         elif task.state == states.RETRY:
             defaults['task_id'] = None

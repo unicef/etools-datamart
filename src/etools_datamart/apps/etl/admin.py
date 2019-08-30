@@ -242,8 +242,6 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     models.EtlTask.objects.filter(task=task['name']).update(task_id=task['id'])
             models.EtlTask.objects.exclude(task__in=founds).update(task_id=None)
 
-        print(111, "camera.py:94", i.active())
-
     @action()
     def queue(self, request, pk, message=True):
         obj = self.get_object(request, pk)
