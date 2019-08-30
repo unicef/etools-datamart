@@ -6,7 +6,7 @@ from django.contrib.admin import register
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
 from django.urls import NoReverseMatch, reverse
-from django.utils import dateformat, formats
+from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -95,7 +95,9 @@ def get_css(obj):
 
 def df(value):
     # formats.date_format(obj.last_success, 'DATETIME_FORMAT')
-    return dateformat.format(value, 'b d, H:m')
+    if value:
+        return value.strftime("%b %d, %H:%I")
+        # dateformat.format(value, 'b d, H:i')
 
 
 @register(models.EtlTask)
