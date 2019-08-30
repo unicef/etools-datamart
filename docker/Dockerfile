@@ -75,6 +75,7 @@ ENV PIPENV_PYPI_MIRROR=${PIPENV_PYPI_MIRROR}, \
     CELERY_BROKER_URL="redis://127.0.0.1:6379/2" \
     CELERY_LOGLEVEL="ERROR" \
     CELERY_RESULT_BACKEND="redis://127.0.0.1:6379/3" \
+    CELERY_EXTRA="" \
     CSRF_COOKIE_SECURE=True \
     DATABASE_URL="postgres://postgres:@127.0.0.1:5432/etools_datamart" \
     DATABASE_URL_ETOOLS="postgis://postgres:@127.0.0.1:5432/etools" \

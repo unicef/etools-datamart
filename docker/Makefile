@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=0
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.0.0a29
+TARGET?=2.0.0a30
 BASE=2.0
 # below vars are used internally
 BUILD_OPTIONS?=--squash
@@ -32,6 +32,7 @@ build-base:
 			--no-cache \
 			-t ${DOCKER_IMAGE_NAME}-base:${BASE} \
 			-f docker/Dockerfile.base .
+	docker push ${DOCKER_IMAGE_NAME}-base:${BASE}
 
 
 .build:
@@ -110,6 +111,8 @@ deploy:
 	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
 	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade datamart:datamart-admin ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade datamart:celery-w2 ${DOCKER_IMAGE_NAME}:${TARGET}
 	curl -X POST -H 'Content-type: application/json' \
 		--data '{"text":"Datamart ${TARGET} released in dev"}' \
 		https://hooks.slack.com/services/${SLACK_BOT_TOKEN}
@@ -148,7 +151,7 @@ run:
 workers:
 	CONTAINER_NAME=datamart-workers \
 			ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
-			CMD=worker $(MAKE) .run
+			CMD=w2 $(MAKE) .run
 
 beat:
 	CONTAINER_NAME=datamart-beat \

@@ -28,7 +28,6 @@ elif [[ "$*" == "beat" ]];then
 
 elif [[ "$*" == "w2" ]];then
     django-admin db-isready --wait --timeout 60
-    django-admin init-setup --all --verbosity 2
     exec gosu datamart circusd /etc/circus.conf
 
 elif [[ "$*" == "datamart" ]];then
@@ -43,15 +42,6 @@ elif [[ "$*" == "datamart" ]];then
     django-admin db-isready --wait --timeout 300 --connection etools
     exec gosu datamart uwsgi \
         --static-map ${STATIC_URL}=${STATIC_ROOT}
-
-#    gunicorn -b 0.0.0.0:8000 \
-#        $GUNICORN_EXTRA \
-#        --workers=${GUNICORN_WORKERS} \
-#        --chdir /var/datamart \
-#        --timeout ${GUNICORN_TIMEOUT} \
-#        --access-logfile - \
-#        --access-logformat "%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s" \
-#        etools_datamart.config.wsgi
 else
     exec "$@"
 fi
