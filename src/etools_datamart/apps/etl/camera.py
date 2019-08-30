@@ -1,7 +1,5 @@
 from datetime import timedelta
 
-from django.utils import timezone
-
 from celery import states
 from celery.events.snapshot import Polaroid
 from celery.utils.imports import symbol_by_name
@@ -57,19 +55,19 @@ class Camera(Polaroid):
             'traceback': task.traceback,
         }
         if task.state == states.STARTED:
-            defaults['elapsed'] = None
+            pass
         elif task.state == states.SUCCESS:
-            defaults['last_success'] = timezone.now()
-            defaults['last_failure'] = None
-            defaults['elapsed'] = task.runtime
+            # defaults['last_success'] = timezone.now()
+            # defaults['last_failure'] = None
+            # defaults['elapsed'] = task.runtime
             defaults['task_id'] = None
         elif task.state == states.FAILURE:
-            defaults['last_failure'] = timezone.now()
-            defaults['elapsed'] = task.runtime
+            # defaults['last_failure'] = timezone.now()
+            # defaults['elapsed'] = task.runtime
             defaults['task_id'] = None
         elif task.state == states.RETRY:
             defaults['task_id'] = None
-            defaults['last_failure'] = timezone.now()
+            # defaults['last_failure'] = timezone.now()
         self.TaskState.objects.filter(task=task.name).update(**defaults)
 
     def on_shutter(self, state):
