@@ -34,6 +34,24 @@ def queue(modeladmin, request, queryset):
                             messages.SUCCESS)
 
 
+def unlock(modeladmin, request, queryset):
+    count = len(queryset)
+
+    for obj in queryset:
+        try:
+            Service.objects.get_for_model(obj.loader.model).invalidate_cache()
+        except Service.DoesNotExist:
+            pass
+        except Exception as e:
+            process_exception(e)
+        obj.loader.model.objects.truncate()
+        obj.loader.unlock()
+
+    modeladmin.message_user(request,
+                            "{0} loader{1} unlocked".format(count, pluralize(count)),
+                            messages.SUCCESS)
+
+
 def truncate(modeladmin, request, queryset):
     count = len(queryset)
 
@@ -83,13 +101,14 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     )
 
     date_hierarchy = 'last_run'
-    actions = [mass_update, queue, truncate]
+    actions = [mass_update, queue, truncate, unlock]
 
     def _last_run(self, obj):
         if obj.last_run:
             dt = formats.date_format(obj.last_run, 'DATETIME_FORMAT')
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
     _last_run.admin_order_field = 'last_run'
 
     def _last_success(self, obj):
@@ -97,6 +116,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             dt = formats.date_format(obj.last_success, 'DATETIME_FORMAT')
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
     _last_success.admin_order_field = 'last_success'
 
     def _last_failure(self, obj):
@@ -104,6 +124,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             dt = formats.date_format(obj.last_failure, 'DATE_FORMAT')
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
     _last_failure.admin_order_field = 'last_failure'
 
     def _status(self, obj):
