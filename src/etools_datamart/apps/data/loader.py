@@ -534,13 +534,13 @@ class Loader:
              ignore_dependencies=False, max_records=None, countries=None,
              only_delta=True, run_type=RUN_UNKNOWN,
              force_requirements=True):
-        self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
         lock = self.lock()
         truncate = self.config.truncate
         try:
             if lock:  # pragma: no branch
+                self.on_start(run_type)
                 if not ignore_dependencies:
                     for requirement in self.config.depends:
                         if requirement.loader.is_running():
