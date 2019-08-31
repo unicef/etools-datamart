@@ -120,16 +120,16 @@ class RequiredIsRunning(Exception):
         self.req = req
 
     def __str__(self):
-        return "Required dataset %s is still updating" % self.req
+        return "Required ETL '%s' is running" % str(self.req.loader.etl_task.task)
 
 
-class RequiredIsQueued(Exception):
-
-    def __init__(self, req, *args: object) -> None:
-        self.req = req
-
-    def __str__(self):
-        return "Required dataset has been queued %s" % self.req
+# class RequiredIsQueued(Exception):
+#
+#     def __init__(self, req, *args: object) -> None:
+#         self.req = req
+#
+#     def __str__(self):
+#         return "Required dataset has been queued %s" % self.req
 
 
 class RequiredIsMissing(Exception):
@@ -198,7 +198,7 @@ class LoaderTask(celery.Task):
             kwargs.setdefault('ignore_dependencies', False)
             kwargs.setdefault('force_requirements', True)
             return self.loader.load(**kwargs)
-        except (RequiredIsRunning, RequiredIsMissing, RequiredIsQueued) as e:  # pragma: no cover
+        except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
             st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
             self.loader.etl_task.status = st
             self.loader.etl_task.save()
