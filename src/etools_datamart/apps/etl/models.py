@@ -93,6 +93,14 @@ class EtlTask(models.Model):
         except PeriodicTask.DoesNotExist:
             pass
 
+    def snapshot(self):
+        if self.status == 'SUCCESS':
+            return EtlTaskHistory.objects.create(task=self.task,
+                                                 timestamp=self.last_run,
+                                                 elapsed=self.elapsed
+                                                 )
+
+
 #
 # class Offset(models.Model):
 #     table_name = models.CharField(max_length=200, null=True)
@@ -102,3 +110,12 @@ class EtlTask(models.Model):
 #     max_id = models.IntegerField(default=0)
 #     last_modify_date = models.DateTimeField(null=True, blank=True)
 #
+
+class EtlTaskHistory(models.Model):
+    timestamp = models.DateTimeField(blank=True, null=True)
+    task = models.CharField(max_length=200, db_index=True)
+    elapsed = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        get_latest_by = 'last_run'
+        ordering = ('task',)

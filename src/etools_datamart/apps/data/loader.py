@@ -23,6 +23,7 @@ from etools_datamart.libs.time import strfelapsed
 
 loadeables = set()
 locks = caches['lock']
+cache = caches['default']
 
 # logger = logging.getLogger(__name__)
 logger = get_task_logger(__name__)
@@ -502,8 +503,8 @@ class Loader:
                     for service in self.config.model.linked_services:
                         service.invalidate_cache()
                         Subscription.objects.notify(self.config.model)
-        self.unlock()
         self.etl_task.update(**defs)
+        self.etl_task.snapshot()
 
     def lock(self):
         lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
@@ -573,8 +574,8 @@ class Loader:
                     self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
                     if truncate:
                         self.model.objects.truncate()
-
                     for i, country in enumerate(countries, 1):
+                        cache.set("STATUS:%s" % self.etl_task.task, country)
                         self.context['country'] = country
                         if stdout and verbosity > 0:
                             stdout.write(f"{i:>3}/{total_countries} "
@@ -600,8 +601,6 @@ class Loader:
                             self.remove_deleted()
                     if stdout and verbosity > 0:
                         stdout.write("\n")
-                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
-                    # self.results.deleted = deleted
                 except MaxRecordsException:
                     pass
                 except Exception:
@@ -620,6 +619,7 @@ class Loader:
         else:
             self.on_end(None)
         finally:
+            cache.delete("STATUS:%s" % self.etl_task.task)
             if lock:  # pragma: no branch
                 try:
                     lock.release()

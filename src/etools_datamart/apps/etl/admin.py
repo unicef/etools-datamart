@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.contrib import admin, messages
 from django.contrib.admin import register
+from django.core.cache import caches
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
 from django.urls import NoReverseMatch, reverse
@@ -23,6 +24,8 @@ from etools_datamart.celery import app
 from etools_datamart.libs.time import strfelapsed
 
 from . import models
+
+cache = caches['default']
 
 
 def queue(modeladmin, request, queryset):
@@ -148,7 +151,11 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     def _status(self, obj):
         css = get_css(obj)
-        return mark_safe('<span class="%s">%s</span>' % (css, obj.status))
+        c = cache.get("STATUS:%s" % obj.task) or ""
+        s = obj.status
+        if c:
+            s = "%s (%s)" % (obj.status, c)
+        return mark_safe('<span class="%s">%s</span>' % (css, s))
 
     _status.verbose_name = 'status'
     _status.admin_order_field = 'status'
@@ -292,3 +299,15 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         created, updated = self.model.objects.inspect()
         self.message_user(request, f"{created} task created. {updated} have been updated",
                           messages.SUCCESS)
+
+
+@register(models.EtlTaskHistory)
+class EtlTaskHistoryAdmin(admin.ModelAdmin):
+    list_display = ('task', 'timestamp', 'time')
+    list_filter = ('task',)
+    date_hierarchy = 'timestamp'
+
+    def time(self, obj):
+        return strfelapsed(obj.elapsed)
+
+    time.admin_order_field = 'elapsed'
