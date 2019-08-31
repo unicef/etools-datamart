@@ -290,19 +290,25 @@ class Loader:
     def is_running(self):
         return self.etl_task.status == 'RUNNING'
 
-    def need_refresh(self, sender):
-        if not self.etl_task.last_success:
+    def need_refresh(self, other):
+        if not self.etl_task.last_success or self.etl_task.status != 'SUCCESS':
             logger.info('%s: Refresh needed due no successfully run' % self)
             return True
-        if self.etl_task.status != 'SUCCESS':
-            logger.info('%s: Refresh needed because last failure' % self)
+        if self.etl_task.last_success.date() < timezone.now().date():
+            logger.info('%s: Refresh needed because last success too old' % self)
             return True
 
-        if sender.etl_task.last_success:
-            if self.etl_task.last_success.date() > sender.etl_task.last_run.date():
-                logger.info('%s: Refresh needed because last success too old' % self)
-                return True
-
+        # if not other.last_success:
+        # if self.etl_task.status != 'SUCCESS':
+        #     logger.info('%s: Refresh needed because last failure' % self)
+        #     return True
+        #
+        # if other.etl_task.last_success:
+        #     if self.etl_task.last_success.date() < other.etl_task.last_success.date():
+        #         logger.info('%s: Refresh needed because last success too old' % self)
+        #         return True
+        else:
+            pass
         return False
 
     def is_record_changed(self, record, values):
@@ -681,10 +687,17 @@ class CommonSchemaLoader(Loader):
                         if requirement.loader.need_refresh(self):
                             if not force_requirements:
                                 raise RequiredIsMissing(requirement)
-                            logger.info(f"Load required dataset {requirement}")
-                            requirement.loader.load(stdout=stdout,
-                                                    force_requirements=force_requirements,
-                                                    run_type=RUN_AS_REQUIREMENT)
+                            else:
+                                # logger.info(f"Load required dataset {requirement}")
+                                # requirement.loader.task.apply_async(
+                                #     kwargs={"force_requirements": force_requirements,
+                                #             "run_type": RUN_AS_REQUIREMENT}
+                                # )
+                                # raise RequiredIsQueued(requirement)
+                                logger.info(f"Load required dataset {requirement}")
+                                requirement.loader.load(stdout=stdout,
+                                                        force_requirements=force_requirements,
+                                                        run_type=RUN_AS_REQUIREMENT)
                         else:
                             logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update
