@@ -201,8 +201,8 @@ class LoaderTask(celery.Task):
             st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
             self.loader.etl_task.status = st
             self.loader.etl_task.save()
-            self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
-                       countdown=config.ETL_RETRY_COUNTDOWN)
+            raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
+                             countdown=config.ETL_RETRY_COUNTDOWN)
         except Exception as e:  # pragma: no cover
             process_exception(e)
             raise
