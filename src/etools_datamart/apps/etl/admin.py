@@ -151,6 +151,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return mark_safe('<span class="%s">%s</span>' % (css, obj.status))
 
     _status.verbose_name = 'status'
+    _status.admin_order_field = 'status'
 
     def crontab(self, obj):
         opts = PeriodicTask._meta
