@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.contrib import admin, messages
 from django.contrib.admin import register
+from django.core.cache import caches
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
 from django.urls import NoReverseMatch, reverse
@@ -24,6 +25,8 @@ from etools_datamart.libs.time import strfelapsed
 
 from . import models
 
+cache = caches['default']
+
 
 def queue(modeladmin, request, queryset):
     count = len(queryset)
@@ -31,6 +34,24 @@ def queue(modeladmin, request, queryset):
         modeladmin.queue(request, obj.pk, message=False)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
+                            messages.SUCCESS)
+
+
+def unlock(modeladmin, request, queryset):
+    count = len(queryset)
+
+    for obj in queryset:
+        try:
+            Service.objects.get_for_model(obj.loader.model).invalidate_cache()
+        except Service.DoesNotExist:
+            pass
+        except Exception as e:
+            process_exception(e)
+        obj.loader.model.objects.truncate()
+        obj.loader.unlock()
+
+    modeladmin.message_user(request,
+                            "{0} loader{1} unlocked".format(count, pluralize(count)),
                             messages.SUCCESS)
 
 
@@ -60,7 +81,7 @@ def truncate(modeladmin, request, queryset):
 
 def get_css(obj):
     css = ''
-    if obj.status in ['RUNNING']:
+    if obj.status in ['RUNNING' 'STARTED']:
         pass
     elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
         css = 'error'
@@ -75,28 +96,49 @@ def get_css(obj):
     return css
 
 
+def df(value):
+    # formats.date_format(obj.last_success, 'DATETIME_FORMAT')
+    if value is not None:
+        return value.strftime("%b %d, %H:%M")
+        # dateformat.format(value, 'b d, H:i')
+
+
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', '_last_run', 'run_type', '_status', 'time',
+    list_display = ('task', '_last_run', '_status',
+                    '_total', 'time',
                     '_last_success', '_last_failure',
-                    'crontab', 'unlock_task', 'queue_task', 'data'
+                    'unlock_task', 'queue_task', 'data'
                     )
 
     date_hierarchy = 'last_run'
-    actions = [mass_update, queue, truncate]
+    actions = [mass_update, queue, truncate, unlock]
+
+    def _total(self, obj):
+        try:
+            a = obj.results.get('processed', '-')
+            b = obj.results.get('total_records', '-')
+            return "%s/%s" % (a, b)
+        except Exception:
+            return '?'
+
+    def _task_id(self, obj):
+        return (obj.task_id or '')[:8]
 
     def _last_run(self, obj):
         if obj.last_run:
-            dt = formats.date_format(obj.last_run, 'DATETIME_FORMAT')
+            dt = df(obj.last_run)
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
     _last_run.admin_order_field = 'last_run'
 
     def _last_success(self, obj):
         if obj.last_success:
-            dt = formats.date_format(obj.last_success, 'DATETIME_FORMAT')
+            dt = df(obj.last_success)
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
     _last_success.admin_order_field = 'last_success'
 
     def _last_failure(self, obj):
@@ -104,13 +146,22 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             dt = formats.date_format(obj.last_failure, 'DATE_FORMAT')
             css = get_css(obj)
             return mark_safe('<span class="%s">%s</span>' % (css, dt))
+
     _last_failure.admin_order_field = 'last_failure'
 
     def _status(self, obj):
         css = get_css(obj)
-        return mark_safe('<span class="%s">%s</span>' % (css, obj.status))
+        if 'RETRY' in obj.status:
+            s = '%s</br>%s' % (obj.status, obj.results)
+        else:
+            c = cache.get("STATUS:%s" % obj.task) or ""
+            s = obj.status
+            if c:
+                s = "%s (%s)" % (obj.status, c)
+        return mark_safe('<span class="%s">%s</span>' % (css, s))
 
     _status.verbose_name = 'status'
+    _status.admin_order_field = 'status'
 
     def crontab(self, obj):
         opts = PeriodicTask._meta
@@ -145,18 +196,19 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     queue_task.verbose_name = 'queue'
 
     def unlock_task(self, obj):
-        locked = obj.content_type.model_class().loader.is_locked
-        if locked:
-            css = 'error'
-            label = 'unlock'
-        else:
-            css = 'success'
-            label = 'force unlock'
+        if obj.content_type:
+            locked = obj.content_type.model_class().loader.is_locked
+            if locked:
+                css = 'error'
+                label = 'unlock'
+            else:
+                css = 'success'
+                label = 'force unlock'
 
-        opts = self.model._meta
-        url = reverse('admin:%s_%s_unlock' % (opts.app_label,
-                                              opts.model_name), args=[obj.id])
-        return format_html(f'<a href="{url}"><span class="{css}">{label}</span></a>')
+            opts = self.model._meta
+            url = reverse('admin:%s_%s_unlock' % (opts.app_label,
+                                                  opts.model_name), args=[obj.id])
+            return format_html(f'<a href="{url}"><span class="{css}">{label}</span></a>')
 
     unlock_task.verbose_name = 'unlock'
 
@@ -185,6 +237,35 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #                                                            self.opts.model_name))
     #         return HttpResponseRedirect(redirect_url)
     #     return self._changeform_view(request, object_id, form_url, extra_context)
+
+    @link()
+    def check_running(self, request, message=True):
+        # {'celery@gundam.local': [{'id': '7a570647-89cd-4c47-84e4-c8569ef48f28',
+        #                           'name': 'load_data_hact',
+        #                           'args': '()',
+        #                           'kwargs': '{}',
+        #                           'type': 'load_data_hact',
+        #                           'hostname': 'celery@gundam.local',
+        #                           'time_start': 1567185669.1479037,
+        #                           'acknowledged': True,
+        #                           'delivery_info': {'exchange': '',
+        #                                             'routing_key': 'default',
+        #                                             'priority': 0,
+        #                                             'redelivered': None},
+        #                           'worker_pid': 40223}]}
+        from etools_datamart.celery import app
+        i = app.control.inspect()
+        s = i.stats()
+        if not s:
+            self.message_user(request, "Warning unable to get celery control", messages.ERROR)
+        running = i.active()
+        founds = []
+        if running:
+            for worker, tasks in running.items():
+                for task in tasks:
+                    founds.append(task['name'])
+                    models.EtlTask.objects.filter(task=task['name']).update(task_id=task['id'])
+        models.EtlTask.objects.exclude(task__in=founds).update(task_id=None)
 
     @action()
     def queue(self, request, pk, message=True):
@@ -221,3 +302,15 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         created, updated = self.model.objects.inspect()
         self.message_user(request, f"{created} task created. {updated} have been updated",
                           messages.SUCCESS)
+
+
+@register(models.EtlTaskHistory)
+class EtlTaskHistoryAdmin(admin.ModelAdmin):
+    list_display = ('task', 'timestamp', 'time')
+    list_filter = ('task',)
+    date_hierarchy = 'timestamp'
+
+    def time(self, obj):
+        return strfelapsed(obj.elapsed)
+
+    time.admin_order_field = 'elapsed'

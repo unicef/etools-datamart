@@ -100,4 +100,4 @@ tox = "tox"
 init-setup = "./manage.py init-setup"
 
 [pipenv]
-allow_prereleases = true
+allow_prereleases = false

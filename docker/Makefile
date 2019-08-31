@@ -1,10 +1,10 @@
 # envs to set before use this script
 DATABASE_URL?=
 DATABASE_URL_ETOOLS?=
-DEVELOP?=0
+DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.0.0a34
+TARGET?=2.0.0rc22
 BASE=2.0
 # below vars are used internally
 BUILD_OPTIONS?=--squash

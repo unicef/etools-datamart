@@ -79,6 +79,7 @@ ENV PIPENV_PYPI_MIRROR=${PIPENV_PYPI_MIRROR}, \
     CSRF_COOKIE_SECURE=True \
     DATABASE_URL="postgres://postgres:@127.0.0.1:5432/etools_datamart" \
     DATABASE_URL_ETOOLS="postgis://postgres:@127.0.0.1:5432/etools" \
+    DATABASE_URL_PRP="postgis://postgres:@127.0.0.1:5432/prp" \
     DEBUG=0 \
     DEVELOPMENT_MODE=0 \
     DJANGO_SETTINGS_MODULE=etools_datamart.config.settings \

@@ -1,12 +1,12 @@
 2.0
 ---
 * add PRP source endpoints
+* new attachments/attachment endpoint
 * improves performance
 * bug fixes
 * server start as unprivileged user
 * upgrade to python 3.7
 * dependencies upgrade
-* new attachments/attachment endpoint
 * fixes Internet Explorer Content-Disposition issue that prevent file downloading
 
 
