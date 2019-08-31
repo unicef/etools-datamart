@@ -105,7 +105,7 @@ def df(value):
 
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', '_task_id', '_last_run', '_status',
+    list_display = ('task', '_last_run', '_status',
                     '_total', 'time',
                     '_last_success', '_last_failure',
                     'unlock_task', 'queue_task', 'data'
@@ -151,10 +151,13 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     def _status(self, obj):
         css = get_css(obj)
-        c = cache.get("STATUS:%s" % obj.task) or ""
-        s = obj.status
-        if c:
-            s = "%s (%s)" % (obj.status, c)
+        if 'RETRY' in obj.status:
+            s = '%s</br>%s' % (obj.status, obj.results)
+        else:
+            c = cache.get("STATUS:%s" % obj.task) or ""
+            s = obj.status
+            if c:
+                s = "%s (%s)" % (obj.status, c)
         return mark_safe('<span class="%s">%s</span>' % (css, s))
 
     _status.verbose_name = 'status'

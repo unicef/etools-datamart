@@ -138,7 +138,7 @@ class RequiredIsMissing(Exception):
         self.req = req
 
     def __str__(self):
-        return "Missing required dataset %s" % self.req
+        return "Missing required ETL '%s'" % str(self.req.loader.etl_task.task)
 
 
 class MaxRecordsException(Exception):
@@ -241,6 +241,9 @@ class Loader:
 
     def __repr__(self):
         return "<%sLoader>" % self.model._meta.object_name
+
+    def __str__(self):
+        return "%sLoader" % self.model._meta.object_name
 
     # @property
     # def model_name(self):
@@ -543,12 +546,12 @@ class Loader:
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         if requirement.loader.need_refresh(self):
-                            if not force_requirements:
-                                raise RequiredIsMissing(requirement)
-                            logger.info(f"Load required dataset {requirement}")
-                            requirement.loader.load(stdout=stdout,
-                                                    force_requirements=force_requirements,
-                                                    run_type=RUN_AS_REQUIREMENT)
+                            # if not force_requirements:
+                            raise RequiredIsMissing(requirement)
+                            # logger.info(f"Load required dataset {requirement}")
+                            # requirement.loader.load(stdout=stdout,
+                            #                         force_requirements=force_requirements,
+                            #                         run_type=RUN_AS_REQUIREMENT)
                         else:
                             logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update
@@ -685,19 +688,19 @@ class CommonSchemaLoader(Loader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         if requirement.loader.need_refresh(self):
-                            if not force_requirements:
-                                raise RequiredIsMissing(requirement)
-                            else:
-                                # logger.info(f"Load required dataset {requirement}")
-                                # requirement.loader.task.apply_async(
-                                #     kwargs={"force_requirements": force_requirements,
-                                #             "run_type": RUN_AS_REQUIREMENT}
-                                # )
-                                # raise RequiredIsQueued(requirement)
-                                logger.info(f"Load required dataset {requirement}")
-                                requirement.loader.load(stdout=stdout,
-                                                        force_requirements=force_requirements,
-                                                        run_type=RUN_AS_REQUIREMENT)
+                            # if not force_requirements:
+                            raise RequiredIsMissing(requirement)
+                            # else:
+                            # logger.info(f"Load required dataset {requirement}")
+                            # requirement.loader.task.apply_async(
+                            #     kwargs={"force_requirements": force_requirements,
+                            #             "run_type": RUN_AS_REQUIREMENT}
+                            # )
+                            # raise RequiredIsQueued(requirement)
+                            # logger.info(f"Load required dataset {requirement}")
+                            # requirement.loader.load(stdout=stdout,
+                            #                         force_requirements=force_requirements,
+                            #                         run_type=RUN_AS_REQUIREMENT)
                         else:
                             logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update
