@@ -26,7 +26,15 @@ urlpatterns = [
     path(r'sys/version/<name>/', http_basic_login(version), name='sys-version'),
     path(r'explorer/', include('explorer.urls')),
 
+]
 
+
+def trigger_error(request):
+    division_by_zero = 1 / 0  # noqa
+
+
+urlpatterns += [
+    path('sentry-debug/', trigger_error),
 ]
 
 urlpatterns = [

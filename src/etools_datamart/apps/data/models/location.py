@@ -1,7 +1,8 @@
-from django.contrib.gis.db.models import MultiPolygonField, PointField
+from django.contrib.gis.db import models as geomodels
+from django.contrib.gis.db.models.functions import Centroid
 from django.db import models
 
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import DataMartManager, DataMartModel
 from etools_datamart.apps.etools.models import LocationsGatewaytype, LocationsLocation
 
 
@@ -10,8 +11,8 @@ class GatewayType(DataMartModel):
     admin_level = models.SmallIntegerField(blank=True, null=True)
 
     class Meta:
-        unique_together = (('schema_name', 'name'),
-                           ('schema_name', 'admin_level'))
+        unique_together = (('schema_name', 'source_id'),
+                           )
 
     class Options:
         source = LocationsGatewaytype
@@ -20,15 +21,30 @@ class GatewayType(DataMartModel):
         key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           source_id=record.id)
 
+    def __str__(self):
+        return self.name
+
+
+class LocationManager(DataMartManager):
+    def batch_update_centroid(self):
+        sql = '''UPDATE "%s" SET point = ST_Centroid(geom)
+ WHERE point IS NULL ;''' % self.model._meta.db_table
+        self.raw(sql)
+
+    def update_centroid(self):
+        for each in self.objects.annotate(cent=Centroid('geom')):
+            each.point = each.cent
+            each.save()
+
 
 class Location(DataMartModel):
     name = models.CharField(max_length=254, db_index=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     p_code = models.CharField(max_length=32)
-    point = PointField(blank=True, null=True)
+    point = geomodels.PointField(blank=True, null=True)
     gateway = models.ForeignKey(GatewayType, models.DO_NOTHING, blank=True, null=True)
-    geom = MultiPolygonField(blank=True, null=True)
+    geom = geomodels.MultiPolygonField(blank=True, null=True)
     level = models.IntegerField(db_index=True)
     lft = models.IntegerField()
     parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
@@ -37,6 +53,8 @@ class Location(DataMartModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     is_active = models.BooleanField()
+
+    objects = LocationManager()
 
     class Meta:
         unique_together = ('schema_name', 'source_id')
@@ -52,3 +70,6 @@ class Location(DataMartModel):
                    'parent': '__self__',
                    'gateway': GatewayType
                    }
+
+    def __str__(self):
+        return self.name

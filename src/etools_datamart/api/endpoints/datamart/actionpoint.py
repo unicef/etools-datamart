@@ -91,7 +91,7 @@ class ActionPointSerializerV2(DataMartSerializer):
 class ActionPointSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
-        exclude = ('related_module_class',)
+        exclude = ()
 
 
 class ActionPointFilterForm(forms.Form):

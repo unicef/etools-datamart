@@ -29,6 +29,7 @@ def preload(path):
         logger.info(f'Preloading {target}')
         assert path.startswith('/')
         response = requests.get(target,
+                                timeout=300,
                                 headers={'Authorization': 'Token %s' % user.auth_token})
         return response.headers
     except Exception as e:

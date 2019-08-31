@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"0b9e099f4ebcd5c6ad429e6114833d26\""
+            "\"8bcb971af4fb1025839649d0ad11e4a5\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,19 +39,14 @@
         ],
         "content-length": [
             "Content-Length",
-            "1008"
+            "875"
         ]
     },
     "data": {
-        "id": 404,
+        "id": 606,
         "source_id": null,
-        "last_modify_date": "02 Aug 2019 12:38:54",
+        "last_modify_date": "10 Aug 2019 21:15:00",
         "seen": null,
-        "location_source_id": null,
-        "location_name": null,
-        "location_pcode": null,
-        "location_level": null,
-        "location_levelname": null,
         "deleted_at": null,
         "created": null,
         "modified": null,
@@ -86,8 +81,7 @@
         "country_name": "bolivia",
         "area_code": null,
         "activities": null,
-        "activities_data": null,
-        "location": null
+        "activities_data": null
     },
     "content_type": null
 }

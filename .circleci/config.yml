@@ -3,14 +3,20 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: python:3.6.7-slim
+      - image: python:3.7-slim
         environment:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: "postgis://postgres:postgres@127.0.0.1:5432/etools_datamart"
           DATABASE_URL_ETOOLS: "postgis://postgres:postgres@127.0.0.1:5432/etools"
           RELEASE_MATCH: "release/*"
+          CELERY_BROKER_URL: "amqp://guest:guest@127.0.0.1/datamart"
+          CELERY_RESULT_BACKEND: "amqp://guest:guest@127.0.0.1/datamart"
+
       - image: redis:alpine
+      - image: rabbitmq:3.7-alpine
+        environment:
+           RABBITMQ_DEFAULT_VHOST: "datamart"
       - image: mdillon/postgis:9.6
         environment:
           POSTGRES_USER: postgres
@@ -26,11 +32,13 @@ jobs:
             apt-get update
             apt-get install -y \
                   libc-bin \
+                  libzmq3-dev \
+                  git \
                   gcc \
                   curl \
                   gdal-bin \
                   python-dev \
-                  postgresql-client-9.6
+                  postgresql-client
 
       - run:
           name: Create databases
@@ -51,7 +59,7 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install tox
-            tox -e py36-d22
+            tox -e py37-d22
       - store_artifacts:
           path: ~build/coverage
           destination: coverage

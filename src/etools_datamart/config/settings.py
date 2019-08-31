@@ -35,6 +35,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   IGNORED_SCHEMAS=(str, ["public", "uat", "frg"]),
                   DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
+                  DATABASE_URL_PRP=(str, "postgis://postgres:@127.0.0.1:5432/prp"),
                   DEBUG=(bool, False),
                   DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
                   DISABLE_SERVICE_RESTRICTIONS=(bool, False),
@@ -96,12 +97,23 @@ DATABASES = {
     'etools': env.db('DATABASE_URL_ETOOLS',
                      engine='etools_datamart.apps.multitenant.postgresql'
                      ),
+    'prp': env.db('DATABASE_URL_PRP')
+
 }
+
+DATABASES['default']['CONN_MAX_AGE'] = 60
+DATABASES['etools']['AUTOCOMMIT'] = False
+DATABASES['prp']['AUTOCOMMIT'] = False
+
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
-    # router_factory('default', ['default'], syncdb=True),
+    # router_factory('default', ['data', 'unicef_rest_framework',
+    #                            'etl', 'security', 'unicef_security',
+    #                            'auth', 'authtoken', 'contenttypes',
+    #                            'django_db_logging'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
+    router_factory('prp', ['prp'], syncdb=True),
 ]
 
 LOGIN_URL = '/login/'
@@ -177,7 +189,6 @@ STATICFILES_FINDERS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -289,6 +300,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
+    'etools_datamart.apps.prp',
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',
@@ -302,7 +314,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'unicef_security',
-    'redisboard',
+    # 'redisboard',
     'django_filters',
     'month_field',
     'drf_querystringfilter',
@@ -424,15 +436,17 @@ CONSTANCE_CONFIG = {
     'ALLOW_EMAIL_PASSWORD': (False, 'Allow send local password by email', bool)
 }
 
-CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
-CELERY_TIMEZONE = 'America/New_York'
-CELERY_BROKER_URL = env('CELERY_BROKER_URL')
-CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
-CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
 CELERY_ACCEPT_CONTENT = ['etljson']
-CELERY_TASK_SERIALIZER = 'etljson'
+CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
+CELERY_BROKER_POOL_LIMIT = 0
+CELERY_BROKER_URL = env('CELERY_BROKER_URL')
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = env.bool('CELERY_ALWAYS_EAGER')
+CELERY_REDIS_MAX_CONNECTIONS = 10
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_RESULT_SERIALIZER = 'etljson'
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
+CELERY_TASK_SERIALIZER = 'etljson'
+CELERY_TIMEZONE = 'America/New_York'
 
 CONCURRENCY_IGNORE_DEFAULT = False
 
@@ -450,6 +464,8 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'ordering',
     'DATETIME_FORMAT': DATETIME_FORMAT,
     # 'DATE_FORMAT': DATE_FORMAT,
+    'DEFAULT_SCHEMA_CLASS': 'etools_datamart.api.endpoints.openapi.DatamartAutoSchema',
+
 }
 
 JWT_AUTH = {
@@ -523,8 +539,9 @@ IGNORE_DEFAULT_SCOPE = True
 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': env('ABSOLUTE_BASE_URL') + env('API_PREFIX'),
-    'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
-    'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
+    # 'DEFAULT_AUTO_SCHEMA_CLASS': 'etools_datamart.api.swagger.schema.APIAutoSchema',
+    # 'DEFAULT_FILTER_INSPECTORS': ['etools_datamart.api.swagger.filters.APIFilterInspector', ],
+    'DISPLAY_OPERATION_ID': False,
     'SECURITY_DEFINITIONS': {
         'basic': {
             'type': 'basic'
@@ -666,9 +683,12 @@ SENTRY_DSN = env('SENTRY_DSN', '')
 if SENTRY_ENABLED:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.celery import CeleryIntegration
+
+    # from sentry_sdk.integrations.redis import RedisIntegration
 
     sentry_sdk.init(dsn=SENTRY_DSN,
-                    integrations=[DjangoIntegration()],
+                    integrations=[DjangoIntegration(), CeleryIntegration()],
                     release=get_full_version(),
                     debug=False)
 

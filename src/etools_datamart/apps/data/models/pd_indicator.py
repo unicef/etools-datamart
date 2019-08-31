@@ -1,5 +1,4 @@
-from decimal import Decimal
-
+from etools_datamart.apps.data.fields import SafeDecimal
 from etools_datamart.apps.data.loader import Loader
 from etools_datamart.apps.data.models import Location
 from etools_datamart.apps.data.models.base import DataMartModel
@@ -13,10 +12,10 @@ class PDIndicatorLoader(Loader):
         values = super().get_values(record)
         for k, v in values.items():
             if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
-                if v is not None:
-                    if isinstance(v, str) and ',' in v:
-                        v = v.replace(',', '.')
-                    values[k] = Decimal(v)
+                # if v is not None:
+                #     if isinstance(v, str) and ',' in v:
+                #         v = v.replace(',', '.')
+                values[k] = SafeDecimal(v)
         return values
 
     def process_country(self):
@@ -60,10 +59,10 @@ class PDIndicator(LocationMixin, DataMartModel):
 
     # target = models.TextField()  # This field type is a guess.
     target_denominator = models.DecimalField(blank=True, null=True,
-                                             max_digits=10, decimal_places=3)
+                                             max_digits=15, decimal_places=3)
 
     target_numerator = models.DecimalField(blank=True, null=True,
-                                           max_digits=10, decimal_places=3)
+                                           max_digits=15, decimal_places=3)
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
     baseline_denominator = models.DecimalField(blank=True, null=True,

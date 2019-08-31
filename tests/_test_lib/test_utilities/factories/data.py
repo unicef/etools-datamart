@@ -253,3 +253,8 @@ class HACTHistoryFactory(DataMartModelFactory):
 class ReportIndicatorFactory(DataMartModelFactory):
     class Meta:
         model = models.ReportIndicator
+
+
+class AttachmentFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Attachment

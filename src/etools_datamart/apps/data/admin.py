@@ -17,6 +17,7 @@ from humanize import naturaldelta
 
 from unicef_rest_framework.models import Service
 
+from etools_datamart.apps.core.admin_mixins import DisplayAllMixin
 from etools_datamart.apps.multitenant.admin import SchemaFilter
 from etools_datamart.config import settings
 from etools_datamart.libs.truncate import TruncateTableMixin
@@ -30,14 +31,14 @@ class DatamartChangeList(ChangeList):
     pass
 
 
-class DataModelAdmin(TruncateTableMixin, ModelAdmin):
+class DataModelAdmin(TruncateTableMixin, DisplayAllMixin, ModelAdmin):
     actions = [mass_update, export_as_csv, export_as_xls]
 
-    def get_list_display(self, request):
-        ret = self.list_display
-        if ret == ('pk',):
-            return [f.name for f in self.model._meta.fields]
-        return ret
+    # def get_list_display(self, request):
+    #     ret = self.list_display
+    #     if ret == ('pk',):
+    #         return [f.name for f in self.model._meta.fields]
+    #     return ret
 
     def get_list_filter(self, request):
         if SchemaFilter not in self.list_filter:
@@ -155,7 +156,7 @@ class InterventionAdmin(DataModelAdmin, TruncateTableMixin):
 @register(models.InterventionByLocation)
 class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
     list_display = ('country_name', 'title', 'document_type',
-                    'location_name', 'number', 'status')
+                    'location', 'number', 'status')
     list_filter = (SchemaFilter,
                    ('document_type', AllValuesComboFilter),
                    ('status', AllValuesComboFilter),
@@ -163,6 +164,7 @@ class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
                    )
     search_fields = ('number', 'title')
     date_hierarchy = 'start_date'
+    autocomplete_fields = ('location',)
 
 
 @register(models.FAMIndicator)
@@ -192,13 +194,17 @@ class HACTAdmin(DataModelAdmin):
 @register(models.GatewayType)
 class GatewayTypeAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'admin_level', 'source_id')
+    search_fields = ('name',)
 
 
 @register(models.Location)
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude')
-    readonly_fields = ('parent', 'gateway')
+    # readonly_fields = ('parent', 'gateway')
     list_filter = ('level',)
+    search_fields = ('name',)
+    autocomplete_fields = ('parent', 'gateway')
+    # raw_id_fields = ('parent', )
 
 
 @register(models.FundsReservation)
@@ -259,7 +265,7 @@ class ActionPointAdmin(DataModelAdmin):
 
 @register(models.TPMVisit)
 class TPMVisitAdmin(DataModelAdmin):
-    pass
+    list_display = ('start_date', 'end_date', 'partner_name')
 
 
 @register(models.TPMActivity)
@@ -326,5 +332,11 @@ class HACTDetailAdmin(DataModelAdmin):
 
 @register(models.ReportIndicator)
 class ReportIndicatorAdmin(DataModelAdmin):
-    list_display = ('pk',)
+    list_display = ('__str__',)
+    list_filter = ()
+
+
+@register(models.Attachment)
+class AttachmentAdmin(DataModelAdmin):
+    list_display = ('__str__',)
     list_filter = ()

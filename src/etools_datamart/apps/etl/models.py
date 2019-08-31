@@ -48,9 +48,10 @@ class EtlTask(models.Model):
                 # ('NODATA', 'NO DATA'),
                 )
     task = models.CharField(max_length=200, unique=True)
-    last_run = models.DateTimeField(null=True, help_text="last execution time")
-    status = models.CharField(max_length=200)
-    elapsed = models.IntegerField(null=True, blank=True)
+    task_id = models.CharField('UUID', blank=True, null=True, max_length=36, unique=True)
+    last_run = models.DateTimeField(blank=True, null=True, help_text="last execution time")
+    status = models.CharField(max_length=200, blank=True, null=True)
+    elapsed = models.IntegerField(blank=True, null=True)
     run_type = models.IntegerField(choices=RUN_TYPES, default=RUN_UNKNOWN, blank=True)
     last_success = models.DateTimeField(null=True, blank=True, help_text="last successully execution time")
     last_failure = models.DateTimeField(null=True, blank=True, help_text="last failure execution time")
@@ -59,6 +60,7 @@ class EtlTask(models.Model):
     content_type = models.OneToOneField(ContentType, models.CASCADE, null=True)
 
     results = JSONField(blank=True, null=True)
+    traceback = models.TextField(blank=True, null=True)
 
     objects = TaskLogManager()
 
@@ -91,6 +93,14 @@ class EtlTask(models.Model):
         except PeriodicTask.DoesNotExist:
             pass
 
+    def snapshot(self):
+        if self.status == 'SUCCESS':
+            return EtlTaskHistory.objects.create(task=self.task,
+                                                 timestamp=self.last_run,
+                                                 elapsed=self.elapsed
+                                                 )
+
+
 #
 # class Offset(models.Model):
 #     table_name = models.CharField(max_length=200, null=True)
@@ -100,3 +110,12 @@ class EtlTask(models.Model):
 #     max_id = models.IntegerField(default=0)
 #     last_modify_date = models.DateTimeField(null=True, blank=True)
 #
+
+class EtlTaskHistory(models.Model):
+    timestamp = models.DateTimeField(blank=True, null=True)
+    task = models.CharField(max_length=200, db_index=True)
+    elapsed = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        get_latest_by = 'last_run'
+        ordering = ('task',)

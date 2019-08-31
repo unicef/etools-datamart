@@ -21,7 +21,7 @@ def pytest_generate_tests(metafunc):
 
 
 def test_model_str(model):
-    assert str(model())
+    assert str(model()) is not None
 
 
 def test_model_loader(model):

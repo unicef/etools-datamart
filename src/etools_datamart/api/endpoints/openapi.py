@@ -3,8 +3,10 @@
 
 from drf_yasg import openapi
 from drf_yasg.app_settings import swagger_settings
+from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
 description = """
 Each API endpoint allows filtering and/or ordering results.
@@ -75,6 +77,20 @@ Retrieve entries in the second/third/fourth quarter (April 1 to June 30):
 
 """.format(HOST=swagger_settings.DEFAULT_API_URL)
 
+
+class DatamartAutoSchema(AutoSchema):
+
+    def _get_operation_id(self, path, method):
+        # TODO: remove me
+        print(111, "openapi.py:85",1111111)
+        return 'a___sss'
+        # return super()._get_operation_id(path, method)
+
+
+class DatamartSchemaGenerator(OpenAPISchemaGenerator):
+    pass
+
+
 schema_view = get_schema_view(
     openapi.Info(
         title="eTools Datamart API",
@@ -85,6 +101,7 @@ schema_view = get_schema_view(
         # license=openapi.License(name="BSD License"),
         # aaaaaaa="aaaaaa",
     ),
+    generator_class=DatamartSchemaGenerator,
     # validators=['flex', 'ssv'],
     public=True,
     permission_classes=(permissions.AllowAny,),

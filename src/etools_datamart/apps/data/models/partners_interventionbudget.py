@@ -52,6 +52,9 @@ class InterventionBudget(InterventionAbstract, DataMartModel):
     class Options(InterventionAbstract.Options):
         model = PartnersInterventionbudget
         depends = (Location,)
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+                                          source_id=record.pk)
+
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(
                              budget_cso_contribution='total_partner_contribution',

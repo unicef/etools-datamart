@@ -286,9 +286,7 @@ class InterventionAbstract(models.Model):
                                                                        'country_programme',
                                                                        'partnersintervention_partners_interventionbudget_intervention_id'
                                                                        )
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          area_code=loader.context['country'].business_area_code,
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           intervention_id=record.pk)
         mapping = dict(
             agreement_reference_number='agreement.reference_number',
@@ -370,6 +368,14 @@ class Intervention(InterventionAbstract, DataMartModel):
 
 
 class InterventionByLocationLoader(InterventionLoader):
+
+    def get_values(self, record):
+        values = super().get_values(record)
+        values['location'] = Location.objects.filter(
+            schema_name=self.context['country'].schema_name,
+            source_id=record.location.id).first()
+        return values
+
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for intervention in qs.all():
@@ -377,11 +383,6 @@ class InterventionByLocationLoader(InterventionLoader):
                 intervention.location = location
                 filters = self.config.key(self, intervention)
                 values = self.get_values(intervention)
-                # removes fields inherited by InterventionLoader
-                # FIXME: Loader inherotance should follow Model inheritance
-                # and have a common InterventioAbstractLoader
-                # values.pop('locations_data')
-                # values.pop('locations')
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
@@ -395,9 +396,7 @@ class InterventionByLocation(LocationMixin, InterventionAbstract, DataMartModel)
         unique_together = ('schema_name', 'intervention_id', 'location_source_id')
 
     class Options(InterventionAbstract.Options):
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          area_code=loader.context['country'].business_area_code,
+        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           intervention_id=record.pk,
                                           location_source_id=record.location.pk)
         mapping = add_location_mapping(InterventionAbstract.Options.mapping)

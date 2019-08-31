@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "3591"
+            "3675"
         ]
     },
     "data": {
@@ -99,6 +99,7 @@
                 "engagement_source_id": null,
                 "engagement_type": null,
                 "engagement_subclass": null,
+                "related_module_class": null,
                 "related_module_id": null,
                 "section_source_id": null,
                 "section_type": null,
@@ -151,6 +152,7 @@
                 "engagement_source_id": null,
                 "engagement_type": null,
                 "engagement_subclass": null,
+                "related_module_class": null,
                 "related_module_id": null,
                 "section_source_id": null,
                 "section_type": null,
@@ -203,6 +205,7 @@
                 "engagement_source_id": null,
                 "engagement_type": null,
                 "engagement_subclass": null,
+                "related_module_class": null,
                 "related_module_id": null,
                 "section_source_id": null,
                 "section_type": null,

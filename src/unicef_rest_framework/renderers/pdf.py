@@ -8,6 +8,8 @@ from django.template import loader
 from crashlog.middleware import process_exception
 from xhtml2pdf import pisa
 
+from unicef_rest_framework.renderers.mixin import ContentDispositionMixin
+
 from .html import HTMLRenderer
 
 logger = logging.getLogger(__name__)
@@ -40,7 +42,7 @@ def link_callback(uri, rel):
     return path
 
 
-class PDFRenderer(HTMLRenderer):
+class PDFRenderer(ContentDispositionMixin, HTMLRenderer):
     media_type = 'application/pdf'
     format = 'pdf'
     charset = 'utf-8'
@@ -54,6 +56,8 @@ class PDFRenderer(HTMLRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         response = renderer_context['response']
+        self.process_response(renderer_context)
+
         if response.status_code != 200:
             return ''
         try:

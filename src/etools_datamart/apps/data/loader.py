@@ -1,5 +1,4 @@
 import json
-import logging
 import time
 from inspect import isclass
 
@@ -11,6 +10,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 import celery
+from celery.utils.log import get_task_logger
 from constance import config
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
@@ -23,8 +23,10 @@ from etools_datamart.libs.time import strfelapsed
 
 loadeables = set()
 locks = caches['lock']
+cache = caches['default']
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 CREATED = 'created'
 UPDATED = 'updated'
@@ -47,7 +49,8 @@ RUN_TYPES = ((RUN_UNKNOWN, ""),
 
 
 class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'total', 'status', 'context', 'error', 'retry']
+    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'processed', 'total_records',
+                 'status', 'context', 'error', 'retry']
 
     def __init__(self, updated=0, created=0, unchanged=0, deleted=0,
                  status='SUCCESS', context=None, error=None, retry=False, **kwargs):
@@ -59,14 +62,15 @@ class EtlResult:
         self.status = status
         self.error = error
         self.context = context or {}
-        self.total = 0
+        self.processed = 0
+        self.total_records = 0
 
     def __repr__(self):
         return repr(self.as_dict())
 
     def incr(self, counter):
         setattr(self, counter, getattr(self, counter) + 1)
-        self.total += 1
+        self.processed += 1
 
     # def add(self, counter, value):
     #     setattr(self, counter, getattr(self, counter) + value)
@@ -77,7 +81,9 @@ class EtlResult:
                 'unchanged': self.unchanged,
                 'deleted': self.deleted,
                 'status': self.status,
-                'error': self.error}
+                'error': self.error,
+                'processed': self.processed,
+                'total_records': self.total_records}
 
     # def __add__(self, other):
     #     if isinstance(other, EtlResult):
@@ -114,7 +120,16 @@ class RequiredIsRunning(Exception):
         self.req = req
 
     def __str__(self):
-        return "Required dataset %s is still updating" % self.req
+        return "Required ETL '%s' is running" % str(self.req.loader.etl_task.task)
+
+
+# class RequiredIsQueued(Exception):
+#
+#     def __init__(self, req, *args: object) -> None:
+#         self.req = req
+#
+#     def __str__(self):
+#         return "Required dataset has been queued %s" % self.req
 
 
 class RequiredIsMissing(Exception):
@@ -123,7 +138,7 @@ class RequiredIsMissing(Exception):
         self.req = req
 
     def __str__(self):
-        return "Missing required dataset %s" % self.req
+        return "Missing required ETL '%s'" % str(self.req.loader.etl_task.task)
 
 
 class MaxRecordsException(Exception):
@@ -178,6 +193,8 @@ class LoaderTask(celery.Task):
     def run(self, *args, **kwargs):
         logger.debug(kwargs)
         try:
+            if self.loader.etl_task.task_id:
+                return EtlResult()
             kwargs.setdefault('ignore_dependencies', False)
             kwargs.setdefault('force_requirements', True)
             return self.loader.load(**kwargs)
@@ -185,8 +202,8 @@ class LoaderTask(celery.Task):
             st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
             self.loader.etl_task.status = st
             self.loader.etl_task.save()
-            self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
-                       countdown=config.ETL_RETRY_COUNTDOWN)
+            raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
+                             countdown=config.ETL_RETRY_COUNTDOWN)
         except Exception as e:  # pragma: no cover
             process_exception(e)
             raise
@@ -224,6 +241,9 @@ class Loader:
 
     def __repr__(self):
         return "<%sLoader>" % self.model._meta.object_name
+
+    def __str__(self):
+        return "%sLoader" % self.model._meta.object_name
 
     # @property
     # def model_name(self):
@@ -273,15 +293,25 @@ class Loader:
     def is_running(self):
         return self.etl_task.status == 'RUNNING'
 
-    def need_refresh(self, sender):
-        if not self.etl_task.last_success:
+    def need_refresh(self, other):
+        if not self.etl_task.last_success or self.etl_task.status != 'SUCCESS':
+            logger.info('%s: Refresh needed due no successfully run' % self)
             return True
-        if self.etl_task.status != 'SUCCESS':
+        if self.etl_task.last_success.date() < timezone.now().date():
+            logger.info('%s: Refresh needed because last success too old' % self)
             return True
 
-        if sender.etl_task.last_success:
-            return self.etl_task.last_success.date() > sender.etl_task.last_run.date()
-
+        # if not other.last_success:
+        # if self.etl_task.status != 'SUCCESS':
+        #     logger.info('%s: Refresh needed because last failure' % self)
+        #     return True
+        #
+        # if other.etl_task.last_success:
+        #     if self.etl_task.last_success.date() < other.etl_task.last_success.date():
+        #         logger.info('%s: Refresh needed because last success too old' % self)
+        #         return True
+        else:
+            pass
         return False
 
     def is_record_changed(self, record, values):
@@ -455,6 +485,7 @@ class Loader:
     def on_end(self, error=None, retry=False):
         from etools_datamart.apps.subscriptions.models import Subscription
         from django.utils import timezone
+        self.results.total_records = self.model.objects.count()
 
         cost = time.time() - self._start
         defs = {'elapsed': cost,
@@ -463,7 +494,6 @@ class Loader:
         if retry:
             defs['status'] = 'RETRY'
             defs['results'] = str(error)
-            defs['last_failure'] = timezone.now()
         elif error:
             defs['status'] = 'FAILURE'
             defs['results'] = str(error)
@@ -482,6 +512,7 @@ class Loader:
                         service.invalidate_cache()
                         Subscription.objects.notify(self.config.model)
         self.etl_task.update(**defs)
+        self.etl_task.snapshot()
 
     def lock(self):
         lock = locks.lock(self.config.lock_key, timeout=self.config.timeout)
@@ -502,24 +533,24 @@ class Loader:
              ignore_dependencies=False, max_records=None, countries=None,
              only_delta=True, run_type=RUN_UNKNOWN,
              force_requirements=True):
-        self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
         lock = self.lock()
         truncate = self.config.truncate
         try:
             if lock:  # pragma: no branch
+                self.on_start(run_type)
                 if not ignore_dependencies:
                     for requirement in self.config.depends:
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         if requirement.loader.need_refresh(self):
-                            if not force_requirements:
-                                raise RequiredIsMissing(requirement)
-                            logger.info(f"Load required dataset {requirement}")
-                            requirement.loader.load(stdout=stdout,
-                                                    force_requirements=force_requirements,
-                                                    run_type=RUN_AS_REQUIREMENT)
+                            # if not force_requirements:
+                            raise RequiredIsMissing(requirement)
+                            # logger.info(f"Load required dataset {requirement}")
+                            # requirement.loader.load(stdout=stdout,
+                            #                         force_requirements=force_requirements,
+                            #                         run_type=RUN_AS_REQUIREMENT)
                         else:
                             logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update
@@ -550,9 +581,10 @@ class Loader:
                     self.results.context = self.context
                     self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
                     if truncate:
+                        cache.set("STATUS:%s" % self.etl_task.task, '[truncating]')
                         self.model.objects.truncate()
-
                     for i, country in enumerate(countries, 1):
+                        cache.set("STATUS:%s" % self.etl_task.task, country)
                         self.context['country'] = country
                         if stdout and verbosity > 0:
                             stdout.write(f"{i:>3}/{total_countries} "
@@ -575,11 +607,10 @@ class Loader:
                             stdout.flush()
                         self.post_process_country()
                         if self.config.sync_deleted_records(self):
+                            cache.set("STATUS:%s" % self.etl_task.task, '[remove deleted]')
                             self.remove_deleted()
                     if stdout and verbosity > 0:
                         stdout.write("\n")
-                    # deleted = self.model.objects.exclude(seen=today).delete()[0]
-                    # self.results.deleted = deleted
                 except MaxRecordsException:
                     pass
                 except Exception:
@@ -598,12 +629,12 @@ class Loader:
         else:
             self.on_end(None)
         finally:
+            cache.delete("STATUS:%s" % self.etl_task.task)
             if lock:  # pragma: no branch
                 try:
                     lock.release()
                 except LockError as e:  # pragma: no cover
                     logger.warning(e)
-
         return self.results
 
 
@@ -658,12 +689,19 @@ class CommonSchemaLoader(Loader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         if requirement.loader.need_refresh(self):
-                            if not force_requirements:
-                                raise RequiredIsMissing(requirement)
-                            logger.info(f"Load required dataset {requirement}")
-                            requirement.loader.load(stdout=stdout,
-                                                    force_requirements=force_requirements,
-                                                    run_type=RUN_AS_REQUIREMENT)
+                            # if not force_requirements:
+                            raise RequiredIsMissing(requirement)
+                            # else:
+                            # logger.info(f"Load required dataset {requirement}")
+                            # requirement.loader.task.apply_async(
+                            #     kwargs={"force_requirements": force_requirements,
+                            #             "run_type": RUN_AS_REQUIREMENT}
+                            # )
+                            # raise RequiredIsQueued(requirement)
+                            # logger.info(f"Load required dataset {requirement}")
+                            # requirement.loader.load(stdout=stdout,
+                            #                         force_requirements=force_requirements,
+                            #                         run_type=RUN_AS_REQUIREMENT)
                         else:
                             logger.info(f"Loader {requirement} is uptodate")
                 self.always_update = always_update

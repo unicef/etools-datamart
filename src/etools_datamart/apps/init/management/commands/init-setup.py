@@ -1,7 +1,6 @@
 import os
 import uuid
 import warnings
-from urllib.parse import urlparse
 
 from django.apps import apps
 from django.conf import settings
@@ -17,7 +16,7 @@ from django.urls import NoReverseMatch
 from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule
 from post_office.models import EmailTemplate
-from redisboard.models import RedisServer
+# from redisboard.models import RedisServer
 from strategy_field.utils import fqn
 
 from unicef_rest_framework.models import PeriodicTask
@@ -247,13 +246,13 @@ class Command(BaseCommand):
                     u.groups.add(public_areas)
                     u.groups.add(restricted_areas)
 
-            # hostname
-            for entry, values in settings.CACHES.items():
-                loc = values.get('LOCATION', '')
-                spec = urlparse(loc)
-                if spec.scheme == 'redis':
-                    RedisServer.objects.get_or_create(hostname=spec.hostname,
-                                                      port=int(spec.port))
+            # redisboard
+            # for entry, values in settings.CACHES.items():
+            #     loc = values.get('LOCATION', '')
+            #     spec = urlparse(loc)
+                # if spec.scheme == 'redis':
+                #     RedisServer.objects.get_or_create(hostname=spec.hostname,
+                #                                       port=int(spec.port))
 
             if options['tasks'] or _all or options['refresh']:
                 preload_cron, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)

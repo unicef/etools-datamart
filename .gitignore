@@ -11,6 +11,7 @@
 .pydevproject
 .tox
 .venv
+*.bak
 /contacts.json
 /dist
 /media
