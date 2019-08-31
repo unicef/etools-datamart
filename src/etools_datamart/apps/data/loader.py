@@ -494,7 +494,6 @@ class Loader:
         if retry:
             defs['status'] = 'RETRY'
             defs['results'] = str(error)
-            defs['last_failure'] = timezone.now()
         elif error:
             defs['status'] = 'FAILURE'
             defs['results'] = str(error)
