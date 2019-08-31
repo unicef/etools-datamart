@@ -582,6 +582,7 @@ class Loader:
                     self.results.context = self.context
                     self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
                     if truncate:
+                        cache.set("STATUS:%s" % self.etl_task.task, '[truncating]')
                         self.model.objects.truncate()
                     for i, country in enumerate(countries, 1):
                         cache.set("STATUS:%s" % self.etl_task.task, country)
@@ -607,6 +608,7 @@ class Loader:
                             stdout.flush()
                         self.post_process_country()
                         if self.config.sync_deleted_records(self):
+                            cache.set("STATUS:%s" % self.etl_task.task, '[remove deleted]')
                             self.remove_deleted()
                     if stdout and verbosity > 0:
                         stdout.write("\n")
