@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.0.0rc22
+TARGET?=2.0.1
 BASE=2.0
 # below vars are used internally
 BUILD_OPTIONS?=--squash
@@ -30,10 +30,10 @@ build-base:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--no-cache \
-			-t ${DOCKER_IMAGE_NAME}-base:${BASE} \
+			-t ${DOCKER_IMAGE_NAME}:${BASE}-base \
 			-f docker/Dockerfile.base .
 	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-	docker push ${DOCKER_IMAGE_NAME}-base:${BASE}
+	docker push ${DOCKER_IMAGE_NAME}:${BASE}-base
 
 
 .build:

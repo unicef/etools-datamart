@@ -581,10 +581,9 @@ class Loader:
                     self.results.context = self.context
                     self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
                     if truncate:
-                        cache.set("STATUS:%s" % self.etl_task.task, '[truncating]')
                         self.model.objects.truncate()
                     for i, country in enumerate(countries, 1):
-                        cache.set("STATUS:%s" % self.etl_task.task, country)
+                        cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
                         self.context['country'] = country
                         if stdout and verbosity > 0:
                             stdout.write(f"{i:>3}/{total_countries} "

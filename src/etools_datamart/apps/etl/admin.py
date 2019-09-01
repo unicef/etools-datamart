@@ -151,7 +151,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     def _status(self, obj):
         css = get_css(obj)
-        if 'RETRY' in obj.status:
+        if obj.status and 'RETRY' in obj.status:
             s = '%s</br>%s' % (obj.status, obj.results)
         else:
             c = cache.get("STATUS:%s" % obj.task) or ""

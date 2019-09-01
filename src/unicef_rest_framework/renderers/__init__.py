@@ -8,3 +8,4 @@ from .microsoft.xml import MSXmlRenderer  # noqa
 from .pdf import PDFRenderer  # noqa
 from .txt import TextRenderer  # noqa
 from .xls import XLSXRenderer  # noqa
+from .yaml import YAMLRenderer  # noqa

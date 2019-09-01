@@ -22,7 +22,7 @@ ARG BASE_IMAGE
 #    && curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
 #    fi
 
-FROM unicef/datamart-base:${BASE_IMAGE}
+FROM unicef/datamart:${BASE_IMAGE}-base
 #COPY --from=loader /code /code
 
 ARG BUILD_DATE
@@ -105,6 +105,7 @@ ENV UWSGI_PROTOCOL=http \
     UWSGI_DISABLE_LOGGING=false \
     UWSGI_DISABLE_WRITE_EXCEPTION=true \
     UWSGI_FREEBIND=true \
+    UWSGI_HARAKIRI=120 \
     UWSGI_HTTP_TIMEOUT=60 \
     UWSGI_IGNORE_SIGPIPE=true \
     UWSGI_IGNORE_WRITE_ERRORS=true \
