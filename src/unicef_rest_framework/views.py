@@ -8,7 +8,6 @@ from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework_xml.renderers import XMLRenderer
-from rest_framework_yaml.renderers import YAMLRenderer
 from strategy_field.utils import fqn
 
 from unicef_rest_framework.pagination import PageFilter
@@ -21,8 +20,8 @@ from .filtering import SystemFilterBackend
 from .negotiation import CT
 from .ordering import OrderingFilter
 from .permissions import ServicePermission
-from .renderers import (CSVRenderer, HTMLRenderer, IQYRenderer, JSONRenderer, MSJSONRenderer,
-                        MSXmlRenderer, PDFRenderer, TextRenderer, URFBrowsableAPIRenderer, XLSXRenderer,)
+from .renderers import (CSVRenderer, HTMLRenderer, IQYRenderer, JSONRenderer, MSJSONRenderer, MSXmlRenderer,
+                        PDFRenderer, TextRenderer, URFBrowsableAPIRenderer, XLSXRenderer, YAMLRenderer,)
 
 
 class classproperty(object):

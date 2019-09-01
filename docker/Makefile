@@ -30,10 +30,10 @@ build-base:
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
 			--no-cache \
-			-t ${DOCKER_IMAGE_NAME}-base:${BASE} \
+			-t ${DOCKER_IMAGE_NAME}:${BASE}-base \
 			-f docker/Dockerfile.base .
 	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-	docker push ${DOCKER_IMAGE_NAME}-base:${BASE}
+	docker push ${DOCKER_IMAGE_NAME}:${BASE}-base
 
 
 .build:

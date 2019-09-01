@@ -66,9 +66,9 @@ class PDIndicator(LocationMixin, DataMartModel):
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
     baseline_denominator = models.DecimalField(blank=True, null=True,
-                                               max_digits=8, decimal_places=3)
+                                               max_digits=20, decimal_places=3)
     baseline_numerator = models.DecimalField(blank=True, null=True,
-                                             max_digits=8, decimal_places=3)
+                                             max_digits=20, decimal_places=3)
 
     # from lower_result
     lower_result_name = models.CharField(max_length=500, blank=True, null=True)
