@@ -34,11 +34,11 @@ def test_load_requiredisrunning(loader1):
                 loader1.load(max_records=2)
 
 
-def test_load_requiredsuccess(loader1):
-    with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
-        with mock.patch('etools_datamart.apps.data.models.Intervention.loader.load', lambda *a, **kw: True):
-            loader1.load(max_records=2)
-
+# def test_load_requiredsuccess(loader1):
+#     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: True):
+#         with mock.patch('etools_datamart.apps.data.models.Intervention.loader.load', lambda *a, **kw: True):
+#             loader1.load(max_records=2)
+#
 
 def test_load_requiredready(loader1):
     with mock.patch('etools_datamart.apps.data.models.Intervention.loader.need_refresh', lambda *a: False):

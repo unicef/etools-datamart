@@ -81,18 +81,19 @@ def truncate(modeladmin, request, queryset):
 
 def get_css(obj):
     css = ''
-    if obj.status in ['RUNNING' 'STARTED']:
-        pass
-    elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
-        css = 'error'
-    elif 'RETRY' in obj.status:
-        css = 'warn'
-    elif obj.last_failure:
-        css = 'error'
-    elif obj.last_run and (obj.last_run.date() < datetime.today().date()):
-        css = 'warn'
-    elif obj.status == 'SUCCESS':
-        css = 'success'
+    if obj.status:
+        if obj.status in ['RUNNING' 'STARTED']:
+            pass
+        elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
+            css = 'error'
+        elif 'RETRY' in obj.status:
+            css = 'warn'
+        elif obj.last_failure:
+            css = 'error'
+        elif obj.last_run and (obj.last_run.date() < datetime.today().date()):
+            css = 'warn'
+        elif obj.status == 'SUCCESS':
+            css = 'success'
     return css
 
 

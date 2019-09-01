@@ -15,6 +15,7 @@ DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 env = environ.Env(API_PREFIX=(str, '/api/'),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   ANALYTICS_CODE=(str, ""),
+                  AUTOCOMMIT_EXTERNAL=(bool, True),
                   AZURE_ACCOUNT_KEY=(str, ''),
                   AZURE_ACCOUNT_NAME=(str, ''),
                   AZURE_CLIENT_ID=(str, ''),
@@ -102,8 +103,8 @@ DATABASES = {
 }
 
 DATABASES['default']['CONN_MAX_AGE'] = 60
-DATABASES['etools']['AUTOCOMMIT'] = False
-DATABASES['prp']['AUTOCOMMIT'] = False
+DATABASES['etools']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
+DATABASES['prp']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 
 
 DATABASE_ROUTERS = [
