@@ -39,8 +39,11 @@ class TripFilterForm(forms.Form):
                                                       ))
     primary_traveler__istartswith = forms.CharField(label='Primary Traveler',
                                                     required=False)
-    date = DateRangePickerField(label='Date between',
-                                required=False)
+    start_date = DateRangePickerField(label='Start Date between',
+                                      required=False)
+
+    end_date = DateRangePickerField(label='End Date between',
+                                    required=False)
 
 
 class TripViewSet(common.DataMartViewSet):

@@ -102,7 +102,7 @@ class Trip(DataMartModel):
     cp_output_id = models.CharField(max_length=300, blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     currency_code = models.CharField(max_length=10, blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True, db_index=True)
     estimated_travel_cost = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     first_submission_date = models.DateTimeField(blank=True, null=True)
     hact_visit_report = models.CharField(max_length=300, blank=True, null=True)
@@ -130,7 +130,7 @@ class Trip(DataMartModel):
     rejection_note = models.TextField(blank=True, null=True)
     report_note = models.TextField(blank=True, null=True)
     section_name = models.CharField(max_length=300, blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True, db_index=True)
     status = models.CharField(max_length=50,
                               choices=CHOICES,
                               blank=True, null=True)

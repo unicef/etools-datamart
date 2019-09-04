@@ -118,10 +118,12 @@ class EngagementlLoader(Loader):
                 schema_name=self.context['country'].schema_name,
                 source_id=original.partner.id)
             return {'name': p.name,
+                    'vendor_number': p.vendor_number,
                     'id': p.id,
                     'source_id': p.source_id}
         except Partner.DoesNotExist:
             return {'name': 'N/A',
+                    'vendor_number': 'N/A',
                     'id': 'N/A',
                     'source_id': 'N/A'}
 

@@ -37,7 +37,7 @@ def test_loader_load(loader, number_of_intervention):
         loader.unlock()
         ret = loader.load(max_records=2, ignore_dependencies=True, only_delta=False)
     assert loader.model.objects.count()
-    assert ret.total_records == 2
+    assert ret.processed == 2
     # assert ret.deleted == 0
     # assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
     # assert not loader.model.objects.filter(id=to_delete.pk).exists()

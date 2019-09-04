@@ -25,7 +25,7 @@ def test_encoder():
     e = EtlEncoder()
     assert e.encode(
         EtlResult(1, 1, 1)) == '{"__type__": "__EtlResult__", ' \
-                               '"data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null}}'
+                               '"data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null, "processed": 0, "total_records": 0}}'
 
 
 def test_encoder2():
@@ -51,7 +51,7 @@ def test_decode2():
 def test_dumps():
     assert etl_dumps(
         EtlResult(1, 1,
-                  1)) == '{"__type__": "__EtlResult__", "data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null}}'
+                  1)) == '{"__type__": "__EtlResult__", "data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null, "processed": 0, "total_records": 0}}'
 
 
 def test_dumps2():
