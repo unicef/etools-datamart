@@ -114,7 +114,8 @@ class Trip(DataMartModel):
     locations_data = JSONField(blank=True, null=True)
     misc_expenses = models.TextField(blank=True, null=True)
     mode_of_travel = ArrayField(models.CharField(max_length=5,
-                                                 choices=ModeOfTravel.CHOICES), null=True, blank=True,
+                                                 choices=ModeOfTravel.CHOICES),
+                                null=True, blank=True, db_index=True,
                                 verbose_name=_('Mode of Travel'))
 
     office_name = models.CharField(max_length=300, blank=True, null=True)

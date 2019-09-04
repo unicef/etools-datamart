@@ -229,7 +229,8 @@ class Engagement(DataMartModel):
     date_of_report_submit = models.DateField(null=True, blank=True)
     end_date = models.DateField(blank=True, null=True, db_index=True)
     engagement_attachments = models.TextField(blank=True, null=True)
-    engagement_type = models.CharField(max_length=300, blank=True, null=True, choices=TYPES, db_index=True)
+    engagement_type = models.CharField(max_length=300, blank=True,
+                                       null=True, choices=TYPES, db_index=True)
     exchange_rate = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     explanation_for_additional_information = models.TextField(blank=True, null=True)
     joint_audit = models.BooleanField(default=False, blank=True, null=True)
@@ -245,7 +246,8 @@ class Engagement(DataMartModel):
     staff_members = models.TextField(blank=True, null=True)
     staff_members_data = JSONField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True, db_index=True)
-    status = models.CharField(max_length=300, blank=True, null=True)
+    status = models.CharField(max_length=300, blank=True, null=True,
+                              db_index=True)
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     write_off_required = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
 
@@ -279,7 +281,8 @@ class Engagement(DataMartModel):
 
     audited_expenditure = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     financial_findings = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
-    audit_opinion = models.CharField(max_length=20, choices=AUDIT_OPTIONS, blank=True, null=True)
+    audit_opinion = models.CharField(max_length=20, choices=AUDIT_OPTIONS,
+                                     blank=True, null=True, db_index=True)
     # final_report = CodedGenericRelation(Attachment, code='audit_final_report')
 
     # SpecialAudit

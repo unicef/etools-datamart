@@ -73,11 +73,29 @@ class EngagementFilterForm(forms.Form):
     partner_contacted_at = DateRangePickerField(label='Date IP was contacted',
                                                 required=False)
 
-    start_date = DateRangePickerField(label='Period Start Date',
+    start_date = DateRangePickerField(label='Start Date',
                                       required=False)
 
-    end_date = DateRangePickerField(label='Period End Date',
+    end_date = DateRangePickerField(label='End Date',
                                     required=False)
+
+    status__in = Select2MultipleChoiceField(label='Status',
+                                            choices=models.Engagement.STATUSES,
+                                            required=False)
+
+    audit_opinion__in = Select2MultipleChoiceField(label='Audit Opinion',
+                                                   choices=models.Engagement.AUDIT_OPTIONS,
+                                                   required=False)
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, *args, **kwargs):
+        filters = data.copy()
+        if 'status__in' in filters:
+            filters.setlist('status__in', data['status__in'].split(','))
+        if 'engagement_type__in' in filters:
+            filters.setlist('engagement_type__in', data['engagement_type__in'].split(','))
+        if 'audit_opinion__in' in filters:
+            filters.setlist('audit_opinion__in', data['audit_opinion__in'].split(','))
+        super().__init__(filters, files, auto_id, prefix, initial, *args, **kwargs)
 
 
 class EngagementViewSet(DataMartViewSet):
@@ -86,7 +104,7 @@ class EngagementViewSet(DataMartViewSet):
     serializer_class = EngagementSerializer
     queryset = models.Engagement.objects.all()
     filter_fields = ('engagement_type', 'partner_contacted_at',
-                     'start_date', 'end_date')
+                     'start_date', 'end_date', 'status', 'audit_opinion')
     serializers_fieldsets = {'std': None,
                              'simple': EngagementSerializerSimple}
 

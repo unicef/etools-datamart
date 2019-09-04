@@ -234,7 +234,10 @@ class TripFactory(DataMartModelFactory):
 
 
 class EngagementFactory(DataMartModelFactory):
-    partner = {"id": 100}
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
 
     class Meta:
         model = models.Engagement
