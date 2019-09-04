@@ -39,8 +39,9 @@ class PeriodicTaskPreloadForm(PeriodicTaskForm):
 
 class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
     list_display = ('name', 'service', 'enabled', 'schedule', 'one_off', 'total_run_count')
-    list_filter = ('enabled', 'last_run_at', 'service')
+    list_filter = ('enabled', 'last_run_at', )
     date_hierarchy = 'last_run_at'
+    search_fields = ('service__name', 'name')
     actions = ('enable_tasks', 'disable_tasks', 'toggle_tasks', 'run_tasks', mass_update)
     mass_update_form = PeriodicTaskUpdateForm
     fieldsets = (
@@ -87,14 +88,14 @@ class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
     run_tasks.short_description = _('Run selected tasks')
 
     @action()
-    def run_task(self, request, pk):
+    def queue_task(self, request, pk):
         periodic_task = PeriodicTask.objects.get(pk=pk)
         self.celery_app.loader.import_default_modules()
 
         task = self.celery_app.tasks.get(periodic_task.task)
         task.delay(*loads(periodic_task.args), **loads(periodic_task.kwargs))
 
-        self.message_user(request, _('task successfully run'))
+        self.message_user(request, _('task successfully queued'))
 
     @link()
     def preload(self, request):

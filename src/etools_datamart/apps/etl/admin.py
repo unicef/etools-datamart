@@ -114,6 +114,8 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     date_hierarchy = 'last_run'
     actions = [mass_update, queue, truncate, unlock]
+    mass_update_hints = ['status', ]
+    mass_update_exclude = ['task', 'table_name', 'content_type']
 
     def _total(self, obj):
         try:

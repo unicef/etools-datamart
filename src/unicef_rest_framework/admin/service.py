@@ -48,6 +48,9 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     readonly_fields = ('cache_version', 'cache_ttl', 'cache_key', 'viewset', 'name', 'uuid',
                        'last_modify_user', 'source_model', 'endpoint', 'basename', 'suffix')
     form = ServiceForm
+    mass_update_hints = []
+    mass_update_exclude = ['linked_models', 'source_model', 'viewset', 'suffix', 'name',
+                           'version']
     filter_horizontal = ('linked_models',)
     fieldsets = [("", {"fields": ('name',
                                   'description',
