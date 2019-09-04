@@ -11,7 +11,7 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.template.response import TemplateResponse
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
-from adminactions.mass_update import mass_update
+from adminactions.mass_update import mass_update, MassUpdateForm
 
 from unicef_rest_framework.models import Service, UserAccessControl
 from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl
@@ -53,6 +53,10 @@ class GroupAccessControlForm(forms.Form):
                                    max_length=255)
 
 
+class LazyMassUpdateForm(MassUpdateForm):
+    _no_sample_for = ['last_modify_user', ]
+
+
 class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('group', 'service', 'rate', 'serializers', 'policy')
     list_filter = ('group', 'policy', 'service')
@@ -60,6 +64,7 @@ class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
     form = GroupACLAdminForm
     autocomplete_fields = ('group',)
     actions = [mass_update]
+    mass_update_form = LazyMassUpdateForm
 
     # filter_horizontal = ('services',)
 
