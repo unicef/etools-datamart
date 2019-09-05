@@ -117,6 +117,7 @@ class EtlTaskHistory(models.Model):
     task = models.CharField(max_length=200, db_index=True)
     elapsed = models.IntegerField(blank=True, null=True)
     delta = models.IntegerField(blank=True, null=True, default=None)
+    delta_percentage = models.FloatField(blank=True, null=True, default=None)
 
     class Meta:
         get_latest_by = 'last_run'

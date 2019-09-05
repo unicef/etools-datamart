@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from django.contrib import admin, messages
-from django.contrib.admin import FieldListFilter, register
+from django.contrib.admin import register, SimpleListFilter
 from django.core.cache import caches
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
@@ -307,48 +307,60 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                           messages.SUCCESS)
 
 
-class RangeFilter(FieldListFilter):
-    title = 'Section'  # or use _('country') for translated title
-    parameter_name = 'section'
+class RangeFilter(SimpleListFilter):
+    ranges = {}
 
-    ranges = {0: ('All', dict()),
-              1: ('< 1m', dict(elapsed__lt=60)),
+    def lookups(self, request, model_admin):
+        return [(a, b[0]) for a, b in self.ranges.items()]
+
+    def value(self):
+        return self.used_parameters.get(self.parameter_name)
+
+    def queryset(self, request, queryset):
+        if self.value():
+            flt = self.ranges[int(self.value())][1]
+            if isinstance(flt, dict):
+                return queryset.filter(**flt)
+            else:
+                return queryset.filter(*flt)
+        return queryset
+
+
+class ElapsedFilter(RangeFilter):
+    title = 'Elapsed'
+    parameter_name = 'elapsed'
+
+    ranges = {1: ('< 1m', dict(elapsed__lt=60)),
               2: ('> 1m', dict(elapsed__gt=60)),
               3: ('> 10m', dict(elapsed__gt=60 * 10)),
               4: ('> 1h', dict(elapsed__gt=60 * 60)),
               }
 
-    def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_val = field_path
-        self.used_parameters = {}
-        super().__init__(field, request, params, model, model_admin, field_path)
 
-    def expected_parameters(self):
-        return [self.field_path]
+class DeltaFilter(RangeFilter):
+    title = 'Delta'
+    parameter_name = 'delta'
 
-    # def value(self):
-    #     return self.used_parameters.get(self.parameter_name)
-    #
-    def choices(self, changelist):
-        for lookup, (title, flt) in self.ranges.items():
-            yield {
-                'selected': self.lookup_val == lookup and not self.lookup_val,
-                'query_string': changelist.get_query_string(flt, [self.field_path]),
-                'display': title,
-            }
-
-    # def queryset(self, request, queryset):
-    #     if self.value():
-    #         return queryset.filter(**self.ranges[int(self.value())])
-    #     return queryset
+    ranges = {1: ('< 10%', dict(delta_percentage__lt=10)),
+              2: ('> 10%', dict(delta_percentage__gt=10)),
+              3: ('> 20%', dict(delta_percentage__gt=20)),
+              4: ('> 50%', dict(delta_percentage__gt=50))
+              }
 
 
 @register(models.EtlTaskHistory)
 class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', 'timestamp', 'time', 'delta')
-    list_filter = ('task', ('elapsed', RangeFilter))
+    list_display = ('task', 'timestamp', 'time', 'incr')
+    list_filter = ('task', ElapsedFilter, DeltaFilter)
+    actions = [mass_update]
+    mass_update_fields = ('delta', 'delta_percentage')
+    mass_update_exclude = None
     date_hierarchy = 'timestamp'
     search_fields = ('task',)
+
+    def incr(self, obj):
+        if obj.delta_percentage:
+            return "{0:.2f}%".format(obj.delta_percentage)
 
     def time(self, obj):
         return strfelapsed(obj.elapsed)
@@ -363,6 +375,7 @@ class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
                              timestamp__lt=e.timestamp).exclude(id=e.id).first()
             if prev:
                 e.delta = e.elapsed - prev.elapsed
+                e.delta_percentage = (100.0 * (e.elapsed / prev.elapsed)) - 100
             else:
                 e.delta = None
             e.save()
