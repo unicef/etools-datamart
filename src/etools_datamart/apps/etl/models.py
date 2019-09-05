@@ -97,7 +97,8 @@ class EtlTask(models.Model):
         if self.status == 'SUCCESS':
             return EtlTaskHistory.objects.create(task=self.task,
                                                  timestamp=self.last_run,
-                                                 elapsed=self.elapsed
+                                                 elapsed=self.elapsed,
+                                                 delta=None
                                                  )
 
 
@@ -115,7 +116,8 @@ class EtlTaskHistory(models.Model):
     timestamp = models.DateTimeField(blank=True, null=True)
     task = models.CharField(max_length=200, db_index=True)
     elapsed = models.IntegerField(blank=True, null=True)
+    delta = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         get_latest_by = 'last_run'
-        ordering = ('task',)
+        ordering = ('task', '-timestamp')

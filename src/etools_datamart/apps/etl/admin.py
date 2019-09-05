@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from django.contrib import admin, messages
-from django.contrib.admin import register
+from django.contrib.admin import FieldListFilter, register
 from django.core.cache import caches
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
@@ -307,13 +307,62 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                           messages.SUCCESS)
 
 
+class RangeFilter(FieldListFilter):
+    title = 'Section'  # or use _('country') for translated title
+    parameter_name = 'section'
+
+    ranges = {0: ('All', dict()),
+              1: ('< 1m', dict(elapsed__lt=60)),
+              2: ('> 1m', dict(elapsed__gt=60)),
+              3: ('> 10m', dict(elapsed__gt=60 * 10)),
+              4: ('> 1h', dict(elapsed__gt=60 * 60)),
+              }
+
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        self.lookup_val = field_path
+        self.used_parameters = {}
+        super().__init__(field, request, params, model, model_admin, field_path)
+
+    def expected_parameters(self):
+        return [self.field_path]
+
+    # def value(self):
+    #     return self.used_parameters.get(self.parameter_name)
+    #
+    def choices(self, changelist):
+        for lookup, (title, flt) in self.ranges.items():
+            yield {
+                'selected': self.lookup_val == lookup and not self.lookup_val,
+                'query_string': changelist.get_query_string(flt, [self.field_path]),
+                'display': title,
+            }
+
+    # def queryset(self, request, queryset):
+    #     if self.value():
+    #         return queryset.filter(**self.ranges[int(self.value())])
+    #     return queryset
+
+
 @register(models.EtlTaskHistory)
-class EtlTaskHistoryAdmin(admin.ModelAdmin):
-    list_display = ('task', 'timestamp', 'time')
-    list_filter = ('task',)
+class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
+    list_display = ('task', 'timestamp', 'time', 'delta')
+    list_filter = ('task', ('elapsed', RangeFilter))
     date_hierarchy = 'timestamp'
+    search_fields = ('task',)
 
     def time(self, obj):
         return strfelapsed(obj.elapsed)
 
     time.admin_order_field = 'elapsed'
+
+    @link()
+    def delta(self, request):
+        qs = self.get_queryset(request).order_by('-timestamp')
+        for e in qs.filter(delta__isnull=True):
+            prev = qs.filter(task=e.task,
+                             timestamp__lt=e.timestamp).exclude(id=e.id).first()
+            if prev:
+                e.delta = e.elapsed - prev.elapsed
+            else:
+                e.delta = None
+            e.save()
