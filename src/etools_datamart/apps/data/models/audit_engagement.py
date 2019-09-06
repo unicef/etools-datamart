@@ -4,8 +4,8 @@ from django.utils.translation import gettext as _
 
 from model_utils import Choices
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import (AttachmentsAttachment, AuditAudit, AuditEngagement,
                                                 AuditEngagementActivePd, AuditMicroassessment, AuditSpecialaudit,
                                                 AuditSpotcheck, DjangoContentType,)
@@ -19,7 +19,7 @@ attachment_codes = {AuditAudit: 'audit_final_report',
                     }
 
 
-class EngagementlLoader(Loader):
+class EngagementlLoader(EtoolsLoader):
 
     def get_queryset(self):
         return AuditEngagement.objects.select_related('partner',
@@ -160,7 +160,7 @@ class EngagementlLoader(Loader):
                 self.increment_counter(op)
 
 
-class Engagement(DataMartModel):
+class Engagement(EtoolsDataMartModel):
     TYPE_AUDIT = 'audit'
     TYPE_MICRO_ASSESSMENT = 'ma'
     TYPE_SPOT_CHECK = 'sc'

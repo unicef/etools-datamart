@@ -1,10 +1,10 @@
 from django.db import models
 
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import FundsGrant
 
 
-class Grant(DataMartModel):
+class Grant(EtoolsDataMartModel):
     name = models.CharField(max_length=128, blank=True, null=True)
     donor = models.CharField(max_length=128, blank=True, null=True)
     expiry = models.DateField(blank=True, null=True)

@@ -2,13 +2,13 @@
 # import django_filters
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.enrichment.consts import PartnersAgreementConst
 from etools_datamart.apps.etools.models import PartnersAgreement
 
 
-class AgreementLoader(Loader):
+class AgreementLoader(EtoolsLoader):
     def get_agreement_amendments(self, original: PartnersAgreement, values: dict, **kwargs):
         return ",".join([a.number for a in original.amendments])
 
@@ -22,7 +22,7 @@ class AgreementLoader(Loader):
         return ",".join(officers)
 
 
-class Agreement(DataMartModel):
+class Agreement(EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
     start = models.DateField(blank=True, null=True)

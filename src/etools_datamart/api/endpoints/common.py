@@ -1,5 +1,4 @@
 from functools import wraps
-from inspect import isclass
 
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -9,7 +8,7 @@ from django.http import Http404
 import coreapi
 import coreschema
 from drf_querystringfilter.exceptions import QueryFilterException
-from dynamic_serializer.core import DynamicSerializer, InvalidSerializerError
+from dynamic_serializer.core import InvalidSerializerError
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
@@ -57,14 +56,13 @@ class AutoRegisterMetaClass(type):
         return new_class
 
 
-class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
-                              metaclass=AutoRegisterMetaClass):
-    filter_backends = [CountryFilter,
-                       DatamartQueryStringFilterBackend,
+class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
+                                  metaclass=AutoRegisterMetaClass):
+    authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MysticaBasicAuthentication,)
+    filter_backends = [DatamartQueryStringFilterBackend,
                        OrderingFilter,
                        DynamicSerializerFilter,
                        ]
-    authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MysticaBasicAuthentication,)
     ordering_fields = ('id',)
     ordering = 'id'
     family = 'datamart'
@@ -119,6 +117,14 @@ class APIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
                 return obj
 
         return super().get_object()
+
+
+class APIReadOnlyModelViewSet(BaseAPIReadOnlyModelViewSet):
+    filter_backends = [CountryFilter,
+                       DatamartQueryStringFilterBackend,
+                       OrderingFilter,
+                       DynamicSerializerFilter,
+                       ]
 
 
 def one_schema(func):
@@ -178,25 +184,25 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
     querystringfilter_form_base_class = forms.Form
 
-    def _get_serializer_from_param(self, name=None):
-        if self.request:
-            name = self.request.query_params.get(self.serializer_field_param, 'std')
-        else:
-            name = 'std'
-
-        if name == 'std':
-            return self.serializers_fieldsets.get('std', self._default_serializer) or self._default_serializer
-
-        target = self.serializers_fieldsets.get(name, None)
-        if isinstance(target, DynamicSerializer):
-            field_list = target.get_fields(self)
-            return self._build_serializer_from_fields(field_list)
-        elif isinstance(target, (list, tuple)):
-            return self._build_serializer_from_fields(target)
-        elif isclass(target):  # Serializer class
-            return target
-        else:  # Standard Serializer
-            raise InvalidSerializerError
+    # def _get_serializer_from_param(self, name=None):
+    #     if self.request:
+    #         name = self.request.query_params.get(self.serializer_field_param, 'std')
+    #     else:
+    #         name = 'std'
+    #
+    #     if name == 'std':
+    #         return self.serializers_fieldsets.get('std', self._default_serializer) or self._default_serializer
+    #
+    #     target = self.serializers_fieldsets.get(name, None)
+    #     if isinstance(target, DynamicSerializer):
+    #         field_list = target.get_fields(self)
+    #         return self._build_serializer_from_fields(field_list)
+    #     elif isinstance(target, (list, tuple)):
+    #         return self._build_serializer_from_fields(target)
+    #     elif isclass(target):  # Serializer class
+    #         return target
+    #     else:  # Standard Serializer
+    #         raise InvalidSerializerError
 
     def get_querystringfilter_form(self, request, filter):
         return self.querystringfilter_form_base_class(request.GET, filter.form_prefix)

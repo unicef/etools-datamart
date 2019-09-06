@@ -23,7 +23,7 @@ from unicef_rest_framework.models import PeriodicTask
 from unicef_rest_framework.models.acl import GroupAccessControl
 from unicef_rest_framework.tasks import preload
 
-from etools_datamart.apps.data.loader import loadeables
+from etools_datamart.apps.etl.loader import loadeables
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.security.models import SchemaAccessControl
 

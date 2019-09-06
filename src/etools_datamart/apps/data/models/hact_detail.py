@@ -3,8 +3,8 @@ import json
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import HactHacthistory
 
 # from etools_datamart.libs.json import print
@@ -48,7 +48,7 @@ def get_item(d, target, default: object = 'N/A', sep='|'):
         return default
 
 
-class HACTDetailLoader(Loader):
+class HACTDetailLoader(EtoolsLoader):
     def get_source_partner(self, record, values, field_name):
         return json.loads(record.partner_values)
 
@@ -126,7 +126,7 @@ class HACTDetailLoader(Loader):
             self.increment_counter(op)
 
 
-class HACTHistory(DataMartModel):
+class HACTHistory(EtoolsDataMartModel):
     year = models.IntegerField(blank=True, null=True, db_index=True)
     partner_name = models.CharField(max_length=300, blank=True, null=True)
     partner_source_id = models.IntegerField(blank=True, null=True)

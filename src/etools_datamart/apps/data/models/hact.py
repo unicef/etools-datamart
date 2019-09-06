@@ -2,12 +2,12 @@ import json
 
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import HactAggregatehact
 
 
-class HACTLoader(Loader):
+class HACTLoader(EtoolsLoader):
 
     def get_queryset(self):
         return self.config.source.objects.filter(year=self.context['year'])
@@ -44,7 +44,7 @@ class HACTLoader(Loader):
                 pass
 
 
-class HACT(DataMartModel):
+class HACT(EtoolsDataMartModel):
     year = models.IntegerField()
     microassessments_total = models.IntegerField(default=0,
                                                  help_text="Total number of completed Microassessments in the business area in the past year")

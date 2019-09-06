@@ -43,7 +43,7 @@ djangorestframework-gis = "*"
 djangorestframework-jwt = "*"
 djangorestframework-xml = "*"
 djangorestframework-yaml = "*"
-drf-dynamic-serializer = ">=1.2.0"
+drf-dynamic-serializer = ">=2.1"
 drf-extensions = "*"
 drf-renderer-xlsx = "*"
 drf-yasg = {version = "*",extras = ["validation"]}
@@ -68,6 +68,7 @@ django-sql-explorer = "*"
 uwsgi = "*"
 packaging = "*"
 circus = "*"
+rapidpro-python = "*"
 
 [dev-packages]
 bumpversion = "*"

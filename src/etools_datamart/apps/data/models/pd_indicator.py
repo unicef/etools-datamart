@@ -1,20 +1,17 @@
 from etools_datamart.apps.data.fields import SafeDecimal
-from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models import Location
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import models, ReportsAppliedindicator
 
 
-class PDIndicatorLoader(Loader):
+class PDIndicatorLoader(EtoolsLoader):
 
     def get_values(self, record):
         values = super().get_values(record)
         for k, v in values.items():
             if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
-                # if v is not None:
-                #     if isinstance(v, str) and ',' in v:
-                #         v = v.replace(',', '.')
                 values[k] = SafeDecimal(v)
         return values
 
@@ -31,7 +28,7 @@ class PDIndicatorLoader(Loader):
                     self.increment_counter(op)
 
 
-class PDIndicator(LocationMixin, DataMartModel):
+class PDIndicator(LocationMixin, EtoolsDataMartModel):
     context_code = models.CharField(max_length=50, blank=True, null=True)
     assumptions = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)

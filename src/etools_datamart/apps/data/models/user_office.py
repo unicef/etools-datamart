@@ -1,10 +1,10 @@
 from django.db import models
 
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import UsersOffice
 
 
-class Office(DataMartModel):
+class Office(EtoolsDataMartModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     zonal_chief_email = models.CharField(max_length=254, blank=True, null=True)
 

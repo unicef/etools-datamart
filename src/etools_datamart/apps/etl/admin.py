@@ -19,11 +19,11 @@ from django_celery_beat.models import PeriodicTask
 
 from unicef_rest_framework.models import Service
 
-from etools_datamart.apps.data.loader import RUN_QUEUED, RUN_UNKNOWN
 from etools_datamart.celery import app
 from etools_datamart.libs.time import strfelapsed
 
 from . import models
+from .loader import RUN_QUEUED, RUN_UNKNOWN
 
 cache = caches['default']
 

@@ -1,19 +1,19 @@
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.etools.enrichment.consts import T2FTravelConsts
 from etools_datamart.apps.etools.models import T2FTravel
 
-from .base import DataMartModel
+from .base import EtoolsDataMartModel
 
 
-class TravelLoader(Loader):
+class TravelLoader(EtoolsLoader):
     def get_attachments(self, record, values, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
                                    record.attachments.values_list('type', 'file'))))
 
 
-class Travel(DataMartModel):
+class Travel(EtoolsDataMartModel):
     additional_note = models.TextField(blank=True, null=True, )
     approved_at = models.DateTimeField(blank=True, null=True, db_index=True)
     approved_cost_travel_agencies = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
