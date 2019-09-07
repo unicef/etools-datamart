@@ -3,14 +3,14 @@ from django.db import models
 
 from crashlog.middleware import process_exception
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import (AttachmentsAttachment, DjangoContentType,
                                                 TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
                                                 TpmTpmvisitTpmPartnerFocalPoints,)
 
 
-class TPMVisitLoader(Loader):
+class TPMVisitLoader(EtoolsLoader):
     def get_activities(self, original: TpmTpmvisit, values: dict, **kwargs):
         ret = []
         for activity in original.activities.order_by('activity_ptr_id'):
@@ -63,7 +63,7 @@ class TPMVisitLoader(Loader):
             self.increment_counter(op)
 
 
-class TPMVisit(DataMartModel):
+class TPMVisit(EtoolsDataMartModel):
     deleted_at = models.DateTimeField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)

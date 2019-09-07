@@ -4,7 +4,7 @@ from django.apps import apps
 import pytest
 from freezegun import freeze_time
 
-from etools_datamart.apps.data.loader import loadeables
+from etools_datamart.apps.etl.loader import loadeables
 
 
 def pytest_generate_tests(metafunc):
@@ -23,9 +23,12 @@ def pytest_generate_tests(metafunc):
                 'data.reportindicator',
             ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
+            elif model._meta.app_label == 'rapidpro':
+                m.append(pytest.param(model.loader, marks=pytest.mark.skip))
             else:
                 m.append(model.loader)
-            ids.append(model.__name__)
+            # ids.append('%s.%s' % (model._meta.app_label, model._meta.verbose_name))
+            ids.append(model._meta.label)
         metafunc.parametrize("loader", m, ids=ids)
 
 

@@ -11,7 +11,6 @@ from django.core.cache import caches
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connections
-from django.urls import NoReverseMatch
 
 from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule
@@ -19,11 +18,11 @@ from post_office.models import EmailTemplate
 # from redisboard.models import RedisServer
 from strategy_field.utils import fqn
 
-from unicef_rest_framework.models import PeriodicTask
+from unicef_rest_framework.models import PeriodicTask, Preload
 from unicef_rest_framework.models.acl import GroupAccessControl
-from unicef_rest_framework.tasks import preload
+from unicef_rest_framework.tasks import preload_all
 
-from etools_datamart.apps.data.loader import loadeables
+from etools_datamart.apps.etl.loader import loadeables
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.security.models import SchemaAccessControl
 
@@ -263,8 +262,11 @@ class Command(BaseCommand):
 
                 every_minute, __ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
 
+                PeriodicTask.objects.get_or_create(name=f"PRELOAD ",
+                                                   defaults={'task': fqn(preload_all),
+                                                             'crontab': preload_cron})
+
                 # tasks = app.get_all_etls()
-                counters = {True: 0, False: 0}
                 loaders = []
                 for loadeable in loadeables:
                     model = apps.get_model(loadeable)
@@ -277,37 +279,20 @@ class Command(BaseCommand):
                     if is_new:
                         self.stdout.write(f"NEW load task {model.loader.task.name} scheduled at {midnight}")
 
+                User = get_user_model()
+                user = User.objects.get(username='system')
                 # preload
                 for service in Service.objects.all():
-                    try:
-                        url = service.endpoint
-                    except NoReverseMatch:
-                        PeriodicTask.objects.filter(service=service).delete()
-                        service.delete()
-                    else:
-                        pp, is_new = PeriodicTask.objects.get_or_create(name=f'PRELOAD {url}',
-                                                                        defaults={'task': fqn(preload),
-                                                                                  'crontab': preload_cron,
-                                                                                  'service': service,
-                                                                                  'args': f'["{url}?page_size=-1"]'})
-                        if is_new:
-                            self.stdout.write(f"NEW preload task for '{url}'")
-
-                ret = PeriodicTask.objects.filter(task__startswith='load_').exclude(task__in=loaders).delete()
-                counters[False] = ret[0]
+                    Preload.objects.get_or_create(
+                        url=service.endpoint,
+                        params={},
+                        as_user=user
+                    )
 
                 EtlTask.objects.inspect()
-                self.stdout.write(
-                    f"{PeriodicTask.objects.filter(name__startswith='data.').count()} "
-                    f"periodic task found. {counters[True]} new. {counters[False]} deleted")
-
                 PeriodicTask.objects.get_or_create(task='send_queued_mail',
                                                    defaults={'name': 'process mail queue',
                                                              'interval': every_minute})
-
-                # PeriodicTask.objects.get_or_create(task='send_queued_mail',
-                #                                    defaults={'name': 'process mail queue',
-                #                                              'interval': every_minute})
 
             EmailTemplate.objects.get_or_create(name='dataset_changed_attachment',
                                                 defaults=dict(subject='Dataset changed',
@@ -326,7 +311,6 @@ class Command(BaseCommand):
                     model.loader.task.delay()
 
             if deploy:
-                Service.objects.invalidate_cache()
                 config.CACHE_VERSION = config.CACHE_VERSION + 1
         finally:
             lock.release()

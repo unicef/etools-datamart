@@ -2,11 +2,11 @@ from django.contrib.gis.db import models as geomodels
 from django.contrib.gis.db.models.functions import Centroid
 from django.db import models
 
-from etools_datamart.apps.data.models.base import DataMartManager, DataMartModel
+from etools_datamart.apps.data.models.base import DataMartManager, EtoolsDataMartModel
 from etools_datamart.apps.etools.models import LocationsGatewaytype, LocationsLocation
 
 
-class GatewayType(DataMartModel):
+class GatewayType(EtoolsDataMartModel):
     name = models.CharField(db_index=True, max_length=64)
     admin_level = models.SmallIntegerField(blank=True, null=True)
 
@@ -37,7 +37,7 @@ class LocationManager(DataMartManager):
             each.save()
 
 
-class Location(DataMartModel):
+class Location(EtoolsDataMartModel):
     name = models.CharField(max_length=254, db_index=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)

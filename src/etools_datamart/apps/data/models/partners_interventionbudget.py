@@ -1,7 +1,7 @@
 from django.contrib.postgres.fields import JSONField
 
 from etools_datamart.apps.data.models import Location
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.data.models.intervention import InterventionAbstract, InterventionLoader
 from etools_datamart.apps.data.models.mixins import extend
 from etools_datamart.apps.etools.models import (FundsFundsreservationheader, models,
@@ -33,7 +33,7 @@ class InterventionBudgetLoader(InterventionLoader):
         return ", ".join(ret)
 
 
-class InterventionBudget(InterventionAbstract, DataMartModel):
+class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
     budget_cso_contribution = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)

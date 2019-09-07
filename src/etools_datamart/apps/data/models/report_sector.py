@@ -1,10 +1,10 @@
 from django.db import models
 
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import ReportsSector
 
 
-class Section(DataMartModel):
+class Section(EtoolsDataMartModel):
     name = models.CharField(max_length=45, blank=True, null=True)
     description = models.CharField(max_length=256, blank=True, null=True)
     alternate_id = models.IntegerField(blank=True, null=True)

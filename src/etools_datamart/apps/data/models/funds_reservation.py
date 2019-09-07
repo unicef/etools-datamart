@@ -1,13 +1,13 @@
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.etools.models import FundsFundsreservationitem
 
-from .base import DataMartModel
+from .base import EtoolsDataMartModel
 from .intervention import Intervention
 
 
-class FundsReservationLoader(Loader):
+class FundsReservationLoader(EtoolsLoader):
     def get_intervention(self, record, values, **kwargs):
         if record.fund_reservation.intervention:
             try:
@@ -18,7 +18,7 @@ class FundsReservationLoader(Loader):
                 pass
 
 
-class FundsReservation(DataMartModel):
+class FundsReservation(EtoolsDataMartModel):
     # header
     vendor_code = models.CharField(max_length=20)
     fr_number = models.CharField(max_length=20)

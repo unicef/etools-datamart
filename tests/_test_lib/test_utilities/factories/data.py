@@ -5,6 +5,7 @@ from django.db import connections
 from django.utils import timezone
 
 import factory
+import pytz
 from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
@@ -112,7 +113,7 @@ class FuzzyMonth(BaseFuzzyAttribute):
         super().__init__(**kwargs)
 
     def fuzz(self):
-        return datetime(today.year, random.choice([1, 2, 3]), 1)  # noqa
+        return datetime(today.year, random.choice([1, 2, 3]), 1, tzinfo=pytz.UTC)  # noqa
 
 
 class UserStatsFactory(DataMartModelFactory):
@@ -148,6 +149,7 @@ class FundsReservationFactory(DataMartModelFactory):
 class PDIndicatorFactory(DataMartModelFactory):
     is_active = True
     is_high_frequency = True
+    target_denominator = 1.1
 
     class Meta:
         model = models.PDIndicator

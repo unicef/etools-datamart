@@ -234,9 +234,6 @@
                             <a href="{{ admin_url }}"
                                style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
                                class="btn btn-primary">Data</a>
-                            <a href='{% url 'admin:django_celery_beat_periodictask_add' %}?name=preload&task=unicef_rest_framework.tasks.preload&args=["{{ request.path }}"]&crontab=1'
-                               style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
-                               class="btn btn-primary">Preload</a>
                         {% endif %}
                         {% if service_url %}
                             <a href="{{ service_url }}"

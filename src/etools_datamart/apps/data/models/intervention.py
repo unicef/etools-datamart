@@ -7,13 +7,13 @@ from django.db.models import F
 
 from crashlog.middleware import process_exception
 
-from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.etools.enrichment.consts import TravelType
 from etools_datamart.apps.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
                                                 PartnersIntervention, PartnersInterventionplannedvisits,
                                                 ReportsAppliedindicator, T2FTravelactivity,)
 
-from .base import DataMartModel
+from .base import EtoolsDataMartModel
 from .location import Location
 from .mixins import add_location_mapping, LocationMixin
 from .partner import Partner
@@ -22,7 +22,7 @@ from .user_office import Office
 logger = logging.getLogger(__name__)
 
 
-class InterventionLoader(Loader):
+class InterventionLoader(EtoolsLoader):
     def get_queryset(self):
         return PartnersIntervention.objects.select_related('agreement',
                                                            'agreement__partner',
@@ -349,7 +349,7 @@ class InterventionAbstract(models.Model):
         )
 
 
-class Intervention(InterventionAbstract, DataMartModel):
+class Intervention(InterventionAbstract, EtoolsDataMartModel):
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True, default=dict)
 
@@ -387,7 +387,7 @@ class InterventionByLocationLoader(InterventionLoader):
                 self.increment_counter(op)
 
 
-class InterventionByLocation(LocationMixin, InterventionAbstract, DataMartModel):
+class InterventionByLocation(LocationMixin, InterventionAbstract, EtoolsDataMartModel):
     loader = InterventionByLocationLoader()
 
     class Meta:

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
-import sys
 import time
 
 from django.apps import apps
 from django.core.management import BaseCommand
 from django.db import connections
 
-from etools_datamart.apps.data.loader import loadeables, RUN_COMMAND
+# from etools_datamart.apps.data.loader import loadeables, RUN_COMMAND
+from etools_datamart.apps.etl.loader import loadeables, RUN_COMMAND
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.libs.time import strfelapsed
 
@@ -60,6 +60,10 @@ class Command(BaseCommand):
             help="Run all loaders.",
         )
         parser.add_argument(
+            '--api-token', action='store',
+            help="RapidPRO token",
+        )
+        parser.add_argument(
             '--ignore-changes', action='store_true',
             help="Run all loaders.",
         )
@@ -92,6 +96,11 @@ class Command(BaseCommand):
             help="Run only failed tasks",
         )
 
+        parser.add_argument(
+            '--async', action='store_true',
+            help="Run only failed tasks",
+        )
+
         parser.add_argument('-c',
                             '--countries',
                             help="Run only selected counries",
@@ -121,6 +130,7 @@ class Command(BaseCommand):
         countries = options['countries']
         no_delta = options['no_delta']
         truncate = options['truncate']
+        asyncronous = options['async']
 
         if debug:
             setup_logging(self.verbosity)
@@ -166,14 +176,19 @@ class Command(BaseCommand):
                     if options['elapsed']:
                         start_time = time.time()
 
-                    res = model.loader.load(always_update=options['ignore_changes'],
-                                            ignore_dependencies=options['no_deps'],
-                                            verbosity=self.verbosity - 1,
-                                            run_type=RUN_COMMAND,
-                                            max_records=records,
-                                            countries=schemas,
-                                            only_delta=not no_delta,
-                                            stdout=sys.stdout)
+                    model.loader.config.always_update = options['ignore_changes']
+                    config = dict(api_token=options.get('api_token'),
+                                  ignore_dependencies=options['no_deps'],
+                                  verbosity=self.verbosity - 1,
+                                  run_type=RUN_COMMAND,
+                                  max_records=records,
+                                  countries=schemas,
+                                  only_delta=not no_delta)
+                    if asyncronous:
+                        aresult = model.loader.task.apply_async(**config)
+                        res = aresult.get()
+                    else:
+                        res = model.loader.load(**config, stdout=self.stdout)
                     if options['elapsed']:
                         elapsed_time = time.time() - start_time
                         elapsed = "in %s" % strfelapsed(elapsed_time)

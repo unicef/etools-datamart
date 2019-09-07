@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from django.contrib import admin, messages
-from django.contrib.admin import register, SimpleListFilter
+from django.contrib.admin import register
 from django.core.cache import caches
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
@@ -19,11 +19,12 @@ from django_celery_beat.models import PeriodicTask
 
 from unicef_rest_framework.models import Service
 
-from etools_datamart.apps.data.loader import RUN_QUEUED, RUN_UNKNOWN
 from etools_datamart.celery import app
+from etools_datamart.libs.admin_filters import RangeFilter
 from etools_datamart.libs.time import strfelapsed
 
 from . import models
+from .loader import RUN_QUEUED, RUN_UNKNOWN
 
 cache = caches['default']
 
@@ -305,25 +306,6 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         created, updated = self.model.objects.inspect()
         self.message_user(request, f"{created} task created. {updated} have been updated",
                           messages.SUCCESS)
-
-
-class RangeFilter(SimpleListFilter):
-    ranges = {}
-
-    def lookups(self, request, model_admin):
-        return [(a, b[0]) for a, b in self.ranges.items()]
-
-    def value(self):
-        return self.used_parameters.get(self.parameter_name)
-
-    def queryset(self, request, queryset):
-        if self.value():
-            flt = self.ranges[int(self.value())][1]
-            if isinstance(flt, dict):
-                return queryset.filter(**flt)
-            else:
-                return queryset.filter(*flt)
-        return queryset
 
 
 class ElapsedFilter(RangeFilter):

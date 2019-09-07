@@ -19,6 +19,7 @@ omit =
         **/reset-migrations.py
         **/tracking/management/commands/track.py
         **/data/management/commands/sqlall.py
+        **/etools_datamart/apps/prp/management/commands/inspectprp.py
         tests/**
 
 

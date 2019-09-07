@@ -231,8 +231,6 @@ class QueryStringFilterBackend(BaseFilterBackend):
                 except Exception as e:
                     logger.exception(e)
                     raise
-        # TODO: remove me
-        print(111, "backend.py:235", 11111, self.filters)
         return self.filters, self.exclude
 
     def filter_queryset(self, request, queryset, view):

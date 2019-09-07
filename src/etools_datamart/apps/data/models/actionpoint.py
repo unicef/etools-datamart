@@ -1,8 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.enrichment.consts import ActionPointConsts, CategoryConsts
 from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
@@ -27,7 +27,7 @@ RELATED_MODULE_NAMES = [c.__name__ for c in RELATED_MODULES]
 RELATED_MODULE_CHOICES = zip(RELATED_MODULE_NAMES, RELATED_MODULE_NAMES)
 
 
-class ActionPointLoader(Loader):
+class ActionPointLoader(EtoolsLoader):
 
     def get_reference_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
         country = self.context['country']
@@ -132,7 +132,7 @@ class ActionPointLoader(Loader):
             return obj.tpm_visit.reference_number
 
 
-class ActionPoint(LocationMixin, DataMartModel):
+class ActionPoint(LocationMixin, EtoolsDataMartModel):
     reference_number = models.CharField(max_length=200, blank=True, null=True, db_index=True)
 
     author_username = models.CharField(max_length=200, blank=True, null=True)

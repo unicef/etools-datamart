@@ -77,7 +77,7 @@ MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost'])
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
 URL_PREFIX = env('URL_PREFIX')
@@ -102,7 +102,7 @@ DATABASES = {
 
 }
 
-DATABASES['default']['CONN_MAX_AGE'] = 60
+# DATABASES['default']['CONN_MAX_AGE'] = 60
 DATABASES['etools']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 DATABASES['prp']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 
@@ -302,10 +302,14 @@ INSTALLED_APPS = [
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
     'etools_datamart.apps.prp',
+    'etools_datamart.apps.rapidpro',
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',
     'adminactions',
+
+    'jsoneditor',
+
     'explorer',
     'unicef_rest_framework.apps.Config',
     'rest_framework',
@@ -424,6 +428,7 @@ AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
     'ETOOLS_ADDRESS': ('https://etools.unicef.org', 'eTools hostname', str),
+    'RAPIDPRO_ADDRESS': ('https://app.rapidpro.io/', 'RapidPro default hostname', str),
     'CACHE_VERSION': (1, 'Global cache version', int),
     'CACHE_ENABLED': (True, 'Enable/Disable API cache', bool),
     'AZURE_USE_GRAPH': (True, 'Use MS Graph API to fetch user data', bool),
@@ -435,6 +440,7 @@ CONSTANCE_CONFIG = {
     'ETL_MAX_RETRIES': (30, 'Max retries for dependent tasks', int),
     'ETL_RETRY_COUNTDOWN': (180, 'Retry counddown in secods', int),
     'ALLOW_EMAIL_PASSWORD': (False, 'Allow send local password by email', bool)
+
 }
 
 CELERY_ACCEPT_CONTENT = ['etljson']

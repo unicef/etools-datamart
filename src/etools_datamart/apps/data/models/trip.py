@@ -4,17 +4,17 @@ from django.utils.translation import gettext as _
 
 from dynamic_serializer.core import get_attr
 
-from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.etools.models import T2FTravel, T2FTravelactivity, T2FTravelattachment
 
-from .base import DataMartModel
+from .base import EtoolsDataMartModel
 
 
 class TravelAttachment(object):
     pass
 
 
-class TripLoader(Loader):
+class TripLoader(EtoolsLoader):
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for t2f_travel_activity in qs.all().order_by('id'):
@@ -73,7 +73,7 @@ class ModeOfTravel:
     )
 
 
-class Trip(DataMartModel):
+class Trip(EtoolsDataMartModel):
     PLANNED = 'planned'
     SUBMITTED = 'submitted'
     REJECTED = 'rejected'

@@ -1,9 +1,9 @@
 from test_utilities.factories import RegisterModelFactory
 
 
-class EToolsModelFactory(RegisterModelFactory):
+class RapidProModelFactory(RegisterModelFactory):
     pass
 
 
-class ActionPointFactory(EToolsModelFactory):
-    pass
+class ActionPointFactory(RapidProModelFactory):
+    RapidProModelFactory

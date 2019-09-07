@@ -3,13 +3,13 @@ from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType, TravelType
 from etools_datamart.apps.etools.models import PartnersPartnerorganization, T2FTravelactivity
 
 
-class PartnerLoader(Loader):
+class PartnerLoader(EtoolsLoader):
 
     def get_queryset(self):
         return PartnersPartnerorganization.objects.select_related('planned_engagement').all()
@@ -42,7 +42,7 @@ class PartnerLoader(Loader):
         return data
 
 
-class Partner(DataMartModel):
+class Partner(EtoolsDataMartModel):
     address = models.TextField(blank=True, null=True)
     alternate_id = models.IntegerField(blank=True, null=True)
     alternate_name = models.CharField(max_length=255, blank=True, null=True)
