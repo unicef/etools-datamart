@@ -114,7 +114,7 @@ class EtlTaskHistory(models.Model):
 
     class Meta:
         get_latest_by = 'last_run'
-        ordering = ('task', '-timestamp')
+        ordering = ('-timestamp', 'task')
 
 
 class Config(models.Model):

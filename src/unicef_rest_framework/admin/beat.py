@@ -38,7 +38,7 @@ class PeriodicTaskPreloadForm(PeriodicTaskForm):
 
 
 class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
-    list_display = ('name', 'service', 'enabled', 'schedule', 'one_off', 'total_run_count')
+    list_display = ('name', 'enabled', 'schedule', 'one_off', 'total_run_count')
     list_filter = ('enabled', 'last_run_at', )
     date_hierarchy = 'last_run_at'
     search_fields = ('service__name', 'name')

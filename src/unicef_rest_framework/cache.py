@@ -223,14 +223,12 @@ class APICacheResponse(CacheResponse):
         else:
             response = None
             key = '--'
-
         if not response:
             view_instance.request._request.api_info['cache-hit'] = False
             response = view_method(view_instance, request, *args, **kwargs)
             response = view_instance.finalize_response(request, response, *args, **kwargs)
             response.render()  # should be rendered, before picklining while storing to cache
-
-            if not response.status_code >= 400 or self.cache_errors:  # pragma: no cover
+            if config.CACHE_ENABLED and response.status_code == 200:  # pragma: no cover
                 expire = parse_ttl(view_instance.get_service().cache_ttl or '1y')
                 cache.set(key, response, expire)
         else:

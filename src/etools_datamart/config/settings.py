@@ -77,7 +77,7 @@ MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['testserver', 'localhost'])
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
 URL_PREFIX = env('URL_PREFIX')
@@ -307,6 +307,9 @@ INSTALLED_APPS = [
     'impersonate',
     'admin_extra_urls',
     'adminactions',
+
+    'jsoneditor',
+
     'explorer',
     'unicef_rest_framework.apps.Config',
     'rest_framework',

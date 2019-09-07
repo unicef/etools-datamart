@@ -4,10 +4,12 @@ import logging
 from urllib.parse import urlencode
 
 from django.contrib import admin
+from django.http import HttpResponseRedirect
 from django.template.defaultfilters import pluralize
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.extras import link
+from admin_extra_urls.extras import action, link
 
 from unicef_rest_framework.admin import APIModelAdmin, TruncateTableMixin
 from unicef_rest_framework.utils import humanize_size
@@ -56,28 +58,18 @@ class APIRequestLogAdmin(TruncateTableMixin, admin.ModelAdmin):
         processed = APIRequestLog.objects.aggregate()
         self.message_user(request, "{} {} aggregated".format(processed, pluralize(processed, 'day,days')))
 
-    # @action()
-    # def preload(self, request, pk):
-    #     obj = APIRequestLog.objects.get(id=pk)
-    #     base_url = reverse("admin:unicef_rest_framework_periodictask_preload")
-    #     params = json.loads(obj.query_params)
-    #     preload_cron, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)
-    #     if params:
-    #         path = "{0.path}?{1}".format(obj, urlencode(params))
-    #     else:
-    #         path = obj.path
-    #     qs = {'task': fqn(preload),
-    #           'name': f'PRELOAD {path}',
-    #           'crontab': preload_cron.id,
-    #           'service': obj.viewset.get_service().id,
-    #           'args': json.dumps([path]),
-    #           'kwargs': "{}",
-    #           'enabled': True,
-    #           '_from': reverse('admin:tracking_apirequestlog_change', args=[obj.pk])
-    #           }
-    #     url = f'{base_url}?{urlencode(qs)}'
-    #     return HttpResponseRedirect(url)
-    #
+    @action()
+    def preload(self, request, pk):
+        obj = APIRequestLog.objects.get(id=pk)
+        from unicef_rest_framework.models import Preload
+        Preload.objects.get_or_create(
+            url=obj.path,
+            params=json.loads(obj.query_params),
+            as_user=obj.user
+        )
+        base_url = reverse("admin:unicef_rest_framework_preload_changelist")
+        return HttpResponseRedirect(base_url)
+
     def is_filtered(self, obj):
         return obj.query_params != '{}'
 

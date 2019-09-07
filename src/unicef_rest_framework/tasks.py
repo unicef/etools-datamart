@@ -1,13 +1,8 @@
 import logging
 
-from django.conf import settings
-from django.contrib.auth import get_user_model
-
-import requests
 from celery.app import default_app
-from crashlog.middleware import process_exception
 
-from unicef_rest_framework.models import Service
+from unicef_rest_framework.models import Preload, Service
 
 logger = logging.getLogger(__name__)
 
@@ -21,17 +16,13 @@ def invalidate_cache(service_id):
 
 
 @default_app.task()
-def preload(path):
-    try:
-        User = get_user_model()
-        user = User.objects.get(username='system')
-        target = "%s%s" % (settings.ABSOLUTE_BASE_URL, path)
-        logger.info(f'Preloading {target}')
-        assert path.startswith('/')
-        response = requests.get(target,
-                                timeout=300,
-                                headers={'Authorization': 'Token %s' % user.auth_token})
-        return response.headers
-    except Exception as e:
-        process_exception(e)
-        raise
+def preload_all():
+    for t in Preload.objects.filter(enabled=True).values_list('id', flat=True):
+        preload.apply_async(args=[t])
+
+
+@default_app.task()
+def preload(target_id):
+    target = Preload.objects.get(id=target_id)
+    response = target.run()
+    return response.status_code
