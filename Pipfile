@@ -72,7 +72,6 @@ rapidpro-python = "*"
 django-jsoneditor = "*"
 
 [dev-packages]
-bumpversion = "*"
 check-manifest= "*"
 django-extensions = "*"
 django-webtest = "*"
@@ -92,6 +91,7 @@ vcrpy = "*"
 #fancycompleter = {file = "https://github.com/theY4Kman/fancycompleter/archive/0.8.tar.gz"}
 flake8 = "*"
 ipdb = "*"
+bump2version = "*"
 
 [requires]
 python_version = "3.7"
