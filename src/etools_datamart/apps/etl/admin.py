@@ -357,7 +357,10 @@ class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
                              timestamp__lt=e.timestamp).exclude(id=e.id).first()
             if prev:
                 e.delta = e.elapsed - prev.elapsed
-                e.delta_percentage = (100.0 * (e.elapsed / prev.elapsed)) - 100
+                try:
+                    e.delta_percentage = (100.0 * (e.elapsed / prev.elapsed)) - 100
+                except ZeroDivisionError:
+                    pass
             else:
                 e.delta = None
             e.save()
