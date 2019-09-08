@@ -1,9 +1,9 @@
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 
 from crashlog.middleware import process_exception
-from django_extensions.db.fields.json import JSONField
 from rest_framework.test import APIClient
 
 from unicef_security.models import User
