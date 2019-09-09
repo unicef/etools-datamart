@@ -15,6 +15,7 @@ class InterventionBudgetLoader(InterventionLoader):
             record.intervention.budget = record
             filters = self.config.key(self, record.intervention)
             values = self.get_values(record.intervention)
+            values['source_id'] = record.id
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
@@ -57,9 +58,9 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
 
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(
-                             budget_cso_contribution='total_partner_contribution',
-                             budget_unicef_cash='budget.unicef_cash',
-                             budget_total='budget.total',
+                             budget_cso_contribution='partner_contribution_local',
+                             budget_unicef_cash='budget.unicef_cash_local',
+                             budget_total='budget.total_local',
                              budget_currency='budget.currency',
-                             budget_unicef_supply='budget.in_kind_amount',
+                             budget_unicef_supply='budget.in_kind_amount_local',
                          ))
