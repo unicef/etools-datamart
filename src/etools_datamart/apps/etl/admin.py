@@ -358,7 +358,10 @@ class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
             if prev:
                 e.delta = e.elapsed - prev.elapsed
                 try:
-                    e.delta_percentage = (100.0 * (e.elapsed / prev.elapsed)) - 100
+                    # e.delta_percentage = (100.0 * (e.elapsed / prev.elapsed)) - 100
+                    # 1 / 2 * 100
+                    if prev.elapsed:
+                        e.delta_percentage = (e.elapsed / prev.elapsed) * 100
                 except ZeroDivisionError:
                     pass
             else:
