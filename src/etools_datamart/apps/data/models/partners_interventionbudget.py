@@ -58,7 +58,7 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
 
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(
-                             budget_cso_contribution='partner_contribution_local',
+                             budget_cso_contribution='budget.partner_contribution_local',
                              budget_unicef_cash='budget.unicef_cash_local',
                              budget_total='budget.total_local',
                              budget_currency='budget.currency',

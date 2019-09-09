@@ -1,6 +1,6 @@
 2.1 (dev)
 ---------
-* Bug fixing
+* Fixes
 * add centroid/lat/lng info to datamart/locations/
 * add extra filter to datamart/t2f/trips/
 * add 'vendor_number' to datamart/audit/engagements
