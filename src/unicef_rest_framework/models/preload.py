@@ -39,7 +39,7 @@ class Client(APIClient):
 class Preload(models.Model):
     url = models.CharField(max_length=200)
     as_user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    params = JSONField(blank=True, null=True, default=dict())
+    params = JSONField(blank=True, null=True, default=dict)
     enabled = models.BooleanField(default=True, blank=True)
 
     last_run = models.DateTimeField(blank=True, null=True)

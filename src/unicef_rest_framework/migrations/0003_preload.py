@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('url', models.CharField(max_length=200)),
-                ('params', django.contrib.postgres.fields.JSONField(blank=True, default={}, null=True)),
+                ('params', django.contrib.postgres.fields.JSONField(blank=True, default=dict, null=True)),
                 ('enabled', models.BooleanField(blank=True, default=True)),
                 ('last_run', models.DateTimeField(blank=True, null=True)),
                 ('last_status_code', models.IntegerField(blank=True, null=True)),
