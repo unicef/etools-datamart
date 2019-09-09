@@ -1,6 +1,8 @@
 2.1 (dev)
 ---------
 * Bug fixing
+* add extra serializer `ext` with related offices to etools/workspaces endpoint
+* add 'countries' field  datamart/user-offices/ endpoint
 * add extra filter to datamart/t2f/trips/
 * add 'vendor_number' to datamart/audit/engagements
 * add 'reference_number' to datamart/audit/engagements
