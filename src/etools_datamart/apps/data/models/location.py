@@ -1,8 +1,10 @@
 from django.contrib.gis.db import models as geomodels
 from django.contrib.gis.db.models.functions import Centroid
-from django.db import models
+from django.db import connection, models
+from django.db.models.manager import BaseManager
 
-from etools_datamart.apps.data.models.base import DataMartManager, EtoolsDataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import DataMartQuerySet, EtoolsDataMartModel
 from etools_datamart.apps.etools.models import LocationsGatewaytype, LocationsLocation
 
 
@@ -25,16 +27,35 @@ class GatewayType(EtoolsDataMartModel):
         return self.name
 
 
-class LocationManager(DataMartManager):
+class LocationQuerySet(DataMartQuerySet):
     def batch_update_centroid(self):
-        sql = '''UPDATE "%s" SET point = ST_Centroid(geom)
- WHERE point IS NULL ;''' % self.model._meta.db_table
-        self.raw(sql)
+        sql = '''UPDATE "%s" SET point = ST_Centroid(geom),
+latitude = ST_X(ST_Centroid(geom)),
+longitude = ST_Y(ST_Centroid(geom))
+WHERE point IS NULL''' % self.model._meta.db_table
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
     def update_centroid(self):
-        for each in self.objects.annotate(cent=Centroid('geom')):
+        clone = self._chain()
+        for each in clone.annotate(cent=Centroid('geom')):
             each.point = each.cent
+            each.latitude = each.point.x
+            each.longitude = each.point.y
             each.save()
+
+
+class LocationManager(BaseManager.from_queryset(LocationQuerySet)):
+    pass
+
+
+class LocationLoader(EtoolsLoader):
+
+    def load(self, **kwargs):
+        try:
+            return super().load()
+        finally:
+            Location.objects.batch_update_centroid()
 
 
 class Location(EtoolsDataMartModel):
@@ -55,6 +76,7 @@ class Location(EtoolsDataMartModel):
     is_active = models.BooleanField()
 
     objects = LocationManager()
+    loader = LocationLoader()
 
     class Meta:
         unique_together = ('schema_name', 'source_id')
