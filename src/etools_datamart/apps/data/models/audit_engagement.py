@@ -6,6 +6,7 @@ from model_utils import Choices
 
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
+from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.etools.models import (AttachmentsAttachment, AuditAudit, AuditEngagement,
                                                 AuditEngagementActivePd, AuditMicroassessment, AuditSpecialaudit,
                                                 AuditSpotcheck, DjangoContentType,)
@@ -35,6 +36,23 @@ class EngagementlLoader(EtoolsLoader):
                    }
         return DjangoContentType.objects.get(app_label='audit',
                                              model=mapping[sub_type])
+
+    def get_reference_number(self, original: AuditEngagement, values: dict, **kwargs):
+        engagement_code = 'a' if original.engagement_type == AuditEngagementConsts.TYPE_AUDIT else original.engagement_type
+        return "/".join([self.context['country'].country_short_code,
+                         original.partner.name[:5],
+                         engagement_code.upper(),
+                         str(original.created.year),
+                         str(original.id)
+                         ])
+        # return '{}/{}/{}/{}/{}'.format(
+        #     self.context['country'].short_code,
+        #     # connection.tenant.country_short_code or '',
+        #     original.partner.name[:5],
+        #     engagement_code.upper(),
+        #     original.created.year,
+        #     original.id
+        # )
 
     def get_engagement_attachments(self, original: AuditEngagement, values: dict, **kwargs):
         # audit_engagement
@@ -251,6 +269,8 @@ class Engagement(EtoolsDataMartModel):
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     write_off_required = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
 
+    reference_number = models.CharField(max_length=300, blank=True, null=True)
+
     # final_report is shared across all Engagement types
     final_report = models.CharField(max_length=300, blank=True, null=True)
 
@@ -300,6 +320,7 @@ class Engagement(EtoolsDataMartModel):
             active_pd_data="i",
             agreement="agreement.order_number",  # PurchaseOrder
             authorized_officers="-",
+            reference_number="-",
             engagement_attachments='-',
             report_attachments='-',
             staff_members='-',

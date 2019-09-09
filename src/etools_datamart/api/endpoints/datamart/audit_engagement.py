@@ -23,6 +23,7 @@ class EngagementSerializerSimple(DataMartSerializer):
                   'schema',
                   'created',
                   'modified',
+                  'reference_number',
                   'status',
                   'partner_contacted_at',
                   'engagement_type',
