@@ -60,6 +60,14 @@ class InterventionFactory(DataMartModelFactory):
     total_local = 10
     currency = 'USD'
     intervention_id = factory.Sequence(lambda n: n)
+    locations_data = [dict(source_id='1',
+                           name="location.name",
+                           pcode="location.p_code",
+                           level="location.level",
+                           levelname="location.gateway.name",
+                           latitude="location.latitude",
+                           longitude="location.longitude",
+                           )]
 
     class Meta:
         model = models.Intervention
