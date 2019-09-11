@@ -30,8 +30,8 @@ class GatewayType(EtoolsDataMartModel):
 class LocationQuerySet(DataMartQuerySet):
     def batch_update_centroid(self):
         sql = '''UPDATE "%s" SET point = ST_Centroid(geom),
-latitude = ST_X(ST_Centroid(geom)),
-longitude = ST_Y(ST_Centroid(geom))
+latitude = ST_Y(ST_Centroid(geom)),
+longitude = ST_X(ST_Centroid(geom))
 WHERE point IS NULL''' % self.model._meta.db_table
         with connection.cursor() as cursor:
             cursor.execute(sql)
@@ -40,8 +40,8 @@ WHERE point IS NULL''' % self.model._meta.db_table
         clone = self._chain()
         for each in clone.annotate(cent=Centroid('geom')):
             each.point = each.cent
-            each.latitude = each.point.x
-            each.longitude = each.point.y
+            each.latitude = each.point.y
+            each.longitude = each.point.x
             each.save()
 
 
