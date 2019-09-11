@@ -96,7 +96,9 @@ class InterventionLoader(EtoolsLoader):
                 name=location.name,
                 pcode=location.p_code,
                 level=location.level,
-                levelname=location.gateway.name
+                levelname=location.gateway.name,
+                latitude=location.latitude,
+                longitude=location.longitude,
             ))
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])
