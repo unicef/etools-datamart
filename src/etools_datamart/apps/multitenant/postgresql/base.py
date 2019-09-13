@@ -98,9 +98,9 @@ tenant: {tenant_sql}
             return super(TenantCursor, self).execute(tenant_sql, params * len(self.db.schemas))
         except django.db.utils.ProgrammingError as e:  # pragma: no cover
             logger.error(f"{e} {msg}")
-            raise django.db.utils.ProgrammingError(f"{e} {msg}") from e
+            raise django.db.utils.ProgrammingError(f"{type(e)}:{e} {msg}") from e
         except Exception as e:  # pragma: no cover
-            logger.error(f"{e} {msg}")
+            logger.error(f"{type(e)}:{e} {msg}")
             raise Exception(msg) from e
 
 

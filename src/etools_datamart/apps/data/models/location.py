@@ -29,10 +29,12 @@ class GatewayType(EtoolsDataMartModel):
 
 class LocationQuerySet(DataMartQuerySet):
     def batch_update_centroid(self):
-        sql = '''UPDATE "%s" SET point = ST_Centroid(geom),
+        sql = '''UPDATE "{0}" SET point = ST_Centroid(geom),
 latitude = ST_Y(ST_Centroid(geom)),
 longitude = ST_X(ST_Centroid(geom))
-WHERE point IS NULL''' % self.model._meta.db_table
+WHERE point IS NULL AND geom IS NOT NULL;
+UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
+'''.format(self.model._meta.db_table)
         with connection.cursor() as cursor:
             cursor.execute(sql)
 
