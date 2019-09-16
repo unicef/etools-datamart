@@ -133,6 +133,7 @@ class BaseLoaderOptions:
         self.sync_deleted_records = lambda loader: True
         self.truncate = False
         self.fields_to_compare = None
+        self.exclude_from_compare = ['seen']
 
         if base:
             for attr in self.__attrs__:
@@ -189,6 +190,8 @@ def _compare_json(dict1, dict2):
 def equal(a, b):
     if isinstance(a, (dict, list, tuple)):
         return _compare_json(a, b)
+    elif isinstance(b, bool):
+        return str(a) == str(b)
     return a == b
 
 
@@ -265,12 +268,15 @@ class BaseLoader:
 
             if not equal(current, new):
                 verbosity = self.context['verbosity']
-                if verbosity > 2:  # pragma: no cover
+                if verbosity >= 2:  # pragma: no cover
                     stdout = self.context['stdout']
-                    stdout.write("Detected field changed '%s': %s->%s\n" %
+                    stdout.write("Detected field changed '%s': %s(%s)->%s(%s)\n" %
                                  (field_name,
                                   getattr(record, field_name),
-                                  getattr(other, field_name)))
+                                  type(getattr(record, field_name)),
+                                  getattr(other, field_name),
+                                  type(getattr(other, field_name))
+                                  ))
                     stdout.flush()
 
                 return True
@@ -405,7 +411,7 @@ class BaseLoader:
         self.results = EtlResult()
 
         if self.config.fields_to_compare is None:
-            self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+            self.fields_to_compare = [f for f in self.mapping.keys() if f not in self.config.exclude_from_compare]
         defs = {'status': 'RUNNING',
                 'elapsed': None,
                 'run_type': run_type,
@@ -441,6 +447,7 @@ class BaseLoader:
                     for service in self.config.model.linked_services:
                         service.invalidate_cache()
                         Subscription.objects.notify(self.config.model)
+                defs['results']['checks'] = self.consistency_check()
         self.etl_task.update(**defs)
         self.etl_task.snapshot()
 
@@ -462,3 +469,6 @@ class BaseLoader:
     def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
              only_delta=True, run_type=RUN_UNKNOWN):
         raise NotImplementedError()
+
+    def consistency_check(self):
+        pass

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 
+from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import register
+from django.contrib.postgres import fields
 from django.core.cache import caches
 from django.http import HttpResponseRedirect
+from django.template import Context, Template
 from django.template.defaultfilters import pluralize
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats
@@ -16,6 +20,9 @@ from admin_extra_urls.mixins import _confirm_action
 from adminactions.mass_update import mass_update
 from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers.data import JsonLexer
 
 from unicef_rest_framework.models import Service
 
@@ -105,6 +112,26 @@ def df(value):
         # dateformat.format(value, 'b d, H:i')
 
 
+class JSONROWidget(forms.Textarea):
+    tpl = '''<input type="hidden" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}>
+    {{style}}{{json}}'''
+
+    def render(self, name, value, attrs=None, renderer=None):
+        formatter = HtmlFormatter(style='colorful')
+        formatted_json = highlight(json.dumps(json.loads(value), sort_keys=True, indent=2),
+                                   JsonLexer(), formatter)
+
+        context = self.get_context(name, value, attrs)
+        context['json'] = mark_safe(formatted_json)
+        context['style'] = mark_safe("<style>" + formatter.get_style_defs() + "</style>")
+        template = Template(self.tpl)
+        return template.render(Context(context))
+
+        # style =
+        # return mark_safe(original + style + response)
+        # return mark_safe(json.dumps(value, sort_keys=True, indent=4))
+
+
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('task', '_last_run', '_status',
@@ -117,6 +144,10 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     actions = [mass_update, queue, truncate, unlock]
     mass_update_hints = ['status', ]
     mass_update_exclude = ['task', 'table_name', 'content_type']
+    # readonly_fields = ['results', ]
+    formfield_overrides = {
+        fields.JSONField: {'widget': JSONROWidget},
+    }
 
     def _total(self, obj):
         try:

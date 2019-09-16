@@ -1,5 +1,5 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
-from django.db import models
+from django.db import connections, models
 from django.utils.translation import gettext as _
 
 from dynamic_serializer.core import get_attr
@@ -15,6 +15,27 @@ class TravelAttachment(object):
 
 
 class TripLoader(EtoolsLoader):
+    def remove_deleted(self):
+        country = self.context['country']
+        existing = list(self.get_queryset().only('id').values_list('id', flat=True))
+        to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_activity_id__in=existing)
+        self.results.deleted += to_delete.count()
+        to_delete.delete()
+
+    def consistency_check(self):
+        connection = connections['etools']
+        connection.set_schemas(['jordan'])
+        connection.set_schemas(['afghanistan'])
+        ids = list(Trip.objects.values_list('source_id', 'source_activity_id'))
+        ids1, ids2 = zip(*ids)
+        info = {
+            "Travel Total Records": T2FTravel.objects.count(),
+            "Activity Total Records": T2FTravelactivity.objects.count(),
+            "Travel Missing": list(T2FTravel.objects.exclude(id__in=ids1).values_list('id', flat=True)),
+            "Activity Missing": list(T2FTravelactivity.objects.exclude(id__in=ids2).values_list('id', flat=True)),
+        }
+        return info
+
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for t2f_travel_activity in qs.all().order_by('id'):
@@ -55,7 +76,7 @@ class TripLoader(EtoolsLoader):
 
     def get_trip_attachments(self, record, values, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
-                               record.attachments.values_list('type', 'file'))))
+                                   record.attachments.values_list('type', 'file'))))
 
 
 class ModeOfTravel:
@@ -152,16 +173,14 @@ class Trip(EtoolsDataMartModel):
     loader = TripLoader()
 
     class Meta:
-        pass
+        unique_together = ('schema_name', 'source_id', 'source_activity_id')
 
     class Options:
         source = T2FTravelactivity
-        # queryset = lambda: FundsFundsreservationitem.objects.select_related('fund_reservation')
         # last_modify_field = 'modified'
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.id,
-                                          source_activity_id=record.activity.id,
+        key = lambda loader, travel: dict(schema_name=loader.context['country'].schema_name,
+                                          source_id=travel.id,
+                                          source_activity_id=travel.activity.id,
                                           )
 
         mapping = dict(

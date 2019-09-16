@@ -70,7 +70,6 @@ class EtoolsLoader(BaseLoader):
 
     def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
              only_delta=True, run_type=RUN_UNKNOWN, **kwargs):
-
         logger.debug(f"Running loader {self}")
         lock = self.lock()
         truncate = self.config.truncate
@@ -151,7 +150,7 @@ class EtoolsLoader(BaseLoader):
                     transaction.savepoint_rollback(sid)
                     raise
             else:
-                logger.info(f"Unable to get lock for {self}")
+                logger.error(f"Unable to get lock for {self}")
 
         except (RequiredIsMissing, RequiredIsRunning) as e:
             self.on_end(error=e, retry=True)

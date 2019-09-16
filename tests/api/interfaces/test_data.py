@@ -3,7 +3,7 @@ import os
 from functools import wraps
 
 import pytest
-from drf_api_checker.pytest import contract
+from drf_api_checker.pytest import contract, frozenfixture
 from drf_api_checker.recorder import BASE_DATADIR, Recorder
 from rest_framework.test import APIClient
 from test_utilities.factories import factories_registry, UserFactory
@@ -67,7 +67,7 @@ def pytest_generate_tests(metafunc, *args):
         metafunc.parametrize("viewset,serializer", params, ids=ids)
 
 
-@frozenfixture2()
+@frozenfixture
 def data(db, request):
     # TIPS: database access is forbidden in pytest_generate_tests
     viewset = request.getfixturevalue('viewset')

@@ -281,7 +281,6 @@ INSTALLED_APPS = [
     'etools_datamart.apps.init.apps.Config',
     'etools_datamart.apps.multitenant',
     'etools_datamart.apps.security.apps.Config',
-
     'constance',
     'constance.backends.database',
     'django.contrib.auth',

@@ -358,7 +358,7 @@ class Intervention(InterventionAbstract, EtoolsDataMartModel):
     loader = InterventionLoader()
 
     class Meta:
-        ordering = ('country_name', 'title')
+        ordering = ('country_name', 'title', 'id')
         verbose_name = "Intervention"
         unique_together = ('schema_name', 'intervention_id')
 
