@@ -126,7 +126,7 @@ class Trip(EtoolsDataMartModel):
     preserved_expenses_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     primary_traveler = models.CharField(max_length=300, blank=True, null=True)
     purpose = models.CharField(max_length=500, blank=True, null=True)
-    reference_number = models.CharField(max_length=12, blank=True, null=True)
+    reference_number = models.CharField(max_length=12, blank=True, null=True, db_index=True)
     rejected_at = models.DateTimeField(blank=True, null=True)
     rejection_note = models.TextField(blank=True, null=True)
     report_note = models.TextField(blank=True, null=True)

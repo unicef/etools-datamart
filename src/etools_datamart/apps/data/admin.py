@@ -314,8 +314,10 @@ class AgreementAdmin(DataModelAdmin):
 
 @register(models.Trip)
 class TripAdmin(DataModelAdmin):
-    list_display = ('traveler_name', 'partner_name', 'vendor_number', 'end_date',)
+    list_display = ('reference_number', 'traveler_name',
+                    'partner_name', 'vendor_number', 'end_date',)
     list_filter = ('start_date', 'end_date')
+    search_fields = ('reference_number', )
 
 
 @register(models.Engagement)
