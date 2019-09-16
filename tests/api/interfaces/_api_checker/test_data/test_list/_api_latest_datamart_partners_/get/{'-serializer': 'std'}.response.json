@@ -1,0 +1,211 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"7ccec5df985dccc47feaacff3ebeb6b2\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "7ccec5df985dccc47feaacff3ebeb6b2"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "3093"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 908,
+                "source_id": null,
+                "last_modify_date": "16 Sep 2019 18:29:17",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "address": null,
+                "alternate_id": null,
+                "alternate_name": null,
+                "basis_for_risk_rating": null,
+                "blocked": false,
+                "city": null,
+                "core_values_assessment_date": null,
+                "country": null,
+                "created": "16 Sep 2019 18:29:02",
+                "cso_type": null,
+                "deleted_flag": false,
+                "description": "",
+                "email": null,
+                "hact_values": null,
+                "hidden": false,
+                "last_assessment_date": null,
+                "manually_blocked": false,
+                "modified": null,
+                "name": "name000",
+                "net_ct_cy": null,
+                "outstanding_dct_amount_6_to_9_months_usd": null,
+                "outstanding_dct_amount_more_than_9_months_usd": null,
+                "partner_type": null,
+                "phone_number": null,
+                "postal_code": null,
+                "rating": null,
+                "reported_cy": null,
+                "shared_with": null,
+                "short_name": null,
+                "street_address": null,
+                "total_ct_cp": null,
+                "total_ct_cy": null,
+                "total_ct_ytd": null,
+                "type_of_assessment": null,
+                "vendor_number": null,
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0
+            },
+            {
+                "id": 909,
+                "source_id": null,
+                "last_modify_date": "16 Sep 2019 18:29:17",
+                "seen": null,
+                "country_name": "chad",
+                "schema_name": "chad",
+                "area_code": "",
+                "address": null,
+                "alternate_id": null,
+                "alternate_name": null,
+                "basis_for_risk_rating": null,
+                "blocked": false,
+                "city": null,
+                "core_values_assessment_date": null,
+                "country": null,
+                "created": "16 Sep 2019 18:29:02",
+                "cso_type": null,
+                "deleted_flag": false,
+                "description": "",
+                "email": null,
+                "hact_values": null,
+                "hidden": false,
+                "last_assessment_date": null,
+                "manually_blocked": false,
+                "modified": null,
+                "name": "name001",
+                "net_ct_cy": null,
+                "outstanding_dct_amount_6_to_9_months_usd": null,
+                "outstanding_dct_amount_more_than_9_months_usd": null,
+                "partner_type": null,
+                "phone_number": null,
+                "postal_code": null,
+                "rating": null,
+                "reported_cy": null,
+                "shared_with": null,
+                "short_name": null,
+                "street_address": null,
+                "total_ct_cp": null,
+                "total_ct_cy": null,
+                "total_ct_ytd": null,
+                "type_of_assessment": null,
+                "vendor_number": null,
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0
+            },
+            {
+                "id": 910,
+                "source_id": null,
+                "last_modify_date": "16 Sep 2019 18:29:17",
+                "seen": null,
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "area_code": "",
+                "address": null,
+                "alternate_id": null,
+                "alternate_name": null,
+                "basis_for_risk_rating": null,
+                "blocked": false,
+                "city": null,
+                "core_values_assessment_date": null,
+                "country": null,
+                "created": "16 Sep 2019 18:29:02",
+                "cso_type": null,
+                "deleted_flag": false,
+                "description": "",
+                "email": null,
+                "hact_values": null,
+                "hidden": false,
+                "last_assessment_date": null,
+                "manually_blocked": false,
+                "modified": null,
+                "name": "name002",
+                "net_ct_cy": null,
+                "outstanding_dct_amount_6_to_9_months_usd": null,
+                "outstanding_dct_amount_more_than_9_months_usd": null,
+                "partner_type": null,
+                "phone_number": null,
+                "postal_code": null,
+                "rating": null,
+                "reported_cy": null,
+                "shared_with": null,
+                "short_name": null,
+                "street_address": null,
+                "total_ct_cp": null,
+                "total_ct_cy": null,
+                "total_ct_ytd": null,
+                "type_of_assessment": null,
+                "vendor_number": null,
+                "vision_synced": true,
+                "min_req_programme_visits": 0,
+                "hact_min_requirements": {},
+                "min_req_spot_checks": 0
+            }
+        ]
+    },
+    "content_type": null
+}

@@ -1,0 +1,22 @@
+{
+    "record": {
+        "master": {
+            "model": "data.userstats",
+            "pk": 371,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2019-09-16T18:29:20.592Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "month": "2019-02-01",
+                "total": 0,
+                "unicef": 0,
+                "logins": 0,
+                "unicef_logins": 0
+            }
+        },
+        "deps": []
+    }
+}
