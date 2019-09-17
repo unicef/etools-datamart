@@ -414,6 +414,7 @@ class BaseLoader:
             self.fields_to_compare = [f for f in self.mapping.keys() if f not in self.config.exclude_from_compare]
         defs = {'status': 'RUNNING',
                 'elapsed': None,
+                'results': {},
                 'run_type': run_type,
                 'last_run': timezone.now()}
         self.etl_task.update(**defs)
