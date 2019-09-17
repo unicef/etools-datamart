@@ -5,6 +5,7 @@ from django.db import connections
 from django.utils import timezone
 
 import factory
+import pytz
 from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
@@ -59,6 +60,14 @@ class InterventionFactory(DataMartModelFactory):
     total_local = 10
     currency = 'USD'
     intervention_id = factory.Sequence(lambda n: n)
+    locations_data = [dict(source_id='1',
+                           name="location.name",
+                           pcode="location.p_code",
+                           level="location.level",
+                           levelname="location.gateway.name",
+                           latitude="location.latitude",
+                           longitude="location.longitude",
+                           )]
 
     class Meta:
         model = models.Intervention
@@ -112,7 +121,7 @@ class FuzzyMonth(BaseFuzzyAttribute):
         super().__init__(**kwargs)
 
     def fuzz(self):
-        return datetime(today.year, random.choice([1, 2, 3]), 1)  # noqa
+        return datetime(today.year, random.choice([1, 2, 3]), 1, tzinfo=pytz.UTC)  # noqa
 
 
 class UserStatsFactory(DataMartModelFactory):
@@ -148,6 +157,7 @@ class FundsReservationFactory(DataMartModelFactory):
 class PDIndicatorFactory(DataMartModelFactory):
     is_active = True
     is_high_frequency = True
+    target_denominator = 1.1
 
     class Meta:
         model = models.PDIndicator
@@ -234,7 +244,10 @@ class TripFactory(DataMartModelFactory):
 
 
 class EngagementFactory(DataMartModelFactory):
-    partner = {"id": 100}
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
 
     class Meta:
         model = models.Engagement

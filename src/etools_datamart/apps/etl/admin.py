@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 
+from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import register
+from django.contrib.postgres import fields
 from django.core.cache import caches
 from django.http import HttpResponseRedirect
+from django.template import Context, Template
 from django.template.defaultfilters import pluralize
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats
@@ -16,14 +20,18 @@ from admin_extra_urls.mixins import _confirm_action
 from adminactions.mass_update import mass_update
 from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers.data import JsonLexer
 
 from unicef_rest_framework.models import Service
 
-from etools_datamart.apps.data.loader import RUN_QUEUED, RUN_UNKNOWN
 from etools_datamart.celery import app
+from etools_datamart.libs.admin_filters import RangeFilter
 from etools_datamart.libs.time import strfelapsed
 
 from . import models
+from .loader import RUN_QUEUED, RUN_UNKNOWN
 
 cache = caches['default']
 
@@ -81,18 +89,21 @@ def truncate(modeladmin, request, queryset):
 
 def get_css(obj):
     css = ''
-    if obj.status in ['RUNNING' 'STARTED']:
-        pass
-    elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
-        css = 'error'
-    elif 'RETRY' in obj.status:
-        css = 'warn'
-    elif obj.last_failure:
-        css = 'error'
-    elif obj.last_run and (obj.last_run.date() < datetime.today().date()):
-        css = 'warn'
-    elif obj.status == 'SUCCESS':
-        css = 'success'
+    if obj.status:
+        if obj.status in ['QUEUED']:
+            pass
+        elif obj.status in ['RUNNING', 'STARTED']:
+            css = 'run'
+        elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
+            css = 'error'
+        elif 'RETRY' in obj.status:
+            css = 'warn'
+        elif obj.last_failure:
+            css = 'error'
+        elif obj.last_run and (obj.last_run.date() < datetime.today().date()):
+            css = 'warn'
+        elif obj.status == 'SUCCESS':
+            css = 'success'
     return css
 
 
@@ -101,6 +112,26 @@ def df(value):
     if value is not None:
         return value.strftime("%b %d, %H:%M")
         # dateformat.format(value, 'b d, H:i')
+
+
+class JSONROWidget(forms.Textarea):
+    tpl = '''<input type="hidden" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}>
+    {{style}}{{json}}'''
+
+    def render(self, name, value, attrs=None, renderer=None):
+        formatter = HtmlFormatter(style='colorful')
+        formatted_json = highlight(json.dumps(json.loads(value), sort_keys=True, indent=2),
+                                   JsonLexer(), formatter)
+
+        context = self.get_context(name, value, attrs)
+        context['json'] = mark_safe(formatted_json)
+        context['style'] = mark_safe("<style>" + formatter.get_style_defs() + "</style>")
+        template = Template(self.tpl)
+        return template.render(Context(context))
+
+        # style =
+        # return mark_safe(original + style + response)
+        # return mark_safe(json.dumps(value, sort_keys=True, indent=4))
 
 
 @register(models.EtlTask)
@@ -113,6 +144,12 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     date_hierarchy = 'last_run'
     actions = [mass_update, queue, truncate, unlock]
+    mass_update_hints = ['status', ]
+    mass_update_exclude = ['task', 'table_name', 'content_type']
+    # readonly_fields = ['results', ]
+    formfield_overrides = {
+        fields.JSONField: {'widget': JSONROWidget},
+    }
 
     def _total(self, obj):
         try:
@@ -304,13 +341,62 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                           messages.SUCCESS)
 
 
+class ElapsedFilter(RangeFilter):
+    title = 'Elapsed'
+    parameter_name = 'elapsed'
+
+    ranges = {1: ('< 1m', dict(elapsed__lt=60)),
+              2: ('> 1m', dict(elapsed__gt=60)),
+              3: ('> 10m', dict(elapsed__gt=60 * 10)),
+              4: ('> 1h', dict(elapsed__gt=60 * 60)),
+              }
+
+
+class DeltaFilter(RangeFilter):
+    title = 'Delta'
+    parameter_name = 'delta'
+
+    ranges = {1: ('< 10%', dict(delta_percentage__lt=10)),
+              2: ('> 10%', dict(delta_percentage__gt=10)),
+              3: ('> 20%', dict(delta_percentage__gt=20)),
+              4: ('> 50%', dict(delta_percentage__gt=50))
+              }
+
+
 @register(models.EtlTaskHistory)
-class EtlTaskHistoryAdmin(admin.ModelAdmin):
-    list_display = ('task', 'timestamp', 'time')
-    list_filter = ('task',)
+class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
+    list_display = ('task', 'timestamp', 'time', 'incr')
+    list_filter = ('task', ElapsedFilter, DeltaFilter)
+    actions = [mass_update]
+    mass_update_fields = ('delta', 'delta_percentage')
+    mass_update_exclude = None
     date_hierarchy = 'timestamp'
+    search_fields = ('task',)
+
+    def incr(self, obj):
+        if obj.delta_percentage:
+            return "{0:.2f}%".format(obj.delta_percentage)
 
     def time(self, obj):
         return strfelapsed(obj.elapsed)
 
     time.admin_order_field = 'elapsed'
+
+    @link()
+    def delta(self, request):
+        qs = self.get_queryset(request).order_by('-timestamp')
+        for e in qs.filter(delta__isnull=True):
+            prev = qs.filter(task=e.task,
+                             timestamp__lt=e.timestamp).exclude(id=e.id).first()
+            if prev:
+                e.delta = e.elapsed - prev.elapsed
+                try:
+                    # e.delta_percentage = (100.0 * (e.elapsed / prev.elapsed)) - 100
+                    # 1 / 2 * 100
+                    if prev.elapsed:
+                        e.delta_percentage = (e.elapsed / prev.elapsed) * 100
+                except ZeroDivisionError:
+                    pass
+            else:
+                e.delta = None
+            e.save()

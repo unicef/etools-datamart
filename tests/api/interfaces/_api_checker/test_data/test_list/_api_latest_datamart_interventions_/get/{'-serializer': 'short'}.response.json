@@ -1,0 +1,85 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"80005e5084d491ef3d8b735e1640a2a4\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "80005e5084d491ef3d8b735e1640a2a4"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "321"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "title": "title000",
+                "number": "#000",
+                "country_name": "bolivia",
+                "start_date": null
+            },
+            {
+                "title": "title001",
+                "number": "#001",
+                "country_name": "chad",
+                "start_date": null
+            },
+            {
+                "title": "title002",
+                "number": "#002",
+                "country_name": "lebanon",
+                "start_date": null
+            }
+        ]
+    },
+    "content_type": null
+}

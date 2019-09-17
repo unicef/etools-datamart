@@ -4,8 +4,9 @@ from django.utils.translation import gettext as _
 
 from model_utils import Choices
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
+from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.etools.models import (AttachmentsAttachment, AuditAudit, AuditEngagement,
                                                 AuditEngagementActivePd, AuditMicroassessment, AuditSpecialaudit,
                                                 AuditSpotcheck, DjangoContentType,)
@@ -19,7 +20,7 @@ attachment_codes = {AuditAudit: 'audit_final_report',
                     }
 
 
-class EngagementlLoader(Loader):
+class EngagementlLoader(EtoolsLoader):
 
     def get_queryset(self):
         return AuditEngagement.objects.select_related('partner',
@@ -35,6 +36,23 @@ class EngagementlLoader(Loader):
                    }
         return DjangoContentType.objects.get(app_label='audit',
                                              model=mapping[sub_type])
+
+    def get_reference_number(self, original: AuditEngagement, values: dict, **kwargs):
+        engagement_code = 'a' if original.engagement_type == AuditEngagementConsts.TYPE_AUDIT else original.engagement_type
+        return "/".join([self.context['country'].country_short_code,
+                         original.partner.name[:5],
+                         engagement_code.upper(),
+                         str(original.created.year),
+                         str(original.id)
+                         ])
+        # return '{}/{}/{}/{}/{}'.format(
+        #     self.context['country'].short_code,
+        #     # connection.tenant.country_short_code or '',
+        #     original.partner.name[:5],
+        #     engagement_code.upper(),
+        #     original.created.year,
+        #     original.id
+        # )
 
     def get_engagement_attachments(self, original: AuditEngagement, values: dict, **kwargs):
         # audit_engagement
@@ -118,10 +136,12 @@ class EngagementlLoader(Loader):
                 schema_name=self.context['country'].schema_name,
                 source_id=original.partner.id)
             return {'name': p.name,
+                    'vendor_number': p.vendor_number,
                     'id': p.id,
                     'source_id': p.source_id}
         except Partner.DoesNotExist:
             return {'name': 'N/A',
+                    'vendor_number': 'N/A',
                     'id': 'N/A',
                     'source_id': 'N/A'}
 
@@ -158,7 +178,7 @@ class EngagementlLoader(Loader):
                 self.increment_counter(op)
 
 
-class Engagement(DataMartModel):
+class Engagement(EtoolsDataMartModel):
     TYPE_AUDIT = 'audit'
     TYPE_MICRO_ASSESSMENT = 'ma'
     TYPE_SPOT_CHECK = 'sc'
@@ -227,7 +247,8 @@ class Engagement(DataMartModel):
     date_of_report_submit = models.DateField(null=True, blank=True)
     end_date = models.DateField(blank=True, null=True, db_index=True)
     engagement_attachments = models.TextField(blank=True, null=True)
-    engagement_type = models.CharField(max_length=300, blank=True, null=True, choices=TYPES, db_index=True)
+    engagement_type = models.CharField(max_length=300, blank=True,
+                                       null=True, choices=TYPES, db_index=True)
     exchange_rate = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     explanation_for_additional_information = models.TextField(blank=True, null=True)
     joint_audit = models.BooleanField(default=False, blank=True, null=True)
@@ -243,9 +264,12 @@ class Engagement(DataMartModel):
     staff_members = models.TextField(blank=True, null=True)
     staff_members_data = JSONField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True, db_index=True)
-    status = models.CharField(max_length=300, blank=True, null=True)
+    status = models.CharField(max_length=300, blank=True, null=True,
+                              db_index=True)
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     write_off_required = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
+
+    reference_number = models.CharField(max_length=300, blank=True, null=True)
 
     # final_report is shared across all Engagement types
     final_report = models.CharField(max_length=300, blank=True, null=True)
@@ -277,7 +301,8 @@ class Engagement(DataMartModel):
 
     audited_expenditure = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     financial_findings = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
-    audit_opinion = models.CharField(max_length=20, choices=AUDIT_OPTIONS, blank=True, null=True)
+    audit_opinion = models.CharField(max_length=20, choices=AUDIT_OPTIONS,
+                                     blank=True, null=True, db_index=True)
     # final_report = CodedGenericRelation(Attachment, code='audit_final_report')
 
     # SpecialAudit
@@ -295,6 +320,7 @@ class Engagement(DataMartModel):
             active_pd_data="i",
             agreement="agreement.order_number",  # PurchaseOrder
             authorized_officers="-",
+            reference_number="-",
             engagement_attachments='-',
             report_attachments='-',
             staff_members='-',

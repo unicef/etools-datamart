@@ -20,8 +20,12 @@
   color: #e9b71f;
 }
 
+.run {
+  color: #000000;
+}
+
 .results {
-  .success, .error, .failure, .warn {
+  .success, .error, .failure, .warn, .run{
     font-weight: bold;
   }
 }

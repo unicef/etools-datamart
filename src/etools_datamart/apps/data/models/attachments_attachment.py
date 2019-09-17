@@ -1,19 +1,19 @@
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import AttachmentsAttachmentflat
 
 from .partner import Partner
 
 
-class AttachmentLoader(Loader):
+class AttachmentLoader(EtoolsLoader):
 
     def get_linked_to(self, original: AttachmentsAttachmentflat, values: dict, **kwargs):
         return None
 
 
-class Attachment(DataMartModel):
+class Attachment(EtoolsDataMartModel):
     # from AttachmentsAttachmentflat
     agreement_reference_number = models.CharField(max_length=100, blank=True, null=True)
     created = models.CharField(max_length=50, blank=True, null=True)

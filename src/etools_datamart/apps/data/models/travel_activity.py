@@ -1,12 +1,12 @@
 from django.db import models
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.etools.models import T2FTravelactivity
 
 
-class TravelActivityLoader(Loader):
+class TravelActivityLoader(EtoolsLoader):
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for record in qs.order_by('id', '-date'):
@@ -20,7 +20,7 @@ class TravelActivityLoader(Loader):
                     self.increment_counter(op)
 
 
-class TravelActivity(LocationMixin, DataMartModel):
+class TravelActivity(LocationMixin, EtoolsDataMartModel):
     travel_reference_number = models.CharField(max_length=200, blank=True, null=True)
     travel_type = models.CharField(max_length=200, blank=True, null=True)
     date = models.DateField(blank=True, null=True)

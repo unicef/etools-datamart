@@ -5,14 +5,14 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import PartnersIntervention, PartnersPartnerorganization
 
 logger = logging.getLogger(__name__)
 
 
-class PMPIndicatorLoader(Loader):
+class PMPIndicatorLoader(EtoolsLoader):
 
     def get_queryset(self):
         return PartnersPartnerorganization.objects.all()
@@ -66,7 +66,7 @@ class PMPIndicatorLoader(Loader):
                 self.increment_counter(op)
 
 
-class PMPIndicators(DataMartModel):
+class PMPIndicators(EtoolsDataMartModel):
     vendor_number = models.CharField(max_length=255, null=True, db_index=True)
 
     partner_name = models.CharField(max_length=255, null=True, db_index=True)

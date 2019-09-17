@@ -4,7 +4,7 @@ from django.apps import apps
 import pytest
 from freezegun import freeze_time
 
-from etools_datamart.apps.data.loader import loadeables
+from etools_datamart.apps.etl.loader import loadeables
 
 
 def pytest_generate_tests(metafunc):
@@ -23,9 +23,12 @@ def pytest_generate_tests(metafunc):
                 'data.reportindicator',
             ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
+            elif model._meta.app_label == 'rapidpro':
+                m.append(pytest.param(model.loader, marks=pytest.mark.skip))
             else:
                 m.append(model.loader)
-            ids.append(model.__name__)
+            # ids.append('%s.%s' % (model._meta.app_label, model._meta.verbose_name))
+            ids.append(model._meta.label)
         metafunc.parametrize("loader", m, ids=ids)
 
 
@@ -35,9 +38,9 @@ def test_loader_load(loader, number_of_intervention):
     with freeze_time("2018-12-31", tz_offset=1):
         loader.model.objects.truncate()
         loader.unlock()
-        ret = loader.load(max_records=2, force_requirements=True, only_delta=False)
+        ret = loader.load(max_records=2, ignore_dependencies=True, only_delta=False)
     assert loader.model.objects.count()
-    assert ret.total == 2
+    assert ret.processed == 2
     # assert ret.deleted == 0
     # assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
     # assert not loader.model.objects.filter(id=to_delete.pk).exists()

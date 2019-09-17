@@ -37,19 +37,22 @@ class ServicePermission(BasePermission):
             acls = self.get_acl(request, service)
             if not acls:
                 return False
+            requested_serializer = request.GET.get(view.serializer_field_param, "std")
+
             for acl in acls:
+
                 if acl.policy == AbstractAccessControl.POLICY_DENY:
                     logger.error(f"Access denied for user '{request.user}' to '{fqn(view)}'")
                     raise PermissionDenied
 
-                requested_serializer = request.GET.get(view.serializer_field_param, "std")
-
-                if (requested_serializer not in acl.serializers) and ("*" not in acl.serializers):
-                    logger.error(
-                        f"Forbidden serialiser '{requested_serializer}' for user '{request.user}' to '{fqn(view)}'")
-                    raise PermissionDenied(f"Forbidden serializer '{requested_serializer}'")
-
-            return True
+                if (requested_serializer in acl.serializers) or ("*" in acl.serializers):
+                    return True
+                # if (requested_serializer not in acl.serializers) and ("*" not in acl.serializers):
+                #     logger.error(
+                #         f"Forbidden serializer '{requested_serializer}' for user '{request.user}' to '{fqn(view)}'")
+                #     raise PermissionDenied(f"Forbidden serializer '{requested_serializer}'")
+            raise PermissionDenied(f"Forbidden serializer '{requested_serializer}'")
+            # return False
         except (GroupAccessControl.DoesNotExist):
             logger.error(f"User '{request.user}' does not have grants for '{fqn(view)}'")
             return False

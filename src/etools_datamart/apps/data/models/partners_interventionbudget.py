@@ -1,7 +1,7 @@
 from django.contrib.postgres.fields import JSONField
 
 from etools_datamart.apps.data.models import Location
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.data.models.intervention import InterventionAbstract, InterventionLoader
 from etools_datamart.apps.data.models.mixins import extend
 from etools_datamart.apps.etools.models import (FundsFundsreservationheader, models,
@@ -15,6 +15,7 @@ class InterventionBudgetLoader(InterventionLoader):
             record.intervention.budget = record
             filters = self.config.key(self, record.intervention)
             values = self.get_values(record.intervention)
+            values['source_id'] = record.id
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
@@ -33,7 +34,7 @@ class InterventionBudgetLoader(InterventionLoader):
         return ", ".join(ret)
 
 
-class InterventionBudget(InterventionAbstract, DataMartModel):
+class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
     budget_cso_contribution = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
@@ -57,9 +58,9 @@ class InterventionBudget(InterventionAbstract, DataMartModel):
 
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(
-                             budget_cso_contribution='total_partner_contribution',
-                             budget_unicef_cash='budget.unicef_cash',
-                             budget_total='budget.total',
+                             budget_cso_contribution='budget.partner_contribution_local',
+                             budget_unicef_cash='budget.unicef_cash_local',
+                             budget_total='budget.total_local',
                              budget_currency='budget.currency',
-                             budget_unicef_supply='budget.in_kind_amount',
+                             budget_unicef_supply='budget.in_kind_amount_local',
                          ))

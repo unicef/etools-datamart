@@ -4,14 +4,14 @@ import logging
 
 from django import forms
 from django.contrib import admin
-from django.contrib.admin import widgets
+from django.contrib.admin import SimpleListFilter, widgets
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.auth.models import Group
 from django.contrib.postgres.forms import SimpleArrayField
 from django.template.response import TemplateResponse
 
 from admin_extra_urls.extras import ExtraUrlMixin, link
-from adminactions.mass_update import mass_update
+from adminactions.mass_update import mass_update, MassUpdateForm
 
 from unicef_rest_framework.models import Service, UserAccessControl
 from unicef_rest_framework.models.acl import AbstractAccessControl, GroupAccessControl
@@ -53,13 +53,33 @@ class GroupAccessControlForm(forms.Form):
                                    max_length=255)
 
 
+class LazyMassUpdateForm(MassUpdateForm):
+    _no_sample_for = ['last_modify_user', ]
+
+
+class SectionFilter(SimpleListFilter):
+    title = 'Section'  # or use _('country') for translated title
+    parameter_name = 'section'
+
+    def lookups(self, request, model_admin):
+        return [('.datamart.', 'Datamart'),
+                ('.etools.', 'eTools'),
+                ('.prp.', 'PRP')]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(service__name__contains=self.value())
+        return queryset
+
+
 class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('group', 'service', 'rate', 'serializers', 'policy')
-    list_filter = ('group', 'policy', 'service')
-    search_fields = ('group', 'service',)
+    list_filter = ('group', 'policy', SectionFilter)
+    search_fields = ('group__name', 'service__name',)
     form = GroupACLAdminForm
     autocomplete_fields = ('group',)
     actions = [mass_update]
+    mass_update_form = LazyMassUpdateForm
 
     # filter_horizontal = ('services',)
 

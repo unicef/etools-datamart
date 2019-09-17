@@ -4,12 +4,12 @@ from django.db import models
 
 from month_field.models import MonthField
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import AuthUser
 
 
-class UserStatsLoader(Loader):
+class UserStatsLoader(EtoolsLoader):
 
     def get_queryset(self):
         return self.config.source.objects.filter(profile__country=self.context['country'])
@@ -43,7 +43,7 @@ class UserStatsLoader(Loader):
         self.increment_counter(op)
 
 
-class UserStats(DataMartModel):
+class UserStats(EtoolsDataMartModel):
     month = MonthField("Month Value")
     total = models.IntegerField("Total users", default=0)
     unicef = models.IntegerField("UNICEF uswers", default=0)

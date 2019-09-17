@@ -61,7 +61,7 @@ class UserAdmin2(ExtraUrlMixin, UserAdmin):
     list_display = ['username', 'display_name', 'email', 'is_staff',
                     'is_active', 'is_superuser', 'is_linked', 'last_login']
     list_filter = ['is_superuser', 'is_staff', 'is_active']
-    search_fields = ['username', 'display_name']
+    search_fields = ['username', 'display_name', 'email']
     fieldsets = (
         (None, {'fields': (('username', 'azure_id'), 'password')}),
         (_('Personal info'), {'fields': (('first_name', 'last_name',),

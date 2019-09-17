@@ -147,7 +147,8 @@ class StatsMiddleware(object):
         response = self.get_response(request)
         if response.status_code == 200 and \
                 hasattr(request, 'api_info') and \
-                config.TRACK_PATH.match(request.path):
+                config.TRACK_PATH.match(request.path) and \
+                not hasattr(request, '_is_preload_internal_request'):
             self.log(request, response)
         return response
 

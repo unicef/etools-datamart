@@ -1,0 +1,88 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"9c674ac793328f0e46d9333e2e50a0db\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "9c674ac793328f0e46d9333e2e50a0db"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "351"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "name": "name000",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
+            },
+            {
+                "name": "name001",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
+            },
+            {
+                "name": "name002",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
+            }
+        ]
+    },
+    "content_type": null
+}

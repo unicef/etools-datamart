@@ -2,7 +2,8 @@ from django.apps import apps
 from django.core import checks
 from django.core.checks import Error
 
-from etools_datamart.apps.data.loader import loadeables
+# from etools_datamart.apps.data.loader import loadeables
+from etools_datamart.apps.etl.loader import loadeables
 
 
 @checks.register()

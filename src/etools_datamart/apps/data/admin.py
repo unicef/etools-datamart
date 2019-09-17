@@ -199,12 +199,21 @@ class GatewayTypeAdmin(DataModelAdmin):
 
 @register(models.Location)
 class LocationAdmin(DataModelAdmin):
-    list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude')
+    list_display = ('country_name', 'schema_name', 'name', 'latitude', 'longitude', 'point')
     # readonly_fields = ('parent', 'gateway')
     list_filter = ('level',)
     search_fields = ('name',)
     autocomplete_fields = ('parent', 'gateway')
-    # raw_id_fields = ('parent', )
+    actions = ['update_centroid', mass_update]
+    mass_update_exclude = ['geom', 'id']
+    mass_update_hints = []
+
+    def update_centroid(self, request, queryset):
+        queryset.update_centroid()
+
+    @link()
+    def batch_update_centroid(self, request):
+        models.Location.objects.batch_update_centroid()
 
 
 @register(models.FundsReservation)
@@ -305,8 +314,10 @@ class AgreementAdmin(DataModelAdmin):
 
 @register(models.Trip)
 class TripAdmin(DataModelAdmin):
-    list_display = ('traveler_name', 'partner_name', 'vendor_number', 'end_date',)
+    list_display = ('reference_number', 'traveler_name',
+                    'partner_name', 'vendor_number', 'end_date',)
     list_filter = ('start_date', 'end_date')
+    search_fields = ('reference_number', )
 
 
 @register(models.Engagement)

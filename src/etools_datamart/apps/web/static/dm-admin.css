@@ -10,5 +10,8 @@
 .warn {
   color: #d5a71c; }
 
-.results .field-_status .success, .results .field-_status .error, .results .field-_status .failure, .results .field-_status .warn {
+.run {
+  color: #000000; }
+
+.results .field-_status .success, .results .field-_status .error, .results .field-_status .failure, .results .field-_status .warn, .results .field-_status .run {
   font-weight: bold; }

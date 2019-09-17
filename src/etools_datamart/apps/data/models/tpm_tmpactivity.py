@@ -4,12 +4,12 @@ from django.utils.functional import cached_property
 
 from dynamic_serializer.core import get_attr
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import AttachmentsAttachment, DjangoContentType, TpmTpmactivity
 
 
-class TPMActivityLoader(Loader):
+class TPMActivityLoader(EtoolsLoader):
     @cached_property
     def _ct(self):
         return DjangoContentType.objects.get(app_label='tpm',
@@ -131,7 +131,7 @@ class TPMActivityLoader(Loader):
             self.increment_counter(op)
 
 
-class TPMActivity(DataMartModel):
+class TPMActivity(EtoolsDataMartModel):
     additional_information = models.CharField(max_length=500, blank=True, null=True)
     approval_comment = models.TextField(blank=True, null=True)
     area_code = models.CharField(max_length=500, blank=True, null=True)

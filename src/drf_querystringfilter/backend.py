@@ -212,8 +212,11 @@ class QueryStringFilterBackend(BaseFilterBackend):
                             f = "{}__{}".format(real_field_name, "__".join(parts[1:]))
                         else:
                             f = filter_field_name
-                        if op == 'in':
+                        if op in ['in', 'contained_by']:
                             value = raw_value.split(',')
+                        elif op == 'acontains':
+                            value = raw_value.split(',')
+                            f = f.replace('__acontains', '__contains')
                         elif op == 'isnull':
                             value = parse_bool(raw_value)
                         elif value_type == bool:

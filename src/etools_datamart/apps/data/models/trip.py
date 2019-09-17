@@ -4,17 +4,24 @@ from django.utils.translation import gettext as _
 
 from dynamic_serializer.core import get_attr
 
-from etools_datamart.apps.data.loader import Loader
+from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.etools.models import T2FTravel, T2FTravelactivity, T2FTravelattachment
 
-from .base import DataMartModel
+from .base import EtoolsDataMartModel
 
 
 class TravelAttachment(object):
     pass
 
 
-class TripLoader(Loader):
+class TripLoader(EtoolsLoader):
+    def remove_deleted(self):
+        country = self.context['country']
+        existing = list(self.get_queryset().only('id').values_list('id', flat=True))
+        to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_activity_id__in=existing)
+        self.results.deleted += to_delete.count()
+        to_delete.delete()
+
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for t2f_travel_activity in qs.all().order_by('id'):
@@ -55,7 +62,7 @@ class TripLoader(Loader):
 
     def get_trip_attachments(self, record, values, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
-                               record.attachments.values_list('type', 'file'))))
+                                   record.attachments.values_list('type', 'file'))))
 
 
 class ModeOfTravel:
@@ -73,7 +80,7 @@ class ModeOfTravel:
     )
 
 
-class Trip(DataMartModel):
+class Trip(EtoolsDataMartModel):
     PLANNED = 'planned'
     SUBMITTED = 'submitted'
     REJECTED = 'rejected'
@@ -102,7 +109,7 @@ class Trip(DataMartModel):
     cp_output_id = models.CharField(max_length=300, blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     currency_code = models.CharField(max_length=10, blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True, db_index=True)
     estimated_travel_cost = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     first_submission_date = models.DateTimeField(blank=True, null=True)
     hact_visit_report = models.CharField(max_length=300, blank=True, null=True)
@@ -114,7 +121,8 @@ class Trip(DataMartModel):
     locations_data = JSONField(blank=True, null=True)
     misc_expenses = models.TextField(blank=True, null=True)
     mode_of_travel = ArrayField(models.CharField(max_length=5,
-                                                 choices=ModeOfTravel.CHOICES), null=True, blank=True,
+                                                 choices=ModeOfTravel.CHOICES),
+                                null=True, blank=True, db_index=True,
                                 verbose_name=_('Mode of Travel'))
 
     office_name = models.CharField(max_length=300, blank=True, null=True)
@@ -125,12 +133,12 @@ class Trip(DataMartModel):
     preserved_expenses_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     primary_traveler = models.CharField(max_length=300, blank=True, null=True)
     purpose = models.CharField(max_length=500, blank=True, null=True)
-    reference_number = models.CharField(max_length=12, blank=True, null=True)
+    reference_number = models.CharField(max_length=12, blank=True, null=True, db_index=True)
     rejected_at = models.DateTimeField(blank=True, null=True)
     rejection_note = models.TextField(blank=True, null=True)
     report_note = models.TextField(blank=True, null=True)
     section_name = models.CharField(max_length=300, blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True, db_index=True)
     status = models.CharField(max_length=50,
                               choices=CHOICES,
                               blank=True, null=True)
@@ -151,16 +159,14 @@ class Trip(DataMartModel):
     loader = TripLoader()
 
     class Meta:
-        pass
+        unique_together = ('schema_name', 'source_id', 'source_activity_id')
 
     class Options:
         source = T2FTravelactivity
-        # queryset = lambda: FundsFundsreservationitem.objects.select_related('fund_reservation')
         # last_modify_field = 'modified'
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.id,
-                                          source_activity_id=record.activity.id,
+        key = lambda loader, travel: dict(schema_name=loader.context['country'].schema_name,
+                                          source_id=travel.id,
+                                          source_activity_id=travel.activity.id,
                                           )
 
         mapping = dict(

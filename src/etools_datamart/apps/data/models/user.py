@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from etools_datamart.apps.data.loader import CommonSchemaLoader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import AuthUser
 
 
@@ -17,7 +17,7 @@ class EtoolsUserLoader(CommonSchemaLoader):
             return ""
 
 
-class EtoolsUser(DataMartModel):
+class EtoolsUser(EtoolsDataMartModel):
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.BooleanField(blank=True, null=True)
     username = models.CharField(unique=True, max_length=150)

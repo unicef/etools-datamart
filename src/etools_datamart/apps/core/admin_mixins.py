@@ -21,7 +21,9 @@ class DisplayAllMixin:
         if self.list_display == ('__str__',):
             return [field.name for field in self.model._meta.fields
                     if not (isinstance(field, models.ForeignKey) or
-                            field.name in ['seen', 'created',
+                            field.name in ['seen',
+                                           'created',
+                                           'uuid',
                                            'country_name',
                                            'area_code',
                                            'source_id',

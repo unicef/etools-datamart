@@ -3,13 +3,13 @@ from django.db import models
 from month_field import Month
 from month_field.models import MonthField
 
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
                                                 AuditSpecialaudit, AuditSpotcheck,)
 
 
-class FAMIndicatorLoader(Loader):
+class FAMIndicatorLoader(EtoolsLoader):
     def get_values(self, record):
         pass  # pragma: no cover
 
@@ -38,7 +38,7 @@ class FAMIndicatorLoader(Loader):
             self.increment_counter(op)
 
 
-class FAMIndicator(DataMartModel):
+class FAMIndicator(EtoolsDataMartModel):
     month = MonthField("Month Value")
 
     spotcheck_ip_contacted = models.IntegerField(verbose_name='Spot Check-IP Contacted', default=0)

@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.0.1
+TARGET?=2.1
 BASE=2.0
 # below vars are used internally
 BUILD_OPTIONS?=--squash
@@ -162,8 +162,6 @@ beat:
 
 test:
 	RUN_OPTIONS="-e DEBUG=0 \
-	 			 -e SENTRY_DSN=https://bc20b97f5c824ebd8a709238a2379870@sentry.io/1434933 \
-	 			 -e SENTRY_ENABLED=true \
 				 -e X_FRAME_OPTIONS=DENY \
 				 -e SESSION_COOKIE_SECURE=1 \
 				 -e CSRF_COOKIE_SECURE=1 \

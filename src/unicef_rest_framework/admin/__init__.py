@@ -3,6 +3,8 @@ from django.contrib import admin
 
 from django_celery_beat.models import CrontabSchedule
 
+from unicef_rest_framework.admin.preload import PreloadAdmin
+from unicef_rest_framework.models import Preload
 from unicef_rest_framework.models.acl import GroupAccessControl
 
 from ..models import Application, CacheVersion, PeriodicTask, Service, SystemFilter, UserAccessControl
@@ -36,3 +38,4 @@ admin.site.register(Service, ServiceAdmin)
 admin.site.register(UserAccessControl, UserAccessControlAdmin)
 admin.site.register(SystemFilter, SystemFilterAdmin)
 admin.site.register(GroupAccessControl, GroupAccessControlAdmin)
+admin.site.register(Preload, PreloadAdmin)

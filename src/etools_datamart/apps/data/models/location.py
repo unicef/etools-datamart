@@ -1,12 +1,14 @@
 from django.contrib.gis.db import models as geomodels
 from django.contrib.gis.db.models.functions import Centroid
-from django.db import models
+from django.db import connection, models
+from django.db.models.manager import BaseManager
 
-from etools_datamart.apps.data.models.base import DataMartManager, DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import DataMartQuerySet, EtoolsDataMartModel
 from etools_datamart.apps.etools.models import LocationsGatewaytype, LocationsLocation
 
 
-class GatewayType(DataMartModel):
+class GatewayType(EtoolsDataMartModel):
     name = models.CharField(db_index=True, max_length=64)
     admin_level = models.SmallIntegerField(blank=True, null=True)
 
@@ -25,19 +27,40 @@ class GatewayType(DataMartModel):
         return self.name
 
 
-class LocationManager(DataMartManager):
+class LocationQuerySet(DataMartQuerySet):
     def batch_update_centroid(self):
-        sql = '''UPDATE "%s" SET point = ST_Centroid(geom)
- WHERE point IS NULL ;''' % self.model._meta.db_table
-        self.raw(sql)
+        sql = '''UPDATE "{0}" SET point = ST_Centroid(geom),
+latitude = ST_Y(ST_Centroid(geom)),
+longitude = ST_X(ST_Centroid(geom))
+WHERE point IS NULL AND geom IS NOT NULL;
+UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
+'''.format(self.model._meta.db_table)
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
     def update_centroid(self):
-        for each in self.objects.annotate(cent=Centroid('geom')):
+        clone = self._chain()
+        for each in clone.annotate(cent=Centroid('geom')):
             each.point = each.cent
+            each.latitude = each.point.y
+            each.longitude = each.point.x
             each.save()
 
 
-class Location(DataMartModel):
+class LocationManager(BaseManager.from_queryset(LocationQuerySet)):
+    pass
+
+
+class LocationLoader(EtoolsLoader):
+
+    def load(self, **kwargs):
+        try:
+            return super().load()
+        finally:
+            Location.objects.batch_update_centroid()
+
+
+class Location(EtoolsDataMartModel):
     name = models.CharField(max_length=254, db_index=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -55,6 +78,7 @@ class Location(DataMartModel):
     is_active = models.BooleanField()
 
     objects = LocationManager()
+    loader = LocationLoader()
 
     class Meta:
         unique_together = ('schema_name', 'source_id')

@@ -81,8 +81,6 @@ Retrieve entries in the second/third/fourth quarter (April 1 to June 30):
 class DatamartAutoSchema(AutoSchema):
 
     def _get_operation_id(self, path, method):
-        # TODO: remove me
-        print(111, "openapi.py:85",1111111)
         return 'a___sss'
         # return super()._get_operation_id(path, method)
 

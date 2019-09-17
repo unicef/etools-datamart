@@ -2,8 +2,8 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from etools_datamart.apps.data.fields import SafeDecimal
-from etools_datamart.apps.data.loader import Loader
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.loader import EtoolsLoader
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.data.models.mixins import LocationInlineMixin, LocationLoadertMixin
 from etools_datamart.apps.etools.models import PartnersIntervention, ReportsAppliedindicator, ReportsLowerresult
 
@@ -12,7 +12,7 @@ def get_pd_output_names(obj: PartnersIntervention):
     return [ll.name for rl in obj.result_links.all() for ll in rl.ll_results.all()]
 
 
-class ReportIndicatorLoader(LocationLoadertMixin, Loader):
+class ReportIndicatorLoader(LocationLoadertMixin, EtoolsLoader):
     def get_baseline_denominator(self, record, values, field_name):
         value = SafeDecimal(record.baseline.get('d'))
         return value
@@ -83,7 +83,7 @@ class ReportIndicatorLoader(LocationLoadertMixin, Loader):
             self.increment_counter(op)
 
 
-class ReportIndicator(LocationInlineMixin, DataMartModel):
+class ReportIndicator(LocationInlineMixin, EtoolsDataMartModel):
     assumptions = models.TextField(null=True, blank=True, )
     baseline = JSONField(default=dict, blank=True, null=True)
     baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)

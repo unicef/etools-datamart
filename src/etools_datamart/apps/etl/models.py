@@ -5,17 +5,19 @@ from django.db import models
 from django.utils.functional import cached_property
 
 from django_celery_beat.models import PeriodicTask
+from picklefield import PickledObjectField
 
-from etools_datamart.apps.data.loader import RUN_TYPES, RUN_UNKNOWN
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.celery import app
+
+from .loader import RUN_TYPES, RUN_UNKNOWN
 
 
 class TaskLogManager(models.Manager):
     def filter_for_models(self, *models):
         return self.filter(content_type__in=ContentType.objects.get_for_models(*models).values())
 
-    def get_for_model(self, model: DataMartModel):
+    def get_for_model(self, model: EtoolsDataMartModel):
         try:
             return self.get(content_type=ContentType.objects.get_for_model(model))
         except EtlTask.MultipleObjectsReturned:  # pragma: no cover
@@ -31,6 +33,7 @@ class TaskLogManager(models.Manager):
             t, created = self.get_or_create(content_type=ContentType.objects.get_for_model(task.linked_model),
                                             defaults=dict(
                                                 task=task.name,
+                                                status='',
                                                 last_run=None,
                                                 table_name=task.linked_model._meta.db_table))
             results[created] += 1
@@ -97,25 +100,23 @@ class EtlTask(models.Model):
         if self.status == 'SUCCESS':
             return EtlTaskHistory.objects.create(task=self.task,
                                                  timestamp=self.last_run,
-                                                 elapsed=self.elapsed
+                                                 elapsed=self.elapsed,
+                                                 delta=None
                                                  )
 
-
-#
-# class Offset(models.Model):
-#     table_name = models.CharField(max_length=200, null=True)
-#     schema_name = models.CharField(max_length=200, null=True)
-#     content_type = models.OneToOneField(ContentType, models.CASCADE, null=True)
-#     record_count = models.IntegerField(default=0)
-#     max_id = models.IntegerField(default=0)
-#     last_modify_date = models.DateTimeField(null=True, blank=True)
-#
 
 class EtlTaskHistory(models.Model):
     timestamp = models.DateTimeField(blank=True, null=True)
     task = models.CharField(max_length=200, db_index=True)
     elapsed = models.IntegerField(blank=True, null=True)
+    delta = models.IntegerField(blank=True, null=True, default=None)
+    delta_percentage = models.FloatField(blank=True, null=True, default=None)
 
     class Meta:
         get_latest_by = 'last_run'
-        ordering = ('task',)
+        ordering = ('-timestamp', 'task')
+
+
+class Config(models.Model):
+    key = models.CharField(max_length=200, null=True, unique=True)
+    value = PickledObjectField()

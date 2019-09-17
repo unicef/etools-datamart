@@ -2,11 +2,11 @@
 # import django_filters
 from django.db import models
 
-from etools_datamart.apps.data.models.base import DataMartModel
+from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.models import PartnersPartnerstaffmember
 
 
-class PartnerStaffMember(DataMartModel):
+class PartnerStaffMember(EtoolsDataMartModel):
     title = models.CharField(max_length=64, blank=True, null=True)
     first_name = models.CharField(max_length=64, blank=True, null=True)
     last_name = models.CharField(max_length=64, blank=True, null=True)
