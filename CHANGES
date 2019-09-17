@@ -1,6 +1,6 @@
-2.1 (dev)
----------
-* Fixes
+2.1
+---
+* Fixes TripLoader
 * add lat/lng info to datamart/interventions/
 * add centroid/lat/lng info to datamart/locations/
 * add extra filter to datamart/t2f/trips/
