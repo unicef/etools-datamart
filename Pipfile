@@ -70,6 +70,7 @@ packaging = "*"
 circus = "*"
 rapidpro-python = "*"
 django-jsoneditor = "*"
+pygments = "*"
 
 [dev-packages]
 check-manifest= "*"
