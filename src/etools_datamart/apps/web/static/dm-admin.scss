@@ -14,9 +14,13 @@
   color: #d5a71c;
 }
 
+.run {
+  color: #000000;
+}
+
 .results {
   .field-_status {
-    .success, .error, .failure, .warn {
+    .success, .error, .failure, .warn, .run {
       font-weight: bold;
     }
   }

@@ -90,8 +90,10 @@ def truncate(modeladmin, request, queryset):
 def get_css(obj):
     css = ''
     if obj.status:
-        if obj.status in ['RUNNING' 'STARTED']:
+        if obj.status in ['QUEUED']:
             pass
+        elif obj.status in ['RUNNING', 'STARTED']:
+            css = 'run'
         elif obj.status in ['FAILURE', 'ERROR', 'NO DATA']:
             css = 'error'
         elif 'RETRY' in obj.status:

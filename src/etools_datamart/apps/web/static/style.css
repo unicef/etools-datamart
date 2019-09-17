@@ -15,7 +15,10 @@
 .warn {
   color: #e9b71f; }
 
-.results .success, .results .error, .results .failure, .results .warn {
+.run {
+  color: #000000; }
+
+.results .success, .results .error, .results .failure, .results .warn, .results .run {
   font-weight: bold; }
 
 body, html {
