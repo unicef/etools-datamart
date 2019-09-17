@@ -140,7 +140,6 @@ class EtoolsLoader(BaseLoader):
                             stdout.flush()
                         self.post_process_country()
                         if self.config.sync_deleted_records(self):
-                            cache.set("STATUS:%s" % self.etl_task.task, '[remove deleted]')
                             self.remove_deleted()
                     if stdout and verbosity > 0:
                         stdout.write("\n")

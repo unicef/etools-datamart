@@ -17,7 +17,8 @@ class TravelAttachment(object):
 class TripLoader(EtoolsLoader):
     def remove_deleted(self):
         country = self.context['country']
-        existing = list(self.get_queryset().only('id').values_list('id', flat=True))
+        # existing = list(self.get_queryset().only('id').values_list('id', flat=True))
+        existing = list(T2FTravelactivity.objects.only('id').values_list('id', flat=True))
         to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_activity_id__in=existing)
         self.results.deleted += to_delete.count()
         to_delete.delete()
