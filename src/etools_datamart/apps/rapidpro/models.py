@@ -49,6 +49,8 @@ class Organization(models.Model):
     credits = JSONField(default=dict)
     anon = models.BooleanField(default=False)
 
+    objects = DataMartManager()
+
     # loader = TembaLoader()
     class Meta:
         app_label = 'rapidpro'

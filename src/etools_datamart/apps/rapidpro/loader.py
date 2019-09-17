@@ -24,7 +24,7 @@ class TembaLoader(BaseLoader):
     def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
              only_delta=True, run_type=RUN_UNKNOWN, api_token=None, **kwargs):
         from .models import Source, Organization
-        sources = Source.objects.all()
+        sources = Source.objects.filter(is_active=True)
         self.results = EtlResult()
         try:
             if api_token:
@@ -46,6 +46,18 @@ class TembaLoader(BaseLoader):
             self.on_start(run_type)
             for source in sources:
                 client = TembaClient(config.RAPIDPRO_ADDRESS, source.api_token)
+                oo = client.get_org()
+
+                org, __ = Organization.objects.get_or_create(source=source,
+                                                             defaults={'name': oo.name,
+                                                                       'country': oo.country,
+                                                                       'primary_language': oo.primary_language,
+                                                                       'timezone': oo.timezone,
+                                                                       'date_style': oo.date_style,
+                                                                       'languages': oo.languages,
+                                                                       'anon': oo.anon
+                                                                       })
+
                 func = "get_%s" % self.config.source
                 getter = getattr(client, func)
                 data = getter()

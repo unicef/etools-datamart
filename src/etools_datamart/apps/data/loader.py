@@ -160,8 +160,9 @@ class EtoolsLoader(BaseLoader):
             raise
         else:
             self.on_end(None)
+            cache.set("STATUS:%s" % self.etl_task.task, "completed - %s" % self.results.processed)
         finally:
-            cache.delete("STATUS:%s" % self.etl_task.task)
+            cache.set("STATUS:%s" % self.etl_task.task, "error")
             if lock:  # pragma: no branch
                 try:
                     lock.release()
