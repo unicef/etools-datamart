@@ -1,3 +1,9 @@
+2.2
+---
+* fixes InterventionBudgetLoader
+* admin improvements
+* improves indexing
+
 2.1
 ---
 * Fixes TripLoader

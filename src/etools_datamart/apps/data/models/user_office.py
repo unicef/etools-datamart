@@ -18,9 +18,8 @@ class Office(EtoolsDataMartModel):
         # truncate = True
         # sync_deleted_records = lambda loader: False
 
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.id)
+        # key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+        #                                   source_id=record.id)
         mapping = {'zonal_chief_email': 'zonal_chief.email',
                    'zonal_chief_source_id': 'zonal_chief.id'
                    }

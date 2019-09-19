@@ -1,6 +1,7 @@
 import json
 import time
 from inspect import isclass
+from uuid import UUID
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
@@ -14,7 +15,6 @@ from celery.utils.log import get_task_logger
 from constance import config
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
-from sentry_sdk import capture_exception
 from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.data.exceptions import LoaderException
@@ -85,11 +85,6 @@ class EtlResult:
                 'total_records': self.total_records}
 
 
-DEFAULT_KEY = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.pk)
-
-
 class RequiredIsRunning(Exception):
 
     def __init__(self, req, *args: object) -> None:
@@ -112,7 +107,11 @@ class MaxRecordsException(Exception):
     pass
 
 
+undefined = object()
+
+
 class BaseLoaderOptions:
+    DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
                  'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
                  'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare']
@@ -125,7 +124,7 @@ class BaseLoaderOptions:
         self.always_update = False
         self.source = None
         self.lock_key = None
-        self.key = DEFAULT_KEY
+        self.key = undefined
         self.timeout = None
         self.depends = ()
         self.filters = None
@@ -143,6 +142,8 @@ class BaseLoaderOptions:
                         setattr(self, attr, n)
                     else:
                         setattr(self, attr, getattr(base, attr, getattr(self, attr)))
+        if self.key == undefined:
+            self.key = type(self).DEFAULT_KEY
 
         if self.truncate:
             self.sync_deleted_records = lambda loader: False
@@ -187,12 +188,14 @@ def _compare_json(dict1, dict2):
     return json.dumps(dict1, sort_keys=True, indent=0) == json.dumps(dict2, sort_keys=True, indent=0)
 
 
-def equal(a, b):
-    if isinstance(a, (dict, list, tuple)):
-        return _compare_json(a, b)
-    elif isinstance(b, bool):
-        return str(a) == str(b)
-    return a == b
+def equal(current, new_value):
+    if isinstance(current, (dict, list, tuple)):
+        return _compare_json(current, new_value)
+    elif isinstance(current, UUID):
+        return current == UUID(new_value)
+    elif isinstance(new_value, bool):
+        return str(current) == str(new_value)
+    return current == new_value
 
 
 def has_attr(obj, attr):
@@ -270,7 +273,7 @@ class BaseLoader:
                 verbosity = self.context['verbosity']
                 if verbosity >= 2:  # pragma: no cover
                     stdout = self.context['stdout']
-                    stdout.write("Detected field changed '%s': %s(%s)->%s(%s)\n" %
+                    stdout.write("Detected field changed '%s': current: %s(%s) new value: %s(%s)\n" %
                                  (field_name,
                                   getattr(record, field_name),
                                   type(getattr(record, field_name)),
@@ -302,11 +305,7 @@ class BaseLoader:
                     op = UNCHANGED
             return op
         except Exception as e:  # pragma: no cover
-            logger.exception(e)
-            capture_exception()
-            err = process_exception(e)
-            raise LoaderException(f"Error in {self}: {e}",
-                                  err) from e
+            raise LoaderException(f"Error in {self}: {e}") from e
 
     def get_mart_values(self, record=None):
         country = self.context['country']

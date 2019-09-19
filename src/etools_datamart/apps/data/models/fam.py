@@ -69,6 +69,3 @@ class FAMIndicator(EtoolsDataMartModel):
         source = AuditEngagement
         sync_deleted_records = lambda loader: False
         # mapping = dict(source_id='engagement_ptr_id')
-        # key = lambda loader, record: dict(country_name=loader.context['country'].name,
-        #                                   schema_name=loader.context['country'].schema_name,
-        #                                   source_id=record.engagement_ptr.id)

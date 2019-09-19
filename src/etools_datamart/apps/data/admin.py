@@ -292,8 +292,9 @@ class EtoolsUserAdmin(DataModelAdmin):
 
 @register(models.InterventionBudget)
 class InterventionBudgetAdmin(DataModelAdmin):
-    list_display = ('title', 'number',
-                    'budget_cso_contribution', 'budget_unicef_cash')
+    list_display = ('source_id', 'schema_name',
+                    'reference_number', 'agreement_reference_number')
+    search_fields = ('reference_number', 'agreement_reference_number')
 
 
 @register(models.Office)
@@ -317,7 +318,7 @@ class TripAdmin(DataModelAdmin):
     list_display = ('reference_number', 'traveler_name',
                     'partner_name', 'vendor_number', 'end_date',)
     list_filter = ('start_date', 'end_date')
-    search_fields = ('reference_number', )
+    search_fields = ('reference_number',)
 
 
 @register(models.Engagement)
