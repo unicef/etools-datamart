@@ -17,11 +17,11 @@ logger = get_task_logger(__name__)
 
 
 class EToolsLoaderOptions(BaseLoaderOptions):
-
-    def __init__(self, base=None):
-        super().__init__(base)
-        self.key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                               source_id=record.pk)
+    pass
+#     def __init__(self, base=None):
+#         super().__init__(base)
+#         self.key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+#                                                source_id=record.pk)
 
 
 class EtoolsLoader(BaseLoader):
