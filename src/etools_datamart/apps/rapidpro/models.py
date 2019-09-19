@@ -88,20 +88,6 @@ class RapidProDataMartModel(models.Model, metaclass=RapidProModelBase):
         return [s for s in Service.objects.all() if s.managed_model == self]
 
 
-class SyncCheckpoint(models.Model):
-    organization = models.ForeignKey(Organization, db_index=True, on_delete=models.CASCADE)
-    collection_name = models.CharField(max_length=100)
-    subcollection_name = models.CharField(max_length=100, null=True, blank=True)
-    last_started = models.DateTimeField()
-    last_saved = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        unique_together = ('organization', 'collection_name', 'subcollection_name')
-
-    def __str__(self):
-        return '{}: {} {}'.format(self.organization, self.collection_name, self.subcollection_name or '').strip()
-
-
 class Group(RapidProDataMartModel):
     uuid = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
     name = models.TextField(null=True, blank=True)
