@@ -65,15 +65,14 @@ class CommonDataMartModel(models.Model, metaclass=DataMartModelBase):
 
 
 class EtoolsDataMartModel(CommonDataMartModel, metaclass=EToolsDataMartModelBase):
-    country_name = models.CharField(max_length=100, db_index=True)
+    country_name = models.CharField(max_length=100)
     schema_name = models.CharField(max_length=63, db_index=True)
     area_code = models.CharField(max_length=10, db_index=True)
 
     class Meta:
         abstract = True
         indexes = [
-            models.Index(name='source',
-                         fields=['source_id', 'schema_name']),
+            models.Index(fields=['source_id', 'schema_name']),
         ]
 
     objects = DataMartManager()

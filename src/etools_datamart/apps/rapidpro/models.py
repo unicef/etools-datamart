@@ -99,15 +99,23 @@ class Group(RapidProDataMartModel):
         source = 'groups'
 
 
-# class Group(RapidProDataMartModel):
-#     uuid = models.UUIDField(unique=True, db_index=True)
-#     name = models.TextField()
-#     query = models.TextField(null=True, blank=True)
-#     count = models.IntegerField()
-#     status = models.CharField(max_length=100, blank=True, null=True)
-#
-#     def __str__(self):
-#         return '{} ({})'.format(self.name, self.organization)
-#
-#     class Options:
-#         source = 'groups'
+class Contact(RapidProDataMartModel):
+    uuid = models.UUIDField(unique=True, db_index=True)
+    name = models.TextField(null=True, blank=True)
+    language = models.CharField(max_length=100, null=True, blank=True)
+    urns = ArrayField(
+        models.CharField(max_length=100),
+        default=list
+    )
+    groups = models.ManyToManyField(Group)
+    fields = JSONField(default=dict)
+    blocked = models.NullBooleanField()
+    stopped = models.NullBooleanField()
+    created_on = models.DateTimeField(null=True, blank=True)
+    modified_on = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.organization)
+
+    class Options:
+        source = 'contacts'

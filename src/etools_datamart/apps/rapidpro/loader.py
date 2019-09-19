@@ -8,11 +8,16 @@ from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, EtlRe
 
 logger = get_task_logger(__name__)
 
+DEFAULT_KEY = lambda loader, record: dict(uuid=record['uuid'],
+                                          organization=loader.context['organization'])
+
 
 class TembaLoaderOptions(BaseLoaderOptions):
     __attrs__ = BaseLoaderOptions.__attrs__ + ['host', 'temba_object']
-    DEFAULT_KEY = lambda loader, record: dict(uuid=record['uuid'],
-                                              organization=loader.context['organization'])
+
+    def __init__(self, base=None):
+        super().__init__(base)
+        self.key = DEFAULT_KEY
 
 
 class TembaLoader(BaseLoader):
