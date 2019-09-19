@@ -20,8 +20,8 @@ class GatewayType(EtoolsDataMartModel):
         source = LocationsGatewaytype
         sync_deleted_records = lambda loader: False
 
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.id)
+        # key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+        #                                   source_id=record.id)
 
     def __str__(self):
         return self.name

@@ -1,5 +1,8 @@
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -51,6 +54,30 @@ class Preload(models.Model):
     class Meta:
         unique_together = ('url', 'as_user', 'params')
         ordering = ('url',)
+
+    def clean(self):
+        super().clean()
+        self.check_url(True)
+
+    def full_url(self):
+        return "%s%s?%s" % (settings.ABSOLUTE_BASE_URL, self.url,
+                            urlencode(self.params))
+
+    def check_url(self, validate=True):
+        try:
+            target = "%s%s" % (settings.ABSOLUTE_BASE_URL, self.url)
+            client = Client()
+            if self.as_user:
+                client.force_authenticate(self.as_user)
+            res = client.head(target, data=self.params)
+            if res.status_code != 200:
+                raise Exception('Invalid Response: %s on %s' % (res.status_code,
+                                                                self.full_url()))
+        except Exception as e:
+            if validate:
+                raise ValidationError(str(e))
+            else:
+                return False
 
     def run(self):
         try:

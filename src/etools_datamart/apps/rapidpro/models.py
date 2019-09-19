@@ -67,6 +67,7 @@ class RapidProManager(DataMartManager):
 
 
 class RapidProDataMartModel(models.Model, metaclass=RapidProModelBase):
+    source_id = models.CharField(max_length=100, blank=True, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     objects = RapidProManager()
 
@@ -96,3 +97,17 @@ class Group(RapidProDataMartModel):
 
     class Options:
         source = 'groups'
+
+
+# class Group(RapidProDataMartModel):
+#     uuid = models.UUIDField(unique=True, db_index=True)
+#     name = models.TextField()
+#     query = models.TextField(null=True, blank=True)
+#     count = models.IntegerField()
+#     status = models.CharField(max_length=100, blank=True, null=True)
+#
+#     def __str__(self):
+#         return '{} ({})'.format(self.name, self.organization)
+#
+#     class Options:
+#         source = 'groups'

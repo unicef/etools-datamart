@@ -70,6 +70,3 @@ class HACT(EtoolsDataMartModel):
         source = HactAggregatehact
         sync_deleted_records = lambda loader: False
         truncate = False
-        # key = lambda loader, record: dict(country_name=loader.context['country'].name,
-        #                                   schema_name=loader.context['country'].schema_name,
-        #                                   year=loader.context['today'].year)

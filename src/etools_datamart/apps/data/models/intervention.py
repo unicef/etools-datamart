@@ -193,7 +193,8 @@ class InterventionLoader(EtoolsLoader):
 
 
 class InterventionAbstract(models.Model):
-    agreement_reference_number = models.CharField(max_length=300, blank=True, null=True)
+    agreement_reference_number = models.CharField(max_length=300,
+                                                  blank=True, null=True)
     amendment_types = models.TextField(blank=True, null=True)
     attachment_types = models.TextField(blank=True, null=True)
     agreement_id = models.IntegerField(blank=True, null=True)

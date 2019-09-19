@@ -14,7 +14,6 @@ from celery.utils.log import get_task_logger
 from constance import config
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
-from sentry_sdk import capture_exception
 from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.data.exceptions import LoaderException
@@ -85,11 +84,6 @@ class EtlResult:
                 'total_records': self.total_records}
 
 
-DEFAULT_KEY = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.pk)
-
-
 class RequiredIsRunning(Exception):
 
     def __init__(self, req, *args: object) -> None:
@@ -113,6 +107,8 @@ class MaxRecordsException(Exception):
 
 
 class BaseLoaderOptions:
+    DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
+
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
                  'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
                  'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare']
@@ -125,7 +121,7 @@ class BaseLoaderOptions:
         self.always_update = False
         self.source = None
         self.lock_key = None
-        self.key = DEFAULT_KEY
+        self.key = self.DEFAULT_KEY
         self.timeout = None
         self.depends = ()
         self.filters = None
@@ -302,11 +298,7 @@ class BaseLoader:
                     op = UNCHANGED
             return op
         except Exception as e:  # pragma: no cover
-            logger.exception(e)
-            capture_exception()
-            err = process_exception(e)
-            raise LoaderException(f"Error in {self}: {e}",
-                                  err) from e
+            raise LoaderException(f"Error in {self}: {e}") from e
 
     def get_mart_values(self, record=None):
         country = self.context['country']

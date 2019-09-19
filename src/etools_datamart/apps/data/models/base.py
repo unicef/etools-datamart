@@ -71,5 +71,9 @@ class EtoolsDataMartModel(CommonDataMartModel, metaclass=EToolsDataMartModelBase
 
     class Meta:
         abstract = True
+        indexes = [
+            models.Index(name='source',
+                         fields=['source_id', 'schema_name']),
+        ]
 
     objects = DataMartManager()

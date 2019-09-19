@@ -198,9 +198,8 @@ class TPMActivity(EtoolsDataMartModel):
         # depends = (Intervention,)
         # truncate = True
         sync_deleted_records = lambda a: False
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.id)
+        # key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+        #                                   source_id=record.id)
 
         source = TpmTpmactivity
         mapping = dict(additional_information='additional_information',

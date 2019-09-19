@@ -11,6 +11,8 @@ logger = get_task_logger(__name__)
 
 class TembaLoaderOptions(BaseLoaderOptions):
     __attrs__ = BaseLoaderOptions.__attrs__ + ['host', 'temba_object']
+    DEFAULT_KEY = lambda loader, record: dict(uuid=record['uuid'],
+                                              organization=loader.context['organization'])
 
 
 class TembaLoader(BaseLoader):
@@ -20,6 +22,9 @@ class TembaLoader(BaseLoader):
 
     def load_organization(self):
         pass
+
+    def get_values(self, record):
+        return record.serialize()
 
     def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
              only_delta=True, run_type=RUN_UNKNOWN, api_token=None, **kwargs):
@@ -67,13 +72,16 @@ class TembaLoader(BaseLoader):
                                     records=0,
                                     only_delta=only_delta,
                                     is_empty=not self.model.objects.exists(),
-                                    stdout=stdout
+                                    stdout=stdout,
+                                    organization=source.organization
                                     )
 
                 for entry in data.all():
-                    values = entry.serialize()
-                    values['organization'] = source.organization
-                    filters = {'uuid': values.get('uuid')}
+                    filters = self.config.key(self, entry)
+                    values = self.get_values(entry)
+
+                    # values['organization'] = source.organization
+                    # filters = {'uuid': values['uuid']}
                     op = self.process_record(filters, values)
                     self.increment_counter(op)
 
