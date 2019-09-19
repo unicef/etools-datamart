@@ -24,6 +24,9 @@ class Source(models.Model):
     class Meta:
         app_label = 'rapidpro'
 
+    def __str__(self):
+        return self.name
+
 
 class Organization(models.Model):
     {
@@ -85,12 +88,25 @@ class RapidProDataMartModel(models.Model, metaclass=RapidProModelBase):
         return [s for s in Service.objects.all() if s.managed_model == self]
 
 
+class SyncCheckpoint(models.Model):
+    organization = models.ForeignKey(Organization, db_index=True, on_delete=models.CASCADE)
+    collection_name = models.CharField(max_length=100)
+    subcollection_name = models.CharField(max_length=100, null=True, blank=True)
+    last_started = models.DateTimeField()
+    last_saved = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('organization', 'collection_name', 'subcollection_name')
+
+    def __str__(self):
+        return '{}: {} {}'.format(self.organization, self.collection_name, self.subcollection_name or '').strip()
+
+
 class Group(RapidProDataMartModel):
-    uuid = models.UUIDField(unique=True, db_index=True)
-    name = models.TextField()
+    uuid = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
+    name = models.TextField(null=True, blank=True)
     query = models.TextField(null=True, blank=True)
-    count = models.IntegerField()
-    status = models.CharField(max_length=100, blank=True, null=True)
+    count = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.organization)
@@ -98,24 +114,35 @@ class Group(RapidProDataMartModel):
     class Options:
         source = 'groups'
 
-#
-# class Contact(RapidProDataMartModel):
-#     uuid = models.UUIDField(unique=True, db_index=True)
-#     name = models.TextField(null=True, blank=True)
-#     language = models.CharField(max_length=100, null=True, blank=True)
-#     urns = ArrayField(
-#         models.CharField(max_length=100),
-#         default=list
-#     )
-#     groups = models.ManyToManyField(Group)
-#     fields = JSONField(default=dict)
-#     blocked = models.NullBooleanField()
-#     stopped = models.NullBooleanField()
-#     created_on = models.DateTimeField(null=True, blank=True)
-#     modified_on = models.DateTimeField(null=True, blank=True)
-#
-#     def __str__(self):
-#         return '{} ({})'.format(self.name, self.organization)
-#
-#     class Options:
-#         source = 'contacts'
+
+class ContactLoader(TembaLoader):
+
+    def get_groups(self, record, ret, field_name):
+        return [oo.serialize() for oo in record.groups]
+
+
+class Contact(RapidProDataMartModel):
+    uuid = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
+    name = models.TextField(null=True, blank=True)
+    language = models.CharField(max_length=100, null=True, blank=True)
+    urns = ArrayField(
+        models.CharField(max_length=100),
+        default=list,
+        null=True, blank=True
+    )
+    # groups = models.ManyToManyField(Group)
+    groups = JSONField(default=dict, null=True, blank=True)
+    fields = JSONField(default=dict, null=True, blank=True)
+    blocked = models.BooleanField(null=True, blank=True)
+    stopped = models.BooleanField(null=True, blank=True)
+    created_on = models.DateTimeField(null=True, blank=True)
+    modified_on = models.DateTimeField(null=True, blank=True)
+    loader = ContactLoader()
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.organization)
+
+    class Options:
+        source = 'contacts'
+        exclude_from_compare = ['groups', ]
+        fields_to_compare = None

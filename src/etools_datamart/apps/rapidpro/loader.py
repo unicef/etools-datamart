@@ -2,13 +2,15 @@ from django.utils import timezone
 
 from celery.utils.log import get_task_logger
 from constance import config
+from strategy_field.utils import get_attr
+from temba_client.serialization import TembaObject
 from temba_client.v2 import TembaClient
 
-from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, EtlResult, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, EtlResult, has_attr, RUN_UNKNOWN
 
 logger = get_task_logger(__name__)
 
-DEFAULT_KEY = lambda loader, record: dict(uuid=record['uuid'],
+DEFAULT_KEY = lambda loader, record: dict(uuid=record.uuid,
                                           organization=loader.context['organization'])
 
 
@@ -28,19 +30,16 @@ class TembaLoader(BaseLoader):
     def load_organization(self):
         pass
 
-    def get_mart_values(self, record=None):
+    def get_mart_values(self, record: TembaObject = None):
         organization = self.context['organization']
-        ret = {'organization': organization,
-               'seen': self.context['today']
-               }
+        ret = {'organization': organization}
         if record:
-            ret['source_id'] = record['uuid']
+            ret['source_id'] = record.uuid
         return ret
 
-    def get_values(self, record):
-        organization = self.context['organization']
+    def get_values(self, record: TembaObject):
+        # organization = self.context['organization']
         ret = self.get_mart_values(record)
-
         for k, v in self.mapping.items():
             if k in ret:
                 continue
@@ -55,35 +54,17 @@ class TembaLoader(BaseLoader):
                 _value = getter(record, ret, field_name=k)
                 if _value != self.noop:
                     ret[k] = _value
+            # elif v and isinstance(v, list) and isinstance(v[0], ObjectRef):
+            #     ret[k] = [oo.serialize() for oo in v]
             elif v == '-' or hasattr(self, 'get_%s' % k):
                 getter = getattr(self, 'get_%s' % k)
                 _value = getter(record, ret, field_name=k)
                 if _value != self.noop:
                     ret[k] = _value
-            elif v == '__self__':
-                try:
-                    ret[k] = self.model.objects.get(schema_name=country.schema_name,
-                                                    source_id=getattr(record, k).id)
-                except AttributeError:
-                    ret[k] = None
-                except self.model.DoesNotExist:
-                    ret[k] = None
-                    self.tree_parents.append((record.id, getattr(record, k).id))
-
-            elif isclass(v) and issubclass(v, models.Model):
-                try:
-                    ret[k] = v.objects.get(schema_name=country.schema_name,
-                                           source_id=getattr(record, k).id)
-                except ObjectDoesNotExist:  # pragma: no cover
-                    ret[k] = None
-                except AttributeError:  # pragma: no cover
-                    pass
             elif callable(v):
                 ret[k] = v(self, record)
             elif v == '=' and has_attr(record, k):
                 ret[k] = get_attr(record, k)
-            # elif has_attr(record, k):
-            #     ret[k] = get_attr(record, k)
             elif not isinstance(v, str):
                 ret[k] = v
             elif has_attr(record, v):
@@ -92,9 +73,12 @@ class TembaLoader(BaseLoader):
                 raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
 
         return ret
-    #
-    # def get_values(self, record):
-    #     return record.serialize()
+
+    def on_start(self, run_type):
+        super().on_start(run_type)
+
+    def on_end(self, error=None, retry=False):
+        super().on_end(error, retry)
 
     def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
              only_delta=True, run_type=RUN_UNKNOWN, api_token=None, **kwargs):
@@ -103,15 +87,18 @@ class TembaLoader(BaseLoader):
         self.results = EtlResult()
         try:
             if api_token:
-                source, __ = Source.objects.get_or_create(api_token=api_token,
-                                                          defaults={'name': api_token})
-                client = TembaClient(source.server, api_token)
+                Source.objects.get_or_create(api_token=api_token,
+                                             defaults={'name': api_token})
                 sources = sources.filter(api_token=api_token)
 
             self.on_start(run_type)
             for source in sources:
+                if verbosity >= 0:
+                    stdout.write("Source %s" % source)
                 client = TembaClient(config.RAPIDPRO_ADDRESS, source.api_token)
                 oo = client.get_org()
+                if verbosity >= 0:
+                    stdout.write("  fetching organization info")
 
                 org, __ = Organization.objects.get_or_create(source=source,
                                                              defaults={'name': oo.name,
@@ -122,10 +109,12 @@ class TembaLoader(BaseLoader):
                                                                        'languages': oo.languages,
                                                                        'anon': oo.anon
                                                                        })
+                if verbosity >= 0:
+                    stdout.write("  found organization %s" % oo.name)
 
                 func = "get_%s" % self.config.source
                 getter = getattr(client, func)
-                data = getter()
+                data = getter(after=self.etl_task.last_success)
                 self.update_context(today=timezone.now(),
                                     max_records=max_records,
                                     verbosity=verbosity,
@@ -135,15 +124,17 @@ class TembaLoader(BaseLoader):
                                     stdout=stdout,
                                     organization=source.organization
                                     )
+                if verbosity >= 0:
+                    stdout.write("  fetching data")
+                for page in data.iterfetches():
+                    for entry in page:
+                        filters = self.config.key(self, entry)
+                        values = self.get_values(entry)
 
-                for entry in data.all():
-                    filters = self.config.key(self, entry)
-                    values = self.get_values(entry)
-
-                    # values['organization'] = source.organization
-                    # filters = {'uuid': values['uuid']}
-                    op = self.process_record(filters, values)
-                    self.increment_counter(op)
+                        # values['organization'] = source.organization
+                        # filters = {'uuid': values['uuid']}
+                        op = self.process_record(filters, values)
+                        self.increment_counter(op)
 
         except Exception as e:
             self.on_end(error=e)

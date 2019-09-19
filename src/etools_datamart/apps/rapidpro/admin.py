@@ -32,4 +32,13 @@ class OrganizationAdmin(RapidProAdmin):
 
 @register(models.Group)
 class GroupAdmin(RapidProAdmin):
+    list_display = ('id', 'organization', 'name', 'query', 'count')
     list_filter = ('organization',)
+    search_fields = ('name',)
+
+
+@register(models.Contact)
+class ContactAdmin(RapidProAdmin):
+    list_display = ('id', 'organization', 'name', 'language', 'blocked', 'stopped')
+    list_filter = ('organization',)
+    search_fields = ('name',)

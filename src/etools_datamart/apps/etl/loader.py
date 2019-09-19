@@ -1,6 +1,7 @@
 import json
 import time
 from inspect import isclass
+from uuid import UUID
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
@@ -184,12 +185,14 @@ def _compare_json(dict1, dict2):
     return json.dumps(dict1, sort_keys=True, indent=0) == json.dumps(dict2, sort_keys=True, indent=0)
 
 
-def equal(a, b):
-    if isinstance(a, (dict, list, tuple)):
-        return _compare_json(a, b)
-    elif isinstance(b, bool):
-        return str(a) == str(b)
-    return a == b
+def equal(current, new_value):
+    if isinstance(current, (dict, list, tuple)):
+        return _compare_json(current, new_value)
+    elif isinstance(current, UUID):
+        return current == UUID(new_value)
+    elif isinstance(new_value, bool):
+        return str(current) == str(new_value)
+    return current == new_value
 
 
 def has_attr(obj, attr):
@@ -267,7 +270,7 @@ class BaseLoader:
                 verbosity = self.context['verbosity']
                 if verbosity >= 2:  # pragma: no cover
                     stdout = self.context['stdout']
-                    stdout.write("Detected field changed '%s': %s(%s)->%s(%s)\n" %
+                    stdout.write("Detected field changed '%s': current: %s(%s) new value: %s(%s)\n" %
                                  (field_name,
                                   getattr(record, field_name),
                                   type(getattr(record, field_name)),
