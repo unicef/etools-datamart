@@ -107,10 +107,11 @@ class MaxRecordsException(Exception):
     pass
 
 
-DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
+undefined = object()
 
 
 class BaseLoaderOptions:
+    DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
                  'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
                  'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare']
@@ -123,7 +124,7 @@ class BaseLoaderOptions:
         self.always_update = False
         self.source = None
         self.lock_key = None
-        self.key = DEFAULT_KEY
+        self.key = undefined
         self.timeout = None
         self.depends = ()
         self.filters = None
@@ -141,6 +142,8 @@ class BaseLoaderOptions:
                         setattr(self, attr, n)
                     else:
                         setattr(self, attr, getattr(base, attr, getattr(self, attr)))
+        if self.key == undefined:
+            self.key = type(self).DEFAULT_KEY
 
         if self.truncate:
             self.sync_deleted_records = lambda loader: False

@@ -17,7 +17,10 @@ logger = get_task_logger(__name__)
 
 
 class EToolsLoaderOptions(BaseLoaderOptions):
-    pass
+    DEFAULT_KEY = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
+                                              source_id=record.pk)
+
+
 #     def __init__(self, base=None):
 #         super().__init__(base)
 #         self.key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
@@ -173,6 +176,10 @@ class EtoolsLoader(BaseLoader):
                 except LockError as e:  # pragma: no cover
                     logger.warning(e)
         return self.results
+
+
+class CommonSchemaLoaderOptions(BaseLoaderOptions):
+    DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
 
 
 class CommonSchemaLoader(EtoolsLoader):
