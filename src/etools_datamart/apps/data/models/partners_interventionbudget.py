@@ -13,8 +13,8 @@ class InterventionBudgetLoader(InterventionLoader):
         qs = self.filter_queryset(PartnersInterventionbudget.objects.all())
         for record in qs.all():
             record.intervention.budget = record
-            filters = self.config.key(self, record.intervention)
-            values = self.get_values(record)
+            filters = self.config.key(self, record)
+            values = self.get_values(record.intervention)
             values['source_id'] = record.id
             op = self.process_record(filters, values)
             self.increment_counter(op)
