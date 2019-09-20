@@ -14,7 +14,7 @@ class InterventionBudgetLoader(InterventionLoader):
         for record in qs.all():
             record.intervention.budget = record
             filters = self.config.key(self, record.intervention)
-            values = self.get_values(record.intervention)
+            values = self.get_values(record)
             values['source_id'] = record.id
             op = self.process_record(filters, values)
             self.increment_counter(op)
