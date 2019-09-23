@@ -36,15 +36,15 @@ class InterventionLoader(EtoolsLoader):
     # def fr_currencies_ok(self, original: PartnersIntervention):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
 
-    def get_partner_id(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_partner_id(self, record: PartnersIntervention, values: dict, **kwargs):
         try:
             return Partner.objects.get(schema_name=self.context['country'].schema_name,
-                                       source_id=original.agreement.partner.id).pk
+                                       source_id=record.agreement.partner.id).pk
         except Partner.DoesNotExist:
             return None
 
-    def get_planned_programmatic_visits(self, original: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionplannedvisits.objects.filter(intervention=original)
+    def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
+        qs = PartnersInterventionplannedvisits.objects.filter(intervention=record)
         qs = qs.filter(year=self.context['today'].year)
         qs = qs.annotate(
             planned=F('programmatic_q1') + F('programmatic_q2') + F('programmatic_q3') + F('programmatic_q4'))
@@ -52,34 +52,34 @@ class InterventionLoader(EtoolsLoader):
         if record:
             return record.planned
 
-    def get_attachment_types(self, original: PartnersIntervention, values: dict, **kwargs):
-        qs = original.attachments.all()
+    def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
+        qs = record.attachments.all()
         values['number_of_attachments'] = qs.count()
         return ", ".join(qs.values_list('type__name', flat=True))
 
-    def get_amendment_types(self, original: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersAgreementamendment.objects.filter(agreement=original.agreement).order_by('signed_date')
+    def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
+        qs = PartnersAgreementamendment.objects.filter(agreement=record.agreement).order_by('signed_date')
         values['number_of_amendments'] = qs.count()
         if qs:
             values['last_amendment_date'] = qs.latest('signed_date').signed_date
         types = [str(t) for t in qs.values_list('types', flat=True)]
         return ", ".join(types)
 
-    def get_days_from_prc_review_to_signature(self, original: PartnersIntervention, values: dict, **kwargs):
-        i1 = original.review_date_prc
-        i2 = original.signed_by_partner_date
+    def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
+        i1 = record.review_date_prc
+        i2 = record.signed_by_partner_date
         if i1 and i2:
             return (i2 - i1).days
 
-    def get_days_from_submission_to_signature(self, original: PartnersIntervention, values: dict, **kwargs):
-        i1 = original.submission_date
-        i2 = original.signed_by_unicef_date
+    def get_days_from_submission_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
+        i1 = record.submission_date
+        i2 = record.signed_by_unicef_date
         if i1 and i2:
             return (i2 - i1).days
 
-    def get_sections(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_sections(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
-        for section in original.sections.all():
+        for section in record.sections.all():
             data.append(dict(source_id=section.id,
                              name=section.name,
                              description=section.description,
@@ -87,10 +87,10 @@ class InterventionLoader(EtoolsLoader):
         values['sections_data'] = data
         return ", ".join([l['name'] for l in data])
 
-    def get_locations(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_locations(self, record: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
-        for location in original.flat_locations.select_related('gateway').order_by('id'):
+        for location in record.flat_locations.select_related('gateway').order_by('id'):
             locs.append(dict(
                 source_id=location.id,
                 name=location.name,
@@ -103,26 +103,26 @@ class InterventionLoader(EtoolsLoader):
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])
 
-    def get_last_pv_date(self, original: PartnersIntervention, values: dict, **kwargs):
-        ta = T2FTravelactivity.objects.filter(partnership__pk=original.pk,
+    def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
+        ta = T2FTravelactivity.objects.filter(partnership__pk=record.pk,
                                               travel_type=TravelType.PROGRAMME_MONITORING,
                                               travels__status='completed',
                                               date__isnull=False,
                                               ).order_by('date').last()
         return ta.date if ta else None
 
-    def get_unicef_signatory_name(self, original: PartnersIntervention, values: dict, **kwargs):
-        if original.unicef_signatory:
-            return "{0.username} ({0.email})".format(original.unicef_signatory)
+    def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
+        if record.unicef_signatory:
+            return "{0.username} ({0.email})".format(record.unicef_signatory)
 
-    def get_partner_signatory_name(self, original: PartnersIntervention, values: dict, **kwargs):
-        if original.partner_authorized_officer_signatory:
-            return "{0.last_name} {0.first_name} ({0.email})".format(original.partner_authorized_officer_signatory)
+    def get_partner_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
+        if record.partner_authorized_officer_signatory:
+            return "{0.last_name} {0.first_name} ({0.email})".format(record.partner_authorized_officer_signatory)
 
-    def get_offices(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionOffices
         data = []
-        for office in original.offices.select_related('zonal_chief').order_by('id'):
+        for office in record.offices.select_related('zonal_chief').order_by('id'):
             data.append(dict(source_id=office.id,
                              name=office.name,
                              zonal_chief_email=getattr(office.zonal_chief, 'email', ''),
@@ -130,19 +130,19 @@ class InterventionLoader(EtoolsLoader):
         values['offices_data'] = data
         return ", ".join([l['name'] for l in data])
 
-    def get_clusters(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_clusters(self, record: PartnersIntervention, values: dict, **kwargs):
 
-        qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=original)
+        qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=record)
         clusters = set()
         for applied_indicator in qs.all():
             if applied_indicator.cluster_name:
                 clusters.add(applied_indicator.cluster_name)
         return ", ".join(clusters)
 
-    def get_partner_focal_points(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_partner_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
-        for member in original.partner_focal_points.all():
+        for member in record.partner_focal_points.all():
             # member is PartnersPartnerstaffmember
             ret.append("{0.last_name} {0.first_name} ({0.email}) {0.phone}".format(member))
             data.append(dict(last_name=member.last_name,
@@ -154,9 +154,9 @@ class InterventionLoader(EtoolsLoader):
         values['partner_focal_points_data'] = data
         return ", ".join(ret)
 
-    def get_fr_number(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
         try:
-            return FundsFundsreservationheader.objects.get(intervention=original,
+            return FundsFundsreservationheader.objects.get(intervention=record,
                                                            end_date__isnull=True).fr_number
         except FundsFundsreservationheader.MultipleObjectsReturned as e:
             process_exception(e)
@@ -164,14 +164,14 @@ class InterventionLoader(EtoolsLoader):
         except FundsFundsreservationheader.DoesNotExist:
             return None
 
-    def get_cp_outputs(self, original: PartnersIntervention, values: dict, **kwargs):
-        values['cp_outputs_data'] = list(original.result_links.values("name", "code"))
-        return ", ".join([rl.name for rl in original.result_links.all()])
+    def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
+        values['cp_outputs_data'] = list(record.result_links.values("name", "code"))
+        return ", ".join([rl.name for rl in record.result_links.all()])
 
-    def get_unicef_focal_points(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
-        for member in original.unicef_focal_points.all():
+        for member in record.unicef_focal_points.all():
             ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
             data.append(dict(last_name=member.last_name,
                              first_name=member.first_name,

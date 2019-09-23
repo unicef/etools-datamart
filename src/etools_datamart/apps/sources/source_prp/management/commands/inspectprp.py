@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--app_label', default='prp', type=str,
+            '--app_label', default='source_prp', type=str,
             help='application name',
         )
 

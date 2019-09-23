@@ -8,7 +8,8 @@ from strategy_field.utils import get_attr
 from temba_client.serialization import TembaObject
 from temba_client.v2 import TembaClient
 
-from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, EtlResult, has_attr, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import (BaseLoader, BaseLoaderOptions, EtlResult,
+                                             has_attr, MaxRecordsException, RUN_UNKNOWN,)
 
 logger = get_task_logger(__name__)
 
@@ -140,6 +141,8 @@ class TembaLoader(BaseLoader):
                         op = self.process_record(filters, values)
                         self.increment_counter(op)
 
+        except MaxRecordsException:
+            pass
         except Exception as e:
             self.on_end(error=e)
             raise

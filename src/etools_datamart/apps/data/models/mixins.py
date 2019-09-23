@@ -50,9 +50,9 @@ class LocationMixin(models.Model):
 class LocationLoadertMixin:
     location_m2m_field = 'locations'
 
-    def get_locations(self, original, values: dict, **kwargs):
+    def get_locations(self, record, values: dict, **kwargs):
         locs = []
-        locations = getattr(original, self.location_m2m_field)
+        locations = getattr(record, self.location_m2m_field)
         for location in locations.select_related('gateway').order_by('id'):
             locs.append(dict(
                 source_id=location.id,

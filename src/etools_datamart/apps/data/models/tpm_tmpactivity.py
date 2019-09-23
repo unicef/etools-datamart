@@ -18,13 +18,13 @@ class TPMActivityLoader(EtoolsLoader):
     # def get_pd_ssfa_reference_number(self, original: TpmTpmactivity, values: dict):
     #     return reference_number(original.activity.intervention)
 
-    def get_task_reference_number(self, original: TpmTpmactivity, values: dict, **kwargs):
-        return "Task #{}.{}".format(original.tpm_visit.id, original.id)
+    def get_task_reference_number(self, record: TpmTpmactivity, values: dict, **kwargs):
+        return "Task #{}.{}".format(record.tpm_visit.id, record.id)
 
-    def get_visit_url(self, original: TpmTpmactivity, values: dict, **kwargs):
-        return 'tpm/visits/%s/details' % original.id
+    def get_visit_url(self, record: TpmTpmactivity, values: dict, **kwargs):
+        return 'tpm/visits/%s/details' % record.id
 
-    def get_report_attachments(self, original: TpmTpmactivity, values: dict, **kwargs):
+    def get_report_attachments(self, record: TpmTpmactivity, values: dict, **kwargs):
         # attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
         #                                                    code='activity_report',
         #                                                    content_type=self._ct,
@@ -33,7 +33,7 @@ class TPMActivityLoader(EtoolsLoader):
         # values['report_attachments_data'] = attachments
         attachments = (AttachmentsAttachment.objects
                        .select_related('uploaded_by', 'file_type')
-                       .filter(object_id=original.tpm_visit.id,
+                       .filter(object_id=record.tpm_visit.id,
                                code='activity_report',
                                content_type=self._ct,
                                ).order_by('id'))
@@ -49,10 +49,10 @@ class TPMActivityLoader(EtoolsLoader):
         values['report_attachments_data'] = ret
         return ", ".join([a.file for a in attachments])
 
-    def get_attachments(self, original: TpmTpmactivity, values: dict, **kwargs):
+    def get_attachments(self, record: TpmTpmactivity, values: dict, **kwargs):
         attachments = (AttachmentsAttachment.objects
                        .select_related('uploaded_by', 'file_type')
-                       .filter(object_id=original.tpm_visit.id,
+                       .filter(object_id=record.tpm_visit.id,
                                code='activity_attachments',
                                content_type=self._ct,
                                ).order_by('id'))
@@ -68,9 +68,9 @@ class TPMActivityLoader(EtoolsLoader):
         values['attachments_data'] = ret
         return ", ".join([a.file for a in attachments])
 
-    def get_offices(self, original: TpmTpmactivity, values: dict, **kwargs):
+    def get_offices(self, record: TpmTpmactivity, values: dict, **kwargs):
         locs = []
-        for office in original.offices.select_related('zonal_chief').order_by('id'):
+        for office in record.offices.select_related('zonal_chief').order_by('id'):
             locs.append(dict(
                 source_id=office.id,
                 name=office.name,
@@ -79,19 +79,19 @@ class TPMActivityLoader(EtoolsLoader):
         values['offices_data'] = locs
         return ", ".join([l['name'] for l in locs])
 
-    def get_unicef_focal_points(self, original: TpmTpmactivity, values: dict, **kwargs):
+    def get_unicef_focal_points(self, record: TpmTpmactivity, values: dict, **kwargs):
         # TpmTpmactivityUnicefFocalPoints
         ret = []
-        for i in original.unicef_focal_points.all():
+        for i in record.unicef_focal_points.all():
             ret.append(i.email)
 
         return ", ".join(ret)
 
-    def get_tpm_focal_points(self, original: TpmTpmactivity, values: dict, **kwargs):
+    def get_tpm_focal_points(self, record: TpmTpmactivity, values: dict, **kwargs):
         # tpm_partner : TpmpartnersTpmpartner =
         # staffmembers = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=original.tpm_visit)
         ret = []
-        for member in original.visit.tpm_partner_focal_points.all():
+        for member in record.visit.tpm_partner_focal_points.all():
             ret.append(dict(email=member.user.email,
                             first_name=member.user.first_name,
                             last_name=member.user.last_name, ))
@@ -99,12 +99,12 @@ class TPMActivityLoader(EtoolsLoader):
         values['tpm_focal_points_data'] = ret
         return ",".join([m['email'] for m in ret])
 
-    def get_locations(self, original: TpmTpmactivity, values: dict, **kwargs):
+    def get_locations(self, record: TpmTpmactivity, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention
         # for location in original.activity.locations.select_related('gateway').order_by('id'):
-        for location in original.activity.locations.order_by('id'):
+        for location in record.activity.locations.order_by('id'):
             locs.append(dict(
                 source_id=location.id,
                 name=location.name,

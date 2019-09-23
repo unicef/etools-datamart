@@ -9,13 +9,13 @@ from etools_datamart.apps.etools.models import PartnersAgreement
 
 
 class AgreementLoader(EtoolsLoader):
-    def get_agreement_amendments(self, original: PartnersAgreement, values: dict, **kwargs):
-        return ",".join([a.number for a in original.amendments])
+    def get_agreement_amendments(self, record: PartnersAgreement, values: dict, **kwargs):
+        return ",".join([a.number for a in record.amendments])
 
-    def get_partner_authorized_officers(self, original: PartnersAgreement, values: dict, **kwargs):
+    def get_partner_authorized_officers(self, record: PartnersAgreement, values: dict, **kwargs):
         # PartnersPartnerstaffmember.objects.filter(agreement_authorizations=original)
         officers = []
-        for authorized in original.authorized_officers.all():
+        for authorized in record.authorized_officers.all():
             officers.append('%s %s (%s)' % (authorized.last_name,
                                             authorized.first_name,
                                             authorized.email))

@@ -1,12 +1,9 @@
 import json
 import time
-from inspect import isclass
 from uuid import UUID
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -308,11 +305,7 @@ class BaseLoader:
             raise LoaderException(f"Error in {self}: {e}") from e
 
     def get_mart_values(self, record=None):
-        country = self.context['country']
-        ret = {'area_code': country.business_area_code,
-               'schema_name': country.schema_name,
-               'country_name': country.name,
-               'seen': self.context['today']
+        ret = {'seen': self.context['today']
                }
         if record:
             ret['source_id'] = record.id
@@ -329,9 +322,7 @@ class BaseLoader:
             self.mapping.update(self.config.mapping)
 
     def get_values(self, record):
-        country = self.context['country']
         ret = self.get_mart_values(record)
-
         for k, v in self.mapping.items():
             if k in ret:
                 continue
@@ -348,27 +339,26 @@ class BaseLoader:
                     ret[k] = _value
             elif v == '-' or hasattr(self, 'get_%s' % k):
                 getter = getattr(self, 'get_%s' % k)
-                _value = getter(record, ret, field_name=k)
+                _value = getter(record=record, values=ret, field_name=k)
                 if _value != self.noop:
                     ret[k] = _value
-            elif v == '__self__':
-                try:
-                    ret[k] = self.model.objects.get(schema_name=country.schema_name,
-                                                    source_id=getattr(record, k).id)
-                except AttributeError:
-                    ret[k] = None
-                except self.model.DoesNotExist:
-                    ret[k] = None
-                    self.tree_parents.append((record.id, getattr(record, k).id))
-
-            elif isclass(v) and issubclass(v, models.Model):
-                try:
-                    ret[k] = v.objects.get(schema_name=country.schema_name,
-                                           source_id=getattr(record, k).id)
-                except ObjectDoesNotExist:  # pragma: no cover
-                    ret[k] = None
-                except AttributeError:  # pragma: no cover
-                    pass
+            # elif v == '__self__':
+            #     try:
+            #         ret[k] = self.model.objects.get(source_id=getattr(record, k).id)
+            #     except AttributeError:
+            #         ret[k] = None
+            #     except self.model.DoesNotExist:
+            #         ret[k] = None
+            #         self.tree_parents.append((record.id, getattr(record, k).id))
+            #
+            # elif isclass(v) and issubclass(v, models.Model):
+            #     try:
+            #         ret[k] = v.objects.get(schema_name=country.schema_name,
+            #                                source_id=getattr(record, k).id)
+            #     except ObjectDoesNotExist:  # pragma: no cover
+            #         ret[k] = None
+            #     except AttributeError:  # pragma: no cover
+            #         pass
             elif callable(v):
                 ret[k] = v(self, record)
             elif v == '=' and has_attr(record, k):
@@ -467,7 +457,7 @@ class BaseLoader:
         return self.context
 
     def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
-             only_delta=True, run_type=RUN_UNKNOWN):
+             only_delta=True, run_type=RUN_UNKNOWN, **kwargs):
         raise NotImplementedError()
 
     def consistency_check(self):

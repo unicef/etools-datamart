@@ -41,7 +41,7 @@ def get_stash_url(obj, label=None, **kwargs):
 
 
 class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('name', 'visible', 'access', 'cache_version', 'suffix', 'json', 'admin')
+    list_display = ('short_name', 'visible', 'access', 'cache_version', 'suffix', 'json', 'admin')
     list_filter = ('hidden', 'access')
 
     search_fields = ('name', 'viewset')
@@ -80,6 +80,9 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     acl_page.allow_tags = True
     acl_page.short_description = 'ACL'
+
+    def short_name(self, obj):
+        return "%s.%s" % (obj.source_model.app_label, obj.source_model.model)
 
     def security(self, object):
 

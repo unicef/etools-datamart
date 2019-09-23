@@ -23,6 +23,8 @@ def pytest_generate_tests(metafunc):
                 'data.reportindicator',
             ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
+            elif model._meta.app_label == 'prp':
+                m.append(pytest.param(model.loader, marks=pytest.mark.skip))
             elif model._meta.app_label == 'rapidpro':
                 m.append(pytest.param(model.loader, marks=pytest.mark.skip))
             else:
