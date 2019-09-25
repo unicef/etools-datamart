@@ -82,7 +82,8 @@ RUN mkdir /code
 ADD Pipfile* /code/
 RUN pip install pip pipenv --upgrade
 RUN cd /code \
-    && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS
+    && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS \
+    && sha1sum Pipfile.lock > /CHECKSUM
 
 # need to removes some code not py3.7 compliant
 RUN rm -fr /usr/local/lib/python3.7/site-packages/psycopg2/tests/* \

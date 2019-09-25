@@ -48,6 +48,7 @@ WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
+    && sha1sum -c /CHECKSUM \
     && pip3 install . \
     && rm -fr /code
 
