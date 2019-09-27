@@ -13,7 +13,8 @@ class PDIndicatorLoader(EtoolsLoader):
         for k, v in values.items():
             if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
                 values[k] = SafeDecimal(v)
-                values[k]._validate_for_field(PDIndicator._meta.get_field(k))
+                if values[k]:
+                    values[k]._validate_for_field(PDIndicator._meta.get_field(k))
 
         return values
 

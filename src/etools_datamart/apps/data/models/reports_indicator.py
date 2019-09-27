@@ -15,12 +15,14 @@ def get_pd_output_names(obj: PartnersIntervention):
 class ReportIndicatorLoader(LocationLoadertMixin, EtoolsLoader):
     def get_baseline_denominator(self, record, values, field_name):
         value = SafeDecimal(record.baseline.get('d'))
-        value._validate_for_field(ReportIndicator._meta.get_field(field_name))
+        if value:
+            value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_baseline_numerator(self, record, values, field_name):
         value = SafeDecimal(record.baseline.get('v'))
-        value._validate_for_field(ReportIndicator._meta.get_field(field_name))
+        if value:
+            value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_target_value(self, record, values, field_name):
