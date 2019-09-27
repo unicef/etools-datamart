@@ -77,7 +77,7 @@ MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
 URL_PREFIX = env('URL_PREFIX')
