@@ -13,6 +13,8 @@ class PDIndicatorLoader(EtoolsLoader):
         for k, v in values.items():
             if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
                 values[k] = SafeDecimal(v)
+                values[k]._validate_for_field(PDIndicator._meta.get_field(k))
+
         return values
 
     def process_country(self):
@@ -56,10 +58,10 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
 
     # target = models.TextField()  # This field type is a guess.
     target_denominator = models.DecimalField(blank=True, null=True,
-                                             max_digits=15, decimal_places=3)
+                                             max_digits=25, decimal_places=3)
 
     target_numerator = models.DecimalField(blank=True, null=True,
-                                           max_digits=15, decimal_places=3)
+                                           max_digits=25, decimal_places=3)
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
     baseline_denominator = models.DecimalField(blank=True, null=True,

@@ -15,10 +15,12 @@ def get_pd_output_names(obj: PartnersIntervention):
 class ReportIndicatorLoader(LocationLoadertMixin, EtoolsLoader):
     def get_baseline_denominator(self, record, values, field_name):
         value = SafeDecimal(record.baseline.get('d'))
+        value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_baseline_numerator(self, record, values, field_name):
         value = SafeDecimal(record.baseline.get('v'))
+        value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_target_value(self, record, values, field_name):
@@ -86,8 +88,8 @@ class ReportIndicatorLoader(LocationLoadertMixin, EtoolsLoader):
 class ReportIndicator(LocationInlineMixin, EtoolsDataMartModel):
     assumptions = models.TextField(null=True, blank=True, )
     baseline = JSONField(default=dict, blank=True, null=True)
-    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
-    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
+    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
     # baseline_denominator = models.IntegerField(blank=True, null=True)
     # baseline_numerator = models.IntegerField(blank=True, null=True)
     cluster_indicator_id = models.PositiveIntegerField(blank=True, null=True, )

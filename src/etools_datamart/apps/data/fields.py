@@ -9,3 +9,7 @@ class SafeDecimal(Decimal):
         if isinstance(value, str) and ',' in value:
             value = value.replace(',', '.')
         return Decimal.__new__(cls, value, context)
+
+    def _validate_for_field(self, field):
+        for v in field.validators:
+            v(self)
