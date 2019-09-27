@@ -24,6 +24,7 @@ class Command(BaseCommand):
             '--pidfile',
             dest='pidfile',
             default=None,
+            type=int,
             help='target process pidfile')
         parser.add_argument(
             '--host',
@@ -32,8 +33,10 @@ class Command(BaseCommand):
             help='run deployment related actions')
         parser.add_argument(
             '--timeout',
+            '-t',
             dest='timeout',
             default=60 * 5,
+            type=int,
             help='check timeout')
 
     def handle(self, *args, **options):
@@ -68,8 +71,12 @@ class Command(BaseCommand):
                         self.stdout._out.flush()
 
                     if time.time() > stop_at:
+                        self.stdout.write('Error')
                         sys.exit(1)
                     time.sleep(sleep)
         except KeyboardInterrupt:
             self.stdout.write('')
+            sys.exit(1)
+        except Exception as e:
+            self.stdout.write(str(e))
             sys.exit(1)
