@@ -8,6 +8,7 @@ class SafeDecimal(Decimal):
             return None
         if isinstance(value, str) and ',' in value:
             value = value.replace(',', '.')
+        value = value.rstrip('0').rstrip('.') if '.' in value else value
         return Decimal.__new__(cls, value, context)
 
     def _validate_for_field(self, field):
