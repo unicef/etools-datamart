@@ -12,7 +12,7 @@ def get_pd_output_names(obj: PartnersIntervention):
     return [ll.name for rl in obj.result_links.all() for ll in rl.ll_results.all()]
 
 
-class ReportIndicatorLoader(NestedLocationMixin, EtoolsLoader):
+class ReportIndicatorLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = 'locations'
 
     def get_baseline_denominator(self, record, values, field_name):
@@ -89,7 +89,7 @@ class ReportIndicatorLoader(NestedLocationMixin, EtoolsLoader):
             self.increment_counter(op)
 
 
-class ReportIndicator(NestedLocationLoaderMixin, EtoolsDataMartModel):
+class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):
     assumptions = models.TextField(null=True, blank=True, )
     baseline = JSONField(default=dict, blank=True, null=True)
     baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
