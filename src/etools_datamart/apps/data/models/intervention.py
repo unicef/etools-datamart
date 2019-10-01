@@ -338,7 +338,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     #     return "%.1f" % percent
 
 
-class Intervention(NestedLocationMixin, EtoolsDataMartModel):
+class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartModel):
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True, default=dict)
 
