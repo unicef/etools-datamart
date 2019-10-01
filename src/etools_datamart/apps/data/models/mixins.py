@@ -47,17 +47,21 @@ class LocationMixin(models.Model):
         abstract = True
 
 
-class LocationLoadertMixin:
-    location_m2m_field = 'locations'
+class NestedLocationMixin:
+    location_m2m_field = None
 
     def get_locations(self, record, values: dict, **kwargs):
         locs = []
         locations = getattr(record, self.location_m2m_field)
         for location in locations.select_related('gateway').order_by('id'):
+            loc = Location.objects.get(source_id=location.id,
+                                       schema_name=self.context['country'].schema_name)
             locs.append(dict(
                 source_id=location.id,
                 name=location.name,
                 pcode=location.p_code,
+                latitude=loc.latitude,
+                longitude=loc.longitude,
                 level=location.level,
                 levelname=location.gateway.name
             ))
@@ -65,7 +69,7 @@ class LocationLoadertMixin:
         return ", ".join([l['name'] for l in locs])
 
 
-class LocationInlineMixin(models.Model):
+class NestedLocationLoaderMixin(models.Model):
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True, default=dict)
 

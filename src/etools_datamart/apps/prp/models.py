@@ -51,7 +51,7 @@ from django.utils import timezone
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 
-from etools_datamart.apps.data.models.mixins import LocationLoadertMixin
+from etools_datamart.apps.data.models.mixins import NestedLocationMixin
 from etools_datamart.apps.etl.loader import (BaseLoader, EtlResult, logger, MaxRecordsException,
                                              RequiredIsMissing, RequiredIsRunning, RUN_UNKNOWN,)
 from etools_datamart.apps.sources.source_prp.models import CoreCountry, CoreGatewaytype, IndicatorIndicatorlocationdata
@@ -156,7 +156,7 @@ class PrpBaseLoader(BaseLoader):
         return self.results
 
 
-class IndicatorByLocationLoader(PrpBaseLoader, LocationLoadertMixin):
+class IndicatorByLocationLoader(PrpBaseLoader, NestedLocationMixin):
     def get_location_levelname(self, record, values, field_name):
         pass
 

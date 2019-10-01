@@ -15,181 +15,11 @@ from etools_datamart.apps.etools.models import (FundsFundsreservationheader, Par
 
 from .base import EtoolsDataMartModel
 from .location import Location
-from .mixins import add_location_mapping, LocationMixin
+from .mixins import add_location_mapping, LocationMixin, NestedLocationLoaderMixin, NestedLocationMixin
 from .partner import Partner
 from .user_office import Office
 
 logger = logging.getLogger(__name__)
-
-
-class InterventionLoader(EtoolsLoader):
-    def get_queryset(self):
-        return PartnersIntervention.objects.select_related('agreement',
-                                                           'agreement__partner',
-                                                           ).prefetch_related('sections',
-                                                                              'flat_locations',
-                                                                              'offices',
-                                                                              'unicef_focal_points',
-                                                                              'partner_focal_points',
-                                                                              'result_links')
-
-    # def fr_currencies_ok(self, original: PartnersIntervention):
-    #     return original.frs__currency__count == 1 if original.frs__currency__count else None
-
-    def get_partner_id(self, record: PartnersIntervention, values: dict, **kwargs):
-        try:
-            return Partner.objects.get(schema_name=self.context['country'].schema_name,
-                                       source_id=record.agreement.partner.id).pk
-        except Partner.DoesNotExist:
-            return None
-
-    def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionplannedvisits.objects.filter(intervention=record)
-        qs = qs.filter(year=self.context['today'].year)
-        qs = qs.annotate(
-            planned=F('programmatic_q1') + F('programmatic_q2') + F('programmatic_q3') + F('programmatic_q4'))
-        record = qs.first()
-        if record:
-            return record.planned
-
-    def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = record.attachments.all()
-        values['number_of_attachments'] = qs.count()
-        return ", ".join(qs.values_list('type__name', flat=True))
-
-    def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersAgreementamendment.objects.filter(agreement=record.agreement).order_by('signed_date')
-        values['number_of_amendments'] = qs.count()
-        if qs:
-            values['last_amendment_date'] = qs.latest('signed_date').signed_date
-        types = [str(t) for t in qs.values_list('types', flat=True)]
-        return ", ".join(types)
-
-    def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
-        i1 = record.review_date_prc
-        i2 = record.signed_by_partner_date
-        if i1 and i2:
-            return (i2 - i1).days
-
-    def get_days_from_submission_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
-        i1 = record.submission_date
-        i2 = record.signed_by_unicef_date
-        if i1 and i2:
-            return (i2 - i1).days
-
-    def get_sections(self, record: PartnersIntervention, values: dict, **kwargs):
-        data = []
-        for section in record.sections.all():
-            data.append(dict(source_id=section.id,
-                             name=section.name,
-                             description=section.description,
-                             ))
-        values['sections_data'] = data
-        return ", ".join([l['name'] for l in data])
-
-    def get_locations(self, record: PartnersIntervention, values: dict, **kwargs):
-        # PartnersInterventionFlatLocations
-        locs = []
-        for location in record.flat_locations.select_related('gateway').order_by('id'):
-            locs.append(dict(
-                source_id=location.id,
-                name=location.name,
-                pcode=location.p_code,
-                level=location.level,
-                levelname=location.gateway.name,
-                latitude=location.latitude,
-                longitude=location.longitude,
-            ))
-        values['locations_data'] = locs
-        return ", ".join([l['name'] for l in locs])
-
-    def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
-        ta = T2FTravelactivity.objects.filter(partnership__pk=record.pk,
-                                              travel_type=TravelType.PROGRAMME_MONITORING,
-                                              travels__status='completed',
-                                              date__isnull=False,
-                                              ).order_by('date').last()
-        return ta.date if ta else None
-
-    def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
-        if record.unicef_signatory:
-            return "{0.username} ({0.email})".format(record.unicef_signatory)
-
-    def get_partner_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
-        if record.partner_authorized_officer_signatory:
-            return "{0.last_name} {0.first_name} ({0.email})".format(record.partner_authorized_officer_signatory)
-
-    def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
-        # PartnersInterventionOffices
-        data = []
-        for office in record.offices.select_related('zonal_chief').order_by('id'):
-            data.append(dict(source_id=office.id,
-                             name=office.name,
-                             zonal_chief_email=getattr(office.zonal_chief, 'email', ''),
-                             ))
-        values['offices_data'] = data
-        return ", ".join([l['name'] for l in data])
-
-    def get_clusters(self, record: PartnersIntervention, values: dict, **kwargs):
-
-        qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=record)
-        clusters = set()
-        for applied_indicator in qs.all():
-            if applied_indicator.cluster_name:
-                clusters.add(applied_indicator.cluster_name)
-        return ", ".join(clusters)
-
-    def get_partner_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
-        data = []
-        ret = []
-        for member in record.partner_focal_points.all():
-            # member is PartnersPartnerstaffmember
-            ret.append("{0.last_name} {0.first_name} ({0.email}) {0.phone}".format(member))
-            data.append(dict(last_name=member.last_name,
-                             first_name=member.first_name,
-                             email=member.email,
-                             phone=member.phone,
-                             ))
-
-        values['partner_focal_points_data'] = data
-        return ", ".join(ret)
-
-    def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
-        try:
-            return FundsFundsreservationheader.objects.get(intervention=record,
-                                                           end_date__isnull=True).fr_number
-        except FundsFundsreservationheader.MultipleObjectsReturned as e:
-            process_exception(e)
-            return None
-        except FundsFundsreservationheader.DoesNotExist:
-            return None
-
-    def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
-        values['cp_outputs_data'] = list(record.result_links.values("name", "code"))
-        return ", ".join([rl.name for rl in record.result_links.all()])
-
-    def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
-        data = []
-        ret = []
-        for member in record.unicef_focal_points.all():
-            ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
-            data.append(dict(last_name=member.last_name,
-                             first_name=member.first_name,
-                             email=member.email,
-                             ))
-
-        values['unicef_focal_points_data'] = data
-        return ", ".join(ret)
-
-    # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
-    #     if original.frs__actual_amt_local__sum is None:
-    #         return None
-    #
-    #     if not (self.fr_currencies_ok(original) and original.max_fr_currency == original.planned_budget.currency):
-    #         return "!Error! (currencies do not match)"
-    #     percent = original.frs__actual_amt_local__sum / original.total_unicef_cash * 100 \
-    #         if original.total_unicef_cash and original.total_unicef_cash > 0 else 0
-    #     return "%.1f" % percent
 
 
 class InterventionAbstract(models.Model):
@@ -352,7 +182,163 @@ class InterventionAbstract(models.Model):
         )
 
 
-class Intervention(InterventionAbstract, EtoolsDataMartModel):
+class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
+    location_m2m_field = 'flat_locations'
+
+    def get_queryset(self):
+        return PartnersIntervention.objects.select_related('agreement',
+                                                           'agreement__partner',
+                                                           ).prefetch_related('sections',
+                                                                              'flat_locations',
+                                                                              'offices',
+                                                                              'unicef_focal_points',
+                                                                              'partner_focal_points',
+                                                                              'result_links')
+
+    # def fr_currencies_ok(self, original: PartnersIntervention):
+    #     return original.frs__currency__count == 1 if original.frs__currency__count else None
+
+    def get_partner_id(self, record: PartnersIntervention, values: dict, **kwargs):
+        try:
+            return Partner.objects.get(schema_name=self.context['country'].schema_name,
+                                       source_id=record.agreement.partner.id).pk
+        except Partner.DoesNotExist:
+            return None
+
+    def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
+        qs = PartnersInterventionplannedvisits.objects.filter(intervention=record)
+        qs = qs.filter(year=self.context['today'].year)
+        qs = qs.annotate(
+            planned=F('programmatic_q1') + F('programmatic_q2') + F('programmatic_q3') + F('programmatic_q4'))
+        record = qs.first()
+        if record:
+            return record.planned
+
+    def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
+        qs = record.attachments.all()
+        values['number_of_attachments'] = qs.count()
+        return ", ".join(qs.values_list('type__name', flat=True))
+
+    def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
+        qs = PartnersAgreementamendment.objects.filter(agreement=record.agreement).order_by('signed_date')
+        values['number_of_amendments'] = qs.count()
+        if qs:
+            values['last_amendment_date'] = qs.latest('signed_date').signed_date
+        types = [str(t) for t in qs.values_list('types', flat=True)]
+        return ", ".join(types)
+
+    def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
+        i1 = record.review_date_prc
+        i2 = record.signed_by_partner_date
+        if i1 and i2:
+            return (i2 - i1).days
+
+    def get_days_from_submission_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
+        i1 = record.submission_date
+        i2 = record.signed_by_unicef_date
+        if i1 and i2:
+            return (i2 - i1).days
+
+    def get_sections(self, record: PartnersIntervention, values: dict, **kwargs):
+        data = []
+        for section in record.sections.all():
+            data.append(dict(source_id=section.id,
+                             name=section.name,
+                             description=section.description,
+                             ))
+        values['sections_data'] = data
+        return ", ".join([l['name'] for l in data])
+
+    def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
+        ta = T2FTravelactivity.objects.filter(partnership__pk=record.pk,
+                                              travel_type=TravelType.PROGRAMME_MONITORING,
+                                              travels__status='completed',
+                                              date__isnull=False,
+                                              ).order_by('date').last()
+        return ta.date if ta else None
+
+    def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
+        if record.unicef_signatory:
+            return "{0.username} ({0.email})".format(record.unicef_signatory)
+
+    def get_partner_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
+        if record.partner_authorized_officer_signatory:
+            return "{0.last_name} {0.first_name} ({0.email})".format(record.partner_authorized_officer_signatory)
+
+    def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
+        # PartnersInterventionOffices
+        data = []
+        for office in record.offices.select_related('zonal_chief').order_by('id'):
+            data.append(dict(source_id=office.id,
+                             name=office.name,
+                             zonal_chief_email=getattr(office.zonal_chief, 'email', ''),
+                             ))
+        values['offices_data'] = data
+        return ", ".join([l['name'] for l in data])
+
+    def get_clusters(self, record: PartnersIntervention, values: dict, **kwargs):
+
+        qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=record)
+        clusters = set()
+        for applied_indicator in qs.all():
+            if applied_indicator.cluster_name:
+                clusters.add(applied_indicator.cluster_name)
+        return ", ".join(clusters)
+
+    def get_partner_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
+        data = []
+        ret = []
+        for member in record.partner_focal_points.all():
+            # member is PartnersPartnerstaffmember
+            ret.append("{0.last_name} {0.first_name} ({0.email}) {0.phone}".format(member))
+            data.append(dict(last_name=member.last_name,
+                             first_name=member.first_name,
+                             email=member.email,
+                             phone=member.phone,
+                             ))
+
+        values['partner_focal_points_data'] = data
+        return ", ".join(ret)
+
+    def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
+        try:
+            return FundsFundsreservationheader.objects.get(intervention=record,
+                                                           end_date__isnull=True).fr_number
+        except FundsFundsreservationheader.MultipleObjectsReturned as e:
+            process_exception(e)
+            return None
+        except FundsFundsreservationheader.DoesNotExist:
+            return None
+
+    def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
+        values['cp_outputs_data'] = list(record.result_links.values("name", "code"))
+        return ", ".join([rl.name for rl in record.result_links.all()])
+
+    def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
+        data = []
+        ret = []
+        for member in record.unicef_focal_points.all():
+            ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
+            data.append(dict(last_name=member.last_name,
+                             first_name=member.first_name,
+                             email=member.email,
+                             ))
+
+        values['unicef_focal_points_data'] = data
+        return ", ".join(ret)
+
+    # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
+    #     if original.frs__actual_amt_local__sum is None:
+    #         return None
+    #
+    #     if not (self.fr_currencies_ok(original) and original.max_fr_currency == original.planned_budget.currency):
+    #         return "!Error! (currencies do not match)"
+    #     percent = original.frs__actual_amt_local__sum / original.total_unicef_cash * 100 \
+    #         if original.total_unicef_cash and original.total_unicef_cash > 0 else 0
+    #     return "%.1f" % percent
+
+
+class Intervention(NestedLocationMixin, EtoolsDataMartModel):
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True, default=dict)
 
