@@ -1,3 +1,9 @@
+2.3
+---
+* fixes lat/lng informations
+* fixes Intervention.reference_number
+
+
 2.2
 ---
 * fixes InterventionBudgetLoader
