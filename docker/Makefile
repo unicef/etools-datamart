@@ -109,11 +109,10 @@ release:
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 
 deploy:
-	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:datamart-admin ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:celery-w2 ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:datamart-admin ${DOCKER_IMAGE_NAME}:${TARGET}
 	curl -X POST -H 'Content-type: application/json' \
 		--data '{"text":"Datamart ${TARGET} released in dev"}' \
 		https://hooks.slack.com/services/${SLACK_BOT_TOKEN}

@@ -6,6 +6,8 @@ class SafeDecimal(Decimal):
     def __new__(cls, value="0", context=None):
         if value is None:
             return None
+        if isinstance(value, int):
+            value = str(value)
         if isinstance(value, str) and ',' in value:
             value = value.replace(',', '.')
         value = value.rstrip('0').rstrip('.') if '.' in value else value
