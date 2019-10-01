@@ -56,7 +56,7 @@ router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 
-from etools_datamart.apps.prp import api_urls  # noqa isort:skip
+from etools_datamart.apps.sources.source_prp import api_urls  # noqa isort:skip
 from .endpoints.rapidpro import _urls_  # noqa isort:skip
 
 urlpatterns = [

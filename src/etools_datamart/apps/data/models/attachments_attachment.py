@@ -9,7 +9,7 @@ from .partner import Partner
 
 class AttachmentLoader(EtoolsLoader):
 
-    def get_linked_to(self, original: AttachmentsAttachmentflat, values: dict, **kwargs):
+    def get_linked_to(self, record: AttachmentsAttachmentflat, values: dict, **kwargs):
         return None
 
 

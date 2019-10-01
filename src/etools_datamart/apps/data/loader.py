@@ -28,6 +28,72 @@ class EToolsLoaderOptions(BaseLoaderOptions):
 
 
 class EtoolsLoader(BaseLoader):
+    def get_mart_values(self, record=None):
+        country = self.context['country']
+        ret = {'area_code': country.business_area_code,
+               'schema_name': country.schema_name,
+               'country_name': country.name,
+               'seen': self.context['today']
+               }
+        if record:
+            ret['source_id'] = record.id
+        return ret
+
+    # def get_values(self, record):
+    #     country = self.context['country']
+    #     ret = self.get_mart_values(record)
+    #
+    #     for k, v in self.mapping.items():
+    #         if k in ret:
+    #             continue
+    #         if v is None:
+    #             ret[k] = None
+    #         elif v == 'N/A':
+    #             ret[k] = 'N/A'
+    #         elif v == 'i':
+    #             continue
+    #         elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
+    #             getter = getattr(self, v)
+    #             _value = getter(record, ret, field_name=k)
+    #             if _value != self.noop:
+    #                 ret[k] = _value
+    #         elif v == '-' or hasattr(self, 'get_%s' % k):
+    #             getter = getattr(self, 'get_%s' % k)
+    #             _value = getter(record, ret, field_name=k)
+    #             if _value != self.noop:
+    #                 ret[k] = _value
+    #         elif v == '__self__':
+    #             try:
+    #                 ret[k] = self.model.objects.get(schema_name=country.schema_name,
+    #                                                 source_id=getattr(record, k).id)
+    #             except AttributeError:
+    #                 ret[k] = None
+    #             except self.model.DoesNotExist:
+    #                 ret[k] = None
+    #                 self.tree_parents.append((record.id, getattr(record, k).id))
+    #
+    #         elif isclass(v) and issubclass(v, models.Model):
+    #             try:
+    #                 ret[k] = v.objects.get(schema_name=country.schema_name,
+    #                                        source_id=getattr(record, k).id)
+    #             except ObjectDoesNotExist:  # pragma: no cover
+    #                 ret[k] = None
+    #             except AttributeError:  # pragma: no cover
+    #                 pass
+    #         elif callable(v):
+    #             ret[k] = v(self, record)
+    #         elif v == '=' and has_attr(record, k):
+    #             ret[k] = get_attr(record, k)
+    #         # elif has_attr(record, k):
+    #         #     ret[k] = get_attr(record, k)
+    #         elif not isinstance(v, str):
+    #             ret[k] = v
+    #         elif has_attr(record, v):
+    #             ret[k] = get_attr(record, v)
+    #         else:
+    #             raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
+    #
+    #     return ret
 
     def filter_queryset(self, qs):
         use_delta = self.context['only_delta'] and not self.context['is_empty']
@@ -169,7 +235,6 @@ class EtoolsLoader(BaseLoader):
             self.on_end(None)
             cache.set("STATUS:%s" % self.etl_task.task, "completed - %s" % self.results.processed)
         finally:
-            cache.set("STATUS:%s" % self.etl_task.task, "error")
             if lock:  # pragma: no branch
                 try:
                     lock.release()

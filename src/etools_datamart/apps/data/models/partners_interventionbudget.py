@@ -13,16 +13,16 @@ class InterventionBudgetLoader(InterventionLoader):
         qs = self.filter_queryset(PartnersInterventionbudget.objects.all())
         for record in qs.all():
             record.intervention.budget = record
-            filters = self.config.key(self, record.intervention)
+            filters = self.config.key(self, record)
             values = self.get_values(record.intervention)
             values['source_id'] = record.id
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
-    def get_fr_numbers(self, original: PartnersIntervention, values: dict, **kwargs):
+    def get_fr_numbers(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
-        for fr in FundsFundsreservationheader.objects.filter(intervention=original):
+        for fr in FundsFundsreservationheader.objects.filter(intervention=record):
             ret.append(fr.fr_number)
             data.append(dict(fr_number=fr.fr_number,
                              vendor_code=fr.vendor_code,

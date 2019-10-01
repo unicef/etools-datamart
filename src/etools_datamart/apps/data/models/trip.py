@@ -33,24 +33,24 @@ class TripLoader(EtoolsLoader):
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
-    def get_is_second_traveler(self, original: T2FTravel, values: dict, **kwargs):
-        return original.traveler != original.activity.primary_traveler
+    def get_is_second_traveler(self, record: T2FTravel, values: dict, **kwargs):
+        return record.traveler != record.activity.primary_traveler
 
-    def get_attachments(self, original: T2FTravel, values: dict, **kwargs):
+    def get_attachments(self, record: T2FTravel, values: dict, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
-                                   original.attachments.values_list('type', 'file'))))
+                                   record.attachments.values_list('type', 'file'))))
 
-    def get_hact_visit_report(self, original: T2FTravel, values: dict, **kwargs):
+    def get_hact_visit_report(self, record: T2FTravel, values: dict, **kwargs):
         return "Yes" if T2FTravelattachment.objects.filter(
-            travel=original,
+            travel=record,
             type__istartswith="HACT Programme Monitoring",
         ).exists() else ""
 
-    def get_locations(self, original: T2FTravel, values: dict, **kwargs):
+    def get_locations(self, record: T2FTravel, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention
-        for location in original.activity.locations.select_related('gateway').order_by('id'):
+        for location in record.activity.locations.select_related('gateway').order_by('id'):
             locs.append(dict(
                 source_id=location.id,
                 name=location.name,

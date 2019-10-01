@@ -37,13 +37,13 @@ class EngagementlLoader(EtoolsLoader):
         return DjangoContentType.objects.get(app_label='audit',
                                              model=mapping[sub_type])
 
-    def get_reference_number(self, original: AuditEngagement, values: dict, **kwargs):
-        engagement_code = 'a' if original.engagement_type == AuditEngagementConsts.TYPE_AUDIT else original.engagement_type
+    def get_reference_number(self, record: AuditEngagement, values: dict, **kwargs):
+        engagement_code = 'a' if record.engagement_type == AuditEngagementConsts.TYPE_AUDIT else record.engagement_type
         return "/".join([self.context['country'].country_short_code,
-                         original.partner.name[:5],
+                         record.partner.name[:5],
                          engagement_code.upper(),
-                         str(original.created.year),
-                         str(original.id)
+                         str(record.created.year),
+                         str(record.id)
                          ])
         # return '{}/{}/{}/{}/{}'.format(
         #     self.context['country'].short_code,
@@ -54,19 +54,19 @@ class EngagementlLoader(EtoolsLoader):
         #     original.id
         # )
 
-    def get_engagement_attachments(self, original: AuditEngagement, values: dict, **kwargs):
+    def get_engagement_attachments(self, record: AuditEngagement, values: dict, **kwargs):
         # audit_engagement
         ret = AttachmentsAttachment.objects.filter(
-            object_id=original.id,
+            object_id=record.id,
             code='audit_engagement',
             content_type=self.get_content_type(AuditEngagement)).values_list('file', flat=True)
 
         return ", ".join(ret)
 
-    def get_report_attachments(self, original: AuditEngagement, values: dict, **kwargs):
+    def get_report_attachments(self, record: AuditEngagement, values: dict, **kwargs):
         # audit_report
         ret = AttachmentsAttachment.objects.filter(
-            object_id=original.id,
+            object_id=record.id,
             code='audit_report',
             content_type=self.get_content_type(AuditEngagement)).values_list('file', flat=True)
 
@@ -88,12 +88,12 @@ class EngagementlLoader(EtoolsLoader):
     #         values['spotcheck_final_report'] = None
     #         values['spotcheck_internal_controls'] = None
 
-    def get_final_report(self, original: AuditEngagement, values: dict, **kwargs):
-        if getattr(original._impl, 'final_report', None):
+    def get_final_report(self, record: AuditEngagement, values: dict, **kwargs):
+        if getattr(record._impl, 'final_report', None):
             return AttachmentsAttachment.objects.get(
-                object_id=original.id,
-                code=attachment_codes[original.sub_type],
-                content_type=self.get_content_type(original.sub_type)).file
+                object_id=record.id,
+                code=attachment_codes[record.sub_type],
+                content_type=self.get_content_type(record.sub_type)).file
 
     def get_values(self, record, ):
         values = {}
@@ -105,9 +105,9 @@ class EngagementlLoader(EtoolsLoader):
         self.mapping.update(**values)
         return super(EngagementlLoader, self).get_values(record)
 
-    def get_authorized_officers(self, original: AuditEngagement, values: dict, **kwargs):
+    def get_authorized_officers(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
-        for o in original.authorized_officers.all():
+        for o in record.authorized_officers.all():
             ret.append({'last_name': o.last_name,
                         'first_name': o.first_name,
                         'partner': o.partner.name,
@@ -116,11 +116,11 @@ class EngagementlLoader(EtoolsLoader):
         values['authorized_officers_data'] = ret
         return ", ".join([o['email'] for o in ret])
 
-    def get_active_pd(self, original: AuditEngagement, values: dict, **kwargs):
+    def get_active_pd(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
         for o in (AuditEngagementActivePd.objects
                   .select_related('intervention')
-                  .filter(engagement=original)):
+                  .filter(engagement=record)):
             ret.append({'title': o.intervention.title,
                         'number': o.intervention.number,
                         'status': o.intervention.status,
@@ -130,11 +130,11 @@ class EngagementlLoader(EtoolsLoader):
         values['active_pd_data'] = ret
         return ", ".join([o['number'] for o in ret])
 
-    def get_partner(self, original: AuditEngagement, values: dict, **kwargs):
+    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
         try:
             p = Partner.objects.get(
                 schema_name=self.context['country'].schema_name,
-                source_id=original.partner.id)
+                source_id=record.partner.id)
             return {'name': p.name,
                     'vendor_number': p.vendor_number,
                     'id': p.id,
@@ -145,17 +145,17 @@ class EngagementlLoader(EtoolsLoader):
                     'id': 'N/A',
                     'source_id': 'N/A'}
 
-    def get_partner_id(self, original: AuditEngagement, values: dict, **kwargs):
+    def get_partner_id(self, record: AuditEngagement, values: dict, **kwargs):
         try:
             return Partner.objects.get(
                 schema_name=self.context['country'].schema_name,
-                source_id=original.partner.id).pk
+                source_id=record.partner.id).pk
         except Partner.DoesNotExist:
             return None
 
-    def get_staff_members(self, original: AuditEngagement, values: dict, **kwargs):
+    def get_staff_members(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
-        for o in original.staff_members.all():
+        for o in record.staff_members.all():
             ret.append({'last_name': o.user.last_name,
                         'first_name': o.user.first_name,
                         'email': o.user.email,

@@ -4,7 +4,7 @@ from django.db import models
 from etools_datamart.apps.data.fields import SafeDecimal
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.data.models.mixins import LocationInlineMixin, LocationLoadertMixin
+from etools_datamart.apps.data.models.mixins import NestedLocationLoaderMixin, NestedLocationMixin
 from etools_datamart.apps.etools.models import PartnersIntervention, ReportsAppliedindicator, ReportsLowerresult
 
 
@@ -12,13 +12,19 @@ def get_pd_output_names(obj: PartnersIntervention):
     return [ll.name for rl in obj.result_links.all() for ll in rl.ll_results.all()]
 
 
-class ReportIndicatorLoader(LocationLoadertMixin, EtoolsLoader):
+class ReportIndicatorLoader(NestedLocationLoaderMixin, EtoolsLoader):
+    location_m2m_field = 'locations'
+
     def get_baseline_denominator(self, record, values, field_name):
         value = SafeDecimal(record.baseline.get('d'))
+        if value:
+            value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_baseline_numerator(self, record, values, field_name):
         value = SafeDecimal(record.baseline.get('v'))
+        if value:
+            value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_target_value(self, record, values, field_name):
@@ -83,11 +89,11 @@ class ReportIndicatorLoader(LocationLoadertMixin, EtoolsLoader):
             self.increment_counter(op)
 
 
-class ReportIndicator(LocationInlineMixin, EtoolsDataMartModel):
+class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):
     assumptions = models.TextField(null=True, blank=True, )
     baseline = JSONField(default=dict, blank=True, null=True)
-    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
-    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
+    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
     # baseline_denominator = models.IntegerField(blank=True, null=True)
     # baseline_numerator = models.IntegerField(blank=True, null=True)
     cluster_indicator_id = models.PositiveIntegerField(blank=True, null=True, )
@@ -121,8 +127,8 @@ class ReportIndicator(LocationInlineMixin, EtoolsDataMartModel):
     # source_disaggregation_id = models.IntegerField(blank=True, null=True)
     # source_location_id = models.IntegerField(blank=True, null=True)
     target = JSONField(default=dict, blank=True, null=True)
-    target_denominator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
-    target_numerator = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=3)
+    target_denominator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
+    target_numerator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
     # target_denominator = models.IntegerField(blank=True, null=True)
     # target_numerator = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=1024, blank=True, null=True)

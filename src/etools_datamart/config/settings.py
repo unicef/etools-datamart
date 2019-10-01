@@ -77,7 +77,7 @@ MEDIA_ROOT = env('MEDIA_ROOT')
 STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
 URL_PREFIX = env('URL_PREFIX')
@@ -114,7 +114,7 @@ DATABASE_ROUTERS = [
     #                            'auth', 'authtoken', 'contenttypes',
     #                            'django_db_logging'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
-    router_factory('prp', ['prp'], syncdb=True),
+    router_factory('prp', ['source_prp'], syncdb=False),
 ]
 
 LOGIN_URL = '/login/'
@@ -300,8 +300,9 @@ INSTALLED_APPS = [
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
-    'etools_datamart.apps.prp',
+    'etools_datamart.apps.sources.source_prp.apps.Config',
     'etools_datamart.apps.rapidpro',
+    'etools_datamart.apps.prp',
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',

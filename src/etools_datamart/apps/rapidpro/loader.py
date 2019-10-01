@@ -1,3 +1,5 @@
+import inspect
+
 from django.utils import timezone
 
 from celery.utils.log import get_task_logger
@@ -6,7 +8,8 @@ from strategy_field.utils import get_attr
 from temba_client.serialization import TembaObject
 from temba_client.v2 import TembaClient
 
-from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, EtlResult, has_attr, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import (BaseLoader, BaseLoaderOptions, EtlResult,
+                                             has_attr, MaxRecordsException, RUN_UNKNOWN,)
 
 logger = get_task_logger(__name__)
 
@@ -88,11 +91,11 @@ class TembaLoader(BaseLoader):
 
             self.on_start(run_type)
             for source in sources:
-                if verbosity >= 0:
+                if verbosity > 0:
                     stdout.write("Source %s" % source)
                 client = TembaClient(config.RAPIDPRO_ADDRESS, source.api_token)
                 oo = client.get_org()
-                if verbosity >= 0:
+                if verbosity > 0:
                     stdout.write("  fetching organization info")
 
                 org, __ = Organization.objects.get_or_create(source=source,
@@ -104,12 +107,19 @@ class TembaLoader(BaseLoader):
                                                                        'languages': oo.languages,
                                                                        'anon': oo.anon
                                                                        })
-                if verbosity >= 0:
+                if verbosity > 0:
                     stdout.write("  found organization %s" % oo.name)
 
                 func = "get_%s" % self.config.source
                 getter = getattr(client, func)
-                data = getter(after=self.etl_task.last_success)
+
+                args_spec = inspect.getfullargspec(getter)
+                if 'after' in args_spec.args and self.etl_task.last_success:
+                    filters = dict(after=self.etl_task.last_success)
+                else:
+                    filters = {}
+
+                data = getter(**filters)
                 self.update_context(today=timezone.now(),
                                     max_records=max_records,
                                     verbosity=verbosity,
@@ -119,7 +129,7 @@ class TembaLoader(BaseLoader):
                                     stdout=stdout,
                                     organization=source.organization
                                     )
-                if verbosity >= 0:
+                if verbosity > 0:
                     stdout.write("  fetching data")
                 for page in data.iterfetches():
                     for entry in page:
@@ -131,6 +141,8 @@ class TembaLoader(BaseLoader):
                         op = self.process_record(filters, values)
                         self.increment_counter(op)
 
+        except MaxRecordsException:
+            pass
         except Exception as e:
             self.on_end(error=e)
             raise

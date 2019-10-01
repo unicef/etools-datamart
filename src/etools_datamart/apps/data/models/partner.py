@@ -14,7 +14,7 @@ class PartnerLoader(EtoolsLoader):
     def get_queryset(self):
         return PartnersPartnerorganization.objects.select_related('planned_engagement').all()
 
-    def get_last_pv_date(self, record, valuess, **kwargs):
+    def get_last_pv_date(self, record, values, **kwargs):
         # FIXME: improves this
         activity = T2FTravelactivity.objects.filter(partnership__agreement__partner=record,
                                                     travel_type=TravelType.PROGRAMME_MONITORING,
@@ -26,7 +26,7 @@ class PartnerLoader(EtoolsLoader):
         if activity:
             return activity.date
 
-    def get_planned_engagement(self, record, valuess, **kwargs):
+    def get_planned_engagement(self, record, values, **kwargs):
         try:
             rec = record.planned_engagement
             data = {'spot_check_planned_q1': rec.spot_check_planned_q1,

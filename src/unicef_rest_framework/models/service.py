@@ -147,7 +147,10 @@ class Service(MasterDataModel):
 
     @cached_property
     def endpoint(self):
-        return reverse(f'api:{self.basename}-list', args=['latest'])
+        try:
+            return reverse(f'api:{self.basename}-list', args=['latest'])
+        except Exception:
+            pass
 
     @cached_property
     def display_name(self):

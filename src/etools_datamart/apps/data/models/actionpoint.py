@@ -29,19 +29,19 @@ RELATED_MODULE_CHOICES = zip(RELATED_MODULE_NAMES, RELATED_MODULE_NAMES)
 
 class ActionPointLoader(EtoolsLoader):
 
-    def get_reference_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
+    def get_reference_number(self, record: ActionPointsActionpoint, values: dict, **kwargs):
         country = self.context['country']
         return '{}/{}/{}/APD'.format(country.country_short_code or '',
-                                     original.created.year,
-                                     original.id)
+                                     record.created.year,
+                                     record.id)
 
     # def get_category_module(self, original: ActionPointsActionpoint, values: dict):
     #     if original.engagement:
     #         return original.engagement.engagement_type
 
-    def get_actions_taken(self, original: ActionPointsActionpoint, values: dict, **kwargs):
+    def get_actions_taken(self, record: ActionPointsActionpoint, values: dict, **kwargs):
         ct = DjangoContentType.objects.get(app_label='action_points', model='actionpoint')
-        comments = DjangoComments.objects.filter(object_pk=original.id,
+        comments = DjangoComments.objects.filter(object_pk=record.id,
                                                  content_type=ct)
         return ";\n\n".join(["{} ({}): {}".format(c.user if c.user else '-', c.submit_date.strftime(
             "%d %b %Y"), c.comment) for c in comments.all()])
@@ -50,48 +50,48 @@ class ActionPointLoader(EtoolsLoader):
     #     if original.tpm_activity:
     #         return original.tpm_activity.tpm_visit.reference_number
     #
-    def get_related_module_id(self, original: ActionPointsActionpoint, values: dict, **kwargs):
+    def get_related_module_id(self, record: ActionPointsActionpoint, values: dict, **kwargs):
         module = values['related_module_class']
         if module in ENGAGEMENTS_NAMES:
-            return original.engagement.pk
+            return record.engagement.pk
         elif module == 'TpmTpmactivity':
-            return original.tpm_activity.tpm_visit_id
+            return record.tpm_activity.tpm_visit_id
         elif module == 'T2FTravelactivity':
-            return original.travel_activity.pk
+            return record.travel_activity.pk
         elif module is None:
             return None
         raise ValueError(values['related_module_class'])
 
-    def get_related_module_class(self, original: ActionPointsActionpoint, values: dict, **kwargs):
-        if original.engagement:
+    def get_related_module_class(self, record: ActionPointsActionpoint, values: dict, **kwargs):
+        if record.engagement:
             for target in ENGAGEMENTS:
                 try:
-                    target.objects.get(engagement_ptr=original.engagement_id)
+                    target.objects.get(engagement_ptr=record.engagement_id)
                     return target.__name__
                 except ObjectDoesNotExist:
                     pass
             return 'Error'
-        elif original.tpm_activity:
+        elif record.tpm_activity:
             return 'TpmTpmactivity'
-        elif original.travel_activity:
+        elif record.travel_activity:
             return 'T2FTravelactivity'
         return None
 
-    def get_engagement_subclass(self, original: ActionPointsActionpoint, values: dict, **kwargs):
+    def get_engagement_subclass(self, record: ActionPointsActionpoint, values: dict, **kwargs):
         # targets = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
-        if not original.engagement:
+        if not record.engagement:
             return None
         for target in ENGAGEMENTS:
             try:
-                target.objects.get(engagement_ptr=original.engagement_id)
+                target.objects.get(engagement_ptr=record.engagement_id)
                 return target.__name__
             except ObjectDoesNotExist:
                 pass
-        raise ValueError('Cannot find subclass for ActionPoint #%s Engagement %s' % (original.id,
-                                                                                     original.engagement_id))
+        raise ValueError('Cannot find subclass for ActionPoint #%s Engagement %s' % (record.id,
+                                                                                     record.engagement_id))
 
-    def get_intervention_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
-        intervention = original.intervention
+    def get_intervention_number(self, record: ActionPointsActionpoint, values: dict, **kwargs):
+        intervention = record.intervention
         if intervention:
             agreement_base_number = intervention.agreement.agreement_number.split('-')[0]
             if intervention.document_type != PartnersIntervention.SSFA:
@@ -104,31 +104,31 @@ class ActionPointLoader(EtoolsLoader):
                 return number
             return agreement_base_number
 
-    def get_module_reference_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
-        if original.engagement:
-            engagement_code = 'a' if original.engagement.engagement_type == AuditEngagement.TYPE_AUDIT else original.engagement.engagement_type
+    def get_module_reference_number(self, record: ActionPointsActionpoint, values: dict, **kwargs):
+        if record.engagement:
+            engagement_code = 'a' if record.engagement.engagement_type == AuditEngagement.TYPE_AUDIT else record.engagement.engagement_type
             return '{}/{}/{}/{}/{}'.format(
                 self.context['country'].country_short_code or '',
-                original.partner.name[:5],
+                record.partner.name[:5],
                 engagement_code.upper(),
-                original.created.year,
-                original.id
+                record.created.year,
+                record.id
             )
-        elif original.tpm_activity:
-            return original.tpm_activity.tpm_visit.reference_number
-        elif original.travel_activity:
-            ta = original.travel_activity
+        elif record.tpm_activity:
+            return record.tpm_activity.tpm_visit.reference_number
+        elif record.travel_activity:
+            ta = record.travel_activity
             travel = ta.travels.filter(traveler=ta.primary_traveler).first()
             if not travel:
                 return
             return travel.reference_number
 
-    def get_module_task_activity_reference_number(self, original: ActionPointsActionpoint, values: dict, **kwargs):
-        obj = original.related_object
+    def get_module_task_activity_reference_number(self, record: ActionPointsActionpoint, values: dict, **kwargs):
+        obj = record.related_object
         if not obj:
             return 'n/a'
 
-        if original.tpm_activity:
+        if record.tpm_activity:
             return obj.tpm_visit.reference_number
 
 

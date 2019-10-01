@@ -1,7 +1,7 @@
 from unicef_rest_framework.views import URFReadOnlyModelViewSet
 
 from etools_datamart.api.endpoints.etools import serializers
-from etools_datamart.apps.prp import models
+from etools_datamart.apps.sources.source_prp import models
 
 
 class AccountUserSerializer(serializers.ModelSerializer):

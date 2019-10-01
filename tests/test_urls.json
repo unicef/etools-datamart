@@ -437,10 +437,16 @@
   "\\+sw(?P<format>\\.json|\\.yaml)$",
   "^\\+swagger/$",
   "^\\+redoc/$",
-  "^datamart/rapidpro/group/$",
-  "^datamart/rapidpro/group\\.(?P<format>[a-z0-9]+)/?$",
-  "^datamart/rapidpro/group/iqy/$",
-  "^datamart/rapidpro/group/iqy\\.(?P<format>[a-z0-9]+)/?$",
-  "^datamart/rapidpro/group/(?P<pk>[^/.]+)/$",
-  "^datamart/rapidpro/group/(?P<pk>[^/.]+)\\.(?P<format>[a-z0-9]+)/?$"
+  "^rapidpro/contact/$",
+  "^rapidpro/contact\\.(?P<format>[a-z0-9]+)/?$",
+  "^rapidpro/contact/iqy/$",
+  "^rapidpro/contact/iqy\\.(?P<format>[a-z0-9]+)/?$",
+  "^rapidpro/contact/(?P<pk>[^/.]+)/$",
+  "^rapidpro/contact/(?P<pk>[^/.]+)\\.(?P<format>[a-z0-9]+)/?$",
+  "^rapidpro/group/$",
+  "^rapidpro/group\\.(?P<format>[a-z0-9]+)/?$",
+  "^rapidpro/group/iqy/$",
+  "^rapidpro/group/iqy\\.(?P<format>[a-z0-9]+)/?$",
+  "^rapidpro/group/(?P<pk>[^/.]+)/$",
+  "^rapidpro/group/(?P<pk>[^/.]+)\\.(?P<format>[a-z0-9]+)/?$"
 ]

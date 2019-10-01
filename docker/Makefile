@@ -4,8 +4,8 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.2
-BASE=2.0
+TARGET?=2.3
+BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]\)\.\([0-9]\)\.\(.*\)/\1.\2/g" )
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -18,7 +18,7 @@ DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
 PORTS=
-ABSOLUTE_BASE_URL?="http://192.268.66.66:8000"
+ABSOLUTE_BASE_URL?="http://192.368.66.66:8000"
 
 help:
 	@echo "dev                  build dev image (based on local code)"
@@ -71,12 +71,12 @@ build_old:
 	cd .. && docker run \
 	 		--rm \
 			-e ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
-			-e CACHE_URL=redis://192.268.66.66:6379/1 \
-			-e CACHE_URL_API=redis://192.268.66.66:6379/2 \
-			-e CACHE_URL_LOCK=redis://192.268.66.66:6379/3 \
-			-e CACHE_URL_TEMPLATE=redis://192.268.66.66:6379/4 \
-			-e CELERY_BROKER_URL=redis://192.268.66.66:6379/2 \
-			-e CELERY_RESULT_BACKEND=redis://192.268.66.66:6379/3 \
+			-e CACHE_URL=redis://192.368.66.66:6379/1 \
+			-e CACHE_URL_API=redis://192.368.66.66:6379/2 \
+			-e CACHE_URL_LOCK=redis://192.368.66.66:6379/3 \
+			-e CACHE_URL_TEMPLATE=redis://192.368.66.66:6379/4 \
+			-e CELERY_BROKER_URL=redis://192.368.66.66:6379/2 \
+			-e CELERY_RESULT_BACKEND=redis://192.368.66.66:6379/3 \
 			-e CSRF_COOKIE_SECURE=false \
 			-e DATABASE_URL=${DATABASE_URL} \
 			-e DATABASE_URL_ETOOLS=${DATABASE_URL_ETOOLS} \
@@ -109,11 +109,10 @@ release:
 	docker push ${DOCKER_IMAGE_NAME}:${TARGET}
 
 deploy:
-	lazo rancher upgrade datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:datamart-admin ${DOCKER_IMAGE_NAME}:${TARGET}
-	lazo rancher upgrade datamart:celery-w2 ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:datamart ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:celery ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:beat ${DOCKER_IMAGE_NAME}:${TARGET}
+	lazo rancher upgrade --no-check datamart:datamart-admin ${DOCKER_IMAGE_NAME}:${TARGET}
 	curl -X POST -H 'Content-type: application/json' \
 		--data '{"text":"Datamart ${TARGET} released in dev"}' \
 		https://hooks.slack.com/services/${SLACK_BOT_TOKEN}

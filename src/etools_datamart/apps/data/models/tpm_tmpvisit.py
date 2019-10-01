@@ -11,9 +11,9 @@ from etools_datamart.apps.etools.models import (AttachmentsAttachment, DjangoCon
 
 
 class TPMVisitLoader(EtoolsLoader):
-    def get_activities(self, original: TpmTpmvisit, values: dict, **kwargs):
+    def get_activities(self, record: TpmTpmvisit, values: dict, **kwargs):
         ret = []
-        for activity in original.activities.order_by('activity_ptr_id'):
+        for activity in record.activities.order_by('activity_ptr_id'):
             ret.append(dict(
                 source_id=activity.activity_ptr_id,
                 date=str(activity.activity_ptr.date),
