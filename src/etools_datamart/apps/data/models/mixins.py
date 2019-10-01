@@ -47,7 +47,7 @@ class LocationMixin(models.Model):
         abstract = True
 
 
-class NestedLocationMixin:
+class NestedLocationLoaderMixin:
     location_m2m_field = None
 
     def get_locations(self, record, values: dict, **kwargs):
@@ -69,7 +69,7 @@ class NestedLocationMixin:
         return ", ".join([l['name'] for l in locs])
 
 
-class NestedLocationLoaderMixin(models.Model):
+class NestedLocationMixin(models.Model):
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True, default=dict)
 
