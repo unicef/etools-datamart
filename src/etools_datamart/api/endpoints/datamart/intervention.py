@@ -7,7 +7,7 @@ from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleCho
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.models import PartnersIntervention
+from etools_datamart.apps.etools.enrichment.consts import PartnersInterventionConst
 
 from .. import common
 from .location import LocationSerializerPos
@@ -15,7 +15,7 @@ from .location import LocationSerializerPos
 
 class InterventionFilterForm(forms.Form):
     status__in = Select2MultipleChoiceField(label='Status',
-                                            choices=PartnersIntervention.STATUSES,
+                                            choices=PartnersInterventionConst.STATUSES,
                                             required=False)
     last_modify_date = DateRangePickerField(label='Modified between',
                                             required=False)
@@ -26,7 +26,7 @@ class InterventionFilterForm(forms.Form):
                                            required=False)
 
     document_type__in = Select2MultipleChoiceField(label='Document Type',
-                                                   choices=PartnersIntervention.INTERVENTION_TYPES,
+                                                   choices=PartnersInterventionConst.INTERVENTION_TYPES,
                                                    required=False)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, *args, **kwargs):

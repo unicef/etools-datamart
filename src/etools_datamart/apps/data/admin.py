@@ -295,6 +295,7 @@ class InterventionBudgetAdmin(DataModelAdmin):
     list_display = ('source_id', 'schema_name',
                     'reference_number', 'agreement_reference_number')
     search_fields = ('reference_number', 'agreement_reference_number')
+    list_filter = ('status',)
 
 
 @register(models.Office)
