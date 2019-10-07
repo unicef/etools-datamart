@@ -289,15 +289,15 @@ class BaseLoader:
             stdout.write('.')
             stdout.flush()
         try:
-            record, created = self.model.objects.get_or_create(**filters,
-                                                               defaults=values)
+            self.record, created = self.model.objects.get_or_create(**filters,
+                                                                    defaults=values)
             if created:
                 op = CREATED
             else:
-                if self.config.always_update or self.is_record_changed(record, values):
+                if self.config.always_update or self.is_record_changed(self.record, values):
                     op = UPDATED
-                    self.model.objects.update_or_create(**filters,
-                                                        defaults=values)
+                    self.record, __ = self.model.objects.update_or_create(**filters,
+                                                                          defaults=values)
                 else:
                     op = UNCHANGED
             return op

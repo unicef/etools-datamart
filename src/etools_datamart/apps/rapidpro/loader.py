@@ -7,6 +7,7 @@ from constance import config
 from strategy_field.utils import get_attr
 from temba_client.serialization import TembaObject
 from temba_client.v2 import TembaClient
+from temba_client.v2.types import ObjectRef
 
 from etools_datamart.apps.etl.loader import (BaseLoader, BaseLoaderOptions, EtlResult,
                                              has_attr, MaxRecordsException, RUN_UNKNOWN,)
@@ -27,6 +28,10 @@ class TembaLoader(BaseLoader):
 
     def load_organization(self):
         pass
+
+    def get_foreign_key(self, model, ref: ObjectRef):
+        if ref:
+            return model.objects.get(source_id=ref.uuid)
 
     def get_mart_values(self, record: TembaObject = None):
         organization = self.context['organization']
@@ -67,6 +72,12 @@ class TembaLoader(BaseLoader):
                 ret[k] = v
             elif has_attr(record, v):
                 ret[k] = get_attr(record, v)
+            elif isinstance(v, str) and isinstance(getattr(record, v, None), TembaObject):
+                ref = getattr(record, v, None)
+                fk = self.model._meta.get_field(k)
+                if has_attr(ref, 'uuid'):
+                    ret[k] = self.get_foreign_key(fk.remote_field.model,
+                                                  ref)
             else:
                 raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
 
@@ -133,6 +144,7 @@ class TembaLoader(BaseLoader):
                     stdout.write("  fetching data")
                 for page in data.iterfetches():
                     for entry in page:
+                        self.source_record = entry
                         filters = self.config.key(self, entry)
                         values = self.get_values(entry)
 
