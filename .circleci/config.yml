@@ -64,15 +64,14 @@ jobs:
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            pip install pytest
-            pytest tests/test_imports.py -x --create-db || exit 0
+            pipenv run pytest tests/test_imports.py -x --create-db || exit 0
 
       - run:
           name: run tests
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            pytest tests/ -x --reuse-db
+            pipenv run pytest tests/ -x --reuse-db
 
       - store_artifacts:
           path: ~build/coverage
