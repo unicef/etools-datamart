@@ -58,8 +58,7 @@ jobs:
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            pipenv run pytest tests/ -x --create-db || exit 0
-
+            pytest tests/test_imports.py -x --create-db || exit 0
       - run:
           name: run tests
           command: |
