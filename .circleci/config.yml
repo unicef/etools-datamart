@@ -54,12 +54,19 @@ jobs:
             - deps-v2-{{ checksum "Pipfile.lock" }}
 
       - run:
+          name: install deps
+          command: |
+            pip install pipenv==2018.10.13
+            pipenv install -d --deploy --ignore-pipfile
+
+      - run:
           name: create db
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install pytest
             pytest tests/test_imports.py -x --create-db || exit 0
+
       - run:
           name: run tests
           command: |
