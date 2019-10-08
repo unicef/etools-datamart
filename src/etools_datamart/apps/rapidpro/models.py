@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField, JSONField
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from celery.local import class_property
@@ -220,6 +221,27 @@ class Flow(RapidProDataMartModel):
         return '{} ({})'.format(self.name, self.organization)
 
 
+class FlowStartLoader(TembaLoader):
+    def process_record(self, filters, values):
+        op = super().process_record(filters, values)
+        for m2m_name in ('groups', 'contacts'):
+            m2m = getattr(self.source_record, m2m_name)
+            m2m_local = getattr(self.record, m2m_name)
+            m2m_local_model = m2m_local.model
+            for entry in m2m:
+                try:
+                    lbl = self.get_foreign_key(m2m_local_model, entry)
+                    m2m_local.add(lbl)
+                    # TODO: remove me
+                    print(111, "models.py:236", m2m_local_model, lbl)
+                except ObjectDoesNotExist as e:
+                    # TODO: remove me
+                    print(111, "models.py:237", e)
+                    capture_exception(e)
+
+        return op
+
+
 class FlowStart(RapidProDataMartModel):
     uuid = models.UUIDField(unique=True, db_index=True)
     flow = models.ForeignKey(Flow, null=True, blank=True, on_delete=models.CASCADE)
@@ -231,5 +253,8 @@ class FlowStart(RapidProDataMartModel):
     created_on = models.DateTimeField(null=True, blank=True)
     modified_on = models.DateTimeField(null=True, blank=True)
 
+    loader = FlowStartLoader()
+
     class Options:
         source = 'flow_starts'
+        depends = (Flow, Group, Contact)

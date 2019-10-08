@@ -46,7 +46,7 @@ class ContactAdmin(RapidProAdmin):
 
 @register(models.Label)
 class LabelAdmin(RapidProAdmin):
-    list_display = ('id', 'uuid', 'name', 'count', )
+    list_display = ('id', 'uuid', 'name', 'count',)
     list_filter = ('organization',)
     search_fields = ('name',)
 
@@ -62,3 +62,11 @@ class FlowAdmin(RapidProAdmin):
     list_display = ('id', 'name', 'archived', 'expires', 'runs')
     list_filter = ('organization',)
     search_fields = ('name',)
+
+
+@register(models.FlowStart)
+class FlowStartAdmin(RapidProAdmin):
+    list_display = ('id', 'uuid', 'flow', 'status', 'created_on')
+    list_filter = ('organization',)
+    raw_id_fields = ('flow', 'organization')
+    exclude = ('groups', 'contacts')
