@@ -20,6 +20,21 @@ attachment_codes = {AuditAudit: 'audit_final_report',
                     }
 
 
+URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
+          'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
+          'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
+          'AuditAudit': "%s/ap/audits/%s/overview/?schema=%s",
+          'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
+          'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s"}
+
+MODULEMAP = {'AuditSpotcheck': "fam",
+             'AuditMicroassessment': "fam",
+             'AuditSpecialaudit': "fam",
+             'AuditAudit': "fam",
+             'TpmTpmactivity': "tpm",
+             'T2FTravelactivity': "trips"}
+
+
 class EngagementlLoader(EtoolsLoader):
 
     def get_queryset(self):
