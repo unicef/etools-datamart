@@ -25,19 +25,9 @@ MODULEMAP = {'AuditSpotcheck': "fam",
              'T2FTravelactivity': "trips"}
 
 
-class ActionPointSerializerV2(DataMartSerializer):
-    section = serializers.CharField(source='section_type')
-    pd_ssfa_title = serializers.CharField(source='intervention_title')
-    pd_ssfa_reference_number = serializers.CharField(source='intervention_title')
-    fam_category = serializers.CharField(source='category_description')
-    action_point_url = serializers.SerializerMethodField()
+class UrlsMixin(DataMartSerializer):
     related_module_url = serializers.SerializerMethodField()
     related_module = serializers.SerializerMethodField()
-
-    def get_action_point_url(self, obj):
-        return "%s/apd/action-points/detail/%s/?schema=%s" % (config.ETOOLS_ADDRESS,
-                                                              obj.source_id,
-                                                              obj.schema_name)
 
     def get_related_module(self, obj):
         if obj.related_module_class and obj.related_module_id:
@@ -48,6 +38,19 @@ class ActionPointSerializerV2(DataMartSerializer):
             base_url = URLMAP[obj.related_module_class]
             return base_url % (config.ETOOLS_ADDRESS,
                                obj.related_module_id, obj.schema_name)
+
+
+class ActionPointSerializerV2(UrlsMixin, DataMartSerializer):
+    section = serializers.CharField(source='section_type')
+    pd_ssfa_title = serializers.CharField(source='intervention_title')
+    pd_ssfa_reference_number = serializers.CharField(source='intervention_title')
+    fam_category = serializers.CharField(source='category_description')
+    action_point_url = serializers.SerializerMethodField()
+
+    def get_action_point_url(self, obj):
+        return "%s/apd/action-points/detail/%s/?schema=%s" % (config.ETOOLS_ADDRESS,
+                                                              obj.source_id,
+                                                              obj.schema_name)
 
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
@@ -88,7 +91,7 @@ class ActionPointSerializerV2(DataMartSerializer):
                   'action_point_url')
 
 
-class ActionPointSerializer(DataMartSerializer):
+class ActionPointSerializer(UrlsMixin, DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.ActionPoint
         exclude = ()
