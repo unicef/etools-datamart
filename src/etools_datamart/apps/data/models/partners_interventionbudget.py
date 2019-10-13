@@ -10,7 +10,7 @@ from etools_datamart.apps.etools.models import (FundsFundsreservationheader, mod
 
 class InterventionBudgetLoader(InterventionLoader):
     def process_country(self):
-        qs = self.filter_queryset(PartnersInterventionbudget.objects.all())
+        qs = PartnersInterventionbudget.objects.all()
         for record in qs.all():
             record.intervention.budget = record
             filters = self.config.key(self, record)
