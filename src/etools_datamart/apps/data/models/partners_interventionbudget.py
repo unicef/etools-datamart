@@ -54,7 +54,7 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
         model = PartnersInterventionbudget
         depends = (Location,)
         key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.pk)
+                                          source_id=record.intervention.budget.pk)
 
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(
