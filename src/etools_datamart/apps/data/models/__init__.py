@@ -24,3 +24,4 @@ from .trip import Trip  # noqa
 from .user import EtoolsUser  # noqa
 from .user_office import Office  # noqa
 from .userstats import UserStats  # noqa
+from .audit_result import AuditResult

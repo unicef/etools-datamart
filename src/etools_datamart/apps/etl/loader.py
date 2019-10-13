@@ -391,7 +391,8 @@ class BaseLoader:
         from etools_datamart.apps.etl.models import EtlTask
         return EtlTask.objects.get_or_create(task=self.task.name,
                                              content_type=ContentType.objects.get_for_model(self.config.model),
-                                             table_name=self.config.model._meta.db_table)[0]
+                                             table_name=self.config.model._meta.db_table,
+                                             defaults={'status': '--'})[0]
 
     def on_start(self, run_type):
         logger.info(f"Start loader {self}")

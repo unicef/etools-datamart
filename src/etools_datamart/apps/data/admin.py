@@ -353,3 +353,10 @@ class ReportIndicatorAdmin(DataModelAdmin):
 class AttachmentAdmin(DataModelAdmin):
     list_display = ('__str__',)
     list_filter = ()
+
+
+@register(models.AuditResult)
+class AuditResultAdmin(DataModelAdmin):
+    # list_display = ('vendor', 'partner_type', 'risk_rating')
+    list_display = ('__str__',)
+    list_filter = ()
