@@ -271,3 +271,12 @@ class ReportIndicatorFactory(DataMartModelFactory):
 class AttachmentFactory(DataMartModelFactory):
     class Meta:
         model = models.Attachment
+
+
+class AuditResultFactory(DataMartModelFactory):
+    audited_expenditure = 1.0
+    financial_findings = 2.0
+    audit_opinion = "--"
+
+    class Meta:
+        model = models.AuditResult

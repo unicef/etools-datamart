@@ -42,3 +42,31 @@ class ContactAdmin(RapidProAdmin):
     list_display = ('id', 'organization', 'name', 'language', 'blocked', 'stopped')
     list_filter = ('organization',)
     search_fields = ('name',)
+
+
+@register(models.Label)
+class LabelAdmin(RapidProAdmin):
+    list_display = ('id', 'uuid', 'name', 'count',)
+    list_filter = ('organization',)
+    search_fields = ('name',)
+
+
+@register(models.Runs)
+class RunsAdmin(RapidProAdmin):
+    list_display = ('id', 'flow', 'active', 'completed', 'expired', 'interrupted',)
+    list_filter = ('organization',)
+
+
+@register(models.Flow)
+class FlowAdmin(RapidProAdmin):
+    list_display = ('id', 'name', 'archived', 'expires', 'runs')
+    list_filter = ('organization',)
+    search_fields = ('name',)
+
+
+@register(models.FlowStart)
+class FlowStartAdmin(RapidProAdmin):
+    list_display = ('id', 'uuid', 'flow', 'status', 'created_on')
+    list_filter = ('organization',)
+    raw_id_fields = ('flow', 'organization')
+    exclude = ('groups', 'contacts')

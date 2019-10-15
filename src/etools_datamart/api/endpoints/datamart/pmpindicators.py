@@ -6,7 +6,7 @@ from django import forms
 from unicef_rest_framework.forms import DatePickerField, Select2MultipleChoiceField
 
 from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.models import PartnersIntervention, PartnersPartnerorganization
+from etools_datamart.apps.etools.enrichment.consts import PartnerOrganizationConst, PartnersInterventionConst
 
 from .. import common
 from . import serializers
@@ -14,11 +14,11 @@ from . import serializers
 
 class PMPIndicatorFilterForm(forms.Form):
     partner_type__in = Select2MultipleChoiceField(label='Partner Type',
-                                                  choices=PartnersPartnerorganization.CSO_TYPES,
+                                                  choices=PartnerOrganizationConst.CSO_TYPES,
                                                   required=False)
 
     pd_ssfa_status__in = Select2MultipleChoiceField(label='Status',
-                                                    choices=PartnersIntervention.STATUSES,
+                                                    choices=PartnersInterventionConst.STATUSES,
                                                     required=False)
 
     last_modify_date__gte = DatePickerField(label='Modified after',

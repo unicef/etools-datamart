@@ -1,6 +1,6 @@
-from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization
 from etools_datamart.apps.etools.models import AuditSpotcheck, PartnersPartnerorganization
 
+from .consts import PartnerOrganizationConst
 from .utils import create_alias
 
 PartnersPartnerorganization.CSO_TYPES = (
@@ -28,23 +28,23 @@ def min_req_programme_visits(self):
     programme_visits = 0
     ct = self.net_ct_cy or 0  # Must be integer, but net_ct_cy could be None
 
-    if ct <= PartnerOrganization.CT_MR_AUDIT_TRIGGER_LEVEL:
+    if ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL:
         programme_visits = 0
-    elif PartnerOrganization.CT_MR_AUDIT_TRIGGER_LEVEL < ct <= PartnerOrganization.CT_MR_AUDIT_TRIGGER_LEVEL2:
+    elif PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL < ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL2:
         programme_visits = 1
-    elif PartnerOrganization.CT_MR_AUDIT_TRIGGER_LEVEL2 < ct <= PartnerOrganization.CT_MR_AUDIT_TRIGGER_LEVEL3:
-        if self.rating in [PartnerOrganization.RATING_HIGH, PartnerOrganization.RATING_SIGNIFICANT]:
+    elif PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL2 < ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL3:
+        if self.rating in [PartnerOrganizationConst.RATING_HIGH, PartnerOrganizationConst.RATING_SIGNIFICANT]:
             programme_visits = 3
-        elif self.rating in [PartnerOrganization.RATING_MEDIUM, ]:
+        elif self.rating in [PartnerOrganizationConst.RATING_MEDIUM, ]:
             programme_visits = 2
-        elif self.rating in [PartnerOrganization.RATING_LOW, ]:
+        elif self.rating in [PartnerOrganizationConst.RATING_LOW, ]:
             programme_visits = 1
     else:
-        if self.rating in [PartnerOrganization.RATING_HIGH, PartnerOrganization.RATING_SIGNIFICANT]:
+        if self.rating in [PartnerOrganizationConst.RATING_HIGH, PartnerOrganizationConst.RATING_SIGNIFICANT]:
             programme_visits = 4
-        elif self.rating in [PartnerOrganization.RATING_MEDIUM, ]:
+        elif self.rating in [PartnerOrganizationConst.RATING_MEDIUM, ]:
             programme_visits = 3
-        elif self.rating in [PartnerOrganization.RATING_LOW, ]:
+        elif self.rating in [PartnerOrganizationConst.RATING_LOW, ]:
             programme_visits = 2
     return programme_visits
 
@@ -55,7 +55,7 @@ PartnersPartnerorganization.min_req_programme_visits = property(min_req_programm
 def min_req_spot_checks(self):
     # reported_cy can be None
     reported_cy = self.reported_cy or 0
-    if self.type_of_assessment == 'Low Risk Assumed' or reported_cy <= PartnerOrganization.CT_CP_AUDIT_TRIGGER_LEVEL:
+    if self.type_of_assessment == 'Low Risk Assumed' or reported_cy <= PartnerOrganizationConst.CT_CP_AUDIT_TRIGGER_LEVEL:
         return 0
     return 1
 

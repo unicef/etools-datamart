@@ -1,5 +1,6 @@
 import inspect
 
+from django.db.models import ForeignKey
 from django.utils import timezone
 
 from celery.utils.log import get_task_logger
@@ -7,6 +8,7 @@ from constance import config
 from strategy_field.utils import get_attr
 from temba_client.serialization import TembaObject
 from temba_client.v2 import TembaClient
+from temba_client.v2.types import ObjectRef
 
 from etools_datamart.apps.etl.loader import (BaseLoader, BaseLoaderOptions, EtlResult,
                                              has_attr, MaxRecordsException, RUN_UNKNOWN,)
@@ -28,6 +30,10 @@ class TembaLoader(BaseLoader):
     def load_organization(self):
         pass
 
+    def get_foreign_key(self, model, ref: ObjectRef):
+        if ref:
+            return model.objects.get(source_id=ref.uuid)
+
     def get_mart_values(self, record: TembaObject = None):
         organization = self.context['organization']
         ret = {'organization': organization}
@@ -38,37 +44,46 @@ class TembaLoader(BaseLoader):
     def get_values(self, record: TembaObject):
         # organization = self.context['organization']
         ret = self.get_mart_values(record)
-        for k, v in self.mapping.items():
-            if k in ret:
+        for dm_field_name, resolver in self.mapping.items():
+            remote_attr = getattr(record, resolver, None)
+            dm_field = self.model._meta.get_field(resolver)
+
+            if dm_field_name in ret:
                 continue
-            if v is None:
-                ret[k] = None
-            elif v == 'N/A':
-                ret[k] = 'N/A'
-            elif v == 'i':
+
+            if resolver is None:
+                ret[dm_field_name] = None
+            elif resolver == 'N/A':
+                ret[dm_field_name] = 'N/A'
+            elif resolver == 'i':
                 continue
-            elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
-                getter = getattr(self, v)
-                _value = getter(record, ret, field_name=k)
+            elif resolver == '-' or hasattr(self, 'get_%s' % dm_field_name):
+                getter = getattr(self, 'get_%s' % dm_field_name)
+                _value = getter(record, ret, field_name=dm_field_name)
                 if _value != self.noop:
-                    ret[k] = _value
-            # elif v and isinstance(v, list) and isinstance(v[0], ObjectRef):
-            #     ret[k] = [oo.serialize() for oo in v]
-            elif v == '-' or hasattr(self, 'get_%s' % k):
-                getter = getattr(self, 'get_%s' % k)
-                _value = getter(record, ret, field_name=k)
+                    ret[dm_field_name] = _value
+            elif callable(resolver):
+                ret[dm_field_name] = resolver(self, record)
+            elif resolver == '=' and has_attr(record, dm_field_name):
+                ret[dm_field_name] = get_attr(record, dm_field_name)
+            elif not isinstance(resolver, str):
+                ret[dm_field_name] = resolver
+            elif isinstance(resolver, str) and hasattr(self, resolver) and callable(getattr(self, resolver)):
+                getter = getattr(self, resolver)
+                _value = getter(record, ret, field_name=dm_field_name)
                 if _value != self.noop:
-                    ret[k] = _value
-            elif callable(v):
-                ret[k] = v(self, record)
-            elif v == '=' and has_attr(record, k):
-                ret[k] = get_attr(record, k)
-            elif not isinstance(v, str):
-                ret[k] = v
-            elif has_attr(record, v):
-                ret[k] = get_attr(record, v)
+                    ret[dm_field_name] = _value
+            elif dm_field_name == resolver and isinstance(remote_attr, TembaObject) and isinstance(dm_field,
+                                                                                                   ForeignKey):
+                ref = getattr(record, resolver, None)
+                fk = self.model._meta.get_field(dm_field_name)
+                if has_attr(ref, 'uuid'):
+                    ret[dm_field_name] = self.get_foreign_key(fk.remote_field.model,
+                                                              ref)
+            elif has_attr(record, resolver):
+                ret[dm_field_name] = get_attr(record, resolver)
             else:
-                raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
+                raise Exception("Invalid field name or mapping '%s:%s'" % (dm_field_name, resolver))
 
         return ret
 
@@ -133,6 +148,7 @@ class TembaLoader(BaseLoader):
                     stdout.write("  fetching data")
                 for page in data.iterfetches():
                     for entry in page:
+                        self.source_record = entry
                         filters = self.config.key(self, entry)
                         values = self.get_values(entry)
 

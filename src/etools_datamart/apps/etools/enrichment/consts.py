@@ -43,7 +43,7 @@ class PartnerType:
                (UN_AGENCY, UN_AGENCY))
 
 
-class PartnerOrganization:
+class PartnerOrganizationConst:
     EXPIRING_ASSESSMENT_LIMIT_YEAR = 4
 
     CT_CP_AUDIT_TRIGGER_LEVEL = decimal.Decimal('50000.00')
@@ -246,3 +246,35 @@ class PartnersAgreementConst:
         DRAFT: [SIGNED],
         SIGNED: [ENDED],
     }
+
+
+class PartnersInterventionConst:
+    DRAFT = 'draft'
+    SIGNED = 'signed'
+    ACTIVE = 'active'
+    ENDED = 'ended'
+    IMPLEMENTED = 'implemented'
+    CLOSED = 'closed'
+    SUSPENDED = 'suspended'
+    TERMINATED = 'terminated'
+    CANCELLED = 'cancelled'
+
+    PD = 'PD'
+    SHPD = 'SHPD'
+    SSFA = 'SSFA'
+
+    INTERVENTION_TYPES = (
+        (PD, 'Programme Document'),
+        (SHPD, 'Simplified Humanitarian Programme Document'),
+        (SSFA, 'SSFA'),
+    )
+    STATUSES = (
+        (DRAFT, "Draft"),
+        (SIGNED, 'Signed'),
+        (ACTIVE, "Active"),
+        (ENDED, "Ended"),
+        (CLOSED, "Closed"),
+        (SUSPENDED, "Suspended"),
+        (TERMINATED, "Terminated"),
+        (CANCELLED, "Cancelled"),
+    )

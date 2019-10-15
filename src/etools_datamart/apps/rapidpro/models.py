@@ -1,9 +1,11 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField, JSONField
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from celery.local import class_property
 from constance import config
+from sentry_sdk import capture_exception
 
 from etools_datamart.apps.data.models.base import DataMartManager
 from etools_datamart.apps.etl.base import DataMartModelBase
@@ -132,3 +134,127 @@ class Contact(RapidProDataMartModel):
         source = 'contacts'
         exclude_from_compare = ['groups', ]
         fields_to_compare = None
+
+
+class CampaignLoader(TembaLoader):
+    def get_group(self, record, values, field_name):
+        return self.get_foreign_key(Group, record.group)
+
+
+class Campaign(RapidProDataMartModel):
+    uuid = models.UUIDField(unique=True, db_index=True)
+    group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.CASCADE)
+    archived = models.BooleanField(default=False)
+    created_on = models.DateTimeField(null=True, blank=True)
+    name = models.CharField(max_length=100)
+    loader = CampaignLoader()
+
+    class Options:
+        source = 'campaigns'
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.organization)
+
+
+class Label(RapidProDataMartModel):
+    uuid = models.UUIDField(unique=True, db_index=True)
+    name = models.CharField(max_length=100)
+    count = models.IntegerField(null=True, blank=True)
+
+    class Options:
+        source = 'labels'
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.organization)
+
+
+class Runs(RapidProDataMartModel):
+    active = models.IntegerField(default=0)
+    completed = models.IntegerField(default=0)
+    expired = models.IntegerField(default=0)
+    interrupted = models.IntegerField(default=0)
+
+    class Options:
+        source = 'runs'
+
+    def __str__(self):
+        return f'{self.active} {self.completed} {self.expired} {self.interrupted}'
+
+
+class FlowLoader(TembaLoader):
+    def get_runs(self, record, values, field_name):
+        return record.runs.serialize()
+
+    def process_record(self, filters, values):
+        runs = values.pop('runs')
+        op = super().process_record(filters, values)
+        runs['organization'] = self.record.organization
+        rr, __ = Runs.objects.update_or_create(id=self.record.id,
+                                               defaults=runs)
+        self.record.runs = rr
+        self.record.save()
+        for label in self.source_record.labels:
+            try:
+                lbl = self.get_foreign_key(Label, label)
+                self.record.labels.add(lbl)
+            except Label.DoesNotExist as e:
+                capture_exception(e)
+
+        return op
+
+
+class Flow(RapidProDataMartModel):
+    uuid = models.UUIDField(unique=True, db_index=True)
+    name = models.CharField(max_length=100)
+    archived = models.BooleanField(default=False)
+    labels = models.ManyToManyField(Label)
+    expires = models.IntegerField(null=True, blank=True)
+    created_on = models.DateTimeField(null=True, blank=True)
+    runs = models.OneToOneField(Runs, null=True, blank=True, on_delete=models.CASCADE)
+
+    loader = FlowLoader()
+
+    class Options:
+        source = 'flows'
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.organization)
+
+
+class FlowStartLoader(TembaLoader):
+    def process_record(self, filters, values):
+        op = super().process_record(filters, values)
+        for m2m_name in ('groups', 'contacts'):
+            m2m = getattr(self.source_record, m2m_name)
+            m2m_local = getattr(self.record, m2m_name)
+            m2m_local_model = m2m_local.model
+            for entry in m2m:
+                try:
+                    lbl = self.get_foreign_key(m2m_local_model, entry)
+                    m2m_local.add(lbl)
+                    # TODO: remove me
+                    print(111, "models.py:236", m2m_local_model, lbl)
+                except ObjectDoesNotExist as e:
+                    # TODO: remove me
+                    print(111, "models.py:237", e)
+                    capture_exception(e)
+
+        return op
+
+
+class FlowStart(RapidProDataMartModel):
+    uuid = models.UUIDField(unique=True, db_index=True)
+    flow = models.ForeignKey(Flow, null=True, blank=True, on_delete=models.CASCADE)
+    groups = models.ManyToManyField(Group)
+    contacts = models.ManyToManyField(Contact)
+    restart_participants = models.NullBooleanField()
+    status = models.CharField(max_length=100)
+    extra = JSONField(default=dict)
+    created_on = models.DateTimeField(null=True, blank=True)
+    modified_on = models.DateTimeField(null=True, blank=True)
+
+    loader = FlowStartLoader()
+
+    class Options:
+        source = 'flow_starts'
+        depends = (Flow, Group, Contact)

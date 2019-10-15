@@ -10,7 +10,7 @@ from etools_datamart.apps.etools.models import (FundsFundsreservationheader, mod
 
 class InterventionBudgetLoader(InterventionLoader):
     def process_country(self):
-        qs = self.filter_queryset(PartnersInterventionbudget.objects.all())
+        qs = PartnersInterventionbudget.objects.all()
         for record in qs.all():
             record.intervention.budget = record
             filters = self.config.key(self, record)
@@ -54,7 +54,7 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
         model = PartnersInterventionbudget
         depends = (Location,)
         key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.pk)
+                                          source_id=record.intervention.budget.pk)
 
         mapping = extend(InterventionAbstract.Options.mapping,
                          dict(

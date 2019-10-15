@@ -295,6 +295,7 @@ class InterventionBudgetAdmin(DataModelAdmin):
     list_display = ('source_id', 'schema_name',
                     'reference_number', 'agreement_reference_number')
     search_fields = ('reference_number', 'agreement_reference_number')
+    list_filter = ('status',)
 
 
 @register(models.Office)
@@ -350,5 +351,12 @@ class ReportIndicatorAdmin(DataModelAdmin):
 
 @register(models.Attachment)
 class AttachmentAdmin(DataModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()
+
+
+@register(models.AuditResult)
+class AuditResultAdmin(DataModelAdmin):
+    # list_display = ('vendor', 'partner_type', 'risk_rating')
     list_display = ('__str__',)
     list_filter = ()

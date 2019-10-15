@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.etools.enrichment.consts import PartnerOrganization, PartnerType, TravelType
+from etools_datamart.apps.etools.enrichment.consts import PartnerOrganizationConst, PartnerType, TravelType
 from etools_datamart.apps.etools.models import PartnersPartnerorganization, T2FTravelactivity
 
 
@@ -54,7 +54,7 @@ class Partner(EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     cso_type = models.CharField(max_length=50, blank=True, null=True,
                                 db_index=True,
-                                choices=PartnerOrganization.CSO_TYPES)
+                                choices=PartnerOrganizationConst.CSO_TYPES)
     deleted_flag = models.BooleanField(blank=True, null=True)
     description = models.CharField(max_length=256, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
@@ -76,10 +76,10 @@ class Partner(EtoolsDataMartModel):
     postal_code = models.CharField(max_length=32, blank=True, null=True)
     rating = models.CharField(max_length=50, blank=True, null=True,
                               db_index=True,
-                              choices=PartnerOrganization.RISK_RATINGS)
+                              choices=PartnerOrganizationConst.RISK_RATINGS)
     reported_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     shared_with = ArrayField(
-        models.CharField(max_length=20, blank=True, choices=PartnerOrganization.AGENCY_CHOICES),
+        models.CharField(max_length=20, blank=True, choices=PartnerOrganizationConst.AGENCY_CHOICES),
         verbose_name=_("Shared Partner"),
         blank=True,
         null=True

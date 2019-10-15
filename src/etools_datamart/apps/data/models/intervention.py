@@ -8,7 +8,7 @@ from django.db.models import F
 from crashlog.middleware import process_exception
 
 from etools_datamart.apps.data.loader import EtoolsLoader
-from etools_datamart.apps.etools.enrichment.consts import TravelType
+from etools_datamart.apps.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
                                                 PartnersIntervention, PartnersInterventionplannedvisits,
                                                 ReportsAppliedindicator, T2FTravelactivity,)
@@ -42,7 +42,8 @@ class InterventionAbstract(models.Model):
     currency = models.CharField(max_length=4, blank=True, null=True)
     days_from_prc_review_to_signature = models.IntegerField(blank=True, null=True)
     days_from_submission_to_signature = models.IntegerField(blank=True, null=True)
-    document_type = models.CharField(max_length=255, null=True)
+    document_type = models.CharField(max_length=255, null=True,
+                                     choices=PartnersInterventionConst.INTERVENTION_TYPES)
     end_date = models.DateField(null=True)
     fr_number = models.CharField(max_length=300, blank=True, null=True)
     in_kind_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
@@ -87,7 +88,8 @@ class InterventionAbstract(models.Model):
     signed_by_unicef_date = models.DateField(null=True)
     signed_pd_document = models.CharField(max_length=1024, null=True)
     start_date = models.DateField(null=True)
-    status = models.CharField(max_length=32, null=True)
+    status = models.CharField(max_length=32, null=True, db_index=True,
+                              choices=PartnersInterventionConst.STATUSES)
     submission_date = models.DateField(null=True)
     submission_date_prc = models.DateField(null=True)
     title = models.CharField(max_length=256, null=True, db_index=True)

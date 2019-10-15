@@ -22,35 +22,7 @@ PartnersIntervention.total_partner_contribution = property(
 PartnersIntervention.total_unicef_budget = property(
     lambda self: self.total_unicef_cash + self.total_in_kind_amount)
 
-PartnersIntervention.DRAFT = 'draft'
-PartnersIntervention.SIGNED = 'signed'
-PartnersIntervention.ACTIVE = 'active'
-PartnersIntervention.ENDED = 'ended'
-PartnersIntervention.IMPLEMENTED = 'implemented'
-PartnersIntervention.CLOSED = 'closed'
-PartnersIntervention.SUSPENDED = 'suspended'
-PartnersIntervention.TERMINATED = 'terminated'
-PartnersIntervention.CANCELLED = 'cancelled'
 
-PartnersIntervention.STATUSES = (
-    (PartnersIntervention.DRAFT, "Draft"),
-    (PartnersIntervention.SIGNED, 'Signed'),
-    (PartnersIntervention.ACTIVE, "Active"),
-    (PartnersIntervention.ENDED, "Ended"),
-    (PartnersIntervention.CLOSED, "Closed"),
-    (PartnersIntervention.SUSPENDED, "Suspended"),
-    (PartnersIntervention.TERMINATED, "Terminated"),
-    (PartnersIntervention.CANCELLED, "Cancelled"),
-)
-PartnersIntervention.PD = 'PD'
-PartnersIntervention.SHPD = 'SHPD'
-PartnersIntervention.SSFA = 'SSFA'
-
-PartnersIntervention.INTERVENTION_TYPES = (
-    (PartnersIntervention.PD, 'Programme Document'),
-    (PartnersIntervention.SHPD, 'Simplified Humanitarian Programme Document'),
-    (PartnersIntervention.SSFA, 'SSFA'),
-)
 models.ManyToManyField(LocationsLocation,
                        through=PartnersInterventionFlatLocations,
                        ).contribute_to_class(PartnersIntervention, 'flat_locations')

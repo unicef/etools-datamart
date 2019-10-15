@@ -2,12 +2,14 @@
 # import django_filters
 from django import forms
 
+from constance import config
 from rest_framework import serializers
 
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
+from etools_datamart.apps.data.models import Engagement
 
 from ..common import DataMartViewSet
 
@@ -53,12 +55,28 @@ class EngagementSerializerSimple(DataMartSerializer):
                   )
 
 
+URL_MAP = {Engagement.TYPE_AUDIT: 'audit',
+           Engagement.TYPE_MICRO_ASSESSMENT: 'micro-assessments',
+           Engagement.TYPE_SPOT_CHECK: 'spot-checks',
+           Engagement.TYPE_SPECIAL_AUDIT: 'special-audits'
+           }
+
+
 class EngagementSerializer(DataMartSerializer):
     partner_name = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
 
     class Meta(DataMartSerializer.Meta):
         model = models.Engagement
         exclude = ('seen', 'source_id',)
+
+    def get_url(self, obj):
+        try:
+            return "%s/ap/%s/%s/overview" % (config.ETOOLS_ADDRESS,
+                                             URL_MAP[obj.engagement_type],
+                                             obj.source_id)
+        except KeyError:
+            return ""
 
     def get_partner_name(self, obj):
         try:

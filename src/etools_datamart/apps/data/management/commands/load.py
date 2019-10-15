@@ -65,7 +65,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--ignore-changes', action='store_true',
-            help="Run all loaders.",
+            help=".",
         )
         parser.add_argument(
             '--unlock', action='store_true',
@@ -73,7 +73,11 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--no-deps', action='store_true',
-            help="Ingnore status of required datasets",
+            help="Ignore status of required datasets",
+        )
+        parser.add_argument(
+            '--process-deps', action='store_true',
+            help="process all dependencies first",
         )
 
         parser.add_argument(
@@ -119,6 +123,20 @@ class Command(BaseCommand):
         elif self.verbosity > 1:
             self.stdout.write('.', ending='')
 
+    def calculate_deps(self, names):
+        def process(model):
+            queue = []
+            for dep in model.loader.config.depends:
+                queue.extend(process(dep))
+            queue.append("%s.%s" % (model._meta.app_label, model._meta.model_name))
+            return queue
+
+        model_names = []
+        for m in names:
+            model = apps.get_model(m)
+            model_names.extend(process(model))
+        return model_names
+
     def handle(self, *model_names, **options):
         self.verbosity = options['verbosity']
 
@@ -151,6 +169,9 @@ class Command(BaseCommand):
         else:
             if options['elapsed']:
                 global_start_time = time.time()
+            if options['process_deps']:
+                model_names = self.calculate_deps(model_names)
+
             try:
                 for model_name in model_names:
                     if self.verbosity > 0:

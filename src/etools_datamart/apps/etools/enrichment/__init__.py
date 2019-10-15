@@ -23,4 +23,4 @@ def apply():
     from etools_datamart.apps.etools import models
     consts.enrich(models.ActionPointsActionpoint, consts.ActionPointConsts)
     consts.enrich(models.AuditEngagement, consts.AuditEngagementConsts)
-    consts.enrich(models.PartnersPartnerorganization, consts.PartnerOrganization)
+    consts.enrich(models.PartnersPartnerorganization, consts.PartnerOrganizationConst)

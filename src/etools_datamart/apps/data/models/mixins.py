@@ -40,7 +40,7 @@ class LocationMixin(models.Model):
     location_name = models.CharField(max_length=254, blank=True, null=True)
     location_pcode = models.CharField(max_length=32, blank=True, null=True)
     location_level = models.IntegerField(blank=True, null=True)
-    location_levelname = models.CharField(max_length=32, blank=True, null=True)
+    location_levelname = models.CharField(max_length=80, blank=True, null=True)
     location = models.ForeignKey(Location, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:

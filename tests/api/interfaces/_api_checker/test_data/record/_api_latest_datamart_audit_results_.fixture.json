@@ -1,0 +1,26 @@
+{
+    "record": {
+        "master": {
+            "model": "data.auditresult",
+            "pk": 183,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2019-10-15T16:02:24.974Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "vendor": null,
+                "partner_type": null,
+                "risk_rating": null,
+                "audited_expenditure": "1.00",
+                "financial_findings": "2.00",
+                "audit_opinion": "--",
+                "count_high_risk_findings": null,
+                "count_financial_findings": null,
+                "count_key_control_weaknesses": null
+            }
+        },
+        "deps": []
+    }
+}

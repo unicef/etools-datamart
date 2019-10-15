@@ -6,12 +6,12 @@ from etools_datamart.api.endpoints import common
 from etools_datamart.api.endpoints.datamart.intervention import (InterventionSerializer, InterventionSerializerFull,
                                                                  InterventionSerializerPlain, InterventionSerializerV2,)
 from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.models import PartnersIntervention
+from etools_datamart.apps.etools.enrichment.consts import PartnersInterventionConst
 
 
 class InterventionFilterForm(forms.Form):
     status__in = Select2MultipleChoiceField(label='Status',
-                                            choices=PartnersIntervention.STATUSES,
+                                            choices=PartnersInterventionConst.STATUSES,
                                             required=False)
     last_modify_date = DateRangePickerField(label='Modified between',
                                             required=False)
@@ -22,7 +22,7 @@ class InterventionFilterForm(forms.Form):
                                            required=False)
 
     document_type__in = Select2MultipleChoiceField(label='Document Type',
-                                                   choices=PartnersIntervention.INTERVENTION_TYPES,
+                                                   choices=PartnersInterventionConst.INTERVENTION_TYPES,
                                                    required=False)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, *args, **kwargs):

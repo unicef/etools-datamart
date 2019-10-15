@@ -1,0 +1,11 @@
+
+{% load rest_framework i18n query %}
+<div class="list-group">
+<label for="id_vendor_number" class="control-label ">{{ label }}</label>
+<select name="{{ query_param }}" multiple="multiple" data-allowclear="true" class="select2" style="width: 100%">
+{% for elem in elements %}<option {% if elem.0 in selection %}selected="selected"{% endif %} value="{{ elem.0 }}">{{ elem.1 }}</option>
+{% endfor %}
+</select>
+</div>
+<script>
+</script>

@@ -111,12 +111,14 @@ class BaseLoaderOptions:
     DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
                  'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
-                 'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare']
+                 'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare',
+                 'exclude_from_compare']
 
     def __init__(self, base=None):
         self.mapping = {}
         self.host = config.RAPIDPRO_ADDRESS
         self.celery = app
+        self.source = None
         self.queryset = None
         self.always_update = False
         self.source = None
@@ -136,9 +138,10 @@ class BaseLoaderOptions:
                 if hasattr(base, attr):
                     if isinstance(getattr(self, attr), (list, tuple)):
                         n = getattr(self, attr) + getattr(base, attr)
-                        setattr(self, attr, n)
                     else:
-                        setattr(self, attr, getattr(base, attr, getattr(self, attr)))
+                        n = getattr(base, attr, getattr(self, attr))
+                    setattr(self, attr, n)
+
         if self.key == undefined:
             self.key = type(self).DEFAULT_KEY
 
@@ -289,15 +292,15 @@ class BaseLoader:
             stdout.write('.')
             stdout.flush()
         try:
-            record, created = self.model.objects.get_or_create(**filters,
-                                                               defaults=values)
+            self.record, created = self.model.objects.get_or_create(**filters,
+                                                                    defaults=values)
             if created:
                 op = CREATED
             else:
-                if self.config.always_update or self.is_record_changed(record, values):
+                if self.config.always_update or self.is_record_changed(self.record, values):
                     op = UPDATED
-                    self.model.objects.update_or_create(**filters,
-                                                        defaults=values)
+                    self.record, __ = self.model.objects.update_or_create(**filters,
+                                                                          defaults=values)
                 else:
                     op = UNCHANGED
             return op
@@ -391,7 +394,8 @@ class BaseLoader:
         from etools_datamart.apps.etl.models import EtlTask
         return EtlTask.objects.get_or_create(task=self.task.name,
                                              content_type=ContentType.objects.get_for_model(self.config.model),
-                                             table_name=self.config.model._meta.db_table)[0]
+                                             table_name=self.config.model._meta.db_table,
+                                             defaults={'status': '--'})[0]
 
     def on_start(self, run_type):
         logger.info(f"Start loader {self}")

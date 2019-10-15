@@ -21,6 +21,7 @@ def pytest_generate_tests(metafunc):
                 'data.interventionbylocation',
                 'data.fundsreservation',
                 'data.reportindicator',
+                'data.auditresult',
             ]:
                 m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
             elif model._meta.app_label == 'prp':
@@ -35,8 +36,8 @@ def pytest_generate_tests(metafunc):
 
 
 def test_loader_load(loader, number_of_intervention):
-    # factory = factories_registry.get(loader.model)
-    # factory()
+    # source  = loader.model._etl_config.source
+    # factory = factories_registry.get(source)
     with freeze_time("2018-12-31", tz_offset=1):
         loader.model.objects.truncate()
         loader.unlock()

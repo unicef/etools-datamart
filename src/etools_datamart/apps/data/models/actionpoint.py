@@ -4,11 +4,11 @@ from django.db import models
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.data.models.mixins import add_location_mapping, LocationMixin
-from etools_datamart.apps.etools.enrichment.consts import ActionPointConsts, CategoryConsts
-from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
-                                                AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
-                                                DjangoComments, DjangoContentType, PartnersIntervention,
-                                                T2FTravelactivity, TpmTpmactivity,)
+from etools_datamart.apps.etools.enrichment.consts import (ActionPointConsts, AuditEngagementConsts,
+                                                           CategoryConsts, PartnersInterventionConst,)
+from etools_datamart.apps.etools.models import (ActionPointsActionpoint, AuditAudit, AuditMicroassessment,
+                                                AuditSpecialaudit, AuditSpotcheck, DjangoComments,
+                                                DjangoContentType, T2FTravelactivity, TpmTpmactivity,)
 
 from .intervention import Intervention
 
@@ -94,7 +94,7 @@ class ActionPointLoader(EtoolsLoader):
         intervention = record.intervention
         if intervention:
             agreement_base_number = intervention.agreement.agreement_number.split('-')[0]
-            if intervention.document_type != PartnersIntervention.SSFA:
+            if intervention.document_type != PartnersInterventionConst.SSFA:
                 number = '{agreement}/{type}{year}{id}'.format(
                     agreement=agreement_base_number,
                     type=intervention.document_type,
@@ -106,7 +106,7 @@ class ActionPointLoader(EtoolsLoader):
 
     def get_module_reference_number(self, record: ActionPointsActionpoint, values: dict, **kwargs):
         if record.engagement:
-            engagement_code = 'a' if record.engagement.engagement_type == AuditEngagement.TYPE_AUDIT else record.engagement.engagement_type
+            engagement_code = 'a' if record.engagement.engagement_type == AuditEngagementConsts.TYPE_AUDIT else record.engagement.engagement_type
             return '{}/{}/{}/{}/{}'.format(
                 self.context['country'].country_short_code or '',
                 record.partner.name[:5],
