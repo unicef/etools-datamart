@@ -1,6 +1,11 @@
 2.4
 ---
-*
+* new endpoint "datamart/audit/results"
+* updates ActionPoint std serializer
+* bug fixes
+* admin improvements
+* filtering improvements
+
 
 2.3
 ---
