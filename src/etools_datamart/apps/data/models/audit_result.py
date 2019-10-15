@@ -2,7 +2,7 @@ from django.db import models
 
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.etools.models import AuditAudit, AuditRisk, AuditFinancialfinding, AuditKeyinternalcontrol
+from etools_datamart.apps.etools.models import AuditAudit, AuditFinancialfinding, AuditKeyinternalcontrol, AuditRisk
 
 
 class AuditResultLoader(EtoolsLoader):
