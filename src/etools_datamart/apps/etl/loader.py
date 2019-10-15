@@ -111,12 +111,14 @@ class BaseLoaderOptions:
     DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
     __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
                  'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
-                 'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare']
+                 'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare',
+                 'exclude_from_compare']
 
     def __init__(self, base=None):
         self.mapping = {}
         self.host = config.RAPIDPRO_ADDRESS
         self.celery = app
+        self.source = None
         self.queryset = None
         self.always_update = False
         self.source = None
@@ -136,9 +138,10 @@ class BaseLoaderOptions:
                 if hasattr(base, attr):
                     if isinstance(getattr(self, attr), (list, tuple)):
                         n = getattr(self, attr) + getattr(base, attr)
-                        setattr(self, attr, n)
                     else:
-                        setattr(self, attr, getattr(base, attr, getattr(self, attr)))
+                        n = getattr(base, attr, getattr(self, attr))
+                    setattr(self, attr, n)
+
         if self.key == undefined:
             self.key = type(self).DEFAULT_KEY
 
