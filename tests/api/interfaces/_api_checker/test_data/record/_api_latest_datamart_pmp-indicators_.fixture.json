@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.pmpindicators",
-            "pk": 911,
+            "pk": 2507,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-09-16T18:29:20.341Z",
+                "last_modify_date": "2019-10-16T09:17:09.566Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -31,12 +31,9 @@
                 "fr_currencies": null,
                 "sum_of_all_fr_planned_amount": null,
                 "core_value_attached": null,
-                "partner_link": null,
-                "intervention_link": null,
-                "country_id": null,
                 "partner_id": null,
                 "intervention_id": null,
-                "created": "2019-09-16T18:29:20.341Z",
+                "created": "2019-10-16T09:17:09.566Z",
                 "updated": null
             }
         },

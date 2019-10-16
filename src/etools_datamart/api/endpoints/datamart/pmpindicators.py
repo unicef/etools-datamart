@@ -3,13 +3,34 @@ from collections import OrderedDict
 
 from django import forms
 
+from constance import config
+from rest_framework import serializers
+
 from unicef_rest_framework.forms import DatePickerField, Select2MultipleChoiceField
 
+from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
 from etools_datamart.apps.etools.enrichment.consts import PartnerOrganizationConst, PartnersInterventionConst
 
 from .. import common
-from . import serializers
+
+
+class PMPIndicatorsSerializer(DataMartSerializer):
+    partner_link = serializers.SerializerMethodField()
+    intervention_link = serializers.SerializerMethodField()
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.PMPIndicators
+
+    def get_partner_link(self, obj):
+        return "%s/pmp/partners/%s/details/?schema=%s" % (config.ETOOLS_ADDRESS,
+                                                          obj.source_id,
+                                                          obj.schema_name)
+
+    def get_intervention_link(self, obj):
+        return "%s/pmp/interventions/%s/details/?schema=%s" % (config.ETOOLS_ADDRESS,
+                                                               obj.source_id,
+                                                               obj.schema_name)
 
 
 class PMPIndicatorFilterForm(forms.Form):
@@ -34,7 +55,7 @@ class PMPIndicatorFilterForm(forms.Form):
 
 
 class PMPIndicatorsViewSet(common.DataMartViewSet):
-    serializer_class = serializers.PMPIndicatorsSerializer
+    serializer_class = PMPIndicatorsSerializer
     queryset = models.PMPIndicators.objects.all()
     filter_fields = ('partner_type', 'last_modify_date', 'pd_ssfa_status')
     serializers_fieldsets = {"std": None,

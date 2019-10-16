@@ -94,10 +94,10 @@ class PMPIndicators(EtoolsDataMartModel):
     fr_currencies = models.CharField(max_length=207, null=True, help_text='FR currencies')
     sum_of_all_fr_planned_amount = models.CharField(max_length=208, null=True, help_text='Sum of all FR planned amount')
     core_value_attached = models.CharField(max_length=209, null=True, help_text='Core value attached')
-    partner_link = models.CharField(max_length=210, null=True, help_text='Partner Link')
-    intervention_link = models.CharField(max_length=211, null=True, help_text='Intervention Link')
+    # partner_link = models.CharField(max_length=210, null=True, help_text='Partner Link')
+    # intervention_link = models.CharField(max_length=211, null=True, help_text='Intervention Link')
 
-    country_id = models.IntegerField(null=True)
+    # country_id = models.IntegerField(null=True)
     partner_id = models.IntegerField(null=True)
     intervention_id = models.IntegerField(null=True)
     created = models.DateTimeField(auto_now=True)

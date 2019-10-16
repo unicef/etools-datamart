@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.pmpindicators",
-                "pk": 908,
+                "pk": 2504,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-09-16T18:29:15.845Z",
+                    "last_modify_date": "2019-10-16T09:17:09.047Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -32,21 +32,18 @@
                     "fr_currencies": null,
                     "sum_of_all_fr_planned_amount": null,
                     "core_value_attached": null,
-                    "partner_link": null,
-                    "intervention_link": null,
-                    "country_id": null,
                     "partner_id": null,
                     "intervention_id": null,
-                    "created": "2019-09-16T18:29:15.845Z",
+                    "created": "2019-10-16T09:17:09.047Z",
                     "updated": null
                 }
             },
             {
                 "model": "data.pmpindicators",
-                "pk": 909,
+                "pk": 2505,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-09-16T18:29:15.865Z",
+                    "last_modify_date": "2019-10-16T09:17:09.064Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -72,21 +69,18 @@
                     "fr_currencies": null,
                     "sum_of_all_fr_planned_amount": null,
                     "core_value_attached": null,
-                    "partner_link": null,
-                    "intervention_link": null,
-                    "country_id": null,
                     "partner_id": null,
                     "intervention_id": null,
-                    "created": "2019-09-16T18:29:15.865Z",
+                    "created": "2019-10-16T09:17:09.064Z",
                     "updated": null
                 }
             },
             {
                 "model": "data.pmpindicators",
-                "pk": 910,
+                "pk": 2506,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-09-16T18:29:15.882Z",
+                    "last_modify_date": "2019-10-16T09:17:09.074Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -112,12 +106,9 @@
                     "fr_currencies": null,
                     "sum_of_all_fr_planned_amount": null,
                     "core_value_attached": null,
-                    "partner_link": null,
-                    "intervention_link": null,
-                    "country_id": null,
                     "partner_id": null,
                     "intervention_id": null,
-                    "created": "2019-09-16T18:29:15.882Z",
+                    "created": "2019-10-16T09:17:09.074Z",
                     "updated": null
                 }
             }
