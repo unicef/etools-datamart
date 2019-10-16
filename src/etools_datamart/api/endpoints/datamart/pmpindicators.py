@@ -24,12 +24,12 @@ class PMPIndicatorsSerializer(DataMartSerializer):
 
     def get_partner_link(self, obj):
         return "%s/pmp/partners/%s/details/?schema=%s" % (config.ETOOLS_ADDRESS,
-                                                          obj.source_id,
+                                                          obj.partner_id,
                                                           obj.schema_name)
 
     def get_intervention_link(self, obj):
         return "%s/pmp/interventions/%s/details/?schema=%s" % (config.ETOOLS_ADDRESS,
-                                                               obj.source_id,
+                                                               obj.intervention_id,
                                                                obj.schema_name)
 
 
