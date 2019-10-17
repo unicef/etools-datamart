@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.5.0a1
+TARGET?=2.5.0a2
 BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]\)\.\([0-9]\)\.\(.*\)/\1.\2/g" )
 # below vars are used internally
 BUILD_OPTIONS?=--squash
@@ -18,7 +18,7 @@ DOCKERFILE?=Dockerfile
 RUN_OPTIONS?=
 PIPENV_ARGS?=
 PORTS=
-ABSOLUTE_BASE_URL?="http://192.5.0a168.66.66:8000"
+ABSOLUTE_BASE_URL?="http://192.5.0a268.66.66:8000"
 
 help:
 	@echo "dev                  build dev image (based on local code)"
@@ -71,12 +71,12 @@ build_old:
 	cd .. && docker run \
 	 		--rm \
 			-e ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
-			-e CACHE_URL=redis://192.5.0a168.66.66:6379/1 \
-			-e CACHE_URL_API=redis://192.5.0a168.66.66:6379/2 \
-			-e CACHE_URL_LOCK=redis://192.5.0a168.66.66:6379/3 \
-			-e CACHE_URL_TEMPLATE=redis://192.5.0a168.66.66:6379/4 \
-			-e CELERY_BROKER_URL=redis://192.5.0a168.66.66:6379/2 \
-			-e CELERY_RESULT_BACKEND=redis://192.5.0a168.66.66:6379/3 \
+			-e CACHE_URL=redis://192.5.0a268.66.66:6379/1 \
+			-e CACHE_URL_API=redis://192.5.0a268.66.66:6379/2 \
+			-e CACHE_URL_LOCK=redis://192.5.0a268.66.66:6379/3 \
+			-e CACHE_URL_TEMPLATE=redis://192.5.0a268.66.66:6379/4 \
+			-e CELERY_BROKER_URL=redis://192.5.0a268.66.66:6379/2 \
+			-e CELERY_RESULT_BACKEND=redis://192.5.0a268.66.66:6379/3 \
 			-e CSRF_COOKIE_SECURE=false \
 			-e DATABASE_URL=${DATABASE_URL} \
 			-e DATABASE_URL_ETOOLS=${DATABASE_URL_ETOOLS} \
