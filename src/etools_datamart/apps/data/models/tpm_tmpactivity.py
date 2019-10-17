@@ -132,7 +132,7 @@ class TPMActivityLoader(EtoolsLoader):
 
 
 class TPMActivity(EtoolsDataMartModel):
-    additional_information = models.CharField(max_length=500, blank=True, null=True)
+    additional_information = models.TextField(blank=True, null=True)
     approval_comment = models.TextField(blank=True, null=True)
     area_code = models.CharField(max_length=500, blank=True, null=True)
     attachments = models.TextField(blank=True, null=True)

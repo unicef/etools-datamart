@@ -9,11 +9,6 @@ class DataMartSerializer(serializers.ModelSerializer):
         exclude = ('schema_name', )
 
 
-class PMPIndicatorsSerializer(DataMartSerializer):
-    class Meta(DataMartSerializer.Meta):
-        model = models.PMPIndicators
-
-
 class FAMIndicatorSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.FAMIndicator

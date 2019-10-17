@@ -31,6 +31,7 @@ class AuditResult(EtoolsDataMartModel):
 
     # AuditAudit.engagement_ptr.agreement.auditor_firm.name - -
     vendor = models.CharField(max_length=300, blank=True, null=True)
+    vendor_number = models.CharField(max_length=300, blank=True, null=True)
 
     # AuditAudit.engagement_ptr.partner.partner_type - -
     partner_type = models.CharField(max_length=300, blank=True, null=True)
@@ -62,7 +63,8 @@ class AuditResult(EtoolsDataMartModel):
         source = AuditAudit
         sync_deleted_records = lambda loader: False
         mapping = {'source_id': 'engagement_ptr.id',
-                   'vendor': 'engagement_ptr.agreement.auditor_firm.name',
+                   'vendor': 'engagement_ptr.partner.name',
+                   'vendor_number': 'engagement_ptr.partner.vendor_number',
                    'partner_type': 'engagement_ptr.partner.partner_type',
                    'risk_rating': 'engagement_ptr.partner.rating',
                    'audited_expenditure': '=',
