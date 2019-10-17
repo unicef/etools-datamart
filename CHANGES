@@ -1,3 +1,10 @@
+2.5
+---
+* updates AuditResult
+* fixes #15714
+* fixes #15746
+
+
 2.4
 ---
 * new endpoint "datamart/audit/results"
