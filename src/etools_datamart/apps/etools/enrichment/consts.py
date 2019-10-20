@@ -169,6 +169,18 @@ class AuditEngagementConsts:
              (TYPE_SPECIAL_AUDIT, _('Special Audit')),
              )
 
+    DISPLAY_STATUSES = Choices(
+        ('partner_contacted', _('IP Contacted')),
+        ('field_visit', _('Field Visit')),
+        ('draft_issued_to_partner', _('Draft Report Issued to IP')),
+        ('comments_received_by_partner', _('Comments Received from IP')),
+        ('draft_issued_to_unicef', _('Draft Report Issued to UNICEF')),
+        ('comments_received_by_unicef', _('Comments Received from UNICEF')),
+        ('report_submitted', _('Report Submitted')),
+        ('final', _('Final Report')),
+        ('cancelled', _('Cancelled')),
+    )
+
 
 class ActionPointConsts:
     MODULE_CHOICES = CategoryConsts.MODULE_CHOICES

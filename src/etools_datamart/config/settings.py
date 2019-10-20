@@ -114,7 +114,7 @@ DATABASE_ROUTERS = [
     #                            'auth', 'authtoken', 'contenttypes',
     #                            'django_db_logging'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
-    router_factory('prp', ['source_prp'], syncdb=False),
+    # router_factory('prp', ['source_prp'], syncdb=False),
 ]
 
 LOGIN_URL = '/login/'
@@ -300,7 +300,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
-    'etools_datamart.apps.sources.source_prp.apps.Config',
+    # 'etools_datamart.apps.sources.source_prp.apps.Config',
     'etools_datamart.apps.rapidpro',
     'etools_datamart.apps.prp',
     'etools_datamart.api',
