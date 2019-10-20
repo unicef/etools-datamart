@@ -71,6 +71,7 @@ circus = "*"
 rapidpro-python = "*"
 django-jsoneditor = "*"
 pygments = "*"
+bump2version = "*"
 
 [dev-packages]
 check-manifest= "*"
