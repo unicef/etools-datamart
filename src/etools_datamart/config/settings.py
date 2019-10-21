@@ -114,7 +114,7 @@ DATABASE_ROUTERS = [
     #                            'auth', 'authtoken', 'contenttypes',
     #                            'django_db_logging'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
-    # router_factory('prp', ['source_prp'], syncdb=False),
+    router_factory('prp', ['source_prp'], syncdb=False),
 ]
 
 LOGIN_URL = '/login/'

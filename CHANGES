@@ -1,7 +1,9 @@
 2.6
 ---
 * updates requirements
-*
+* add `status` and `vendor_number` to AuditResult
+* add `status` filter to AuditResult endpoint
+* fixes "missing Engagements" issue in FAMIndicator
 
 2.5
 ---

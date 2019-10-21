@@ -51,7 +51,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1140"
+            "1245"
         ]
     },
     "data": {
@@ -69,6 +69,7 @@
                 "country_name": "bolivia",
                 "area_code": "",
                 "vendor": null,
+                "vendor_number": null,
                 "partner_type": null,
                 "risk_rating": null,
                 "audited_expenditure": "1.00",
@@ -76,7 +77,8 @@
                 "audit_opinion": "--",
                 "count_high_risk_findings": null,
                 "count_financial_findings": null,
-                "count_key_control_weaknesses": null
+                "count_key_control_weaknesses": null,
+                "status": null
             },
             {
                 "id": 181,
@@ -86,6 +88,7 @@
                 "country_name": "chad",
                 "area_code": "",
                 "vendor": null,
+                "vendor_number": null,
                 "partner_type": null,
                 "risk_rating": null,
                 "audited_expenditure": "1.00",
@@ -93,7 +96,8 @@
                 "audit_opinion": "--",
                 "count_high_risk_findings": null,
                 "count_financial_findings": null,
-                "count_key_control_weaknesses": null
+                "count_key_control_weaknesses": null,
+                "status": null
             },
             {
                 "id": 182,
@@ -103,6 +107,7 @@
                 "country_name": "lebanon",
                 "area_code": "",
                 "vendor": null,
+                "vendor_number": null,
                 "partner_type": null,
                 "risk_rating": null,
                 "audited_expenditure": "1.00",
@@ -110,7 +115,8 @@
                 "audit_opinion": "--",
                 "count_high_risk_findings": null,
                 "count_financial_findings": null,
-                "count_key_control_weaknesses": null
+                "count_key_control_weaknesses": null,
+                "status": null
             }
         ]
     },

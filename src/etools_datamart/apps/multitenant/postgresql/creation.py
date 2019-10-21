@@ -125,10 +125,14 @@ SET default_tablespace = '';
                 str(public_dump)]
         try:
             subprocess.check_call(cmds)
-        except Exception as e:
+        except BaseException as e:
+            print(" ======= UNRECOVERABLE ERROR ========= ")
             print(e)
             print(" ".join(cmds))
-            sys.exit(1)
+            if hasattr(sys, '_called_from_test'):
+                import pytest
+                pytest.exit("--")
+            sys.exit(2)
         try:
             cur.execute(raw_sql(header.format(schema='public')))
         except Exception as e:
