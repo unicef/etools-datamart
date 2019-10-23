@@ -1,5 +1,7 @@
 from django.db import models
+from django.utils.translation import gettext as _
 
+from model_utils import Choices
 from month_field import Month
 from month_field.models import MonthField
 
@@ -10,6 +12,18 @@ from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, Aud
 
 
 class FAMIndicatorLoader(EtoolsLoader):
+    PARTNER_CONTACTED = 'partner_contacted'
+    REPORT_SUBMITTED = 'report_submitted'
+    FINAL = 'final'
+    CANCELLED = 'cancelled'
+
+    STATUSES = Choices(
+        (PARTNER_CONTACTED, _('IP Contacted')),
+        (REPORT_SUBMITTED, _('Report Submitted')),
+        (FINAL, _('Final Report')),
+        (CANCELLED, _('Cancelled')),
+    )
+
     def get_values(self, record):
         pass  # pragma: no cover
 
@@ -24,7 +38,7 @@ class FAMIndicatorLoader(EtoolsLoader):
             realname = "_".join(model._meta.db_table.split('_')[1:])
             values = self.get_mart_values(country)
             # prepare all fields
-            for status, status_display in AuditEngagement.STATUSES:
+            for status, status_display in self.STATUSES:
                 filter_dict = {
                     'engagement_ptr__status': status,
                     'engagement_ptr__start_date__month': start_date.month,
@@ -45,14 +59,17 @@ class FAMIndicator(EtoolsDataMartModel):
     spotcheck_report_submitted = models.IntegerField(verbose_name='Spot Check-Report Submitted', default=0)
     spotcheck_final_report = models.IntegerField(verbose_name='Spot Check-Final Report', default=0)
     spotcheck_cancelled = models.IntegerField(verbose_name='Spot Check-Cancelled', default=0)
+
     audit_ip_contacted = models.IntegerField(verbose_name='Audit-IP Contacted', default=0)
     audit_report_submitted = models.IntegerField(verbose_name='Audit-Report Submitted', default=0)
     audit_final_report = models.IntegerField(verbose_name='Audit-Final Report', default=0)
     audit_cancelled = models.IntegerField(verbose_name='Audit-Cancelled', default=0)
+
     specialaudit_ip_contacted = models.IntegerField(verbose_name='Special Audit-IP Contacted', default=0)
     specialaudit_report_submitted = models.IntegerField(verbose_name='Special Audit-Report Submitted', default=0)
     specialaudit_final_report = models.IntegerField(verbose_name='Special Audit-Final Report', default=0)
     specialaudit_cancelled = models.IntegerField(verbose_name='Special Audit-Cancelled', default=0)
+
     microassessment_ip_contacted = models.IntegerField(verbose_name='Micro Assessment-IP Contacted', default=0)
     microassessment_report_submitted = models.IntegerField(verbose_name='Micro Assessment-Report Submitted', default=0)
     microassessment_final_report = models.IntegerField(verbose_name='Micro Assessment-Final Report', default=0)

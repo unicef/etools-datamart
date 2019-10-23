@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import uuid
 import warnings
@@ -35,8 +36,14 @@ def pytest_configure(config):
     # enable this to remove deprecations
     os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
     os.environ['STATIC_ROOT'] = tempfile.gettempdir()
+    sys._called_from_pytest = True
     if not config.option.help:
         _setup_models()
+
+
+def pytest_unconfigure(config):
+    import sys  # This was missing from the manual
+    del sys._called_from_pytest
 
 
 # warnings.simplefilter('once', DeprecationWarning)
@@ -87,7 +94,6 @@ def django_db_setup(request,
         django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
 
-    #
     # from pytest_django.fixtures import django_db_setup as dj_db_setup
     # dj_db_setup(request,
     #             django_test_environment,
@@ -96,8 +102,8 @@ def django_db_setup(request,
     #             django_db_keepdb,
     #             django_db_createdb,
     #             django_db_modify_db_settings)
-
-    """Top level fixture to ensure test databases are available"""
+    #
+    # """Top level fixture to ensure test databases are available"""
     from pytest_django.compat import setup_databases, teardown_databases
     from pytest_django.fixtures import _disable_native_migrations
     setup_databases_args = {}
@@ -115,12 +121,12 @@ def django_db_setup(request,
             **setup_databases_args
         )
 
-    def teardown_database():
+    def _teardown_database():
         with django_db_blocker.unblock():
             teardown_databases(db_cfg, verbosity=request.config.option.verbose)
 
     if not django_db_keepdb:
-        request.addfinalizer(teardown_database)
+        request.addfinalizer(_teardown_database)
 
     #
     from unicef_rest_framework.models import Service, UserAccessControl

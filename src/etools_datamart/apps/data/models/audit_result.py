@@ -2,6 +2,7 @@ from django.db import models
 
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
+from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.etools.models import AuditAudit, AuditFinancialfinding, AuditKeyinternalcontrol, AuditRisk
 
 
@@ -57,6 +58,10 @@ class AuditResult(EtoolsDataMartModel):
     # model count(Audit.KeyInternalControl) per engagement
     count_key_control_weaknesses = models.IntegerField(blank=True, null=True)
 
+    status = models.CharField(max_length=30, blank=True, null=True,
+                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
+                              db_index=True)
+
     loader = AuditResultLoader()
 
     class Options:
@@ -64,6 +69,7 @@ class AuditResult(EtoolsDataMartModel):
         sync_deleted_records = lambda loader: False
         mapping = {'source_id': 'engagement_ptr.id',
                    'vendor': 'engagement_ptr.partner.name',
+                   'status': 'engagement_ptr.status',
                    'vendor_number': 'engagement_ptr.partner.vendor_number',
                    'partner_type': 'engagement_ptr.partner.partner_type',
                    'risk_rating': 'engagement_ptr.partner.rating',

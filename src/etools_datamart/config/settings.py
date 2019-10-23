@@ -300,7 +300,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
-    'etools_datamart.apps.sources.source_prp.apps.Config',
+    # 'etools_datamart.apps.sources.source_prp.apps.Config',
     'etools_datamart.apps.rapidpro',
     'etools_datamart.apps.prp',
     'etools_datamart.api',

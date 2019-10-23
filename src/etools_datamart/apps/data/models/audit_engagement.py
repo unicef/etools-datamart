@@ -206,40 +206,28 @@ class Engagement(EtoolsDataMartModel):
         (TYPE_SPECIAL_AUDIT, _('Special Audit')),
     )
 
-    PARTNER_CONTACTED = 'partner_contacted'
-    REPORT_SUBMITTED = 'report_submitted'
-    FINAL = 'final'
-    CANCELLED = 'cancelled'
-
-    STATUSES = Choices(
-        (PARTNER_CONTACTED, _('IP Contacted')),
-        (REPORT_SUBMITTED, _('Report Submitted')),
-        (FINAL, _('Final Report')),
-        (CANCELLED, _('Cancelled')),
-    )
-
-    DISPLAY_STATUSES = Choices(
-        ('partner_contacted', _('IP Contacted')),
-        ('field_visit', _('Field Visit')),
-        ('draft_issued_to_partner', _('Draft Report Issued to IP')),
-        ('comments_received_by_partner', _('Comments Received from IP')),
-        ('draft_issued_to_unicef', _('Draft Report Issued to UNICEF')),
-        ('comments_received_by_unicef', _('Comments Received from UNICEF')),
-        ('report_submitted', _('Report Submitted')),
-        ('final', _('Final Report')),
-        ('cancelled', _('Cancelled')),
-    )
-    DISPLAY_STATUSES_DATES = {
-        DISPLAY_STATUSES.partner_contacted: 'partner_contacted_at',
-        DISPLAY_STATUSES.field_visit: 'date_of_field_visit',
-        DISPLAY_STATUSES.draft_issued_to_partner: 'date_of_draft_report_to_ip',
-        DISPLAY_STATUSES.comments_received_by_partner: 'date_of_comments_by_ip',
-        DISPLAY_STATUSES.draft_issued_to_unicef: 'date_of_draft_report_to_unicef',
-        DISPLAY_STATUSES.comments_received_by_unicef: 'date_of_comments_by_unicef',
-        DISPLAY_STATUSES.report_submitted: 'date_of_report_submit',
-        DISPLAY_STATUSES.final: 'date_of_final_report',
-        DISPLAY_STATUSES.cancelled: 'date_of_cancel'
-    }
+    # DISPLAY_STATUSES = Choices(
+    #     ('partner_contacted', _('IP Contacted')),
+    #     ('field_visit', _('Field Visit')),
+    #     ('draft_issued_to_partner', _('Draft Report Issued to IP')),
+    #     ('comments_received_by_partner', _('Comments Received from IP')),
+    #     ('draft_issued_to_unicef', _('Draft Report Issued to UNICEF')),
+    #     ('comments_received_by_unicef', _('Comments Received from UNICEF')),
+    #     ('report_submitted', _('Report Submitted')),
+    #     ('final', _('Final Report')),
+    #     ('cancelled', _('Cancelled')),
+    # )
+    # DISPLAY_STATUSES_DATES = {
+    #     DISPLAY_STATUSES.partner_contacted: 'partner_contacted_at',
+    #     DISPLAY_STATUSES.field_visit: 'date_of_field_visit',
+    #     DISPLAY_STATUSES.draft_issued_to_partner: 'date_of_draft_report_to_ip',
+    #     DISPLAY_STATUSES.comments_received_by_partner: 'date_of_comments_by_ip',
+    #     DISPLAY_STATUSES.draft_issued_to_unicef: 'date_of_draft_report_to_unicef',
+    #     DISPLAY_STATUSES.comments_received_by_unicef: 'date_of_comments_by_unicef',
+    #     DISPLAY_STATUSES.report_submitted: 'date_of_report_submit',
+    #     DISPLAY_STATUSES.final: 'date_of_final_report',
+    #     DISPLAY_STATUSES.cancelled: 'date_of_cancel'
+    # }
 
     # Base fields
     active_pd = models.TextField(blank=True, null=True)
@@ -279,7 +267,8 @@ class Engagement(EtoolsDataMartModel):
     staff_members = models.TextField(blank=True, null=True)
     staff_members_data = JSONField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True, db_index=True)
-    status = models.CharField(max_length=300, blank=True, null=True,
+    status = models.CharField(max_length=30, blank=True, null=True,
+                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
                               db_index=True)
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     write_off_required = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)

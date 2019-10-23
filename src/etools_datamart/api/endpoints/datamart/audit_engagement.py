@@ -10,6 +10,7 @@ from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleCho
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.data import models
 from etools_datamart.apps.data.models import Engagement
+from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
 
 from ..common import DataMartViewSet
 
@@ -99,7 +100,7 @@ class EngagementFilterForm(forms.Form):
                                     required=False)
 
     status__in = Select2MultipleChoiceField(label='Status',
-                                            choices=models.Engagement.STATUSES,
+                                            choices=AuditEngagementConsts.DISPLAY_STATUSES,
                                             required=False)
 
     audit_opinion__in = Select2MultipleChoiceField(label='Audit Opinion',
