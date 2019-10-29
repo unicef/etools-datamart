@@ -26,10 +26,9 @@ class CampaignSerializer(DataMartSerializer):
 class CampaignViewSet(RapidProViewSet):
     serializer_class = CampaignSerializer
     queryset = models.Campaign.objects.all()
-    # filter_fields = ('created', 'date_of_completion', 'due_date')
     serializers_fieldsets = {'std': CampaignSerializer}
     querystringfilter_form_base_class = CampaignFilterForm
-    filter_fields = ['organization', ]
+    filter_fields = ['organization', 'archived']
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)
