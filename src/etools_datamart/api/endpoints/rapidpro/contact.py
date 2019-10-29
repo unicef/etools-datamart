@@ -20,7 +20,7 @@ class ContactFilterForm(forms.Form):
 class ContactViewSet(RapidProViewSet):
     serializer_class = ContactSerializer
     queryset = models.Contact.objects.all()
-    # filter_fields = ('created', 'date_of_completion', 'due_date')
+    filter_fields = ('organization', )
     serializers_fieldsets = {'std': ContactSerializer}
     querystringfilter_form_base_class = ContactFilterForm
 
