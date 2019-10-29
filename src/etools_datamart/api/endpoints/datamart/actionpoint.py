@@ -115,7 +115,7 @@ class ActionPointFilterForm(forms.Form):
 class ActionPointViewSet(common.DataMartViewSet):
     serializer_class = ActionPointSerializer
     queryset = models.ActionPoint.objects.all()
-    filter_fields = ('created', 'date_of_completion', 'due_date')
+    filter_fields = ('created', 'date_of_completion', 'due_date', 'high_priority')
     serializers_fieldsets = {'std': ActionPointSerializer,
                              'v2': ActionPointSerializerV2}
     querystringfilter_form_base_class = ActionPointFilterForm

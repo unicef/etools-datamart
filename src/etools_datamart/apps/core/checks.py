@@ -13,7 +13,7 @@ def check_loader(app_configs, **kwargs):
         if hasattr(viewset, 'querystringfilter_form_base_class'):
             view = viewset()
             form = view.get_querystringfilter_form(MagicMock(), MagicMock())
-            a = set(form.fields.keys())
+            a = set([a.split('__')[0] for a in form.fields.keys()])
             b = set(viewset.filter_fields)
             not_enabled = a - b
             if not_enabled:
