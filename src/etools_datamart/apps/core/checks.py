@@ -17,7 +17,7 @@ def check_loader(app_configs, **kwargs):
             b = set(viewset.filter_fields)
             not_enabled = a - b
             if not_enabled:
-                errors.append(Error('%s %s enabled but not showed in form' % (viewset.__name__, not_enabled)))
+                errors.append(Error('%s %s is present in form but not enabled' % (viewset.__name__, not_enabled)))
             # missed_in_form = b - a
             # if missed_in_form:
             #     errors.append(Error('%s form is missing %s' % (viewset.__name__, missed_in_form)))
