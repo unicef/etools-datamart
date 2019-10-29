@@ -28,7 +28,7 @@ class CampaignViewSet(RapidProViewSet):
     queryset = models.Campaign.objects.all()
     serializers_fieldsets = {'std': CampaignSerializer}
     querystringfilter_form_base_class = CampaignFilterForm
-    filter_fields = ['organization', 'archived']
+    filter_fields = ['organization', 'archived', 'created_on']
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)
