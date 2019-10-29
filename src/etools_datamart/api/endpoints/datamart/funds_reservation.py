@@ -32,7 +32,7 @@ class FundsReservationFilterForm(forms.Form):
 class FundsReservationViewSet(common.DataMartViewSet):
     serializer_class = FundsReservationSerializer
     queryset = models.FundsReservation.objects.all()
-    filter_fields = ('vendor_code', 'fr_type', 'start_date')
+    filter_fields = ('vendor_code', 'fr_type', 'start_date', 'last_modify_date', 'submission_date')
 
     def get_querystringfilter_form(self, request, filter):
         return FundsReservationFilterForm(request.GET, filter.form_prefix)

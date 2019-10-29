@@ -50,7 +50,7 @@ class TravelViewSet(common.DataMartViewSet):
 
     serializer_class = TravelSerializer
     queryset = models.Travel.objects.all()
-    filter_fields = ('status', 'created',
+    filter_fields = ('status', 'created', 'last_modify_date',
                      'completed_at', 'approved_at', 'end_date', 'start_date')
     ordering_fields = ("id", "created", "start_date")
 

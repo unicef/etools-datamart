@@ -74,7 +74,7 @@ class PartnerViewSet(common.DataMartViewSet):
                              'short': PartnerSerializerShort
                              }
     queryset = models.Partner.objects.all()
-    filter_fields = ('partner_type', 'hidden', 'cso_type', 'rating')
+    filter_fields = ('partner_type', 'hidden', 'cso_type', 'rating', 'last_modify_date')
     ordering_fields = ("id", "name")
 
     def get_querystringfilter_form(self, request, filter):

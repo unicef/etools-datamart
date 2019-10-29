@@ -64,7 +64,7 @@ class InterventionBudgetSerializerPlain(InterventionSerializerPlain):
 
 class InterventionBudgetViewSet(common.DataMartViewSet):
     querystringfilter_form_base_class = InterventionFilterForm
-
+    filter_fields = ('document_type', 'last_modify_date', 'start_date', 'status', 'submission_date')
     serializer_class = InterventionBudgetSerializer
     queryset = models.InterventionBudget.objects.all()
     serializers_fieldsets = {'std': None,
