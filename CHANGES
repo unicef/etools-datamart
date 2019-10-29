@@ -1,4 +1,4 @@
-2.6.1
+2.7
 -----
 * add check to pevent missing filter declaration
 * fixes AuditResult `status` filter
