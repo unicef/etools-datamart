@@ -1,8 +1,6 @@
-from unittest.mock import Mock, MagicMock
+from unittest.mock import MagicMock
 
 from django.core import checks
-
-# from django.core.checks import Error
 from django.core.checks import Error
 
 from etools_datamart.api.urls import router

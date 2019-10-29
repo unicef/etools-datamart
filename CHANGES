@@ -1,6 +1,7 @@
 2.7 (dev)
 --------
 * add check to pevent missing filter declaration
+* fixes AuditResult `status` filter
 
 
 2.6

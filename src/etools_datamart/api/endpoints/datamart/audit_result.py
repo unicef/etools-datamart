@@ -35,7 +35,7 @@ class AuditResultFilterForm(forms.Form):
 class AuditResultViewSet(common.DataMartViewSet):
     serializer_class = AuditResultSerializer
     queryset = models.AuditResult.objects.all()
-    filter_fields = ('risk_rating',)
+    filter_fields = ('risk_rating', 'status')
     serializers_fieldsets = {'std': AuditResultSerializer}
     querystringfilter_form_base_class = AuditResultFilterForm
 
