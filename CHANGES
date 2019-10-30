@@ -1,3 +1,11 @@
+2.7
+-----
+* add dedicated check to prevent missing filter declaration
+* fixes AuditResult `status` filter
+* fixes some missing field filtering
+* uses `python:3.6-slim-stretch` as base image
+
+
 2.6
 ---
 * updates requirements

@@ -1,102 +1,58 @@
-FROM python:3.7.4-alpine3.10
+FROM python:3.6-slim-stretch
 
+ARG BUILD_DATE
 ARG PIPENV_ARGS
+ARG VERSION
+ARG TEST
 
-ENV CPLUS_INCLUDE_PATH /usr/include/gdal
-ENV C_INCLUDE_PATH /usr/include/gdal
+ENV CPLUS_INCLUDE_PATH /usr/include/libxml2/
+ENV C_INCLUDE_PATH /usr/include/libxml2/
+ENV TEST ${TEST}
 
-RUN apk add --no-cache --virtual .fetch-deps \
-        curl \
-        ca-certificates \
-        openssl \
-        tar
-
-RUN apk add --no-cache --virtual .build-deps \
-        autoconf \
-        automake \
-        pkgconf \
-        g++ \
-        json-c-dev \
-        libtool \
-        libxml2-dev \
-        make \
-        perl
-
-RUN apk add --no-cache --virtual .build-deps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        proj-dev \
-        protobuf-c-dev
-
-RUN apk add --no-cache --virtual .postgis-rundeps \
-        mailcap \
-        json-c \
-        libuuid \
-        libxml2
-
-
-RUN apk add --no-cache --virtual .postgis-rundeps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        binutils \
-        geos \
-        geos-dev \
-        gdal-dev \
-        gdal \
-        gosu \
-        libmagic \
-        libpq \
-        libuuid \
-        libxslt \
-        libzmq \
-        jpeg \
-        proj \
-        protobuf-c \
-        zlib
-
-RUN apk add --no-cache --virtual .datamart-build-deps \
-        freetype-dev \
-        fontconfig-dev \
-        freetype-dev \
-        jpeg-dev \
-        lcms2-dev \
+RUN set -x \
+    && buildDeps=" \
+        gcc \
+        git \
         libffi-dev \
-        libressl-dev \
-        linux-headers \
-        musl-dev \
-        openjpeg-dev \
-        postgresql-dev \
-        python3-dev \
-        tcl-dev \
-        tiff-dev \
-        tk-dev \
-        zlib-dev
+        libgdal-dev \
+        libjpeg-dev \
+        libmaxminddb-dev \
+        libpq-dev \
+        libxml2-dev \
+        libxmlsec1-dev \
+        libxslt-dev \
+        libyaml-dev \
+        libsasl2-dev \
+        python-dev \
+        libldap2-dev \
+        libssl-dev \
+        pkg-config \
+    " \
+    && apt-get update && apt-get install -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/*
 
-RUN apk add --no-cache --virtual .datamart-run-deps \
-        postgresql-libs
+RUN set -x \
+    && runDeps=" \
+        gosu \
+    " \
+    && apt-get update && apt-get install -y --no-install-recommends $runDeps && rm -rf /var/lib/apt/lists/*
 
-RUN apk add --no-cache --virtual .system-run-deps \
-        bash
 
-RUN mkdir /code
-ADD Pipfile* /code/
-RUN pip install pip pipenv --upgrade
-RUN cd /code \
-    && pipenv install --verbose --system --deploy --ignore-pipfile $PIPENV_ARGS \
+RUN mkdir -p /code
+COPY Pipfile* /code/
+WORKDIR /code
+
+RUN set -ex \
+    ls -al /code \
+    && pip install pip pipenv \
+    && pipenv install --verbose --system --deploy $TEST --ignore-pipfile $PIPENV_ARGS \
     && sha1sum Pipfile.lock > /CHECKSUM
 
-# need to removes some code not py3.7 compliant
-RUN rm -fr /usr/local/lib/python3.7/site-packages/psycopg2/tests/* \
-           /usr/local/lib/python3.7/site-packages/tornado/test/* \
-           /usr/local/lib/python3.7/site-packages/circus/tests/*
+RUN find /usr/local/lib/python3.6/site-packages/etools_datamart -name *.pyc | xargs rm -f \
+    && python -O -m compileall -fqb /usr/local/lib/python3.6/site-packages/etools_datamart \
+    && find /usr/local/lib/python3.6/site-packages/etools_datamart -name *.py | xargs rm -f
 
-# before compile site-packages
-RUN find /usr/local/lib/python3.7/ -name *.pyc | xargs rm -f \
-    && python -O -m compileall -fqb /usr/local/lib/python3.7 \
-    && find /usr/local/lib/python3.7/ -name *.py | xargs rm -f
-
-RUN apk del .fetch-deps .build-deps .build-deps-edge .datamart-build-deps \
-    && rm -rf /var/cache/apk/* \
+RUN apt-get purge -y --auto-remove $buildDeps \
+    && rm -rf /var/lib/apt/lists/* \
     && rm -fr /root/.cache/ \
-    && rm -fr /usr/include/
-
+    && rm -fr /var/etools_datamart/.cache/ \
+    && rm -fr /usr/include/ \

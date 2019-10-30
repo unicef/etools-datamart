@@ -49,7 +49,7 @@ class EtoolsUserViewSet(common.DataMartViewSet):
                        ]
 
     queryset = models.EtoolsUser.objects.all()
-    filter_fields = ('last_modify_date', 'office')
+    filter_fields = ('last_modify_date', 'office', 'last_login')
     serializers_fieldsets = {"std": None,
                              "full": EtoolsUserSerializerFull,
                              }

@@ -69,7 +69,7 @@ class PartnerAgreementViewSet(common.DataMartViewSet):
 
     serializer_class = PartnerAgreementSerializer
     queryset = models.Agreement.objects.all()
-    filter_fields = ('agreement_type', 'status')
+    filter_fields = ('agreement_type', 'status', 'last_modify_date')
 
     def get_querystringfilter_form(self, request, filter):
         return AgreementFilterForm(request.GET, filter.form_prefix)

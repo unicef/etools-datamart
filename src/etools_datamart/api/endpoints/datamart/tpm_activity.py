@@ -51,7 +51,7 @@ class TPMActivitySerializer(DataMartSerializer):
 class TPMActivityViewSet(common.DataMartViewSet):
     serializer_class = TPMActivitySerializer
     queryset = models.TPMActivity.objects.all()
-    filter_fields = ('date', 'is_pv', 'visit_status')
+    filter_fields = ('date', 'is_pv', 'visit_status', 'visit_start_date')
     ordering_fields = ("id", "created",)
     querystringfilter_form_base_class = TPMActivityFilterForm
 

@@ -14,7 +14,7 @@ class FlowStartFilterForm(forms.Form):
                                                      (True, 'True'),))
 
     created_on = DateRangePickerField(label='Created between',
-                                            required=False)
+                                      required=False)
 
 
 class FlowStartSerializer(DataMartSerializer):
@@ -29,7 +29,7 @@ class FlowStartViewSet(RapidProViewSet):
     # filter_fields = ('created', 'date_of_completion', 'due_date')
     serializers_fieldsets = {'std': FlowStartSerializer}
     querystringfilter_form_base_class = FlowStartFilterForm
-    filter_fields = ['organization', ]
+    filter_fields = ['organization', 'archived', 'created_on']
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)

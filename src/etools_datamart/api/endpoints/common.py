@@ -66,6 +66,10 @@ class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
     ordering_fields = ('id',)
     ordering = 'id'
     family = 'datamart'
+    querystringfilter_form_base_class = forms.Form
+
+    def get_querystringfilter_form(self, request, filter):
+        return self.querystringfilter_form_base_class(request.GET, filter.form_prefix)
 
     def get_schema_fields(self):
         ret = []
@@ -182,7 +186,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 
 
 class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
-    querystringfilter_form_base_class = forms.Form
+    pass
 
     # def _get_serializer_from_param(self, name=None):
     #     if self.request:
@@ -203,6 +207,3 @@ class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
     #         return target
     #     else:  # Standard Serializer
     #         raise InvalidSerializerError
-
-    def get_querystringfilter_form(self, request, filter):
-        return self.querystringfilter_form_base_class(request.GET, filter.form_prefix)

@@ -237,6 +237,8 @@ class QueryStringFilterBackend(BaseFilterBackend):
         self.request = request
         try:
             filters, exclude = self._get_filters(request, queryset, view)
+            request.api_info['qs_filter'] = filters
+            request.api_info['qs_exclude'] = exclude
             qs = queryset.filter(**filters).exclude(**exclude)
             logger.debug("""Filtering using:
 {}

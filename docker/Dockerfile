@@ -1,26 +1,25 @@
 ARG BASE_IMAGE
 
-#FROM byrnedo/alpine-curl:0.1.7 as loader
-#
-#ARG BUILD_DATE
-#ARG VERSION
-#ARG DEVELOP
-#ARG GITHUB_TOKEN
+FROM byrnedo/alpine-curl:0.1.7 as loader
 
-#ENV DEVELOP=${DEVELOP}
-#ENV GITHUB_TOKEN=${GITHUB_TOKEN}
-#ENV DATAMART_VERSION=${VERSION}
-#
-#RUN mkdir -p /code
-#COPY . /code
-#WORKDIR /code
-#RUN set -o pipefail && \
-#    if [ "${DEVELOP}" = "1" ]; then \
-#    echo "${VERSION}-develop"; \
-#    else \
-#    echo "Download package: https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" \
-#    && curl -L -u "${GITHUB_TOKEN}:" "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
-#    fi
+ARG BUILD_DATE
+ARG VERSION
+ARG DEVELOP
+ARG GITLAB_API_TOKEN
+
+ENV DEVELOP=${DEVELOP}
+ENV GITLAB_API_TOKEN=${GITLAB_API_TOKEN}
+
+RUN mkdir -p /code
+COPY . /code
+WORKDIR /code
+RUN set -o pipefail && \
+    if [ "${DEVELOP}" = "1" ]; then \
+    echo "${VERSION}-develop"; \
+    else \
+    echo "Download package: https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" \
+    && curl -L -u "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
+    fi
 
 FROM unicef/datamart:${BASE_IMAGE}-base
 #COPY --from=loader /code /code
@@ -37,14 +36,7 @@ ENV DATAMART_VERSION=${VERSION}
 RUN mkdir -p /code
 COPY . /code
 WORKDIR /code
-RUN set -o pipefail && \
-    if [ "${DEVELOP}" = "1" ]; then \
-    echo "${VERSION}-develop"; \
-    else \
-    echo "Download package: https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" \
-    && curl -L -u "https://github.com/unicef/etools-datamart/archive/${DATAMART_VERSION}.tar.gz" | tar -xzf - --strip-components=1; \
-    fi
-WORKDIR /code
+
 
 RUN set -ex \
     ls -al /code \
@@ -132,8 +124,8 @@ EXPOSE 8000
 ADD docker/*.sh /usr/local/bin/
 ADD docker/circus.conf /etc/
 
-RUN addgroup --gid 1024 datamart \
-    && adduser --disabled-password --ingroup datamart -S datamart
+RUN groupadd --gid 1024 datamart \
+    && useradd -r -m -g datamart datamart
 
 ENTRYPOINT ["entrypoint.sh"]
 WORKDIR /var/datamart

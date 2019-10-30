@@ -20,7 +20,7 @@ class GroupFilterForm(forms.Form):
 class GroupViewSet(RapidProViewSet):
     serializer_class = GroupSerializer
     queryset = models.Group.objects.all()
-    # filter_fields = ('created', 'date_of_completion', 'due_date')
+    filter_fields = ('organization', )
     serializers_fieldsets = {'std': GroupSerializer}
     querystringfilter_form_base_class = GroupFilterForm
 
