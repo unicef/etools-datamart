@@ -22,7 +22,7 @@ class TPMActivityLoader(EtoolsLoader):
         return "Task #{}.{}".format(record.tpm_visit.id, record.id)
 
     def get_visit_url(self, record: TpmTpmactivity, values: dict, **kwargs):
-        return 'tpm/visits/%s/details' % record.id
+        return 'tpm/visits/%s/details' % record.tpm_visit_id
 
     def get_report_attachments(self, record: TpmTpmactivity, values: dict, **kwargs):
         # attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
