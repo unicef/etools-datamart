@@ -40,7 +40,7 @@ class EtoolsLoader(BaseLoader):
             ret['source_id'] = record.id
         return ret
 
-    def get_values(self, record):
+    def xxget_values(self, record):
         country = self.context['country']
         ret = self.get_mart_values(record)
 
@@ -95,6 +95,30 @@ class EtoolsLoader(BaseLoader):
                 raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
 
         return ret
+
+    def get_value(self, field_name, value_or_func, original_record, current_mapping):
+        if value_or_func == '__self__':
+            country = self.context['country']
+            try:
+                return self.model.objects.get(schema_name=country.schema_name,
+                                              source_id=getattr(original_record, field_name).id)
+            except AttributeError:
+                return None
+            except self.model.DoesNotExist:
+                self.tree_parents.append((original_record.id, getattr(original_record, field_name).id))
+                return None
+        if isclass(value_or_func) and issubclass(value_or_func, models.Model):
+            country = self.context['country']
+            try:
+                return value_or_func.objects.get(schema_name=country.schema_name,
+                                                 source_id=getattr(original_record, field_name).id)
+            except ObjectDoesNotExist:  # pragma: no cover
+                return None
+            except AttributeError:  # pragma: no cover
+                pass
+        else:
+            return super(EtoolsLoader, self).get_value(field_name, value_or_func,
+                                                       original_record, current_mapping)
 
     def filter_queryset(self, qs):
         use_delta = self.context['only_delta'] and not self.context['is_empty']
@@ -255,7 +279,7 @@ class CommonSchemaLoader(EtoolsLoader):
             ret['source_id'] = record.id
         return ret
 
-    def get_values(self, record):
+    def ssget_values(self, record):
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
@@ -282,6 +306,16 @@ class CommonSchemaLoader(EtoolsLoader):
                 ret[k] = get_attr(record, v)
 
         return ret
+
+    def get_value(self, field_name, value_or_func, original_record, current_mapping):
+        if isclass(value_or_func) and issubclass(value_or_func, models.Model):
+            try:
+                return value_or_func.objects.get(source_id=getattr(original_record, field_name).id)
+            except AttributeError:  # pragma: no cover
+                pass
+        else:
+            return super(CommonSchemaLoader, self).get_value(field_name, value_or_func, original_record,
+                                                             current_mapping)
 
     def load(self, *, verbosity=0, stdout=None,
              ignore_dependencies=False, max_records=None,
