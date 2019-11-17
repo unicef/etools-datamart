@@ -55,7 +55,7 @@ class LocationLoader(EtoolsLoader):
 
     def load(self, **kwargs):
         try:
-            return super().load()
+            return super().load(**kwargs)
         finally:
             Location.objects.batch_update_centroid()
 

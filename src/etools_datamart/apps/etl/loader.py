@@ -345,15 +345,15 @@ class BaseLoader:
                 _value = getter(record=record, values=ret, field_name=k)
                 if _value != self.noop:
                     ret[k] = _value
-            # elif v == '__self__':
-            #     try:
-            #         ret[k] = self.model.objects.get(source_id=getattr(record, k).id)
-            #     except AttributeError:
-            #         ret[k] = None
-            #     except self.model.DoesNotExist:
-            #         ret[k] = None
-            #         self.tree_parents.append((record.id, getattr(record, k).id))
-            #
+            elif v == '__self__':
+                try:
+                    ret[k] = self.model.objects.get(source_id=getattr(record, k).id)
+                except AttributeError:
+                    ret[k] = None
+                except self.model.DoesNotExist:
+                    ret[k] = None
+                    self.tree_parents.append((record.id, getattr(record, k).id))
+
             # elif isclass(v) and issubclass(v, models.Model):
             #     try:
             #         ret[k] = v.objects.get(schema_name=country.schema_name,
