@@ -1,3 +1,9 @@
+2.8
+---
+* fixes #16623 - wrong visit_url in TPMActivity
+* fixes Location / GtewayType Loaders
+
+
 2.7
 -----
 * add dedicated check to prevent missing filter declaration

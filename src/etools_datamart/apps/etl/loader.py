@@ -327,55 +327,43 @@ class BaseLoader:
     def get_values(self, record):
         ret = self.get_mart_values(record)
         for k, v in self.mapping.items():
-            if k in ret:
+            if k in ret or v == 'i':
                 continue
-            if v is None:
-                ret[k] = None
-            elif v == 'N/A':
-                ret[k] = 'N/A'
-            elif v == 'i':
-                continue
-            elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
-                getter = getattr(self, v)
-                _value = getter(record, ret, field_name=k)
-                if _value != self.noop:
-                    ret[k] = _value
-            elif v == '-' or hasattr(self, 'get_%s' % k):
-                getter = getattr(self, 'get_%s' % k)
-                _value = getter(record=record, values=ret, field_name=k)
-                if _value != self.noop:
-                    ret[k] = _value
-            # elif v == '__self__':
-            #     try:
-            #         ret[k] = self.model.objects.get(source_id=getattr(record, k).id)
-            #     except AttributeError:
-            #         ret[k] = None
-            #     except self.model.DoesNotExist:
-            #         ret[k] = None
-            #         self.tree_parents.append((record.id, getattr(record, k).id))
-            #
-            # elif isclass(v) and issubclass(v, models.Model):
-            #     try:
-            #         ret[k] = v.objects.get(schema_name=country.schema_name,
-            #                                source_id=getattr(record, k).id)
-            #     except ObjectDoesNotExist:  # pragma: no cover
-            #         ret[k] = None
-            #     except AttributeError:  # pragma: no cover
-            #         pass
-            elif callable(v):
-                ret[k] = v(self, record)
-            elif v == '=' and has_attr(record, k):
-                ret[k] = get_attr(record, k)
-            # elif has_attr(record, k):
-            #     ret[k] = get_attr(record, k)
-            elif not isinstance(v, str):
-                ret[k] = v
-            elif has_attr(record, v):
-                ret[k] = get_attr(record, v)
             else:
-                raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
-
+                ret[k] = self.get_value(k, v, record, ret)
         return ret
+
+    def get_value(self, field_name, value_or_func, original_record, current_mapping):
+        if value_or_func is None:
+            return None
+        elif value_or_func == 'N/A':
+            return 'N/A'
+        elif isinstance(value_or_func, str) and hasattr(self, value_or_func) and callable(getattr(self, value_or_func)):
+            getter = getattr(self, value_or_func)
+            _value = getter(original_record, current_mapping, field_name=field_name)
+            if _value != self.noop:
+                return _value
+        elif value_or_func == '-' or hasattr(self, 'get_%s' % field_name):
+            getter = getattr(self, 'get_%s' % field_name)
+            _value = getter(record=original_record, values=current_mapping, field_name=field_name)
+            if _value != self.noop:
+                return _value
+        elif value_or_func == '__self__':
+            try:
+                return self.model.objects.get(source_id=getattr(original_record, field_name).id)
+            except AttributeError:
+                return None
+            except self.model.DoesNotExist:
+                self.tree_parents.append((original_record.id, getattr(original_record, field_name).id))
+                return None
+        elif callable(value_or_func):
+            return value_or_func(self, original_record)
+        elif value_or_func == '=' and has_attr(original_record, field_name):
+            return get_attr(original_record, field_name)
+        elif not isinstance(value_or_func, str):
+            return value_or_func
+        elif has_attr(original_record, value_or_func):
+            return get_attr(original_record, value_or_func)
 
     @property
     def is_locked(self):

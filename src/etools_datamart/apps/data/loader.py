@@ -1,6 +1,7 @@
 import time
 from inspect import isclass
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
 from django.utils import timezone
 
@@ -9,8 +10,8 @@ from crashlog.middleware import process_exception
 from dynamic_serializer.core import get_attr
 from redis.exceptions import LockError
 
-from etools_datamart.apps.etl.loader import (BaseLoader, BaseLoaderOptions, cache, EtlResult, MaxRecordsException,
-                                             RequiredIsMissing, RequiredIsRunning, RUN_UNKNOWN,)
+from etools_datamart.apps.etl.loader import (BaseLoader, BaseLoaderOptions, cache, EtlResult, has_attr,
+                                             MaxRecordsException, RequiredIsMissing, RequiredIsRunning, RUN_UNKNOWN,)
 from etools_datamart.libs.time import strfelapsed
 
 logger = get_task_logger(__name__)
@@ -39,61 +40,85 @@ class EtoolsLoader(BaseLoader):
             ret['source_id'] = record.id
         return ret
 
-    # def get_values(self, record):
-    #     country = self.context['country']
-    #     ret = self.get_mart_values(record)
-    #
-    #     for k, v in self.mapping.items():
-    #         if k in ret:
-    #             continue
-    #         if v is None:
-    #             ret[k] = None
-    #         elif v == 'N/A':
-    #             ret[k] = 'N/A'
-    #         elif v == 'i':
-    #             continue
-    #         elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
-    #             getter = getattr(self, v)
-    #             _value = getter(record, ret, field_name=k)
-    #             if _value != self.noop:
-    #                 ret[k] = _value
-    #         elif v == '-' or hasattr(self, 'get_%s' % k):
-    #             getter = getattr(self, 'get_%s' % k)
-    #             _value = getter(record, ret, field_name=k)
-    #             if _value != self.noop:
-    #                 ret[k] = _value
-    #         elif v == '__self__':
-    #             try:
-    #                 ret[k] = self.model.objects.get(schema_name=country.schema_name,
-    #                                                 source_id=getattr(record, k).id)
-    #             except AttributeError:
-    #                 ret[k] = None
-    #             except self.model.DoesNotExist:
-    #                 ret[k] = None
-    #                 self.tree_parents.append((record.id, getattr(record, k).id))
-    #
-    #         elif isclass(v) and issubclass(v, models.Model):
-    #             try:
-    #                 ret[k] = v.objects.get(schema_name=country.schema_name,
-    #                                        source_id=getattr(record, k).id)
-    #             except ObjectDoesNotExist:  # pragma: no cover
-    #                 ret[k] = None
-    #             except AttributeError:  # pragma: no cover
-    #                 pass
-    #         elif callable(v):
-    #             ret[k] = v(self, record)
-    #         elif v == '=' and has_attr(record, k):
-    #             ret[k] = get_attr(record, k)
-    #         # elif has_attr(record, k):
-    #         #     ret[k] = get_attr(record, k)
-    #         elif not isinstance(v, str):
-    #             ret[k] = v
-    #         elif has_attr(record, v):
-    #             ret[k] = get_attr(record, v)
-    #         else:
-    #             raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
-    #
-    #     return ret
+    def xxget_values(self, record):
+        country = self.context['country']
+        ret = self.get_mart_values(record)
+
+        for k, v in self.mapping.items():
+            if k in ret:
+                continue
+            if v is None:
+                ret[k] = None
+            elif v == 'N/A':
+                ret[k] = 'N/A'
+            elif v == 'i':
+                continue
+            elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
+                getter = getattr(self, v)
+                _value = getter(record, ret, field_name=k)
+                if _value != self.noop:
+                    ret[k] = _value
+            elif v == '-' or hasattr(self, 'get_%s' % k):
+                getter = getattr(self, 'get_%s' % k)
+                _value = getter(record, ret, field_name=k)
+                if _value != self.noop:
+                    ret[k] = _value
+            elif v == '__self__':
+                try:
+                    ret[k] = self.model.objects.get(schema_name=country.schema_name,
+                                                    source_id=getattr(record, k).id)
+                except AttributeError:
+                    ret[k] = None
+                except self.model.DoesNotExist:
+                    ret[k] = None
+                    self.tree_parents.append((record.id, getattr(record, k).id))
+
+            elif isclass(v) and issubclass(v, models.Model):
+                try:
+                    ret[k] = v.objects.get(schema_name=country.schema_name,
+                                           source_id=getattr(record, k).id)
+                except ObjectDoesNotExist:  # pragma: no cover
+                    ret[k] = None
+                except AttributeError:  # pragma: no cover
+                    pass
+            elif callable(v):
+                ret[k] = v(self, record)
+            elif v == '=' and has_attr(record, k):
+                ret[k] = get_attr(record, k)
+            # elif has_attr(record, k):
+            #     ret[k] = get_attr(record, k)
+            elif not isinstance(v, str):
+                ret[k] = v
+            elif has_attr(record, v):
+                ret[k] = get_attr(record, v)
+            else:
+                raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
+
+        return ret
+
+    def get_value(self, field_name, value_or_func, original_record, current_mapping):
+        if value_or_func == '__self__':
+            country = self.context['country']
+            try:
+                return self.model.objects.get(schema_name=country.schema_name,
+                                              source_id=getattr(original_record, field_name).id)
+            except AttributeError:
+                return None
+            except self.model.DoesNotExist:
+                self.tree_parents.append((original_record.id, getattr(original_record, field_name).id))
+                return None
+        if isclass(value_or_func) and issubclass(value_or_func, models.Model):
+            country = self.context['country']
+            try:
+                return value_or_func.objects.get(schema_name=country.schema_name,
+                                                 source_id=getattr(original_record, field_name).id)
+            except ObjectDoesNotExist:  # pragma: no cover
+                return None
+            except AttributeError:  # pragma: no cover
+                pass
+        else:
+            return super(EtoolsLoader, self).get_value(field_name, value_or_func,
+                                                       original_record, current_mapping)
 
     def filter_queryset(self, qs):
         use_delta = self.context['only_delta'] and not self.context['is_empty']
@@ -254,7 +279,7 @@ class CommonSchemaLoader(EtoolsLoader):
             ret['source_id'] = record.id
         return ret
 
-    def get_values(self, record):
+    def ssget_values(self, record):
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
@@ -281,6 +306,16 @@ class CommonSchemaLoader(EtoolsLoader):
                 ret[k] = get_attr(record, v)
 
         return ret
+
+    def get_value(self, field_name, value_or_func, original_record, current_mapping):
+        if isclass(value_or_func) and issubclass(value_or_func, models.Model):
+            try:
+                return value_or_func.objects.get(source_id=getattr(original_record, field_name).id)
+            except AttributeError:  # pragma: no cover
+                pass
+        else:
+            return super(CommonSchemaLoader, self).get_value(field_name, value_or_func, original_record,
+                                                             current_mapping)
 
     def load(self, *, verbosity=0, stdout=None,
              ignore_dependencies=False, max_records=None,

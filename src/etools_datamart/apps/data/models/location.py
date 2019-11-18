@@ -55,7 +55,7 @@ class LocationLoader(EtoolsLoader):
 
     def load(self, **kwargs):
         try:
-            return super().load()
+            return super().load(**kwargs)
         finally:
             Location.objects.batch_update_centroid()
 
@@ -88,6 +88,7 @@ class Location(EtoolsDataMartModel):
         source = LocationsLocation
         queryset = lambda: LocationsLocation.objects.order_by('-parent')
         last_modify_field = 'modified'
+        exclude_from_compare = ['latitude', 'longitude', 'point']
         # sync_deleted_records = False
         mapping = {'source_id': 'id',
                    # 'area_code': lambda loader, record: loader.context['country'].business_area_code,

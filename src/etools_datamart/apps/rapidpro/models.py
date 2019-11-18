@@ -232,11 +232,7 @@ class FlowStartLoader(TembaLoader):
                 try:
                     lbl = self.get_foreign_key(m2m_local_model, entry)
                     m2m_local.add(lbl)
-                    # TODO: remove me
-                    print(111, "models.py:236", m2m_local_model, lbl)
                 except ObjectDoesNotExist as e:
-                    # TODO: remove me
-                    print(111, "models.py:237", e)
                     capture_exception(e)
 
         return op

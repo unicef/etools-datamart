@@ -1,10 +1,12 @@
 import inspect
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import ForeignKey
 from django.utils import timezone
 
 from celery.utils.log import get_task_logger
 from constance import config
+from sentry_sdk import capture_exception
 from strategy_field.utils import get_attr
 from temba_client.serialization import TembaObject
 from temba_client.v2 import TembaClient
@@ -78,8 +80,12 @@ class TembaLoader(BaseLoader):
                 ref = getattr(record, resolver, None)
                 fk = self.model._meta.get_field(dm_field_name)
                 if has_attr(ref, 'uuid'):
-                    ret[dm_field_name] = self.get_foreign_key(fk.remote_field.model,
-                                                              ref)
+                    try:
+                        ret[dm_field_name] = self.get_foreign_key(fk.remote_field.model,
+                                                                  ref)
+                    except ObjectDoesNotExist as e:
+                        capture_exception(e)
+                        ret[dm_field_name] = None
             elif has_attr(record, resolver):
                 ret[dm_field_name] = get_attr(record, resolver)
             else:
