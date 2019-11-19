@@ -6,7 +6,7 @@ from dynamic_serializer.core import get_attr
 
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.etools.models import AttachmentsAttachment, DjangoContentType, TpmTpmactivity
+from etools_datamart.apps.etools.models import DjangoContentType, TpmTpmactivity, UnicefAttachmentsAttachment
 
 
 class TPMActivityLoader(EtoolsLoader):
@@ -31,7 +31,7 @@ class TPMActivityLoader(EtoolsLoader):
         #                                                    ).order_by('id').values_list('file', flat=True)
         #
         # values['report_attachments_data'] = attachments
-        attachments = (AttachmentsAttachment.objects
+        attachments = (UnicefAttachmentsAttachment.objects
                        .select_related('uploaded_by', 'file_type')
                        .filter(object_id=record.tpm_visit.id,
                                code='activity_report',
@@ -50,7 +50,7 @@ class TPMActivityLoader(EtoolsLoader):
         return ", ".join([a.file for a in attachments])
 
     def get_attachments(self, record: TpmTpmactivity, values: dict, **kwargs):
-        attachments = (AttachmentsAttachment.objects
+        attachments = (UnicefAttachmentsAttachment.objects
                        .select_related('uploaded_by', 'file_type')
                        .filter(object_id=record.tpm_visit.id,
                                code='activity_attachments',

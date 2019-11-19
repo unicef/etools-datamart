@@ -7,9 +7,9 @@ from model_utils import Choices
 from etools_datamart.apps.data.loader import EtoolsLoader
 from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
-from etools_datamart.apps.etools.models import (AttachmentsAttachment, AuditAudit, AuditEngagement,
-                                                AuditEngagementActivePd, AuditMicroassessment, AuditSpecialaudit,
-                                                AuditSpotcheck, DjangoContentType,)
+from etools_datamart.apps.etools.models import (AuditAudit, AuditEngagement, AuditEngagementActivePd,
+                                                AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
+                                                DjangoContentType, UnicefAttachmentsAttachment,)
 
 from .partner import Partner
 
@@ -71,7 +71,7 @@ class EngagementlLoader(EtoolsLoader):
 
     def get_engagement_attachments(self, record: AuditEngagement, values: dict, **kwargs):
         # audit_engagement
-        ret = AttachmentsAttachment.objects.filter(
+        ret = UnicefAttachmentsAttachment.objects.filter(
             object_id=record.id,
             code='audit_engagement',
             content_type=self.get_content_type(AuditEngagement)).values_list('file', flat=True)
@@ -80,43 +80,22 @@ class EngagementlLoader(EtoolsLoader):
 
     def get_report_attachments(self, record: AuditEngagement, values: dict, **kwargs):
         # audit_report
-        ret = AttachmentsAttachment.objects.filter(
+        ret = UnicefAttachmentsAttachment.objects.filter(
             object_id=record.id,
             code='audit_report',
             content_type=self.get_content_type(AuditEngagement)).values_list('file', flat=True)
 
         return ", ".join(ret)
 
-    # def get_audited_expenditure(self, original: AuditEngagement, values: dict, **kwargs):
-    #     if getattr(original._impl, 'total_amount_tested', None):
-    #         values['total_amount_of_ineligible_expenditure'] = original._impl.total_amount_of_ineligible_expenditure
-    #     audited_expenditure
-
-    # def get_spotcheck_total_amount_tested(self, original: AuditEngagement, values: dict, **kwargs):
-    #     if getattr(original._impl, 'total_amount_tested', None):
-    #         values['total_amount_of_ineligible_expenditure'] = original._impl.total_amount_of_ineligible_expenditure
-    #         values['spotcheck_final_report'] = original._impl.final_report
-    #         values['spotcheck_internal_controls'] = original._impl.internal_controls
-    #         return original._impl.total_amount_tested
-    #     else:
-    #         values['spotcheck_total_amount_of_ineligible_expenditure'] = None
-    #         values['spotcheck_final_report'] = None
-    #         values['spotcheck_internal_controls'] = None
-
     def get_final_report(self, record: AuditEngagement, values: dict, **kwargs):
         if getattr(record._impl, 'final_report', None):
-            return AttachmentsAttachment.objects.get(
+            return UnicefAttachmentsAttachment.objects.get(
                 object_id=record.id,
                 code=attachment_codes[record.sub_type],
                 content_type=self.get_content_type(record.sub_type)).file
 
     def get_values(self, record, ):
         values = {}
-        # if getattr(record._impl, 'total_amount_tested', None):
-        # values['spotcheck_total_amount_tested'] = record._impl.total_amount_tested
-        # values['total_amount_of_ineligible_expenditure'] = record._impl.total_amount_of_ineligible_expenditure
-        # values['spotcheck_final_report'] = record._impl.final_report
-        # values['spotcheck_internal_controls'] = record._impl.internal_controls
         self.mapping.update(**values)
         return super(EngagementlLoader, self).get_values(record)
 
