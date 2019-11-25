@@ -1,16 +1,15 @@
-FROM python:3.6-slim-stretch
+FROM python:3.7-slim-stretch
 
 ARG BUILD_DATE
 ARG PIPENV_ARGS
 ARG VERSION
-ARG TEST
 
 ENV CPLUS_INCLUDE_PATH /usr/include/libxml2/
 ENV C_INCLUDE_PATH /usr/include/libxml2/
-ENV TEST ${TEST}
 
 RUN set -x \
     && buildDeps=" \
+        build-essential \
         gcc \
         git \
         libffi-dev \
@@ -38,14 +37,15 @@ RUN set -x \
 
 
 RUN mkdir -p /code
-COPY Pipfile* /code/
+COPY poetry.lock pyproject.toml /code/
 WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
-    && pip install pip pipenv \
-    && pipenv install --verbose --system --deploy $TEST --ignore-pipfile $PIPENV_ARGS \
-    && sha1sum Pipfile.lock > /CHECKSUM
+    && pip install pip poetry \
+    && poetry config settings.virtualenvs.create false \
+    && poetry install --no-dev \
+    && sha1sum poetry.lock > /CHECKSUM
 
 RUN find /usr/local/lib/python3.6/site-packages/etools_datamart -name *.pyc | xargs rm -f \
     && python -O -m compileall -fqb /usr/local/lib/python3.6/site-packages/etools_datamart \

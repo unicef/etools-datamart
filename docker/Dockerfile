@@ -40,8 +40,9 @@ WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
+    && rm /code/pyproject.toml \
     && sha1sum -c /CHECKSUM \
-    && pip3 install . \
+    && pip3 install . --no-deps \
     && rm -fr /code
 
 
@@ -55,9 +56,7 @@ LABEL org.label.name="eTools Datamart" \
 
 ENV VERSION ${VERSION}
 
-ENV PIPENV_PYPI_MIRROR=${PIPENV_PYPI_MIRROR}, \
-    PIPENV_ARGS=${PIPENV_ARGS}, \
-    HOME=/root/ \
+ENV HOME=/root/ \
     PYTHONUNBUFFERED=1 \
     USE_GUNICORN=0 \
     GUNICORN_WORKERS=4 \

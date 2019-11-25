@@ -766,7 +766,8 @@ class UnicefProgrammedocumentPartnerFocalPoint(ReadOnlyModel):
 
 class UnicefProgrammedocumentSections(ReadOnlyModel):
     programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    section = models.ForeignKey('source_prp.UnicefSection', models.PROTECT, related_name='+')
+    section = models.ForeignKey('source_prp.UnicefSection',
+                                models.PROTECT, related_name='+')
 
     class Meta:
         managed = False

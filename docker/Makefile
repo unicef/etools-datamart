@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.9.0a2
+TARGET?=2.9.0a3
 BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]\)\.\([0-9]\)\.\(.*\)/\1.\2/g" )
 # below vars are used internally
 BUILD_OPTIONS?=--squash
@@ -54,17 +54,6 @@ build-test:
 
 build:
 	$(MAKE) .build test
-
-build_old:
-	cd .. && docker build \
-			${BUILD_OPTIONS} \
-			--build-arg DEVELOP=${DEVELOP} \
-			--build-arg VERSION=${TARGET} \
-			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
-			-t ${DOCKER_IMAGE} \
-			-f docker/Dockerfile.flat .
-	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
-	docker images | grep ${DOCKER_IMAGE_NAME}
 
 
 .run:
