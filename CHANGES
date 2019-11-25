@@ -1,3 +1,9 @@
+2.9
+---
+* use poetry instead of pipenv
+*
+
+
 2.8
 ---
 * fixes #16623 - wrong visit_url in TPMActivity
