@@ -67,7 +67,7 @@ class Command(BaseCommand):
         # connection.mode = SINGLE_TENANT
         # state.schemas = [schema, "public"]
         connection.schema_name = schema
-        from etools_datamart.apps.etools.enrichment._related import names
+        from etools_datamart.apps.sources.etools.enrichment import names
         with connection.cursor() as cursor:
             # cursor.execute(raw_sql(f"SET search_path={schema}"))
             yield "# flake8: noqa F405."

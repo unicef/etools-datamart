@@ -4,7 +4,7 @@ from unicef_rest_framework.forms import CleareableSelect2ChoiceField, DateRangeP
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.api.endpoints.rapidpro._base_ import RapidProViewSet
-from etools_datamart.apps.rapidpro import models
+from etools_datamart.apps.mart.rapidpro import models
 
 
 class FlowStartFilterForm(forms.Form):

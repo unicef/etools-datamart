@@ -29,7 +29,7 @@ def client(user):
 def test_filter_cache_country_arg(db, client, flt, monkeypatch):
     fake = MockCache()
     monkeypatch.setattr('etools_datamart.api.filtering.cache', fake)
-    url = f"/api/latest/etools/partners/assessment/?%s" % flt
+    url = f"/api/latest/sources/etools/partners/assessment/?%s" % flt
     with user_allow_service(client.handler._force_user, AssessmentViewSet):
         with user_allow_country(client.handler._force_user, ["bolivia", "chad"]):
             client.get(url)

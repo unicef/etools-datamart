@@ -10,7 +10,7 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data import models
+from etools_datamart.apps.mart.data import models
 
 
 class DataMartModelFactory(RegisterModelFactory):

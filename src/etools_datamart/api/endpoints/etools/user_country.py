@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
-from etools_datamart.apps.etools.models import UsersCountry
+from etools_datamart.apps.sources.etools.models import UsersCountry
 
 from .. import common
 

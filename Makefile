@@ -13,9 +13,9 @@ help:
 
 
 develop:
-	@pipenv sync --dev
-	pipenv run pre-commit install
-	pipenv run pre-commit install --hook-type pre-push.
+	@poetry run
+	poetry run pre-commit install
+	poetry run pre-commit install --hook-type pre-push.
 	$(MAKE) .init-db
 
 

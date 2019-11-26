@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from etools_datamart.apps.data import models
+from etools_datamart.apps.mart.data import models
 
 
 class DataMartSerializer(serializers.ModelSerializer):

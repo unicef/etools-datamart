@@ -8,8 +8,8 @@ from rest_framework import serializers
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
-from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.enrichment.consts import PartnersAgreementConst
+from etools_datamart.apps.mart.data import models
+from etools_datamart.apps.sources.etools.enrichment.consts import PartnersAgreementConst
 
 from .. import common
 

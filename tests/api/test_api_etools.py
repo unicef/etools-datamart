@@ -4,8 +4,8 @@ from rest_framework.reverse import reverse
 
 from etools_datamart.api.endpoints import AssessmentViewSet
 from etools_datamart.api.urls import router
-from etools_datamart.apps.etools.models import PartnersAssessment
 from etools_datamart.apps.multitenant.postgresql.utils import current_schema
+from etools_datamart.apps.sources.etools.models import PartnersAssessment
 
 
 def pytest_generate_tests(metafunc):

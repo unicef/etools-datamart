@@ -1,7 +1,8 @@
 2.9
 ---
 * use poetry instead of pipenv
-*
+* BACKWARD INCOMPATIBLE: all `prp` endpoints to the source database moved to `sources/prp`
+* BACKWARD INCOMPATIBLE: all `etools` endpoints to the source database moved to `sources/etools`
 
 
 2.8

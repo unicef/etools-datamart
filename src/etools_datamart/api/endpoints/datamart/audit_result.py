@@ -3,8 +3,8 @@ from django import forms
 from unicef_rest_framework.forms import CleareableSelect2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
-from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
+from etools_datamart.apps.mart.data import models
+from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 
 from .. import common
 

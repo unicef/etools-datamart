@@ -8,7 +8,7 @@ from unicef_rest_framework.pagination import APIPagination
 
 from etools_datamart.api.endpoints.common import BaseAPIReadOnlyModelViewSet
 from etools_datamart.api.filtering import DatamartQueryStringFilterBackend
-from etools_datamart.apps.rapidpro.models import Organization
+from etools_datamart.apps.mart.rapidpro.models import Organization
 
 
 class RapidProPagination(APIPagination):

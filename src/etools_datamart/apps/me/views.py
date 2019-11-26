@@ -6,13 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
 
-from etools_datamart.apps.etools.utils import get_allowed_schemas, get_allowed_services
+# from etools_datamart.apps.sources.etools import get_allowed_schemas, get_allowed_services
 from etools_datamart.apps.me.forms import ProfileForm
-
 # @login_required
 # def profile(request):
 #     context = {'form': ProfileForm()}
 #     return TemplateResponse(request, 'index.html', context)
+from etools_datamart.apps.security.utils import get_allowed_schemas, get_allowed_services
 
 
 class ProfileView(FormView):

@@ -14,7 +14,8 @@ from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
 
-from etools_datamart.apps.data.exceptions import LoaderException
+from etools_datamart.apps.etl.exceptions import (LoaderException, MaxRecordsException,
+                                                 RequiredIsMissing, RequiredIsRunning,)
 from etools_datamart.celery import app
 
 loadeables = set()
@@ -80,28 +81,6 @@ class EtlResult:
                 'error': self.error,
                 'processed': self.processed,
                 'total_records': self.total_records}
-
-
-class RequiredIsRunning(Exception):
-
-    def __init__(self, req, *args: object) -> None:
-        self.req = req
-
-    def __str__(self):
-        return "Required ETL '%s' is running" % str(self.req.loader.etl_task.task)
-
-
-class RequiredIsMissing(Exception):
-
-    def __init__(self, req, *args: object) -> None:
-        self.req = req
-
-    def __str__(self):
-        return "Missing required ETL '%s'" % str(self.req.loader.etl_task.task)
-
-
-class MaxRecordsException(Exception):
-    pass
 
 
 undefined = object()

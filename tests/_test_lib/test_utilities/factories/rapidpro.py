@@ -1,6 +1,6 @@
 from test_utilities.factories import factory, RegisterModelFactory
 
-from etools_datamart.apps.rapidpro import models
+from etools_datamart.apps.mart.rapidpro import models
 
 
 class EToolsModelFactory(RegisterModelFactory):

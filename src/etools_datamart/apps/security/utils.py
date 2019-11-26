@@ -7,8 +7,8 @@ from constance import config
 
 from unicef_rest_framework.models import Service
 
-from etools_datamart.apps.etools.models import UsersUserprofile
 from etools_datamart.apps.security.models import SchemaAccessControl
+from etools_datamart.apps.sources.etools.models import UsersUserprofile
 from etools_datamart.libs.version import get_full_version
 
 conn = connections['etools']

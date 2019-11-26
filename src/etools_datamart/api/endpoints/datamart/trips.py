@@ -8,8 +8,7 @@ from rest_framework import serializers
 from unicef_rest_framework.forms import DateRangePickerField, Select2ChoiceField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
-from etools_datamart.apps.data import models
-from etools_datamart.apps.data.models.trip import ModeOfTravel
+from etools_datamart.apps.mart.data import models
 
 from .. import common
 
@@ -40,7 +39,7 @@ class TripFilterForm(forms.Form):
                                                       ))
     mode_of_travel__acontains = Select2MultipleChoiceField(label='Mode Of Travel',
                                                            required=False,
-                                                           choices=ModeOfTravel.CHOICES
+                                                           choices=models.ModeOfTravel.CHOICES
                                                            )
     # primary_traveler__istartswith = forms.CharField(label='Primary Traveler',
     #                                                 required=False)

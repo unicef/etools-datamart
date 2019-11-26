@@ -5,8 +5,8 @@ from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleCho
 from etools_datamart.api.endpoints import common
 from etools_datamart.api.endpoints.datamart.intervention import (InterventionSerializer, InterventionSerializerFull,
                                                                  InterventionSerializerPlain, InterventionSerializerV2,)
-from etools_datamart.apps.data import models
-from etools_datamart.apps.etools.enrichment.consts import PartnersInterventionConst
+from etools_datamart.apps.mart.data import models
+from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst
 
 
 class InterventionFilterForm(forms.Form):

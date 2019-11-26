@@ -2,8 +2,8 @@ import pytest
 
 from unicef_security.models import User
 
-from etools_datamart.apps.data.models import HACT
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.apps.mart.data.models import HACT
 
 pytestmarker = pytest.mark.django_db
 

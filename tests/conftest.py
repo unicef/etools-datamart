@@ -228,7 +228,7 @@ def number_of_intervention(db):
 
 @pytest.fixture()
 def etools_user(db):
-    from etools_datamart.apps.etools.models import AuthUser
+    from etools_datamart.apps.sources.etools.models import AuthUser
     return AuthUser.objects.get(id=1)
 
 

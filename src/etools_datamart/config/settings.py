@@ -290,19 +290,22 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'django.contrib.admin',
+
     'etools_datamart.config.admin.AdminConfig',
 
     'etools_datamart.apps.core.apps.Config',
-    'etools_datamart.apps.etools',
-    'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
-    # 'etools_datamart.apps.sources.source_prp.apps.Config',
-    'etools_datamart.apps.rapidpro',
-    'etools_datamart.apps.prp',
+
+    'etools_datamart.apps.sources.etools',
+    'etools_datamart.apps.sources.source_prp.apps.Config',
+
+    'etools_datamart.apps.mart.data',
+    'etools_datamart.apps.mart.rapidpro',
+    'etools_datamart.apps.mart.prp',
+
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',

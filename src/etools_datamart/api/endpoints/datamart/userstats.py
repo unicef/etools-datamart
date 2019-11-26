@@ -5,7 +5,7 @@ from month_field.rest_framework import MonthFilterBackend
 from rest_framework.fields import SerializerMethodField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
-from etools_datamart.apps.data import models
+from etools_datamart.apps.mart.data import models
 
 from .. import common
 
