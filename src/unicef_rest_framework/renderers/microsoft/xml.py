@@ -6,7 +6,6 @@ from rest_framework_xml.renderers import XMLRenderer
 class MSXmlRenderer(XMLRenderer):
     media_type = 'application/xml'
     format = 'ms-xml'
-    disable_pagination = True
     root_tag_name = "DocumentElement"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):

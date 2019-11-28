@@ -22,6 +22,6 @@ class WorkspaceSerializer(DataMartSerializer):
         return getattr(obj.local_currency, 'name', None)
 
 
-class WorkspaceViewSet(common.APIReadOnlyModelViewSet):
+class EtoolsWorkspaceViewSet(common.APIReadOnlyModelViewSet):
     serializer_class = WorkspaceSerializer
     queryset = UsersCountry.objects.select_related('local_currency').exclude(schema_name__in=['public'])

@@ -25,7 +25,7 @@ class GrantViewSet(common.DataMartViewSet):
     querystringfilter_form_base_class = GrantFilterForm
 
     serializer_class = GrantSerializer
-    queryset = models.Trip.objects.all()
+    queryset = models.Grant.objects.all()
     filter_fields = ('expiry',)
     ordering_fields = ("id", "name",)
 

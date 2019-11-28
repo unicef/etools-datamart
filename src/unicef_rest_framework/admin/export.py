@@ -15,29 +15,19 @@ def queue(modeladmin, request, queryset):
         preload.apply_async(args=[t.id])
 
 
-# class PreloadForm(forms.ModelForm):
-#     class Meta:
-#         model = Preload
-#         fields = '__all__'
-#         widgets = {
-#             'params': JSONEditor,
-#             # 'params': JSONEditorWidget({}, collapsed=False),
-#         }
-
-
-class PreloadAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('url', 'as_user', 'format',
-                    'enabled', 'last_run',
-                    'status_code', 'size', 'response_ms', 'preview')
+                    'enabled', 'refresh', 'last_run',
+                    'status_code', 'size', 'response_ms', 'api')
     date_hierarchy = 'last_run'
     search_fields = ('url',)
-    list_filter = (StatusFilter, 'enabled', SizeFilter)
+    list_filter = (StatusFilter, 'enabled', SizeFilter, 'refresh')
     actions = [queue, ]
 
     def format(self, obj):
         return obj.params.get('format', '')
 
-    def preview(self, obj):
+    def api(self, obj):
         return mark_safe("<a href='{0}' title='{0}' target='_new'>preview</a>".format(obj.get_full_url()))
 
     @action(label='Goto API')
@@ -53,8 +43,13 @@ class PreloadAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     @action()
     def queue(self, request, id):
-        from unicef_rest_framework.tasks import preload
-        preload.apply_async(args=[id])
+        from unicef_rest_framework.tasks import export
+        export.apply_async(args=[id])
+
+    @action()
+    def run(self, request, id):
+        from unicef_rest_framework.tasks import export
+        export(id)
 
     @action()
     def check_url(self, request, id):

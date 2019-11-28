@@ -32,6 +32,7 @@ class Client(APIClient):
         env['REMOTE_ADDR'] = '127.0.0.1'
         env['SERVER_NAME'] = 'localhost'
         env['SERVER_PORT'] = '80'
+        env['HTTP_PAGINATION_KEY'] = settings.DISABLE_PAGINATION_KEY
         return env
 
     def request(self, **kwargs):
@@ -39,7 +40,7 @@ class Client(APIClient):
         return request
 
 
-class Preload(models.Model):
+class AbstractPreload(models.Model):
     url = models.CharField(max_length=200)
     as_user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     params = JSONField(blank=True, null=True, default=dict)
@@ -50,16 +51,18 @@ class Preload(models.Model):
     status_code = models.IntegerField(blank=True, null=True)
     response_length = models.IntegerField(blank=True, null=True)
     response_ms = models.PositiveIntegerField('ms', default=0, blank=True, null=True)
+    etag = models.CharField(max_length=300, blank=True, null=True)
 
     class Meta:
         unique_together = ('url', 'as_user', 'params')
         ordering = ('url',)
+        abstract = True
 
     def clean(self):
         super().clean()
         self.check_url(True)
 
-    def full_url(self):
+    def get_full_url(self):
         return "%s%s?%s" % (settings.ABSOLUTE_BASE_URL, self.url,
                             urlencode(self.params))
 
@@ -69,26 +72,30 @@ class Preload(models.Model):
             client = Client()
             if self.as_user:
                 client.force_authenticate(self.as_user)
-            res = client.head(target, data=self.params)
+            params = dict(self.params)
+            params['page_size'] = 10
+            res = client.head(target, data=params)
             if res.status_code != 200:
                 raise Exception('Invalid Response: %s on %s' % (res.status_code,
-                                                                self.full_url()))
+                                                                self.get_full_url()))
         except Exception as e:
             if validate:
                 raise ValidationError(str(e))
             else:
                 return False
 
-    def run(self):
+    def run(self, target=None):
         try:
             self.last_run = timezone.now()
-            target = "%s%s" % (settings.ABSOLUTE_BASE_URL, self.url)
-            client = Client()
+            target = target or "%s%s" % (settings.ABSOLUTE_BASE_URL, self.url)
+            client = Client(HTTP_IF_NONE_MATCH=self.etag or 'Not-Set')
             if self.as_user:
                 client.force_authenticate(self.as_user)
+
             response = client.get(target, data=self.params)
             self.status_code = response.status_code
             self.response_length = len(response.content)
+            self.etag = response['ETag']
             response_timedelta = timezone.now() - self.last_run
             self.response_ms = int(response_timedelta.total_seconds() * 1000)
             return response
@@ -97,3 +104,8 @@ class Preload(models.Model):
             raise
         finally:
             self.save()
+
+
+class Preload(AbstractPreload):
+    class Meta:
+        pass

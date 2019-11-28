@@ -3,6 +3,7 @@
 * use poetry instead of pipenv
 * BACKWARD INCOMPATIBLE: all `prp` endpoints to the source database moved to `sources/prp`
 * BACKWARD INCOMPATIBLE: all `etools` endpoints to the source database moved to `sources/etools`
+* BACKWARD INCOMPATIBLE: pagination cannot be disabled. Users can access full dataset using alternate endpoint.
 
 
 2.8

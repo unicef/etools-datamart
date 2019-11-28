@@ -14,6 +14,7 @@ from django_regex.utils import RegexList
 logger = logging.getLogger(__name__)
 
 INGNORED_TABLES = RegexList([
+    'auth_permission',
     'django_cron_.*',
     'post_office_.*',
     'django_session',

@@ -14,6 +14,7 @@
             <li><a href="/status/">Service Status</a></li>
             <li><a href="{% url "monitor" %}">Monitor</a></li>
             <li><a href="{% url "profile" %}">Settings</a></li>
+            <li><a href="{% url "urf:export-list" %}">Files</a></li>
             {% if request.user.is_staff %}
                 <li class="menu-sep h10">&nbsp;</li>
                 <li><a href="{% url "admin:index" %}">Admin</a></li>

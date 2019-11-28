@@ -457,7 +457,7 @@ class IndicatorReportable(ReadOnlyModel):
     active = models.BooleanField()
     blueprint = models.ForeignKey(IndicatorIndicatorblueprint, models.PROTECT, related_name='+', blank=True, null=True)
     ca_indicator_used_by_reporting_entity = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
-    content_type = models.ForeignKey(DjangoContentType, models.PROTECT, related_name='+')
+    # content_type = models.ForeignKey(DjangoContentType, models.PROTECT, related_name='+')
     parent_indicator = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
 
     class Meta:

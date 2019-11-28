@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('indicator_target', models.CharField(blank=True, max_length=50, null=True)),
                 ('indicator_baseline', models.CharField(blank=True, max_length=50, null=True)),
                 ('title_of_indicator', models.TextField(blank=True, max_length=2048, null=True)),
-                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='etools_datamart.apps.mart.data.Location')),
+                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='data.Location')),
             ],
         ),
     ]

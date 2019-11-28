@@ -37,6 +37,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DATABASE_URL_PRP=(str, "postgis://postgres:@127.0.0.1:5432/prp"),
+                  DISABLE_PAGINATION_KEY=('str', 'disable-pagination'),
                   DEBUG=(bool, False),
                   DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
                   DISABLE_SERVICE_RESTRICTIONS=(bool, False),
@@ -106,7 +107,6 @@ DATABASES = {
 DATABASES['etools']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 DATABASES['prp']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 
-
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
     # router_factory('default', ['data', 'unicef_rest_framework',
@@ -119,6 +119,9 @@ DATABASE_ROUTERS = [
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DISABLE_PAGINATION_KEY = env('DISABLE_PAGINATION_KEY')
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -156,7 +159,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-# MEDIA_ROOT = os.path.join(PUBLIC_DIR, 'media')
+MEDIA_ROOT = env('MEDIA_ROOT')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.

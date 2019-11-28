@@ -15,12 +15,12 @@ class ReadOnlyRouter(APIReadOnlyRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r'sources/etools/funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
-router.register(r'sources/etools/funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
-router.register(r'sources/etools/funds/grant', endpoints.GrantViewSet)
-router.register(r'sources/etools/partners/assessment', endpoints.AssessmentViewSet)
-router.register(r'sources/etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
-router.register(r'sources/etools/workspaces', endpoints.WorkspaceViewSet)
+router.register(r'sources/etools/funds/fundsreservationheader', endpoints.EtoolsFundsReservationHeaderViewSet)
+router.register(r'sources/etools/funds/fundsreservationitem', endpoints.EtoolsFundsreservationitemViewSet)
+router.register(r'sources/etools/funds/grant', endpoints.EtoolsGrantViewSet)
+router.register(r'sources/etools/partners/assessment', endpoints.EtoolsAssessmentViewSet)
+router.register(r'sources/etools/partners/plannedengagement', endpoints.EtoolsPlannedengagementViewSet)
+router.register(r'sources/etools/workspaces', endpoints.EtoolsWorkspaceViewSet)
 
 router.register(r'datamart/attachment/attachment', endpoints.AttachmentViewSet)
 router.register(r'datamart/funds/grants', endpoints.GrantViewSet)

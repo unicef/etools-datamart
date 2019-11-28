@@ -35,9 +35,9 @@ class AuthGroupPermissionsAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
-@register(models.AuthPermission)
-class AuthPermissionAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
+# @register(models.AuthPermission)
+# class AuthPermissionAdmin(DatamartSourceModelAdmin, ModelAdmin):
+#     list_filter = []
 
 
 @register(models.AuthtokenToken)

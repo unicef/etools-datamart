@@ -1,0 +1,63 @@
+{% extends "rest_framework/base.html" %}{% load crispy_forms_filters %}
+{% block head %}{{ block.super }}{% endblock %}
+{% block body %}{{ block.super }}{% endblock %}
+{% block navbar %}{{ block.super }}{% endblock %}
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li class="active"><a href="{% url "home" %}">Home</a></li>
+        <li class="active"><a href="{% url "profile" %}">Settings</a></li>
+        <li class="active"><a href="{% url 'urf:export-list' %}">Files</a></li>
+    </ul>
+{% endblock %}
+{% block request-info %}
+{#    <div class="request-info" style="clear: both">#}
+{#    <pre class="prettyprint"><b>GET</b> {{ url }}<span style="cursor:pointer;float: right;position: relative;display: inline"#}
+{#                                    id="copyToClipboard">copy</span></pre>#}
+{#        <input style="position: absolute;left:-9999px" readonly="readonly" type="text"#}
+{#               name="query-url" value="{{ url }}">#}
+{#    </div>#}
+{% endblock %}
+{% block api-response %}
+    <h1>Files</h1>
+    {% if export_list %}
+        <table class="container table">
+<thead>
+                <tr>
+                    <th>description</th>
+                    <th>endpoint</th>
+                    <th>filename</th>
+                    <th>refresh</th>
+                    <th>enabled</th>
+                    <th>Owner</th>
+                    <th>Updated On</th>
+                    <th></th>
+                </tr>
+
+</thead>
+            {% for export in export_list %}
+                <tr>
+                    <td>{% if export.as_user == request.user %}
+                        <a href="{% url "urf:export-update" export.id %}">{{ export.name }}</a>
+                    {% else %}
+                        {{ export.name }}
+                    {% endif %}
+                    </td>
+
+                    <td>{{ export.url }}</td>
+                    <td>{{ export.filename }}</td>
+                    <td>{{ export.refresh }}</td>
+                    <td>{{ export.enabled }}</td>
+                    <td>{{ export.as_user }}</td>
+                    <td>{{ export.last_run|default_if_none:"" }}</td>
+                    <td>{% if export.last_run %}
+                        <a href="{% url "urf:export-fetch" export.id %}">download</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>There are no books in the library.</p>
+    {% endif %}
+{% endblock %}
+{% block script %}{{ block.super }}{% endblock %}

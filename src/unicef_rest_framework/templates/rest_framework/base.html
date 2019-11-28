@@ -108,7 +108,6 @@
             <!-- Content -->
             <div id="content" role="main" aria-label="{% trans "content" %}">
                 {% block content %}
-
                     <div class="region" aria-label="{% trans "request form" %}">
                         {% if service %}
                             <div class="pull-right" style="margin-left: 10px">
@@ -235,10 +234,16 @@
                                style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
                                class="btn btn-primary">Data</a>
                         {% endif %}
+                        {% if export_button %}
+                            <a href="{% url 'urf:export-create' %}?url={{ request.get_full_path|urlencode:"" }}"
+                               style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
+                               class="btn btn-primary">Book Export</a>
+                        {% endif %}
                         {% if service_url %}
                             <a href="{{ service_url }}"
                                style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
                                class="btn btn-primary">Service</a>
+
                             {% for name,url in extra_actions.items %}
                                 {% if url != request.build_absolute_uri %}
                                     <a href="{{ url }}"
@@ -259,7 +264,7 @@
                         {#                  {% get_pagination_html paginator %}#}
                         {#                </nav>#}
                         {#              {% endif %}#}
-
+{% block request-info %}
                         <div class="request-info" style="clear: both" aria-label="{% trans "request info" %}">
                             <pre class="prettyprint"><b>{{ request.method }}</b> {{ request.get_full_path }}<span
                                     style="cursor:pointer;float: right;position: relative;display: inline"
@@ -267,11 +272,14 @@
                             <input style="position: absolute;left:-9999px" readonly="readonly" type="text"
                                    name="query-url" value="{{ request.get_full_path }}">
                         </div>
+    {% endblock %}
                         <div class="response-info" aria-label="{% trans "response info" %}">
-                <pre class="prettyprint">
+
+                            {% block api-response %}
+                            <pre class="prettyprint">
 <span class="meta nocode"><b>HTTP {{ response.status_code }} {{ response.status_text }}</b>{% autoescape off %}{% for key, val in response_headers|items %}
 <b>{{ key }}:</b><span class="lit">{{ val|break_long_headers|urlize_quoted_links }}</span>{% endfor %}
-</span>{{ content|urlize_quoted_links }}</pre>{% endautoescape %}
+</span>{{ content|urlize_quoted_links }}{% endautoescape %}</pre>{% endblock %}
                         </div>
                     </div>
 
@@ -431,7 +439,8 @@
         <script src="{% static "rest_framework/js/default.js" %}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
-
+{% endblock %}
+{% block bottom_scripts %}
         <script>
             $(document).ready(function () {
                 $('form').ajaxForm();

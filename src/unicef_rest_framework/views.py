@@ -1,16 +1,27 @@
 # -*- coding: utf-8 -*-
 from functools import lru_cache
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.utils.functional import cached_property
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 import rest_framework_extensions.utils
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+from rest_framework.reverse import reverse
+from rest_framework.utils.breadcrumbs import get_breadcrumbs
 from rest_framework_xml.renderers import XMLRenderer
+from sentry_sdk import capture_exception
 from strategy_field.utils import fqn
 
+from unicef_rest_framework.forms import ExportForm
+from unicef_rest_framework.models import Export
 from unicef_rest_framework.pagination import PageFilter
+from unicef_rest_framework.storage import OverwriteStorage
+from unicef_rest_framework.utils import get_query_string, parse_url
 
 from . import acl
 from .auth import AnonymousAuthentication, IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
@@ -116,30 +127,26 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
         from unicef_rest_framework.models import Service
         return Service.objects.get_for_viewset(cls)
 
-    # @classproperty
-    # def endpoint(self):
-    #     for __, viewset, base_name in conf.ROUTER.registry:
-    #         if viewset == self:
-    #             return reverse(f'api:{base_name}-list', args=['latest'])
-    #     return None
+    @etag(etag_func='list_etag_func')
+    @cache_response(key_func='list_cache_key_func', cache='api')
+    def options(self, request, *args, **kwargs):
+        return super().options(request, *args, **kwargs)
 
     @etag(etag_func='object_etag_func')
     @cache_response(key_func='object_cache_key_func', cache='api')
     def retrieve(self, request, *args, **kwargs):
-        return super(URFReadOnlyModelViewSet, self).retrieve(request, *args, **kwargs)
+        return super().retrieve(request, *args, **kwargs)
 
     @etag(etag_func='list_etag_func')
     @cache_response(key_func='list_cache_key_func', cache='api')
     def list(self, request, *args, **kwargs):
-        return super(URFReadOnlyModelViewSet, self).list(request, *args, **kwargs)
+        return super().list(request, *args, **kwargs)
 
     @property
     def paginator(self):
         """
         The paginator instance associated with the view, or `None`.
         """
-        if hasattr(self.request.accepted_renderer, 'disable_pagination'):
-            return None
         if not hasattr(self, '_paginator'):
             if self.pagination_class is None:
                 self._paginator = None
@@ -153,3 +160,100 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
 
     def get_paginated_response(self, data):
         return super().get_paginated_response(data)
+
+
+class ExportList(ListView):
+    model = Export
+
+
+class ExportFetch(LoginRequiredMixin, DetailView):
+    model = Export
+
+    def get(self, request, *args, **kwargs):
+        record = self.get_object()
+        if record.check_access(request.user):
+            filename = "{}.{}".format(record.etag, record.stem)
+            storage = OverwriteStorage()
+            try:
+                c = storage.open(filename).read()
+            except FileNotFoundError as e:
+                # TODO: remove me
+                print(111, "views.py:195", e)
+                capture_exception(e)
+                return JsonResponse({"error": "File not found"}, status=404)
+
+            response = HttpResponse(c, status=200)
+            if record.save_as:
+                response['Content-Disposition'] = u'attachment; filename="%s"' % record.filename
+            return response
+        return JsonResponse({"error": "Permission denied"}, status=403)
+
+
+class ExportObjectMixin(LoginRequiredMixin):
+    model = Export
+    form_class = ExportForm
+
+    def get_success_url(self):
+        return reverse('urf:export-list')
+
+    def form_valid(self, form):
+        form.instance.as_user = self.request.user
+        self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        url = self.request.GET.get('url')
+        path, params = parse_url(url)
+        params = get_query_string(params, remove=['page_size', 'format'])
+        data.update({'breadcrumblist': self.breadcrumbs,
+                     'url': url,
+                     'path': path,
+                     'params': params
+                     })
+        return data
+
+
+class ExportCreate(ExportObjectMixin, CreateView):
+
+    def get_form_kwargs(self):
+        path, params = parse_url(self.request.GET.get('url'))
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'url': path,
+                       'params': params,
+                       })
+        return kwargs
+
+    def get_initial(self):
+        return {'name': self.breadcrumbs[-1][0],
+                'filename': self.breadcrumbs[-1][0]}
+
+    @cached_property
+    def breadcrumbs(self):
+        url = self.request.GET.get('url')
+        return get_breadcrumbs(url, self.request)
+
+
+class ExportUpdate(ExportObjectMixin, UpdateView):
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'url': self.object.url})
+        return kwargs
+
+    @cached_property
+    def breadcrumbs(self):
+        url = self.object.get_full_url()
+        return get_breadcrumbs(url, self.request)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+
+        path, params = parse_url(self.object.url)
+        params = get_query_string(params, remove=['page_size', 'format'])
+        data.update({'record': self.object,
+                     'url': self.object.get_full_url(),
+                     'path': path,
+                     'params': params
+                     })
+        return data
