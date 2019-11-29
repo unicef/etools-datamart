@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
 
-from unicef_rest_framework.storage import OverwriteStorage
+from strategy_field.utils import import_by_name
 
 from .preload import AbstractPreload, Client
 
@@ -63,14 +63,29 @@ class Export(AbstractPreload):
         response = client.get(url)
         return response.status_code in [200, 304]
 
-    def run(self, target=None):
+    def check_file(self):
+        return storage.exists(self.file_id)
+
+    @property
+    def file_id(self):
+        return "{}.{}".format(self.etag, self.stem)
+
+    def run(self, target=None, pre_save=None):
+        def save_file(me, response):
+            if me.status_code == 200:
+                storage.save(self.file_id, BytesIO(response.content))
+
         params = dict(self.params)
         params.update({'page_size': '-1',
                        'format': self.stem})
         url = "{}{}?{}".format(settings.ABSOLUTE_BASE_URL, self.url, urlencode(params))
-        response = super().run(url)
-        if response.status_code == 200:
-            filename = "{}.{}".format(self.etag, self.stem)
-            storage = OverwriteStorage()
-            storage.save(filename, BytesIO(response.content))
+        response = super().run(url, save_file)
         return response
+
+
+def get_storage():
+    storage_class = import_by_name(settings.EXPORT_FILE_STORAGE)
+    return storage_class(**settings.EXPORT_FILE_STORAGE_KWARGS)
+
+
+storage = get_storage()

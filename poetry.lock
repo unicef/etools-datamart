@@ -605,6 +605,17 @@ unicodecsv = ">=0.14.1"
 
 [[package]]
 category = "main"
+description = "Support for many storage backends in Django"
+name = "django-storages"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "1.8"
+
+[package.dependencies]
+Django = ">=1.11"
+
+[[package]]
+category = "main"
 description = "Django custom field to implement the strategy pattern"
 name = "django-strategy-field"
 optional = false
@@ -1918,7 +1929,7 @@ version = "0.6.0"
 more-itertools = "*"
 
 [metadata]
-content-hash = "90d3523c1f32a1950cb2be3d1ced52d0a0a85c0a40e5baa333a279eaf11417e8"
+content-hash = "5778b1372a8fa6c7efd77cf6d9016601996ff85973c8d398ae64d0d3a0866e20"
 python-versions = "^3.7"
 
 [metadata.hashes]
@@ -1980,6 +1991,7 @@ django-redis = ["af0b393864e91228dd30d8c85b5c44d670b5524cb161b7f9e41acc98b6e5ace
 django-regex = ["3f85f4611a921299b86614591fb7b82201d1748ac6207b358bd8b1f2d2289513"]
 django-rest-framework-social-oauth2 = ["c9a297b636ffd37957c6146280e99ead41e6aca37bcb995e3d52d65eefbca0b7"]
 django-sql-explorer = ["b28f33750b7c1f1564644755dcffa393b75790598dc98ee155e487390855b967"]
+django-storages = ["0a9b7e620e969fb0797523695329ed223bf540bbfdf6cd163b061fc11dab2d1c", "9322ab74ba6371e2e0fccc350c741686ade829e43085597b26b07ae8955a0a00"]
 django-strategy-field = ["fafd78f9d75a1edcfba2f9cae8f8f1b8609ebd9ec84c310f5eea6fc35ba21a9b"]
 django-sysinfo = ["73844d6662ab7eb724d40f935aaef84bbe00cbe03a529bf263b54caf918b1c9c"]
 django-timezone-field = ["1a7bbcf984ae191c6dfe713994b4ff4062dc21e47a909356c93e76d027c87c8f", "a25af66b86d13709aa8c69a361c1ea68322cda64b5bbf9141fb67b8b44aa4e43"]

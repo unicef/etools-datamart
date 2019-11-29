@@ -19,8 +19,8 @@ from strategy_field.utils import fqn
 
 from unicef_rest_framework.forms import ExportForm
 from unicef_rest_framework.models import Export
+from unicef_rest_framework.models.export import storage
 from unicef_rest_framework.pagination import PageFilter
-from unicef_rest_framework.storage import OverwriteStorage
 from unicef_rest_framework.utils import get_query_string, parse_url
 
 from . import acl
@@ -172,13 +172,9 @@ class ExportFetch(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         record = self.get_object()
         if record.check_access(request.user):
-            filename = "{}.{}".format(record.etag, record.stem)
-            storage = OverwriteStorage()
             try:
-                c = storage.open(filename).read()
+                c = storage.open(record.file_id).read()
             except FileNotFoundError as e:
-                # TODO: remove me
-                print(111, "views.py:195", e)
                 capture_exception(e)
                 return JsonResponse({"error": "File not found"}, status=404)
 

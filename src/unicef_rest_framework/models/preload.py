@@ -84,7 +84,7 @@ class AbstractPreload(models.Model):
             else:
                 return False
 
-    def run(self, target=None):
+    def run(self, target=None, pre_save=None):
         try:
             self.last_run = timezone.now()
             target = target or "%s%s" % (settings.ABSOLUTE_BASE_URL, self.url)
@@ -98,9 +98,14 @@ class AbstractPreload(models.Model):
             self.etag = response['ETag']
             response_timedelta = timezone.now() - self.last_run
             self.response_ms = int(response_timedelta.total_seconds() * 1000)
+            if pre_save:
+                pre_save(self, response)
             return response
         except Exception as e:
             process_exception(e)
+            self.status_code = 501
+            self.etag = ""
+            self.response_ms = 0
             raise
         finally:
             self.save()

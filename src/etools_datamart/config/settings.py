@@ -49,6 +49,8 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   EMAIL_USE_TLS=(bool, True),
                   ENABLE_LIVE_STATS=(bool, False),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
+                  EXPORT_FILE_STORAGE=(str, 'unicef_rest_framework.storage.RedisStorage'),
+                  EXPORT_FILE_STORAGE_KWARGS=(dict, 'host=127.0.0.1'),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   MYSTICA_PASSWORD=(str, ''),
                   REDOC_BASE=(str, '/api/+redoc/#operation/'),
@@ -73,9 +75,6 @@ DEBUG = env.bool('DEBUG')
 if DEBUG:  # pragma: no cover
     env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
     environ.Env.read_env(str(env_file))
-
-MEDIA_ROOT = env('MEDIA_ROOT')
-STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
@@ -170,7 +169,7 @@ MEDIA_URL = '/dm-media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-# STATIC_ROOT = os.path.join(PUBLIC_DIR, 'static')
+STATIC_ROOT = env('STATIC_ROOT')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -708,3 +707,6 @@ if SENTRY_ENABLED:
 SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]
 
 FORMAT_MODULE_PATH = 'etools_datamart.locale'
+
+EXPORT_FILE_STORAGE = env('EXPORT_FILE_STORAGE')
+EXPORT_FILE_STORAGE_KWARGS = env('EXPORT_FILE_STORAGE_KWARGS')
