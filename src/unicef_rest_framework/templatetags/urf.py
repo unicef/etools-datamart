@@ -8,6 +8,7 @@ import six
 from strategy_field.utils import fqn
 
 from unicef_rest_framework.admin.service import ACL_ICONS
+from unicef_rest_framework.utils import humanize_size
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,13 @@ register = template.Library()
 @register.filter()
 def doc(api):
     return api.__doc__
+
+
+@register.filter()
+def humanize(value):
+    if value:
+        return humanize_size(value)
+    return ""
 
 
 @register.filter
@@ -32,7 +40,6 @@ def _fqn(obj):
 
 @register.simple_tag(takes_context=True)
 def code(context, obj):
-
     if not obj:
         return ''
     elif isinstance(obj, (list, tuple)):

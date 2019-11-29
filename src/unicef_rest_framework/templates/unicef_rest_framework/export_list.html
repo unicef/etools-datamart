@@ -1,4 +1,4 @@
-{% extends "rest_framework/base.html" %}{% load crispy_forms_filters %}
+{% extends "rest_framework/base.html" %}{% load crispy_forms_filters urf  %}
 {% block head %}{{ block.super }}{% endblock %}
 {% block body %}{{ block.super }}{% endblock %}
 {% block navbar %}{{ block.super }}{% endblock %}
@@ -24,35 +24,38 @@
 <thead>
                 <tr>
                     <th>description</th>
-                    <th>endpoint</th>
                     <th>filename</th>
                     <th>refresh</th>
                     <th>enabled</th>
                     <th>Owner</th>
                     <th>Updated On</th>
+                    <th>Size</th>
                     <th></th>
                 </tr>
 
 </thead>
             {% for export in export_list %}
-                <tr>
+                <tr style="padding-bottom: 0;">
                     <td>{% if export.as_user == request.user or request.user.is_superuser %}
                         <a href="{% url "urf:export-update" export.id %}">{{ export.name }}</a>
                     {% else %}
                         {{ export.name }}
                     {% endif %}
                     </td>
-
-                    <td>{{ export.url }}</td>
                     <td>{{ export.filename }}</td>
                     <td>{{ export.refresh }}</td>
                     <td>{{ export.enabled }}</td>
                     <td>{{ export.as_user }}</td>
                     <td>{{ export.last_run|default_if_none:"" }}</td>
+                    <td>{{ export.response_length|humanize }}</td>
                     <td>{% if export.last_run %}
                         <a href="{% url "urf:export-fetch" export.id %}">download</a>
                         {% endif %}
                     </td>
+                </tr>
+                <tr style="border-top: 0;padding-top: 0;">
+                <td colspan="8" style="border-top: 0;padding-top: 0;"><small>{{ export.url }}</small>
+                </td>
                 </tr>
             {% endfor %}
         </table>
