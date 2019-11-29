@@ -1,8 +1,10 @@
+import base64
 import logging
 
 from django.conf import settings
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.backends import ModelBackend
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from constance import config
@@ -118,3 +120,26 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
             msg = _('User account is disabled.')
             raise exceptions.AuthenticationFailed(msg)
         return user
+
+
+def basicauth(view):
+    def wrap(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return view(request, *args, **kwargs)
+
+        if 'HTTP_AUTHORIZATION' in request.META:
+            auth = request.META['HTTP_AUTHORIZATION'].split()
+            if len(auth) == 2:
+                if auth[0].lower() == "basic":
+                    uname, passwd = base64.b64decode(auth[1].encode()).decode().split(':')
+                    user = authenticate(username=uname, password=passwd)
+                    if user is not None and user.is_active:
+                        request.user = user
+                        return view(request, *args, **kwargs)
+
+        response = HttpResponse()
+        response.status_code = 401
+        response['WWW-Authenticate'] = 'Basic realm="datamart"'
+        return response
+
+    return wrap

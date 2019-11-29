@@ -4,6 +4,7 @@ from functools import lru_cache
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -24,7 +25,7 @@ from unicef_rest_framework.pagination import PageFilter
 from unicef_rest_framework.utils import get_query_string, parse_url
 
 from . import acl
-from .auth import AnonymousAuthentication, IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
+from .auth import AnonymousAuthentication, basicauth, IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
 from .cache import cache_response, etag, ListKeyConstructor
 from .ds import DynamicSerializerFilter, DynamicSerializerMixin
 from .filtering import SystemFilterBackend
@@ -166,6 +167,7 @@ class ExportList(ListView):
     model = Export
 
 
+@method_decorator(basicauth, 'dispatch')
 class ExportFetch(LoginRequiredMixin, DetailView):
     model = Export
 
