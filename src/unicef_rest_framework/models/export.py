@@ -74,7 +74,12 @@ class Export(AbstractPreload):
     def file_id(self):
         return "{}.{}".format(self.etag, self.stem)
 
-    def run(self, target=None, pre_save=None):
+    def get_client(self, **kwargs):
+        return Client(HTTP_IF_NONE_MATCH=self.etag or 'Not-Set',
+                      HTTP_PAGINATION_KEY=settings.DISABLE_PAGINATION_KEY,
+                      **kwargs)
+
+    def run(self, target=None, params=None, pre_save=None):
         def save_file(me, response):
             if me.status_code == 200:
                 storage.save(self.file_id, BytesIO(response.content))
@@ -82,8 +87,8 @@ class Export(AbstractPreload):
         params = dict(self.params)
         params.update({'page_size': '-1',
                        'format': self.stem})
-        url = "{}{}?{}".format(settings.ABSOLUTE_BASE_URL, self.url, urlencode(params))
-        response = super().run(url, save_file)
+        url = "{}{}".format(settings.ABSOLUTE_BASE_URL, self.url)
+        response = super().run(target=url, params=params, pre_save=save_file)
         return response
 
 

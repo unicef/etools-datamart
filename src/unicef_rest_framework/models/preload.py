@@ -84,15 +84,18 @@ class AbstractPreload(models.Model):
             else:
                 return False
 
-    def run(self, target=None, pre_save=None):
+    def get_client(self, **kwargs):
+        return Client(HTTP_IF_NONE_MATCH=self.etag or 'Not-Set', **kwargs)
+
+    def run(self, *, target=None, params=None, pre_save=None):
         try:
             self.last_run = timezone.now()
             target = target or "%s%s" % (settings.ABSOLUTE_BASE_URL, self.url)
-            client = Client(HTTP_IF_NONE_MATCH=self.etag or 'Not-Set')
+            client = self.get_client()
             if self.as_user:
                 client.force_authenticate(self.as_user)
-
-            response = client.get(target, data=self.params)
+            params = params or self.params
+            response = client.get(target, data=params)
             self.status_code = response.status_code
             if self.status_code == 200:
                 self.response_length = len(response.content)
