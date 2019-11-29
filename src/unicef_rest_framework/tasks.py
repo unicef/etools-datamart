@@ -23,7 +23,7 @@ def preload_all():
         preload.apply_async(args=[t])
 
     for t in Export.objects.filter(enabled=True, refresh=True).values_list('id', flat=True):
-        preload.apply_async(args=[t])
+        export.apply_async(args=[t])
 
 
 @default_app.task()
@@ -37,7 +37,7 @@ def preload(target_id):
 def export(target_id):
     target = Export.objects.get(id=target_id)
     response = target.run()
-    if target.as_user.email:
+    if target.notify and target.as_user.email:
         mail.send(
             target.as_user.email,  # List of email addresses also accepted
             'notification@datamart.unicef.io',

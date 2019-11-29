@@ -34,6 +34,8 @@ class Export(AbstractPreload):
                                             '"SaveAs" popup. Note that popup will '
                                             'be displayed in any case if browser do not '
                                             'natively support requested format')
+    notify = models.BooleanField(default=False,
+                                 help_text='Send me an email when file is available')
 
     class Meta:
         unique_together = ('url', 'as_user', 'params', 'format')
@@ -50,8 +52,10 @@ class Export(AbstractPreload):
             return self.format.split('/')[1]
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        from ..tasks import export
         self.filename = Path(self.filename).with_suffix('.%s' % self.stem)
         super().save(force_insert, force_update, using, update_fields)
+        export.apply_async(args=[self.pk])
 
     def check_access(self, user):
         params = dict(self.params)
