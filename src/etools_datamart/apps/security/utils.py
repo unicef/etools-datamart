@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from django.conf import settings
 from django.core.cache import caches
 from django.db import connections
@@ -15,6 +17,7 @@ conn = connections['etools']
 cache = caches['default']
 
 
+@lru_cache(2)
 def get_allowed_schemas(user):
     if not user.is_authenticated:
         return []

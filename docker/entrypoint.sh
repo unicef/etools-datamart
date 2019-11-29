@@ -3,8 +3,10 @@ mkdir -p /var/datamart/static
 mkdir -p /var/datamart/log
 mkdir -p /var/datamart/conf
 mkdir -p /var/datamart/run
+mkdir -p $MEDIA_ROOT
 
 chown datamart:datamart -R /var/datamart/
+chown datamart:datamart -R $MEDIA_ROOT
 
 
 if [[ "$*" == "worker" ]];then
@@ -41,7 +43,9 @@ elif [[ "$*" == "datamart" ]];then
     django-admin init-setup --all --verbosity 2
     django-admin db-isready --wait --timeout 300 --connection etools
     echo "uwsgi --static-map ${STATIC_URL}=${STATIC_ROOT}"
-    exec gosu datamart uwsgi --static-map ${STATIC_URL}=${STATIC_ROOT}
+    exec gosu datamart uwsgi \
+          --static-map ${STATIC_URL}=${STATIC_ROOT} \
+          --static-map ${MEDIA_URL}=${MEDIA_ROOT}
 else
     exec "$@"
 fi

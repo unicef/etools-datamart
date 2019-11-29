@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from sentry_sdk import capture_exception
 from strategy_field.utils import fqn
 
+from unicef_rest_framework.cache import ListKeyConstructor
 from unicef_rest_framework.ds import DynamicSerializerFilter
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.ordering import OrderingFilter
@@ -23,6 +24,7 @@ from unicef_rest_framework.views import URFReadOnlyModelViewSet
 from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
+from etools_datamart.apps.security.cache import SchemaAccessKeyBit
 from etools_datamart.libs.mystica import MysticaBasicAuthentication
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
@@ -54,6 +56,10 @@ class AutoRegisterMetaClass(type):
         new_class = super().__new__(mcs, class_name, bases, attrs)
         mcs.registry[fqn(new_class)] = new_class
         return new_class
+
+
+class CountryAwareKeyConstructor(ListKeyConstructor):
+    schemas = SchemaAccessKeyBit()
 
 
 class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet,
@@ -186,7 +192,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 
 
 class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
-    pass
+    list_cache_key_func = list_etag_func = CountryAwareKeyConstructor()
 
     # def _get_serializer_from_param(self, name=None):
     #     if self.request:
