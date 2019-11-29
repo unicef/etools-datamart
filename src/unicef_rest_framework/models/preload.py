@@ -94,10 +94,11 @@ class AbstractPreload(models.Model):
 
             response = client.get(target, data=self.params)
             self.status_code = response.status_code
-            self.response_length = len(response.content)
-            self.etag = response['ETag']
-            response_timedelta = timezone.now() - self.last_run
-            self.response_ms = int(response_timedelta.total_seconds() * 1000)
+            if self.status_code == 200:
+                self.response_length = len(response.content)
+                self.etag = response['ETag']
+                response_timedelta = timezone.now() - self.last_run
+                self.response_ms = int(response_timedelta.total_seconds() * 1000)
             if pre_save:
                 pre_save(self, response)
             return response
