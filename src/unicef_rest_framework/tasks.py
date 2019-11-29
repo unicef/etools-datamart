@@ -43,7 +43,6 @@ def export(target_id):
             'notification@datamart.unicef.io',
             template='export_ready',
             context={'target': target,
-                     'download_url': reverse('urf:export-fetch', args=[target.id])},
-            attachments=[target.content]
+                     'download_url': reverse('urf:export-fetch', args=[target.id])}
         )
     return response.status_code
