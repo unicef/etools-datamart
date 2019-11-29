@@ -107,7 +107,7 @@ class APIPagination(PageNumberPagination):
             if desired == "-1":
                 if self.allow_disable_pagination or \
                         (request.META.get('HTTP_PAGINATION_KEY', None) == self.disable_pagination_key):
-                    return sys.maxsize
+                    return None
                 else:
                     raise InvalidPaginationError('Pagination cannot be disabled')
         except KeyError:
