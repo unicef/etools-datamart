@@ -2,6 +2,7 @@ import logging
 
 from celery.app import default_app
 from post_office import mail
+from rest_framework.reverse import reverse
 
 from unicef_rest_framework.models import Export, Preload, Service
 
@@ -41,7 +42,8 @@ def export(target_id):
             target.as_user.email,  # List of email addresses also accepted
             'notification@datamart.unicef.io',
             template='export_ready',
-            context={'target': target, },
+            context={'target': target,
+                     'download_url': reverse('urf:export-fetch', args=[target.id])},
             attachments=[target.content]
         )
     return response.status_code
