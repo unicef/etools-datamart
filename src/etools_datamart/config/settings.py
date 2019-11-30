@@ -16,13 +16,16 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   ANALYTICS_CODE=(str, ""),
                   AUTOCOMMIT_EXTERNAL=(bool, True),
-                  AZURE_ACCOUNT_KEY=(str, ''),
-                  AZURE_ACCOUNT_NAME=(str, ''),
                   AZURE_CLIENT_ID=(str, ''),
                   AZURE_CLIENT_SECRET=(str, ''),
-                  AZURE_CONTAINER=(str, ''),
-                  AZURE_LOCATION=(str, ''),
-                  AZURE_OVERWRITE_FILES=(bool, True),
+                  AZURE_STORAGE_ACCOUNT_KEY=(str, ''),
+                  AZURE_STORAGE_ACCOUNT_NAME=(str, ''),
+                  AZURE_STORAGE_OVERWRITE_FILES=(bool, True),
+                  AZURE_STORAGE_CONTAINER=(str, ''),
+                  AZURE_STORAGE_LOCATION=(str, ''),
+                  AZURE_STORAGE_AUTO_SIGN=(bool, True),
+                  AZURE_STORAGE_ACCESS_MODE=(str, "r"),
+                  AZURE_STORAGE_ACCESS_TTL=(int, 60 * 60 * 24),
                   AZURE_TENANT=(str, ''),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
@@ -49,8 +52,8 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   EMAIL_USE_TLS=(bool, True),
                   ENABLE_LIVE_STATS=(bool, False),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
-                  EXPORT_FILE_STORAGE=(str, 'unicef_rest_framework.storage.RedisStorage'),
-                  EXPORT_FILE_STORAGE_KWARGS=(dict, {'host': '127.0.0.1'}),
+                  EXPORT_FILE_STORAGE=(str, 'unicef_rest_framework.storage.UnicefAzureStorage'),
+                  EXPORT_FILE_STORAGE_KWARGS=(dict, {}),
                   MEDIA_ROOT=(str, '/tmp/media'),
                   MYSTICA_PASSWORD=(str, ''),
                   REDOC_BASE=(str, '/api/+redoc/#operation/'),
@@ -425,12 +428,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     }],
 }
 
-AZURE_ACCOUNT_NAME = env('AZURE_ACCOUNT_NAME')
-AZURE_ACCOUNT_KEY = env('AZURE_ACCOUNT_KEY')
-AZURE_CONTAINER = env('AZURE_CONTAINER')
-AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
-AZURE_LOCATION = env('AZURE_LOCATION')
-
 CONSTANCE_CONFIG = {
     'ETOOLS_ADDRESS': ('https://etools.unicef.org', 'eTools hostname', str),
     'RAPIDPRO_ADDRESS': ('https://app.rapidpro.io/', 'RapidPro default hostname', str),
@@ -710,3 +707,12 @@ FORMAT_MODULE_PATH = 'etools_datamart.locale'
 
 EXPORT_FILE_STORAGE = env('EXPORT_FILE_STORAGE')
 EXPORT_FILE_STORAGE_KWARGS = env('EXPORT_FILE_STORAGE_KWARGS')
+
+AZURE_ACCOUNT_NAME = env('AZURE_STORAGE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = env('AZURE_STORAGE_ACCOUNT_KEY')
+AZURE_OVERWRITE_FILES = env('AZURE_STORAGE_OVERWRITE_FILES')
+AZURE_CONTAINER = env('AZURE_STORAGE_CONTAINER')
+AZURE_LOCATION = env('AZURE_STORAGE_LOCATION')
+AZURE_AUTO_SIGN = env('AZURE_STORAGE_AUTO_SIGN')
+AZURE_ACCESS_MODE = env('AZURE_STORAGE_ACCESS_MODE')
+AZURE_ACCESS_TTL = env('AZURE_STORAGE_ACCESS_TTL')

@@ -67,7 +67,7 @@ social-auth-app-django = "*"
 sqlparse = "*"
 uwsgi = "*"
 xhtml2pdf = "*"
-django-storages = "^1.8"
+django-storages = {version = "^1.8", extras = ["azure"]}
 
 [tool.poetry.dev-dependencies]
 check-manifest= "*"

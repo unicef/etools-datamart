@@ -10,6 +10,16 @@ from unicef_rest_framework.utils import humanize_size
 from etools_datamart.libs.admin_filters import SizeFilter, StatusFilter
 
 
+def check(modeladmin, request, queryset):
+    for t in queryset:
+        if not t.check_file():
+            t.status_code = 999
+            t.response_length = 0
+            t.response_ms = 0
+            t.etag = ""
+            t.save()
+
+
 def queue(modeladmin, request, queryset):
     from unicef_rest_framework.tasks import preload
     for t in queryset:
@@ -17,13 +27,13 @@ def queue(modeladmin, request, queryset):
 
 
 class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('url', 'as_user', 'format',
+    list_display = ('name', 'as_user', 'format',
                     'enabled', 'refresh', 'last_run',
                     'status_code', 'size', 'response_ms', 'api', 'download')
     date_hierarchy = 'last_run'
     search_fields = ('url',)
     list_filter = (StatusFilter, 'enabled', SizeFilter, 'refresh')
-    actions = [queue, ]
+    actions = [queue, check]
 
     def format(self, obj):
         return obj.stem
@@ -32,8 +42,10 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return mark_safe("<a href='{0}' title='{0}' target='_new'>preview</a>".format(obj.get_full_url()))
 
     def download(self, obj):
-        url = reverse('urf:export-fetch', args=[obj.pk])
-        return mark_safe("<a href='{0}' title='{0}' target='_new'>download</a>".format(url))
+        if obj.etag:
+            url = reverse('urf:export-fetch', args=[obj.pk])
+            return mark_safe("<a href='{0}' title='{0}' target='_new'>download</a>".format(url))
+        return '--'
 
     def size(self, obj):
         if obj.response_length:

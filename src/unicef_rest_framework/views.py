@@ -3,7 +3,7 @@ from functools import lru_cache
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -175,12 +175,13 @@ class ExportFetch(LoginRequiredMixin, DetailView):
         record = self.get_object()
         if record.check_access(request.user):
             try:
-                c = storage.open(record.file_id).read()
+                c = storage.open(record.file_id)
             except FileNotFoundError as e:
                 capture_exception(e)
                 return JsonResponse({"error": "File not found"}, status=404)
 
-            response = HttpResponse(c, status=200)
+            response = StreamingHttpResponse(c, status=200,
+                                             content_type=record.format)
             if record.save_as:
                 response['Content-Disposition'] = u'attachment; filename="%s"' % record.filename
             return response
