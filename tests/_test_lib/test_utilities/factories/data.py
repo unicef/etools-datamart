@@ -280,3 +280,13 @@ class AuditResultFactory(DataMartModelFactory):
 
     class Meta:
         model = models.AuditResult
+
+
+class SpotCheckFactory(DataMartModelFactory):
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
+
+    class Meta:
+        model = models.SpotCheck

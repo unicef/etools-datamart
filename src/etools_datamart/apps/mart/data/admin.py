@@ -360,3 +360,9 @@ class AuditResultAdmin(DataModelAdmin):
     # list_display = ('vendor', 'partner_type', 'risk_rating')
     list_display = ('__str__',)
     list_filter = ()
+
+
+@register(models.SpotCheck)
+class SpotCheckAdmin(DataModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()

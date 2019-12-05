@@ -2,6 +2,7 @@ from .actionpoint import ActionPoint  # noqa
 from .attachments_attachment import Attachment  # noqa
 from .audit_engagement import Engagement  # noqa
 from .audit_result import AuditResult  # noqa
+from .audit_spotcheck import SpotCheck  # noqa
 from .fam import FAMIndicator  # noqa
 from .funds_grant import Grant  # noqa
 from .funds_reservation import FundsReservation  # noqa
