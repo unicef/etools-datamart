@@ -251,10 +251,11 @@ class ExportUpdate(ExportObjectMixin, UpdateView):
         data = super().get_context_data(**kwargs)
 
         path, params = parse_url(self.object.url)
-        params = get_query_string(params, remove=['page_size', 'format'])
+        qs = get_query_string(self.object.params, remove=['page_size', 'format'])
         data.update({'record': self.object,
                      'url': self.object.get_full_url(),
                      'path': path,
-                     'params': params
+                     'source': "{}{}{}".format(settings.ABSOLUTE_BASE_URL, path, qs),
+                     'qs': qs
                      })
         return data
