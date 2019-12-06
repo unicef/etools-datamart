@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import lru_cache
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse, StreamingHttpResponse
@@ -204,11 +205,12 @@ class ExportObjectMixin(LoginRequiredMixin):
         data = super().get_context_data(**kwargs)
         url = self.request.GET.get('url')
         path, params = parse_url(url)
-        params = get_query_string(params, remove=['page_size', 'format'])
+        qs = get_query_string(params, remove=['page_size', 'format'])
         data.update({'breadcrumblist': self.breadcrumbs,
                      'url': url,
+                     'source': "{}{}{}".format(settings.ABSOLUTE_BASE_URL, path, qs),
                      'path': path,
-                     'params': params
+                     'qs': qs
                      })
         return data
 
@@ -216,7 +218,7 @@ class ExportObjectMixin(LoginRequiredMixin):
 class ExportCreate(ExportObjectMixin, CreateView):
 
     def get_form_kwargs(self):
-        path, params = parse_url(self.request.GET.get('url'))
+        path, params = parse_url(self.request.GET.get('url'), remove=['page_size'])
         kwargs = super().get_form_kwargs()
         kwargs.update({'url': path,
                        'params': params,
