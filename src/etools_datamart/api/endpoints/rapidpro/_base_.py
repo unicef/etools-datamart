@@ -1,7 +1,6 @@
 from django.template import loader
 
 from rest_framework.filters import BaseFilterBackend, OrderingFilter
-from rest_framework.pagination import _positive_int
 
 from unicef_rest_framework.ds import DynamicSerializerFilter
 from unicef_rest_framework.pagination import APIPagination
@@ -15,18 +14,18 @@ class RapidProPagination(APIPagination):
     page_size = 10
     max_page_size = 1000
 
-    def get_page_size(self, request):
-        if self.page_size_query_param:
-            try:
-                return _positive_int(
-                    request.query_params[self.page_size_query_param],
-                    strict=True,
-                    cutoff=self.max_page_size
-                )
-            except (KeyError, ValueError):
-                pass
-
-        return self.page_size
+    # def get_page_size(self, request):
+    #     if self.page_size_query_param:
+    #         try:
+    #             return _positive_int(
+    #                 request.query_params[self.page_size_query_param],
+    #                 strict=True,
+    #                 cutoff=self.max_page_size
+    #             )
+    #         except (KeyError, ValueError):
+    #             pass
+    #
+    #     return self.page_size
 
 
 class OrganizationFilter(BaseFilterBackend):
