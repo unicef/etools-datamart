@@ -4,8 +4,8 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.10.0a
-BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]\)\.\([0-9]\)\.\(.*\)/\1.\2/g" )
+TARGET?=2.10.0a2
+BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" )
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -31,7 +31,7 @@ build-base:
 			${BUILD_OPTIONS} \
 			--no-cache \
 			-t ${DOCKER_IMAGE_NAME}:${BASE}-base \
-			-f docker/Dockerfile.base .
+			-f docker/${DOCKERFILE}.base .
 	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
 	docker push ${DOCKER_IMAGE_NAME}:${BASE}-base
 
@@ -45,7 +45,7 @@ build-base:
 			--build-arg VERSION=${TARGET} \
 			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
-			-f docker/Dockerfile .
+			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
