@@ -34,7 +34,10 @@ class TembaLoader(BaseLoader):
 
     def get_foreign_key(self, model, ref: ObjectRef):
         if ref:
-            return model.objects.get(source_id=ref.uuid)
+            try:
+                return model.objects.get(source_id=ref.uuid)
+            except ObjectDoesNotExist:
+                return None
 
     def get_mart_values(self, record: TembaObject = None):
         organization = self.context['organization']
