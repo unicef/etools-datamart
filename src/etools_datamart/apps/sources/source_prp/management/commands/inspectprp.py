@@ -110,7 +110,7 @@ class Command(BaseCommand):
             with api_file.open('w') as api:
                 api.write("from unicef_rest_framework.views import URFReadOnlyModelViewSet\n\n")
                 api.write("from etools_datamart.api.endpoints.etools import serializers\n")
-                api.write("from etools_datamart.apps.prp import models\n")
+                api.write("from etools_datamart.apps.sources.source_prp import models\n")
 
                 for model_name in self.prp_models:
                     if model_name not in NO_API:

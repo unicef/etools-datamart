@@ -35,11 +35,6 @@ class AuthGroupPermissionsAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
-# @register(models.AuthPermission)
-# class AuthPermissionAdmin(DatamartSourceModelAdmin, ModelAdmin):
-#     list_filter = []
-
-
 @register(models.AuthtokenToken)
 class AuthtokenTokenAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
@@ -273,3 +268,4 @@ class UnicefReportingperioddatesAdmin(DatamartSourceModelAdmin, ModelAdmin):
 @register(models.UnicefSection)
 class UnicefSectionAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
+

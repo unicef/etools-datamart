@@ -4,28 +4,6 @@ from etools_datamart.api.endpoints.etools import serializers
 from etools_datamart.apps.sources.source_prp import models
 
 
-class AccountUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AccountUser
-        exclude = ()
-
-
-class AccountUserViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AccountUserSerializer
-    queryset = models.AccountUser.objects.all()
-
-
-class AccountUserprofileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AccountUserprofile
-        exclude = ()
-
-
-class AccountUserprofileViewSet(URFReadOnlyModelViewSet):
-    serializer_class = AccountUserprofileSerializer
-    queryset = models.AccountUserprofile.objects.all()
-
-
 class ClusterClusterSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ClusterCluster

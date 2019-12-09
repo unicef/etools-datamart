@@ -1,6 +1,6 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2019-08-20 13:50:08.824966
+# Generated on 2019-12-09 14:07:01.100956
 from django.contrib.gis.db import models
 
 from etools_datamart.apps.core.readonly import ReadOnlyModel
@@ -77,17 +77,6 @@ class AuthGroupPermissions(ReadOnlyModel):
         managed = False
         db_table = 'auth_group_permissions'
         unique_together = (('group', 'permission_id'),)
-        app_label = 'source_prp'
-
-
-class AuthPermission(ReadOnlyModel):
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('source_prp.DjangoContentType', models.PROTECT, related_name='+')
-    codename = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_permission'
         app_label = 'source_prp'
 
 
@@ -209,7 +198,6 @@ class CoreGatewaytype(ReadOnlyModel):
     name = models.CharField(max_length=64)
     admin_level = models.SmallIntegerField()
     country_id = models.IntegerField()
-
     display_name = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
@@ -457,7 +445,7 @@ class IndicatorReportable(ReadOnlyModel):
     active = models.BooleanField()
     blueprint = models.ForeignKey(IndicatorIndicatorblueprint, models.PROTECT, related_name='+', blank=True, null=True)
     ca_indicator_used_by_reporting_entity = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
-    # content_type = models.ForeignKey(DjangoContentType, models.PROTECT, related_name='+')
+    content_type = models.ForeignKey(DjangoContentType, models.PROTECT, related_name='+')
     parent_indicator = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
 
     class Meta:
@@ -766,8 +754,7 @@ class UnicefProgrammedocumentPartnerFocalPoint(ReadOnlyModel):
 
 class UnicefProgrammedocumentSections(ReadOnlyModel):
     programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    section = models.ForeignKey('source_prp.UnicefSection',
-                                models.PROTECT, related_name='+')
+    section = models.ForeignKey('source_prp.UnicefSection', models.PROTECT, related_name='+')
 
     class Meta:
         managed = False
