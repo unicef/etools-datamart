@@ -2,6 +2,7 @@
 import datetime
 import os
 from pathlib import Path
+from smtplib import SMTPServerDisconnected
 
 import environ
 
@@ -701,6 +702,15 @@ if SENTRY_ENABLED:
                     integrations=[DjangoIntegration(), CeleryIntegration()],
                     release=get_full_version(),
                     debug=False)
+
+    def before_send(event, hint):
+        if 'exc_info' in hint:
+            exc_type, exc_value, tb = hint['exc_info']
+            if isinstance(exc_value, SMTPServerDisconnected):
+                return None
+
+    sentry_sdk.init(before_send=before_send)
+
 
 SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]
 
