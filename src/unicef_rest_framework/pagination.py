@@ -77,8 +77,8 @@ class APIPagination(PageNumberPagination):
     # Set to an integer to limit the maximum page size the client may request.
     # Only relevant if 'page_size_query_param' has also been set.
     max_page_size = 1000
-    allow_disable_pagination = False
-    disable_pagination_key = settings.DISABLE_PAGINATION_KEY
+    allow_single_page_response = settings.API_PAGINATION_SINGLE_PAGE_ENABLED
+    disable_pagination_key = settings.API_PAGINATION_OVERRIDE_KEY
     last_page_strings = ('last',)
 
     def get_paginated_response(self, data):
@@ -105,7 +105,7 @@ class APIPagination(PageNumberPagination):
         try:
             desired = request.query_params[self.page_size_query_param]
             if desired == "-1":
-                if self.allow_disable_pagination or \
+                if self.allow_single_page_response or \
                         (request.META.get('HTTP_PAGINATION_KEY', None) == self.disable_pagination_key):
                     return sys.maxsize
                 else:
