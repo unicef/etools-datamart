@@ -76,7 +76,7 @@ class Export(AbstractPreload):
 
     def get_client(self, **kwargs):
         return Client(HTTP_IF_NONE_MATCH=self.etag or 'Not-Set',
-                      HTTP_PAGINATION_KEY=settings.DISABLE_PAGINATION_KEY,
+                      HTTP_PAGINATION_KEY=settings.API_PAGINATION_OVERRIDE_KEY,
                       **kwargs)
 
     def run(self, target=None, params=None, pre_save=None):

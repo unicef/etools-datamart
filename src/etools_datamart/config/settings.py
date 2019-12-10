@@ -40,8 +40,8 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DATABASE_URL_PRP=(str, "postgis://postgres:@127.0.0.1:5432/prp"),
-                  DISABLE_PAGINATION_KEY=(str, 'disable-pagination'),
-                  DEBUG=(bool, False),
+                  API_PAGINATION_OVERRIDE_KEY=(str, 'disable-pagination'),
+                  API_PAGINATION_SINGLE_PAGE_ENABLED=(bool, False),
                   DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
                   DISABLE_SERVICE_RESTRICTIONS=(bool, False),
                   DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
@@ -123,7 +123,8 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DISABLE_PAGINATION_KEY = env('DISABLE_PAGINATION_KEY')
+API_PAGINATION_OVERRIDE_KEY = env('API_PAGINATION_OVERRIDE_KEY')
+API_PAGINATION_SINGLE_PAGE_ENABLED = env('API_PAGINATION_SINGLE_PAGE_ENABLED')
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

@@ -32,7 +32,7 @@ class Client(APIClient):
         env['REMOTE_ADDR'] = '127.0.0.1'
         env['SERVER_NAME'] = 'localhost'
         env['SERVER_PORT'] = '80'
-        env['HTTP_PAGINATION_KEY'] = settings.DISABLE_PAGINATION_KEY
+        env['HTTP_PAGINATION_KEY'] = settings.API_PAGINATION_OVERRIDE_KEY
         return env
 
     def request(self, **kwargs):
