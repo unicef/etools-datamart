@@ -36,7 +36,8 @@ class TembaLoader(BaseLoader):
         if ref:
             try:
                 return model.objects.get(source_id=ref.uuid)
-            except ObjectDoesNotExist:
+            except ObjectDoesNotExist as e:
+                logger.exception(e)
                 return None
 
     def get_mart_values(self, record: TembaObject = None):
