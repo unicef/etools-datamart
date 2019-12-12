@@ -9,7 +9,7 @@ from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.sources.etools.models import (AuditAudit, AuditEngagement, AuditEngagementActivePd,
                                                         AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
-                                                        DjangoContentType, UnicefAttachmentsAttachment,)
+                                                        DjangoContentType, UnicefAttachmentsAttachment, )
 
 from .partner import Partner
 
@@ -18,7 +18,6 @@ attachment_codes = {AuditAudit: 'audit_final_report',
                     AuditSpecialaudit: 'special_audit_final_report',
                     AuditSpotcheck: 'spotcheck_final_report',
                     }
-
 
 URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
           'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
@@ -113,8 +112,8 @@ class EngagementlLoader(EtoolsLoader):
     def get_active_pd(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
         for o in (AuditEngagementActivePd.objects
-                  .select_related('intervention')
-                  .filter(engagement=record)):
+                .select_related('intervention')
+                .filter(engagement=record)):
             ret.append({'title': o.intervention.title,
                         'number': o.intervention.number,
                         'status': o.intervention.status,
@@ -322,3 +321,32 @@ class Engagement(EtoolsDataMartModel):
             audit_opinion='_impl.audit_opinion',
 
         )
+
+
+class EngagementFindings(EtoolsDataMartModel):
+    engagement = models.CharField(max_length=300, blank=True, null=True)
+    engagement_date = models.DateField(blank=True, null=True)
+    partner = models.CharField(max_length=300, blank=True, null=True)
+    vendor_number = models.CharField(max_length=300, blank=True, null=True)
+    auditor = models.CharField(max_length=300, blank=True, null=True)
+    value_of_face_forms = models.CharField(max_length=300, blank=True, null=True)
+    value_of_amount_tested = models.CharField(max_length=300, blank=True, null=True)
+    face_form_period = models.CharField(max_length=300, blank=True, null=True)
+    findings = models.CharField(max_length=300, blank=True, null=True)
+    agree_actions_by_partner = models.CharField(max_length=300, blank=True, null=True)
+    ratings = models.CharField(max_length=300, blank=True, null=True)
+    actions_points = models.CharField(max_length=300, blank=True, null=True)
+    ap_assignee = models.CharField(max_length=300, blank=True, null=True)
+    assignor = models.CharField(max_length=300, blank=True, null=True)
+    actions_taken = models.CharField(max_length=300, blank=True, null=True)
+    ineligible_expenses = models.CharField(max_length=300, blank=True, null=True)
+    financial_findings = models.CharField(max_length=300, blank=True, null=True)
+    action_point_status = models.CharField(max_length=300, blank=True, null=True)
+
+    class Options:
+        source = AuditEngagement
+        mapping = {'partner': 'partner.name',
+                   'vendor_number': 'partner.vendor_number',
+                   'financial_findings': 'AuditAudit_engagement_ptr.financial_findings',
+                   'actions_points': 'ActionPointsActionpoint_engagement'
+                   }

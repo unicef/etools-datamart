@@ -11,7 +11,7 @@ if [ -n "$DB_DUMP_LOCATION" ];then
 #        CREATE ROLE etoolusr WITH superuser login;
 #        CREATE DATABASE etools;
 #        GRANT ALL PRIVILEGES ON DATABASE etools TO etoolusr;
-#EOSQL
+##EOSQL
 #
         echo "*** DATABASE CREATED! ***"
     else

@@ -138,7 +138,8 @@ class AttachmentsFiletype(models.TenantModel):
 
 
 class AuditAudit(models.TenantModel):
-    engagement_ptr = models.OneToOneField('AuditEngagement', models.DO_NOTHING, related_name='AuditAudit_engagement_ptr')
+    engagement_ptr = models.OneToOneField('AuditEngagement', models.DO_NOTHING,
+                                          related_name='AuditAudit_engagement_ptr')
     audited_expenditure = models.DecimalField(max_digits=20, decimal_places=2)
     financial_findings = models.DecimalField(max_digits=20, decimal_places=2)
     audit_opinion = models.CharField(max_length=20)

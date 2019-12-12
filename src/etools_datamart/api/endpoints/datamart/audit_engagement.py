@@ -129,3 +129,6 @@ class EngagementViewSet(DataMartViewSet):
 
     def get_querystringfilter_form(self, request, filter):
         return EngagementFilterForm(request.GET, filter.form_prefix)
+
+class EngagementFindings(DataMartViewSet):
+    pass
