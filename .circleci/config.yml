@@ -39,11 +39,6 @@ jobs:
                   python-dev \
                   postgresql-client
 
-      - run:
-          name: Create databases
-          command: |
-            createdb --user postgres etools
-
       - restore_cache:
           keys:
             - source-{{ .Branch }}-{{ .Revision }}
@@ -63,14 +58,7 @@ jobs:
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            poetry run pytest tests/test_login.py -x --create-db || exit 0
-
-      - run:
-          name: run tests
-          command: |
-            export PATH=/home/circleci/.local/bin:$PATH
-            export PYTHONHASHSEED=${RANDOM}
-            poetry run pytest tests/ -x --reuse-db
+            poetry run pytest tests/test_login.py --create-db
 
       - store_artifacts:
           path: ~build/coverage
