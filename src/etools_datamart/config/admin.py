@@ -18,7 +18,11 @@ cache = caches['default']
 DEFAULT_INDEX_SECTIONS = {
     'Administration': ['unicef_rest_framework', 'constance',
                        'dbtemplates', 'subscriptions', 'etl'],
-    'Data': ['data', 'etools'],
+    'Data': ['data', 'prp', 'rapidpro'],
+
+    'Source/eTools': ['etools'],
+    'Source/PRP': ['source_prp'],
+
     'Security': ['auth',
                  'unicef_security.User',
                  'security',
@@ -78,7 +82,7 @@ class DatamartAdminSite(AdminSite):
 
     @never_cache
     def index_new(self, request, extra_context=None):
-        key = f'apps_groups:{request.user.id}:{get_full_version()}:{config.CACHE_VERSION}'
+        key = f'2apps_groups:{request.user.id}:{get_full_version()}:{config.CACHE_VERSION}'
         app_list = self.get_app_list(request)
         groups = cache.get(key)
         if not groups:

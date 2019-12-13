@@ -55,8 +55,11 @@ from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
-from etools_datamart.apps.sources.source_prp.models import CoreCountry, CoreGatewaytype, IndicatorIndicatorlocationdata, \
-    UnicefProgressreport, IndicatorIndicatorreport, UnicefProgrammedocument, IndicatorReportable, UnicefLowerleveloutput
+from etools_datamart.apps.sources.source_prp.models import (CoreCountry, CoreGatewaytype,
+                                                            IndicatorIndicatorlocationdata, IndicatorIndicatorreport,
+                                                            IndicatorReportable, IndicatorReportablelocationgoal,
+                                                            UnicefLowerleveloutput, UnicefPdresultlink,
+                                                            UnicefProgrammedocument, UnicefProgressreport,)
 
 from .base import PrpDataMartModel
 
@@ -215,29 +218,22 @@ class IndicatorByLocation(PrpDataMartModel):
         }
 
 
-class AAALoader(PrpBaseLoader):
+class DataReportLoader(PrpBaseLoader):
 
     def get_queryset(self):
-        all_progress_reports = UnicefProgressreport.objects.all()
-        return IndicatorIndicatorlocationdata.objects.exclude(Q(indicator_report__progress_report__isnull=False) |
-                                                              Q(indicator_report__progress_report__status__in=["Due",
-                                                                                                               "Ove",
-                                                                                                               "Sen"])).all()
-        # for idl in all_indicator_locations_data:
-        #     r = idl.indicator_report.reportable
-        #     yield r
+        # all_progress_reports = UnicefProgressreport.objects.all()
+        qs = IndicatorIndicatorlocationdata.objects.all()
+        qs = qs.exclude(Q(indicator_report__progress_report__isnull=False) |
+                        Q(indicator_report__progress_report__status__in=["Due",
+                                                                         "Ove",
+                                                                         "Sen"]))
+        return qs.all()
 
     def get_value(self, field_name, value_or_func, original_record, current_mapping):
         return super().get_value(field_name, value_or_func, original_record, current_mapping)
 
     def get_values(self, record: IndicatorIndicatorlocationdata):
-        r: IndicatorReportable = record.indicator_report.reportable
-        # FIXME: pdb
-        import pdb;
-        pdb.set_trace()
-        # r.lower_level_output.cp_output.programme_document
-
-        # llo: UnicefLowerleveloutput = UnicefLowerleveloutput.objects.get(cp_output__programme_document=record.indicator_report.prog)
+        record._reportable: IndicatorReportable = record.indicator_report.reportable
         return super().get_values(record)
 
     def process_record(self, filters, values):
@@ -249,9 +245,51 @@ class AAALoader(PrpBaseLoader):
     def get_etools_cp_output_indicators_id(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         return 'N/A'
 
+    def get_locations(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
+        # PartnersInterventionFlatLocations
+        locs = []
+        # intervention: PartnersIntervention = original.activity.intervention
+        # for location in original.activity.locations.select_related('gateway').order_by('id'):
+        qs = (IndicatorReportablelocationgoal.objects
+              .select_related('location')
+              .filter(reportable=record.indicator_report.reportable))
+        for entry in qs.all():
+            location = entry.location
+            locs.append(dict(
+                source_id=location.id,
+                name=location.title,
+                pcode=location.p_code,
+                level=location.level,
+                levelname=location.gateway.name
+            ))
+        values['locations_data'] = locs
+        return ", ".join([l['name'] for l in locs])
+
+    def get_submitted_by(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
+        user = record.indicator_report.progress_report.submitted_by
+        if user:
+            return "%s %s (%s)" % (user.first_name, user.last_name, user.email)
+
+    def get_programme_document(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
+        # UnicefLowerleveloutput.
+        # r: IndicatorReportable = record.indicator_report.reportable
+        ct = record._reportable.content_type
+        if ct.model == 'lowerleveloutput':
+            ll: UnicefLowerleveloutput = UnicefLowerleveloutput.objects.get(id=record._reportable.object_id)
+            cp_output: UnicefPdresultlink = ll.cp_output
+            values['cp_output'] = cp_output.title
+            values['etools_cp_output_id'] = cp_output.external_cp_output_id
+
+            record._programme_document = cp_output.programme_document
+            record.indicator_report.reportable.lower_level_output = ll
+            return cp_output.programme_document.title
+        return None
+
+    def get_total_cumulative_progress(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
+        return record._reportable.total["c"]
+
     def get_progress_report(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         ir: IndicatorIndicatorreport = record.indicator_report
-        r: IndicatorReportable = record.indicator_report.reportable
         pr: UnicefProgressreport = ir.progress_report
         if pr:
             pd: UnicefProgrammedocument = pr.programme_document
@@ -356,27 +394,26 @@ class DataReport(PrpDataMartModel):
     total_cumulative_progress_in_location = models.CharField(max_length=2048, blank=True, null=True)
     # total_cumulative_progress | reportable.total["c"] |
     total_cumulative_progress = models.CharField(max_length=2048, blank=True, null=True)
-    loader = AAALoader()
+    loader = DataReportLoader()
 
     class Meta:
         app_label = 'prp'
 
     class Options:
-        # queryset = UnicefProgressreport.objects.all()
-        # source = UnicefProgressreport
         key = lambda loader, record: {'source_id': record.id}
         mapping = {'indicator_report': 'indicator_report.title',
                    'progress_report': 'indicator_report.progress_report',
                    # 'programme_document': 'indicator_report.reportable.lower_level_output.cp_output.programme_document',
-                   'country_name': 'programme_document.workspace.title',
-                   'business_area': 'programme_document.workspace.business_area_code',
-                   'partner_name': 'programme_document.partner.title',
-                   'partner_vendor_number': 'programme_document.partner.vendor_number',
-                   'etools_intervention_id': 'programme_document.external_id',
-                   'prp_intervention_id': 'programme_document.id',
-                   'intervention_reference_number': 'programme_document.reference_number',
-                   'cp_output': 'indicator_report.reportable.lower_level_output.cp_output',
-                   'etools_cp_output_id': 'indicator_report.reportable.lower_level_output.cp_output.external_cp_output_id',
+                   'programme_document': '-',
+                   'country_name': '_programme_document.workspace.title',
+                   'business_area': '_programme_document.workspace.business_area_code',
+                   'partner_name': '_programme_document.partner.title',
+                   'partner_vendor_number': '_programme_document.partner.vendor_number',
+                   'etools_intervention_id': '_programme_document.external_id',
+                   'prp_intervention_id': '_programme_document.id',
+                   'intervention_reference_number': '_programme_document.reference_number',
+                   'cp_output': 'i',
+                   'etools_cp_output_id': 'i',
                    'pd_result': 'indicator_report.reportable.lower_level_output.title',
                    'etools_pd_result_id': 'indicator_report.reportable.lower_level_output.external_id',
                    'performance_indicator': 'indicator_report.reportable.blueprint.title',
@@ -387,22 +424,22 @@ class DataReport(PrpDataMartModel):
                    'target': 'indicator_report.reportable.calculated_target',
                    'high_frequency': 'indicator_report.reportable.is_unicef_hf_indicator',
                    'means_of_verification': 'indicator_report.reportable.means_of_verification',
-                   'locations': 'indicator_report.reportable.lower_level_output.locations.all',
-                   'locations_data': 'indicator_report.reportable.lower_level_output.locations.all',
-                   'report_number': 'progres_report.report_number',
-                   'due_date': 'progres_report.due_date',
-                   'reporting_period_start_date': 'progres_report.start_date',
-                   'reporting_period_end_date': 'progres_report.end_date',
-                   'reporting_period_due_date': 'progres_report.due_date',
-                   'report_submission_date': 'progres_report.submission_date',
-                   'submitted_by': 'progres_report.submitted_by.first_name + progres_report.submitted_by.last_name + progres_report.submitted_by.email',
-                   'narrative': 'progres_report.narrative',
+                   'locations': '-',
+                   'locations_data': 'i',
+                   'report_number': 'indicator_report.progress_report.report_number',
+                   'due_date': 'indicator_report.progress_report.due_date',
+                   'reporting_period_start_date': 'indicator_report.progress_report.start_date',
+                   'reporting_period_end_date': 'indicator_report.progress_report.end_date',
+                   'reporting_period_due_date': 'indicator_report.progress_report.due_date',
+                   'report_submission_date': 'indicator_report.progress_report.submission_date',
+                   'submitted_by': '-',
+                   'narrative': 'indicator_report.progress_report.narrative',
                    'pd_output_progress_status': 'indicator_report.overall_status',
                    'pd_output_narrative_assessment': 'indicator_report.narrative_assessment',
-                   'calculation_method_across_location': 'r.blueprint.calculation_formula_across_locations',
-                   'calculation_method_across_reporting_periods': 'r.blueprint.calculation_formula_across_periods',
-                   'current_location': 'location',
+                   'calculation_method_across_location': 'indicator_report.reportable.blueprint.calculation_formula_across_locations',
+                   'calculation_method_across_reporting_periods': 'indicator_report.reportable.blueprint.calculation_formula_across_periods',
+                   'current_location': 'location.title',
                    'previous_location_progress': 'previous_location_data',
                    'total_cumulative_progress_in_location': 'N/A',
-                   'total_cumulative_progress': 'reportable.total["c"]'
+                   'total_cumulative_progress': '-'
                    }

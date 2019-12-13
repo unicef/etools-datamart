@@ -345,13 +345,9 @@ class BaseLoader:
         elif has_attr(original_record, value_or_func):
             ret = get_attr(original_record, value_or_func, undefined)
             if ret == undefined:
-                # FIXME: pdb
-                import pdb;pdb.set_trace()
                 raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
         else:
-            raise ValueError(field_name)
-        # TODO: remove me
-        print(111, "loader.py:350", 11111, field_name, value_or_func, ret)
+            raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
         return ret
 
     @property

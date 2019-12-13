@@ -1,6 +1,6 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2019-12-09 14:07:01.100956
+# Generated on 2019-12-13 11:17:44.226293
 from django.contrib.gis.db import models
 
 from etools_datamart.apps.core.readonly import ReadOnlyModel
@@ -10,15 +10,15 @@ class AccountUser(ReadOnlyModel):
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.BooleanField()
-    username = models.CharField(max_length=150)
+    username = models.CharField(unique=True, max_length=150)
     is_staff = models.BooleanField()
     is_active = models.BooleanField()
     date_joined = models.DateTimeField()
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     organization = models.CharField(max_length=255, blank=True, null=True)
-    email = models.CharField(max_length=255)
-    partner = models.ForeignKey('source_prp.PartnerPartner', models.PROTECT, related_name='+', blank=True, null=True)
+    email = models.CharField(unique=True, max_length=255)
+    partner = models.ForeignKey('source_prp.PartnerPartner', models.PROTECT, related_name='AccountUser_partner', blank=True, null=True)
     position = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
@@ -28,31 +28,20 @@ class AccountUser(ReadOnlyModel):
 
 
 class AccountUserGroups(ReadOnlyModel):
-    user_id = models.IntegerField()
-    group = models.ForeignKey('source_prp.AuthGroup', models.PROTECT, related_name='+')
+    user = models.ForeignKey(AccountUser, models.PROTECT, related_name='AccountUserGroups_user')
+    group = models.ForeignKey('source_prp.AuthGroup', models.PROTECT, related_name='AccountUserGroups_group')
 
     class Meta:
         managed = False
         db_table = 'account_user_groups'
-        unique_together = (('user_id', 'group'),)
-        app_label = 'source_prp'
-
-
-class AccountUserUserPermissions(ReadOnlyModel):
-    user_id = models.IntegerField()
-    permission_id = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'account_user_user_permissions'
-        unique_together = (('user_id', 'permission_id'),)
+        unique_together = (('user', 'group'),)
         app_label = 'source_prp'
 
 
 class AccountUserprofile(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    user_id = models.IntegerField()
+    user = models.OneToOneField(AccountUser, models.PROTECT, related_name='AccountUserprofile_user')
 
     class Meta:
         managed = False
@@ -69,21 +58,10 @@ class AuthGroup(ReadOnlyModel):
         app_label = 'source_prp'
 
 
-class AuthGroupPermissions(ReadOnlyModel):
-    group = models.ForeignKey(AuthGroup, models.PROTECT, related_name='+')
-    permission_id = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission_id'),)
-        app_label = 'source_prp'
-
-
 class AuthtokenToken(ReadOnlyModel):
     key = models.CharField(primary_key=True, max_length=40)
     created = models.DateTimeField()
-    user_id = models.IntegerField(unique=True)
+    user = models.OneToOneField(AccountUser, models.PROTECT, related_name='AuthtokenToken_user')
 
     class Meta:
         managed = False
@@ -98,11 +76,12 @@ class ClusterCluster(ReadOnlyModel):
     external_source = models.TextField(blank=True, null=True)
     type = models.CharField(max_length=32)
     imported_type = models.TextField(blank=True, null=True)
-    response_plan = models.ForeignKey('source_prp.CoreResponseplan', models.PROTECT, related_name='+', blank=True, null=True)
+    response_plan = models.ForeignKey('source_prp.CoreResponseplan', models.PROTECT, related_name='ClusterCluster_response_plan', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'cluster_cluster'
+        unique_together = (('external_id', 'external_source'), ('type', 'imported_type', 'response_plan'),)
         app_label = 'source_prp'
 
 
@@ -112,7 +91,7 @@ class ClusterClusteractivity(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
     title = models.TextField()
-    cluster_objective_id = models.IntegerField()
+    cluster_objective = models.ForeignKey('source_prp.ClusterClusterobjective', models.PROTECT, related_name='ClusterClusteractivity_cluster_objective')
 
     class Meta:
         managed = False
@@ -122,13 +101,13 @@ class ClusterClusteractivity(ReadOnlyModel):
 
 
 class ClusterClusteractivityLocations(ReadOnlyModel):
-    clusteractivity_id = models.IntegerField()
-    location = models.ForeignKey('source_prp.CoreLocation', models.PROTECT, related_name='+')
+    clusteractivity = models.ForeignKey(ClusterClusteractivity, models.PROTECT, related_name='ClusterClusteractivityLocations_clusteractivity')
+    location = models.ForeignKey('source_prp.CoreLocation', models.PROTECT, related_name='ClusterClusteractivityLocations_location')
 
     class Meta:
         managed = False
         db_table = 'cluster_clusteractivity_locations'
-        unique_together = (('clusteractivity_id', 'location'),)
+        unique_together = (('clusteractivity', 'location'),)
         app_label = 'source_prp'
 
 
@@ -138,7 +117,7 @@ class ClusterClusterobjective(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
     title = models.TextField()
-    cluster_id = models.IntegerField()
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='ClusterClusterobjective_cluster')
 
     class Meta:
         managed = False
@@ -148,13 +127,13 @@ class ClusterClusterobjective(ReadOnlyModel):
 
 
 class ClusterClusterobjectiveLocations(ReadOnlyModel):
-    clusterobjective_id = models.IntegerField()
-    location = models.ForeignKey('source_prp.CoreLocation', models.PROTECT, related_name='+')
+    clusterobjective = models.ForeignKey(ClusterClusterobjective, models.PROTECT, related_name='ClusterClusterobjectiveLocations_clusterobjective')
+    location = models.ForeignKey('source_prp.CoreLocation', models.PROTECT, related_name='ClusterClusterobjectiveLocations_location')
 
     class Meta:
         managed = False
         db_table = 'cluster_clusterobjective_locations'
-        unique_together = (('clusterobjective_id', 'location'),)
+        unique_together = (('clusterobjective', 'location'),)
         app_label = 'source_prp'
 
 
@@ -165,9 +144,9 @@ class CoreCartodbtable(ReadOnlyModel):
     rght = models.IntegerField()
     tree_id = models.IntegerField()
     level = models.IntegerField()
-    country_id = models.IntegerField()
-    location_type_id = models.IntegerField()
-    parent_id = models.IntegerField(blank=True, null=True)
+    country = models.ForeignKey('source_prp.CoreCountry', models.PROTECT, related_name='CoreCartodbtable_country')
+    location_type = models.ForeignKey('source_prp.CoreGatewaytype', models.PROTECT, related_name='CoreCartodbtable_location_type')
+    parent = models.ForeignKey('self', models.PROTECT, related_name='CoreCartodbtable_parent', blank=True, null=True)
     display_name = models.CharField(max_length=254)
     name_col = models.CharField(max_length=254)
     parent_code_col = models.CharField(max_length=254)
@@ -195,14 +174,15 @@ class CoreCountry(ReadOnlyModel):
 class CoreGatewaytype(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    name = models.CharField(max_length=64)
+    name = models.CharField(unique=True, max_length=64)
     admin_level = models.SmallIntegerField()
-    country_id = models.IntegerField()
+    country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='CoreGatewaytype_country')
     display_name = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'core_gatewaytype'
+        unique_together = (('country', 'admin_level'),)
         app_label = 'source_prp'
 
 
@@ -215,9 +195,9 @@ class CoreLocation(ReadOnlyModel):
     p_code = models.CharField(max_length=32, blank=True, null=True)
     geom = models.GeometryField(blank=True, null=True)
     point = models.GeometryField(blank=True, null=True)
-    carto_db_table_id = models.IntegerField(blank=True, null=True)
-    gateway_id = models.IntegerField()
-    parent = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
+    carto_db_table = models.ForeignKey(CoreCartodbtable, models.PROTECT, related_name='CoreLocation_carto_db_table', blank=True, null=True)
+    gateway = models.ForeignKey(CoreGatewaytype, models.PROTECT, related_name='CoreLocation_gateway')
+    parent = models.ForeignKey('self', models.PROTECT, related_name='CoreLocation_parent', blank=True, null=True)
     level = models.IntegerField()
     lft = models.IntegerField()
     rght = models.IntegerField()
@@ -236,15 +216,15 @@ class CorePrprole(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
     role = models.CharField(max_length=32)
-    cluster_id = models.IntegerField(blank=True, null=True)
-    user_id = models.IntegerField()
-    workspace = models.ForeignKey('source_prp.CoreWorkspace', models.PROTECT, related_name='+', blank=True, null=True)
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='CorePrprole_cluster', blank=True, null=True)
+    user = models.ForeignKey(AccountUser, models.PROTECT, related_name='CorePrprole_user')
+    workspace = models.ForeignKey('source_prp.CoreWorkspace', models.PROTECT, related_name='CorePrprole_workspace', blank=True, null=True)
     is_active = models.BooleanField()
 
     class Meta:
         managed = False
         db_table = 'core_prprole'
-        unique_together = (('external_id', 'external_source'),)
+        unique_together = (('user', 'role', 'workspace', 'cluster'),)
         app_label = 'source_prp'
 
 
@@ -257,7 +237,7 @@ class CoreResponseplan(ReadOnlyModel):
     plan_type = models.CharField(max_length=5)
     start = models.DateField(blank=True, null=True)
     end = models.DateField(blank=True, null=True)
-    workspace = models.ForeignKey('source_prp.CoreWorkspace', models.PROTECT, related_name='+')
+    workspace = models.ForeignKey('source_prp.CoreWorkspace', models.PROTECT, related_name='CoreResponseplan_workspace')
     plan_custom_type_label = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
@@ -286,13 +266,118 @@ class CoreWorkspace(ReadOnlyModel):
 
 
 class CoreWorkspaceCountries(ReadOnlyModel):
-    workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='+')
-    country_id = models.IntegerField()
+    workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='CoreWorkspaceCountries_workspace')
+    country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='CoreWorkspaceCountries_country')
 
     class Meta:
         managed = False
         db_table = 'core_workspace_countries'
-        unique_together = (('workspace', 'country_id'),)
+        unique_together = (('workspace', 'country'),)
+        app_label = 'source_prp'
+
+
+class DjangoCeleryBeatClockedschedule(ReadOnlyModel):
+    clocked_time = models.DateTimeField()
+    enabled = models.BooleanField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_beat_clockedschedule'
+        app_label = 'source_prp'
+
+
+class DjangoCeleryBeatCrontabschedule(ReadOnlyModel):
+    minute = models.CharField(max_length=240)
+    hour = models.CharField(max_length=96)
+    day_of_week = models.CharField(max_length=64)
+    day_of_month = models.CharField(max_length=124)
+    month_of_year = models.CharField(max_length=64)
+    timezone = models.CharField(max_length=63)
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_beat_crontabschedule'
+        app_label = 'source_prp'
+
+
+class DjangoCeleryBeatIntervalschedule(ReadOnlyModel):
+    every = models.IntegerField()
+    period = models.CharField(max_length=24)
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_beat_intervalschedule'
+        app_label = 'source_prp'
+
+
+class DjangoCeleryBeatPeriodictask(ReadOnlyModel):
+    name = models.CharField(unique=True, max_length=200)
+    task = models.CharField(max_length=200)
+    args = models.TextField()
+    kwargs = models.TextField()
+    queue = models.CharField(max_length=200, blank=True, null=True)
+    exchange = models.CharField(max_length=200, blank=True, null=True)
+    routing_key = models.CharField(max_length=200, blank=True, null=True)
+    expires = models.DateTimeField(blank=True, null=True)
+    enabled = models.BooleanField()
+    last_run_at = models.DateTimeField(blank=True, null=True)
+    total_run_count = models.IntegerField()
+    date_changed = models.DateTimeField()
+    description = models.TextField()
+    crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_crontab', blank=True, null=True)
+    interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_interval', blank=True, null=True)
+    solar = models.ForeignKey('source_prp.DjangoCeleryBeatSolarschedule', models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_solar', blank=True, null=True)
+    one_off = models.BooleanField()
+    start_time = models.DateTimeField(blank=True, null=True)
+    priority = models.IntegerField(blank=True, null=True)
+    headers = models.TextField()
+    clocked = models.ForeignKey(DjangoCeleryBeatClockedschedule, models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_clocked', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_beat_periodictask'
+        app_label = 'source_prp'
+
+
+class DjangoCeleryBeatPeriodictasks(ReadOnlyModel):
+    ident = models.SmallIntegerField(primary_key=True)
+    last_update = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_beat_periodictasks'
+        app_label = 'source_prp'
+
+
+class DjangoCeleryBeatSolarschedule(ReadOnlyModel):
+    event = models.CharField(max_length=24)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_beat_solarschedule'
+        unique_together = (('event', 'latitude', 'longitude'),)
+        app_label = 'source_prp'
+
+
+class DjangoCeleryResultsTaskresult(ReadOnlyModel):
+    task_id = models.CharField(unique=True, max_length=255)
+    status = models.CharField(max_length=50)
+    content_type = models.CharField(max_length=128)
+    content_encoding = models.CharField(max_length=64)
+    result = models.TextField(blank=True, null=True)
+    date_done = models.DateTimeField()
+    traceback = models.TextField(blank=True, null=True)
+    hidden = models.BooleanField()
+    meta = models.TextField(blank=True, null=True)
+    task_args = models.TextField(blank=True, null=True)
+    task_kwargs = models.TextField(blank=True, null=True)
+    task_name = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_results_taskresult'
         app_label = 'source_prp'
 
 
@@ -324,7 +409,7 @@ class IndicatorDisaggregation(ReadOnlyModel):
     external_source = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255)
     active = models.BooleanField()
-    response_plan = models.ForeignKey(CoreResponseplan, models.PROTECT, related_name='+', blank=True, null=True)
+    response_plan = models.ForeignKey(CoreResponseplan, models.PROTECT, related_name='IndicatorDisaggregation_response_plan', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -340,7 +425,7 @@ class IndicatorDisaggregationvalue(ReadOnlyModel):
     external_source = models.TextField(blank=True, null=True)
     value = models.CharField(max_length=128)
     active = models.BooleanField()
-    disaggregation = models.ForeignKey(IndicatorDisaggregation, models.PROTECT, related_name='+')
+    disaggregation = models.ForeignKey(IndicatorDisaggregation, models.PROTECT, related_name='IndicatorDisaggregationvalue_disaggregation')
 
     class Meta:
         managed = False
@@ -380,8 +465,8 @@ class IndicatorIndicatorlocationdata(ReadOnlyModel):
     disaggregation_reported_on = models.TextField()  # This field type is a guess.
     percentage_allocated = models.DecimalField(max_digits=5, decimal_places=2)
     is_locked = models.BooleanField()
-    indicator_report = models.ForeignKey('source_prp.IndicatorIndicatorreport', models.PROTECT, related_name='+')
-    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
+    indicator_report = models.ForeignKey('source_prp.IndicatorIndicatorreport', models.PROTECT, related_name='IndicatorIndicatorlocationdata_indicator_report')
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='IndicatorIndicatorlocationdata_location')
 
     class Meta:
         managed = False
@@ -405,11 +490,11 @@ class IndicatorIndicatorreport(ReadOnlyModel):
     narrative_assessment = models.TextField(blank=True, null=True)
     review_date = models.DateField(blank=True, null=True)
     sent_back_feedback = models.TextField(blank=True, null=True)
-    parent = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
-    progress_report = models.ForeignKey('source_prp.UnicefProgressreport', models.PROTECT, related_name='+', blank=True, null=True)
-    reportable = models.ForeignKey('source_prp.IndicatorReportable', models.PROTECT, related_name='+')
-    reporting_entity = models.ForeignKey('source_prp.IndicatorReportingentity', models.PROTECT, related_name='+')
-    project = models.ForeignKey('source_prp.PartnerPartnerproject', models.PROTECT, related_name='+', blank=True, null=True)
+    parent = models.ForeignKey('self', models.PROTECT, related_name='IndicatorIndicatorreport_parent', blank=True, null=True)
+    progress_report = models.ForeignKey('source_prp.UnicefProgressreport', models.PROTECT, related_name='IndicatorIndicatorreport_progress_report', blank=True, null=True)
+    reportable = models.ForeignKey('source_prp.IndicatorReportable', models.PROTECT, related_name='IndicatorIndicatorreport_reportable')
+    reporting_entity = models.ForeignKey('source_prp.IndicatorReportingentity', models.PROTECT, related_name='IndicatorIndicatorreport_reporting_entity')
+    project = models.ForeignKey('source_prp.PartnerPartnerproject', models.PROTECT, related_name='IndicatorIndicatorreport_project', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -443,10 +528,10 @@ class IndicatorReportable(ReadOnlyModel):
     cs_dates = models.TextField(blank=True, null=True)  # This field type is a guess.
     location_admin_refs = models.TextField(blank=True, null=True)  # This field type is a guess.
     active = models.BooleanField()
-    blueprint = models.ForeignKey(IndicatorIndicatorblueprint, models.PROTECT, related_name='+', blank=True, null=True)
-    ca_indicator_used_by_reporting_entity = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
-    content_type = models.ForeignKey(DjangoContentType, models.PROTECT, related_name='+')
-    parent_indicator = models.ForeignKey('self', models.PROTECT, related_name='+', blank=True, null=True)
+    blueprint = models.ForeignKey(IndicatorIndicatorblueprint, models.PROTECT, related_name='IndicatorReportable_blueprint', blank=True, null=True)
+    ca_indicator_used_by_reporting_entity = models.ForeignKey('self', models.PROTECT, related_name='IndicatorReportable_ca_indicator_used_by_reporting_entity', blank=True, null=True)
+    content_type = models.ForeignKey(DjangoContentType, models.PROTECT, related_name='IndicatorReportable_content_type')
+    parent_indicator = models.ForeignKey('self', models.PROTECT, related_name='IndicatorReportable_parent_indicator', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -455,8 +540,8 @@ class IndicatorReportable(ReadOnlyModel):
 
 
 class IndicatorReportableDisaggregations(ReadOnlyModel):
-    reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='+')
-    disaggregation = models.ForeignKey(IndicatorDisaggregation, models.PROTECT, related_name='+')
+    reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='IndicatorReportableDisaggregations_reportable')
+    disaggregation = models.ForeignKey(IndicatorDisaggregation, models.PROTECT, related_name='IndicatorReportableDisaggregations_disaggregation')
 
     class Meta:
         managed = False
@@ -471,8 +556,8 @@ class IndicatorReportablelocationgoal(ReadOnlyModel):
     target = models.TextField()  # This field type is a guess.
     baseline = models.TextField()  # This field type is a guess.
     in_need = models.TextField(blank=True, null=True)  # This field type is a guess.
-    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
-    reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='+')
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='IndicatorReportablelocationgoal_location')
+    reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='IndicatorReportablelocationgoal_reportable')
     is_active = models.BooleanField()
 
     class Meta:
@@ -528,13 +613,13 @@ class PartnerPartner(ReadOnlyModel):
 
 
 class PartnerPartnerClusters(ReadOnlyModel):
-    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
-    cluster_id = models.IntegerField()
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='PartnerPartnerClusters_partner')
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='PartnerPartnerClusters_cluster')
 
     class Meta:
         managed = False
         db_table = 'partner_partner_clusters'
-        unique_together = (('partner', 'cluster_id'),)
+        unique_together = (('partner', 'cluster'),)
         app_label = 'source_prp'
 
 
@@ -542,9 +627,9 @@ class PartnerPartneractivity(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     title = models.CharField(max_length=2048)
-    cluster_activity_id = models.IntegerField(blank=True, null=True)
-    cluster_objective_id = models.IntegerField(blank=True, null=True)
-    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+    cluster_activity = models.ForeignKey(ClusterClusteractivity, models.PROTECT, related_name='PartnerPartneractivity_cluster_activity', blank=True, null=True)
+    cluster_objective = models.ForeignKey(ClusterClusterobjective, models.PROTECT, related_name='PartnerPartneractivity_cluster_objective', blank=True, null=True)
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='PartnerPartneractivity_partner')
 
     class Meta:
         managed = False
@@ -553,8 +638,8 @@ class PartnerPartneractivity(ReadOnlyModel):
 
 
 class PartnerPartneractivityLocations(ReadOnlyModel):
-    partneractivity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='+')
-    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
+    partneractivity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='PartnerPartneractivityLocations_partneractivity')
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='PartnerPartneractivityLocations_location')
 
     class Meta:
         managed = False
@@ -569,8 +654,8 @@ class PartnerPartneractivityprojectcontext(ReadOnlyModel):
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=3)
-    activity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='+')
-    project = models.ForeignKey('source_prp.PartnerPartnerproject', models.PROTECT, related_name='+')
+    activity = models.ForeignKey(PartnerPartneractivity, models.PROTECT, related_name='PartnerPartneractivityprojectcontext_activity')
+    project = models.ForeignKey('source_prp.PartnerPartnerproject', models.PROTECT, related_name='PartnerPartneractivityprojectcontext_project')
 
     class Meta:
         managed = False
@@ -598,7 +683,7 @@ class PartnerPartnerproject(ReadOnlyModel):
     prioritization = models.TextField(blank=True, null=True)
     total_budget = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     funding_source = models.TextField(blank=True, null=True)
-    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='PartnerPartnerproject_partner')
 
     class Meta:
         managed = False
@@ -607,8 +692,8 @@ class PartnerPartnerproject(ReadOnlyModel):
 
 
 class PartnerPartnerprojectAdditionalPartners(ReadOnlyModel):
-    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
-    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
+    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='PartnerPartnerprojectAdditionalPartners_partnerproject')
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='PartnerPartnerprojectAdditionalPartners_partner')
 
     class Meta:
         managed = False
@@ -618,19 +703,19 @@ class PartnerPartnerprojectAdditionalPartners(ReadOnlyModel):
 
 
 class PartnerPartnerprojectClusters(ReadOnlyModel):
-    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
-    cluster_id = models.IntegerField()
+    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='PartnerPartnerprojectClusters_partnerproject')
+    cluster = models.ForeignKey(ClusterCluster, models.PROTECT, related_name='PartnerPartnerprojectClusters_cluster')
 
     class Meta:
         managed = False
         db_table = 'partner_partnerproject_clusters'
-        unique_together = (('partnerproject', 'cluster_id'),)
+        unique_together = (('partnerproject', 'cluster'),)
         app_label = 'source_prp'
 
 
 class PartnerPartnerprojectLocations(ReadOnlyModel):
-    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='+')
-    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='+')
+    partnerproject = models.ForeignKey(PartnerPartnerproject, models.PROTECT, related_name='PartnerPartnerprojectLocations_partnerproject')
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='PartnerPartnerprojectLocations_location')
 
     class Meta:
         managed = False
@@ -649,7 +734,7 @@ class PartnerPartnerprojectfunding(ReadOnlyModel):
     bilateral_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
     unicef_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
     wfp_funding = models.DecimalField(max_digits=32, decimal_places=2, blank=True, null=True)
-    project = models.OneToOneField(PartnerPartnerproject, models.PROTECT, related_name='+')
+    project = models.OneToOneField(PartnerPartnerproject, models.PROTECT, related_name='PartnerPartnerprojectfunding_project')
 
     class Meta:
         managed = False
@@ -663,13 +748,13 @@ class UnicefLowerleveloutput(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     title = models.CharField(max_length=512)
     active = models.BooleanField()
-    cp_output = models.ForeignKey('source_prp.UnicefPdresultlink', models.PROTECT, related_name='+')
+    cp_output = models.ForeignKey('source_prp.UnicefPdresultlink', models.PROTECT, related_name='UnicefLowerleveloutput_cp_output')
     external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'unicef_lowerleveloutput'
-        unique_together = (('external_id', 'external_business_area_code'),)
+        unique_together = (('external_id', 'external_business_area_code', 'cp_output'),)
         app_label = 'source_prp'
 
 
@@ -679,7 +764,7 @@ class UnicefPdresultlink(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     title = models.CharField(max_length=512)
     external_cp_output_id = models.IntegerField()
-    programme_document = models.ForeignKey('source_prp.UnicefProgrammedocument', models.PROTECT, related_name='+')
+    programme_document = models.ForeignKey('source_prp.UnicefProgrammedocument', models.PROTECT, related_name='UnicefPdresultlink_programme_document')
     external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
@@ -710,7 +795,7 @@ class UnicefProgrammedocument(ReadOnlyModel):
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
     agreement = models.CharField(max_length=255)
-    document_type = models.CharField(max_length=3)
+    document_type = models.CharField(max_length=4)
     reference_number = models.CharField(max_length=255)
     title = models.CharField(max_length=512)
     unicef_office = models.CharField(max_length=255)
@@ -727,12 +812,13 @@ class UnicefProgrammedocument(ReadOnlyModel):
     total_unicef_cash_currency = models.CharField(max_length=16)
     in_kind_amount = models.DecimalField(max_digits=64, decimal_places=2)
     in_kind_amount_currency = models.CharField(max_length=16)
-    funds_received_to_date = models.DecimalField(max_digits=64, decimal_places=2)
+    funds_received_to_date = models.DecimalField(max_digits=64, decimal_places=2, blank=True, null=True)
     funds_received_to_date_currency = models.CharField(max_length=16, blank=True, null=True)
     amendments = models.TextField()  # This field type is a guess.
-    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='+')
-    workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='+')
+    partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='UnicefProgrammedocument_partner')
+    workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='UnicefProgrammedocument_workspace')
     external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
+    funds_received_to_date_percent = models.DecimalField(max_digits=64, decimal_places=2, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -742,8 +828,8 @@ class UnicefProgrammedocument(ReadOnlyModel):
 
 
 class UnicefProgrammedocumentPartnerFocalPoint(ReadOnlyModel):
-    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='UnicefProgrammedocumentPartnerFocalPoint_programmedocument')
+    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='UnicefProgrammedocumentPartnerFocalPoint_person')
 
     class Meta:
         managed = False
@@ -753,8 +839,8 @@ class UnicefProgrammedocumentPartnerFocalPoint(ReadOnlyModel):
 
 
 class UnicefProgrammedocumentSections(ReadOnlyModel):
-    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    section = models.ForeignKey('source_prp.UnicefSection', models.PROTECT, related_name='+')
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='UnicefProgrammedocumentSections_programmedocument')
+    section = models.ForeignKey('source_prp.UnicefSection', models.PROTECT, related_name='UnicefProgrammedocumentSections_section')
 
     class Meta:
         managed = False
@@ -764,8 +850,8 @@ class UnicefProgrammedocumentSections(ReadOnlyModel):
 
 
 class UnicefProgrammedocumentUnicefFocalPoint(ReadOnlyModel):
-    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='UnicefProgrammedocumentUnicefFocalPoint_programmedocument')
+    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='UnicefProgrammedocumentUnicefFocalPoint_person')
 
     class Meta:
         managed = False
@@ -775,8 +861,8 @@ class UnicefProgrammedocumentUnicefFocalPoint(ReadOnlyModel):
 
 
 class UnicefProgrammedocumentUnicefOfficers(ReadOnlyModel):
-    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='+')
+    programmedocument = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='UnicefProgrammedocumentUnicefOfficers_programmedocument')
+    person = models.ForeignKey(UnicefPerson, models.PROTECT, related_name='UnicefProgrammedocumentUnicefOfficers_person')
 
     class Meta:
         managed = False
@@ -803,9 +889,9 @@ class UnicefProgressreport(ReadOnlyModel):
     report_type = models.CharField(max_length=3)
     is_final = models.BooleanField()
     narrative = models.TextField(blank=True, null=True)
-    programme_document = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
-    submitted_by_id = models.IntegerField(blank=True, null=True)
-    submitting_user_id = models.IntegerField(blank=True, null=True)
+    programme_document = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='UnicefProgressreport_programme_document')
+    submitted_by = models.ForeignKey(AccountUser, models.PROTECT, related_name='UnicefProgressreport_submitted_by', blank=True, null=True)
+    submitting_user = models.ForeignKey(AccountUser, models.PROTECT, related_name='UnicefProgressreport_submitting_user', blank=True, null=True)
     reviewed_by_email = models.CharField(max_length=256, blank=True, null=True)
     reviewed_by_external_id = models.IntegerField(blank=True, null=True)
     reviewed_by_name = models.CharField(max_length=256, blank=True, null=True)
@@ -822,7 +908,7 @@ class UnicefProgressreportattachment(ReadOnlyModel):
     modified = models.DateTimeField()
     file = models.CharField(max_length=500)
     type = models.CharField(max_length=5)
-    progress_report = models.ForeignKey(UnicefProgressreport, models.PROTECT, related_name='+')
+    progress_report = models.ForeignKey(UnicefProgressreport, models.PROTECT, related_name='UnicefProgressreportattachment_progress_report')
 
     class Meta:
         managed = False
@@ -839,7 +925,7 @@ class UnicefReportingperioddates(ReadOnlyModel):
     end_date = models.DateField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
     description = models.CharField(max_length=512, blank=True, null=True)
-    programme_document = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='+')
+    programme_document = models.ForeignKey(UnicefProgrammedocument, models.PROTECT, related_name='UnicefReportingperioddates_programme_document')
     external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
