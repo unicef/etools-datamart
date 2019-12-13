@@ -90,6 +90,7 @@ class FundsReservation(EtoolsDataMartModel):
             pd_ssfa_number='fund_reservation.number',
             fr_type='fund_reservation.fr_type',
             currency='fund_reservation.currency',
+
             document_text='fund_reservation.document_text',
             start_date='fund_reservation.start_date',
             end_date='fund_reservation.end_date',
@@ -103,8 +104,8 @@ class FundsReservation(EtoolsDataMartModel):
             multi_curr_flag='fund_reservation.multi_curr_flag',
             completed_flag='fund_reservation.completed_flag',
             intervention_title="fund_reservation.intervention.title",
-            delegated="fund_reservation.intervention.delegated",
-
+            # delegated="fund_reservation.intervention.delegated",
+            delegated='i',
             source_id='id',
             source_intervention_id='fund_reservation.id',
             seen="=",

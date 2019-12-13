@@ -55,7 +55,7 @@ def pytest_generate_tests(metafunc, *args):
         params = []
         ids = []
         for prefix, viewset, basenametry in router.registry:
-            if prefix.startswith('prp/'):
+            if prefix.startswith('sources/prp/'):
                 sers = viewset.serializers_fieldsets.keys()
                 for ser in sers:
                     params.append([viewset, ser])

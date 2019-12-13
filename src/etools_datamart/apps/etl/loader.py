@@ -313,7 +313,7 @@ class BaseLoader:
         return ret
 
     def get_value(self, field_name, value_or_func, original_record, current_mapping):
-        ret = None
+        ret = undefined
         # if value_or_func is None:
         #     ret  None
         if value_or_func == 'N/A':
@@ -344,10 +344,14 @@ class BaseLoader:
             ret = value_or_func
         elif has_attr(original_record, value_or_func):
             ret = get_attr(original_record, value_or_func, undefined)
-            if ret == undefined:
-                raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
-        else:
-            raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        #     if ret == undefined:
+        #         return None
+        #         # raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        # else:
+        #     raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        if ret == undefined:
+            ret = None
+            # raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
         return ret
 
     @property

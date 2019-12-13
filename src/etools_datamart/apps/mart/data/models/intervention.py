@@ -144,6 +144,7 @@ class InterventionAbstract(models.Model):
             intervention_id='id',
             last_amendment_date='i',
             last_pv_date='-',
+            location='i',
             # locations_data='i',
             # locations='-',
             number_of_amendments='i',
@@ -331,19 +332,19 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     # def get_reference_number(self, record: PartnersIntervention, values: dict, **kwargs):
     #     return record.number
-        # if record.document_type != PartnersIntervention.SSFA:
-        #     number = '{agreement}/{type}{year}{id}'.format(
-        #         agreement=record.agreement.base_number,
-        #         type=record.document_type,
-        #         year=record.reference_number_year,
-        #         id=record.id
-        #     )
-        #     ret = number
-        # else:
-        #     ret = record.agreement.base_number
-        # # TODO: remove me
-        # print(111, "intervention.py:344", 1111, record.number, ret)
-        # return ret
+    # if record.document_type != PartnersIntervention.SSFA:
+    #     number = '{agreement}/{type}{year}{id}'.format(
+    #         agreement=record.agreement.base_number,
+    #         type=record.document_type,
+    #         year=record.reference_number_year,
+    #         id=record.id
+    #     )
+    #     ret = number
+    # else:
+    #     ret = record.agreement.base_number
+    # # TODO: remove me
+    # print(111, "intervention.py:344", 1111, record.number, ret)
+    # return ret
     # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
     #     if original.frs__actual_amt_local__sum is None:
     #         return None

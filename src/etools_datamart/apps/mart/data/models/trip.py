@@ -171,7 +171,8 @@ class Trip(EtoolsDataMartModel):
                                           )
 
         mapping = dict(
-            cp_output="activity.result.name",
+            # cp_output="activity.result.name",
+            cp_output="i",
             cp_output_id="activity.result.vision_id",
             currency_code='currency.code',
             is_second_traveler="-",

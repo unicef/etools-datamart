@@ -19,7 +19,6 @@ attachment_codes = {AuditAudit: 'audit_final_report',
                     AuditSpotcheck: 'spotcheck_final_report',
                     }
 
-
 URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
           'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
           'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
@@ -94,7 +93,7 @@ class EngagementlLoader(EtoolsLoader):
                 code=attachment_codes[record.sub_type],
                 content_type=self.get_content_type(record.sub_type)).file
 
-    def get_values(self, record, ):
+    def get_values(self, record: AuditEngagement):
         values = {}
         self.mapping.update(**values)
         return super(EngagementlLoader, self).get_values(record)

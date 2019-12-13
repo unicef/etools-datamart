@@ -4,11 +4,7 @@ import tempfile
 import uuid
 import warnings
 from pathlib import Path
-from unittest import mock
 from unittest.mock import MagicMock
-
-import pytest
-from _pytest.fixtures import SubRequest
 
 # def _setup_models():
 #     from django.db import connection
@@ -37,6 +33,9 @@ from _pytest.fixtures import SubRequest
 #     #     if issubclass(m, ReadOnlyModel):
 #     #         setattr(m, 'save', Model.save)
 from django.db.models import signals
+
+import pytest
+from _pytest.fixtures import SubRequest
 
 
 def pytest_configure(config):
@@ -121,7 +120,6 @@ def django_db_setup(request,
     # E                                                                ^
     #
     signals.post_migrate.disconnect(dispatch_uid='constance.create_perm')
-    # with mock.patch('constance.apps.ConstanceConfig.create_perm'):
     with django_db_blocker.unblock():
         db_cfg = setup_databases(
             verbosity=request.config.option.verbose,
@@ -136,7 +134,6 @@ def django_db_setup(request,
     if not django_db_keepdb:
         request.addfinalizer(_teardown_database)
 
-    #
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory

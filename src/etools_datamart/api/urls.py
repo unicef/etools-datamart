@@ -55,6 +55,8 @@ router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
 router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
 router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
+router.register(r'prp/datareport', endpoints.DataReportViewSet)
+
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 
 from etools_datamart.apps.sources.source_prp import api_urls  # noqa isort:skip

@@ -79,7 +79,7 @@ class EtoolsUser(EtoolsDataMartModel):
                        vendor_number='profile.vendor_number',
                        country_name='profile.country.name',
                        office='profile.office.name',
-                       country_override='profile.country_override.name',
+                       country_override='i',
                        oic='profile.oic.office',
                        supervisor='profile.oic.office',
 
