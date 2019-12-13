@@ -4,6 +4,7 @@ import tempfile
 import uuid
 import warnings
 from pathlib import Path
+from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
@@ -35,6 +36,7 @@ from _pytest.fixtures import SubRequest
 #     #
 #     #     if issubclass(m, ReadOnlyModel):
 #     #         setattr(m, 'save', Model.save)
+from django.db.models import signals
 
 
 def pytest_configure(config):
@@ -109,7 +111,17 @@ def django_db_setup(request,
 
     if django_db_keepdb and not django_db_createdb:
         setup_databases_args["keepdb"] = True
-
+    # this patch is logically wrong, but we do not use constance permissions
+    # otherwise test fails with
+    #
+    # .venv/lib/python3.7/site-packages/django/db/backends/utils.py:84: in _execute
+    #     return self.cursor.execute(sql, params)
+    # E   django.db.utils.ProgrammingError: relation "django_content_type" does not exist
+    # E   LINE 1: ..."."app_label", "django_content_type"."model" FROM "django_co...
+    # E                                                                ^
+    #
+    signals.post_migrate.disconnect(dispatch_uid='constance.create_perm')
+    # with mock.patch('constance.apps.ConstanceConfig.create_perm'):
     with django_db_blocker.unblock():
         db_cfg = setup_databases(
             verbosity=request.config.option.verbose,

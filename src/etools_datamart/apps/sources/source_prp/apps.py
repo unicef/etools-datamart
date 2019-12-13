@@ -7,4 +7,5 @@ class Config(AppConfig):
     label = 'source_prp'
 
     def ready(self):
-        pass
+        from .enrichment import patch
+        patch()

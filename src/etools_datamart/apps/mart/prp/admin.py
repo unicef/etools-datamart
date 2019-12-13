@@ -13,3 +13,8 @@ logger = logging.getLogger(__name__)
 class IndicatorByLocationAdmin(TruncateTableMixin, ModelAdmin):
     list_display = ('source_id', 'project',
                     'country', 'partner', 'reference_number', 'title_of_indicator')
+
+
+@register(models.DataReport)
+class DataReportAdmin(TruncateTableMixin, ModelAdmin):
+    list_display = ('__str__',)

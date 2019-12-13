@@ -313,36 +313,42 @@ class BaseLoader:
         return ret
 
     def get_value(self, field_name, value_or_func, original_record, current_mapping):
-        if value_or_func is None:
-            return None
-        elif value_or_func == 'N/A':
-            return 'N/A'
+        ret = None
+        # if value_or_func is None:
+        #     ret  None
+        if value_or_func == 'N/A':
+            ret = 'N/A'
         elif isinstance(value_or_func, str) and hasattr(self, value_or_func) and callable(getattr(self, value_or_func)):
             getter = getattr(self, value_or_func)
             _value = getter(original_record, current_mapping, field_name=field_name)
             if _value != self.noop:
-                return _value
+                ret = _value
         elif value_or_func == '-' or hasattr(self, 'get_%s' % field_name):
             getter = getattr(self, 'get_%s' % field_name)
             _value = getter(record=original_record, values=current_mapping, field_name=field_name)
             if _value != self.noop:
-                return _value
+                ret = _value
         elif value_or_func == '__self__':
             try:
-                return self.model.objects.get(source_id=getattr(original_record, field_name).id)
+                ret = self.model.objects.get(source_id=getattr(original_record, field_name).id)
             except AttributeError:
-                return None
+                ret = None
             except self.model.DoesNotExist:
                 self.tree_parents.append((original_record.id, getattr(original_record, field_name).id))
-                return None
+                ret = None
         elif callable(value_or_func):
-            return value_or_func(self, original_record)
+            ret = value_or_func(self, original_record)
         elif value_or_func == '=' and has_attr(original_record, field_name):
-            return get_attr(original_record, field_name)
+            ret = get_attr(original_record, field_name)
         elif not isinstance(value_or_func, str):
-            return value_or_func
+            ret = value_or_func
         elif has_attr(original_record, value_or_func):
-            return get_attr(original_record, value_or_func)
+            ret = get_attr(original_record, value_or_func, undefined)
+            if ret == undefined:
+                raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        else:
+            raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        return ret
 
     @property
     def is_locked(self):
