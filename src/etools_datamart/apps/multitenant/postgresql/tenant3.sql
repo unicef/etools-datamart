@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 9.6.12
--- Dumped by pg_dump version 9.6.11
+-- Dumped by pg_dump version 11.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,6 +12,7 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
@@ -51,7 +52,8 @@ CREATE TABLE [[schema]].action_points_actionpoint (
     tpm_activity_id integer,
     high_priority boolean NOT NULL,
     travel_activity_id integer,
-    category_id integer
+    category_id integer,
+    psea_assessment_id integer
 );
 
 
@@ -1372,6 +1374,97 @@ ALTER SEQUENCE [[schema]].locations_locationremaphistory_id_seq OWNED BY [[schem
 
 
 --
+-- Name: management_sectionhistory; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].management_sectionhistory (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    history_type character varying(10) NOT NULL
+);
+
+
+--
+-- Name: management_sectionhistory_from_sections; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].management_sectionhistory_from_sections (
+    id integer NOT NULL,
+    sectionhistory_id integer NOT NULL,
+    section_id integer NOT NULL
+);
+
+
+--
+-- Name: management_sectionhistory_from_sections_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].management_sectionhistory_from_sections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: management_sectionhistory_from_sections_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].management_sectionhistory_from_sections_id_seq OWNED BY [[schema]].management_sectionhistory_from_sections.id;
+
+
+--
+-- Name: management_sectionhistory_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].management_sectionhistory_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: management_sectionhistory_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].management_sectionhistory_id_seq OWNED BY [[schema]].management_sectionhistory.id;
+
+
+--
+-- Name: management_sectionhistory_to_sections; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].management_sectionhistory_to_sections (
+    id integer NOT NULL,
+    sectionhistory_id integer NOT NULL,
+    section_id integer NOT NULL
+);
+
+
+--
+-- Name: management_sectionhistory_to_sections_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].management_sectionhistory_to_sections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: management_sectionhistory_to_sections_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].management_sectionhistory_to_sections_id_seq OWNED BY [[schema]].management_sectionhistory_to_sections.id;
+
+
+--
 -- Name: partners_agreement; Type: TABLE; Schema: [[schema]]; Owner: -
 --
 
@@ -2274,6 +2367,398 @@ ALTER SEQUENCE [[schema]].partners_workspacefiletype_id_seq OWNED BY [[schema]].
 
 
 --
+-- Name: psea_answer; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_answer (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    comments text,
+    assessment_id integer NOT NULL,
+    indicator_id integer NOT NULL,
+    rating_id integer NOT NULL
+);
+
+
+--
+-- Name: psea_answer_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_answer_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_answer_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_answer_id_seq OWNED BY [[schema]].psea_answer.id;
+
+
+--
+-- Name: psea_answerevidence; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_answerevidence (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    description text,
+    answer_id integer NOT NULL,
+    evidence_id integer NOT NULL
+);
+
+
+--
+-- Name: psea_answerevidence_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_answerevidence_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_answerevidence_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_answerevidence_id_seq OWNED BY [[schema]].psea_answerevidence.id;
+
+
+--
+-- Name: psea_assessment; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_assessment (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    reference_number character varying(100) NOT NULL,
+    overall_rating integer,
+    assessment_date date,
+    status character varying(30) NOT NULL,
+    partner_id integer NOT NULL
+);
+
+
+--
+-- Name: psea_assessment_focal_points; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_assessment_focal_points (
+    id integer NOT NULL,
+    assessment_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+--
+-- Name: psea_assessment_focal_points_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_assessment_focal_points_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_assessment_focal_points_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_assessment_focal_points_id_seq OWNED BY [[schema]].psea_assessment_focal_points.id;
+
+
+--
+-- Name: psea_assessment_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_assessment_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_assessment_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_assessment_id_seq OWNED BY [[schema]].psea_assessment.id;
+
+
+--
+-- Name: psea_assessmentstatushistory; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_assessmentstatushistory (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    status character varying(30) NOT NULL,
+    assessment_id integer NOT NULL,
+    comment text NOT NULL
+);
+
+
+--
+-- Name: psea_assessmentstatushistory_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_assessmentstatushistory_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_assessmentstatushistory_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_assessmentstatushistory_id_seq OWNED BY [[schema]].psea_assessmentstatushistory.id;
+
+
+--
+-- Name: psea_assessor; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_assessor (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    assessor_type character varying(30) NOT NULL,
+    order_number character varying(30) NOT NULL,
+    assessment_id integer NOT NULL,
+    auditor_firm_id integer,
+    user_id integer
+);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_assessor_auditor_firm_staff (
+    id integer NOT NULL,
+    assessor_id integer NOT NULL,
+    auditorstaffmember_id integer NOT NULL
+);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_assessor_auditor_firm_staff_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_assessor_auditor_firm_staff_id_seq OWNED BY [[schema]].psea_assessor_auditor_firm_staff.id;
+
+
+--
+-- Name: psea_assessor_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_assessor_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_assessor_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_assessor_id_seq OWNED BY [[schema]].psea_assessor.id;
+
+
+--
+-- Name: psea_evidence; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_evidence (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    label text NOT NULL,
+    requires_description boolean NOT NULL,
+    active boolean NOT NULL
+);
+
+
+--
+-- Name: psea_evidence_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_evidence_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_evidence_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_evidence_id_seq OWNED BY [[schema]].psea_evidence.id;
+
+
+--
+-- Name: psea_indicator; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_indicator (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    subject text NOT NULL,
+    content text NOT NULL,
+    active boolean NOT NULL,
+    "order" integer NOT NULL,
+    rating_instructions text NOT NULL,
+    CONSTRAINT psea_indicator_order_check CHECK (("order" >= 0))
+);
+
+
+--
+-- Name: psea_indicator_evidences; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_indicator_evidences (
+    id integer NOT NULL,
+    indicator_id integer NOT NULL,
+    evidence_id integer NOT NULL
+);
+
+
+--
+-- Name: psea_indicator_evidences_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_indicator_evidences_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_indicator_evidences_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_indicator_evidences_id_seq OWNED BY [[schema]].psea_indicator_evidences.id;
+
+
+--
+-- Name: psea_indicator_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_indicator_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_indicator_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_indicator_id_seq OWNED BY [[schema]].psea_indicator.id;
+
+
+--
+-- Name: psea_indicator_ratings; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_indicator_ratings (
+    id integer NOT NULL,
+    indicator_id integer NOT NULL,
+    rating_id integer NOT NULL
+);
+
+
+--
+-- Name: psea_indicator_ratings_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_indicator_ratings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_indicator_ratings_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_indicator_ratings_id_seq OWNED BY [[schema]].psea_indicator_ratings.id;
+
+
+--
+-- Name: psea_rating; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].psea_rating (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    label character varying(50) NOT NULL,
+    weight integer NOT NULL,
+    active boolean NOT NULL
+);
+
+
+--
+-- Name: psea_rating_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].psea_rating_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: psea_rating_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].psea_rating_id_seq OWNED BY [[schema]].psea_rating.id;
+
+
+--
 -- Name: reports_appliedindicator; Type: TABLE; Schema: [[schema]]; Owner: -
 --
 
@@ -2766,7 +3251,8 @@ CREATE TABLE [[schema]].reports_sector (
     dashboard boolean NOT NULL,
     color character varying(7),
     created timestamp with time zone NOT NULL,
-    modified timestamp with time zone NOT NULL
+    modified timestamp with time zone NOT NULL,
+    active boolean NOT NULL
 );
 
 
@@ -3812,6 +4298,27 @@ ALTER TABLE ONLY [[schema]].locations_locationremaphistory ALTER COLUMN id SET D
 
 
 --
+-- Name: management_sectionhistory id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory ALTER COLUMN id SET DEFAULT nextval('[[schema]].management_sectionhistory_id_seq'::regclass);
+
+
+--
+-- Name: management_sectionhistory_from_sections id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_from_sections ALTER COLUMN id SET DEFAULT nextval('[[schema]].management_sectionhistory_from_sections_id_seq'::regclass);
+
+
+--
+-- Name: management_sectionhistory_to_sections id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_to_sections ALTER COLUMN id SET DEFAULT nextval('[[schema]].management_sectionhistory_to_sections_id_seq'::regclass);
+
+
+--
 -- Name: partners_agreement id; Type: DEFAULT; Schema: [[schema]]; Owner: -
 --
 
@@ -3984,6 +4491,90 @@ ALTER TABLE ONLY [[schema]].partners_plannedengagement ALTER COLUMN id SET DEFAU
 --
 
 ALTER TABLE ONLY [[schema]].partners_workspacefiletype ALTER COLUMN id SET DEFAULT nextval('[[schema]].partners_workspacefiletype_id_seq'::regclass);
+
+
+--
+-- Name: psea_answer id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answer ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_answer_id_seq'::regclass);
+
+
+--
+-- Name: psea_answerevidence id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answerevidence ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_answerevidence_id_seq'::regclass);
+
+
+--
+-- Name: psea_assessment id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_assessment_id_seq'::regclass);
+
+
+--
+-- Name: psea_assessment_focal_points id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment_focal_points ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_assessment_focal_points_id_seq'::regclass);
+
+
+--
+-- Name: psea_assessmentstatushistory id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessmentstatushistory ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_assessmentstatushistory_id_seq'::regclass);
+
+
+--
+-- Name: psea_assessor id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_assessor_id_seq'::regclass);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor_auditor_firm_staff ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_assessor_auditor_firm_staff_id_seq'::regclass);
+
+
+--
+-- Name: psea_evidence id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_evidence ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_evidence_id_seq'::regclass);
+
+
+--
+-- Name: psea_indicator id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_indicator_id_seq'::regclass);
+
+
+--
+-- Name: psea_indicator_evidences id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_evidences ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_indicator_evidences_id_seq'::regclass);
+
+
+--
+-- Name: psea_indicator_ratings id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_ratings ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_indicator_ratings_id_seq'::regclass);
+
+
+--
+-- Name: psea_rating id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_rating ALTER COLUMN id SET DEFAULT nextval('[[schema]].psea_rating_id_seq'::regclass);
 
 
 --
@@ -4245,23 +4836,9 @@ ALTER TABLE ONLY [[schema]].unicef_snapshot_activity ALTER COLUMN id SET DEFAULT
 
 
 --
--- Name: action_points_actionpoint_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].action_points_actionpoint_id_seq', 1, false);
-
-
---
 -- Data for Name: activities_activity; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: activities_activity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].activities_activity_id_seq', 1, false);
 
 
 --
@@ -4271,36 +4848,15 @@ SELECT pg_catalog.setval('[[schema]].activities_activity_id_seq', 1, false);
 
 
 --
--- Name: activities_activity_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].activities_activity_locations_id_seq', 1, false);
-
-
---
 -- Data for Name: actstream_action; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: actstream_action_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].actstream_action_id_seq', 1, false);
-
-
---
 -- Data for Name: actstream_follow; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: actstream_follow_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].actstream_follow_id_seq', 1, false);
 
 
 --
@@ -4745,13 +5301,6 @@ INSERT INTO [[schema]].attachments_attachment VALUES (430, '2018-04-12 16:14:27.
 INSERT INTO [[schema]].attachments_attachment VALUES (431, '2018-04-25 16:13:45.296746+00', '2018-08-10 04:09:14.402326+00', '', '', 343, 'partners_partner_assessment', 275, 35, NULL);
 INSERT INTO [[schema]].attachments_attachment VALUES (433, '2018-06-02 16:11:05.332756+00', '2018-08-10 04:09:18.478207+00', '', '', 411, 'partners_partner_assessment', 275, 35, NULL);
 INSERT INTO [[schema]].attachments_attachment VALUES (429, '2018-04-01 16:13:47.584255+00', '2018-08-10 04:09:18.763768+00', '', '', 416, 'partners_partner_assessment', 275, 35, NULL);
-
-
---
--- Name: attachments_attachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].attachments_attachment_id_seq', 438, true);
 
 
 --
@@ -5202,13 +5751,6 @@ INSERT INTO [[schema]].attachments_attachmentflat VALUES (316, 'LA FUTURE PORTE 
 
 
 --
--- Name: attachments_attachmentflat_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].attachments_attachmentflat_id_seq', 441, true);
-
-
---
 -- Data for Name: attachments_filetype; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -5253,13 +5795,6 @@ INSERT INTO [[schema]].attachments_filetype VALUES (23, 10, 'prc_submission', 't
 
 
 --
--- Name: attachments_filetype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].attachments_filetype_id_seq', 42, true);
-
-
---
 -- Data for Name: audit_audit; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -5269,13 +5804,6 @@ SELECT pg_catalog.setval('[[schema]].attachments_filetype_id_seq', 42, true);
 -- Data for Name: audit_detailedfindinginfo; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: audit_detailedfindinginfo_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_detailedfindinginfo_id_seq', 1, false);
 
 
 --
@@ -5291,30 +5819,9 @@ SELECT pg_catalog.setval('[[schema]].audit_detailedfindinginfo_id_seq', 1, false
 
 
 --
--- Name: audit_engagement_active_pd_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_engagement_active_pd_id_seq', 1, false);
-
-
---
 -- Data for Name: audit_engagement_authorized_officers; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: audit_engagement_authorized_officers_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_engagement_authorized_officers_id_seq', 1, false);
-
-
---
--- Name: audit_engagement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_engagement_id_seq', 1, false);
 
 
 --
@@ -5324,23 +5831,9 @@ SELECT pg_catalog.setval('[[schema]].audit_engagement_id_seq', 1, false);
 
 
 --
--- Name: audit_engagement_staff_members1_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_engagement_staff_members1_id_seq', 1, false);
-
-
---
 -- Data for Name: audit_financialfinding; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: audit_financialfinding_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_financialfinding_id_seq', 1, false);
 
 
 --
@@ -5350,23 +5843,9 @@ SELECT pg_catalog.setval('[[schema]].audit_financialfinding_id_seq', 1, false);
 
 
 --
--- Name: audit_finding_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_finding_id_seq', 1, false);
-
-
---
 -- Data for Name: audit_keyinternalcontrol; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: audit_keyinternalcontrol_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_keyinternalcontrol_id_seq', 1, false);
 
 
 --
@@ -5379,13 +5858,6 @@ SELECT pg_catalog.setval('[[schema]].audit_keyinternalcontrol_id_seq', 1, false)
 -- Data for Name: audit_risk; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: audit_risk_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_risk_id_seq', 1, false);
 
 
 --
@@ -5512,13 +5984,6 @@ INSERT INTO [[schema]].audit_riskblueprint VALUES (117, 0, 1, false, 'Procuremen
 
 
 --
--- Name: audit_riskblueprint_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_riskblueprint_id_seq', 117, true);
-
-
---
 -- Data for Name: audit_riskcategory; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -5555,13 +6020,6 @@ INSERT INTO [[schema]].audit_riskcategory VALUES (38, 6, 'Procurement', 'default
 
 
 --
--- Name: audit_riskcategory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_riskcategory_id_seq', 38, true);
-
-
---
 -- Data for Name: audit_specialaudit; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -5574,23 +6032,9 @@ SELECT pg_catalog.setval('[[schema]].audit_riskcategory_id_seq', 38, true);
 
 
 --
--- Name: audit_specialauditrecommendation_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_specialauditrecommendation_id_seq', 1, false);
-
-
---
 -- Data for Name: audit_specificprocedure; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: audit_specificprocedure_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].audit_specificprocedure_id_seq', 1, false);
 
 
 --
@@ -5606,23 +6050,9 @@ SELECT pg_catalog.setval('[[schema]].audit_specificprocedure_id_seq', 1, false);
 
 
 --
--- Name: django_comment_flags_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].django_comment_flags_id_seq', 1, false);
-
-
---
 -- Data for Name: django_comments; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: django_comments_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].django_comments_id_seq', 1, false);
 
 
 --
@@ -5924,26 +6354,30 @@ INSERT INTO [[schema]].django_migrations VALUES (540, 'post_office', '0008_attac
 INSERT INTO [[schema]].django_migrations VALUES (541, 'publics', '0006_auto_20190625_1547', '2019-08-03 14:38:33.731584+00');
 INSERT INTO [[schema]].django_migrations VALUES (542, 'purchase_order', '0007_auto_20190625_1437', '2019-08-03 14:38:33.847535+00');
 INSERT INTO [[schema]].django_migrations VALUES (543, 'tpmpartners', '0005_auto_20190625_1437', '2019-08-03 14:38:33.920894+00');
-
-
---
--- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 543, true);
+INSERT INTO [[schema]].django_migrations VALUES (544, 'psea', '0001_initial', '2019-12-15 08:05:43.914036+00');
+INSERT INTO [[schema]].django_migrations VALUES (545, 'psea', '0002_auto_20190820_1618', '2019-12-15 08:05:45.120384+00');
+INSERT INTO [[schema]].django_migrations VALUES (546, 'action_points', '0010_actionpoint_psea_assessment', '2019-12-15 08:05:45.329884+00');
+INSERT INTO [[schema]].django_migrations VALUES (547, 'categories', '0004_auto_20190820_2009', '2019-12-15 08:05:45.495324+00');
+INSERT INTO [[schema]].django_migrations VALUES (548, 'reports', '0018_section_active', '2019-12-15 08:05:45.705107+00');
+INSERT INTO [[schema]].django_migrations VALUES (549, 'management', '0003_sectionhistory', '2019-12-15 08:05:46.03113+00');
+INSERT INTO [[schema]].django_migrations VALUES (550, 'management', '0004_auto_20190715_2047', '2019-12-15 08:05:46.430342+00');
+INSERT INTO [[schema]].django_migrations VALUES (551, 'management', '0005_auto_20190806_1400', '2019-12-15 08:05:46.515211+00');
+INSERT INTO [[schema]].django_migrations VALUES (552, 'psea', '0003_auto_20190826_1416', '2019-12-15 08:05:47.0632+00');
+INSERT INTO [[schema]].django_migrations VALUES (553, 'psea', '0004_assessmentstatushistory_comment', '2019-12-15 08:05:47.24666+00');
+INSERT INTO [[schema]].django_migrations VALUES (554, 'psea', '0005_auto_20190828_1726', '2019-12-15 08:05:47.600145+00');
+INSERT INTO [[schema]].django_migrations VALUES (555, 'psea', '0006_auto_20190829_1227', '2019-12-15 08:05:47.737798+00');
+INSERT INTO [[schema]].django_migrations VALUES (556, 'psea', '0007_auto_20190906_1513', '2019-12-15 08:05:47.868509+00');
+INSERT INTO [[schema]].django_migrations VALUES (557, 'psea', '0008_assessmentactionpoint', '2019-12-15 08:05:47.904646+00');
+INSERT INTO [[schema]].django_migrations VALUES (558, 'psea', '0009_auto_20190917_1128', '2019-12-15 08:05:48.257658+00');
+INSERT INTO [[schema]].django_migrations VALUES (559, 'psea', '0010_indicator_order', '2019-12-15 08:05:48.332775+00');
+INSERT INTO [[schema]].django_migrations VALUES (560, 'psea', '0011_indicator_rating_instructions', '2019-12-15 08:05:48.439892+00');
+INSERT INTO [[schema]].django_migrations VALUES (561, 'reports', '0019_auto_20190816_1609', '2019-12-15 08:05:48.566838+00');
 
 
 --
 -- Data for Name: funds_donor; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: funds_donor_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].funds_donor_id_seq', 1, false);
 
 
 --
@@ -7259,13 +7693,6 @@ INSERT INTO [[schema]].funds_fundscommitmentheader VALUES (234, '2500228112', '0
 INSERT INTO [[schema]].funds_fundscommitmentheader VALUES (1183, '2500232213', '0100310564', '2018-02-06', 'HACT:DCT', 'XAF', '0810/0398 - 882 CSD NUTRITION 2018', '-531.225', NULL, '2018-04-09 17:11:55.537363+00', '2018-05-04 00:02:34.62525+00');
 INSERT INTO [[schema]].funds_fundscommitmentheader VALUES (1190, '2500213985', '0100312123', '2018-03-19', 'HACT:DCT', 'XAF', '0810/0411 - 886 PROTECTION 2018', '-531.225', NULL, '2018-04-18 00:06:12.061371+00', '2018-05-04 00:02:34.645417+00');
 INSERT INTO [[schema]].funds_fundscommitmentheader VALUES (1192, '2500213985', '0100312916', '2018-03-19', 'HACT:DCT', 'XAF', '0810/0411 - 886 PROTECTION 2018', '-531.225', NULL, '2018-04-24 12:22:05.732107+00', '2018-05-04 00:02:34.664721+00');
-
-
---
--- Name: funds_fundscommitmentheader_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].funds_fundscommitmentheader_id_seq', 1309, true);
 
 
 --
@@ -9128,13 +9555,6 @@ INSERT INTO [[schema]].funds_fundscommitmentitem VALUES (1653, '0100309786-1', '
 
 
 --
--- Name: funds_fundscommitmentitem_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].funds_fundscommitmentitem_id_seq', 1854, true);
-
-
---
 -- Data for Name: funds_fundsreservationheader; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -10150,13 +10570,6 @@ INSERT INTO [[schema]].funds_fundsreservationheader VALUES (122, '2500218808', '
 INSERT INTO [[schema]].funds_fundsreservationheader VALUES (327, '2500212820', '0400029114', '2015-03-24', 'Programme Document Against PCA', 'XAF', 'REMBOURSEMENT ONG SIF DERNIERE TRANCHE', '2015-03-24', '2015-04-05', 10473.07, NULL, 10473.07, 0.00, 10473.07, '2018-03-15 16:10:06.407235+00', '2018-10-21 00:02:23.170954+00', 6481635.00, 0.00, 6481635.00, false, false, false);
 INSERT INTO [[schema]].funds_fundsreservationheader VALUES (58, '2500225658', '0400034560', '2015-10-22', 'Programme Document Against PCA', 'XAF', 'REMBOURSEMENT COÛT DIRECT DU PROJET/ADERBA', '2015-10-22', '2015-12-31', 3824.65, NULL, 3824.65, 0.00, 3824.65, '2018-03-15 16:10:06.407235+00', '2018-10-21 00:02:23.328456+00', 2236010.00, 0.00, 2236010.00, false, false, false);
 INSERT INTO [[schema]].funds_fundsreservationheader VALUES (825, '2500213955', '0400036108', '2015-12-07', 'SSFA', 'XAF', 'REMB APPUI SYSTEME PROTECTION SOCIALE DES OEV', '2015-12-07', '2015-12-31', 17863.19, NULL, 17863.19, 0.00, 17863.19, '2018-03-15 16:10:06.407235+00', '2018-10-21 00:02:23.399474+00', 11076181.00, 0.00, 11076181.00, false, false, false);
-
-
---
--- Name: funds_fundsreservationheader_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].funds_fundsreservationheader_id_seq', 1013, true);
 
 
 --
@@ -11729,23 +12142,9 @@ INSERT INTO [[schema]].funds_fundsreservationitem VALUES (493, '0400023942-7', 7
 
 
 --
--- Name: funds_fundsreservationitem_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].funds_fundsreservationitem_id_seq', 1563, true);
-
-
---
 -- Data for Name: funds_grant; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: funds_grant_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].funds_grant_id_seq', 1, false);
 
 
 --
@@ -11754,13 +12153,6 @@ SELECT pg_catalog.setval('[[schema]].funds_grant_id_seq', 1, false);
 
 INSERT INTO [[schema]].hact_aggregatehact VALUES (2, '2019-01-01 04:00:11.154023+00', '2019-04-08 04:00:19.673313+00', 2019, '"{\"assurance_activities\": {\"programmatic_visits\": {\"completed\": 0, \"min_required\": 99}, \"spot_checks\": {\"completed\": 0, \"min_required\": 41, \"follow_up\": 0}, \"scheduled_audit\": 0, \"special_audit\": 0, \"micro_assessment\": 0, \"missing_micro_assessment\": 15}, \"assurance_coverage\": {\"coverage_by_number_of_ips\": [[\"Coverage by number of IPs\", \"Count\"], [\"Without Assurance\", 91], [\"Partially Met Requirements\", 0], [\"Met Requirements\", 0]], \"coverage_by_cash_transfer\": [[\"Coverage by Cash Transfer (USD) (Total)\", \"Count\"], [\"Without Assurance\", 3912520.69], [\"Partially Met Requirements\", 0.0], [\"Met Requirements\", 0.0]], \"table\": [{\"label\": \"Active Partners\", \"value\": 91}, {\"label\": \"IPs without required PV\", \"value\": 64}, {\"label\": \"IPs without required SC\", \"value\": 42}, {\"label\": \"IPs without required assurance\", \"value\": 33}]}, \"financial_findings\": [{\"name\": \"Total Audited Expenditure\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Total Financial Findings\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Refunds\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Additional Supporting Documentation Received\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Justification Provided and Accepted\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Impairment\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Outstanding current year (Requires Follow-up)\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Outstanding prior year\", \"value\": 0.0, \"highlighted\": true}], \"financial_findings_numbers\": [{\"name\": \"Number of High Priority Findings\", \"value\": 0}, {\"name\": \"Number of Medium Priority Findings\", \"value\": 0}, {\"name\": \"Number of Low Priority Findings\", \"value\": 0}, {\"name\": \"Audit Opinion\", \"value\": [{\"name\": \"qualified\", \"value\": 0}, {\"name\": \"unqualified\", \"value\": 0}, {\"name\": \"denial\", \"value\": 0}, {\"name\": \"adverse\", \"value\": 0}]}], \"charts\": {\"cash_transfers_amounts\": [[\"Risk Rating\", \"Not Required\", \"Low\", \"Medium\", \"Significant\", \"High\", \"Number of IPs\"], [\"$0-50,000\", 0.0, 126599.39, 86336.77, 81793.4, 228043.62, 75], [\"$50,001-100,000\", 0.0, 165030.41, 146827.78, 141753.16, 148903.74, 8], [\"$100,001-350,000\", 0.0, 146536.86, 118859.3, 239583.31, 224271.98, 6], [\"$350,001-500,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\">$500,000\", 0.0, 0.0, 0.0, 0.0, 2057980.97, 2]], \"cash_transfers_risk_ratings\": [[\"Risk Rating\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of IPs\"], [\"Not Required\", null, \"#D8D8D8\", 0], [\"Low\", 438166.66, \"#2BB0F2\", 15], [\"Medium\", 352023.85, \"#FECC02\", 13], [\"Significant\", 463129.87, \"#F05656\", 15], [\"High\", 2659200.31, \"#751010\", 48]], \"cash_transfers_partner_type\": [[\"Partner Type\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of Partners\"], [\"CSO\", 720986.74, \"#FECC02\", 38], [\"GOV\", 3191533.95, \"#F05656\", 53]], \"spot_checks_completed\": [[\"Completed by\", \"Count\"], [\"Staff\", 0], [\"Service Providers\", 0]]}}"');
 INSERT INTO [[schema]].hact_aggregatehact VALUES (1, '2018-02-15 19:30:47.116992+00', '2018-12-31 04:00:10.744513+00', 2018, '"{\"assurance_activities\": {\"programmatic_visits\": {\"completed\": 0, \"min_required\": 174}, \"spot_checks\": {\"completed\": 0, \"min_required\": 55, \"follow_up\": 0}, \"scheduled_audit\": 0, \"special_audit\": 0, \"micro_assessment\": 0, \"missing_micro_assessment\": 21}, \"assurance_coverage\": {\"coverage_by_number_of_ips\": [[\"Coverage by number of IPs\", \"Count\"], [\"Without Assurance\", 125], [\"Partially Met Requirements\", 0], [\"Met Requirements\", 0]], \"coverage_by_cash_transfer\": [[\"Coverage by Cash Transfer (USD) (Total)\", \"Count\"], [\"Without Assurance\", 17687781.4], [\"Partially Met Requirements\", 0.0], [\"Met Requirements\", 0.0]], \"table\": [{\"label\": \"Active Partners\", \"value\": 125}, {\"label\": \"IPs without required PV\", \"value\": 106}, {\"label\": \"IPs without required SC\", \"value\": 55}, {\"label\": \"IPs without required assurance\", \"value\": 52}]}, \"financial_findings\": [{\"name\": \"Total Audited Expenditure\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Total Financial Findings\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Refunds\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Additional Supporting Documentation Received\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Justification Provided and Accepted\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Impairment\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Outstanding current year (Requires Follow-up)\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Outstanding prior year\", \"value\": 0.0, \"highlighted\": true}], \"financial_findings_numbers\": [{\"name\": \"Number of High Priority Findings\", \"value\": 0}, {\"name\": \"Number of Medium Priority Findings\", \"value\": 0}, {\"name\": \"Number of Low Priority Findings\", \"value\": 0}, {\"name\": \"Audit Opinion\", \"value\": [{\"name\": \"qualified\", \"value\": 0}, {\"name\": \"unqualified\", \"value\": 0}, {\"name\": \"denial\", \"value\": 0}, {\"name\": \"adverse\", \"value\": 0}]}], \"charts\": {\"cash_transfers_amounts\": [[\"Risk Rating\", \"Not Required\", \"Low\", \"Medium\", \"Significant\", \"High\", \"Number of IPs\"], [\"$0-50,000\", 0.0, 57824.35, 74921.85, 138152.32, 435668.98, 66], [\"$50,001-100,000\", 0.0, 199602.88, 174634.72, 138698.03, 677550.85, 16], [\"$100,001-350,000\", 0.0, 1185031.61, 246623.62, 1026005.53, 2280302.14, 25], [\"$350,001-500,000\", 0.0, 801681.11, 1670641.81, 1112473.22, 0.0, 9], [\">$500,000\", 0.0, 657494.76, 2292416.08, 688583.34, 3829474.2, 9]], \"cash_transfers_risk_ratings\": [[\"Risk Rating\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of IPs\"], [\"Not Required\", 0.0, \"#D8D8D8\", 2], [\"Low\", 2901634.71, \"#2BB0F2\", 16], [\"Medium\", 4459238.08, \"#FECC02\", 21], [\"Significant\", 3103912.44, \"#F05656\", 20], [\"High\", 7222996.17, \"#751010\", 66]], \"cash_transfers_partner_type\": [[\"Partner Type\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of Partners\"], [\"CSO\", 8663176.83, \"#FECC02\", 53], [\"GOV\", 9024604.57, \"#F05656\", 72]], \"spot_checks_completed\": [[\"Completed by\", \"Count\"], [\"Staff\", 0], [\"Service Providers\", 0]]}}"');
-
-
---
--- Name: hact_aggregatehact_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].hact_aggregatehact_id_seq', 2, true);
 
 
 --
@@ -11895,13 +12287,6 @@ INSERT INTO [[schema]].hact_hacthistory VALUES (121, '2018-12-31 13:05:27.612598
 
 
 --
--- Name: hact_hacthistory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].hact_hacthistory_id_seq', 125, true);
-
-
---
 -- Data for Name: locations_cartodbtable; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -11911,26 +12296,12 @@ INSERT INTO [[schema]].locations_cartodbtable VALUES (3, 'eTools', '965fc4960ed7
 
 
 --
--- Name: locations_cartodbtable_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].locations_cartodbtable_id_seq', 3, true);
-
-
---
 -- Data for Name: locations_gatewaytype; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 INSERT INTO [[schema]].locations_gatewaytype VALUES (1, 'Country', 0, '2019-02-07 15:44:49.228112+00', '2019-02-07 15:44:49.329572+00');
 INSERT INTO [[schema]].locations_gatewaytype VALUES (2, 'Region', 1, '2019-02-07 15:44:49.228112+00', '2019-02-07 15:44:49.329572+00');
 INSERT INTO [[schema]].locations_gatewaytype VALUES (3, 'Department', 2, '2019-02-07 15:44:49.228112+00', '2019-02-07 15:44:49.329572+00');
-
-
---
--- Name: locations_gatewaytype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].locations_gatewaytype_id_seq', 3, true);
 
 
 --
@@ -12034,23 +12405,27 @@ INSERT INTO [[schema]].locations_location VALUES (24, 'Wadi Fira', NULL, NULL, '
 
 
 --
--- Name: locations_location_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].locations_location_id_seq', 95, true);
-
-
---
 -- Data for Name: locations_locationremaphistory; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: locations_locationremaphistory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+-- Data for Name: management_sectionhistory; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].locations_locationremaphistory_id_seq', 1, false);
+
+
+--
+-- Data for Name: management_sectionhistory_from_sections; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: management_sectionhistory_to_sections; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
 
 
 --
@@ -12066,43 +12441,15 @@ SELECT pg_catalog.setval('[[schema]].locations_locationremaphistory_id_seq', 1, 
 
 
 --
--- Name: partners_agreement_authorized_officers_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_agreement_authorized_officers_id_seq', 1, false);
-
-
---
--- Name: partners_agreement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_agreement_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_agreementamendment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: partners_agreementamendment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_agreementamendment_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_assessment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_assessment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_assessment_id_seq', 1, false);
 
 
 --
@@ -12567,23 +12914,9 @@ INSERT INTO [[schema]].partners_corevaluesassessment VALUES (455, '2019-04-07 00
 
 
 --
--- Name: partners_corevaluesassessment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_corevaluesassessment_id_seq', 455, true);
-
-
---
 -- Data for Name: partners_directcashtransfer; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_directcashtransfer_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_directcashtransfer_id_seq', 1, false);
 
 
 --
@@ -12600,13 +12933,6 @@ INSERT INTO [[schema]].partners_filetype VALUES (7, 'Other');
 
 
 --
--- Name: partners_filetype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_filetype_id_seq', 7, true);
-
-
---
 -- Data for Name: partners_intervention; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -12619,30 +12945,9 @@ SELECT pg_catalog.setval('[[schema]].partners_filetype_id_seq', 7, true);
 
 
 --
--- Name: partners_intervention_flat_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_intervention_flat_locations_id_seq', 1, false);
-
-
---
--- Name: partners_intervention_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_intervention_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_intervention_offices; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_intervention_offices_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_intervention_offices_id_seq', 1, false);
 
 
 --
@@ -12652,23 +12957,9 @@ SELECT pg_catalog.setval('[[schema]].partners_intervention_offices_id_seq', 1, f
 
 
 --
--- Name: partners_intervention_partner_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_intervention_partner_focal_points_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_intervention_sections; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_intervention_sections_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_intervention_sections_id_seq', 1, false);
 
 
 --
@@ -12678,23 +12969,9 @@ SELECT pg_catalog.setval('[[schema]].partners_intervention_sections_id_seq', 1, 
 
 
 --
--- Name: partners_intervention_unicef_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_intervention_unicef_focal_points_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_interventionamendment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_interventionamendment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_interventionamendment_id_seq', 1, false);
 
 
 --
@@ -12704,23 +12981,9 @@ SELECT pg_catalog.setval('[[schema]].partners_interventionamendment_id_seq', 1, 
 
 
 --
--- Name: partners_interventionattachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_interventionattachment_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_interventionbudget; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_interventionbudget_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_interventionbudget_id_seq', 1, false);
 
 
 --
@@ -12730,23 +12993,9 @@ SELECT pg_catalog.setval('[[schema]].partners_interventionbudget_id_seq', 1, fal
 
 
 --
--- Name: partners_interventionplannedvisits_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_interventionplannedvisits_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_interventionreportingperiod; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_interventionreportingperiod_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_interventionreportingperiod_id_seq', 1, false);
 
 
 --
@@ -12756,23 +13005,9 @@ SELECT pg_catalog.setval('[[schema]].partners_interventionreportingperiod_id_seq
 
 
 --
--- Name: partners_interventionresultlink_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_interventionresultlink_ram_indicators; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_interventionresultlink_ram_indicators_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_ram_indicators_id_seq', 1, false);
 
 
 --
@@ -13224,36 +13459,15 @@ INSERT INTO [[schema]].partners_partnerorganization VALUES (117, 'Civil Society 
 
 
 --
--- Name: partners_partnerorganization_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_partnerorganization_id_seq', 443, true);
-
-
---
 -- Data for Name: partners_partnerplannedvisits; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: partners_partnerplannedvisits_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_partnerplannedvisits_id_seq', 1, false);
-
-
---
 -- Data for Name: partners_partnerstaffmember; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: partners_partnerstaffmember_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_partnerstaffmember_id_seq', 1, false);
 
 
 --
@@ -13705,23 +13919,81 @@ INSERT INTO [[schema]].partners_plannedengagement VALUES (428, '2018-03-15 16:11
 
 
 --
--- Name: partners_plannedengagement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].partners_plannedengagement_id_seq', 442, true);
-
-
---
 -- Data for Name: partners_workspacefiletype; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: partners_workspacefiletype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+-- Data for Name: psea_answer; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].partners_workspacefiletype_id_seq', 1, false);
+
+
+--
+-- Data for Name: psea_answerevidence; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_assessment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_assessment_focal_points; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_assessmentstatushistory; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_assessor; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_assessor_auditor_firm_staff; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_evidence; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_indicator; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_indicator_evidences; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_indicator_ratings; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: psea_rating; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
 
 
 --
@@ -13737,30 +14009,9 @@ SELECT pg_catalog.setval('[[schema]].partners_workspacefiletype_id_seq', 1, fals
 
 
 --
--- Name: reports_appliedindicator_disaggregation_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_appliedindicator_disaggregation_id_seq', 1, false);
-
-
---
--- Name: reports_appliedindicator_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_appliedindicator_id_seq', 1, false);
-
-
---
 -- Data for Name: reports_appliedindicator_locations; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: reports_appliedindicator_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_appliedindicator_locations_id_seq', 1, false);
 
 
 --
@@ -13771,36 +14022,15 @@ INSERT INTO [[schema]].reports_countryprogramme VALUES (73, 'CHAD COUNTRY PROGRA
 
 
 --
--- Name: reports_countryprogramme_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_countryprogramme_id_seq', 73, true);
-
-
---
 -- Data for Name: reports_disaggregation; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: reports_disaggregation_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_disaggregation_id_seq', 1, false);
-
-
---
 -- Data for Name: reports_disaggregationvalue; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: reports_disaggregationvalue_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_disaggregationvalue_id_seq', 1, false);
 
 
 --
@@ -13992,23 +14222,9 @@ INSERT INTO [[schema]].reports_indicator VALUES (79, 'People in humanitarian sit
 
 
 --
--- Name: reports_indicator_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_indicator_id_seq', 182, true);
-
-
---
 -- Data for Name: reports_indicatorblueprint; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: reports_indicatorblueprint_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_indicatorblueprint_id_seq', 1, false);
 
 
 --
@@ -14018,36 +14234,15 @@ SELECT pg_catalog.setval('[[schema]].reports_indicatorblueprint_id_seq', 1, fals
 
 
 --
--- Name: reports_lowerresult_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_lowerresult_id_seq', 1, false);
-
-
---
 -- Data for Name: reports_quarter; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: reports_quarter_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_quarter_id_seq', 1, false);
-
-
---
 -- Data for Name: reports_reportingrequirement; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: reports_reportingrequirement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_reportingrequirement_id_seq', 1, false);
 
 
 --
@@ -14227,13 +14422,6 @@ INSERT INTO [[schema]].reports_result VALUES (22, 'URGENCE, GENRE & BUREAU DE ZO
 
 
 --
--- Name: reports_result_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_result_id_seq', 170, true);
-
-
---
 -- Data for Name: reports_resulttype; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
@@ -14243,36 +14431,22 @@ INSERT INTO [[schema]].reports_resulttype VALUES (3, 'Activity');
 
 
 --
--- Name: reports_resulttype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_resulttype_id_seq', 3, true);
-
-
---
 -- Data for Name: reports_sector; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].reports_sector VALUES (2, 'Communication', NULL, NULL, 'comms', false, NULL, '2018-12-31 17:42:35.489222+00', '2018-12-31 17:42:35.503788+00');
-INSERT INTO [[schema]].reports_sector VALUES (3, 'Urgences', NULL, NULL, 'urg', false, NULL, '2018-12-31 17:42:46.250067+00', '2018-12-31 17:42:46.26369+00');
-INSERT INTO [[schema]].reports_sector VALUES (4, 'Partnership Unit', NULL, NULL, 'Partnership', false, NULL, '2018-12-31 17:43:00.161017+00', '2018-12-31 17:43:00.177114+00');
-INSERT INTO [[schema]].reports_sector VALUES (5, 'ICT', NULL, NULL, 'ict', false, NULL, '2018-12-31 17:43:08.020432+00', '2018-12-31 17:43:08.033953+00');
-INSERT INTO [[schema]].reports_sector VALUES (6, 'Administration', NULL, NULL, 'admin', false, NULL, '2018-12-31 17:43:15.357907+00', '2018-12-31 17:43:15.371073+00');
-INSERT INTO [[schema]].reports_sector VALUES (7, 'Child Survival', NULL, NULL, 'cs', false, NULL, '2018-12-31 17:43:27.993309+00', '2018-12-31 17:43:28.00553+00');
-INSERT INTO [[schema]].reports_sector VALUES (8, 'WASH', NULL, NULL, 'wash', false, NULL, '2018-12-31 17:43:37.559375+00', '2018-12-31 17:43:37.573444+00');
-INSERT INTO [[schema]].reports_sector VALUES (9, 'Education', NULL, NULL, 'edu', false, NULL, '2018-12-31 17:43:43.897149+00', '2018-12-31 17:43:43.909019+00');
-INSERT INTO [[schema]].reports_sector VALUES (10, 'Protection', NULL, NULL, 'prot', false, NULL, '2018-12-31 17:44:30.015947+00', '2018-12-31 17:44:30.028546+00');
-INSERT INTO [[schema]].reports_sector VALUES (11, 'SPPME', NULL, NULL, 'sppme', false, NULL, '2018-12-31 17:44:37.080954+00', '2018-12-31 17:44:37.093304+00');
-INSERT INTO [[schema]].reports_sector VALUES (12, 'Finance', NULL, NULL, 'fnanc', false, NULL, '2018-12-31 17:44:47.273448+00', '2018-12-31 17:44:47.286402+00');
-INSERT INTO [[schema]].reports_sector VALUES (13, 'Supply', NULL, NULL, 'supp', false, NULL, '2018-12-31 17:44:54.810153+00', '2018-12-31 17:44:54.826873+00');
-INSERT INTO [[schema]].reports_sector VALUES (14, 'Ressources Humaines', NULL, NULL, 'rh', false, NULL, '2018-12-31 17:45:09.493387+00', '2018-12-31 17:45:09.505769+00');
-
-
---
--- Name: reports_sector_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_sector_id_seq', 14, true);
+INSERT INTO [[schema]].reports_sector VALUES (2, 'Communication', NULL, NULL, 'comms', false, NULL, '2018-12-31 17:42:35.489222+00', '2018-12-31 17:42:35.503788+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (3, 'Urgences', NULL, NULL, 'urg', false, NULL, '2018-12-31 17:42:46.250067+00', '2018-12-31 17:42:46.26369+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (4, 'Partnership Unit', NULL, NULL, 'Partnership', false, NULL, '2018-12-31 17:43:00.161017+00', '2018-12-31 17:43:00.177114+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (5, 'ICT', NULL, NULL, 'ict', false, NULL, '2018-12-31 17:43:08.020432+00', '2018-12-31 17:43:08.033953+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (6, 'Administration', NULL, NULL, 'admin', false, NULL, '2018-12-31 17:43:15.357907+00', '2018-12-31 17:43:15.371073+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (7, 'Child Survival', NULL, NULL, 'cs', false, NULL, '2018-12-31 17:43:27.993309+00', '2018-12-31 17:43:28.00553+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (8, 'WASH', NULL, NULL, 'wash', false, NULL, '2018-12-31 17:43:37.559375+00', '2018-12-31 17:43:37.573444+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (9, 'Education', NULL, NULL, 'edu', false, NULL, '2018-12-31 17:43:43.897149+00', '2018-12-31 17:43:43.909019+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (10, 'Protection', NULL, NULL, 'prot', false, NULL, '2018-12-31 17:44:30.015947+00', '2018-12-31 17:44:30.028546+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (11, 'SPPME', NULL, NULL, 'sppme', false, NULL, '2018-12-31 17:44:37.080954+00', '2018-12-31 17:44:37.093304+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (12, 'Finance', NULL, NULL, 'fnanc', false, NULL, '2018-12-31 17:44:47.273448+00', '2018-12-31 17:44:47.286402+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (13, 'Supply', NULL, NULL, 'supp', false, NULL, '2018-12-31 17:44:54.810153+00', '2018-12-31 17:44:54.826873+00', true);
+INSERT INTO [[schema]].reports_sector VALUES (14, 'Ressources Humaines', NULL, NULL, 'rh', false, NULL, '2018-12-31 17:45:09.493387+00', '2018-12-31 17:45:09.505769+00', true);
 
 
 --
@@ -14282,23 +14456,9 @@ SELECT pg_catalog.setval('[[schema]].reports_sector_id_seq', 14, true);
 
 
 --
--- Name: reports_specialreportingrequirement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_specialreportingrequirement_id_seq', 1, false);
-
-
---
 -- Data for Name: reports_unit; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: reports_unit_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reports_unit_id_seq', 1, false);
 
 
 --
@@ -14308,50 +14468,15 @@ SELECT pg_catalog.setval('[[schema]].reports_unit_id_seq', 1, false);
 
 
 --
--- Name: reversion_revision_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reversion_revision_id_seq', 1, false);
-
-
---
 -- Data for Name: reversion_version; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: reversion_version_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].reversion_version_id_seq', 1, false);
-
-
---
 -- Data for Name: snapshot_activity; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: snapshot_activity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].snapshot_activity_id_seq', 1, false);
-
-
---
--- Name: t2f_iteneraryitem_airlines_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_airlines_id_seq', 1, false);
-
-
---
--- Name: t2f_iteneraryitem_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_id_seq', 1, false);
 
 
 --
@@ -14373,23 +14498,9 @@ SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_id_seq', 1, false);
 
 
 --
--- Name: t2f_travel_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].t2f_travel_id_seq', 1, false);
-
-
---
 -- Data for Name: t2f_travelactivity; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: t2f_travelactivity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_id_seq', 1, false);
 
 
 --
@@ -14399,36 +14510,15 @@ SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_id_seq', 1, false);
 
 
 --
--- Name: t2f_travelactivity_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_locations_id_seq', 1, false);
-
-
---
 -- Data for Name: t2f_travelactivity_travels; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: t2f_travelactivity_travels_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_travels_id_seq', 1, false);
-
-
---
 -- Data for Name: t2f_travelattachment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: t2f_travelattachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].t2f_travelattachment_id_seq', 1, false);
 
 
 --
@@ -14444,23 +14534,9 @@ SELECT pg_catalog.setval('[[schema]].t2f_travelattachment_id_seq', 1, false);
 
 
 --
--- Name: tpm_tpmactivity_offices_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_offices_id_seq', 1, false);
-
-
---
 -- Data for Name: tpm_tpmactivity_unicef_focal_points; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: tpm_tpmactivity_unicef_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_unicef_focal_points_id_seq', 1, false);
 
 
 --
@@ -14470,36 +14546,15 @@ SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_unicef_focal_points_id_seq'
 
 
 --
--- Name: tpm_tpmvisit_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_id_seq', 1, false);
-
-
---
 -- Data for Name: tpm_tpmvisit_tpm_partner_focal_points; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: tpm_tpmvisit_tpm_partner_focal_points1_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_tpm_partner_focal_points1_id_seq', 1, false);
-
-
---
 -- Data for Name: tpm_tpmvisitreportrejectcomment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: tpm_tpmvisitreportrejectcomment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].tpm_tpmvisitreportrejectcomment_id_seq', 1, false);
 
 
 --
@@ -14950,36 +15005,15 @@ INSERT INTO [[schema]].unicef_attachments_attachment VALUES (317, '2018-03-29 09
 
 
 --
--- Name: unicef_attachments_attachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachment_id_seq', 441, true);
-
-
---
 -- Data for Name: unicef_attachments_attachmentflat; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
 
 --
--- Name: unicef_attachments_attachmentflat_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachmentflat_id_seq', 1, false);
-
-
---
 -- Data for Name: unicef_attachments_attachmentlink; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-
-
---
--- Name: unicef_attachments_attachmentlink_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachmentlink_id_seq', 1, false);
 
 
 --
@@ -15027,16 +15061,786 @@ INSERT INTO [[schema]].unicef_attachments_filetype VALUES (33, 0, 'overall_repor
 
 
 --
+-- Data for Name: unicef_snapshot_activity; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Name: action_points_actionpoint_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].action_points_actionpoint_id_seq', 1, false);
+
+
+--
+-- Name: activities_activity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].activities_activity_id_seq', 1, false);
+
+
+--
+-- Name: activities_activity_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].activities_activity_locations_id_seq', 1, false);
+
+
+--
+-- Name: actstream_action_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].actstream_action_id_seq', 1, false);
+
+
+--
+-- Name: actstream_follow_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].actstream_follow_id_seq', 1, false);
+
+
+--
+-- Name: attachments_attachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].attachments_attachment_id_seq', 438, true);
+
+
+--
+-- Name: attachments_attachmentflat_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].attachments_attachmentflat_id_seq', 441, true);
+
+
+--
+-- Name: attachments_filetype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].attachments_filetype_id_seq', 42, true);
+
+
+--
+-- Name: audit_detailedfindinginfo_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_detailedfindinginfo_id_seq', 1, false);
+
+
+--
+-- Name: audit_engagement_active_pd_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_engagement_active_pd_id_seq', 1, false);
+
+
+--
+-- Name: audit_engagement_authorized_officers_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_engagement_authorized_officers_id_seq', 1, false);
+
+
+--
+-- Name: audit_engagement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_engagement_id_seq', 1, false);
+
+
+--
+-- Name: audit_engagement_staff_members1_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_engagement_staff_members1_id_seq', 1, false);
+
+
+--
+-- Name: audit_financialfinding_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_financialfinding_id_seq', 1, false);
+
+
+--
+-- Name: audit_finding_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_finding_id_seq', 1, false);
+
+
+--
+-- Name: audit_keyinternalcontrol_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_keyinternalcontrol_id_seq', 1, false);
+
+
+--
+-- Name: audit_risk_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_risk_id_seq', 1, false);
+
+
+--
+-- Name: audit_riskblueprint_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_riskblueprint_id_seq', 117, true);
+
+
+--
+-- Name: audit_riskcategory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_riskcategory_id_seq', 38, true);
+
+
+--
+-- Name: audit_specialauditrecommendation_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_specialauditrecommendation_id_seq', 1, false);
+
+
+--
+-- Name: audit_specificprocedure_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_specificprocedure_id_seq', 1, false);
+
+
+--
+-- Name: django_comment_flags_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].django_comment_flags_id_seq', 1, false);
+
+
+--
+-- Name: django_comments_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].django_comments_id_seq', 1, false);
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 561, true);
+
+
+--
+-- Name: funds_donor_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].funds_donor_id_seq', 1, false);
+
+
+--
+-- Name: funds_fundscommitmentheader_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].funds_fundscommitmentheader_id_seq', 1309, true);
+
+
+--
+-- Name: funds_fundscommitmentitem_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].funds_fundscommitmentitem_id_seq', 1854, true);
+
+
+--
+-- Name: funds_fundsreservationheader_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].funds_fundsreservationheader_id_seq', 1013, true);
+
+
+--
+-- Name: funds_fundsreservationitem_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].funds_fundsreservationitem_id_seq', 1563, true);
+
+
+--
+-- Name: funds_grant_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].funds_grant_id_seq', 1, false);
+
+
+--
+-- Name: hact_aggregatehact_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].hact_aggregatehact_id_seq', 2, true);
+
+
+--
+-- Name: hact_hacthistory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].hact_hacthistory_id_seq', 125, true);
+
+
+--
+-- Name: locations_cartodbtable_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].locations_cartodbtable_id_seq', 3, true);
+
+
+--
+-- Name: locations_gatewaytype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].locations_gatewaytype_id_seq', 3, true);
+
+
+--
+-- Name: locations_location_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].locations_location_id_seq', 95, true);
+
+
+--
+-- Name: locations_locationremaphistory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].locations_locationremaphistory_id_seq', 1, false);
+
+
+--
+-- Name: management_sectionhistory_from_sections_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].management_sectionhistory_from_sections_id_seq', 1, false);
+
+
+--
+-- Name: management_sectionhistory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].management_sectionhistory_id_seq', 1, false);
+
+
+--
+-- Name: management_sectionhistory_to_sections_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].management_sectionhistory_to_sections_id_seq', 1, false);
+
+
+--
+-- Name: partners_agreement_authorized_officers_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_agreement_authorized_officers_id_seq', 1, false);
+
+
+--
+-- Name: partners_agreement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_agreement_id_seq', 1, false);
+
+
+--
+-- Name: partners_agreementamendment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_agreementamendment_id_seq', 1, false);
+
+
+--
+-- Name: partners_assessment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_assessment_id_seq', 1, false);
+
+
+--
+-- Name: partners_corevaluesassessment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_corevaluesassessment_id_seq', 455, true);
+
+
+--
+-- Name: partners_directcashtransfer_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_directcashtransfer_id_seq', 1, false);
+
+
+--
+-- Name: partners_filetype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_filetype_id_seq', 7, true);
+
+
+--
+-- Name: partners_intervention_flat_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_intervention_flat_locations_id_seq', 1, false);
+
+
+--
+-- Name: partners_intervention_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_intervention_id_seq', 1, false);
+
+
+--
+-- Name: partners_intervention_offices_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_intervention_offices_id_seq', 1, false);
+
+
+--
+-- Name: partners_intervention_partner_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_intervention_partner_focal_points_id_seq', 1, false);
+
+
+--
+-- Name: partners_intervention_sections_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_intervention_sections_id_seq', 1, false);
+
+
+--
+-- Name: partners_intervention_unicef_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_intervention_unicef_focal_points_id_seq', 1, false);
+
+
+--
+-- Name: partners_interventionamendment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_interventionamendment_id_seq', 1, false);
+
+
+--
+-- Name: partners_interventionattachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_interventionattachment_id_seq', 1, false);
+
+
+--
+-- Name: partners_interventionbudget_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_interventionbudget_id_seq', 1, false);
+
+
+--
+-- Name: partners_interventionplannedvisits_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_interventionplannedvisits_id_seq', 1, false);
+
+
+--
+-- Name: partners_interventionreportingperiod_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_interventionreportingperiod_id_seq', 1, false);
+
+
+--
+-- Name: partners_interventionresultlink_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_id_seq', 1, false);
+
+
+--
+-- Name: partners_interventionresultlink_ram_indicators_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_ram_indicators_id_seq', 1, false);
+
+
+--
+-- Name: partners_partnerorganization_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_partnerorganization_id_seq', 443, true);
+
+
+--
+-- Name: partners_partnerplannedvisits_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_partnerplannedvisits_id_seq', 1, false);
+
+
+--
+-- Name: partners_partnerstaffmember_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_partnerstaffmember_id_seq', 1, false);
+
+
+--
+-- Name: partners_plannedengagement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_plannedengagement_id_seq', 442, true);
+
+
+--
+-- Name: partners_workspacefiletype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].partners_workspacefiletype_id_seq', 1, false);
+
+
+--
+-- Name: psea_answer_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_answer_id_seq', 1, false);
+
+
+--
+-- Name: psea_answerevidence_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_answerevidence_id_seq', 1, false);
+
+
+--
+-- Name: psea_assessment_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_assessment_focal_points_id_seq', 1, false);
+
+
+--
+-- Name: psea_assessment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_assessment_id_seq', 1, false);
+
+
+--
+-- Name: psea_assessmentstatushistory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_assessmentstatushistory_id_seq', 1, false);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_assessor_auditor_firm_staff_id_seq', 1, false);
+
+
+--
+-- Name: psea_assessor_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_assessor_id_seq', 1, false);
+
+
+--
+-- Name: psea_evidence_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_evidence_id_seq', 1, false);
+
+
+--
+-- Name: psea_indicator_evidences_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_indicator_evidences_id_seq', 1, false);
+
+
+--
+-- Name: psea_indicator_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_indicator_id_seq', 1, false);
+
+
+--
+-- Name: psea_indicator_ratings_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_indicator_ratings_id_seq', 1, false);
+
+
+--
+-- Name: psea_rating_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].psea_rating_id_seq', 1, false);
+
+
+--
+-- Name: reports_appliedindicator_disaggregation_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_appliedindicator_disaggregation_id_seq', 1, false);
+
+
+--
+-- Name: reports_appliedindicator_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_appliedindicator_id_seq', 1, false);
+
+
+--
+-- Name: reports_appliedindicator_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_appliedindicator_locations_id_seq', 1, false);
+
+
+--
+-- Name: reports_countryprogramme_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_countryprogramme_id_seq', 73, true);
+
+
+--
+-- Name: reports_disaggregation_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_disaggregation_id_seq', 1, false);
+
+
+--
+-- Name: reports_disaggregationvalue_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_disaggregationvalue_id_seq', 1, false);
+
+
+--
+-- Name: reports_indicator_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_indicator_id_seq', 182, true);
+
+
+--
+-- Name: reports_indicatorblueprint_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_indicatorblueprint_id_seq', 1, false);
+
+
+--
+-- Name: reports_lowerresult_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_lowerresult_id_seq', 1, false);
+
+
+--
+-- Name: reports_quarter_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_quarter_id_seq', 1, false);
+
+
+--
+-- Name: reports_reportingrequirement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_reportingrequirement_id_seq', 1, false);
+
+
+--
+-- Name: reports_result_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_result_id_seq', 170, true);
+
+
+--
+-- Name: reports_resulttype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_resulttype_id_seq', 3, true);
+
+
+--
+-- Name: reports_sector_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_sector_id_seq', 14, true);
+
+
+--
+-- Name: reports_specialreportingrequirement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_specialreportingrequirement_id_seq', 1, false);
+
+
+--
+-- Name: reports_unit_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_unit_id_seq', 1, false);
+
+
+--
+-- Name: reversion_revision_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reversion_revision_id_seq', 1, false);
+
+
+--
+-- Name: reversion_version_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reversion_version_id_seq', 1, false);
+
+
+--
+-- Name: snapshot_activity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].snapshot_activity_id_seq', 1, false);
+
+
+--
+-- Name: t2f_iteneraryitem_airlines_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_airlines_id_seq', 1, false);
+
+
+--
+-- Name: t2f_iteneraryitem_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_id_seq', 1, false);
+
+
+--
+-- Name: t2f_travel_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].t2f_travel_id_seq', 1, false);
+
+
+--
+-- Name: t2f_travelactivity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_id_seq', 1, false);
+
+
+--
+-- Name: t2f_travelactivity_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_locations_id_seq', 1, false);
+
+
+--
+-- Name: t2f_travelactivity_travels_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_travels_id_seq', 1, false);
+
+
+--
+-- Name: t2f_travelattachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].t2f_travelattachment_id_seq', 1, false);
+
+
+--
+-- Name: tpm_tpmactivity_offices_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_offices_id_seq', 1, false);
+
+
+--
+-- Name: tpm_tpmactivity_unicef_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_unicef_focal_points_id_seq', 1, false);
+
+
+--
+-- Name: tpm_tpmvisit_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_id_seq', 1, false);
+
+
+--
+-- Name: tpm_tpmvisit_tpm_partner_focal_points1_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_tpm_partner_focal_points1_id_seq', 1, false);
+
+
+--
+-- Name: tpm_tpmvisitreportrejectcomment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].tpm_tpmvisitreportrejectcomment_id_seq', 1, false);
+
+
+--
+-- Name: unicef_attachments_attachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachment_id_seq', 441, true);
+
+
+--
+-- Name: unicef_attachments_attachmentflat_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachmentflat_id_seq', 1, false);
+
+
+--
+-- Name: unicef_attachments_attachmentlink_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachmentlink_id_seq', 1, false);
+
+
+--
 -- Name: unicef_attachments_filetype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
 SELECT pg_catalog.setval('[[schema]].unicef_attachments_filetype_id_seq', 45, true);
-
-
---
--- Data for Name: unicef_snapshot_activity; Type: TABLE DATA; Schema: [[schema]]; Owner: -
---
-
 
 
 --
@@ -15519,6 +16323,46 @@ ALTER TABLE ONLY [[schema]].locations_locationremaphistory
 
 
 --
+-- Name: management_sectionhistory_to_sections management_sectionhistor_sectionhistory_id_sectio_4b778c91_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_to_sections
+    ADD CONSTRAINT management_sectionhistor_sectionhistory_id_sectio_4b778c91_uniq UNIQUE (sectionhistory_id, section_id);
+
+
+--
+-- Name: management_sectionhistory_from_sections management_sectionhistor_sectionhistory_id_sectio_74d7be56_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_from_sections
+    ADD CONSTRAINT management_sectionhistor_sectionhistory_id_sectio_74d7be56_uniq UNIQUE (sectionhistory_id, section_id);
+
+
+--
+-- Name: management_sectionhistory_from_sections management_sectionhistory_from_sections_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_from_sections
+    ADD CONSTRAINT management_sectionhistory_from_sections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_sectionhistory management_sectionhistory_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory
+    ADD CONSTRAINT management_sectionhistory_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_sectionhistory_to_sections management_sectionhistory_to_sections_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_to_sections
+    ADD CONSTRAINT management_sectionhistory_to_sections_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: partners_agreement partners_agreement_agreement_number_05f1f99e_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -15860,6 +16704,158 @@ ALTER TABLE ONLY [[schema]].partners_workspacefiletype
 
 ALTER TABLE ONLY [[schema]].partners_workspacefiletype
     ADD CONSTRAINT partners_workspacefiletype_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_answer psea_answer_assessment_id_indicator_id_61b229da_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answer
+    ADD CONSTRAINT psea_answer_assessment_id_indicator_id_61b229da_uniq UNIQUE (assessment_id, indicator_id);
+
+
+--
+-- Name: psea_answer psea_answer_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answer
+    ADD CONSTRAINT psea_answer_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_answerevidence psea_answerevidence_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answerevidence
+    ADD CONSTRAINT psea_answerevidence_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_assessment_focal_points psea_assessment_focal_po_assessment_id_user_id_1e0f0ce2_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment_focal_points
+    ADD CONSTRAINT psea_assessment_focal_po_assessment_id_user_id_1e0f0ce2_uniq UNIQUE (assessment_id, user_id);
+
+
+--
+-- Name: psea_assessment_focal_points psea_assessment_focal_points_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment_focal_points
+    ADD CONSTRAINT psea_assessment_focal_points_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_assessment psea_assessment_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment
+    ADD CONSTRAINT psea_assessment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_assessment psea_assessment_reference_number_key; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment
+    ADD CONSTRAINT psea_assessment_reference_number_key UNIQUE (reference_number);
+
+
+--
+-- Name: psea_assessmentstatushistory psea_assessmentstatushistory_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessmentstatushistory
+    ADD CONSTRAINT psea_assessmentstatushistory_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_assessor psea_assessor_assessment_id_2b2a4617_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor
+    ADD CONSTRAINT psea_assessor_assessment_id_2b2a4617_uniq UNIQUE (assessment_id);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff psea_assessor_auditor_fi_assessor_id_auditorstaff_c34b4b5a_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor_auditor_firm_staff
+    ADD CONSTRAINT psea_assessor_auditor_fi_assessor_id_auditorstaff_c34b4b5a_uniq UNIQUE (assessor_id, auditorstaffmember_id);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff psea_assessor_auditor_firm_staff_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor_auditor_firm_staff
+    ADD CONSTRAINT psea_assessor_auditor_firm_staff_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_assessor psea_assessor_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor
+    ADD CONSTRAINT psea_assessor_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_evidence psea_evidence_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_evidence
+    ADD CONSTRAINT psea_evidence_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_indicator_evidences psea_indicator_evidences_indicator_id_evidence_id_d7518b1e_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_evidences
+    ADD CONSTRAINT psea_indicator_evidences_indicator_id_evidence_id_d7518b1e_uniq UNIQUE (indicator_id, evidence_id);
+
+
+--
+-- Name: psea_indicator_evidences psea_indicator_evidences_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_evidences
+    ADD CONSTRAINT psea_indicator_evidences_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_indicator psea_indicator_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator
+    ADD CONSTRAINT psea_indicator_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_indicator_ratings psea_indicator_ratings_indicator_id_rating_id_48b889c2_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_ratings
+    ADD CONSTRAINT psea_indicator_ratings_indicator_id_rating_id_48b889c2_uniq UNIQUE (indicator_id, rating_id);
+
+
+--
+-- Name: psea_indicator_ratings psea_indicator_ratings_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_ratings
+    ADD CONSTRAINT psea_indicator_ratings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: psea_rating psea_rating_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_rating
+    ADD CONSTRAINT psea_rating_pkey PRIMARY KEY (id);
 
 
 --
@@ -16410,6 +17406,13 @@ CREATE INDEX action_points_actionpoint_ea71e3b4 ON [[schema]].action_points_acti
 
 
 --
+-- Name: action_points_actionpoint_psea_assessment_id_008f62ed; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX action_points_actionpoint_psea_assessment_id_008f62ed ON [[schema]].action_points_actionpoint USING btree (psea_assessment_id);
+
+
+--
 -- Name: activities_activity_123a1ce7; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -16956,6 +17959,34 @@ CREATE INDEX locations_locationremaphistory_75232422 ON [[schema]].locations_loc
 
 
 --
+-- Name: management_sectionhistory__sectionhistory_id_14da1398; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX management_sectionhistory__sectionhistory_id_14da1398 ON [[schema]].management_sectionhistory_from_sections USING btree (sectionhistory_id);
+
+
+--
+-- Name: management_sectionhistory__sectionhistory_id_1c5970f0; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX management_sectionhistory__sectionhistory_id_1c5970f0 ON [[schema]].management_sectionhistory_to_sections USING btree (sectionhistory_id);
+
+
+--
+-- Name: management_sectionhistory_from_sections_section_id_63218348; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX management_sectionhistory_from_sections_section_id_63218348 ON [[schema]].management_sectionhistory_from_sections USING btree (section_id);
+
+
+--
+-- Name: management_sectionhistory_to_sections_section_id_78674036; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX management_sectionhistory_to_sections_section_id_78674036 ON [[schema]].management_sectionhistory_to_sections USING btree (section_id);
+
+
+--
 -- Name: partners_agreement_031ba7c4; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -17254,6 +18285,139 @@ CREATE INDEX partners_partnerstaffmember_email_8d2411ec_like ON [[schema]].partn
 --
 
 CREATE INDEX partners_workspacefiletype_name_0247fb9d_like ON [[schema]].partners_workspacefiletype USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: psea_answer_assessment_id_6aa9c055; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_answer_assessment_id_6aa9c055 ON [[schema]].psea_answer USING btree (assessment_id);
+
+
+--
+-- Name: psea_answer_indicator_id_ecea3283; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_answer_indicator_id_ecea3283 ON [[schema]].psea_answer USING btree (indicator_id);
+
+
+--
+-- Name: psea_answer_rating_id_8ef569c6; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_answer_rating_id_8ef569c6 ON [[schema]].psea_answer USING btree (rating_id);
+
+
+--
+-- Name: psea_answerevidence_answer_id_6b338695; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_answerevidence_answer_id_6b338695 ON [[schema]].psea_answerevidence USING btree (answer_id);
+
+
+--
+-- Name: psea_answerevidence_evidence_id_aed22674; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_answerevidence_evidence_id_aed22674 ON [[schema]].psea_answerevidence USING btree (evidence_id);
+
+
+--
+-- Name: psea_assessment_focal_points_assessment_id_a84d89b6; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessment_focal_points_assessment_id_a84d89b6 ON [[schema]].psea_assessment_focal_points USING btree (assessment_id);
+
+
+--
+-- Name: psea_assessment_focal_points_user_id_9f076320; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessment_focal_points_user_id_9f076320 ON [[schema]].psea_assessment_focal_points USING btree (user_id);
+
+
+--
+-- Name: psea_assessment_partner_id_9dbaf33e; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessment_partner_id_9dbaf33e ON [[schema]].psea_assessment USING btree (partner_id);
+
+
+--
+-- Name: psea_assessment_reference_number_eab738fa_like; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessment_reference_number_eab738fa_like ON [[schema]].psea_assessment USING btree (reference_number varchar_pattern_ops);
+
+
+--
+-- Name: psea_assessmentstatushistory_assessment_id_3e2f1fc6; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessmentstatushistory_assessment_id_3e2f1fc6 ON [[schema]].psea_assessmentstatushistory USING btree (assessment_id);
+
+
+--
+-- Name: psea_assessor_auditor_firm_id_790026af; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessor_auditor_firm_id_790026af ON [[schema]].psea_assessor USING btree (auditor_firm_id);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff_assessor_id_22a90dde; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessor_auditor_firm_staff_assessor_id_22a90dde ON [[schema]].psea_assessor_auditor_firm_staff USING btree (assessor_id);
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff_auditorstaffmember_id_0b02b70a; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessor_auditor_firm_staff_auditorstaffmember_id_0b02b70a ON [[schema]].psea_assessor_auditor_firm_staff USING btree (auditorstaffmember_id);
+
+
+--
+-- Name: psea_assessor_user_id_0248e8cb; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_assessor_user_id_0248e8cb ON [[schema]].psea_assessor USING btree (user_id);
+
+
+--
+-- Name: psea_indicator_evidences_evidence_id_70cd172f; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_indicator_evidences_evidence_id_70cd172f ON [[schema]].psea_indicator_evidences USING btree (evidence_id);
+
+
+--
+-- Name: psea_indicator_evidences_indicator_id_c507443f; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_indicator_evidences_indicator_id_c507443f ON [[schema]].psea_indicator_evidences USING btree (indicator_id);
+
+
+--
+-- Name: psea_indicator_order_f539854c; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_indicator_order_f539854c ON [[schema]].psea_indicator USING btree ("order");
+
+
+--
+-- Name: psea_indicator_ratings_indicator_id_4ff28562; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_indicator_ratings_indicator_id_4ff28562 ON [[schema]].psea_indicator_ratings USING btree (indicator_id);
+
+
+--
+-- Name: psea_indicator_ratings_rating_id_66cd912f; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX psea_indicator_ratings_rating_id_66cd912f ON [[schema]].psea_indicator_ratings USING btree (rating_id);
 
 
 --
@@ -17907,6 +19071,14 @@ ALTER TABLE ONLY [[schema]].action_points_actionpoint
 
 
 --
+-- Name: action_points_actionpoint action_points_action_psea_assessment_id_008f62ed_fk_psea_asse; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].action_points_actionpoint
+    ADD CONSTRAINT action_points_action_psea_assessment_id_008f62ed_fk_psea_asse FOREIGN KEY (psea_assessment_id) REFERENCES [[schema]].psea_assessment(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: action_points_actionpoint action_points_action_travel_activity_id_67662b24_fk_t2f_trave; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -18371,6 +19543,38 @@ ALTER TABLE ONLY [[schema]].locations_cartodbtable
 
 
 --
+-- Name: management_sectionhistory_from_sections management_sectionhi_section_id_63218348_fk_reports_s; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_from_sections
+    ADD CONSTRAINT management_sectionhi_section_id_63218348_fk_reports_s FOREIGN KEY (section_id) REFERENCES [[schema]].reports_sector(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_sectionhistory_to_sections management_sectionhi_section_id_78674036_fk_reports_s; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_to_sections
+    ADD CONSTRAINT management_sectionhi_section_id_78674036_fk_reports_s FOREIGN KEY (section_id) REFERENCES [[schema]].reports_sector(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_sectionhistory_from_sections management_sectionhi_sectionhistory_id_14da1398_fk_managemen; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_from_sections
+    ADD CONSTRAINT management_sectionhi_sectionhistory_id_14da1398_fk_managemen FOREIGN KEY (sectionhistory_id) REFERENCES [[schema]].management_sectionhistory(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_sectionhistory_to_sections management_sectionhi_sectionhistory_id_1c5970f0_fk_managemen; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].management_sectionhistory_to_sections
+    ADD CONSTRAINT management_sectionhi_sectionhistory_id_1c5970f0_fk_managemen FOREIGN KEY (sectionhistory_id) REFERENCES [[schema]].management_sectionhistory(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: partners_agreement p_partner_manager_id_e11fff68_fk_partners_partnerstaffmember_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -18640,6 +19844,150 @@ ALTER TABLE ONLY [[schema]].partners_partnerstaffmember
 
 ALTER TABLE ONLY [[schema]].partners_partnerplannedvisits
     ADD CONSTRAINT partners_partner_id_dde73d25_fk_partners_partnerorganization_id FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_answer psea_answer_assessment_id_6aa9c055_fk_psea_assessment_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answer
+    ADD CONSTRAINT psea_answer_assessment_id_6aa9c055_fk_psea_assessment_id FOREIGN KEY (assessment_id) REFERENCES [[schema]].psea_assessment(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_answer psea_answer_indicator_id_ecea3283_fk_psea_indicator_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answer
+    ADD CONSTRAINT psea_answer_indicator_id_ecea3283_fk_psea_indicator_id FOREIGN KEY (indicator_id) REFERENCES [[schema]].psea_indicator(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_answer psea_answer_rating_id_8ef569c6_fk_psea_rating_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answer
+    ADD CONSTRAINT psea_answer_rating_id_8ef569c6_fk_psea_rating_id FOREIGN KEY (rating_id) REFERENCES [[schema]].psea_rating(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_answerevidence psea_answerevidence_answer_id_6b338695_fk_psea_answer_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answerevidence
+    ADD CONSTRAINT psea_answerevidence_answer_id_6b338695_fk_psea_answer_id FOREIGN KEY (answer_id) REFERENCES [[schema]].psea_answer(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_answerevidence psea_answerevidence_evidence_id_aed22674_fk_psea_evidence_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_answerevidence
+    ADD CONSTRAINT psea_answerevidence_evidence_id_aed22674_fk_psea_evidence_id FOREIGN KEY (evidence_id) REFERENCES [[schema]].psea_evidence(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessment_focal_points psea_assessment_foca_assessment_id_a84d89b6_fk_psea_asse; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment_focal_points
+    ADD CONSTRAINT psea_assessment_foca_assessment_id_a84d89b6_fk_psea_asse FOREIGN KEY (assessment_id) REFERENCES [[schema]].psea_assessment(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessment_focal_points psea_assessment_focal_points_user_id_9f076320_fk_auth_user_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment_focal_points
+    ADD CONSTRAINT psea_assessment_focal_points_user_id_9f076320_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessment psea_assessment_partner_id_9dbaf33e_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessment
+    ADD CONSTRAINT psea_assessment_partner_id_9dbaf33e_fk_partners_ FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessmentstatushistory psea_assessmentstatu_assessment_id_3e2f1fc6_fk_psea_asse; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessmentstatushistory
+    ADD CONSTRAINT psea_assessmentstatu_assessment_id_3e2f1fc6_fk_psea_asse FOREIGN KEY (assessment_id) REFERENCES [[schema]].psea_assessment(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessor psea_assessor_assessment_id_2b2a4617_fk_psea_assessment_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor
+    ADD CONSTRAINT psea_assessor_assessment_id_2b2a4617_fk_psea_assessment_id FOREIGN KEY (assessment_id) REFERENCES [[schema]].psea_assessment(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff psea_assessor_audito_assessor_id_22a90dde_fk_psea_asse; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor_auditor_firm_staff
+    ADD CONSTRAINT psea_assessor_audito_assessor_id_22a90dde_fk_psea_asse FOREIGN KEY (assessor_id) REFERENCES [[schema]].psea_assessor(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessor_auditor_firm_staff psea_assessor_audito_auditorstaffmember_i_0b02b70a_fk_purchase_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor_auditor_firm_staff
+    ADD CONSTRAINT psea_assessor_audito_auditorstaffmember_i_0b02b70a_fk_purchase_ FOREIGN KEY (auditorstaffmember_id) REFERENCES public.purchase_order_auditorstaffmember(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessor psea_assessor_auditor_firm_id_790026af_fk_purchase_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor
+    ADD CONSTRAINT psea_assessor_auditor_firm_id_790026af_fk_purchase_ FOREIGN KEY (auditor_firm_id) REFERENCES public.purchase_order_auditorfirm(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_assessor psea_assessor_user_id_0248e8cb_fk_auth_user_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_assessor
+    ADD CONSTRAINT psea_assessor_user_id_0248e8cb_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_indicator_evidences psea_indicator_evide_evidence_id_70cd172f_fk_psea_evid; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_evidences
+    ADD CONSTRAINT psea_indicator_evide_evidence_id_70cd172f_fk_psea_evid FOREIGN KEY (evidence_id) REFERENCES [[schema]].psea_evidence(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_indicator_evidences psea_indicator_evide_indicator_id_c507443f_fk_psea_indi; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_evidences
+    ADD CONSTRAINT psea_indicator_evide_indicator_id_c507443f_fk_psea_indi FOREIGN KEY (indicator_id) REFERENCES [[schema]].psea_indicator(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_indicator_ratings psea_indicator_ratin_indicator_id_4ff28562_fk_psea_indi; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_ratings
+    ADD CONSTRAINT psea_indicator_ratin_indicator_id_4ff28562_fk_psea_indi FOREIGN KEY (indicator_id) REFERENCES [[schema]].psea_indicator(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: psea_indicator_ratings psea_indicator_ratings_rating_id_66cd912f_fk_psea_rating_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].psea_indicator_ratings
+    ADD CONSTRAINT psea_indicator_ratings_rating_id_66cd912f_fk_psea_rating_id FOREIGN KEY (rating_id) REFERENCES [[schema]].psea_rating(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

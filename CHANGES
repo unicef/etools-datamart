@@ -7,6 +7,7 @@
 * new engagement-findings endpoint - ticket #17372
 * new endpoint audit/spotcheck - ticket #16739
 * new endpoint prp/data-report - ticket #16971
+* updates schema to eTools 7.4
 
 
 2.8
