@@ -240,50 +240,45 @@ input.input100 {
     height: 400px; }
 
 .profile #areas {
-  width: 200px; }
+  width: 18%; }
 
 .profile #services {
-  width: 450px; }
+  width: 40%; }
 
-.profile #menu {
-  width: 170px; }
-  .profile #menu ul {
-    text-align: left;
+.profile #password {
+  width: 40%; }
+  .profile #password ul {
     overflow-y: hidden;
-    padding: 5px; }
-
-.profile #password .message {
-  margin: 20px;
-  text-align: left; }
-  .profile #password .message .password {
-    text-align: center;
-    padding: 20px;
-    font-family: monospace;
-    font-size: 20px;
-    border: 1px solid grey; }
-
-.profile #password form {
-  width: 400px;
-  overflow-y: auto;
-  text-align: center; }
-
-.profile #password .btn {
-  justify-content: center;
-  align-items: center;
-  padding: 0 20px;
-  height: 40px;
-  border-radius: 3px;
-  font-size: 12px;
-  color: black;
-  line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  -webkit-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  transition: all 0.4s;
-  cursor: pointer; }
-
-.profile #password .btn-submit {
-  background: #4bace9;
-  color: #ffffff; }
+    overflow-x: hidden; }
+  .profile #password .message {
+    margin: 20px;
+    text-align: left; }
+    .profile #password .message .password {
+      text-align: center;
+      padding: 20px;
+      font-family: monospace;
+      font-size: 20px;
+      border: 1px solid grey; }
+  .profile #password form {
+    width: 400px;
+    overflow-y: auto;
+    text-align: center; }
+  .profile #password .btn {
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+    height: 40px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: black;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    -webkit-transition: all 0.4s;
+    -o-transition: all 0.4s;
+    -moz-transition: all 0.4s;
+    transition: all 0.4s;
+    cursor: pointer; }
+  .profile #password .btn-submit {
+    background: #4bace9;
+    color: #ffffff; }
