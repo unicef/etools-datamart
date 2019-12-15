@@ -42,8 +42,8 @@ WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
-    && pip install pip poetry \
-    && poetry config settings.virtualenvs.create false \
+    && pip install pip poetry==1.0 \
+    && poetry config virtualenvs.create false \
     && poetry install --no-dev \
     && sha1sum poetry.lock > /CHECKSUM
 
