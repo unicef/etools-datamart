@@ -52,6 +52,7 @@ from django.utils import timezone
 
 from crashlog.middleware import process_exception
 from redis.exceptions import LockError
+from strategy_field.utils import get_attr
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
@@ -266,7 +267,7 @@ class DataReportLoader(PrpBaseLoader):
         return ", ".join([l['name'] for l in locs])
 
     def get_submitted_by(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-        user = record.indicator_report.progress_report.submitted_by
+        user = get_attr(record, 'indicator_report.progress_report.submitted_by')
         if user:
             return "%s %s (%s)" % (user.first_name, user.last_name, user.email)
 
