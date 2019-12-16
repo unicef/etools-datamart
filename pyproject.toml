@@ -6,7 +6,6 @@ authors = ["sax <s.apostolico@gmail.com>"]
 
 [tool.poetry.dependencies]
 admin-extra-urls = "^2.1"
-bump2version = "*"
 celery = "*"
 circus = "*"
 cryptography = "==2.7"
@@ -21,7 +20,6 @@ django-cors-headers = "*"
 django-countries = "*"
 django-crashlog = "*"
 django-crispy-forms = "*"
-django-db-logging = "*"
 django-dbtemplates = "*"
 django-deprecate-fields = "*"
 django-environ = "*"

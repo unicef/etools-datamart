@@ -27,11 +27,6 @@ elif [[ "$*" == "beat" ]];then
             $CELERY_EXTRA \
             --loglevel=${CELERY_LOGLEVEL} \
             --pidfile run/celerybeat.pid
-
-elif [[ "$*" == "w2" ]];then
-    django-admin db-isready --wait --timeout 60
-    exec gosu datamart circusd /etc/circus.conf --log-output=-
-
 elif [[ "$*" == "datamart" ]];then
     rm -f /var/datamart/run/*
 
@@ -41,6 +36,7 @@ elif [[ "$*" == "datamart" ]];then
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
     django-admin init-setup --all --verbosity 2
+    django-admin collectstatic --noinput
     django-admin db-isready --wait --timeout 300 --connection etools
     echo "uwsgi --static-map ${STATIC_URL}=${STATIC_ROOT}"
     exec gosu datamart uwsgi \

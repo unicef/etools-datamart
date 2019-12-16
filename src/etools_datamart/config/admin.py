@@ -29,7 +29,7 @@ DEFAULT_INDEX_SECTIONS = {
                  'unicef_rest_framework.GroupAccessControl',
                  'unicef_rest_framework.UserAccessControl',
                  ],
-    'Logs': ['tracking', 'django_db_logging', 'crashlog', ],
+    'Logs': ['tracking', ],
     'System': ['django_celery_beat', 'post_office',
                'unicef_rest_framework.PeriodicTask'],
     'Other': [],

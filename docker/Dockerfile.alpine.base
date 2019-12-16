@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.9
+FROM python:3.7.3-alpine
 
 ARG BUILD_DATE
 ARG PIPENV_ARGS
@@ -9,13 +9,14 @@ ENV CPLUS_INCLUDE_PATH /usr/include/libxml2/
 ENV C_INCLUDE_PATH /usr/include/libxml2/
 ENV TEST ${TEST}
 
-#RUN echo "http://dl-3.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
 
 RUN apk add --no-cache --virtual .build-deps \
-        --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
         gcc \
         g++ \
+        gdal-dev \
         geos-dev \
         jpeg-dev \
         libc-dev \
@@ -30,38 +31,24 @@ RUN apk add --no-cache --virtual .build-deps \
         python3-dev \
         xmlsec-dev \
         zeromq-dev
-#
-#RUN apk add --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
-#    geos \
-#    geos-dev
-#
-#RUN apk add --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
-#    gdal \
-#    gdal-dev
 
-#RUN apk add --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
-#    geos \
-#    geos-dev
-#
 RUN apk add --no-cache --virtual .run-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
         bash \
-        binutils \
+#        binutils \
         geos \
         gdal \
-        gdal-dev \
         gosu \
         libmagic \
-        libpq \
+#        libpq \
         libuuid \
         libxslt \
-        libzmq \
-        jpeg \
+#        libzmq \
+#        jpeg \
         mailcap \
-        py-gdal \
-        xmlsec \
+#        xmlsec \
         zlib
 
 
@@ -99,7 +86,5 @@ RUN export SITE_PACKAGES="/usr/local/lib/python3.7/site-packages"\
 RUN apk del .build-deps \
     && rm -rf /var/cache/apk/* \
     && rm -fr /root/.cache/ \
-    && rm -fr /var/bitcaster/.cache/ \
+    && rm -fr /var/datamart/.cache/ \
     && rm -fr /usr/include/
-
-#ENTRYPOINT ["/bin/ash"]

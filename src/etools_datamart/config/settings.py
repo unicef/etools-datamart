@@ -56,7 +56,10 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
                   EXPORT_FILE_STORAGE=(str, 'unicef_rest_framework.storage.UnicefAzureStorage'),
                   EXPORT_FILE_STORAGE_KWARGS=(dict, {}),
+                  GEOS_LIBRARY_PATH=(str, None),
+                  GDAL_LIBRARY_PATH=(str, None),
                   MEDIA_ROOT=(str, '/tmp/media'),
+                  MEDIA_URL=(str, '/media/'),
                   MYSTICA_PASSWORD=(str, ''),
                   REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   SECRET_KEY=(str, 'secret'),
@@ -276,6 +279,8 @@ AUTH_PASSWORD_VALIDATORS = [
     #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     # },
 ]
+GEOS_LIBRARY_PATH = env('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = env('GDAL_LIBRARY_PATH')
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
@@ -338,7 +343,6 @@ INSTALLED_APPS = [
     'dbtemplates',
     'drf_yasg',
     'adminfilters',
-    'django_db_logging',
     'django_sysinfo',
     'crashlog',
     'post_office',
@@ -601,12 +605,6 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-
-        'db': {
-            'level': 'ERROR',
-            'class': 'django_db_logging.handlers.DBHandler',
-            'formatter': 'simple'
-        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -630,23 +628,18 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False
         },
-        'django_db_logging': {
-            'handlers': ['console'],
-            'level': {True: 'DEBUG', False: 'ERROR'}[DEBUG],
-            'propagate': False
-        },
         'drf_querystringfilter': {
-            'handlers': ['console', 'db'],
+            'handlers': ['console', ],
             'level': 'DEBUG',
             'propagate': False
         },
         'unicef_rest_framework': {
-            'handlers': ['console', 'db'],
+            'handlers': ['console', ],
             'level': 'ERROR',
             'propagate': False
         },
         'etools_datamart': {
-            'handlers': ['null', 'db'],
+            'handlers': ['null', ],
             'level': 'ERROR',
             'propagate': False
         },
@@ -711,7 +704,6 @@ if SENTRY_ENABLED:
                 return None
 
     sentry_sdk.init(before_send=before_send)
-
 
 SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]
 
