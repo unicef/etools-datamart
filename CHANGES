@@ -4,7 +4,6 @@
 * BACKWARD INCOMPATIBLE: all `prp` endpoints to the source database moved to `sources/prp`
 * BACKWARD INCOMPATIBLE: all `etools` endpoints to the source database moved to `sources/etools`
 * Offline requests and File Exports.
-* new engagement-findings endpoint - ticket #17372
 * new endpoint audit/spotcheck - ticket #16739
 * new endpoint prp/data-report - ticket #16971
 * updates schema to eTools 7.4
