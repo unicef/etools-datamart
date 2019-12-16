@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datamart-core"
-version = "2.10.0a8"
+version = "2.10.0a9"
 description = ""
 authors = ["sax <s.apostolico@gmail.com>"]
 
