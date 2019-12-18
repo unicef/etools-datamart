@@ -45,7 +45,6 @@ build-base:
 			--build-arg BASE_IMAGE=${BASE}-base \
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg VERSION=${TARGET} \
-			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
 			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev

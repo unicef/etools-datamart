@@ -21,7 +21,6 @@ if [[ "$*" == "worker" ]];then
             --pidfile run/celery.pid \
             $CELERY_EXTRA
 
-
 elif [[ "$*" == "beat" ]];then
     exec gosu datamart celery beat -A etools_datamart.celery \
             $CELERY_EXTRA \
