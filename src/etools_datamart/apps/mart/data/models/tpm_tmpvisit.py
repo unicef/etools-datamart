@@ -1,13 +1,12 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from crashlog.middleware import process_exception
-
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (AttachmentsAttachment, DjangoContentType,
                                                         TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
                                                         TpmTpmvisitTpmPartnerFocalPoints,)
+from etools_datamart.sentry import process_exception
 
 
 class TPMVisitLoader(EtoolsLoader):

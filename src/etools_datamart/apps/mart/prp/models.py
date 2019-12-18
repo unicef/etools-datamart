@@ -50,7 +50,6 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import get_attr
 
@@ -61,6 +60,7 @@ from etools_datamart.apps.sources.source_prp.models import (CoreCountry, CoreGat
                                                             IndicatorReportable, IndicatorReportablelocationgoal,
                                                             UnicefLowerleveloutput, UnicefPdresultlink,
                                                             UnicefProgrammedocument, UnicefProgressreport,)
+from etools_datamart.sentry import process_exception
 
 from .base import PrpDataMartModel
 

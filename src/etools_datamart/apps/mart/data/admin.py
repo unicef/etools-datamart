@@ -12,7 +12,6 @@ from django.urls import reverse
 from admin_extra_urls.extras import link
 from adminactions.actions import export_as_csv, export_as_xls, mass_update
 from adminfilters.filters import AllValuesComboFilter
-from crashlog.middleware import process_exception
 from humanize import naturaldelta
 
 from unicef_rest_framework.models import Service
@@ -21,6 +20,7 @@ from etools_datamart.apps.core.admin_mixins import DisplayAllMixin
 from etools_datamart.apps.multitenant.admin import SchemaFilter
 from etools_datamart.config import settings
 from etools_datamart.libs.truncate import TruncateTableMixin
+from etools_datamart.sentry import process_exception
 
 from . import models
 

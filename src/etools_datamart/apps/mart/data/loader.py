@@ -6,13 +6,13 @@ from django.db import connections, models, transaction
 from django.utils import timezone
 
 from celery.utils.log import get_task_logger
-from crashlog.middleware import process_exception
 from dynamic_serializer.core import get_attr
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, cache, EtlResult, has_attr, RUN_UNKNOWN
 from etools_datamart.libs.time import strfelapsed
+from etools_datamart.sentry import process_exception
 
 logger = get_task_logger(__name__)
 

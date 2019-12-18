@@ -1020,6 +1020,14 @@ six = "*"
 
 [[package]]
 category = "main"
+description = "GDAL: Geospatial Data Abstraction Library"
+name = "gdal"
+optional = false
+python-versions = "*"
+version = "3.0.2"
+
+[[package]]
+category = "main"
 description = "HTML parser based on the WHATWG HTML specification"
 name = "html5lib"
 optional = false
@@ -2266,7 +2274,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "0aec334013200cbb9b16755fcfc1469eb5a1c0ccaf56f2940bbbcf7c827d36b2"
+content-hash = "e25818da3cf6f35318d2484ebc6712df83867bd3e0a03780a4a4fd2d5b1e1cd5"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -2660,6 +2668,9 @@ flake8 = [
 freezegun = [
     {file = "freezegun-0.3.12-py2.py3-none-any.whl", hash = "sha256:edfdf5bc6040969e6ed2e36eafe277963bdc8b7c01daeda96c5c8594576c9390"},
     {file = "freezegun-0.3.12.tar.gz", hash = "sha256:2a4d9c8cd3c04a201e20c313caf8b6338f1cfa4cda43f46a94cc4a9fd13ea5e7"},
+]
+gdal = [
+    {file = "GDAL-3.0.2.tar.gz", hash = "sha256:44db073647881faa9dec902e83deff9b8f4f453336bffff8516336f48f5d22c5"},
 ]
 html5lib = [
     {file = "html5lib-1.0.1-py2.py3-none-any.whl", hash = "sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3"},

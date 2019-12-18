@@ -5,13 +5,12 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import F
 
-from crashlog.middleware import process_exception
-
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
                                                         PartnersIntervention, PartnersInterventionplannedvisits,
                                                         ReportsAppliedindicator, T2FTravelactivity,)
+from etools_datamart.sentry import process_exception
 
 from .base import EtoolsDataMartModel
 from .location import Location

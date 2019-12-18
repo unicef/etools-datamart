@@ -10,13 +10,13 @@ from django.utils.functional import cached_property
 import celery
 from celery.utils.log import get_task_logger
 from constance import config
-from crashlog.middleware import process_exception
 from redis.exceptions import LockError
 from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.etl.exceptions import (LoaderException, MaxRecordsException,
                                                  RequiredIsMissing, RequiredIsRunning,)
 from etools_datamart.celery import app
+from etools_datamart.sentry import process_exception
 
 loadeables = set()
 locks = caches['lock']

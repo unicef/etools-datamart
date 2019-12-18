@@ -344,9 +344,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'adminfilters',
     'django_sysinfo',
-    'crashlog',
     'post_office',
-    'djcelery_email',
+    # 'djcelery_email',
 
     'django_celery_beat',
 

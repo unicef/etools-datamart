@@ -1,7 +1,7 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from crashlog.middleware import process_exception
+from etools_datamart.sentry import process_exception
 
 from .location import Location
 
