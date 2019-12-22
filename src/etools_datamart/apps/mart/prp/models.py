@@ -59,7 +59,10 @@ from etools_datamart.apps.sources.source_prp.models import (CoreCountry, CoreGat
                                                             IndicatorIndicatorlocationdata, IndicatorIndicatorreport,
                                                             IndicatorReportable, IndicatorReportablelocationgoal,
                                                             UnicefLowerleveloutput, UnicefPdresultlink,
-                                                            UnicefProgrammedocument, UnicefProgressreport,)
+                                                            UnicefProgrammedocument, UnicefProgressreport,
+                                                            IndicatorDisaggregation, CoreResponseplan,
+                                                            IndicatorDisaggregationvalue,
+                                                            IndicatorReportableDisaggregations)
 from etools_datamart.sentry import process_exception
 
 from .base import PrpDataMartModel
@@ -444,3 +447,61 @@ class DataReport(PrpDataMartModel):
                    'total_cumulative_progress_in_location': 'N/A',
                    'total_cumulative_progress': '-'
                    }
+
+
+class DisaggregationLoader(PrpBaseLoader):
+    def get_queryset(self):
+        # all_progress_reports = UnicefProgressreport.objects.all()
+        # qs = CoreResponseplan.objects.all()
+        for id in IndicatorIndicatorlocationdata.objects.all():
+            values = {'location': id.location.title,
+                      'period_start': id.indicator_report.time_period_start,
+                      'period_end': id.indicator_report.time_period_end,
+                      'indicator': id.indicator_report.reportable.blueprint.title,
+                      'indicator_id': id.indicator_report.reportable.blueprint.id,
+                      'disaggregation': id.disaggregation
+                      }
+            for d in IndicatorDisaggregationvalue.
+            # for d in IndicatorReportableDisaggregations.objects.filter(reportable=id.indicator_report.reportable):
+            #     values['disaggregation'] = d.disaggregation.response_plan.IndicatorDisaggregationvalue_disaggregation.value
+        qs = IndicatorIndicatorreport.objects.all()
+        l = IndicatorIndicatorlocationdata.objects.get(indicator_report=ir)
+        
+        # qs = IndicatorIndicatorreport.objects.all()
+        # for ir in qs.all():
+        #     for ird in IndicatorReportableDisaggregations.objects.filter(reportable=ir.reportable):
+        #         for idv in IndicatorDisaggregationvalue.objects.filter(disaggregation=ird.disaggregation):
+        #             values = {'disaggregation': "%s %s" % (idv.disaggregation.name, idv.value),
+        #                       'indicator_id': ir.reportable.blueprint.id,
+        #                       'indicator': ir.reportable.blueprint.title,
+        #                       'period_start': ir.time_period_start,
+        #                       'period_end': ir.time_period_end,
+        #                       'location': get_attr(idv, 'disaggregation.response_plan.workspace.title')
+        #                       }
+        #             # TODO: remove me
+        #             print(111, "models.py:461", ir, ird, idv)
+        #             # TODO: remove me
+                print(111, "models.py:466", values)
+
+        return qs.all()
+
+
+class Disaggregation(PrpDataMartModel):
+    name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Disaggregation by")
+    indicator_id = models.IntegerField(blank=True, null=True)
+    indicator = models.CharField(max_length=255, blank=True, null=True, )
+    period_start = models.DateField(blank=True, null=True)
+    period_end = models.DateField(blank=True, null=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
+    total = models.IntegerField(blank=True, null=True)
+
+    loader = DisaggregationLoader()
+
+    class Meta:
+        app_label = 'prp'
+
+    class Options:
+        key = lambda loader, record: {'source_id': record.id}
+        mapping = {'period_start': 'response_plan.start',
+                   'period_end': 'response_plan.end',
+                   'location': 'response_plan.workspace.title'}
