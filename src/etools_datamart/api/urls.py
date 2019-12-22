@@ -60,10 +60,13 @@ router.register(r'prp/datareport', endpoints.DataReportViewSet)
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 
 from etools_datamart.apps.sources.source_prp import api_urls  # noqa isort:skip
+from etools_datamart.apps.sources.source_prp.backward_api_urls import backward_compatible_router  # noqa isort:skip
+
 from .endpoints.rapidpro import _urls_  # noqa isort:skip
 
 urlpatterns = [
     re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),
+    re_path(r'(?P<version>(v1|v2|latest))/', include(backward_compatible_router.urls)),
 
     re_path(r'\+sw(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
             name='schema-json'),
