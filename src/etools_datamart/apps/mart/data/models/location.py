@@ -1,9 +1,8 @@
 from django.contrib.gis.db import models as geomodels
 from django.contrib.gis.db.models.functions import Centroid
 from django.db import connection, models
-from django.db.models.manager import BaseManager
 
-from etools_datamart.apps.core.models import DataMartQuerySet
+from etools_datamart.apps.core.models import DataMartManager, DataMartQuerySet
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import LocationsGatewaytype, LocationsLocation
 
@@ -49,7 +48,7 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
             each.save()
 
 
-class LocationManager(BaseManager.from_queryset(LocationQuerySet)):
+class LocationManager(DataMartManager.from_queryset(LocationQuerySet)):
     pass
 
 
