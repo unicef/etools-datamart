@@ -247,6 +247,8 @@ class BaseLoader:
     def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
+            if not hasattr(other, field_name):
+                continue
             new = getattr(other, field_name)
             current = getattr(record, field_name)
 
