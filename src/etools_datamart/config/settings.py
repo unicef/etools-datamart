@@ -701,6 +701,7 @@ if SENTRY_ENABLED:
             exc_type, exc_value, tb = hint['exc_info']
             if isinstance(exc_value, SMTPServerDisconnected):
                 return None
+        return event
 
     sentry_sdk.init(before_send=before_send)
 
