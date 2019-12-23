@@ -245,6 +245,13 @@ class PartnerAdmin(DataModelAdmin):
     search_fields = ('vendor_number', 'name',)
 
 
+@register(models.PartnerStaffMember)
+class PartnerStaffMemberAdmin(DataModelAdmin):
+    list_display = ('title', 'last_name', 'first_name', 'email', 'phone')
+    date_hierarchy = 'created'
+    list_filter = ('active',)
+
+
 @register(models.TravelActivity)
 class TravelActivityAdmin(DataModelAdmin):
     list_display = ('travel_reference_number',

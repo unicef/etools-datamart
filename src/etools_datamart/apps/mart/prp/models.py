@@ -440,7 +440,7 @@ class DataReport(PrpDataMartModel):
                    'calculation_method_across_location': 'indicator_report.reportable.blueprint.calculation_formula_across_locations',
                    'calculation_method_across_reporting_periods': 'indicator_report.reportable.blueprint.calculation_formula_across_periods',
                    'current_location': 'location.title',
-                   'previous_location_progress': 'previous_location_data',
+                   'previous_location_progress': 'previous_location_data.title',
                    'total_cumulative_progress_in_location': 'N/A',
                    'total_cumulative_progress': '-'
                    }

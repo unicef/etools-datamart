@@ -4,6 +4,7 @@ from django.db.models.manager import BaseManager
 
 
 class DataMartQuerySet(QuerySet):
+
     def get(self, *args, **kwargs):
         try:
             return super(DataMartQuerySet, self).get(*args, **kwargs)

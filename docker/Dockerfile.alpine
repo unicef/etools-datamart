@@ -105,7 +105,7 @@ ENV GEOS_LIBRARY_PATH="/usr/lib/libgeos_c.so.1" \
 EXPOSE 8000
 #
 ADD docker/*.sh /usr/local/bin/
-ADD docker/circus.conf /etc/
+#ADD docker/circus.conf /etc/
 
 RUN addgroup --gid 1024 datamart \
     && adduser --disabled-password --ingroup datamart -S datamart
