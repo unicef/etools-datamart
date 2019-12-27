@@ -176,6 +176,8 @@ class Runs(RapidProDataMartModel):
 
     class Options:
         source = 'runs'
+        key = lambda loader, record: dict(source_id=record.source_id,
+                                          organization=loader.context['organization'])
 
     def __str__(self):
         return f'{self.active} {self.completed} {self.expired} {self.interrupted}'
