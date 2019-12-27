@@ -88,20 +88,20 @@ class ActstreamFollow(models.TenantModel):
         unique_together = (('content_type', 'object_id', 'user'),)
 
 
-class AttachmentsAttachment(models.TenantModel):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    file = models.CharField(max_length=1024, blank=True, null=True)
-    hyperlink = models.CharField(max_length=255)
-    object_id = models.IntegerField(blank=True, null=True)
-    code = models.CharField(max_length=64)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='AttachmentsAttachment_content_type', blank=True, null=True)
-    file_type = models.ForeignKey('AttachmentsFiletype', models.DO_NOTHING, related_name='AttachmentsAttachment_file_type', blank=True, null=True)
-    uploaded_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='AttachmentsAttachment_uploaded_by', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'attachments_attachment'
+# class AttachmentsAttachment(models.TenantModel):
+#     created = models.DateTimeField()
+#     modified = models.DateTimeField()
+#     file = models.CharField(max_length=1024, blank=True, null=True)
+#     hyperlink = models.CharField(max_length=255)
+#     object_id = models.IntegerField(blank=True, null=True)
+#     code = models.CharField(max_length=64)
+#     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='AttachmentsAttachment_content_type', blank=True, null=True)
+#     file_type = models.ForeignKey('AttachmentsFiletype', models.DO_NOTHING, related_name='AttachmentsAttachment_file_type', blank=True, null=True)
+#     uploaded_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='AttachmentsAttachment_uploaded_by', blank=True, null=True)
+#
+#     class Meta:
+#         managed = False
+#         db_table = 'attachments_attachment'
 
 
 class AttachmentsAttachmentflat(models.TenantModel):

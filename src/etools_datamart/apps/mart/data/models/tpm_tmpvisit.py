@@ -3,9 +3,8 @@ from django.db import models
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import (AttachmentsAttachment, DjangoContentType,
-                                                        TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
-                                                        TpmTpmvisitTpmPartnerFocalPoints,)
+from etools_datamart.apps.sources.etools.models import (DjangoContentType, TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
+                                                        TpmTpmvisitTpmPartnerFocalPoints, UnicefAttachmentsAttachment,)
 from etools_datamart.sentry import process_exception
 
 
@@ -41,7 +40,7 @@ class TPMVisitLoader(EtoolsLoader):
 
             visit.tpm_focal_points = ",".join(tpm_focal_points)
             try:
-                visit.report_attachments = ",".join(AttachmentsAttachment.objects.filter(
+                visit.report_attachments = ",".join(UnicefAttachmentsAttachment.objects.filter(
                     object_id=visit.id,
                     code='activity_report',
                     content_type=content_type
@@ -49,7 +48,7 @@ class TPMVisitLoader(EtoolsLoader):
             except Exception as e:
                 process_exception(e)
             try:
-                visit.attachments = ",".join(AttachmentsAttachment.objects.filter(
+                visit.attachments = ",".join(UnicefAttachmentsAttachment.objects.filter(
                     object_id=visit.id,
                     code='activity_attachments',
                     content_type=content_type

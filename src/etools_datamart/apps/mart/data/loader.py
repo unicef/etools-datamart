@@ -247,7 +247,7 @@ class EtoolsLoader(BaseLoader):
                     transaction.savepoint_rollback(sid)
                     raise
             else:
-                logger.error(f"Unable to get lock for {self}")
+                logger.info(f"Unable to get lock for {self}")
 
         except (RequiredIsMissing, RequiredIsRunning) as e:
             self.on_end(error=e, retry=True)

@@ -43,15 +43,16 @@ class Attachment(EtoolsDataMartModel):
     class Options:
         depends = (Partner,)
         source = AttachmentsAttachmentflat
-        mapping = dict(file='attachment.file',
-                       attachment_source_id='attachment.pk',
-                       file_type='attachment.file_type.name',
-                       file_type_id='attachment.file_type.pk',
-                       content_type='attachment.content_type.name',
-                       hyperlink='attachment.hyperlink',
-                       object_id='attachment.object_id',
-                       code='attachment.code',
-                       uploaded_by='attachment.uploaded_by.username',
-                       # linked_to='-',
-                       # ct='-',
-                       )
+        mapping = dict(
+            file='attachment.file',
+            attachment_source_id='attachment.pk',
+            file_type='file_type.name',
+            file_type_id='file_type.pk',
+            content_type='content_type.name',
+            hyperlink='attachment.hyperlink',
+            object_id='attachment.object_id',
+            code='attachment.code',
+            uploaded_by='uploaded_by.username',
+            # linked_to='-',
+            # ct='-',
+        )
