@@ -1,5 +1,5 @@
-2.10
-----
+2.10.1
+------
 * use poetry instead of pipenv
 * BACKWARD INCOMPATIBLE: all `prp` endpoints to the source database moved to `sources/prp`
 * BACKWARD INCOMPATIBLE: all `etools` endpoints to the source database moved to `sources/etools`
@@ -9,6 +9,11 @@
 * updates schema to eTools 7.4
 * updates schema to latest PRP
 * fixes RapidPRO endpoints pagination
+
+
+2.10
+----
+* Not released in prod
 
 
 2.9
