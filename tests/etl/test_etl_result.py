@@ -1,4 +1,4 @@
-from etools_datamart.apps.data.loader import EtlResult
+from etools_datamart.apps.etl.loader import EtlResult
 from etools_datamart.apps.etl.results import etl_decoder, etl_dumps, etl_loads, EtlEncoder
 
 # def test_result_eq():

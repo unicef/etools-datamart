@@ -46,6 +46,10 @@ class InvalidFilterError(ApiException):
         return "Invalid filter '{}'".format(self.field)
 
 
+class InvalidPaginationError(ApiException):
+    pass
+
+
 class FilteringError(ApiException):
     def __init__(self, reason, *args, **kwargs):
         self.reason = reason

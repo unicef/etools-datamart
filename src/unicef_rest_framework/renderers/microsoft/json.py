@@ -7,7 +7,6 @@ from rest_framework.renderers import JSONRenderer
 class MSJSONRenderer(JSONRenderer):
     media_type = 'application/json'
     format = 'ms-json'
-    disable_pagination = True
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         view = renderer_context['view']

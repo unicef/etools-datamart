@@ -8,6 +8,8 @@ from django.forms.models import ModelForm
 
 from strategy_field.utils import import_by_name
 
+from unicef_rest_framework.models import Export
+
 from .cache import parse_ttl
 from .models import CacheVersion, Service
 
@@ -145,3 +147,24 @@ class DateRangePickerField(forms.MultiValueField):
             if data_list[0] > data_list[1]:
                 raise ValidationError('Start Date cannot be greater than than End Date')
         return data_list
+
+
+class ExportForm(forms.ModelForm):
+    class Meta:
+        model = Export
+        exclude = ('content', 'as_user', 'status_code', 'response_ms',
+                   'url', 'response_length', 'last_run', 'params', 'etag')
+
+    def __init__(self, instance=None, url=None, params=None, **kwargs):
+        if instance is None:
+            self.url = url
+            self.params = params
+        else:
+            self.url = instance.url
+            self.params = instance.params
+        super().__init__(instance=instance, **kwargs)
+
+    def save(self, commit=True):
+        self.instance.url = self.url
+        self.instance.params = self.params
+        return super().save(commit)

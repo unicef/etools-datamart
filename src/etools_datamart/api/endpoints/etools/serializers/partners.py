@@ -1,5 +1,4 @@
-
-from etools_datamart.apps.etools import models
+from etools_datamart.apps.sources.etools import models
 
 from .base import EToolsSerializer
 

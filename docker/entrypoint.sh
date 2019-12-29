@@ -3,8 +3,10 @@ mkdir -p /var/datamart/static
 mkdir -p /var/datamart/log
 mkdir -p /var/datamart/conf
 mkdir -p /var/datamart/run
+mkdir -p $MEDIA_ROOT
 
 chown datamart:datamart -R /var/datamart/
+chown datamart:datamart -R $MEDIA_ROOT
 
 
 if [[ "$*" == "worker" ]];then
@@ -19,17 +21,11 @@ if [[ "$*" == "worker" ]];then
             --pidfile run/celery.pid \
             $CELERY_EXTRA
 
-
 elif [[ "$*" == "beat" ]];then
     exec gosu datamart celery beat -A etools_datamart.celery \
             $CELERY_EXTRA \
             --loglevel=${CELERY_LOGLEVEL} \
             --pidfile run/celerybeat.pid
-
-elif [[ "$*" == "w2" ]];then
-    django-admin db-isready --wait --timeout 60
-    exec gosu datamart circusd /etc/circus.conf --log-output=-
-
 elif [[ "$*" == "datamart" ]];then
     rm -f /var/datamart/run/*
 
@@ -39,9 +35,12 @@ elif [[ "$*" == "datamart" ]];then
     django-admin db-isready --wait --timeout 60
     django-admin check --deploy
     django-admin init-setup --all --verbosity 2
+    django-admin collectstatic --noinput
     django-admin db-isready --wait --timeout 300 --connection etools
     echo "uwsgi --static-map ${STATIC_URL}=${STATIC_ROOT}"
-    exec gosu datamart uwsgi --static-map ${STATIC_URL}=${STATIC_ROOT}
+    exec gosu datamart uwsgi \
+          --static-map ${STATIC_URL}=${STATIC_ROOT} \
+          --static-map ${MEDIA_URL}=${MEDIA_ROOT}
 else
     exec "$@"
 fi

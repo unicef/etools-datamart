@@ -15,18 +15,18 @@ class ReadOnlyRouter(APIReadOnlyRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r'etools/funds/fundsreservationheader', endpoints.FundsReservationHeaderViewSet)
-router.register(r'etools/funds/fundsreservationitem', endpoints.FundsreservationitemViewSet)
-router.register(r'etools/funds/grant', endpoints.GrantViewSet)
-# router.register(r'etools/partners/agreement', endpoints.AgreementViewSet)
-router.register(r'etools/partners/assessment', endpoints.AssessmentViewSet)
-router.register(r'etools/partners/plannedengagement', endpoints.PlannedengagementViewSet)
-router.register(r'etools/workspaces', endpoints.WorkspaceViewSet)
+router.register(r'sources/etools/funds/fundsreservationheader', endpoints.EtoolsFundsReservationHeaderViewSet)
+router.register(r'sources/etools/funds/fundsreservationitem', endpoints.EtoolsFundsreservationitemViewSet)
+router.register(r'sources/etools/funds/grant', endpoints.EtoolsGrantViewSet)
+router.register(r'sources/etools/partners/assessment', endpoints.EtoolsAssessmentViewSet)
+router.register(r'sources/etools/partners/plannedengagement', endpoints.EtoolsPlannedengagementViewSet)
+router.register(r'sources/etools/workspaces', endpoints.EtoolsWorkspaceViewSet)
 
 router.register(r'datamart/attachment/attachment', endpoints.AttachmentViewSet)
 router.register(r'datamart/funds/grants', endpoints.GrantViewSet)
 router.register(r'datamart/audit/engagements', endpoints.EngagementViewSet)
 router.register(r'datamart/audit/results', endpoints.AuditResultViewSet)
+router.register(r'datamart/audit/spot-check', endpoints.SpotCheckViewSet)
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
@@ -55,13 +55,18 @@ router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
 router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
 router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
+router.register(r'prp/datareport', endpoints.DataReportViewSet)
+
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 
 from etools_datamart.apps.sources.source_prp import api_urls  # noqa isort:skip
+from etools_datamart.apps.sources.source_prp.backward_api_urls import backward_compatible_router  # noqa isort:skip
+
 from .endpoints.rapidpro import _urls_  # noqa isort:skip
 
 urlpatterns = [
     re_path(r'(?P<version>(v1|v2|latest))/', include(router.urls)),
+    re_path(r'(?P<version>(v1|v2|latest))/', include(backward_compatible_router.urls)),
 
     re_path(r'\+sw(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
             name='schema-json'),

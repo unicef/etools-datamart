@@ -10,8 +10,7 @@ from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
 description = """
 Each API endpoint allows filtering and/or ordering results.
-Different formats can be requested using `format` argument.
-Pagination can be disabled with `page_size=-1`
+Different formats can be requested using `format` argument`
 
 ## Query lookups
 

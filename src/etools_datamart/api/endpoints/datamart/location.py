@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeoModelSerializer
 
 from etools_datamart.api.endpoints import common
-from etools_datamart.apps.data import models
+from etools_datamart.apps.mart.data import models
 
 
 class LocationSerializerGeoJson(GeoFeatureModelSerializer):

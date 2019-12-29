@@ -10,7 +10,7 @@ from factory.fuzzy import BaseFuzzyAttribute
 from test_utilities.factories import today
 from test_utilities.factories.common import RegisterModelFactory
 
-from etools_datamart.apps.data import models
+from etools_datamart.apps.mart.data import models
 
 
 class DataMartModelFactory(RegisterModelFactory):
@@ -280,3 +280,13 @@ class AuditResultFactory(DataMartModelFactory):
 
     class Meta:
         model = models.AuditResult
+
+
+class SpotCheckFactory(DataMartModelFactory):
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
+
+    class Meta:
+        model = models.SpotCheck

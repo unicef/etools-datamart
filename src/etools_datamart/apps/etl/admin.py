@@ -18,7 +18,6 @@ from django.utils.safestring import mark_safe
 from admin_extra_urls.extras import action, ExtraUrlMixin, link
 from admin_extra_urls.mixins import _confirm_action
 from adminactions.mass_update import mass_update
-from crashlog.middleware import process_exception
 from django_celery_beat.models import PeriodicTask
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
@@ -29,6 +28,7 @@ from unicef_rest_framework.models import Service
 from etools_datamart.celery import app
 from etools_datamart.libs.admin_filters import RangeFilter
 from etools_datamart.libs.time import strfelapsed
+from etools_datamart.sentry import process_exception
 
 from . import models
 from .loader import RUN_QUEUED, RUN_UNKNOWN

@@ -10,11 +10,12 @@ from django.utils.functional import cached_property
 import celery
 from celery.utils.log import get_task_logger
 from constance import config
-from crashlog.middleware import process_exception
 from redis.exceptions import LockError
+from sentry_sdk import capture_exception
 from strategy_field.utils import fqn, get_attr
 
-from etools_datamart.apps.data.exceptions import LoaderException
+from etools_datamart.apps.etl.exceptions import (LoaderException, MaxRecordsException,
+                                                 RequiredIsMissing, RequiredIsRunning,)
 from etools_datamart.celery import app
 
 loadeables = set()
@@ -80,28 +81,6 @@ class EtlResult:
                 'error': self.error,
                 'processed': self.processed,
                 'total_records': self.total_records}
-
-
-class RequiredIsRunning(Exception):
-
-    def __init__(self, req, *args: object) -> None:
-        self.req = req
-
-    def __str__(self):
-        return "Required ETL '%s' is running" % str(self.req.loader.etl_task.task)
-
-
-class RequiredIsMissing(Exception):
-
-    def __init__(self, req, *args: object) -> None:
-        self.req = req
-
-    def __str__(self):
-        return "Missing required ETL '%s'" % str(self.req.loader.etl_task.task)
-
-
-class MaxRecordsException(Exception):
-    pass
 
 
 undefined = object()
@@ -178,9 +157,11 @@ class LoaderTask(celery.Task):
             raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
                              countdown=config.ETL_RETRY_COUNTDOWN)
         except Exception as e:  # pragma: no cover
+            logger.exception(e)
             # self.loader.etl_task.status = 'ERROR'
             # self.loader.etl_task.save()
-            process_exception(e)
+            # process_exception(e)
+            capture_exception()
             raise
 
 
@@ -266,6 +247,8 @@ class BaseLoader:
     def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
+            if not hasattr(other, field_name):
+                continue
             new = getattr(other, field_name)
             current = getattr(record, field_name)
 
@@ -334,36 +317,46 @@ class BaseLoader:
         return ret
 
     def get_value(self, field_name, value_or_func, original_record, current_mapping):
-        if value_or_func is None:
-            return None
-        elif value_or_func == 'N/A':
-            return 'N/A'
+        ret = undefined
+        # if value_or_func is None:
+        #     ret  None
+        if value_or_func == 'N/A':
+            ret = 'N/A'
         elif isinstance(value_or_func, str) and hasattr(self, value_or_func) and callable(getattr(self, value_or_func)):
             getter = getattr(self, value_or_func)
             _value = getter(original_record, current_mapping, field_name=field_name)
             if _value != self.noop:
-                return _value
+                ret = _value
         elif value_or_func == '-' or hasattr(self, 'get_%s' % field_name):
             getter = getattr(self, 'get_%s' % field_name)
             _value = getter(record=original_record, values=current_mapping, field_name=field_name)
             if _value != self.noop:
-                return _value
+                ret = _value
         elif value_or_func == '__self__':
             try:
-                return self.model.objects.get(source_id=getattr(original_record, field_name).id)
+                ret = self.model.objects.get(source_id=getattr(original_record, field_name).id)
             except AttributeError:
-                return None
+                ret = None
             except self.model.DoesNotExist:
                 self.tree_parents.append((original_record.id, getattr(original_record, field_name).id))
-                return None
+                ret = None
         elif callable(value_or_func):
-            return value_or_func(self, original_record)
+            ret = value_or_func(self, original_record)
         elif value_or_func == '=' and has_attr(original_record, field_name):
-            return get_attr(original_record, field_name)
+            ret = get_attr(original_record, field_name)
         elif not isinstance(value_or_func, str):
-            return value_or_func
+            ret = value_or_func
         elif has_attr(original_record, value_or_func):
-            return get_attr(original_record, value_or_func)
+            ret = get_attr(original_record, value_or_func, undefined)
+        #     if ret == undefined:
+        #         return None
+        #         # raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        # else:
+        #     raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        if ret == undefined:
+            ret = None
+            # raise ValueError('Invalid mapping. Field:%s Value:%s' % (field_name, value_or_func))
+        return ret
 
     @property
     def is_locked(self):

@@ -51,7 +51,7 @@ class EtlDecoder(json.JSONDecoder):
 class EtlEncoder(encoders.JSONEncoder):
 
     def default(self, obj):
-        from etools_datamart.apps.data.loader import EtlResult
+        from etools_datamart.apps.etl.loader import EtlResult
         if isinstance(obj, EtlResult):
             return {
                 '__type__': '__EtlResult__',
@@ -63,7 +63,7 @@ class EtlEncoder(encoders.JSONEncoder):
 def etl_decoder(obj):
     if '__type__' in obj:
         if obj['__type__'] == '__EtlResult__':  # pragma: no cover
-            from etools_datamart.apps.data.loader import EtlResult
+            from etools_datamart.apps.etl.loader import EtlResult
             return EtlResult(**obj['data'])
     return obj
 

@@ -1,6 +1,6 @@
 from etools_datamart.api.endpoints import common
 from etools_datamart.api.endpoints.etools import serializers
-from etools_datamart.apps.etools import models
+from etools_datamart.apps.sources.etools import models
 
 
 class ReportsResultViewSet(common.APIMultiTenantReadOnlyModelViewSet):

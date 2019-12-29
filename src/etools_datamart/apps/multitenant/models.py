@@ -19,7 +19,7 @@ class TenantModel(Model):  # noqa
     objects = TenantManager()
 
     def get_country_instance(self):
-        from etools_datamart.apps.etools.models import UsersCountry
+        from etools_datamart.apps.sources.etools.models import UsersCountry
         return UsersCountry.objects.get(schema_name=self.schema)
 
     class Meta:

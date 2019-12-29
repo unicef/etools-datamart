@@ -1,6 +1,6 @@
 import pytest
 
-from etools_datamart.apps.etools.models import PartnersIntervention, PartnersInterventionFlatLocations
+from etools_datamart.apps.sources.etools.models import PartnersIntervention, PartnersInterventionFlatLocations
 
 pytestmark = pytest.mark.django_db
 

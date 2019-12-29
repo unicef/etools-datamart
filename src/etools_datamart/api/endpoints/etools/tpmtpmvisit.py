@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from etools_datamart.api.endpoints import common
-from etools_datamart.apps.etools import models
+from etools_datamart.apps.sources.etools import models
 
 
 class TpmTpmvisitSerializer(serializers.ModelSerializer):

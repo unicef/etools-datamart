@@ -6,30 +6,36 @@ import warnings
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from django.db.models import Model
+# def _setup_models():
+#     from django.db import connection
+#     from django.db.backends.utils import truncate_name
+#     from django.db.models import Model
+#
+#     from django.conf import settings
+#     # settings.DATABASE_ROUTERS = []
+#     #
+#     # from django.apps import apps
+#     # from etools_datamart.apps.core.readonly import ReadOnlyModel
+#     # for m in apps.get_models():
+#     #     if m._meta.proxy:
+#     #         opts = m._meta.proxy_for_model._meta
+#     #     else:
+#     #         opts = m._meta
+#     #
+#     #     if opts.app_label not in ('contenttypes', 'sites'):
+#     #         db_table = ('{0.app_label}_{0.model_name}'.format(opts)).lower()
+#     #         m._meta.db_table = truncate_name(db_table, connection.ops.max_name_length())
+#     #         m._meta.db_tablespace = ''
+#     #
+#     #     if not m._meta.managed:
+#     #         m._meta.managed = True
+#     #
+#     #     if issubclass(m, ReadOnlyModel):
+#     #         setattr(m, 'save', Model.save)
+from django.db.models import signals
 
 import pytest
 from _pytest.fixtures import SubRequest
-
-
-def _setup_models():
-    from django.apps import apps
-    from etools_datamart.apps.core.readonly import ReadOnlyModel
-
-    for m in apps.get_models():
-        # if m._meta.proxy:
-        #     opts = m._meta.proxy_for_model._meta
-        # else:
-        #     opts = m._meta
-        #
-        # if opts.app_label not in ('content_types',):
-        # db_table = ('{0.app_label}_{0.model_name}'.format(opts)).lower()
-        # m._meta.db_table = truncate_name(db_table, connection.ops.max_name_length())
-        # m._meta.db_tablespace = ''
-        if issubclass(m, ReadOnlyModel):
-            setattr(m, 'save', Model.save)
-            if not m._meta.managed:
-                m._meta.managed = True
 
 
 def pytest_configure(config):
@@ -37,12 +43,12 @@ def pytest_configure(config):
     os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
     os.environ['STATIC_ROOT'] = tempfile.gettempdir()
     sys._called_from_pytest = True
-    if not config.option.help:
-        _setup_models()
+    # if not config.option.help:
+    #     _setup_models()
 
 
 def pytest_unconfigure(config):
-    import sys  # This was missing from the manual
+    import sys
     del sys._called_from_pytest
 
 
@@ -94,15 +100,6 @@ def django_db_setup(request,
         django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
 
-    # from pytest_django.fixtures import django_db_setup as dj_db_setup
-    # dj_db_setup(request,
-    #             django_test_environment,
-    #             django_db_blocker,
-    #             django_db_use_migrations,
-    #             django_db_keepdb,
-    #             django_db_createdb,
-    #             django_db_modify_db_settings)
-    #
     # """Top level fixture to ensure test databases are available"""
     from pytest_django.compat import setup_databases, teardown_databases
     from pytest_django.fixtures import _disable_native_migrations
@@ -113,7 +110,16 @@ def django_db_setup(request,
 
     if django_db_keepdb and not django_db_createdb:
         setup_databases_args["keepdb"] = True
-
+    # this patch is logically wrong, but we do not use constance permissions
+    # otherwise test fails with
+    #
+    # .venv/lib/python3.7/site-packages/django/db/backends/utils.py:84: in _execute
+    #     return self.cursor.execute(sql, params)
+    # E   django.db.utils.ProgrammingError: relation "django_content_type" does not exist
+    # E   LINE 1: ..."."app_label", "django_content_type"."model" FROM "django_co...
+    # E                                                                ^
+    #
+    signals.post_migrate.disconnect(dispatch_uid='constance.create_perm')
     with django_db_blocker.unblock():
         db_cfg = setup_databases(
             verbosity=request.config.option.verbose,
@@ -128,7 +134,6 @@ def django_db_setup(request,
     if not django_db_keepdb:
         request.addfinalizer(_teardown_database)
 
-    #
     from unicef_rest_framework.models import Service, UserAccessControl
     from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory
@@ -228,7 +233,7 @@ def number_of_intervention(db):
 
 @pytest.fixture()
 def etools_user(db):
-    from etools_datamart.apps.etools.models import AuthUser
+    from etools_datamart.apps.sources.etools.models import AuthUser
     return AuthUser.objects.get(id=1)
 
 

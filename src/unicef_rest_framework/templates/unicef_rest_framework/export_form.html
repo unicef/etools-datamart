@@ -1,0 +1,37 @@
+{% extends "rest_framework/base.html" %}{% load crispy_forms_filters %}
+{% block head %}{{ block.super }}{% endblock %}
+{% block body %}{{ block.super }}{% endblock %}
+{% block navbar %}{{ block.super }}{% endblock %}
+{#{% block breadcrumbs %}{{ block.super }}{% endblock %}#}
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li class="active"><a href="{% url "home" %}">Home</a></li>
+        <li class="active"><a href="{% url "profile" %}">Settings</a></li>
+        <li class="active"><a href="{% url 'urf:export-list' %}">Files</a></li>
+        <li class="active"><a href="#">{{ form.instance }}</a></li>
+    </ul>
+{% endblock %}
+{% block request-info %}
+    <div class="request-info" style="clear: both">
+    <pre class="prettyprint"><b class="inline-flex">GET </b><a class="inline-flex" href="{{ source }}">{{ source }}</a></pre>
+    </div>
+{% endblock %}
+{% block api-response %}
+    <div class="container">
+        <div class="col-lg-12">
+            <div class="col-lg-8">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <input type="submit" class="btn btn-primary" value="Save">
+                </form>
+            </div>
+            <div class="col-lg-4">
+                <ul>{% for k,v in form.params.items %}
+                    <li><strong>{{ k }}</strong>: {{ v }}</li>
+                {% endfor %}</ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}{{ block.super }}{% endblock %}

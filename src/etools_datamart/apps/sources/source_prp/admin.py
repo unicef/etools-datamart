@@ -15,11 +15,6 @@ class AccountUserGroupsAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
-@register(models.AccountUserUserPermissions)
-class AccountUserUserPermissionsAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
 @register(models.AccountUserprofile)
 class AccountUserprofileAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
@@ -27,16 +22,6 @@ class AccountUserprofileAdmin(DatamartSourceModelAdmin, ModelAdmin):
 
 @register(models.AuthGroup)
 class AuthGroupAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.AuthGroupPermissions)
-class AuthGroupPermissionsAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.AuthPermission)
-class AuthPermissionAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
@@ -107,6 +92,41 @@ class CoreWorkspaceAdmin(DatamartSourceModelAdmin, ModelAdmin):
 
 @register(models.CoreWorkspaceCountries)
 class CoreWorkspaceCountriesAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.DjangoCeleryBeatClockedschedule)
+class DjangoCeleryBeatClockedscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.DjangoCeleryBeatCrontabschedule)
+class DjangoCeleryBeatCrontabscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.DjangoCeleryBeatIntervalschedule)
+class DjangoCeleryBeatIntervalscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.DjangoCeleryBeatPeriodictask)
+class DjangoCeleryBeatPeriodictaskAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.DjangoCeleryBeatPeriodictasks)
+class DjangoCeleryBeatPeriodictasksAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.DjangoCeleryBeatSolarschedule)
+class DjangoCeleryBeatSolarscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.DjangoCeleryResultsTaskresult)
+class DjangoCeleryResultsTaskresultAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
@@ -257,7 +277,7 @@ class UnicefProgrammedocumentUnicefOfficersAdmin(DatamartSourceModelAdmin, Model
 
 @register(models.UnicefProgressreport)
 class UnicefProgressreportAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
+    list_filter = ['status']
 
 
 @register(models.UnicefProgressreportattachment)

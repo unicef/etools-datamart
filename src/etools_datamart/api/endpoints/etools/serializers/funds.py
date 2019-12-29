@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from etools_datamart.apps.etools import models
+from etools_datamart.apps.sources.etools import models
 
 
-class GrantSerializer(serializers.ModelSerializer):
+class EToolsGrantSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FundsGrant
         exclude = ()
 
 
-class FundsreservationitemSerializer(serializers.ModelSerializer):
+class EToolsFundsreservationitemSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FundsFundsreservationitem
         exclude = ()
 
 
-class FundsReservationHeaderSerializer(serializers.ModelSerializer):
+class EToolsFundsReservationHeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FundsFundsreservationheader
         exclude = ()

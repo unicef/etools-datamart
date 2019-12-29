@@ -2,7 +2,6 @@ import re
 import time
 
 from django.core.cache import caches
-from django.utils.http import quote_etag
 from django.utils.translation import ugettext as _
 
 from constance import config
@@ -172,7 +171,6 @@ class ListKeyConstructor(KeyConstructor):
     cache_version = CacheVersionKeyBit()
     system_filter = SystemFilterKeyBit()
     path = QueryPathKeyBit()
-    unique_method_id = bits.UniqueMethodIdKeyBit()
     format = bits.FormatKeyBit()
     headers = bits.HeadersKeyBit(['Accept'])
     dev = DevelopKeyBit()
@@ -187,11 +185,12 @@ class ListKeyConstructor(KeyConstructor):
 
 
 class APIETAGProcessor(ETAGProcessor):
-    def is_if_none_match_failed(self, res_etag, etags, if_none_match):
-        if res_etag and if_none_match:
-            return quote_etag(res_etag) in etags or '*' in etags
-        else:
-            return False
+    pass
+    # def is_if_none_match_failed(self, res_etag, etags, if_none_match):
+    #     if res_etag and if_none_match:
+    #         return quote_etag(res_etag) in etags or '*' in etags
+    #     else:
+    #         return False
 
 
 class APICacheResponse(CacheResponse):

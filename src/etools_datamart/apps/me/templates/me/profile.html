@@ -1,11 +1,17 @@
 {% extends 'me/base.html' %}{% load static %}
 
 {% block title %}Profile{% endblock %}
+{% block breadcrumbs_items %}
+    {{ block.super }}
+    <li class="active"><a href="{% url "profile" %}">Settings</a></li>
+
+{% endblock breadcrumbs_items %}
+
 {% block content %}
-    <div style="padding-left: 30px">
+    <div style="padding-left: 0px" class="profile">
         <div>{{ user.display_name }} - {{ user.email }}</div>
         <div>Groups: &nbsp;{% for g in user.groups.all %}{{ g.name }}{% endfor %}</div>
-        <div id="areas">
+        <div id="areas" class="panel">
             <h1>Areas</h1>
             <ul>
                 {% for area in business_areas %}
@@ -13,18 +19,17 @@
                 {% endfor %}
             </ul>
         </div>
-        <div id="services">
+        <div id="services" class="panel">
             <h1>Services</h1>
-
             <ul>
                 {% for service in services %}
-                    <li>{{ service.name }}</li>
+                    <li>{{ service.endpoint }}</li>
                 {% endfor %}
             </ul>
         </div>
-        <div id="password">
+        <div id="password" class="panel">
             <h1>Excel integration</h1>
-            {% if user.azure_id %}
+            <ul>
                 <form method="post">
                     {% csrf_token %}
                     <div class="message">
@@ -58,21 +63,30 @@
                         {% endif %}
                     {% endif %}
                 </form>
-            {% else %}
-                <form>
-                    <div class="message">
-                        This account cannot enable Excel integration.
-                        If you are logged in using corporate single sign-on (Azure/Active directory credentials)
-                        contact Datamart administrators to enable it.
-                    </div>
-                </form>
-            {% endif %}
+{#                {% else %}#}
+{#                    <div class="message">#}
+{#                        This account cannot enable Excel integration.#}
+{#                        If you are logged in using corporate single sign-on (Azure/Active directory credentials)#}
+{#                        contact Datamart administrators to enable it.#}
+{#                    </div>#}
+{#                {% endif %}#}
+            </ul>
         </div>
+
+{#        <div id="menu" class="panel">#}
+{#            <ul>#}
+{#                <li><a href="{% url "home" %}">Home</a></li>#}
+{#                <li><a href="{% url "api:api-root" version="latest" %}">API</a></li>#}
+{#                <li><a href="{% url "urf:export-list" %}">Files</a></li>#}
+{#                <li><a href="{% url "api:schema-redoc" %}">Documentation</a></li>#}
+{#            </ul>#}
+{#        </div>#}
+
     </div>
     <script>
     </script>
 {% endblock %}
-{% block bottom_scripts %}
+{% block script %}
     <script src="{% static 'jquery-3.3.1.min.js' %}"></script>
 
     <script>

@@ -11,6 +11,7 @@
 .pydevproject
 .tox
 .venv
+.python-version
 *.bak
 /contacts.json
 /dist

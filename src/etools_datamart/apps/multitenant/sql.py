@@ -13,6 +13,7 @@ SHARED_TABLES = RegexList(['"auth_.*',
                            '"publics_.*',
                            '"users_.*',
                            '"categories_.*',
+                           '"django_content_type.*'
                            ])
 
 cache = {}

@@ -4,8 +4,10 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.8
-BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]\)\.\([0-9]\)\.\(.*\)/\1.\2/g" )
+TARGET?=2.10.1
+PUSH_BASE?=1
+BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" )
+#BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" | echo "`xargs`xx" )
 # below vars are used internally
 BUILD_OPTIONS?=--squash
 CMD?=datamart
@@ -14,7 +16,7 @@ ORGANIZATION=unicef
 IMAGE_NAME=datamart
 DOCKER_IMAGE_NAME?=${ORGANIZATION}/${IMAGE_NAME}
 DOCKER_IMAGE?=${DOCKER_IMAGE_NAME}:${TARGET}
-DOCKERFILE?=Dockerfile
+DOCKERFILE?=Dockerfile.alpine
 RUN_OPTIONS?=
 PIPENV_ARGS?=
 PORTS=
@@ -31,21 +33,20 @@ build-base:
 			${BUILD_OPTIONS} \
 			--no-cache \
 			-t ${DOCKER_IMAGE_NAME}:${BASE}-base \
-			-f docker/Dockerfile.base .
+			-f docker/${DOCKERFILE}.base .
 	@echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-	docker push ${DOCKER_IMAGE_NAME}:${BASE}-base
+	[[ "${PUSH_BASE}" = "1" ]] && docker push ${DOCKER_IMAGE_NAME}:${BASE}-base || echo ""
 
 
 .build:
 	cd .. && ./manage.py makemigrations data --check --dry-run
 	cd .. && docker build \
 			${BUILD_OPTIONS} \
-			--build-arg BASE_IMAGE=${BASE} \
+			--build-arg BASE_IMAGE=${BASE}-base \
 			--build-arg DEVELOP=${DEVELOP} \
 			--build-arg VERSION=${TARGET} \
-			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
 			-t ${DOCKER_IMAGE} \
-			-f docker/Dockerfile .
+			-f docker/${DOCKERFILE} .
 	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
 	docker images | grep ${DOCKER_IMAGE_NAME}
 
@@ -54,17 +55,6 @@ build-test:
 
 build:
 	$(MAKE) .build test
-
-build_old:
-	cd .. && docker build \
-			${BUILD_OPTIONS} \
-			--build-arg DEVELOP=${DEVELOP} \
-			--build-arg VERSION=${TARGET} \
-			--build-arg PIPENV_ARGS=${PIPENV_ARGS} \
-			-t ${DOCKER_IMAGE} \
-			-f docker/Dockerfile.flat .
-	docker tag ${DOCKER_IMAGE_NAME}:${TARGET} ${DOCKER_IMAGE_NAME}:dev
-	docker images | grep ${DOCKER_IMAGE_NAME}
 
 
 .run:
@@ -77,6 +67,7 @@ build_old:
 			-e CACHE_URL_TEMPLATE=redis://192.168.66.66:6379/4 \
 			-e CELERY_BROKER_URL=redis://192.168.66.66:6379/2 \
 			-e CELERY_RESULT_BACKEND=redis://192.168.66.66:6379/3 \
+			-e EXPORT_FILE_STORAGE_KWARGS="host=192.168.66.66" \
 			-e CSRF_COOKIE_SECURE=false \
 			-e DATABASE_URL=${DATABASE_URL} \
 			-e DATABASE_URL_ETOOLS=${DATABASE_URL_ETOOLS} \
@@ -151,7 +142,7 @@ run:
 workers:
 	CONTAINER_NAME=datamart-workers \
 			ABSOLUTE_BASE_URL=${ABSOLUTE_BASE_URL} \
-			CMD=w2 $(MAKE) .run
+			CMD=worker $(MAKE) .run
 
 beat:
 	CONTAINER_NAME=datamart-beat \

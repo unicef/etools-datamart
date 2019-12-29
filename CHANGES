@@ -1,3 +1,26 @@
+2.10.1
+------
+* use poetry instead of pipenv
+* BACKWARD INCOMPATIBLE: all `prp` endpoints to the source database moved to `sources/prp`
+* BACKWARD INCOMPATIBLE: all `etools` endpoints to the source database moved to `sources/etools`
+* Offline requests and File Exports.
+* new endpoint audit/spotcheck - ticket #16739
+* new endpoint prp/data-report - ticket #16971
+* updates schema to eTools 7.4
+* updates schema to latest PRP
+* fixes RapidPRO endpoints pagination
+
+
+2.10
+----
+* Not released in prod
+
+
+2.9
+---
+* Not released in prod
+
+
 2.8
 ---
 * fixes #16623 - wrong visit_url in TPMActivity

@@ -2,6 +2,7 @@
 import datetime
 import os
 from pathlib import Path
+from smtplib import SMTPServerDisconnected
 
 import environ
 
@@ -16,13 +17,16 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   ANALYTICS_CODE=(str, ""),
                   AUTOCOMMIT_EXTERNAL=(bool, True),
-                  AZURE_ACCOUNT_KEY=(str, ''),
-                  AZURE_ACCOUNT_NAME=(str, ''),
                   AZURE_CLIENT_ID=(str, ''),
                   AZURE_CLIENT_SECRET=(str, ''),
-                  AZURE_CONTAINER=(str, ''),
-                  AZURE_LOCATION=(str, ''),
-                  AZURE_OVERWRITE_FILES=(bool, True),
+                  AZURE_STORAGE_ACCOUNT_KEY=(str, ''),
+                  AZURE_STORAGE_ACCOUNT_NAME=(str, ''),
+                  AZURE_STORAGE_OVERWRITE_FILES=(bool, True),
+                  AZURE_STORAGE_CONTAINER=(str, ''),
+                  AZURE_STORAGE_LOCATION=(str, ''),
+                  AZURE_STORAGE_AUTO_SIGN=(bool, True),
+                  AZURE_STORAGE_ACCESS_MODE=(str, "r"),
+                  AZURE_STORAGE_ACCESS_TTL=(int, 60 * 60 * 24),
                   AZURE_TENANT=(str, ''),
                   CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
                   CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
@@ -38,6 +42,9 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DATABASE_URL_PRP=(str, "postgis://postgres:@127.0.0.1:5432/prp"),
                   DEBUG=(bool, False),
+                  STACK=(str, 'DEVELOPMENT'),
+                  API_PAGINATION_OVERRIDE_KEY=(str, 'disable-pagination'),
+                  API_PAGINATION_SINGLE_PAGE_ENABLED=(bool, False),
                   DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
                   DISABLE_SERVICE_RESTRICTIONS=(bool, False),
                   DISCONNECT_URL=(str, 'https://login.microsoftonline.com/unicef.org/oauth2/logout'),
@@ -48,7 +55,12 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   EMAIL_USE_TLS=(bool, True),
                   ENABLE_LIVE_STATS=(bool, False),
                   ETOOLS_DUMP_LOCATION=(str, str(PACKAGE_DIR / 'apps' / 'multitenant' / 'postgresql')),
+                  EXPORT_FILE_STORAGE=(str, 'unicef_rest_framework.storage.UnicefAzureStorage'),
+                  EXPORT_FILE_STORAGE_KWARGS=(dict, {}),
+                  GEOS_LIBRARY_PATH=(str, None),
+                  GDAL_LIBRARY_PATH=(str, None),
                   MEDIA_ROOT=(str, '/tmp/media'),
+                  MEDIA_URL=(str, '/media/'),
                   MYSTICA_PASSWORD=(str, ''),
                   REDOC_BASE=(str, '/api/+redoc/#operation/'),
                   SECRET_KEY=(str, 'secret'),
@@ -72,9 +84,6 @@ DEBUG = env.bool('DEBUG')
 if DEBUG:  # pragma: no cover
     env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
     environ.Env.read_env(str(env_file))
-
-MEDIA_ROOT = env('MEDIA_ROOT')
-STATIC_ROOT = env('STATIC_ROOT')
 
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
@@ -106,7 +115,6 @@ DATABASES = {
 DATABASES['etools']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 DATABASES['prp']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 
-
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
     # router_factory('default', ['data', 'unicef_rest_framework',
@@ -119,6 +127,10 @@ DATABASE_ROUTERS = [
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+API_PAGINATION_OVERRIDE_KEY = env('API_PAGINATION_OVERRIDE_KEY')
+API_PAGINATION_SINGLE_PAGE_ENABLED = env('API_PAGINATION_SINGLE_PAGE_ENABLED')
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -156,7 +168,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-# MEDIA_ROOT = os.path.join(PUBLIC_DIR, 'media')
+MEDIA_ROOT = env('MEDIA_ROOT')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -167,7 +179,7 @@ MEDIA_URL = '/dm-media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-# STATIC_ROOT = os.path.join(PUBLIC_DIR, 'static')
+STATIC_ROOT = env('STATIC_ROOT')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -268,6 +280,8 @@ AUTH_PASSWORD_VALIDATORS = [
     #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     # },
 ]
+GEOS_LIBRARY_PATH = env('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = env('GDAL_LIBRARY_PATH')
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
@@ -290,19 +304,22 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'django.contrib.admin',
+
     'etools_datamart.config.admin.AdminConfig',
 
     'etools_datamart.apps.core.apps.Config',
-    'etools_datamart.apps.etools',
-    'etools_datamart.apps.data',
     'etools_datamart.apps.etl.apps.Config',
     'etools_datamart.apps.tracking.apps.Config',
     'etools_datamart.apps.subscriptions',
     'etools_datamart.apps.me',
-    # 'etools_datamart.apps.sources.source_prp.apps.Config',
-    'etools_datamart.apps.rapidpro',
-    'etools_datamart.apps.prp',
+
+    'etools_datamart.apps.sources.etools',
+    'etools_datamart.apps.sources.source_prp.apps.Config',
+
+    'etools_datamart.apps.mart.data',
+    'etools_datamart.apps.mart.rapidpro',
+    'etools_datamart.apps.mart.prp',
+
     'etools_datamart.api',
     'impersonate',
     'admin_extra_urls',
@@ -327,11 +344,9 @@ INSTALLED_APPS = [
     'dbtemplates',
     'drf_yasg',
     'adminfilters',
-    'django_db_logging',
     'django_sysinfo',
-    'crashlog',
     'post_office',
-    'djcelery_email',
+    # 'djcelery_email',
 
     'django_celery_beat',
 
@@ -419,12 +434,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         'widget': 'etools_datamart.libs.constance.GroupChoice',
     }],
 }
-
-AZURE_ACCOUNT_NAME = env('AZURE_ACCOUNT_NAME')
-AZURE_ACCOUNT_KEY = env('AZURE_ACCOUNT_KEY')
-AZURE_CONTAINER = env('AZURE_CONTAINER')
-AZURE_OVERWRITE_FILES = env.bool('AZURE_OVERWRITE_FILES')
-AZURE_LOCATION = env('AZURE_LOCATION')
 
 CONSTANCE_CONFIG = {
     'ETOOLS_ADDRESS': ('https://etools.unicef.org', 'eTools hostname', str),
@@ -596,12 +605,6 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-
-        'db': {
-            'level': 'ERROR',
-            'class': 'django_db_logging.handlers.DBHandler',
-            'formatter': 'simple'
-        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -625,23 +628,18 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False
         },
-        'django_db_logging': {
-            'handlers': ['console'],
-            'level': {True: 'DEBUG', False: 'ERROR'}[DEBUG],
-            'propagate': False
-        },
         'drf_querystringfilter': {
-            'handlers': ['console', 'db'],
+            'handlers': ['console', ],
             'level': 'DEBUG',
             'propagate': False
         },
         'unicef_rest_framework': {
-            'handlers': ['console', 'db'],
+            'handlers': ['console', ],
             'level': 'ERROR',
             'propagate': False
         },
         'etools_datamart': {
-            'handlers': ['null', 'db'],
+            'handlers': ['null', ],
             'level': 'ERROR',
             'propagate': False
         },
@@ -699,6 +697,40 @@ if SENTRY_ENABLED:
                     release=get_full_version(),
                     debug=False)
 
+    def before_send(event, hint):
+        from django.core.exceptions import ObjectDoesNotExist
+        if 'exc_info' in hint:
+            exc_type, exc_value, tb = hint['exc_info']
+            if isinstance(exc_value, SMTPServerDisconnected):
+                return None
+            elif isinstance(exc_value, KeyError):
+                return None
+            elif isinstance(exc_value, ObjectDoesNotExist):
+                if 'rapidpro' in event.get('tags', {}).get('loader', ''):
+                    return None
+            elif isinstance(exc_value, AttributeError) and str(exc_value) == "'Run' object has no attribute 'source_id'":
+                return None
+            # TODO: remove me
+            print(111, "settings.py:703", event['tags'])
+            print(111, "settings.py:704", event['breadcrumbs'])
+            print(111, "settings.py:705", hint)
+            event['tags']['stack'] = env('STACK')
+        return event
+
+    sentry_sdk.init(before_send=before_send)
+
 SILENCED_SYSTEM_CHECKS = ["models.E006", "models.E007"]
 
 FORMAT_MODULE_PATH = 'etools_datamart.locale'
+
+EXPORT_FILE_STORAGE = env('EXPORT_FILE_STORAGE')
+EXPORT_FILE_STORAGE_KWARGS = env('EXPORT_FILE_STORAGE_KWARGS')
+
+AZURE_ACCOUNT_NAME = env('AZURE_STORAGE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = env('AZURE_STORAGE_ACCOUNT_KEY')
+AZURE_OVERWRITE_FILES = env('AZURE_STORAGE_OVERWRITE_FILES')
+AZURE_CONTAINER = env('AZURE_STORAGE_CONTAINER')
+AZURE_LOCATION = env('AZURE_STORAGE_LOCATION')
+AZURE_AUTO_SIGN = env('AZURE_STORAGE_AUTO_SIGN')
+AZURE_ACCESS_MODE = env('AZURE_STORAGE_ACCESS_MODE')
+AZURE_ACCESS_TTL = env('AZURE_STORAGE_ACCESS_TTL')

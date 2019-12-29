@@ -7,7 +7,6 @@ from django.utils.functional import cached_property
 from django_celery_beat.models import PeriodicTask
 from picklefield import PickledObjectField
 
-from etools_datamart.apps.data.models.base import EtoolsDataMartModel
 from etools_datamart.celery import app
 
 from .loader import RUN_TYPES, RUN_UNKNOWN
@@ -17,7 +16,7 @@ class TaskLogManager(models.Manager):
     def filter_for_models(self, *models):
         return self.filter(content_type__in=ContentType.objects.get_for_models(*models).values())
 
-    def get_for_model(self, model: EtoolsDataMartModel):
+    def get_for_model(self, model):
         try:
             return self.get(content_type=ContentType.objects.get_for_model(model))
         except EtlTask.MultipleObjectsReturned:  # pragma: no cover

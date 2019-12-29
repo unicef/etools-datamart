@@ -2,6 +2,7 @@ import sys
 from collections import OrderedDict
 
 from django import forms
+from django.conf import settings
 from django.template import loader
 
 from rest_framework import serializers
@@ -9,6 +10,8 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.pagination import CursorPagination, PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.utils.urls import remove_query_param, replace_query_param
+
+from unicef_rest_framework.exceptions import InvalidPaginationError
 
 
 class PageFilter(BaseFilterBackend):
@@ -64,7 +67,7 @@ class NumPagesField(serializers.Field):
 
 
 class APIPagination(PageNumberPagination):
-    page_size = 100
+    page_size = 20
     page_query_param = 'page'
 
     # Client can control the page size using this query parameter.
@@ -73,8 +76,9 @@ class APIPagination(PageNumberPagination):
 
     # Set to an integer to limit the maximum page size the client may request.
     # Only relevant if 'page_size_query_param' has also been set.
-    max_page_size = 10000
-
+    max_page_size = 1000
+    allow_single_page_response = settings.API_PAGINATION_SINGLE_PAGE_ENABLED
+    disable_pagination_key = settings.API_PAGINATION_OVERRIDE_KEY
     last_page_strings = ('last',)
 
     def get_paginated_response(self, data):
@@ -98,13 +102,15 @@ class APIPagination(PageNumberPagination):
             ]))
 
     def get_page_size(self, request):
-        if request._request.GET.get('format') == ['csv', 'iqy', 'xlsx']:
-            return sys.maxsize
         try:
             desired = request.query_params[self.page_size_query_param]
             if desired == "-1":
-                return sys.maxsize
-        except (KeyError, ValueError):
+                if self.allow_single_page_response or \
+                        (request.META.get('HTTP_PAGINATION_KEY', None) == self.disable_pagination_key):
+                    return sys.maxsize
+                else:
+                    raise InvalidPaginationError('Pagination cannot be disabled')
+        except KeyError:
             pass
         return super().get_page_size(request)
 

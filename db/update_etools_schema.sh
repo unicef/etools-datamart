@@ -20,7 +20,8 @@ export DATABASE_NAME=etools
 export DATABASE_USER=postgres
 export DATABASE_PASS=
 
-export BACKUPFILE=2019-04-08-1600.bz2
+export BACKUPFILE=${ETOOLS_BACKUP:=2019-04-08-1600.bz2}
+#export BACKUPFILE=${BACKUPFILE:=2019-04-08-1600.bz2}
 
 help (){
     echo "$0"
@@ -155,13 +156,15 @@ done
 
 print(){
     if [[ "$1" == "1" ]]; then
-        echo -en "\e[92m"
+        echo -en "\e[92m+ "
+    else
+        echo -en "\e[33m- "
     fi
     echo -e "$2\e[0m"
 }
 
 echo "Configuration:"
-print $DROP             "[d]rop and rebuild database - restore etools db with data from dump file. db1.bz2 -> etools.dump -> DB"
+print $DROP             "[d]rop and rebuild database - restore etools db with data from dump file. $BACKUPFILE -> etools.dump -> DB"
 print $OBFUSCATE        "[o]bfuscate sensitive data  - obfuscate sensitive data (email, names, phones..)"
 print $RESET_PASSWORD   "[r]eset password            - set all user password as 'password' "
 print $DUMP_PUBLIC      "[p]ublic schema dump        - dump cleanded data to $CURDIR (public.sqldump)"
@@ -171,8 +174,16 @@ print $INSPECT          "[i]nspect db and update ORM - inspect db and creates ne
 print $SUMMARY          "[s]summary                  - print summary informations"
 print $CLEAN            "[c]lean temporary files     - removes temporary files (etools.dump, [$BASE_SCHEMAS].sql, clean.sql, public.sqldump)"
 echo  "Connection        ${DATABASE_USER}:${DATABASE_PASS}@${PGHOST}:${PGPORT}/${DATABASE_NAME}"
-echo
 
+if [[ "$DROP" = "1" ]];then
+  if [[ ! -e ${BACKUPFILE} ]];then
+    echo -e "\e[31mERROR: Database backup file '${BACKUPFILE}' not found"
+    exit 1
+  else
+    echo "Database dump:    ${BACKUPFILE}"
+  fi
+fi
+echo
 #echo "Confirm ? Type the year that you want to check (4 digits), followed by [ENTER]:"
 
 read -p "Continue? " -n 1 -r

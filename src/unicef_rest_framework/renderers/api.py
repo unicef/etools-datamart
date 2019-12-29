@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
     template = 'rest_framework/api.html'
     filter_template = 'rest_framework/filter_template.html'
+    format = 'html'
 
     def get_filter_form(self, data, view, request):
         if not hasattr(view, 'get_queryset') or not hasattr(view, 'filter_backends'):
@@ -64,7 +65,7 @@ class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
                 ctx['response_headers'][key] = request.api_info.str(key)
         # ctx['response_headers']['ordering'] = getattr(view, 'ordering_fields', '')
         ctx['response_headers']['serializers'] = ", ".join(getattr(view, 'serializers_fieldsets', {}).keys())
-        # ctx['response_headers']['filters'] = getattr(view, 'filter_fields', '')
+        ctx['export_button'] = True
 
         ctx['extra_actions'] = view.get_extra_action_url_map()
         # ctx['base_action'] = reverse(f'api:{view.basename}-list', args=['latest'])

@@ -11,8 +11,8 @@ from test_utilities.factories import EmailTemplateFactory, HACTFactory, Subscrip
 
 from unicef_rest_framework.test_utils import user_allow_service
 
-from etools_datamart.apps.data.models import HACT
 from etools_datamart.apps.etl.models import EtlTask
+from etools_datamart.apps.mart.data.models import HACT
 from etools_datamart.apps.subscriptions.models import Subscription
 from etools_datamart.apps.subscriptions.urls import http_basic_auth
 from etools_datamart.apps.subscriptions.views import subscribe

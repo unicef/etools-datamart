@@ -71,6 +71,25 @@ MAIL_ATTACHMENT_HTML = r"""<div>Dear {{user.label}},</div>
 <div>To unsubscribe, change your preferences in <a href="{{base_url}}{% url 'monitor' %}">Datamart Monitor</a></div>
 """
 
+export_ready = r"""Dear {{user.label}},
+
+requested data "{{target.name}}" is ready to  be accessed at {{download_url}}.
+
+
+--
+UNICEF Datamart
+"""
+
+export_ready_html = """<div>Dear {{user.label}},</div>
+<div>&nbsp;</div>
+<div>requested data "{{target.name}}" is ready to  be accessed at {{download_url}}.</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>-</div>
+<div>UNICEF Datamart</div>
+"""
+
 RESTRICTED_AREAS = {'234R': ['mpawlowski@unicef.org',
                              'jmege@unicef.org',
                              'nukhan@unicef.org']}
@@ -249,9 +268,9 @@ class Command(BaseCommand):
             # for entry, values in settings.CACHES.items():
             #     loc = values.get('LOCATION', '')
             #     spec = urlparse(loc)
-                # if spec.scheme == 'redis':
-                #     RedisServer.objects.get_or_create(hostname=spec.hostname,
-                #                                       port=int(spec.port))
+            # if spec.scheme == 'redis':
+            #     RedisServer.objects.get_or_create(hostname=spec.hostname,
+            #                                       port=int(spec.port))
 
             if options['tasks'] or _all or options['refresh']:
                 preload_cron, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)
@@ -303,6 +322,10 @@ class Command(BaseCommand):
                                                 defaults=dict(subject='Dataset changed',
                                                               content=MAIL,
                                                               html_content=MAIL_HTML))
+            EmailTemplate.objects.get_or_create(name='export_ready',
+                                                defaults=dict(subject='dataset ready',
+                                                              content=MAIL_ATTACHMENT,
+                                                              html_content=MAIL_ATTACHMENT_HTML))
 
             if options['refresh'] or deploy:
                 self.stdout.write("Refreshing datamart...")

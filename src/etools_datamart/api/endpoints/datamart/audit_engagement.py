@@ -8,9 +8,8 @@ from rest_framework import serializers
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
-from etools_datamart.apps.data import models
-from etools_datamart.apps.data.models import Engagement
-from etools_datamart.apps.etools.enrichment.consts import AuditEngagementConsts
+from etools_datamart.apps.mart.data import models
+from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 
 from ..common import DataMartViewSet
 
@@ -56,10 +55,10 @@ class EngagementSerializerSimple(DataMartSerializer):
                   )
 
 
-URL_MAP = {Engagement.TYPE_AUDIT: 'audit',
-           Engagement.TYPE_MICRO_ASSESSMENT: 'micro-assessments',
-           Engagement.TYPE_SPOT_CHECK: 'spot-checks',
-           Engagement.TYPE_SPECIAL_AUDIT: 'special-audits'
+URL_MAP = {models.Engagement.TYPE_AUDIT: 'audit',
+           models.Engagement.TYPE_MICRO_ASSESSMENT: 'micro-assessments',
+           models.Engagement.TYPE_SPOT_CHECK: 'spot-checks',
+           models.Engagement.TYPE_SPECIAL_AUDIT: 'special-audits'
            }
 
 

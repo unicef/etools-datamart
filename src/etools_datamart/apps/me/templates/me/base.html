@@ -1,19 +1,34 @@
-{% extends 'base.html' %}{% load static %}
-{% block title %}Profile{% endblock %}
-{% block body %}
-    <div id="header">
-        <img src="{% static 'unicef_logo.png' %}" width="100">
-    </div>
-    <div class="menubar">
-        <span><a href="{% url "home" %}">Home</a></span>
-        <span><a href="{% url "api:api-root" version="latest" %}">API</a></span>
-        <span><a href="{% url "api:schema-redoc" %}">Documentation</a></span>
-
-        {% if user.is_staff %}
-            <span><a href="{% url "admin:index" %}">Admin</a></span>
-        {% endif %}
-    </div>
-
-    {% block content %}
-    {% endblock %}
+{% extends 'rest_framework/base.html' %}{% load static %}
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    {{ block.super }}
 {% endblock %}
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li class="active"><a href="{% url "home" %}">Home</a></li>
+        {% block breadcrumbs_items %}
+        {% endblock breadcrumbs_items %}
+    </ul>
+{% endblock %}
+
+{#{% block title %}Profile{% endblock %}#}
+{#{% block body %}#}
+{#    <div id="header">#}
+{#        <img src="{% static 'unicef_logo.png' %}" width="100">#}
+{#    </div>#}
+{#    <div class="menubar">#}
+{#        <span><a href="{% url "home" %}">Home</a></span>#}
+{#        <span><a href="{% url "api:api-root" version="latest" %}">API</a></span>#}
+{#        <span><a href="{% url "api:schema-redoc" %}">Documentation</a></span>#}
+{##}
+{#        {% if user.is_staff %}#}
+{#            <span><a href="{% url "admin:index" %}">Admin</a></span>#}
+{#        {% endif %}#}
+{#    </div>#}
+{##}
+{#    {% block content %}#}
+{#        {{ block.super }}#}
+{#    {% block content2 %}#}
+{#    {% endblock %}#}
+{#    {% endblock %}#}
+{#{% endblock %}#}

@@ -1,0 +1,66 @@
+{% extends "rest_framework/base.html" %}{% load crispy_forms_filters urf  %}
+{% block head %}{{ block.super }}{% endblock %}
+{% block body %}{{ block.super }}{% endblock %}
+{% block navbar %}{{ block.super }}{% endblock %}
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li class="active"><a href="{% url "home" %}">Home</a></li>
+        <li class="active"><a href="{% url "profile" %}">Settings</a></li>
+        <li class="active"><a href="{% url 'urf:export-list' %}">Files</a></li>
+    </ul>
+{% endblock %}
+{% block request-info %}
+{#    <div class="request-info" style="clear: both">#}
+{#    <pre class="prettyprint"><b>GET</b> {{ url }}<span style="cursor:pointer;float: right;position: relative;display: inline"#}
+{#                                    id="copyToClipboard">copy</span></pre>#}
+{#        <input style="position: absolute;left:-9999px" readonly="readonly" type="text"#}
+{#               name="query-url" value="{{ url }}">#}
+{#    </div>#}
+{% endblock %}
+{% block api-response %}
+    <h1>Files</h1>
+    {% if export_list %}
+        <table class="container table">
+<thead>
+                <tr>
+                    <th>description</th>
+                    <th>filename</th>
+                    <th>refresh</th>
+                    <th>enabled</th>
+                    <th>Owner</th>
+                    <th>Updated On</th>
+                    <th>Size</th>
+                    <th></th>
+                </tr>
+
+</thead>
+            {% for export in export_list %}
+                <tr style="padding-bottom: 0;">
+                    <td>{% if export.as_user == request.user or request.user.is_superuser %}
+                        <a href="{% url "urf:export-update" export.id %}">{{ export.name }}</a>
+                    {% else %}
+                        {{ export.name }}
+                    {% endif %}
+                    </td>
+                    <td>{{ export.filename }}</td>
+                    <td>{{ export.refresh }}</td>
+                    <td>{{ export.enabled }}</td>
+                    <td>{{ export.as_user }}</td>
+                    <td>{{ export.last_run|default_if_none:"" }}</td>
+                    <td>{{ export.response_length|humanize }}</td>
+                    <td>{% if export.last_run %}
+                        <a href="{% url "urf:export-fetch" export.id %}">download</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr style="border-top: 0;padding-top: 0;">
+                <td colspan="8" style="border-top: 0;padding-top: 0;"><small>{{ export.url }}</small>
+                </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>There are no files available.</p>
+    {% endif %}
+{% endblock %}
+{% block script %}{{ block.super }}{% endblock %}

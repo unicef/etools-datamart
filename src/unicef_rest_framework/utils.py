@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from urllib.parse import urlencode
+from urllib.parse import parse_qsl, urlencode, urlparse
 
 from rest_framework.settings import api_settings
 
@@ -69,3 +69,11 @@ def get_query_string(params, new_params=None, remove=None):
         else:
             p[k] = v
     return '?%s' % urlencode(sorted(p.items()))
+
+
+def parse_url(url, remove=None):
+    if remove is None:
+        remove = []
+    parts = urlparse(url)
+    params = dict(parse_qsl(parts.query))
+    return parts.path, {k: v for k, v in params.items() if k not in remove}

@@ -15,15 +15,16 @@ from rest_framework.response import Response
 from sentry_sdk import capture_exception
 from strategy_field.utils import fqn
 
+from unicef_rest_framework.cache import ListKeyConstructor
 from unicef_rest_framework.ds import DynamicSerializerFilter
 from unicef_rest_framework.filtering import SystemFilterBackend
 from unicef_rest_framework.ordering import OrderingFilter
 from unicef_rest_framework.views import URFReadOnlyModelViewSet
-from unicef_rest_framework.views_mixins import IQYConnectionMixin
 
 from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
+from etools_datamart.apps.security.cache import SchemaAccessKeyBit
 from etools_datamart.libs.mystica import MysticaBasicAuthentication
 
 __all__ = ['APIMultiTenantReadOnlyModelViewSet']
@@ -41,10 +42,11 @@ class UpdatesMixin:
         else:
             offset = 'none'
             queryset = self.queryset.all()
-
+        queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data,
-                        headers={'update-date': offset})
+        return self.get_paginated_response(serializer.data)
+        # return Response(serializer.data,
+        #                 headers={'update-date': offset})
 
 
 class AutoRegisterMetaClass(type):
@@ -56,7 +58,11 @@ class AutoRegisterMetaClass(type):
         return new_class
 
 
-class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet, IQYConnectionMixin,
+class CountryAwareKeyConstructor(ListKeyConstructor):
+    schemas = SchemaAccessKeyBit()
+
+
+class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet,
                                   metaclass=AutoRegisterMetaClass):
     authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MysticaBasicAuthentication,)
     filter_backends = [DatamartQueryStringFilterBackend,
@@ -186,7 +192,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 
 
 class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
-    pass
+    list_cache_key_func = list_etag_func = CountryAwareKeyConstructor()
 
     # def _get_serializer_from_param(self, name=None):
     #     if self.request:

@@ -14,6 +14,9 @@ from django_regex.utils import RegexList
 logger = logging.getLogger(__name__)
 
 INGNORED_TABLES = RegexList([
+    'auth_permission',
+    'account_user_user_permissions',
+    'auth_group_permissions',
     'django_cron_.*',
     'post_office_.*',
     'django_session',
@@ -109,7 +112,7 @@ class Command(BaseCommand):
             with api_file.open('w') as api:
                 api.write("from unicef_rest_framework.views import URFReadOnlyModelViewSet\n\n")
                 api.write("from etools_datamart.api.endpoints.etools import serializers\n")
-                api.write("from etools_datamart.apps.prp import models\n")
+                api.write("from etools_datamart.apps.sources.source_prp import models\n")
 
                 for model_name in self.prp_models:
                     if model_name not in NO_API:
@@ -291,8 +294,8 @@ class Command(BaseCommand):
                         if _related_name in REVERSE_RELATION_NAMES:
                             _related_name = REVERSE_RELATION_NAMES[_related_name]
                         else:
-                            # _related_name = _related_name.replace('.', '_')
-                            _related_name = '+'
+                            _related_name = _related_name.replace('.', '_')
+                            # _related_name = '+'
                         field_desc += ', models.PROTECT'
                         field_desc += f", related_name='{_related_name}'"
 

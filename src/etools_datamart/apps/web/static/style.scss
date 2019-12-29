@@ -25,7 +25,7 @@
 }
 
 .results {
-  .success, .error, .failure, .warn, .run{
+  .success, .error, .failure, .warn, .run {
     font-weight: bold;
   }
 }
@@ -169,7 +169,7 @@ ul.index-menu {
   }
   .master-container {
     min-height: 94vh;
-     display: flex;
+    display: flex;
     align-items: start;
   }
 }
@@ -279,7 +279,7 @@ input.input100 {
   background: #4bace9;
 
   font-size: 12px;
-  color: #fff;
+  color: #ffffff;
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -419,35 +419,57 @@ input.input100 {
 }
 
 .profile {
-
-  #areas, #services, #password {
-    margin-right: 20px;
-    padding: 10px;
+  .panel {
+    padding: 5px;
     position: relative;
     display: inline-block;
+    width: 300px;
 
     h1 {
       font-size: 14pt;
       margin-bottom: 5px;
     }
 
-    ul, form {
+    ul {
+      width: 100%;
       border: 1px solid #cfcfcf;
       overflow-y: scroll;
-      width: 300px;
       height: 400px;
     }
   }
 
+  #areas {
+    width: 18%;
+  }
+
+  #services {
+    width: 40%;
+  }
+
+  //#menu {
+  //  width: 170px;
+  //
+  //  ul {
+  //    text-align: left;
+  //    overflow-y: hidden;
+  //    padding: 5px;
+  //  }
+  //}
+
   #password {
+    width: 40%;
+    ul{
+          overflow-y: hidden;
+    overflow-x: hidden;
+
+    }
     .message {
       margin: 20px;
       text-align: left;
 
       .password {
         text-align: center;
-
-        margin: 20px;
+        //margin: 20px;
         padding: 20px;
         font-family: monospace;
         font-size: 20px;
@@ -482,7 +504,7 @@ input.input100 {
 
     .btn-submit {
       background: #4bace9;
-      color: #fff;
+      color: #ffffff;
     }
   }
 }

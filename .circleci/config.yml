@@ -6,7 +6,6 @@ jobs:
       - image: python:3.7-slim
         environment:
           PGHOST: 127.0.0.1
-          PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: "postgis://postgres:postgres@127.0.0.1:5432/etools_datamart"
           DATABASE_URL_ETOOLS: "postgis://postgres:postgres@127.0.0.1:5432/etools"
           RELEASE_MATCH: "release/*"
@@ -40,38 +39,26 @@ jobs:
                   python-dev \
                   postgresql-client
 
-      - run:
-          name: Create databases
-          command: |
-            createdb --user postgres etools
-
       - restore_cache:
           keys:
             - source-{{ .Branch }}-{{ .Revision }}
       - checkout
       - restore_cache:
           keys:
-            - deps-v2-{{ checksum "Pipfile.lock" }}
+            - deps-v2-{{ checksum "poetry.lock" }}
 
       - run:
           name: install deps
           command: |
-            pip install pipenv==2018.10.13
-            pipenv install -d --deploy --ignore-pipfile
+            pip install poetry
+            poetry install
 
       - run:
           name: create db
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            pipenv run pytest tests/test_login.py -x --create-db || exit 0
-
-      - run:
-          name: run tests
-          command: |
-            export PATH=/home/circleci/.local/bin:$PATH
-            export PYTHONHASHSEED=${RANDOM}
-            pipenv run pytest tests/ -x --reuse-db
+            poetry run pytest tests/ --create-db
 
       - store_artifacts:
           path: ~build/coverage
@@ -83,7 +70,7 @@ jobs:
             - ".git"
 
       - save_cache:
-          key: deps-v2-{{ checksum "Pipfile.lock" }}
+          key: deps-v2-{{ checksum "poetry.lock" }}
           paths:
             - ".tox"
             - ".venv"
@@ -191,7 +178,6 @@ jobs:
       - image: docker:17.05.0-ce-git
         environment:
           PGHOST: 127.0.0.1
-          PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/etools_datamart"
           DATABASE_URL_ETOOLS: "postgres://postgres:postgres@127.0.0.1:5432/etools"
       - image: circleci/postgres:9.6-alpine-postgis

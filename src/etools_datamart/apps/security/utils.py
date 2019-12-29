@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from django.conf import settings
 from django.core.cache import caches
 from django.db import connections
@@ -7,14 +9,15 @@ from constance import config
 
 from unicef_rest_framework.models import Service
 
-from etools_datamart.apps.etools.models import UsersUserprofile
 from etools_datamart.apps.security.models import SchemaAccessControl
+from etools_datamart.apps.sources.etools.models import UsersUserprofile
 from etools_datamart.libs.version import get_full_version
 
 conn = connections['etools']
 cache = caches['default']
 
 
+@lru_cache(2)
 def get_allowed_schemas(user):
     if not user.is_authenticated:
         return []

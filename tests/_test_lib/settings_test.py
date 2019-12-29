@@ -52,5 +52,4 @@ SESSION_COOKIE_SECURE = False
 
 LOGGING['loggers']['etools_datamart']['handlers'] = ['null']  # noqa
 LOGGING['loggers']['']['handlers'] = ['null']  # noqa
-LOGGING['loggers']['django_db_logging']['handlers'] = ['null']  # noqa
 LOGGING['loggers']['unicef_rest_framework']['handlers'] = ['null']  # noqa
