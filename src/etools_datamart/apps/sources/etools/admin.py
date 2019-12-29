@@ -41,6 +41,7 @@ class PartnerOrganizationAdmin(TenantModelAdmin):
 class PartnersAssessmentAdmin(TenantModelAdmin):
     pass
 
+
 #
 # @register(models.PartnersAgreement)
 # class PartnersAgreementAdmin(TenantModelAdmin):
@@ -118,4 +119,21 @@ class UsersCountryAdmin(EToolsModelAdmin):
 @register(models.LocationsLocation)
 class LocationsLocationAdmin(TenantModelAdmin):
     list_display = ('name', 'latitude', 'longitude')
-    search_fields = ('name', )
+    search_fields = ('name',)
+
+
+# UnicefAttachments
+
+@register(models.UnicefAttachmentsAttachment)
+class UnicefAttachmentsAttachmentAdmin(TenantModelAdmin):
+    list_display = ('code', 'file')
+
+
+@register(models.UnicefAttachmentsAttachmentflat)
+class UnicefAttachmentsAttachmentflatAdmin(TenantModelAdmin):
+    list_display = ('object_link', 'file_type', 'file_link', 'filename')
+
+
+@register(models.UnicefAttachmentsAttachmentlink)
+class UnicefAttachmentsAttachmentlinkAdmin(TenantModelAdmin):
+    list_display = ('object_id', 'attachment', 'content_type')

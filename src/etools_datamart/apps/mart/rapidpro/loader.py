@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from celery.utils.log import get_task_logger
 from constance import config
-from sentry_sdk import capture_exception
+from sentry_sdk import capture_exception, push_scope
 from strategy_field.utils import get_attr
 from temba_client.serialization import TembaObject
 from temba_client.v2 import TembaClient
@@ -108,70 +108,72 @@ class TembaLoader(BaseLoader):
         from .models import Source, Organization
         sources = Source.objects.filter(is_active=True)
         self.results = EtlResult()
-        try:
-            if api_token:
-                Source.objects.get_or_create(api_token=api_token,
-                                             defaults={'name': api_token})
-                sources = sources.filter(api_token=api_token)
+        with push_scope() as scope:
+            scope.set_tag("loader", "rapidpro.%s" % self.__class__.__name__)
+            try:
+                if api_token:
+                    Source.objects.get_or_create(api_token=api_token,
+                                                 defaults={'name': api_token})
+                    sources = sources.filter(api_token=api_token)
 
-            self.on_start(run_type)
-            for source in sources:
-                if verbosity > 0:
-                    stdout.write("Source %s" % source)
-                client = TembaClient(config.RAPIDPRO_ADDRESS, source.api_token)
-                oo = client.get_org()
-                if verbosity > 0:
-                    stdout.write("  fetching organization info")
+                self.on_start(run_type)
+                for source in sources:
+                    if verbosity > 0:
+                        stdout.write("Source %s" % source)
+                    client = TembaClient(config.RAPIDPRO_ADDRESS, source.api_token)
+                    oo = client.get_org()
+                    if verbosity > 0:
+                        stdout.write("  fetching organization info")
 
-                org, __ = Organization.objects.get_or_create(source=source,
-                                                             defaults={'name': oo.name,
-                                                                       'country': oo.country,
-                                                                       'primary_language': oo.primary_language,
-                                                                       'timezone': oo.timezone,
-                                                                       'date_style': oo.date_style,
-                                                                       'languages': oo.languages,
-                                                                       'anon': oo.anon
-                                                                       })
-                if verbosity > 0:
-                    stdout.write("  found organization %s" % oo.name)
+                    org, __ = Organization.objects.get_or_create(source=source,
+                                                                 defaults={'name': oo.name,
+                                                                           'country': oo.country,
+                                                                           'primary_language': oo.primary_language,
+                                                                           'timezone': oo.timezone,
+                                                                           'date_style': oo.date_style,
+                                                                           'languages': oo.languages,
+                                                                           'anon': oo.anon
+                                                                           })
+                    if verbosity > 0:
+                        stdout.write("  found organization %s" % oo.name)
 
-                func = "get_%s" % self.config.source
-                getter = getattr(client, func)
+                    func = "get_%s" % self.config.source
+                    getter = getattr(client, func)
 
-                args_spec = inspect.getfullargspec(getter)
-                if 'after' in args_spec.args and self.etl_task.last_success:
-                    filters = dict(after=self.etl_task.last_success)
-                else:
-                    filters = {}
+                    args_spec = inspect.getfullargspec(getter)
+                    if 'after' in args_spec.args and self.etl_task.last_success:
+                        filters = dict(after=self.etl_task.last_success)
+                    else:
+                        filters = {}
 
-                data = getter(**filters)
-                self.update_context(today=timezone.now(),
-                                    max_records=max_records,
-                                    verbosity=verbosity,
-                                    records=0,
-                                    only_delta=only_delta,
-                                    is_empty=not self.model.objects.exists(),
-                                    stdout=stdout,
-                                    organization=source.organization
-                                    )
-                if verbosity > 0:
-                    stdout.write("  fetching data")
-                for page in data.iterfetches():
-                    for entry in page:
-                        self.source_record = entry
-                        filters = self.config.key(self, entry)
-                        values = self.get_values(entry)
+                    data = getter(**filters)
+                    self.update_context(today=timezone.now(),
+                                        max_records=max_records,
+                                        verbosity=verbosity,
+                                        records=0,
+                                        only_delta=only_delta,
+                                        is_empty=not self.model.objects.exists(),
+                                        stdout=stdout,
+                                        organization=source.organization
+                                        )
+                    if verbosity > 0:
+                        stdout.write("  fetching data")
+                    for page in data.iterfetches():
+                        for entry in page:
+                            self.source_record = entry
+                            filters = self.config.key(self, entry)
+                            values = self.get_values(entry)
 
-                        # values['organization'] = source.organization
-                        # filters = {'uuid': values['uuid']}
-                        op = self.process_record(filters, values)
-                        self.increment_counter(op)
+                            # values['organization'] = source.organization
+                            # filters = {'uuid': values['uuid']}
+                            op = self.process_record(filters, values)
+                            self.increment_counter(op)
 
-        except MaxRecordsException:
-            pass
-        except Exception as e:
-            self.on_end(error=e)
-            raise
-        finally:
-            self.on_end()
+            except MaxRecordsException:
+                pass
+            except Exception as e:
+                self.on_end(error=e)
+                raise
+            finally:
+                self.on_end()
         return self.results

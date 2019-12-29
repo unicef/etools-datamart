@@ -42,6 +42,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DATABASE_URL_PRP=(str, "postgis://postgres:@127.0.0.1:5432/prp"),
                   DEBUG=(bool, False),
+                  STACK=(str, 'DEVELOPMENT'),
                   API_PAGINATION_OVERRIDE_KEY=(str, 'disable-pagination'),
                   API_PAGINATION_SINGLE_PAGE_ENABLED=(bool, False),
                   DISABLE_SCHEMA_RESTRICTIONS=(bool, False),
@@ -697,10 +698,24 @@ if SENTRY_ENABLED:
                     debug=False)
 
     def before_send(event, hint):
+        from django.core.exceptions import ObjectDoesNotExist
         if 'exc_info' in hint:
             exc_type, exc_value, tb = hint['exc_info']
             if isinstance(exc_value, SMTPServerDisconnected):
                 return None
+            elif isinstance(exc_value, KeyError):
+                return None
+            elif isinstance(exc_value, ObjectDoesNotExist):
+                if 'rapidpro' in event.get('tags', {}).get('loader', ''):
+                    return None
+            elif isinstance(exc_value, AttributeError) and str(exc_value) == "'Run' object has no attribute 'source_id'":
+                return None
+            # TODO: remove me
+            print(111, "settings.py:703", event['tags'])
+            print(111, "settings.py:704", event['breadcrumbs'])
+            print(111, "settings.py:705", hint)
+            event['tags']['stack'] = env('STACK')
+        return event
 
     sentry_sdk.init(before_send=before_send)
 

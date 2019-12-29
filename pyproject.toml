@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datamart-core"
-version = "2.10.0a11"
+version = "2.10.1"
 description = ""
 authors = ["sax <s.apostolico@gmail.com>"]
 
@@ -9,7 +9,7 @@ admin-extra-urls = "^2.1"
 celery = "*"
 circus = "*"
 cryptography = "==2.7"
-django = "*"
+django = "^2.2"
 django-adminactions = "^1.8"
 django-adminfilters = "^1.1"
 django-celery-beat = "*"

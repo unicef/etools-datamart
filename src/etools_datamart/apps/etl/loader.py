@@ -11,12 +11,12 @@ import celery
 from celery.utils.log import get_task_logger
 from constance import config
 from redis.exceptions import LockError
+from sentry_sdk import capture_exception
 from strategy_field.utils import fqn, get_attr
 
 from etools_datamart.apps.etl.exceptions import (LoaderException, MaxRecordsException,
                                                  RequiredIsMissing, RequiredIsRunning,)
 from etools_datamart.celery import app
-from etools_datamart.sentry import process_exception
 
 loadeables = set()
 locks = caches['lock']
@@ -157,9 +157,11 @@ class LoaderTask(celery.Task):
             raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
                              countdown=config.ETL_RETRY_COUNTDOWN)
         except Exception as e:  # pragma: no cover
+            logger.exception(e)
             # self.loader.etl_task.status = 'ERROR'
             # self.loader.etl_task.save()
-            process_exception(e)
+            # process_exception(e)
+            capture_exception()
             raise
 
 
@@ -245,6 +247,8 @@ class BaseLoader:
     def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
+            if not hasattr(other, field_name):
+                continue
             new = getattr(other, field_name)
             current = getattr(record, field_name)
 
