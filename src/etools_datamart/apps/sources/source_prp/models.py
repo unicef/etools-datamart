@@ -550,7 +550,7 @@ class IndicatorReportableDisaggregations(ReadOnlyModel):
         app_label = 'source_prp'
 
 
-class IndicatorReportable locationgoal(ReadOnlyModel):
+class IndicatorReportablelocationgoal(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     target = models.TextField()  # This field type is a guess.

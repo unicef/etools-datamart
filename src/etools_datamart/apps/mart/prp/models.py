@@ -45,6 +45,8 @@ Totalbudget(ideally at most granular level tied to activity / result)
 Utilised budget(same conditions as above)
 Report  #
 """
+import json
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models import Q
@@ -451,22 +453,47 @@ class DataReport(PrpDataMartModel):
 
 class DisaggregationLoader(PrpBaseLoader):
     def get_queryset(self):
-        # all_progress_reports = UnicefProgressreport.objects.all()
-        # qs = CoreResponseplan.objects.all()
+        # OPTION 1
         for id in IndicatorIndicatorlocationdata.objects.all():
-            values = {'location': id.location.title,
-                      'period_start': id.indicator_report.time_period_start,
-                      'period_end': id.indicator_report.time_period_end,
-                      'indicator': id.indicator_report.reportable.blueprint.title,
-                      'indicator_id': id.indicator_report.reportable.blueprint.id,
-                      'disaggregation': id.disaggregation
-                      }
-            for d in IndicatorDisaggregationvalue.
-            # for d in IndicatorReportableDisaggregations.objects.filter(reportable=id.indicator_report.reportable):
-            #     values['disaggregation'] = d.disaggregation.response_plan.IndicatorDisaggregationvalue_disaggregation.value
-        qs = IndicatorIndicatorreport.objects.all()
-        l = IndicatorIndicatorlocationdata.objects.get(indicator_report=ir)
-        
+            # id.disaggregation is JSON with obscure data.
+            # should we iterate it ?
+            # what is total ?
+            # {'disaggregation': {'()': {'c': 0.7666666666666667, 'd': 120, 'v': 92},
+            #                    '(15,)': {'c': 0.6440677966101694, 'd': 59, 'v': 38},
+            #                    '(16,)': {'c': 0.8852459016393442, 'd': 61, 'v': 54},
+            #                    '(17,)': {'c': 0, 'd': 0, 'v': 0},
+            #                    '(18,)': {'c': 0.8235294117647058, 'd': 34, 'v': 28},
+            #                    '(19,)': {'c': 0.6333333333333333, 'd': 30, 'v': 19},
+            #                    '(20,)': {'c': 0.8035714285714286, 'd': 56, 'v': 45},
+            #                    '(15, 17)': {'c': 0, 'd': 0, 'v': 0},
+            #                    '(15, 18)': {'c': 0.6875, 'd': 16, 'v': 11},
+            #                    '(15, 19)': {'c': 0.5, 'd': 18, 'v': 9},
+            #                    '(15, 20)': {'c': 0.72, 'd': 25, 'v': 18},
+            #                    '(16, 17)': {'c': 0, 'd': 0, 'v': 0},
+            #                    '(16, 18)': {'c': 0.9444444444444444, 'd': 18, 'v': 17},
+            #                    '(16, 19)': {'c': 0.8333333333333334, 'd': 12, 'v': 10},
+            #                    '(16, 20)': {'c': 0.8709677419354839, 'd': 31, 'v': 27}}}
+            # {'disaggregation': {'()': {'c': 1.0, 'd': 16, 'v': 16},
+            #                     '(15,)': {'c': 1.0, 'd': 12, 'v': 12},
+            #                     '(16,)': {'c': 1.0, 'd': 4, 'v': 4}}}
+            # {'disaggregation': {'()': {'c': 0, 'd': 0, 'v': 0}}}
+            # {'disaggregation': {'()': {'c': 1, 'd': 1, 'v': 1}}}
+            # {'disaggregation': {'()': {'c': 0.04745403666605644, 'd': 76474, 'v': 3629}}}
+
+            values = {
+                'location': id.location.title,
+                'period_start': id.indicator_report.time_period_start,
+                'period_end': id.indicator_report.time_period_end,
+                'indicator': id.indicator_report.reportable.blueprint.title,
+                'indicator_id': id.indicator_report.reportable.blueprint.id,
+                'disaggregation': id.disaggregation,
+                # '--': id.disaggregation['()'],
+            }
+            print(111, "models.py:466", values)
+            
+        # # OPTION 2
+        # # all_progress_reports = UnicefProgressreport.objects.all()
+        # # qs = CoreResponseplan.objects.all()
         # qs = IndicatorIndicatorreport.objects.all()
         # for ir in qs.all():
         #     for ird in IndicatorReportableDisaggregations.objects.filter(reportable=ir.reportable):
@@ -476,14 +503,13 @@ class DisaggregationLoader(PrpBaseLoader):
         #                       'indicator': ir.reportable.blueprint.title,
         #                       'period_start': ir.time_period_start,
         #                       'period_end': ir.time_period_end,
-        #                       'location': get_attr(idv, 'disaggregation.response_plan.workspace.title')
+        #                       'location': get_attr(idv, 'disaggregation.response_plan.workspace.title'),
+        #                       'total': '?'
         #                       }
-        #             # TODO: remove me
-        #             print(111, "models.py:461", ir, ird, idv)
-        #             # TODO: remove me
-                print(111, "models.py:466", values)
-
-        return qs.all()
+        #             print(111, "models.py:466", values)
+        #             break
+        #         break
+        #     break
 
 
 class Disaggregation(PrpDataMartModel):
