@@ -3,6 +3,8 @@ name = "datamart-core"
 version = "2.11.0a"
 description = ""
 authors = ["sax <s.apostolico@gmail.com>"]
+homepage = "https://github.com/unicef/etools-datamart"
+license = "Not open source"
 
 [tool.poetry.dependencies]
 admin-extra-urls = "^2.1"
