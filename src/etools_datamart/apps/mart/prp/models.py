@@ -224,7 +224,7 @@ class DataReportLoader(PrpBaseLoader):
     def get_queryset(self):
         # all_progress_reports = UnicefProgressreport.objects.all()
         qs = IndicatorIndicatorlocationdata.objects.all()
-        qs = qs.exclude(Q(indicator_report__progress_report__isnull=False) |
+        qs = qs.exclude(Q(indicator_report__progress_report__isnull=True) |
                         Q(indicator_report__progress_report__status__in=["Due",
                                                                          "Ove",
                                                                          "Sen"]))
