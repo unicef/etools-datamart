@@ -10,7 +10,6 @@ from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterv
 from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
                                                         PartnersIntervention, PartnersInterventionplannedvisits,
                                                         ReportsAppliedindicator, T2FTravelactivity,)
-from etools_datamart.sentry import process_exception
 
 from .base import EtoolsDataMartModel
 from .location import Location
@@ -303,14 +302,8 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(ret)
 
     def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
-        try:
-            return FundsFundsreservationheader.objects.get(intervention=record,
-                                                           end_date__isnull=True).fr_number
-        except FundsFundsreservationheader.MultipleObjectsReturned as e:
-            process_exception(e)
-            return None
-        except FundsFundsreservationheader.DoesNotExist:
-            return None
+        return ", ".join(FundsFundsreservationheader.objects.filter(intervention=record)
+                         .values_list('fr_number', flat=True))
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
         values['cp_outputs_data'] = list(record.result_links.values("name", "code"))
