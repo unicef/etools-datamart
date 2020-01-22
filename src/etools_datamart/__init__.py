@@ -1,8 +1,8 @@
 import warnings
 
 NAME = 'etools-datamart'
-VERSION = __version__ = '2.10.2'
+VERSION = __version__ = '2.10.3rc'
 __author__ = ''
 
-# UserWarning: The psycopg2 wheel package will be renamed from release 2.10.2;
+# UserWarning: The psycopg2 wheel package will be renamed from release 2.10.3rc;
 warnings.simplefilter("ignore", UserWarning, 144)
