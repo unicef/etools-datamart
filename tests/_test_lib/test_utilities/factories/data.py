@@ -290,3 +290,8 @@ class SpotCheckFactory(DataMartModelFactory):
 
     class Meta:
         model = models.SpotCheck
+
+
+class PartnerStaffMemberFactory(DataMartModelFactory):
+    class Meta:
+        model = models.PartnerStaffMember
