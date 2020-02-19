@@ -2,6 +2,17 @@
 ----
 * fixes #18276 - Add `Achievement in reporting period` field to the prp/datareport endpoint
 
+
+2.10.3
+------
+* fixes Intervention.frs
+
+
+2.10.2
+------
+* fixes DataReportLoader
+
+
 2.10.1
 ------
 * use poetry instead of pipenv
