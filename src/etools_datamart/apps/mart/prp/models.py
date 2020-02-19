@@ -234,6 +234,7 @@ class DataReportLoader(PrpBaseLoader):
         return super().get_value(field_name, value_or_func, original_record, current_mapping)
 
     def get_values(self, record: IndicatorIndicatorlocationdata):
+        record._indicator: IndicatorIndicatorreport = record.indicator_report
         record._reportable: IndicatorReportable = record.indicator_report.reportable
         return super().get_values(record)
 
@@ -285,6 +286,9 @@ class DataReportLoader(PrpBaseLoader):
             record.indicator_report.reportable.lower_level_output = ll
             return cp_output.programme_document.title
         return None
+
+    def get_achievement_in_reporting_period(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
+        return record._indicator.total["c"]
 
     def get_total_cumulative_progress(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         return record._reportable.total["c"]
@@ -395,6 +399,8 @@ class DataReport(PrpDataMartModel):
     total_cumulative_progress_in_location = models.CharField(max_length=2048, blank=True, null=True)
     # total_cumulative_progress | reportable.total["c"] |
     total_cumulative_progress = models.CharField(max_length=2048, blank=True, null=True)
+    achievement_in_reporting_period = models.CharField(max_length=2048, blank=True, null=True)
+
     loader = DataReportLoader()
 
     class Meta:
@@ -442,5 +448,7 @@ class DataReport(PrpDataMartModel):
                    'current_location': 'location.title',
                    'previous_location_progress': 'previous_location_data.title',
                    'total_cumulative_progress_in_location': 'N/A',
-                   'total_cumulative_progress': '-'
+                   'total_cumulative_progress': '-',
+                   'achievement_in_reporting_period': '-',
+
                    }
