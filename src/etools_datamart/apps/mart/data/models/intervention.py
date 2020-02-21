@@ -72,7 +72,7 @@ class InterventionAbstract(models.Model):
     partner_signatory_first_name = models.CharField(max_length=64, null=True)
     partner_signatory_last_name = models.CharField(max_length=64, null=True)
     partner_signatory_phone = models.CharField(max_length=64, null=True)
-    partner_signatory_title = models.CharField(max_length=64, null=True)
+    partner_signatory_title = models.CharField(max_length=100, null=True)
     partner_source_id = models.IntegerField(blank=True, null=True)
     partner_type = models.CharField(max_length=64, null=True)
     partner_vendor_number = models.CharField(max_length=100, blank=True, null=True)
