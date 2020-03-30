@@ -1,83 +1,87 @@
 version: '2'
 services:
-#  proxy:
-#    build: ./proxy
-#    ports:
-#    - 8000:8000
-#    depends_on:
-#    - datamart
-#    - flower
+  proxy:
+    image: traefik:v2.1
+    command: --api.insecure=True --providers.docker
+    ports:
+      - "8083:80"
+      - "8080:8080"
+    container_name: datamart_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
-#  base:
-#    build:
-#      context: .
-#      dockerfile: ./docker/Dockerfile.alpine.base
-#      args:
-#        VERSION: "x.x"
-
-#  datamart:
-#    build:
-#      context: .
-#      dockerfile: ./docker/Dockerfile.alpine
-#      args:
-#        BASE_IMAGE: "2.11-base"
-#    environment: &environment
-#      AUTOCREATE_USERS: "admin,123"
-#      BASE_IMAGE: "compose"
-#      CACHE_URL: "redis://redis:6379/1"
-#      CACHE_URL_LOCK: "redis://redis:6379/1"
-#      CACHE_URL_API: "redis://redis:6379/1"
-#      CACHE_URL_TEMPLATE: "redis://redis:6379/1"
-#      CELERY_BROKER_URL: "redis://redis:6379/1"
-#      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
-##      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq/datamart"
-##      CELERY_RESULT_BACKEND: "amqp://guest:guest@rabbitmq/datamart"
-#      CSRF_COOKIE_SECURE: 0
-#      DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
-#      DATABASE_URL_ETOOLS: postgis://postgres:@etools:5432/etools
-#      DEBUG: 0
-#      SECRET_KEY: kuhfjhgfuytfuytfuygfuytdfuydfuygdfuygdfuytf
-#      SECURE_BROWSER_XSS_FILTER: 0
-#      SECURE_CONTENT_TYPE_NOSNIFF: 0
-#      SECURE_FRAME_DENY: 0
-#      SECURE_HSTS_PRELOAD: 0
-#      SECURE_HSTS_SECONDS: 0
-#      SECURE_SSL_REDIRECT: 0
-#      SESSION_COOKIE_HTTPONLY: 0
-#      SESSION_COOKIE_SECURE: 0
-#      STATIC_ROOT: /var/datamart/static/
-#      STATIC_URL: /dm-static/
-#    command: datamart
-#    ports:
-#      - 9999:8000
-#    depends_on:
-#      - db
-#      - etools
-#      - redis
+  datamart:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev
+      args:
+        BASE_IMAGE: "2.11-base"
+    container_name: datamart
+    environment:
+      DEBUG: 1
+      DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
+      DATABASE_URL_ETOOLS: postgis://postgres:@localhost:5432/etools
+      DATABASE_URL_PRP: postgis://postgres:@localhost:5432/unicef_prp
+      AUTOCREATE_USERS: "admin,123"
+      BASE_IMAGE: "compose"
+      CACHE_URL: "redis://redis:6379/1"
+      CACHE_URL_LOCK: "redis://redis:6379/1"
+      CACHE_URL_API: "redis://redis:6379/1"
+      CACHE_URL_TEMPLATE: "redis://redis:6379/1"
+      CELERY_BROKER_URL: "redis://redis:6379/1"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
+      CSRF_COOKIE_SECURE: 0
+      SECURE_BROWSER_XSS_FILTER: 0
+      SECURE_CONTENT_TYPE_NOSNIFF: 0
+      SECURE_FRAME_DENY: 0
+      SECURE_HSTS_PRELOAD: 0
+      SECURE_SSL_REDIRECT: 0
+      SESSION_COOKIE_HTTPONLY: 0
+      SESSION_COOKIE_SECURE: 0
+      STATIC_ROOT: /code/src/etools_datamart/apps/web/static/
+    command: bash -c "python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8080"
+    volumes:
+      - "$PWD:/code"
+    labels:
+      - "traefik.http.routers.datamart.rule=PathPrefix(`/`)"
+      - traefik.http.routers.datamart.service=datamart
+      - traefik.http.services.datamart.loadBalancer.server.port=8080
+      - traefik.enable=true
+    depends_on:
+      - db
+      - redis
 
   db:
     image: mdillon/postgis:9.6
+    container_name: datamart_db
     environment:
       POSTGRES_PASSWORD:
       POSTGRES_USER: postgres
       POSTGRES_DB: etools_datamart
     volumes:
-      - "$PWD/~build/db:/var/lib/postgresql/data"
-    ports:
-      - 25432:5432
+      - "$PWD/build/db:/var/lib/postgresql/data"
 
-  etools:
-    image: mdillon/postgis:9.6
-    ports:
-      - "15432:5432"
-    shm_size: '1gb'
-    environment:
-      POSTGRES_PASSWORD:
-      POSTGRES_USER: postgres
-    volumes:
-      - ${VOLUME_ETOOLS_DATA}:/var/lib/postgresql/data
+  # Rely on etools and prp database instances running locally
+  # etools:
+  #   image: mdillon/postgis:9.6
+  #   container_name: datamart_etools
+  #   shm_size: '1gb'
+  #   environment:
+  #     POSTGRES_PASSWORD:
+  #     POSTGRES_USER: postgres
+  #   volumes:
+  #     - ${VOLUME_ETOOLS_DATA}:/var/lib/postgresql/data
 
+  # prp:
+  #   image: mdillon/postgis:9.6
+  #   shm_size: '1gb'
+  #   container_name: datamart_prp
+  #   environment:
+  #     POSTGRES_PASSWORD:
+  #     POSTGRES_USER: postgres
+  #   volumes:
+  #     - ${VOLUME_PRP_DATA}:/var/lib/postgresql/data
 
   redis:
     image: redis:alpine
-
+    container_name: datamart_redis
