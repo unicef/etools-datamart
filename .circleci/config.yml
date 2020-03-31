@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: unicef/etools-base:latest
+      - image: python:3.7-slim
         environment:
           PGHOST: 127.0.0.1
           DATABASE_URL: "postgis://postgres:postgres@127.0.0.1:5432/etools_datamart"
