@@ -12,11 +12,12 @@ set -e
 CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 PROJECT_DIR="`cd "${CURDIR}/..";pwd`"
 DUMP_DIRECTORY="$PROJECT_DIR/src/etools_datamart/apps/multitenant/postgresql"
-MODEL_DIR="$PROJECT_DIR/src/etools_datamart/apps/etools/models/"
+MODEL_DIR="$PROJECT_DIR/src/etools_datamart/apps/sources/etools/models/"
 
+export DEBUG=True
 export PGHOST=127.0.0.1
-export PGPORT=15432
-export DATABASE_NAME=etools
+export PGPORT=5432
+export DATABASE_NAME=etools_master
 export DATABASE_USER=postgres
 export DATABASE_PASS=
 
@@ -235,9 +236,10 @@ function obfuscate(){
             return
         fi
     fi
+    IFS=,
     for tenant in $BASE_SCHEMAS; do
         cat  clean.tpl.sql | sed "s/_SCHEMA_/${tenant}/" > $CURDIR/clean.sql || exit 1
-        psql -h ${PGHOST} -p ${PGPORT} \
+        psql -h ${PGHOST} -p ${PGPORT} -U ${DATABASE_USER} \
             -qtAX \
             -d ${DATABASE_NAME} \
             -f $CURDIR/clean.sql || exit 1
@@ -252,7 +254,7 @@ function reset_password(){
             return
         fi
     fi
-    psql -h ${PGHOST} -p ${PGPORT} \
+    psql -h ${PGHOST} -p ${PGPORT} -U ${DATABASE_USER} \
         -qtAX \
         -d ${DATABASE_NAME} \
         -c "SET search_path=public;UPDATE auth_user SET password='';" || exit 1
@@ -269,6 +271,7 @@ function dump_public(){
     fi
     pg_dump --inserts -O \
             -d ${DATABASE_NAME} \
+            -U ${DATABASE_USER} \
             -n public \
             --format c \
             --blobs \
@@ -315,7 +318,7 @@ function dump_tenant(){
     IFS=,
     for tenant in $BASE_SCHEMAS; do
         echo "4.2.1 Dump $tenant"
-        pg_dump --inserts -O  -d ${DATABASE_NAME} \
+        pg_dump --inserts -O  -d ${DATABASE_NAME} -U ${DATABASE_USER} \
                 --exclude-table-data django_migrations \
                 --exclude-table-data django_comments \
                 --exclude-table-data django_comment_flags \
@@ -363,10 +366,10 @@ function inspect(){
     fi
     cd $CURDIR/..
     echo "6.1 Inspect 'public' schema"
-    ./manage.py inspectschema --database etools  > $CURDIR/../src/etools_datamart/apps/etools/models/public_new.py
+    ./manage.py inspectschema --database etools > $MODEL_DIR/public_new.py
 
     echo "6.2 Inspect 'tenant' schema (${BASE_SCHEMA})"
-    ./manage.py inspectschema --database etools --schema=${BASE_SCHEMA} > $CURDIR/../src/etools_datamart/apps/etools/models/tenant_new.py
+    ./manage.py inspectschema --database etools --schema=${BASE_SCHEMA} > $MODEL_DIR/tenant_new.py
 
     echo "6.3 Backup old models"
     mv $MODEL_DIR/public.py $MODEL_DIR/public_old.py
@@ -375,6 +378,7 @@ function inspect(){
     echo "6.4 Enable new models"
     mv $MODEL_DIR/public_new.py $MODEL_DIR/public.py
     mv $MODEL_DIR/tenant_new.py $MODEL_DIR/tenant.py
+
     echo "6.5 Checking installation"
     ./manage.py check
     cd $CURDIR
@@ -398,7 +402,7 @@ function summary(){
                  partners_intervention_flat_locations \
                  reports_appliedindicator
     do
-        v=`psql -h ${PGHOST} -p ${PGPORT} \
+        v=`psql -h ${PGHOST} -p ${PGPORT} -U ${DATABASE_USER} \
                 -qtAX \
                 -d ${DATABASE_NAME} \
                 -c "SET search_path=${BASE_SCHEMAS};SELECT COUNT(*) FROM $TABLE;"`
@@ -408,21 +412,21 @@ function summary(){
     done
     echo "================================================================"
 
-#    v=`psql -h ${PGHOST} -p ${PGPORT} \
+#    v=`psql -h ${PGHOST} -p ${PGPORT} -U ${DATABASE_USER} \
 #            -qtAX \
 #            -d ${DATABASE_NAME} \
 #            -c "SET search_path=${BASE_SCHEMA};SELECT COUNT(*) FROM partners_partnerorganization;"`
 #    echo "number_of_partnerorganization = $v"
 #    echo $v > $PROJECT_DIR/tests/PARTNERORGANIZATION
 #
-#    v=`psql -h ${PGHOST} -p ${PGPORT} \
+#    v=`psql -h ${PGHOST} -p ${PGPORT} -U ${DATABASE_USER} \
 #        -qtAX \
 #        -d ${DATABASE_NAME} \
 #        -c "SET search_path=${BASE_SCHEMA};SELECT COUNT(*) FROM partners_intervention;"`
 #    echo $v > $PROJECT_DIR/tests/INTERVENTION
 #    echo "number_of_intervention = $v"
 #
-#    v=`psql -h ${PGHOST} -p ${PGPORT} \
+#    v=`psql -h ${PGHOST} -p ${PGPORT} -U ${DATABASE_USER} \
 #        -qtAX \
 #        -d ${DATABASE_NAME} \
 #        -c "SET search_path=${BASE_SCHEMA};SELECT COUNT(*) FROM activities_activity;"`
@@ -444,8 +448,6 @@ function clean(){
     rm -f tenant_*.sql
     rm -f clean.sql
     rm -f public.sqldump
-
-
 }
 
 start=$SECONDS
@@ -454,7 +456,7 @@ start=$SECONDS
 if [[ "$DROP" == "1" ]]; then
     drop
 else
-    echo "1.x SKIP Dropping ans recreating database (RESTORE)"
+    echo "1.x SKIP Dropping and recreating database (RESTORE)"
 fi
 
 if [[ "$OBFUSCATE" == "1" ]]; then
