@@ -32,6 +32,14 @@ class LocationSerializer(serializers.ModelSerializer):
                    'geom', 'point', 'latitude', 'longitude')
 
 
+class LocationRamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Location
+        fields = ('id', 'source_id', 'name', 'latitude', 'longitude', 'parent',
+                  'schema_name', 'area_code', 'p_code', 'gateway', 'is_active', 'last_modify_date',
+                  'created', 'modified')
+
+
 class LocationViewSet(common.DataMartViewSet):
     serializer_class = LocationSerializer
     queryset = models.Location.objects.all()
@@ -42,4 +50,5 @@ class LocationViewSet(common.DataMartViewSet):
                              'gis': LocationSerializerGIS,
                              'geo': LocationSerializerGeoJson,
                              'latlng': LocationSerializerPos,
+                             'ram': LocationRamSerializer,
                              }
