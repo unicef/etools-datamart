@@ -415,7 +415,7 @@ class DataReport(PrpDataMartModel):
     # total_cumulative_progress | reportable.total["c"] |
     total_cumulative_progress = models.CharField(max_length=2048, blank=True, null=True)
     achievement_in_reporting_period = models.CharField(max_length=2048, blank=True, null=True)
-    disaggregation = models.TextField(blank=True, null=True)
+    disaggregation = JSONField(blank=True, null=True)
 
     loader = DataReportLoader()
 
