@@ -313,7 +313,7 @@ class DataReportLoader(PrpBaseLoader):
             except TypeError:
                 # probably a None, so we can ignore
                 pass
-            disaggKeyValues[int(pk)] = value
+            disaggKeyValues[pk] = value
         disagg = {}
         for k, v in record.disaggregation.items():
             k = literal_eval(k)
