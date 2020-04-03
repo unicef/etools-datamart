@@ -45,6 +45,8 @@ Totalbudget(ideally at most granular level tied to activity / result)
 Utilised budget(same conditions as above)
 Report  #
 """
+from ast import literal_eval
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models import Q
@@ -306,15 +308,19 @@ class DataReportLoader(PrpBaseLoader):
         # get disaggregation data and replace keys with disaggration value
         disaggKeyValues = {}
         for pk, value in IndicatorDisaggregationvalue.objects.values_list("external_id", "value").all():
-            disaggKeyValues[pk] = value
+            disaggKeyValues[int(pk)] = value
         disagg = {}
-        for k, v in record.disaggregation:
+        for k, v in record.disaggregation.items():
+            k = literal_eval(k)
             if len(k):
                 nk = []
                 for i in k:
-                    nk.append(disaggKeyValues[i])
+                    try:
+                        nk.append(disaggKeyValues[int(i)])
+                    except KeyError:
+                        nk.append(int(i))
                 k = tuple(nk)
-            disagg[k] = v
+            disagg[str(k)] = v
         return disagg
 
 
