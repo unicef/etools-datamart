@@ -307,7 +307,7 @@ class DataReportLoader(PrpBaseLoader):
     def get_disaggregation(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         # get disaggregation data and replace keys with disaggration value
         disaggKeyValues = {}
-        for pk, value in IndicatorDisaggregationvalue.objects.values_list("external_id", "value").all():
+        for pk, value in IndicatorDisaggregationvalue.objects.values_list("pk", "value").all():
             try:
                 pk = int(pk)
             except TypeError:
