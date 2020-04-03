@@ -2,7 +2,7 @@
 
 
 set -e
-
+echo "Loding db data"
 # Perform all actions as $POSTGRES_USER
 export PGUSER="$POSTGRES_USER"
 
