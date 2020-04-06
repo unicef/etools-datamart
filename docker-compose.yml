@@ -20,8 +20,8 @@ services:
     environment:
       DEBUG: 1
       DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
-      DATABASE_URL_ETOOLS: postgis://postgres:@localhost:5432/etools
-      DATABASE_URL_PRP: postgis://postgres:@localhost:5432/unicef_prp
+      DATABASE_URL_ETOOLS: postgis://postgres:@db-etools:5432/etools
+      DATABASE_URL_PRP: postgis://postgres:@db-prp:5432/prp
       AUTOCREATE_USERS: "admin,123"
       BASE_IMAGE: "compose"
       CACHE_URL: "redis://redis:6379/1"
@@ -64,25 +64,27 @@ services:
       - "$PWD/build/db:/var/lib/postgresql/data"
 
   # Rely on etools and prp database instances running locally
-  # etools:
-  #   image: mdillon/postgis:9.6
-  #   container_name: datamart_etools
-  #   shm_size: '1gb'
-  #   environment:
-  #     POSTGRES_PASSWORD:
-  #     POSTGRES_USER: postgres
-  #   volumes:
-  #     - ${VOLUME_ETOOLS_DATA}:/var/lib/postgresql/data
+  db-etools:
+    image: mdillon/postgis:9.6
+    container_name: datamart_etools
+    shm_size: '1gb'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:
+      POSTGRES_DB: etools
+    volumes:
+      - "$PWD/build/etools:/var/lib/postgresql/data"
 
-  # prp:
-  #   image: mdillon/postgis:9.6
-  #   shm_size: '1gb'
-  #   container_name: datamart_prp
-  #   environment:
-  #     POSTGRES_PASSWORD:
-  #     POSTGRES_USER: postgres
-  #   volumes:
-  #     - ${VOLUME_PRP_DATA}:/var/lib/postgresql/data
+  db-prp:
+    image: mdillon/postgis:9.6
+    shm_size: '1gb'
+    container_name: datamart_prp
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:
+      POSTGRES_DB: prp
+    volumes:
+      - "$PWD/build/prp:/var/lib/postgresql/data"
 
   redis:
     image: redis:alpine
