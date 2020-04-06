@@ -45,6 +45,8 @@ Totalbudget(ideally at most granular level tied to activity / result)
 Utilised budget(same conditions as above)
 Report  #
 """
+from ast import literal_eval
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models import Q
@@ -55,7 +57,7 @@ from strategy_field.utils import get_attr
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
-from etools_datamart.apps.sources.source_prp.models import (CoreCountry, CoreGatewaytype,
+from etools_datamart.apps.sources.source_prp.models import (CoreCountry, CoreGatewaytype, IndicatorDisaggregationvalue,
                                                             IndicatorIndicatorlocationdata, IndicatorIndicatorreport,
                                                             IndicatorReportable, IndicatorReportablelocationgoal,
                                                             UnicefLowerleveloutput, UnicefPdresultlink,
@@ -302,6 +304,30 @@ class DataReportLoader(PrpBaseLoader):
                 pr.id, pd.title, pr.start_date, pr.end_date
             )
 
+    def get_disaggregation(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
+        # get disaggregation data and replace keys with disaggration value
+        disaggKeyValues = {}
+        for pk, value in IndicatorDisaggregationvalue.objects.values_list("pk", "value").all():
+            try:
+                pk = int(pk)
+            except TypeError:
+                # probably a None, so we can ignore
+                pass
+            disaggKeyValues[pk] = value
+        disagg = {}
+        for k, v in record.disaggregation.items():
+            k = literal_eval(k)
+            if len(k):
+                nk = []
+                for i in k:
+                    try:
+                        nk.append(disaggKeyValues[int(i)])
+                    except KeyError:
+                        nk.append(int(i))
+                k = tuple(nk)
+            disagg[str(k)] = v
+        return disagg
+
 
 class DataReport(PrpDataMartModel):
     # | indicator_report | idl.indicator_report |
@@ -400,6 +426,7 @@ class DataReport(PrpDataMartModel):
     # total_cumulative_progress | reportable.total["c"] |
     total_cumulative_progress = models.CharField(max_length=2048, blank=True, null=True)
     achievement_in_reporting_period = models.CharField(max_length=2048, blank=True, null=True)
+    disaggregation = JSONField(blank=True, null=True)
 
     loader = DataReportLoader()
 
@@ -450,5 +477,5 @@ class DataReport(PrpDataMartModel):
                    'total_cumulative_progress_in_location': 'N/A',
                    'total_cumulative_progress': '-',
                    'achievement_in_reporting_period': '-',
-
+                   'disaggregation': '-',
                    }
