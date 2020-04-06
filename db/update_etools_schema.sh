@@ -13,11 +13,12 @@ CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 PROJECT_DIR="`cd "${CURDIR}/..";pwd`"
 DUMP_DIRECTORY="$PROJECT_DIR/src/etools_datamart/apps/multitenant/postgresql"
 MODEL_DIR="$PROJECT_DIR/src/etools_datamart/apps/sources/etools/models/"
+DB_ETOOLS_HOST="$( docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' datamart_etools )"
 
 export DEBUG=True
-export PGHOST=127.0.0.1
+export PGHOST=${DB_ETOOLS_HOST}
 export PGPORT=5432
-export DATABASE_NAME=etools_master
+export DATABASE_NAME=etools
 export DATABASE_USER=postgres
 export DATABASE_PASS=
 
