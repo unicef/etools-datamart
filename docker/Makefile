@@ -9,7 +9,8 @@ PUSH_BASE?=1
 BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" )
 #BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" | echo "`xargs`xx" )
 # below vars are used internally
-BUILD_OPTIONS?=--squash
+# BUILD_OPTIONS?=--squash
+BUILD_OPTIONS=
 CMD?=datamart
 CONTAINER_NAME?=datamart-${TARGET}
 ORGANIZATION=unicef
