@@ -12,6 +12,7 @@ from .hact_aggregate import HACTAggreagateViewSet
 from .hact_history import HACTHistoryViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
 from .location import LocationViewSet
+from .office import OfficeViewSet
 from .partners_agreement import PartnerAgreementViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
 from .partners_partner import PartnerViewSet
@@ -26,5 +27,4 @@ from .travel import TravelViewSet
 from .travel_activity import TravelActivityViewSet
 from .trips import TripViewSet
 from .user import EtoolsUserViewSet
-from .user_office import OfficeViewSet
 from .userstats import UserStatsViewSet

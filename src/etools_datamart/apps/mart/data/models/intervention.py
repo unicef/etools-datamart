@@ -16,7 +16,7 @@ from .base import EtoolsDataMartModel
 from .location import Location
 from .mixins import add_location_mapping, LocationMixin, NestedLocationLoaderMixin, NestedLocationMixin
 from .partner import Partner
-from .user_office import Office
+from etools_datamart.apps.mart.data.models.reports_office import Office
 
 logger = logging.getLogger(__name__)
 

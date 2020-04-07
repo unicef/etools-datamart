@@ -307,7 +307,7 @@ class InterventionBudgetAdmin(DataModelAdmin):
 
 @register(models.Office)
 class OfficeAdmin(DataModelAdmin):
-    list_display = ('name', 'zonal_chief_email')
+    list_display = ('name', 'country_name', 'area_code')
 
 
 @register(models.Section)

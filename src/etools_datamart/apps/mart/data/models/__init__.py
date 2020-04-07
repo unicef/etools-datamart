@@ -18,11 +18,11 @@ from .pd_indicator import PDIndicator  # noqa
 from .pmp import PMPIndicators  # noqa
 from .report_sector import Section  # noqa
 from .reports_indicator import ReportIndicator  # noqa
+from .reports_office import Office  # noqa
 from .tpm_tmpactivity import TPMActivity  # noqa
 from .tpm_tmpvisit import TPMVisit  # noqa
 from .travel import Travel  # noqa
 from .travel_activity import TravelActivity  # noqa
 from .trip import ModeOfTravel, Trip  # noqa
 from .user import EtoolsUser  # noqa
-from .user_office import Office  # noqa
 from .userstats import UserStats  # noqa
