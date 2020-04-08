@@ -136,6 +136,9 @@ class TPMVisit(EtoolsDataMartModel):
 
     loader = TPMVisitLoader()
 
+    class Meta:
+        ordering = ('id',)
+
     class Options:
         # depends = (Intervention,)
         truncate = True

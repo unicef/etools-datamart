@@ -50,6 +50,9 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
 
     loader = InterventionBudgetLoader()
 
+    class Meta:
+        ordering = ("-created",)
+
     class Options(InterventionAbstract.Options):
         model = PartnersInterventionbudget
         depends = (Location,)

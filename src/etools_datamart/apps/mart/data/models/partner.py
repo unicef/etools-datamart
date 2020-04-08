@@ -104,6 +104,7 @@ class Partner(EtoolsDataMartModel):
     last_pv_date = models.DateField(blank=True, null=True, db_index=True)
 
     class Meta:
+        ordering = ("name",)
         unique_together = (('schema_name', 'name', 'vendor_number'),
                            ('schema_name', 'vendor_number'),)
 
