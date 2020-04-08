@@ -70,11 +70,10 @@ class TPMActivityLoader(EtoolsLoader):
 
     def get_offices(self, record: TpmTpmactivity, values: dict, **kwargs):
         locs = []
-        for office in record.offices.select_related('zonal_chief').order_by('id'):
+        for office in record.offices.order_by('id'):
             locs.append(dict(
                 source_id=office.id,
                 name=office.name,
-                zonal_chief=getattr(office.zonal_chief, 'email', None)
             ))
         values['offices_data'] = locs
         return ", ".join([l['name'] for l in locs])

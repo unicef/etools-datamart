@@ -23,7 +23,10 @@ class PMPIndicatorLoader(EtoolsLoader):
             for intervention in PartnersIntervention.objects.filter(agreement__partner=partner):
                 planned_budget = getattr(intervention,
                                          'partnersintervention_partners_interventionbudget_intervention_id', None)
-                fr_currencies = intervention.frs.all().values_list('currency', flat=True).distinct()
+                fr_currencies = intervention.FundsFundsreservationheader_intervention.all().values_list(
+                    'currency',
+                    flat=True,
+                ).distinct()
                 has_assessment = bool(getattr(partner.current_core_value_assessment, 'assessment', False))
                 values = {'country_name': country.name,
                           'schema_name': country.schema_name,
@@ -48,9 +51,11 @@ class PMPIndicatorLoader(EtoolsLoader):
                           'unicef_cash': intervention.planned_budget.unicef_cash if planned_budget else '-',
                           'in_kind_amount': intervention.planned_budget.in_kind_amount if planned_budget else '-',
                           'total': intervention.planned_budget.total if planned_budget else '-',
-                          'fr_numbers_against_pd_ssfa': ' - '.join([fh.fr_number for fh in intervention.frs.all()]),
+                          'fr_numbers_against_pd_ssfa': ' - '.join(
+                              [fh.fr_number for fh in intervention.FundsFundsreservationheader_intervention.all()]
+                          ),
                           'fr_currencies': ', '.join(fr for fr in fr_currencies),
-                          'sum_of_all_fr_planned_amount': intervention.frs.aggregate(
+                          'sum_of_all_fr_planned_amount': intervention.FundsFundsreservationheader_intervention.aggregate(
                               total=Coalesce(Sum('intervention_amt'), 0))[
                               'total'] if fr_currencies.count() <= 1 else '-',
                           'core_value_attached': has_assessment,

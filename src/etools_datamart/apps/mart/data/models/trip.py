@@ -63,7 +63,7 @@ class TripLoader(EtoolsLoader):
 
     def get_trip_attachments(self, record, values, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
-                                   record.attachments.values_list('type', 'file'))))
+                                   record.T2FTravelattachment_travel.values_list('type', 'file'))))
 
 
 class ModeOfTravel:

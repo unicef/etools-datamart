@@ -5,8 +5,8 @@ from etools_datamart.apps.sources.etools.models import (AuthUser, LocationsLocat
                                                         PartnersInterventionPartnerFocalPoints,
                                                         PartnersInterventionresultlink, PartnersInterventionSections,
                                                         PartnersInterventionUnicefFocalPoints,
-                                                        PartnersPartnerstaffmember, ReportsResult, ReportsSector,
-                                                        ReportsOffice,)
+                                                        PartnersPartnerstaffmember, ReportsOffice, ReportsResult,
+                                                        ReportsSector,)
 
 from .utils import create_alias
 
