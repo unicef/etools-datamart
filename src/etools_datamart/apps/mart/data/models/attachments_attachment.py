@@ -40,6 +40,9 @@ class Attachment(EtoolsDataMartModel):
 
     loader = AttachmentLoader()
 
+    class Meta:
+        ordering = ("id",)
+
     class Options:
         depends = (Partner,)
         source = AttachmentsAttachmentflat

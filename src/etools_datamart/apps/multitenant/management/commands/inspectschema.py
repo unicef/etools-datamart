@@ -67,7 +67,7 @@ class Command(BaseCommand):
         # connection.mode = SINGLE_TENANT
         # state.schemas = [schema, "public"]
         connection.schema_name = schema
-        from etools_datamart.apps.sources.etools.enrichment import names
+        # from etools_datamart.apps.sources.etools.enrichment import names
         with connection.cursor() as cursor:
             # cursor.execute(raw_sql(f"SET search_path={schema}"))
             yield "# flake8: noqa F405."
@@ -200,10 +200,10 @@ class Command(BaseCommand):
                         # _related_name = f'{table2model(relations[column_name][1]).lower()}_{table_name}_{column_name}'
                         _related_name = f'{model_name}.{att_name}'
 
-                        if _related_name in names:
-                            _related_name = names[_related_name]
-                        else:
-                            _related_name = _related_name.replace('.', '_')
+                        # if _related_name in names:
+                        #     _related_name = names[_related_name]
+                        # else:
+                        _related_name = _related_name.replace('.', '_')
                         field_desc += ', models.DO_NOTHING'
                         field_desc += f", related_name='{_related_name}'"
 

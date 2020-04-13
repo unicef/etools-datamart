@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.12
--- Dumped by pg_dump version 11.5
+-- Dumped from database version 9.6.3
+-- Dumped by pg_dump version 11.7
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -53,7 +53,9 @@ CREATE TABLE [[schema]].action_points_actionpoint (
     high_priority boolean NOT NULL,
     travel_activity_id integer,
     category_id integer,
-    psea_assessment_id integer
+    psea_assessment_id integer,
+    reference_number character varying(100),
+    monitoring_activity_id integer
 );
 
 
@@ -211,43 +213,6 @@ ALTER SEQUENCE [[schema]].actstream_follow_id_seq OWNED BY [[schema]].actstream_
 
 
 --
--- Name: attachments_attachment; Type: TABLE; Schema: [[schema]]; Owner: -
---
-
-CREATE TABLE [[schema]].attachments_attachment (
-    id integer NOT NULL,
-    created timestamp with time zone NOT NULL,
-    modified timestamp with time zone NOT NULL,
-    file character varying(1024),
-    hyperlink character varying(255) NOT NULL,
-    object_id integer,
-    code character varying(64) NOT NULL,
-    content_type_id integer,
-    file_type_id integer,
-    uploaded_by_id integer
-);
-
-
---
--- Name: attachments_attachment_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
---
-
-CREATE SEQUENCE [[schema]].attachments_attachment_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: attachments_attachment_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
---
-
-ALTER SEQUENCE [[schema]].attachments_attachment_id_seq OWNED BY [[schema]].attachments_attachment.id;
-
-
---
 -- Name: attachments_attachmentflat; Type: TABLE; Schema: [[schema]]; Owner: -
 --
 
@@ -260,13 +225,13 @@ CREATE TABLE [[schema]].attachments_attachmentflat (
     file_type character varying(100) NOT NULL,
     file_link character varying(1024) NOT NULL,
     uploaded_by character varying(255) NOT NULL,
-    created character varying(50) NOT NULL,
     attachment_id integer NOT NULL,
     filename character varying(1024) NOT NULL,
     agreement_reference_number character varying(100) NOT NULL,
     object_link character varying(200) NOT NULL,
     source character varying(150) NOT NULL,
-    pd_ssfa integer
+    pd_ssfa integer,
+    created timestamp with time zone
 );
 
 
@@ -290,39 +255,6 @@ ALTER SEQUENCE [[schema]].attachments_attachmentflat_id_seq OWNED BY [[schema]].
 
 
 --
--- Name: attachments_filetype; Type: TABLE; Schema: [[schema]]; Owner: -
---
-
-CREATE TABLE [[schema]].attachments_filetype (
-    id integer NOT NULL,
-    "order" integer NOT NULL,
-    name character varying(64) NOT NULL,
-    code character varying(64) NOT NULL,
-    label character varying(64) NOT NULL,
-    CONSTRAINT attachments_filetype_order_check CHECK (("order" >= 0))
-);
-
-
---
--- Name: attachments_filetype_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
---
-
-CREATE SEQUENCE [[schema]].attachments_filetype_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: attachments_filetype_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
---
-
-ALTER SEQUENCE [[schema]].attachments_filetype_id_seq OWNED BY [[schema]].attachments_filetype.id;
-
-
---
 -- Name: audit_audit; Type: TABLE; Schema: [[schema]]; Owner: -
 --
 
@@ -330,7 +262,9 @@ CREATE TABLE [[schema]].audit_audit (
     engagement_ptr_id integer NOT NULL,
     audited_expenditure numeric(20,2) NOT NULL,
     financial_findings numeric(20,2) NOT NULL,
-    audit_opinion character varying(20) NOT NULL
+    audit_opinion character varying(20) NOT NULL,
+    audited_expenditure_local numeric(20,2),
+    financial_findings_local numeric(20,2)
 );
 
 
@@ -398,7 +332,8 @@ CREATE TABLE [[schema]].audit_engagement (
     agreement_id integer NOT NULL,
     po_item_id integer,
     shared_ip_with character varying(20)[] NOT NULL,
-    exchange_rate numeric(20,2) NOT NULL
+    exchange_rate numeric(20,2) NOT NULL,
+    currency_of_report character varying(4)
 );
 
 
@@ -482,6 +417,66 @@ ALTER SEQUENCE [[schema]].audit_engagement_id_seq OWNED BY [[schema]].audit_enga
 
 
 --
+-- Name: audit_engagement_offices; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].audit_engagement_offices (
+    id integer NOT NULL,
+    engagement_id integer NOT NULL,
+    office_id integer NOT NULL
+);
+
+
+--
+-- Name: audit_engagement_offices_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].audit_engagement_offices_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: audit_engagement_offices_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].audit_engagement_offices_id_seq OWNED BY [[schema]].audit_engagement_offices.id;
+
+
+--
+-- Name: audit_engagement_sections; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].audit_engagement_sections (
+    id integer NOT NULL,
+    engagement_id integer NOT NULL,
+    section_id integer NOT NULL
+);
+
+
+--
+-- Name: audit_engagement_sections_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].audit_engagement_sections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: audit_engagement_sections_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].audit_engagement_sections_id_seq OWNED BY [[schema]].audit_engagement_sections.id;
+
+
+--
 -- Name: audit_engagement_staff_members; Type: TABLE; Schema: [[schema]]; Owner: -
 --
 
@@ -509,6 +504,36 @@ CREATE SEQUENCE [[schema]].audit_engagement_staff_members1_id_seq
 --
 
 ALTER SEQUENCE [[schema]].audit_engagement_staff_members1_id_seq OWNED BY [[schema]].audit_engagement_staff_members.id;
+
+
+--
+-- Name: audit_engagement_users_notified; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].audit_engagement_users_notified (
+    id integer NOT NULL,
+    engagement_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+--
+-- Name: audit_engagement_users_notified_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].audit_engagement_users_notified_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: audit_engagement_users_notified_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].audit_engagement_users_notified_id_seq OWNED BY [[schema]].audit_engagement_users_notified.id;
 
 
 --
@@ -906,6 +931,738 @@ CREATE SEQUENCE [[schema]].django_migrations_id_seq
 --
 
 ALTER SEQUENCE [[schema]].django_migrations_id_seq OWNED BY [[schema]].django_migrations.id;
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_data_collection_activityoverallfinding (
+    id integer NOT NULL,
+    narrative_finding text NOT NULL,
+    on_track boolean,
+    cp_output_id integer,
+    intervention_id integer,
+    monitoring_activity_id integer NOT NULL,
+    partner_id integer
+);
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_data_collection_activityoverallfinding_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_data_collection_activityoverallfinding_id_seq OWNED BY [[schema]].field_monitoring_data_collection_activityoverallfinding.id;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_data_collection_activityquestion (
+    id integer NOT NULL,
+    specific_details text NOT NULL,
+    is_enabled boolean NOT NULL,
+    cp_output_id integer,
+    intervention_id integer,
+    monitoring_activity_id integer NOT NULL,
+    partner_id integer,
+    question_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_data_collection_activityquestion_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_data_collection_activityquestion_id_seq OWNED BY [[schema]].field_monitoring_data_collection_activityquestion.id;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverallfinding; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_data_collection_activityquestionoverallfinding (
+    id integer NOT NULL,
+    value jsonb,
+    activity_question_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverall_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_data_collection_activityquestionoverall_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverall_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_data_collection_activityquestionoverall_id_seq OWNED BY [[schema]].field_monitoring_data_collection_activityquestionoverallfinding.id;
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_data_collection_checklistoverallfinding (
+    id integer NOT NULL,
+    narrative_finding text NOT NULL,
+    cp_output_id integer,
+    intervention_id integer,
+    partner_id integer,
+    started_checklist_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_data_collection_checklistoverallfinding_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_data_collection_checklistoverallfinding_id_seq OWNED BY [[schema]].field_monitoring_data_collection_checklistoverallfinding.id;
+
+
+--
+-- Name: field_monitoring_data_collection_finding; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_data_collection_finding (
+    id integer NOT NULL,
+    value jsonb,
+    activity_question_id integer NOT NULL,
+    started_checklist_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_data_collection_finding_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_data_collection_finding_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_data_collection_finding_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_data_collection_finding_id_seq OWNED BY [[schema]].field_monitoring_data_collection_finding.id;
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_data_collection_startedchecklist (
+    id integer NOT NULL,
+    information_source character varying(100) NOT NULL,
+    author_id integer NOT NULL,
+    method_id integer NOT NULL,
+    monitoring_activity_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_data_collection_startedchecklist_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_data_collection_startedchecklist_id_seq OWNED BY [[schema]].field_monitoring_data_collection_startedchecklist.id;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_monitoringactivity (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    deleted_at timestamp with time zone NOT NULL,
+    monitor_type character varying(10) NOT NULL,
+    start_date date,
+    end_date date,
+    status character varying(20) NOT NULL,
+    location_id integer,
+    location_site_id integer,
+    person_responsible_id integer,
+    tpm_partner_id integer,
+    cancel_reason text NOT NULL,
+    reject_reason text NOT NULL,
+    field_office_id integer,
+    report_reject_reason text NOT NULL,
+    number character varying(64)
+);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs (
+    id integer NOT NULL,
+    monitoringactivity_id integer NOT NULL,
+    result_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs_id_seq OWNED BY [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs.id;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_id_seq OWNED BY [[schema]].field_monitoring_planning_monitoringactivity.id;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventions; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_monitoringactivity_interventions (
+    id integer NOT NULL,
+    monitoringactivity_id integer NOT NULL,
+    intervention_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventio_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_interventio_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventio_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_interventio_id_seq OWNED BY [[schema]].field_monitoring_planning_monitoringactivity_interventions.id;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_monitoringactivity_partners (
+    id integer NOT NULL,
+    monitoringactivity_id integer NOT NULL,
+    partnerorganization_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_partners_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_partners_id_seq OWNED BY [[schema]].field_monitoring_planning_monitoringactivity_partners.id;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_monitoringactivity_sections (
+    id integer NOT NULL,
+    monitoringactivity_id integer NOT NULL,
+    section_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_sections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_sections_id_seq OWNED BY [[schema]].field_monitoring_planning_monitoringactivity_sections.id;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_members; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_monitoringactivity_team_members (
+    id integer NOT NULL,
+    monitoringactivity_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_member_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_team_member_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_member_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_planning_monitoringactivity_team_member_id_seq OWNED BY [[schema]].field_monitoring_planning_monitoringactivity_team_members.id;
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_questiontemplate (
+    id integer NOT NULL,
+    is_active boolean NOT NULL,
+    specific_details text NOT NULL,
+    cp_output_id integer,
+    intervention_id integer,
+    partner_id integer,
+    question_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_planning_questiontemplate_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_planning_questiontemplate_id_seq OWNED BY [[schema]].field_monitoring_planning_questiontemplate.id;
+
+
+--
+-- Name: field_monitoring_planning_yearplan; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_planning_yearplan (
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    year smallint NOT NULL,
+    prioritization_criteria text NOT NULL,
+    methodology_notes text NOT NULL,
+    target_visits smallint NOT NULL,
+    modalities text NOT NULL,
+    partner_engagement text NOT NULL,
+    other_aspects text NOT NULL,
+    CONSTRAINT field_monitoring_planning_yearplan_target_visits_check CHECK ((target_visits >= 0)),
+    CONSTRAINT field_monitoring_planning_yearplan_year_check CHECK ((year >= 0))
+);
+
+
+--
+-- Name: field_monitoring_settings_category; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_category (
+    id integer NOT NULL,
+    "order" integer NOT NULL,
+    name character varying(100) NOT NULL,
+    CONSTRAINT field_monitoring_settings_category_order_check CHECK (("order" >= 0))
+);
+
+
+--
+-- Name: field_monitoring_settings_category_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_category_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_category_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_category_id_seq OWNED BY [[schema]].field_monitoring_settings_category.id;
+
+
+--
+-- Name: field_monitoring_settings_globalconfig; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_globalconfig (
+    id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_settings_globalconfig_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_globalconfig_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_globalconfig_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_globalconfig_id_seq OWNED BY [[schema]].field_monitoring_settings_globalconfig.id;
+
+
+--
+-- Name: field_monitoring_settings_locationsite; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_locationsite (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    name character varying(254) NOT NULL,
+    p_code character varying(32) NOT NULL,
+    point public.geometry(Point,4326),
+    is_active boolean NOT NULL,
+    parent_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_settings_locationsite_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_locationsite_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_locationsite_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_locationsite_id_seq OWNED BY [[schema]].field_monitoring_settings_locationsite.id;
+
+
+--
+-- Name: field_monitoring_settings_logissue; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_logissue (
+    id integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modified timestamp with time zone NOT NULL,
+    issue text NOT NULL,
+    status character varying(10) NOT NULL,
+    author_id integer NOT NULL,
+    cp_output_id integer,
+    location_id integer,
+    location_site_id integer,
+    partner_id integer
+);
+
+
+--
+-- Name: field_monitoring_settings_logissue_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_logissue_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_logissue_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_logissue_id_seq OWNED BY [[schema]].field_monitoring_settings_logissue.id;
+
+
+--
+-- Name: field_monitoring_settings_method; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_method (
+    id integer NOT NULL,
+    name character varying(100) NOT NULL,
+    use_information_source boolean NOT NULL,
+    short_name character varying(10) NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_settings_method_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_method_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_method_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_method_id_seq OWNED BY [[schema]].field_monitoring_settings_method.id;
+
+
+--
+-- Name: field_monitoring_settings_option; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_option (
+    id integer NOT NULL,
+    label character varying(50) NOT NULL,
+    value jsonb,
+    question_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_settings_option_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_option_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_option_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_option_id_seq OWNED BY [[schema]].field_monitoring_settings_option.id;
+
+
+--
+-- Name: field_monitoring_settings_question; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_question (
+    id integer NOT NULL,
+    answer_type character varying(15) NOT NULL,
+    choices_size smallint,
+    level character varying(15) NOT NULL,
+    text text NOT NULL,
+    is_hact boolean NOT NULL,
+    is_custom boolean NOT NULL,
+    is_active boolean NOT NULL,
+    category_id integer NOT NULL,
+    CONSTRAINT field_monitoring_settings_question_choices_size_check CHECK ((choices_size >= 0))
+);
+
+
+--
+-- Name: field_monitoring_settings_question_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_question_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_question_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_question_id_seq OWNED BY [[schema]].field_monitoring_settings_question.id;
+
+
+--
+-- Name: field_monitoring_settings_question_methods; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_question_methods (
+    id integer NOT NULL,
+    question_id integer NOT NULL,
+    method_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_settings_question_methods_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_question_methods_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_question_methods_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_question_methods_id_seq OWNED BY [[schema]].field_monitoring_settings_question_methods.id;
+
+
+--
+-- Name: field_monitoring_settings_question_sections; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].field_monitoring_settings_question_sections (
+    id integer NOT NULL,
+    question_id integer NOT NULL,
+    section_id integer NOT NULL
+);
+
+
+--
+-- Name: field_monitoring_settings_question_sections_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].field_monitoring_settings_question_sections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: field_monitoring_settings_question_sections_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].field_monitoring_settings_question_sections_id_seq OWNED BY [[schema]].field_monitoring_settings_question_sections.id;
 
 
 --
@@ -2268,7 +3025,7 @@ ALTER SEQUENCE [[schema]].partners_partnerplannedvisits_id_seq OWNED BY [[schema
 
 CREATE TABLE [[schema]].partners_partnerstaffmember (
     id integer NOT NULL,
-    title character varying(64),
+    title character varying(100),
     first_name character varying(64) NOT NULL,
     last_name character varying(64) NOT NULL,
     email character varying(128) NOT NULL,
@@ -3084,6 +3841,35 @@ ALTER SEQUENCE [[schema]].reports_lowerresult_id_seq OWNED BY [[schema]].reports
 
 
 --
+-- Name: reports_office; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].reports_office (
+    id integer NOT NULL,
+    name character varying(254) NOT NULL
+);
+
+
+--
+-- Name: reports_office_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].reports_office_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: reports_office_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].reports_office_id_seq OWNED BY [[schema]].reports_office.id;
+
+
+--
 -- Name: reports_quarter; Type: TABLE; Schema: [[schema]]; Owner: -
 --
 
@@ -3244,7 +4030,7 @@ ALTER SEQUENCE [[schema]].reports_resulttype_id_seq OWNED BY [[schema]].reports_
 
 CREATE TABLE [[schema]].reports_sector (
     id integer NOT NULL,
-    name character varying(45) NOT NULL,
+    name character varying(128) NOT NULL,
     description character varying(256),
     alternate_id integer,
     alternate_name character varying(255),
@@ -3335,6 +4121,36 @@ CREATE SEQUENCE [[schema]].reports_unit_id_seq
 --
 
 ALTER SEQUENCE [[schema]].reports_unit_id_seq OWNED BY [[schema]].reports_unit.id;
+
+
+--
+-- Name: reports_usertenantprofile; Type: TABLE; Schema: [[schema]]; Owner: -
+--
+
+CREATE TABLE [[schema]].reports_usertenantprofile (
+    id integer NOT NULL,
+    office_id integer,
+    profile_id integer NOT NULL
+);
+
+
+--
+-- Name: reports_usertenantprofile_id_seq; Type: SEQUENCE; Schema: [[schema]]; Owner: -
+--
+
+CREATE SEQUENCE [[schema]].reports_usertenantprofile_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: reports_usertenantprofile_id_seq; Type: SEQUENCE OWNED BY; Schema: [[schema]]; Owner: -
+--
+
+ALTER SEQUENCE [[schema]].reports_usertenantprofile_id_seq OWNED BY [[schema]].reports_usertenantprofile.id;
 
 
 --
@@ -3986,6 +4802,7 @@ CREATE TABLE [[schema]].unicef_attachments_filetype (
     name character varying(64) NOT NULL,
     label character varying(64) NOT NULL,
     code character varying(64) NOT NULL,
+    "group" character varying(64)[],
     CONSTRAINT unicef_attachments_filetype_order_check CHECK (("order" >= 0))
 );
 
@@ -4081,24 +4898,10 @@ ALTER TABLE ONLY [[schema]].actstream_follow ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- Name: attachments_attachment id; Type: DEFAULT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_attachment ALTER COLUMN id SET DEFAULT nextval('[[schema]].attachments_attachment_id_seq'::regclass);
-
-
---
 -- Name: attachments_attachmentflat id; Type: DEFAULT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].attachments_attachmentflat ALTER COLUMN id SET DEFAULT nextval('[[schema]].attachments_attachmentflat_id_seq'::regclass);
-
-
---
--- Name: attachments_filetype id; Type: DEFAULT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_filetype ALTER COLUMN id SET DEFAULT nextval('[[schema]].attachments_filetype_id_seq'::regclass);
 
 
 --
@@ -4130,10 +4933,31 @@ ALTER TABLE ONLY [[schema]].audit_engagement_authorized_officers ALTER COLUMN id
 
 
 --
+-- Name: audit_engagement_offices id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_offices ALTER COLUMN id SET DEFAULT nextval('[[schema]].audit_engagement_offices_id_seq'::regclass);
+
+
+--
+-- Name: audit_engagement_sections id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_sections ALTER COLUMN id SET DEFAULT nextval('[[schema]].audit_engagement_sections_id_seq'::regclass);
+
+
+--
 -- Name: audit_engagement_staff_members id; Type: DEFAULT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].audit_engagement_staff_members ALTER COLUMN id SET DEFAULT nextval('[[schema]].audit_engagement_staff_members1_id_seq'::regclass);
+
+
+--
+-- Name: audit_engagement_users_notified id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_users_notified ALTER COLUMN id SET DEFAULT nextval('[[schema]].audit_engagement_users_notified_id_seq'::regclass);
 
 
 --
@@ -4211,6 +5035,160 @@ ALTER TABLE ONLY [[schema]].django_comments ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY [[schema]].django_migrations ALTER COLUMN id SET DEFAULT nextval('[[schema]].django_migrations_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityoverallfinding ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_data_collection_activityoverallfinding_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestion ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_data_collection_activityquestion_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverallfinding id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestionoverallfinding ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_data_collection_activityquestionoverall_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_checklistoverallfinding ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_data_collection_checklistoverallfinding_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_data_collection_finding id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_finding ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_data_collection_finding_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_startedchecklist ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_data_collection_startedchecklist_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_planning_monitoringactivity_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_planning_monitoringactivity_cp_outputs_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventions id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_interventions ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_planning_monitoringactivity_interventio_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_partners ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_planning_monitoringactivity_partners_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_sections ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_planning_monitoringactivity_sections_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_members id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_team_members ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_planning_monitoringactivity_team_member_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_questiontemplate ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_planning_questiontemplate_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_category id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_category ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_category_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_globalconfig id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_globalconfig ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_globalconfig_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_locationsite id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_locationsite ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_locationsite_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_logissue id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_logissue ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_logissue_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_method id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_method ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_method_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_option id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_option ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_option_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_question id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_question_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_question_methods id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_methods ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_question_methods_id_seq'::regclass);
+
+
+--
+-- Name: field_monitoring_settings_question_sections id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_sections ALTER COLUMN id SET DEFAULT nextval('[[schema]].field_monitoring_settings_question_sections_id_seq'::regclass);
 
 
 --
@@ -4641,6 +5619,13 @@ ALTER TABLE ONLY [[schema]].reports_lowerresult ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: reports_office id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].reports_office ALTER COLUMN id SET DEFAULT nextval('[[schema]].reports_office_id_seq'::regclass);
+
+
+--
 -- Name: reports_quarter id; Type: DEFAULT; Schema: [[schema]]; Owner: -
 --
 
@@ -4687,6 +5672,13 @@ ALTER TABLE ONLY [[schema]].reports_specialreportingrequirement ALTER COLUMN id 
 --
 
 ALTER TABLE ONLY [[schema]].reports_unit ALTER COLUMN id SET DEFAULT nextval('[[schema]].reports_unit_id_seq'::regclass);
+
+
+--
+-- Name: reports_usertenantprofile id; Type: DEFAULT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].reports_usertenantprofile ALTER COLUMN id SET DEFAULT nextval('[[schema]].reports_usertenantprofile_id_seq'::regclass);
 
 
 --
@@ -4833,13 +5825,26 @@ ALTER TABLE ONLY [[schema]].unicef_snapshot_activity ALTER COLUMN id SET DEFAULT
 -- Data for Name: action_points_actionpoint; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].action_points_actionpoint VALUES (1, '2017-09-15 19:08:45.166603+00', '2018-08-09 17:48:01.775826+00', 'open', 'first action', '2017-09-30', NULL, 13345, 13345, 13345, NULL, NULL, NULL, NULL, NULL, 46, NULL, NULL, false, 434, NULL, NULL);
-INSERT INTO [[schema]].action_points_actionpoint VALUES (2, '2017-09-15 19:08:45.223519+00', '2018-08-09 17:48:01.865002+00', 'open', 'second action', '2017-09-30', NULL, 13345, 13345, 13345, NULL, NULL, NULL, NULL, NULL, 46, NULL, NULL, false, 434, NULL, NULL);
-INSERT INTO [[schema]].action_points_actionpoint VALUES (3, '2017-10-23 21:01:29.344069+00', '2018-08-09 17:48:01.944726+00', 'open', 'TESTING E.MAILS', '2017-12-03', NULL, 14764, 14764, 14764, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 436, NULL, NULL);
-INSERT INTO [[schema]].action_points_actionpoint VALUES (4, '2017-09-15 19:08:45.269564+00', '2018-08-09 17:48:02.022634+00', 'completed', 'action point from trip 579', '2017-09-30', '2017-09-15 04:00:00.315+00', 13345, 2, 13345, NULL, NULL, NULL, NULL, NULL, 46, NULL, NULL, false, 434, NULL, NULL);
-INSERT INTO [[schema]].action_points_actionpoint VALUES (5, '2017-09-15 19:10:18.261104+00', '2018-08-09 17:48:02.105955+00', 'completed', 'action point from trip 579', '2017-09-30', '2017-09-15 04:00:00.315+00', 13345, 2, 13345, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 435, NULL, NULL);
-INSERT INTO [[schema]].action_points_actionpoint VALUES (6, '2018-10-04 06:14:12.117941+00', '2018-10-04 06:14:12.118681+00', 'open', 'testing', '2018-10-04', NULL, 123, 123, 123, NULL, NULL, NULL, NULL, 2, NULL, 11, NULL, false, NULL, NULL, NULL);
-INSERT INTO [[schema]].action_points_actionpoint VALUES (7, '2018-10-04 06:28:44.572713+00', '2018-10-04 06:28:44.57374+00', 'open', 'test nik1', '2018-10-12', NULL, 123, 123, 123, NULL, NULL, NULL, NULL, 2, NULL, 5, NULL, false, NULL, NULL, NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (1, '2017-09-15 19:08:45.166603+00', '2020-04-02 17:58:33.299088+00', 'open', 'first action', '2017-09-30', NULL, 13345, 13345, 13345, NULL, NULL, NULL, NULL, NULL, 46, NULL, NULL, false, 434, NULL, NULL, 'UAT/2017/1/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (2, '2017-09-15 19:08:45.223519+00', '2020-04-02 17:58:33.300625+00', 'open', 'second action', '2017-09-30', NULL, 13345, 13345, 13345, NULL, NULL, NULL, NULL, NULL, 46, NULL, NULL, false, 434, NULL, NULL, 'UAT/2017/2/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (3, '2017-10-23 21:01:29.344069+00', '2020-04-02 17:58:33.301817+00', 'open', 'TESTING E.MAILS', '2017-12-03', NULL, 14764, 14764, 14764, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 436, NULL, NULL, 'UAT/2017/3/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (4, '2017-09-15 19:08:45.269564+00', '2020-04-02 17:58:33.302967+00', 'completed', 'action point from trip 579', '2017-09-30', '2017-09-15 04:00:00.315+00', 13345, 2, 13345, NULL, NULL, NULL, NULL, NULL, 46, NULL, NULL, false, 434, NULL, NULL, 'UAT/2017/4/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (5, '2017-09-15 19:10:18.261104+00', '2020-04-02 17:58:33.304596+00', 'completed', 'action point from trip 579', '2017-09-30', '2017-09-15 04:00:00.315+00', 13345, 2, 13345, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 435, NULL, NULL, 'UAT/2017/5/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (6, '2018-10-04 06:14:12.117941+00', '2020-04-02 17:58:33.3063+00', 'open', 'testing', '2018-10-04', NULL, 123, 123, 123, NULL, NULL, NULL, NULL, 2, NULL, 11, NULL, false, NULL, NULL, NULL, 'UAT/2018/6/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (7, '2018-10-04 06:28:44.572713+00', '2020-04-02 17:58:33.30791+00', 'open', 'test nik1', '2018-10-12', NULL, 123, 123, 123, NULL, NULL, NULL, NULL, 2, NULL, 5, NULL, false, NULL, NULL, NULL, 'UAT/2018/7/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (8, '2019-05-20 12:15:11.783097+00', '2020-04-02 17:58:33.309548+00', 'open', '4	Recommendations and action points for follow up
+•	HLSS should follow up the issue for M&E tools with UNICEF
+•	amoxicillin syrups should be provided to the site for medical complication issue
+•	HLSS should provide palate for keeping the supplies in all the site 
+•	HLSS should met with CHD on the issue of the store for keeping the supplies before rain come in akoka
+ provision of sugar water solution at OTP centers for children suspected of being hypoglycemia as per the CMAM protocol
+Ensure appetite test is conducted in all the sites during OTP services provision	
+Reorient staff and provide continuous support on the admission and discharge criteria	
+Ensure all required information is recorded in the OTP treatment cards	On going	  HLSS', '2019-05-10', NULL, 25789, 23436, 25789, 97, NULL, 67, NULL, 2, 228, 3, NULL, false, 493, NULL, NULL, 'UAT/2019/8/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (9, '2019-05-23 12:35:33.502345+00', '2020-04-02 17:58:33.311224+00', 'open', 'Testing w/ Nik', '2019-05-25', NULL, 14764, 123, 14764, 120, NULL, NULL, NULL, 2, 229, 5, NULL, false, NULL, NULL, NULL, 'UAT/2019/9/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (10, '2019-05-30 08:05:15.427158+00', '2020-04-02 17:58:33.312964+00', 'open', 'test', '2019-05-30', NULL, 2702, 2702, 2702, 18, NULL, 67, NULL, 2, 228, 9, NULL, false, 497, NULL, NULL, 'UAT/2019/10/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (11, '2019-06-06 13:33:26.628459+00', '2020-04-02 17:58:33.314604+00', 'open', 'test', '2019-06-27', NULL, 123, 189023, 123, NULL, NULL, NULL, NULL, 2, NULL, 4, NULL, false, 498, NULL, NULL, 'UAT/2019/11/APD', NULL);
+INSERT INTO [[schema]].action_points_actionpoint VALUES (12, '2019-06-06 13:34:16.073584+00', '2020-04-02 17:58:33.316255+00', 'open', 'test 2', '2019-06-19', NULL, 123, 189023, 123, NULL, NULL, NULL, NULL, 2, NULL, 4, NULL, false, 498, NULL, NULL, 'UAT/2019/12/APD', NULL);
 
 
 --
@@ -4847,7 +5852,15 @@ INSERT INTO [[schema]].action_points_actionpoint VALUES (7, '2018-10-04 06:28:44
 --
 
 INSERT INTO [[schema]].activities_activity VALUES (1, '2019-04-02', NULL, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (4, '2019-05-16', NULL, 67, 228);
 INSERT INTO [[schema]].activities_activity VALUES (3, '2019-04-02', NULL, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (5, '2019-05-16', NULL, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (6, '2019-05-16', NULL, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (7, '2019-07-01', 60, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (8, '2019-07-02', 60, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (9, '2019-07-02', 60, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (10, '2019-07-19', NULL, 67, 228);
+INSERT INTO [[schema]].activities_activity VALUES (11, '2019-07-25', 60, 67, 228);
 
 
 --
@@ -4855,7 +5868,17 @@ INSERT INTO [[schema]].activities_activity VALUES (3, '2019-04-02', NULL, 67, 22
 --
 
 INSERT INTO [[schema]].activities_activity_locations VALUES (1, 1, 3326);
+INSERT INTO [[schema]].activities_activity_locations VALUES (4, 4, 316);
 INSERT INTO [[schema]].activities_activity_locations VALUES (3, 3, 4549);
+INSERT INTO [[schema]].activities_activity_locations VALUES (5, 4, 4550);
+INSERT INTO [[schema]].activities_activity_locations VALUES (6, 5, 4551);
+INSERT INTO [[schema]].activities_activity_locations VALUES (7, 6, 3326);
+INSERT INTO [[schema]].activities_activity_locations VALUES (8, 7, 4549);
+INSERT INTO [[schema]].activities_activity_locations VALUES (9, 7, 3326);
+INSERT INTO [[schema]].activities_activity_locations VALUES (10, 8, 3326);
+INSERT INTO [[schema]].activities_activity_locations VALUES (11, 9, 3326);
+INSERT INTO [[schema]].activities_activity_locations VALUES (12, 10, 3326);
+INSERT INTO [[schema]].activities_activity_locations VALUES (13, 11, 3326);
 
 
 --
@@ -4877,224 +5900,103 @@ INSERT INTO [[schema]].actstream_action VALUES (79, '2027', 'changed', NULL, '54
 
 
 --
--- Data for Name: attachments_attachment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
---
-
-INSERT INTO [[schema]].attachments_attachment VALUES (15, '2018-03-29 09:41:18.266541+00', '2018-08-10 04:26:21.687675+00', '', '', 15, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (16, '2018-03-29 09:41:18.337204+00', '2018-08-10 04:26:21.761347+00', '', '', 16, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (17, '2018-03-29 09:41:18.419689+00', '2018-08-10 04:26:21.817692+00', '', '', 17, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (18, '2018-03-29 09:41:18.519504+00', '2018-08-10 04:26:21.87627+00', '', '', 18, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (19, '2018-03-29 09:41:18.63447+00', '2018-08-10 04:26:21.932774+00', '', '', 19, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (20, '2018-03-29 09:41:18.743539+00', '2018-08-10 04:26:21.993594+00', '', '', 20, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (21, '2018-03-29 09:41:18.82673+00', '2018-08-10 04:26:22.049793+00', '', '', 21, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (22, '2018-03-29 09:41:18.89391+00', '2018-08-10 04:26:22.104656+00', '', '', 22, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (23, '2018-03-29 09:41:18.958961+00', '2018-08-10 04:26:22.158272+00', '', '', 23, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (24, '2018-03-29 09:41:19.022256+00', '2018-08-10 04:26:22.214471+00', '', '', 24, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (25, '2018-03-29 09:41:19.083983+00', '2018-08-10 04:26:22.27089+00', '', '', 25, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (26, '2018-03-29 09:41:19.150627+00', '2018-08-10 04:26:22.326048+00', '', '', 26, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (27, '2018-03-29 09:41:19.209283+00', '2018-08-10 04:26:22.385942+00', '', '', 27, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (35, '2018-03-29 09:41:19.746464+00', '2018-08-10 04:26:22.850841+00', '', '', 35, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (36, '2018-03-29 09:41:19.821128+00', '2018-08-10 04:26:22.907507+00', '', '', 36, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (37, '2018-03-29 09:41:19.891982+00', '2018-08-10 04:26:22.965532+00', '', '', 37, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (38, '2018-03-29 09:41:19.959993+00', '2018-08-10 04:26:23.020798+00', '', '', 38, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (39, '2018-03-29 09:41:20.022059+00', '2018-08-10 04:26:23.0794+00', '', '', 39, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (40, '2018-03-29 09:41:20.091305+00', '2018-08-10 04:26:23.14165+00', '', '', 40, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (41, '2018-03-29 09:41:20.161265+00', '2018-08-10 04:26:23.204551+00', '', '', 41, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (42, '2018-03-29 09:41:20.22901+00', '2018-08-10 04:26:23.263219+00', '', '', 42, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (43, '2018-03-29 09:41:20.300019+00', '2018-08-10 04:26:23.317628+00', '', '', 43, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (44, '2018-03-29 09:41:20.362233+00', '2018-08-10 04:26:23.374991+00', '', '', 44, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (45, '2018-03-29 09:41:20.42997+00', '2018-08-10 04:26:23.427952+00', '', '', 45, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (46, '2018-03-29 09:41:20.495922+00', '2018-08-10 04:26:23.483522+00', '', '', 46, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (47, '2018-03-29 09:41:20.556314+00', '2018-08-10 04:26:23.538365+00', '', '', 47, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (48, '2018-03-29 09:41:20.626925+00', '2018-08-10 04:26:23.620846+00', '', '', 48, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (49, '2018-03-29 09:41:20.699994+00', '2018-08-10 04:26:23.674334+00', '', '', 49, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (50, '2018-03-29 09:41:20.771182+00', '2018-08-10 04:26:23.728396+00', '', '', 50, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (51, '2018-03-29 09:41:20.834874+00', '2018-08-10 04:26:23.783613+00', '', '', 51, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (52, '2018-03-29 09:41:20.896639+00', '2018-08-10 04:26:23.840322+00', '', '', 52, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (53, '2018-03-29 09:41:20.965241+00', '2018-08-10 04:26:23.897674+00', '', '', 53, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (54, '2018-03-29 09:41:21.031561+00', '2018-08-10 04:26:23.980537+00', '', '', 54, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (56, '2018-03-29 09:41:21.200957+00', '2018-08-10 04:26:24.094913+00', '', '', 56, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (57, '2018-03-29 09:41:21.260331+00', '2018-08-10 04:26:24.154509+00', '', '', 57, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (58, '2018-03-29 09:41:21.324894+00', '2018-08-10 04:26:24.218616+00', '', '', 58, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (59, '2018-03-29 09:41:21.395954+00', '2018-08-10 04:26:24.278025+00', '', '', 59, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (60, '2018-03-29 09:41:21.46506+00', '2018-08-10 04:26:24.35801+00', '', '', 60, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (61, '2018-03-29 09:41:21.52693+00', '2018-08-10 04:26:24.41602+00', '', '', 61, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (62, '2018-03-29 09:41:21.626691+00', '2018-08-10 04:26:24.473588+00', '', '', 62, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (63, '2018-03-29 09:41:21.724073+00', '2018-08-10 04:26:24.530782+00', '', '', 63, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (64, '2018-03-29 09:41:21.813459+00', '2018-08-10 04:26:24.593897+00', '', '', 64, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (66, '2018-03-29 09:41:21.942828+00', '2018-08-10 04:26:24.708788+00', '', '', 66, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (67, '2018-03-29 09:41:22.018309+00', '2018-08-10 04:26:24.773385+00', '', '', 67, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (68, '2018-03-29 09:41:22.087271+00', '2018-08-10 04:26:24.830003+00', '', '', 68, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (69, '2018-03-29 09:41:22.15611+00', '2018-08-10 04:26:24.886522+00', '', '', 69, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (70, '2018-03-29 09:41:22.216645+00', '2018-08-10 04:26:24.965526+00', '', '', 70, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (71, '2018-03-29 09:41:22.285775+00', '2018-08-10 04:26:25.03484+00', '', '', 71, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (72, '2018-03-29 09:41:22.346246+00', '2018-08-10 04:26:25.091501+00', '', '', 72, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (73, '2018-03-29 09:41:22.440277+00', '2018-08-10 04:26:25.149292+00', '', '', 73, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (2, '2018-03-29 09:41:17.13205+00', '2018-08-10 04:26:20.869634+00', '', '', 2, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (3, '2018-03-29 09:41:17.223032+00', '2018-08-10 04:26:20.929003+00', '', '', 3, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (4, '2018-03-29 09:41:17.318162+00', '2018-08-10 04:26:20.990256+00', '', '', 4, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (5, '2018-03-29 09:41:17.386735+00', '2018-08-10 04:26:21.046946+00', '', '', 5, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (6, '2018-03-29 09:41:17.44883+00', '2018-08-10 04:26:21.107551+00', '', '', 6, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (7, '2018-03-29 09:41:17.508798+00', '2018-08-10 04:26:21.163968+00', '', '', 7, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (8, '2018-03-29 09:41:17.569285+00', '2018-08-10 04:26:21.223253+00', '', '', 8, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (9, '2018-03-29 09:41:17.640012+00', '2018-08-10 04:26:21.280785+00', '', '', 9, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (10, '2018-03-29 09:41:17.706803+00', '2018-08-10 04:26:21.341701+00', '', '', 10, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (11, '2018-03-29 09:41:17.800966+00', '2018-08-10 04:26:21.404142+00', '', '', 11, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (13, '2018-03-29 09:41:17.983138+00', '2018-08-10 04:26:21.493523+00', '', '', 12, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (12, '2018-03-29 09:41:17.887626+00', '2018-08-10 04:26:21.550046+00', '', '', 13, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (14, '2018-03-29 09:41:18.165292+00', '2018-08-10 04:26:21.633732+00', '', '', 14, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (74, '2018-03-29 09:44:30.361469+00', '2018-05-02 16:44:09.758552+00', '', '', 24, 'partners_assessment_report', 70, 36, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (1, '2018-03-29 09:41:17.064218+00', '2018-08-10 04:26:20.803567+00', '', '', 1, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (28, '2018-03-29 09:41:19.293705+00', '2018-08-10 04:26:22.444145+00', '', '', 28, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (29, '2018-03-29 09:41:19.354886+00', '2018-08-10 04:26:22.50237+00', '', '', 29, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (30, '2018-03-29 09:41:19.413122+00', '2018-08-10 04:26:22.564914+00', '', '', 30, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (31, '2018-03-29 09:41:19.476989+00', '2018-08-10 04:26:22.620467+00', '', '', 31, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (32, '2018-03-29 09:41:19.54269+00', '2018-08-10 04:26:22.68052+00', 'partners/core_values/WebInspectGenerated_AxDn3D2.txt', '', 32, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (33, '2018-03-29 09:41:19.610651+00', '2018-08-10 04:26:22.736505+00', 'partners/core_values/s.png', '', 33, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (34, '2018-03-29 09:41:19.672555+00', '2018-08-10 04:26:22.794081+00', '', '', 34, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (55, '2018-03-29 09:41:21.110055+00', '2018-08-10 04:26:24.036667+00', '', '', 55, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (65, '2018-03-29 09:41:21.884469+00', '2018-08-10 04:26:24.649149+00', '', '', 65, 'partners_partner_assessment', 275, 35, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (75, '2018-03-29 09:44:30.58233+00', '2018-05-02 16:44:09.862436+00', '', '', 25, 'partners_assessment_report', 70, 36, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (76, '2018-03-29 09:44:30.662286+00', '2018-05-02 16:44:09.960698+00', '', '', 26, 'partners_assessment_report', 70, 36, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (77, '2018-03-29 09:44:30.728009+00', '2018-05-02 16:44:10.083454+00', 'assessments/Fiche_Visite_Programmatique.docx', '', 31, 'partners_assessment_report', 70, 36, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (78, '2018-03-29 09:44:30.798666+00', '2018-05-02 16:44:10.181049+00', '', '', 32, 'partners_assessment_report', 70, 36, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (79, '2018-03-29 09:44:30.864894+00', '2018-05-02 16:44:10.283505+00', '[[schema]]/file_attachments/partner_organizations/35/assesments/None/Test_PCA.docx', '', 33, 'partners_assessment_report', 70, 36, NULL);
-INSERT INTO [[schema]].attachments_attachment VALUES (80, '2018-03-29 09:44:30.938639+00', '2018-05-02 16:44:10.386917+00', '[[schema]]/file_attachments/partner_organizations/11/assesments/None/Travel_Health_Questionnaire.doc', '', 34, 'partners_assessment_report', 70, 36, NULL);
-
-
---
 -- Data for Name: attachments_attachmentflat; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (2, 'Adult Basic Community Org', 'Bilateral / Multilateral', '', '', 'Core Values Assessment', '/api/v2/attachments/file/2/', '', '29 Mar 2018', 2, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (13, 'DEPARTMENT OF EDUCATIONAL PLANNING AND  TRAINING', 'Government', '2500201643', '', 'Core Values Assessment', '/api/v2/attachments/file/13/', '', '29 Mar 2018', 13, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (8, 'Chiild Protection Society ', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/8/', '', '29 Mar 2018', 8, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (12, 'DEPARTMENT OF EDUCATIONAL PLANNING AND  TRAINING', 'Government', '2500218425', '', 'Core Values Assessment', '/api/v2/attachments/file/12/', '', '29 Mar 2018', 12, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (16, 'DEPT OF MYANMAR EDUCATION RESEARCH', 'Government', '2500233172', '', 'Core Values Assessment', '/api/v2/attachments/file/16/', '', '29 Mar 2018', 16, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (17, 'DHP-PLANNING (PLANNING SECTION)', 'Government', '2500220368', '', 'Core Values Assessment', '/api/v2/attachments/file/17/', '', '29 Mar 2018', 17, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (20, 'DPH (PLANNING) NAYPYITAW DEPARTMENT OF PUBLIC HEALTH', 'Government', '2500201713', '', 'Core Values Assessment', '/api/v2/attachments/file/20/', '', '29 Mar 2018', 20, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (21, 'Education au Bandundu', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/21/', '', '29 Mar 2018', 21, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (23, 'ETools Master Fund', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/23/', '', '29 Mar 2018', 23, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (25, 'FOREIGN ECONOMIC RELATIONS DEPARTMENT (FERD)', 'Government', '2500201716', '', 'Core Values Assessment', '/api/v2/attachments/file/25/', '', '29 Mar 2018', 25, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (27, 'GENERAL ADMINISTRATION DEPARTMENT', 'Government', '2500230720', '', 'Core Values Assessment', '/api/v2/attachments/file/27/', '', '29 Mar 2018', 27, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (28, 'Govt test', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/28/', '', '29 Mar 2018', 28, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (32, 'Jason', 'Bi-Lateral Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/32/', '', '29 Mar 2018', 32, 'WebInspectGenerated_AxDn3D2.txt', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (33, 'Ministry of eTools', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/33/', '', '29 Mar 2018', 33, 's.png', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (34, 'Ministry of eTools 2', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/34/', '', '29 Mar 2018', 34, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (37, 'Ministry of Wellbodi', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/37/', '', '29 Mar 2018', 37, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (38, 'MYANMAR COUNCIL CHURCHES', 'Civil Society Organization', '2500201650', '', 'Core Values Assessment', '/api/v2/attachments/file/38/', '', '29 Mar 2018', 38, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (39, 'MYANMAR NATIONAL HUMAN RIGHT COMMISSION', 'Government', '2500220600', '', 'Core Values Assessment', '/api/v2/attachments/file/39/', '', '29 Mar 2018', 39, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (42, 'Partner Organization 2', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/42/', '', '29 Mar 2018', 42, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (43, 'Partners for food', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/43/', '', '29 Mar 2018', 43, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (46, 'QA Govt Test', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/46/', '', '29 Mar 2018', 46, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (47, 'QA Partner Test', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/47/', '', '29 Mar 2018', 47, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (49, 'RELIEF INTERNATIONAL', 'Civil Society Organization', '2500201729', '', 'Core Values Assessment', '/api/v2/attachments/file/49/', '', '29 Mar 2018', 49, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (50, 'right to play', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/50/', '', '29 Mar 2018', 50, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (53, 'Shafaq', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/53/', '', '29 Mar 2018', 53, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (54, 'SOCIAL SECURITY BOARD', 'Government', '2500221380', '', 'Core Values Assessment', '/api/v2/attachments/file/54/', '', '29 Mar 2018', 54, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (55, 'SUPREME COURT', 'Government', '2500201710', '', 'Core Values Assessment', '/api/v2/attachments/file/55/', '', '29 Mar 2018', 55, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (58, 'test partner 1', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/58/', '', '29 Mar 2018', 58, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (59, 'THEATRICAL & ARTISAN ASSOCIATION KYAUKPADAUNG TOWNSHIP DAW WIN WIN MAW', 'Civil Society Organization', '2500223485', '', 'Core Values Assessment', '/api/v2/attachments/file/59/', '', '29 Mar 2018', 59, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (75, 'Campaign to reduce DSA', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/75/', '', '29 Mar 2018', 75, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (77, 'Education in DRC', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/77/', '', '29 Mar 2018', 77, 'Fiche_Visite_Programmatique.docx', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (78, 'right to play', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/78/', '', '29 Mar 2018', 78, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (79, 'Child Protection Society', 'Civil Society Organisation', '', '', 'Assessment Report', '/api/v2/attachments/file/79/', '', '29 Mar 2018', 79, 'Test_PCA.docx', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (80, 'Pro-poor bank', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/80/', '', '29 Mar 2018', 80, 'Travel_Health_Questionnaire.doc', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (83, '', '', '', '', 'Questionnaire', '/api/v2/attachments/file/83/', '', '05 Apr 2019', 83, 'auditor_troubleshoot', '', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F4%252Fdetails', 'Third Party Monitoring', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (1, 'ACTIONAID MYANMAR', 'Civil Society Organization', '2500231372', '', 'Core Values Assessment', '/api/v2/attachments/file/1/', '', '29 Mar 2018', 1, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (5, 'ASSOCIATION FEMME POUR LE DEVELOPPEMENT AGROPASTORAL', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/5/', '', '29 Mar 2018', 5, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (9, 'Child King Organization', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/9/', '', '29 Mar 2018', 9, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (10, 'Child Protection Society', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/10/', '', '29 Mar 2018', 10, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (11, 'CONSORTIUM DUTCH NGO''S', 'Civil Society Organization', '2500223948', '', 'Core Values Assessment', '/api/v2/attachments/file/11/', '', '29 Mar 2018', 11, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (14, 'DEPARTMENT OF HEALTH PLANNING (CHEB)', 'Government', '2500201657', '', 'Core Values Assessment', '/api/v2/attachments/file/14/', '', '29 Mar 2018', 14, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (68, 'World Trust', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/68/', '', '29 Mar 2018', 68, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (69, 'World Trust ', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/69/', '', '29 Mar 2018', 69, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (70, 'World Trust Org', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/70/', '', '29 Mar 2018', 70, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (72, 'XXX NGO', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/72/', '', '29 Mar 2018', 72, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (73, 'YANGON CITY DEVELOPMENT COMMITTEE', 'Government', '2500201679', '', 'Core Values Assessment', '/api/v2/attachments/file/73/', '', '29 Mar 2018', 73, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (76, 'For a Better Education in DRC', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/76/', '', '29 Mar 2018', 76, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (84, '', '', '', '', 'Overall Report', '/api/v2/attachments/file/84/', '', '07 Apr 2019', 84, 'etoolslogo_4.jpg', '', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F2%252Fdetails', 'Third Party Monitoring', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (3, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', '', 'Core Values Assessment', '/api/v2/attachments/file/3/', '', '29 Mar 2018', 3, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (6, 'Awesome Partner Org', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/6/', '', '29 Mar 2018', 6, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (7, 'Campaign to reduce DSA', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/7/', '', '29 Mar 2018', 7, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (15, 'DEPARTMENT OF LABOUR', 'Government', '2500201315', '', 'Core Values Assessment', '/api/v2/attachments/file/15/', '', '29 Mar 2018', 15, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (18, 'DPH (BFHI) DEPARTMENT OF PUBLIC HEALTH', 'Government', '2500218429', '', 'Core Values Assessment', '/api/v2/attachments/file/18/', '', '29 Mar 2018', 18, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (19, 'DPH (CMSD) DEPARTMENT OF PUBLIC HEALTH', 'Government', '2500201680', '', 'Core Values Assessment', '/api/v2/attachments/file/19/', '', '29 Mar 2018', 19, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (22, 'Education in DRC', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/22/', '', '29 Mar 2018', 22, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (24, 'For a Better Education in DRC', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/24/', '', '29 Mar 2018', 24, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (26, 'French Natcom', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/26/', '', '29 Mar 2018', 26, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (29, 'ICO test Partner', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/29/', '', '29 Mar 2018', 29, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (30, 'IMMIGRATION AND NATIONAL REGRISTRAT DEPARTMENT', 'Government', '2500230681', '', 'Core Values Assessment', '/api/v2/attachments/file/30/', '', '29 Mar 2018', 30, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (31, 'IRRIGATION DEPARTMENT', 'Government', '2500221758', '', 'Core Values Assessment', '/api/v2/attachments/file/31/', '', '29 Mar 2018', 31, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (35, 'Ministry of Eucation', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/35/', '', '29 Mar 2018', 35, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (36, 'Ministry of Pawpaw', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/36/', '', '29 Mar 2018', 36, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (40, 'National Rural Support Programme', 'UN Agency', '', '', 'Core Values Assessment', '/api/v2/attachments/file/40/', '', '29 Mar 2018', 40, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (41, 'NATIONAL YOUNG WOMEN''S CHRISTIAN ASSOCIATION', 'Civil Society Organization', '2500201661', '', 'Core Values Assessment', '/api/v2/attachments/file/41/', '', '29 Mar 2018', 41, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (45, 'PYI GYI KHIN', 'Civil Society Organization', '2500201724', '', 'Core Values Assessment', '/api/v2/attachments/file/45/', '', '29 Mar 2018', 45, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (48, 'QA Production Test', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/48/', '', '29 Mar 2018', 48, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (52, 'Save the Congo', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/52/', '', '29 Mar 2018', 52, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (57, 'Test3', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/57/', '', '29 Mar 2018', 57, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (61, 'THEATRICAL ASSOCIATION, KYAUKPADAUNG TOWNSHIP', 'Civil Society Organization', '2500229007', '', 'Core Values Assessment', '/api/v2/attachments/file/61/', '', '29 Mar 2018', 61, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (63, 'UK National Committee', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/63/', '', '29 Mar 2018', 63, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (65, 'United pawpaw workers', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/65/', '', '29 Mar 2018', 65, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (67, 'US Fund for UNICEF', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/67/', '', '29 Mar 2018', 67, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (44, 'Pro-poor bank', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/44/', '', '29 Mar 2018', 44, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (51, 'Save the Chicken', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/51/', '', '29 Mar 2018', 51, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (56, 'TERRE DES HOMMES ITALY', 'Civil Society Organization', '2500201737', '', 'Core Values Assessment', '/api/v2/attachments/file/56/', '', '29 Mar 2018', 56, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (60, 'THEATRICAL ASSOCIATION, CHAUK TOWNSHIP', 'Civil Society Organization', '2500229609', '', 'Core Values Assessment', '/api/v2/attachments/file/60/', '', '29 Mar 2018', 60, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (64, 'UNAIR', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/64/', '', '29 Mar 2018', 64, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (85, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567', 'Report', '/api/v2/attachments/file/85/', '', '07 Apr 2019', 85, 'etoolslogo_4.jpg', 'UAT/PCA2015146', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F2%252Fdetails', 'Third Party Monitoring', 67);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (81, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', '', 'Signed Agreement', '/api/v2/attachments/file/81/', 'Jean Mege', '02 Apr 2019', 81, 'etoolslogo_4.jpg', 'UAT/PCA2015146', '/api/v2/agreements/146/', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (82, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567', 'Signed PD/SSFA', '/api/v2/attachments/file/82/', 'Jean Mege', '02 Apr 2019', 82, 'etoolslogo_4_ZISdM4n.jpg', 'UAT/PCA2015146', '/api/v2/interventions/67/', 'Partnership Management Portal', 67);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (4, 'ASIAN DISASTER PREPAREDNESS CENTER', 'Civil Society Organization', '2500000070', '', 'Core Values Assessment', '/api/v2/attachments/file/4/', '', '29 Mar 2018', 4, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (62, 'THEATRICAL ASSOCIATION, MAWLAMYAING TOWNSHIP', 'Civil Society Organization', '2500229799', '', 'Core Values Assessment', '/api/v2/attachments/file/62/', '', '29 Mar 2018', 62, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (66, 'UNIVERSITY OF PUBLIC HEALTH', 'Government', '2500230101', '', 'Core Values Assessment', '/api/v2/attachments/file/66/', '', '29 Mar 2018', 66, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (71, 'World Tust', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/71/', '', '29 Mar 2018', 71, '', '', '', 'Partnership Management Portal', NULL);
-INSERT INTO [[schema]].attachments_attachmentflat VALUES (74, 'United pawpaw workers', 'Civil Society Organisation', '', '', 'Assessment Report', '/api/v2/attachments/file/74/', '', '29 Mar 2018', 74, '', '', '', 'Partnership Management Portal', NULL);
-
-
---
--- Data for Name: attachments_filetype; Type: TABLE DATA; Schema: [[schema]]; Owner: -
---
-
-INSERT INTO [[schema]].attachments_filetype VALUES (42, 0, 'intervention_attachment', 'partners_intervention_attachment', 'Intervention Attachment');
-INSERT INTO [[schema]].attachments_filetype VALUES (1, 0, 'programme_document', 'tpm', 'FACE');
-INSERT INTO [[schema]].attachments_filetype VALUES (2, 1, 'supply_manual_list', 'tpm', 'Progress report');
-INSERT INTO [[schema]].attachments_filetype VALUES (3, 2, 'unicef_trip_report_action_point_report', 'tpm', 'Partnership review');
-INSERT INTO [[schema]].attachments_filetype VALUES (4, 3, 'partner_report', 'tpm', 'Final Partnership Review');
-INSERT INTO [[schema]].attachments_filetype VALUES (34, 0, 'attached_agreement', 'partners_agreement', 'Signed Agreement');
-INSERT INTO [[schema]].attachments_filetype VALUES (35, 0, 'core_values_assessment', 'partners_partner_assessment', 'Core Values Assessment');
-INSERT INTO [[schema]].attachments_filetype VALUES (36, 0, 'assessment_report', 'partners_assessment_report', 'Assessment Report');
-INSERT INTO [[schema]].attachments_filetype VALUES (37, 0, 'agreement_signed_amendment', 'partners_agreement_amendment', 'Agreement Amendment');
-INSERT INTO [[schema]].attachments_filetype VALUES (38, 0, 'intervention_prc_review', 'partners_intervention_prc_review', 'PRC Review');
-INSERT INTO [[schema]].attachments_filetype VALUES (39, 0, 'intervention_signed_pd', 'partners_intervention_signed_pd', 'Signed PD/SSFA');
-INSERT INTO [[schema]].attachments_filetype VALUES (40, 0, 'intervention_amendment_signed', 'partners_intervention_amendment_signed', 'PD/SSFA Amendment');
-INSERT INTO [[schema]].attachments_filetype VALUES (24, 11, 'other', 'tpm_report', 'Other');
-INSERT INTO [[schema]].attachments_filetype VALUES (25, 12, 'terms_of_reference', 'tpm_partner', 'Terms of Reference');
-INSERT INTO [[schema]].attachments_filetype VALUES (26, 13, 'training_material', 'tpm_partner', 'Training Material');
-INSERT INTO [[schema]].attachments_filetype VALUES (27, 14, 'contract', 'tpm_partner', 'Contract');
-INSERT INTO [[schema]].attachments_filetype VALUES (28, 15, 'questionnaires', 'tpm_partner', 'Questionnaires');
-INSERT INTO [[schema]].attachments_filetype VALUES (29, 16, 'other', 'tpm_partner', 'Other');
-INSERT INTO [[schema]].attachments_filetype VALUES (30, 1, 'picture_dataset', 'tpm_report_attachments', 'Picture Dataset');
-INSERT INTO [[schema]].attachments_filetype VALUES (31, 2, 'questionnaire', 'tpm_report_attachments', 'Questionnaire');
-INSERT INTO [[schema]].attachments_filetype VALUES (32, 3, 'other', 'tpm_report_attachments', 'Other');
-INSERT INTO [[schema]].attachments_filetype VALUES (33, 0, 'overall_report', 'tpm_report_attachments', 'Overall Report');
-INSERT INTO [[schema]].attachments_filetype VALUES (5, 4, 'previous_trip_reports', 'tpm', 'Correspondence');
-INSERT INTO [[schema]].attachments_filetype VALUES (6, 5, 'training_materials', 'tpm', 'Supply/Distribution Plan');
-INSERT INTO [[schema]].attachments_filetype VALUES (7, 6, 'tors', 'tpm', 'Workplan');
-INSERT INTO [[schema]].attachments_filetype VALUES (8, 4, 'ice_form', 'audit_engagement', 'ICE');
-INSERT INTO [[schema]].attachments_filetype VALUES (9, 3, 'face_form', 'audit_engagement', 'FACE form');
-INSERT INTO [[schema]].attachments_filetype VALUES (10, 5, 'other', 'audit_engagement', 'Other');
-INSERT INTO [[schema]].attachments_filetype VALUES (11, 0, 'report', 'audit_report', 'Report');
-INSERT INTO [[schema]].attachments_filetype VALUES (14, 1, 'other', 'audit_report', 'Other');
-INSERT INTO [[schema]].attachments_filetype VALUES (15, 0, 'pca', 'audit_engagement', 'PCA');
-INSERT INTO [[schema]].attachments_filetype VALUES (16, 1, 'pd', 'audit_engagement', 'PD');
-INSERT INTO [[schema]].attachments_filetype VALUES (17, 2, 'workplan', 'audit_engagement', 'Workplan');
-INSERT INTO [[schema]].attachments_filetype VALUES (18, 7, 'other', 'tpm', 'Other');
-INSERT INTO [[schema]].attachments_filetype VALUES (19, 0, 'report', 'tpm_report', 'Report');
-INSERT INTO [[schema]].attachments_filetype VALUES (21, 8, 'pca', 'tpm', 'PCA');
-INSERT INTO [[schema]].attachments_filetype VALUES (22, 9, 'signed_pd/ssfa', 'tpm', 'Signed PD/SSFA');
-INSERT INTO [[schema]].attachments_filetype VALUES (23, 10, 'prc_submission', 'tpm', 'PRC Submission');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (2, 'Adult Basic Community Org', 'Bilateral / Multilateral', '', '', 'Core Values Assessment', '/api/v2/attachments/file/2/', '', 2, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (13, 'DEPARTMENT OF EDUCATIONAL PLANNING AND  TRAINING', 'Government', '2500201643', '', 'Core Values Assessment', '/api/v2/attachments/file/13/', '', 13, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (8, 'Chiild Protection Society ', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/8/', '', 8, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (12, 'DEPARTMENT OF EDUCATIONAL PLANNING AND  TRAINING', 'Government', '2500218425', '', 'Core Values Assessment', '/api/v2/attachments/file/12/', '', 12, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (16, 'DEPT OF MYANMAR EDUCATION RESEARCH', 'Government', '2500233172', '', 'Core Values Assessment', '/api/v2/attachments/file/16/', '', 16, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (17, 'DHP-PLANNING (PLANNING SECTION)', 'Government', '2500220368', '', 'Core Values Assessment', '/api/v2/attachments/file/17/', '', 17, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (20, 'DPH (PLANNING) NAYPYITAW DEPARTMENT OF PUBLIC HEALTH', 'Government', '2500201713', '', 'Core Values Assessment', '/api/v2/attachments/file/20/', '', 20, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (21, 'Education au Bandundu', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/21/', '', 21, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (23, 'ETools Master Fund', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/23/', '', 23, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (25, 'FOREIGN ECONOMIC RELATIONS DEPARTMENT (FERD)', 'Government', '2500201716', '', 'Core Values Assessment', '/api/v2/attachments/file/25/', '', 25, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (27, 'GENERAL ADMINISTRATION DEPARTMENT', 'Government', '2500230720', '', 'Core Values Assessment', '/api/v2/attachments/file/27/', '', 27, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (28, 'Govt test', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/28/', '', 28, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (32, 'Jason', 'Bi-Lateral Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/32/', '', 32, 'WebInspectGenerated_AxDn3D2.txt', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (33, 'Ministry of eTools', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/33/', '', 33, 's.png', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (34, 'Ministry of eTools 2', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/34/', '', 34, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (37, 'Ministry of Wellbodi', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/37/', '', 37, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (38, 'MYANMAR COUNCIL CHURCHES', 'Civil Society Organization', '2500201650', '', 'Core Values Assessment', '/api/v2/attachments/file/38/', '', 38, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (39, 'MYANMAR NATIONAL HUMAN RIGHT COMMISSION', 'Government', '2500220600', '', 'Core Values Assessment', '/api/v2/attachments/file/39/', '', 39, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (42, 'Partner Organization 2', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/42/', '', 42, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (43, 'Partners for food', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/43/', '', 43, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (46, 'QA Govt Test', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/46/', '', 46, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (47, 'QA Partner Test', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/47/', '', 47, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (49, 'RELIEF INTERNATIONAL', 'Civil Society Organization', '2500201729', '', 'Core Values Assessment', '/api/v2/attachments/file/49/', '', 49, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (50, 'right to play', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/50/', '', 50, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (53, 'Shafaq', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/53/', '', 53, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (54, 'SOCIAL SECURITY BOARD', 'Government', '2500221380', '', 'Core Values Assessment', '/api/v2/attachments/file/54/', '', 54, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (55, 'SUPREME COURT', 'Government', '2500201710', '', 'Core Values Assessment', '/api/v2/attachments/file/55/', '', 55, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (58, 'test partner 1', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/58/', '', 58, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (59, 'THEATRICAL & ARTISAN ASSOCIATION KYAUKPADAUNG TOWNSHIP DAW WIN WIN MAW', 'Civil Society Organization', '2500223485', '', 'Core Values Assessment', '/api/v2/attachments/file/59/', '', 59, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (75, 'Campaign to reduce DSA', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/75/', '', 75, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (77, 'Education in DRC', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/77/', '', 77, 'Fiche_Visite_Programmatique.docx', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (78, 'right to play', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/78/', '', 78, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (79, 'Child Protection Society', 'Civil Society Organisation', '', '', 'Assessment Report', '/api/v2/attachments/file/79/', '', 79, 'Test_PCA.docx', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (80, 'Pro-poor bank', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/80/', '', 80, 'Travel_Health_Questionnaire.doc', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (83, '', '', '', '', 'Questionnaire', '/api/v2/attachments/file/83/', '', 83, 'auditor_troubleshoot', '', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F4%252Fdetails', 'Third Party Monitoring', NULL, '2019-04-05 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (1, 'ACTIONAID MYANMAR', 'Civil Society Organization', '2500231372', '', 'Core Values Assessment', '/api/v2/attachments/file/1/', '', 1, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (5, 'ASSOCIATION FEMME POUR LE DEVELOPPEMENT AGROPASTORAL', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/5/', '', 5, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (9, 'Child King Organization', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/9/', '', 9, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (10, 'Child Protection Society', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/10/', '', 10, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (11, 'CONSORTIUM DUTCH NGO''S', 'Civil Society Organization', '2500223948', '', 'Core Values Assessment', '/api/v2/attachments/file/11/', '', 11, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (14, 'DEPARTMENT OF HEALTH PLANNING (CHEB)', 'Government', '2500201657', '', 'Core Values Assessment', '/api/v2/attachments/file/14/', '', 14, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (68, 'World Trust', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/68/', '', 68, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (69, 'World Trust ', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/69/', '', 69, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (70, 'World Trust Org', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/70/', '', 70, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (72, 'XXX NGO', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/72/', '', 72, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (73, 'YANGON CITY DEVELOPMENT COMMITTEE', 'Government', '2500201679', '', 'Core Values Assessment', '/api/v2/attachments/file/73/', '', 73, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (76, 'For a Better Education in DRC', 'Civil Society Organization', '', '', 'Assessment Report', '/api/v2/attachments/file/76/', '', 76, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (84, '', '', '', '', 'Overall Report', '/api/v2/attachments/file/84/', '', 84, 'etoolslogo_4.jpg', '', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F2%252Fdetails', 'Third Party Monitoring', NULL, '2019-04-07 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (3, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', '', 'Core Values Assessment', '/api/v2/attachments/file/3/', '', 3, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (6, 'Awesome Partner Org', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/6/', '', 6, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (7, 'Campaign to reduce DSA', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/7/', '', 7, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (15, 'DEPARTMENT OF LABOUR', 'Government', '2500201315', '', 'Core Values Assessment', '/api/v2/attachments/file/15/', '', 15, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (18, 'DPH (BFHI) DEPARTMENT OF PUBLIC HEALTH', 'Government', '2500218429', '', 'Core Values Assessment', '/api/v2/attachments/file/18/', '', 18, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (19, 'DPH (CMSD) DEPARTMENT OF PUBLIC HEALTH', 'Government', '2500201680', '', 'Core Values Assessment', '/api/v2/attachments/file/19/', '', 19, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (22, 'Education in DRC', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/22/', '', 22, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (24, 'For a Better Education in DRC', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/24/', '', 24, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (26, 'French Natcom', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/26/', '', 26, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (29, 'ICO test Partner', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/29/', '', 29, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (30, 'IMMIGRATION AND NATIONAL REGRISTRAT DEPARTMENT', 'Government', '2500230681', '', 'Core Values Assessment', '/api/v2/attachments/file/30/', '', 30, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (31, 'IRRIGATION DEPARTMENT', 'Government', '2500221758', '', 'Core Values Assessment', '/api/v2/attachments/file/31/', '', 31, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (35, 'Ministry of Eucation', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/35/', '', 35, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (36, 'Ministry of Pawpaw', 'Government', '', '', 'Core Values Assessment', '/api/v2/attachments/file/36/', '', 36, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (40, 'National Rural Support Programme', 'UN Agency', '', '', 'Core Values Assessment', '/api/v2/attachments/file/40/', '', 40, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (41, 'NATIONAL YOUNG WOMEN''S CHRISTIAN ASSOCIATION', 'Civil Society Organization', '2500201661', '', 'Core Values Assessment', '/api/v2/attachments/file/41/', '', 41, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (45, 'PYI GYI KHIN', 'Civil Society Organization', '2500201724', '', 'Core Values Assessment', '/api/v2/attachments/file/45/', '', 45, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (48, 'QA Production Test', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/48/', '', 48, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (52, 'Save the Congo', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/52/', '', 52, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (57, 'Test3', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/57/', '', 57, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (61, 'THEATRICAL ASSOCIATION, KYAUKPADAUNG TOWNSHIP', 'Civil Society Organization', '2500229007', '', 'Core Values Assessment', '/api/v2/attachments/file/61/', '', 61, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (63, 'UK National Committee', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/63/', '', 63, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (65, 'United pawpaw workers', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/65/', '', 65, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (67, 'US Fund for UNICEF', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/67/', '', 67, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (44, 'Pro-poor bank', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/44/', '', 44, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (51, 'Save the Chicken', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/51/', '', 51, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (56, 'TERRE DES HOMMES ITALY', 'Civil Society Organization', '2500201737', '', 'Core Values Assessment', '/api/v2/attachments/file/56/', '', 56, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (60, 'THEATRICAL ASSOCIATION, CHAUK TOWNSHIP', 'Civil Society Organization', '2500229609', '', 'Core Values Assessment', '/api/v2/attachments/file/60/', '', 60, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (64, 'UNAIR', 'Civil Society Organization', '', '', 'Core Values Assessment', '/api/v2/attachments/file/64/', '', 64, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (85, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567', 'Report', '/api/v2/attachments/file/85/', '', 85, 'etoolslogo_4.jpg', 'UAT/PCA2015146', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F2%252Fdetails', 'Third Party Monitoring', 67, '2019-04-07 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (81, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', '', 'Signed Agreement', '/api/v2/attachments/file/81/', 'Jean Mege', 81, 'etoolslogo_4.jpg', 'UAT/PCA2015146', '/api/v2/agreements/146/', 'Partnership Management Portal', NULL, '2019-04-02 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (82, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567', 'Signed PD/SSFA', '/api/v2/attachments/file/82/', 'Jean Mege', 82, 'etoolslogo_4_ZISdM4n.jpg', 'UAT/PCA2015146', '/api/v2/interventions/67/', 'Partnership Management Portal', 67, '2019-04-02 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (90, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567-1', 'Other', '/api/v2/attachments/file/90/', '', 90, 'etoolslogo_4.jpg', 'UAT/PCA2015146', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F9%252Fdetails', 'Third Party Monitoring', 67, '2019-07-20 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (87, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567', 'Other', '/api/v2/attachments/file/87/', 'Nikola Trncic', 87, 'IRQ_PCA201759_PD2019506_results.docx', 'UAT/PCA2015146', '', 'Partnership Management Portal', 67, '2019-05-13 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (88, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', '', 'Other', '/api/v2/attachments/file/88/', '', 88, 'Etools_issues.JPG', '', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Fap%252Fmicro-assessments%252F4%252Foverview', 'Financial Assurance (FAM)', NULL, '2019-05-21 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (89, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567-1', 'PD/SSFA Amendment', '/api/v2/attachments/file/89/', 'Nikola Trncic', 89, 'Screen_Shot_2019-05-29_at_7.49.21_AM.png', 'UAT/PCA2015146', '', 'Partnership Management Portal', 67, '2019-05-31 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (91, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567-1', 'Other', '/api/v2/attachments/file/91/', '', 91, 'etoolslogo_4.jpg', 'UAT/PCA2015146', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F9%252Fdetails', 'Third Party Monitoring', 67, '2019-07-20 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (4, 'ASIAN DISASTER PREPAREDNESS CENTER', 'Civil Society Organization', '2500000070', '', 'Core Values Assessment', '/api/v2/attachments/file/4/', '', 4, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (62, 'THEATRICAL ASSOCIATION, MAWLAMYAING TOWNSHIP', 'Civil Society Organization', '2500229799', '', 'Core Values Assessment', '/api/v2/attachments/file/62/', '', 62, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (66, 'UNIVERSITY OF PUBLIC HEALTH', 'Government', '2500230101', '', 'Core Values Assessment', '/api/v2/attachments/file/66/', '', 66, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (71, 'World Tust', 'Civil Society Organisation', '', '', 'Core Values Assessment', '/api/v2/attachments/file/71/', '', 71, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (74, 'United pawpaw workers', 'Civil Society Organisation', '', '', 'Assessment Report', '/api/v2/attachments/file/74/', '', 74, '', '', '', 'Partnership Management Portal', NULL, '2018-03-29 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (92, '', '', '', '', 'Other', '/api/v2/attachments/file/92/', '', 92, 'etoolslogo_4.jpg', '', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F9%252Fdetails', 'Third Party Monitoring', NULL, '2019-07-20 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (93, '', '', '', '', 'Overall Report', '/api/v2/attachments/file/93/', '', 93, 'etoolslogo_4.jpg', '', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F9%252Fdetails', 'Third Party Monitoring', NULL, '2019-07-20 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (94, 'AGENCY FOR TECH COORDINATION AND DEV ACTED', 'Civil Society Organization', '2500221381', 'UAT/PCA2015146/PD201567-1', 'Report', '/api/v2/attachments/file/94/', '', 94, 'etoolslogo_4.jpg', 'UAT/PCA2015146', 'https://etools.unicef.org/login/?next=%2Fusers%2Fapi%2Fchangecountry%2F%3Fcountry%3D2%26next%3D%252Ftpm%252Fvisits%252F10%252Fdetails', 'Third Party Monitoring', 67, '2019-07-20 00:00:00+00');
+INSERT INTO [[schema]].attachments_attachmentflat VALUES (96, '', '', '', '', '', '/api/v2/attachments/file/96/', 'Robert Avram', 96, 'Screen_Shot_2019-05-16_at_11.08.29_AM.png', '', '', '', NULL, '2019-10-04 00:00:00+00');
 
 
 --
@@ -5113,17 +6015,39 @@ INSERT INTO [[schema]].attachments_filetype VALUES (23, 10, 'prc_submission', 't
 -- Data for Name: audit_engagement; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].audit_engagement VALUES (1, '2018-10-17 14:00:48.746338+00', '2018-10-17 14:01:41.50947+00', 'partner_contacted', '2018-10-11', 'sc', '2018-10-31', '2018-11-14', 0.00, '2018-10-11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, '', '', 228, false, 1, NULL, '{}', 0.00);
+INSERT INTO [[schema]].audit_engagement VALUES (1, '2018-10-17 14:00:48.746338+00', '2018-10-17 14:01:41.50947+00', 'partner_contacted', '2018-10-11', 'sc', '2018-10-31', '2018-11-14', 0.00, '2018-10-11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, '', '', 228, false, 1, NULL, '{}', 0.00, '');
+INSERT INTO [[schema]].audit_engagement VALUES (2, '2019-04-26 14:54:42.36063+00', '2019-04-26 14:54:42.361287+00', 'partner_contacted', '2019-04-26', 'ma', NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, '', '', 229, false, 124, NULL, '{}', 0.00, '');
+INSERT INTO [[schema]].audit_engagement VALUES (4, '2019-05-21 12:57:05.869472+00', '2019-05-21 17:11:33.644632+00', 'partner_contacted', '2019-05-21', 'ma', NULL, NULL, 0.00, '2019-05-21', '2019-05-21', NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, '', '', 228, false, 124, NULL, '{}', 0.00, '');
+INSERT INTO [[schema]].audit_engagement VALUES (3, '2019-04-26 14:55:49.721551+00', '2019-05-29 15:50:04.401676+00', 'partner_contacted', '2019-04-26', 'ma', NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, '', '', 228, false, 124, NULL, '{}', 0.00, '');
+INSERT INTO [[schema]].audit_engagement VALUES (5, '2019-09-06 16:23:45.016972+00', '2019-09-06 16:31:31.332096+00', 'partner_contacted', '2019-09-04', 'sc', '2019-09-02', '2019-09-04', 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, '', '', 228, false, 1, NULL, '{}', 0.00, '');
+INSERT INTO [[schema]].audit_engagement VALUES (6, '2019-09-19 03:03:06.43054+00', '2019-09-19 03:05:45.852189+00', 'cancelled', '2019-09-02', 'sc', '2019-09-18', '2019-09-19', 20000.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2019-09-19', 0.00, 0.00, 0.00, 0.00, 'Incorrect inputs', '', 229, false, 1, NULL, '{}', 0.00, '');
 
 
 --
 -- Data for Name: audit_engagement_active_pd; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].audit_engagement_active_pd VALUES (1, 4, 67);
+INSERT INTO [[schema]].audit_engagement_active_pd VALUES (2, 5, 67);
 
 
 --
 -- Data for Name: audit_engagement_authorized_officers; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+INSERT INTO [[schema]].audit_engagement_authorized_officers VALUES (1, 3, 171);
+INSERT INTO [[schema]].audit_engagement_authorized_officers VALUES (2, 4, 171);
+INSERT INTO [[schema]].audit_engagement_authorized_officers VALUES (3, 5, 171);
+
+
+--
+-- Data for Name: audit_engagement_offices; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: audit_engagement_sections; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
 
@@ -5133,6 +6057,21 @@ INSERT INTO [[schema]].audit_engagement VALUES (1, '2018-10-17 14:00:48.746338+0
 --
 
 INSERT INTO [[schema]].audit_engagement_staff_members VALUES (1, 1, 87);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (2, 2, 357);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (3, 3, 357);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (4, 4, 449);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (5, 3, 449);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (6, 5, 904);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (7, 5, 905);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (8, 6, 940);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (9, 6, 942);
+INSERT INTO [[schema]].audit_engagement_staff_members VALUES (10, 6, 971);
+
+
+--
+-- Data for Name: audit_engagement_users_notified; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
 
 
 --
@@ -5157,59 +6096,26 @@ INSERT INTO [[schema]].audit_engagement_staff_members VALUES (1, 1, 87);
 -- Data for Name: audit_microassessment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].audit_microassessment VALUES (2);
+INSERT INTO [[schema]].audit_microassessment VALUES (3);
+INSERT INTO [[schema]].audit_microassessment VALUES (4);
 
 
 --
 -- Data for Name: audit_risk; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].audit_risk VALUES (1, 2, '{"comments": "teetet"}', 110, 4);
 
 
 --
 -- Data for Name: audit_riskblueprint; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].audit_riskblueprint VALUES (38, 3, 1, false, '4.11 Are IP budgets approved formally at an appropriate level?', '', 20);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (17, 5, 2, true, '2.6 Does the IP carry out and document regular monitoring activities such as review meetings, on-site project visits, etc.', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (18, 6, 1, false, '2.7 Does the IP systematically collect, monitor and eval[[schema]]e data on the achievement of project results?', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (19, 7, 1, false, '2.8 Is it evident that the IP followed up on independent eval[[schema]]ion recommendations?', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (20, 0, 2, true, '3.1 Are the IP’s recruitment, employment and personnel practices clearly defined and followed, and do they embrace transparency and competition?', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (22, 2, 2, true, '3.3 Is the organizational structure of the finance and programme management departments, and competency of staff, appropriate for the complexity of the IP and the scale of activities? Identify the key staff, including job titles, responsibilities, educational backgrounds and professional experience.', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (23, 3, 2, true, '3.4 Is the IP’s accounting/finance function staffed adeq[[schema]]ely to ensure sufficient controls are in place to manage agency funds?', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (24, 4, 1, false, '3.5 Does the IP have training policies for accounting/finance/ programme management staff? Are necessary training activities undertaken?', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (25, 5, 1, false, '3.6 Does the IP perform background verification/checks on all new accounting/finance and management positions?', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (26, 6, 1, false, '3.7 Has there been significant turnover in key finance positions the past five years? If so, has the rate improved or worsened and appears to be a problem? ', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (27, 7, 1, false, '3.8 Does the IP have a documented internal control framework? Is this framework distributed and made available to staff and updated periodically? If so, please describe.', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (28, 0, 2, true, '4.1 Does the IP have an accounting system that allows for proper recording of financial transactions from United Nations agencies, including allocation of expenditures in accordance with the respective components, disbursement categories and sources of funds? ', '', 18);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (29, 1, 2, true, '4.2 Does the IP have an appropriate cost allocation methodology that ensures accurate cost allocations to the various funding sources in accordance with established agreements?', '', 18);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (30, 2, 2, true, '4.3 Are all accounting and supporting documents retained in an organized system that allows authorized users easy access?', '', 18);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (31, 3, 1, false, '4.4 Are the general ledger and subsidiary ledgers reconciled at least monthly? Are explanations provided for significant reconciling items?', '', 18);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (32, 0, 2, true, '4.5 Are the following functional responsibilities performed by different units or individuals: (a) authorization to execute a transaction; (b) recording of the transaction; and (c) custody of assets involved in the transaction?', '', 19);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (35, 0, 2, true, '4.8 Are budgets prepared for all activities in sufficient detail to provide a meaningful tool for monitoring subsequent performance?', '', 20);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (97, 0, 1, false, 'Implementing partner', '', 30);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (1, 0, 2, true, '1.1 Is the IP legally registered? If so, is it in compliance with registration requirements? Please note the legal status and date of registration of the entity.', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (2, 1, 2, true, '1.2 If the IP received United Nations resources in the past, were significant issues reported in managing the resources, including from previous assurance activities.', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (3, 2, 2, true, '1.3 Does the IP have statutory reporting requirements? If so, are they in compliance with such requirements in the prior three fiscal years?', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (4, 3, 1, false, '1.4 Does the governing body meet on a regular basis and perform oversight functions?', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (5, 4, 2, true, '1.5 If any other offices/ external entities participate in implementation, does the IP have policies and process to ensure appropriate oversight and monitoring of implementation?', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (6, 5, 2, true, '1.6 Does the IP show basic financial stability in-country (core resources; funding trend).', 'Provide the amount of total assets, total liabilities, income and expenditure for the current and prior three fiscal years.', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (7, 6, 1, false, '1.7 Can the IP easily receive funds? Have there been any major problems in the past in the receipt of funds, particularly where the funds flow from government ministries?', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (8, 7, 1, false, '1.8 Does the IP have any pending legal actions against it or outstanding material/significant disputes with vendors/contractors?', 'If so, provide details and actions taken by the IP to resolve the legal action.', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (9, 8, 1, false, '1.9 Does the IP have an anti-fraud and corruption policy?', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (10, 9, 1, false, '1.10 Has the IP advised employees, beneficiaries and other recipients to whom they should report if they suspect fraud, waste or misuse of agency resources or property? If so, does the IP have a policy against retaliation relating to such reporting?', '', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (11, 10, 1, false, '1.11 Does the IP have any key financial or operational risks that are not covered by this questionnaire? If so, please describe.', 'Examples: foreign exchange risk; cash receipts.', 11);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (12, 0, 1, false, '2.1 Does the IP have and use sufficiently detailed written policies, procedures and other tools (e.g. project development checklist, work planning templates, work planning schedule) to develop programmes and plans?', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (13, 1, 2, true, '2.2 Do work plans specify expected results and the activities to be carried out to achieve results, with a time frame and budget for the activities?', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (14, 2, 1, false, '2.3 Does the IP identify the potential risks for programme delivery and mechanisms to mitigate them?', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (15, 3, 1, false, '2.4 Does the IP have and use sufficiently detailed policies, procedures, guidelines and other tools (checklists, templates) for monitoring and eval[[schema]]ion?', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (16, 4, 1, false, '2.5 Does the IP have M&E frameworks for its programmes, with indicators, baselines, and targets to monitor achievement of programme results?  ', '', 12);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (21, 1, 1, false, '3.2 Does the IP have clearly defined job descriptions?', '', 13);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (34, 2, 2, true, '4.7 Are bank reconciliations prepared by individuals other than those who make or approve payments?', '', 19);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (36, 1, 2, true, '4.9 Are actual expenditures compared to the budget with reasonable frequency? Are explanations required for significant variations from the budget?', '', 20);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (38, 3, 1, false, '4.11 Are IP budgets approved formally at an appropriate level?', '', 20);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (39, 0, 2, true, '4.12 Do invoice processing procedures provide for:<br /><ul><li>Copies of purchase orders and receiving reports to be obtained directly from issuing departments?</li><li>Comparison of invoice quantities, prices and terms with those indicated on the purchase order and with records of goods/services actually received?</li><li>Checking the accuracy of calculations?</li></ul>', '', 21);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (40, 1, 2, true, '4.13 Are payments authorized at an appropriate level? Does the IP have a table of payment approval thresholds?', '', 21);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (33, 1, 2, true, '4.6 Are the functions of ordering, receiving, accounting for and paying for goods and services appropriately segregated?', '', 19);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (37, 2, 1, false, '4.10 Is prior approval sought for budget amendments in a timely way?', '', 20);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (41, 2, 2, true, '4.14 Are all invoices stamped ‘PAID’, approved, and marked with the project code and account code?', '', 21);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (42, 3, 2, true, '4.15 Do controls exist for preparation and approval of payroll expenditures? Are payroll changes properly authorized?', '', 21);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (43, 4, 2, true, '4.16 Do controls exist to ensure that direct staff salary costs reflects the actual amount of staff time spent on a project?', '', 21);
@@ -5249,14 +6155,54 @@ INSERT INTO [[schema]].audit_riskblueprint VALUES (85, 8, 1, false, '7.9 Do the 
 INSERT INTO [[schema]].audit_riskblueprint VALUES (89, 12, 1, false, '7.13 Does the IP keep track of past performance of suppliers? E.g. database of trusted suppliers.', '', 28);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (90, 13, 2, true, '7.14 Does the IP follow a well-defined process to ensure a secure and transparent bid and eval[[schema]]ion process? If so, describe the process.', '', 28);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (91, 14, 2, true, '7.15 When a formal invitation to bid has been issued, does the IP award the contract on a pre-defined basis set out in the solicitation documentation taking into account technical responsiveness and price?', '', 28);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (98, 1, 1, false, 'Programme Management', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (99, 2, 1, false, 'Organizational structure and staffing', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (100, 3, 1, false, 'Accounting policies and procedures', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (101, 4, 1, false, 'Accounting policies and procedures: Segregation of duties', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (102, 5, 1, false, 'Accounting policies and procedures: Budgeting', '', 30);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (17, 5, 2, true, '2.6 Does the IP carry out and document regular monitoring activities such as review meetings, on-site project visits, etc.', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (18, 6, 1, false, '2.7 Does the IP systematically collect, monitor and eval[[schema]]e data on the achievement of project results?', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (19, 7, 1, false, '2.8 Is it evident that the IP followed up on independent eval[[schema]]ion recommendations?', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (20, 0, 2, true, '3.1 Are the IP’s recruitment, employment and personnel practices clearly defined and followed, and do they embrace transparency and competition?', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (22, 2, 2, true, '3.3 Is the organizational structure of the finance and programme management departments, and competency of staff, appropriate for the complexity of the IP and the scale of activities? Identify the key staff, including job titles, responsibilities, educational backgrounds and professional experience.', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (23, 3, 2, true, '3.4 Is the IP’s accounting/finance function staffed adeq[[schema]]ely to ensure sufficient controls are in place to manage agency funds?', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (24, 4, 1, false, '3.5 Does the IP have training policies for accounting/finance/ programme management staff? Are necessary training activities undertaken?', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (25, 5, 1, false, '3.6 Does the IP perform background verification/checks on all new accounting/finance and management positions?', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (26, 6, 1, false, '3.7 Has there been significant turnover in key finance positions the past five years? If so, has the rate improved or worsened and appears to be a problem? ', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (27, 7, 1, false, '3.8 Does the IP have a documented internal control framework? Is this framework distributed and made available to staff and updated periodically? If so, please describe.', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (28, 0, 2, true, '4.1 Does the IP have an accounting system that allows for proper recording of financial transactions from United Nations agencies, including allocation of expenditures in accordance with the respective components, disbursement categories and sources of funds? ', '', 18);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (29, 1, 2, true, '4.2 Does the IP have an appropriate cost allocation methodology that ensures accurate cost allocations to the various funding sources in accordance with established agreements?', '', 18);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (30, 2, 2, true, '4.3 Are all accounting and supporting documents retained in an organized system that allows authorized users easy access?', '', 18);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (31, 3, 1, false, '4.4 Are the general ledger and subsidiary ledgers reconciled at least monthly? Are explanations provided for significant reconciling items?', '', 18);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (32, 0, 2, true, '4.5 Are the following functional responsibilities performed by different units or individuals: (a) authorization to execute a transaction; (b) recording of the transaction; and (c) custody of assets involved in the transaction?', '', 19);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (35, 0, 2, true, '4.8 Are budgets prepared for all activities in sufficient detail to provide a meaningful tool for monitoring subsequent performance?', '', 20);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (97, 0, 1, false, 'Implementing partner', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (103, 6, 1, false, 'Accounting policies and procedures: Payments', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (104, 7, 1, false, 'Accounting policies and procedures: Cash and bank', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (105, 8, 1, false, 'Accounting policies and procedures: Other offices and entities', '', 30);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (115, 0, 1, false, 'Fixed Assets and Inventory', '', 36);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (116, 0, 1, false, 'Financial Reporting and Monitoring', '', 37);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (117, 0, 1, false, 'Procurement', '', 38);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (1, 0, 2, true, '1.1 Is the IP legally registered? If so, is it in compliance with registration requirements? Please note the legal status and date of registration of the entity.', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (2, 1, 2, true, '1.2 If the IP received United Nations resources in the past, were significant issues reported in managing the resources, including from previous assurance activities.', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (3, 2, 2, true, '1.3 Does the IP have statutory reporting requirements? If so, are they in compliance with such requirements in the prior three fiscal years?', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (4, 3, 1, false, '1.4 Does the governing body meet on a regular basis and perform oversight functions?', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (5, 4, 2, true, '1.5 If any other offices/ external entities participate in implementation, does the IP have policies and process to ensure appropriate oversight and monitoring of implementation?', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (6, 5, 2, true, '1.6 Does the IP show basic financial stability in-country (core resources; funding trend).', 'Provide the amount of total assets, total liabilities, income and expenditure for the current and prior three fiscal years.', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (7, 6, 1, false, '1.7 Can the IP easily receive funds? Have there been any major problems in the past in the receipt of funds, particularly where the funds flow from government ministries?', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (8, 7, 1, false, '1.8 Does the IP have any pending legal actions against it or outstanding material/significant disputes with vendors/contractors?', 'If so, provide details and actions taken by the IP to resolve the legal action.', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (9, 8, 1, false, '1.9 Does the IP have an anti-fraud and corruption policy?', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (10, 9, 1, false, '1.10 Has the IP advised employees, beneficiaries and other recipients to whom they should report if they suspect fraud, waste or misuse of agency resources or property? If so, does the IP have a policy against retaliation relating to such reporting?', '', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (11, 10, 1, false, '1.11 Does the IP have any key financial or operational risks that are not covered by this questionnaire? If so, please describe.', 'Examples: foreign exchange risk; cash receipts.', 11);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (12, 0, 1, false, '2.1 Does the IP have and use sufficiently detailed written policies, procedures and other tools (e.g. project development checklist, work planning templates, work planning schedule) to develop programmes and plans?', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (13, 1, 2, true, '2.2 Do work plans specify expected results and the activities to be carried out to achieve results, with a time frame and budget for the activities?', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (14, 2, 1, false, '2.3 Does the IP identify the potential risks for programme delivery and mechanisms to mitigate them?', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (15, 3, 1, false, '2.4 Does the IP have and use sufficiently detailed policies, procedures, guidelines and other tools (checklists, templates) for monitoring and eval[[schema]]ion?', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (16, 4, 1, false, '2.5 Does the IP have M&E frameworks for its programmes, with indicators, baselines, and targets to monitor achievement of programme results?  ', '', 12);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (21, 1, 1, false, '3.2 Does the IP have clearly defined job descriptions?', '', 13);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (34, 2, 2, true, '4.7 Are bank reconciliations prepared by individuals other than those who make or approve payments?', '', 19);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (33, 1, 2, true, '4.6 Are the functions of ordering, receiving, accounting for and paying for goods and services appropriately segregated?', '', 19);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (37, 2, 1, false, '4.10 Is prior approval sought for budget amendments in a timely way?', '', 20);
+INSERT INTO [[schema]].audit_riskblueprint VALUES (98, 1, 1, false, 'Programme Management', '', 30);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (68, 4, 1, false, '5.9 Are regular physical counts of inventory carried out?', '', 27);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (69, 0, 1, false, '6.1 Does the IP have established financial reporting procedures that specify what reports are to be prepared, the source system for key reports, the frequency of preparation, what they are to contain and how they are to be used?', '', 16);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (70, 1, 1, false, '6.2 Does the IP prepare overall financial statements?one', '', 16);
@@ -5283,9 +6229,6 @@ INSERT INTO [[schema]].audit_riskblueprint VALUES (111, 0, 1, false, 'Implementi
 INSERT INTO [[schema]].audit_riskblueprint VALUES (112, 0, 1, false, 'Programme Management', '', 33);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (113, 0, 1, false, 'Organizational structure and staffing', '', 34);
 INSERT INTO [[schema]].audit_riskblueprint VALUES (114, 0, 1, false, 'Accounting policies and procedures', '', 35);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (115, 0, 1, false, 'Fixed Assets and Inventory', '', 36);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (116, 0, 1, false, 'Financial Reporting and Monitoring', '', 37);
-INSERT INTO [[schema]].audit_riskblueprint VALUES (117, 0, 1, false, 'Procurement', '', 38);
 
 
 --
@@ -5347,6 +6290,8 @@ INSERT INTO [[schema]].audit_riskcategory VALUES (38, 6, 'Procurement', 'default
 --
 
 INSERT INTO [[schema]].audit_spotcheck VALUES (1, 0.00, 0.00, '');
+INSERT INTO [[schema]].audit_spotcheck VALUES (5, 0.00, 0.00, '');
+INSERT INTO [[schema]].audit_spotcheck VALUES (6, 0.00, 0.00, '');
 
 
 --
@@ -5584,6 +6529,7 @@ INSERT INTO [[schema]].django_migrations VALUES (652, 'reports', '0014_auto_2018
 INSERT INTO [[schema]].django_migrations VALUES (653, 'default', '0001_initial', '2019-02-07 15:56:07.348072+00');
 INSERT INTO [[schema]].django_migrations VALUES (654, 'social_auth', '0001_initial', '2019-02-07 15:56:07.425204+00');
 INSERT INTO [[schema]].django_migrations VALUES (655, 'default', '0002_add_related_name', '2019-02-07 15:56:07.748692+00');
+INSERT INTO [[schema]].django_migrations VALUES (696, 'core', '0001_initial', '2019-05-10 17:00:31.033345+00');
 INSERT INTO [[schema]].django_migrations VALUES (556, 'tpmpartners', '0004_auto_20180503_1311', '2018-05-03 19:22:44.339511+00');
 INSERT INTO [[schema]].django_migrations VALUES (399, 'waffle', '0001_initial', '2017-12-30 15:29:18.532674+00');
 INSERT INTO [[schema]].django_migrations VALUES (400, 'waffle', '0002_auto_20161201_0958', '2017-12-30 15:29:18.596713+00');
@@ -5636,58 +6582,238 @@ INSERT INTO [[schema]].django_migrations VALUES (692, 'partners', '0035_auto_201
 INSERT INTO [[schema]].django_migrations VALUES (693, 'publics', '0004_auto_20190220_2033', '2019-04-05 15:56:11.560329+00');
 INSERT INTO [[schema]].django_migrations VALUES (694, 'reports', '0015_auto_20190208_2042', '2019-04-05 15:56:11.831559+00');
 INSERT INTO [[schema]].django_migrations VALUES (695, 'unicef_attachments', '0003_auto_20190227_1332', '2019-04-05 15:56:11.900346+00');
-INSERT INTO [[schema]].django_migrations VALUES (696, 'core', '0001_initial', '2019-05-14 09:13:38.419866+00');
-INSERT INTO [[schema]].django_migrations VALUES (697, 'core', '0002_auto_20190312_1437', '2019-05-14 09:18:04.808431+00');
-INSERT INTO [[schema]].django_migrations VALUES (698, 'reports', '0016_auto_20190412_1612', '2019-05-14 09:32:31.728953+00');
-INSERT INTO [[schema]].django_migrations VALUES (699, 'audit', '0016_auto_20190328_1528', '2019-05-14 09:40:06.772907+00');
-INSERT INTO [[schema]].django_migrations VALUES (700, 'audit', '0017_auto_20190501_1858', '2019-05-14 09:40:07.159023+00');
-INSERT INTO [[schema]].django_migrations VALUES (701, 'environment', '0003_delete_issuecheckconfig', '2019-05-14 09:40:07.198384+00');
-INSERT INTO [[schema]].django_migrations VALUES (702, 'management', '0002_auto_20190326_1500', '2019-05-14 09:40:07.559171+00');
-INSERT INTO [[schema]].django_migrations VALUES (703, 'partners', '0036_auto_20190418_1832', '2019-05-14 09:40:08.103138+00');
-INSERT INTO [[schema]].django_migrations VALUES (704, 't2f', '0015_auto_20190326_1425', '2019-05-14 09:40:09.022731+00');
-INSERT INTO [[schema]].django_migrations VALUES (705, 'users', '0010_auto_20190423_1920', '2019-05-14 09:40:09.291007+00');
-INSERT INTO [[schema]].django_migrations VALUES (706, 'action_points', '0009_auto_20190523_1146', '2019-06-14 16:06:37.150542+00');
-INSERT INTO [[schema]].django_migrations VALUES (707, 'auth', '0010_alter_group_name_max_length', '2019-06-14 16:06:37.217153+00');
-INSERT INTO [[schema]].django_migrations VALUES (708, 'auth', '0011_update_proxy_permissions', '2019-06-14 16:06:37.253123+00');
-INSERT INTO [[schema]].django_migrations VALUES (709, 'core', '0003_auto_20190424_1448', '2019-06-14 16:06:37.311311+00');
-INSERT INTO [[schema]].django_migrations VALUES (710, 'funds', '0010_fundsreservationheader_completed_flag', '2019-06-14 16:06:37.451044+00');
-INSERT INTO [[schema]].django_migrations VALUES (711, 'locations', '0007_auto_20190122_1428', '2019-06-14 16:06:37.53161+00');
-INSERT INTO [[schema]].django_migrations VALUES (712, 'locations', '0008_auto_20190422_1537', '2019-06-14 16:06:38.051611+00');
-INSERT INTO [[schema]].django_migrations VALUES (713, 'partners', '0037_auto_20190502_1407', '2019-06-14 16:06:38.342323+00');
-INSERT INTO [[schema]].django_migrations VALUES (714, 'publics', '0005_delete_dsarateupload', '2019-06-14 16:06:38.389419+00');
-INSERT INTO [[schema]].django_migrations VALUES (715, 'reports', '0017_auto_20190424_1509', '2019-06-14 16:06:38.725636+00');
-INSERT INTO [[schema]].django_migrations VALUES (716, 'users', '0011_auto_20190425_1838', '2019-06-14 16:06:38.860323+00');
-INSERT INTO [[schema]].django_migrations VALUES (717, 'users', '0012_auto_20190513_1804', '2019-06-14 16:06:38.936026+00');
-INSERT INTO [[schema]].django_migrations VALUES (718, 'vision', '0004_visionsynclog_business_area_code', '2019-06-14 16:06:38.998341+00');
-INSERT INTO [[schema]].django_migrations VALUES (719, 'activities', '0003_auto_20190722_1417', '2019-08-03 14:41:57.580431+00');
-INSERT INTO [[schema]].django_migrations VALUES (720, 'django_celery_beat', '0009_periodictask_headers', '2019-08-03 14:41:57.630964+00');
-INSERT INTO [[schema]].django_migrations VALUES (721, 'django_celery_beat', '0010_auto_20190429_0326', '2019-08-03 14:41:57.986875+00');
-INSERT INTO [[schema]].django_migrations VALUES (722, 'django_celery_beat', '0011_auto_20190508_0153', '2019-08-03 14:41:58.052221+00');
-INSERT INTO [[schema]].django_migrations VALUES (723, 'django_celery_results', '0004_auto_20190516_0412', '2019-08-03 14:41:58.21077+00');
-INSERT INTO [[schema]].django_migrations VALUES (724, 'funds', '0011_fundsreservationheader_delegated', '2019-08-03 14:41:58.465044+00');
-INSERT INTO [[schema]].django_migrations VALUES (725, 'partners', '0038_auto_20190620_2024', '2019-08-03 14:41:58.572306+00');
-INSERT INTO [[schema]].django_migrations VALUES (726, 'post_office', '0008_attachment_headers', '2019-08-03 14:41:58.674032+00');
-INSERT INTO [[schema]].django_migrations VALUES (727, 'publics', '0006_auto_20190625_1547', '2019-08-03 14:41:58.736261+00');
-INSERT INTO [[schema]].django_migrations VALUES (728, 'purchase_order', '0007_auto_20190625_1437', '2019-08-03 14:41:58.789031+00');
-INSERT INTO [[schema]].django_migrations VALUES (729, 'tpmpartners', '0005_auto_20190625_1437', '2019-08-03 14:41:58.862197+00');
-INSERT INTO [[schema]].django_migrations VALUES (730, 'psea', '0001_initial', '2019-12-15 08:14:08.294895+00');
-INSERT INTO [[schema]].django_migrations VALUES (731, 'psea', '0002_auto_20190820_1618', '2019-12-15 08:14:09.389944+00');
-INSERT INTO [[schema]].django_migrations VALUES (732, 'action_points', '0010_actionpoint_psea_assessment', '2019-12-15 08:14:09.658665+00');
-INSERT INTO [[schema]].django_migrations VALUES (733, 'categories', '0004_auto_20190820_2009', '2019-12-15 08:14:09.756856+00');
-INSERT INTO [[schema]].django_migrations VALUES (734, 'reports', '0018_section_active', '2019-12-15 08:14:09.873528+00');
-INSERT INTO [[schema]].django_migrations VALUES (735, 'management', '0003_sectionhistory', '2019-12-15 08:14:10.280486+00');
-INSERT INTO [[schema]].django_migrations VALUES (736, 'management', '0004_auto_20190715_2047', '2019-12-15 08:14:10.473054+00');
-INSERT INTO [[schema]].django_migrations VALUES (737, 'management', '0005_auto_20190806_1400', '2019-12-15 08:14:10.552799+00');
-INSERT INTO [[schema]].django_migrations VALUES (738, 'psea', '0003_auto_20190826_1416', '2019-12-15 08:14:10.890513+00');
-INSERT INTO [[schema]].django_migrations VALUES (739, 'psea', '0004_assessmentstatushistory_comment', '2019-12-15 08:14:11.058685+00');
-INSERT INTO [[schema]].django_migrations VALUES (740, 'psea', '0005_auto_20190828_1726', '2019-12-15 08:14:11.601126+00');
-INSERT INTO [[schema]].django_migrations VALUES (741, 'psea', '0006_auto_20190829_1227', '2019-12-15 08:14:11.714017+00');
-INSERT INTO [[schema]].django_migrations VALUES (742, 'psea', '0007_auto_20190906_1513', '2019-12-15 08:14:12.00993+00');
-INSERT INTO [[schema]].django_migrations VALUES (743, 'psea', '0008_assessmentactionpoint', '2019-12-15 08:14:12.044914+00');
-INSERT INTO [[schema]].django_migrations VALUES (744, 'psea', '0009_auto_20190917_1128', '2019-12-15 08:14:12.378348+00');
-INSERT INTO [[schema]].django_migrations VALUES (745, 'psea', '0010_indicator_order', '2019-12-15 08:14:12.456889+00');
-INSERT INTO [[schema]].django_migrations VALUES (746, 'psea', '0011_indicator_rating_instructions', '2019-12-15 08:14:12.562513+00');
-INSERT INTO [[schema]].django_migrations VALUES (747, 'reports', '0019_auto_20190816_1609', '2019-12-15 08:14:12.670117+00');
+INSERT INTO [[schema]].django_migrations VALUES (697, 'reports', '0016_auto_20190412_1612', '2019-05-10 17:04:43.226668+00');
+INSERT INTO [[schema]].django_migrations VALUES (698, 'audit', '0016_auto_20190328_1528', '2019-05-10 17:11:19.415336+00');
+INSERT INTO [[schema]].django_migrations VALUES (699, 'audit', '0017_auto_20190501_1858', '2019-05-10 17:11:19.831087+00');
+INSERT INTO [[schema]].django_migrations VALUES (700, 'core', '0002_auto_20190312_1437', '2019-05-10 17:11:19.879087+00');
+INSERT INTO [[schema]].django_migrations VALUES (701, 'environment', '0003_delete_issuecheckconfig', '2019-05-10 17:11:19.923042+00');
+INSERT INTO [[schema]].django_migrations VALUES (702, 'management', '0002_auto_20190326_1500', '2019-05-10 17:11:20.266198+00');
+INSERT INTO [[schema]].django_migrations VALUES (703, 'partners', '0036_auto_20190418_1832', '2019-05-10 17:11:20.586269+00');
+INSERT INTO [[schema]].django_migrations VALUES (704, 't2f', '0015_auto_20190326_1425', '2019-05-10 17:11:21.524614+00');
+INSERT INTO [[schema]].django_migrations VALUES (705, 'users', '0010_auto_20190423_1920', '2019-05-10 17:11:21.906778+00');
+INSERT INTO [[schema]].django_migrations VALUES (706, 'action_points', '0009_auto_20190523_1146', '2019-06-07 15:13:10.06593+00');
+INSERT INTO [[schema]].django_migrations VALUES (707, 'auth', '0010_alter_group_name_max_length', '2019-06-07 15:13:10.203108+00');
+INSERT INTO [[schema]].django_migrations VALUES (708, 'auth', '0011_update_proxy_permissions', '2019-06-07 15:13:10.266141+00');
+INSERT INTO [[schema]].django_migrations VALUES (709, 'core', '0003_auto_20190424_1448', '2019-06-07 15:13:10.450354+00');
+INSERT INTO [[schema]].django_migrations VALUES (710, 'funds', '0010_fundsreservationheader_completed_flag', '2019-06-07 15:13:11.093258+00');
+INSERT INTO [[schema]].django_migrations VALUES (711, 'locations', '0007_auto_20190122_1428', '2019-06-07 15:13:11.73757+00');
+INSERT INTO [[schema]].django_migrations VALUES (712, 'locations', '0008_auto_20190422_1537', '2019-06-07 15:13:12.712206+00');
+INSERT INTO [[schema]].django_migrations VALUES (713, 'partners', '0037_auto_20190502_1407', '2019-06-07 15:13:13.326347+00');
+INSERT INTO [[schema]].django_migrations VALUES (714, 'publics', '0005_delete_dsarateupload', '2019-06-07 15:13:13.384314+00');
+INSERT INTO [[schema]].django_migrations VALUES (715, 'reports', '0017_auto_20190424_1509', '2019-06-07 15:13:13.99388+00');
+INSERT INTO [[schema]].django_migrations VALUES (716, 'users', '0011_auto_20190425_1838', '2019-06-07 15:13:14.3511+00');
+INSERT INTO [[schema]].django_migrations VALUES (717, 'users', '0012_auto_20190513_1804', '2019-06-07 15:13:14.54703+00');
+INSERT INTO [[schema]].django_migrations VALUES (718, 'vision', '0004_visionsynclog_business_area_code', '2019-06-07 15:13:14.658686+00');
+INSERT INTO [[schema]].django_migrations VALUES (719, 'funds', '0011_fundsreservationheader_delegated', '2019-07-05 16:21:20.121643+00');
+INSERT INTO [[schema]].django_migrations VALUES (720, 'partners', '0038_auto_20190620_2024', '2019-07-05 16:21:20.202977+00');
+INSERT INTO [[schema]].django_migrations VALUES (721, 'publics', '0006_auto_20190625_1547', '2019-07-05 16:21:20.278298+00');
+INSERT INTO [[schema]].django_migrations VALUES (722, 'activities', '0003_auto_20190722_1417', '2019-08-02 15:23:45.661741+00');
+INSERT INTO [[schema]].django_migrations VALUES (723, 'django_celery_beat', '0009_periodictask_headers', '2019-08-02 15:23:45.734026+00');
+INSERT INTO [[schema]].django_migrations VALUES (724, 'django_celery_beat', '0010_auto_20190429_0326', '2019-08-02 15:23:46.971478+00');
+INSERT INTO [[schema]].django_migrations VALUES (725, 'django_celery_beat', '0011_auto_20190508_0153', '2019-08-02 15:23:47.071414+00');
+INSERT INTO [[schema]].django_migrations VALUES (726, 'django_celery_results', '0004_auto_20190516_0412', '2019-08-02 15:23:47.409524+00');
+INSERT INTO [[schema]].django_migrations VALUES (727, 'post_office', '0008_attachment_headers', '2019-08-02 15:23:47.508775+00');
+INSERT INTO [[schema]].django_migrations VALUES (728, 'purchase_order', '0007_auto_20190625_1437', '2019-08-02 15:23:47.594438+00');
+INSERT INTO [[schema]].django_migrations VALUES (729, 'tpmpartners', '0005_auto_20190625_1437', '2019-08-02 15:23:47.75237+00');
+INSERT INTO [[schema]].django_migrations VALUES (730, 'reports', '0018_section_active', '2019-09-06 15:30:35.033984+00');
+INSERT INTO [[schema]].django_migrations VALUES (731, 'management', '0003_sectionhistory', '2019-09-06 15:30:35.529791+00');
+INSERT INTO [[schema]].django_migrations VALUES (732, 'management', '0004_auto_20190715_2047', '2019-09-06 15:30:35.833071+00');
+INSERT INTO [[schema]].django_migrations VALUES (733, 'management', '0005_auto_20190806_1400', '2019-09-06 15:30:35.96034+00');
+INSERT INTO [[schema]].django_migrations VALUES (734, 'reports', '0019_auto_20190816_1609', '2019-09-06 15:30:36.506228+00');
+INSERT INTO [[schema]].django_migrations VALUES (735, 'psea', '0001_initial', '2019-10-04 16:48:01.374754+00');
+INSERT INTO [[schema]].django_migrations VALUES (736, 'psea', '0002_auto_20190820_1618', '2019-10-04 16:48:02.946425+00');
+INSERT INTO [[schema]].django_migrations VALUES (737, 'action_points', '0010_actionpoint_psea_assessment', '2019-10-04 16:48:03.483657+00');
+INSERT INTO [[schema]].django_migrations VALUES (738, 'categories', '0004_auto_20190820_2009', '2019-10-04 16:48:03.581472+00');
+INSERT INTO [[schema]].django_migrations VALUES (739, 'psea', '0003_auto_20190826_1416', '2019-10-04 16:48:04.430591+00');
+INSERT INTO [[schema]].django_migrations VALUES (740, 'psea', '0004_assessmentstatushistory_comment', '2019-10-04 16:48:04.701349+00');
+INSERT INTO [[schema]].django_migrations VALUES (741, 'psea', '0005_auto_20190828_1726', '2019-10-04 16:48:05.504255+00');
+INSERT INTO [[schema]].django_migrations VALUES (742, 'psea', '0006_auto_20190829_1227', '2019-10-04 16:48:05.737691+00');
+INSERT INTO [[schema]].django_migrations VALUES (743, 'psea', '0007_auto_20190906_1513', '2019-10-04 16:48:06.019117+00');
+INSERT INTO [[schema]].django_migrations VALUES (744, 'psea', '0008_assessmentactionpoint', '2019-10-04 16:48:06.081925+00');
+INSERT INTO [[schema]].django_migrations VALUES (745, 'psea', '0009_auto_20190917_1128', '2019-10-04 16:48:06.647724+00');
+INSERT INTO [[schema]].django_migrations VALUES (746, 'psea', '0010_indicator_order', '2019-10-04 16:48:06.766685+00');
+INSERT INTO [[schema]].django_migrations VALUES (747, 'psea', '0011_indicator_rating_instructions', '2019-10-04 16:48:06.946099+00');
+INSERT INTO [[schema]].django_migrations VALUES (748, 'audit', '0018_auto_20191008_2235', '2019-11-08 16:56:31.484265+00');
+INSERT INTO [[schema]].django_migrations VALUES (749, 'psea', '0012_auto_20191004_1752', '2019-11-08 16:56:31.623009+00');
+INSERT INTO [[schema]].django_migrations VALUES (750, 'tpm', '0008_auto_20191016_1312', '2019-11-08 16:56:32.978894+00');
+INSERT INTO [[schema]].django_migrations VALUES (751, 'partners', '0039_auto_20191106_1345', '2020-04-02 17:58:27.831085+00');
+INSERT INTO [[schema]].django_migrations VALUES (752, 'field_monitoring_settings', '0001_initial_20191113', '2020-04-02 17:58:29.838972+00');
+INSERT INTO [[schema]].django_migrations VALUES (753, 'field_monitoring_planning', '0001_initial_20191113', '2020-04-02 17:58:30.691161+00');
+INSERT INTO [[schema]].django_migrations VALUES (754, 'field_monitoring_planning', '0002_auto_20191119_1503', '2020-04-02 17:58:31.852985+00');
+INSERT INTO [[schema]].django_migrations VALUES (755, 'users', '0013_auto_20191010_1621', '2020-04-02 17:58:32.198674+00');
+INSERT INTO [[schema]].django_migrations VALUES (756, 'reports', '0020_office', '2020-04-02 17:58:32.285226+00');
+INSERT INTO [[schema]].django_migrations VALUES (757, 'reports', '0021_auto_20191011_1201', '2020-04-02 17:58:32.644601+00');
+INSERT INTO [[schema]].django_migrations VALUES (758, 'action_points', '0011_actionpoint_reference_number', '2020-04-02 17:58:33.410868+00');
+INSERT INTO [[schema]].django_migrations VALUES (759, 'action_points', '0012_auto_20191011_1303', '2020-04-02 17:58:33.873065+00');
+INSERT INTO [[schema]].django_migrations VALUES (760, 'action_points', '0013_actionpoint_monitoring_activity', '2020-04-02 17:58:34.179837+00');
+INSERT INTO [[schema]].django_migrations VALUES (761, 'attachments', '0016_auto_20190708_1607', '2020-04-02 17:58:34.412311+00');
+INSERT INTO [[schema]].django_migrations VALUES (762, 'attachments', '0017_attachmentflat_created_timestamp', '2020-04-02 17:58:35.041528+00');
+INSERT INTO [[schema]].django_migrations VALUES (763, 'attachments', '0018_remove_attachmentflat_created', '2020-04-02 17:58:35.672214+00');
+INSERT INTO [[schema]].django_migrations VALUES (764, 'reports', '0022_userprofileoffice', '2020-04-02 17:58:35.897281+00');
+INSERT INTO [[schema]].django_migrations VALUES (765, 'reports', '0023_auto_20191014_1546', '2020-04-02 17:58:48.301959+00');
+INSERT INTO [[schema]].django_migrations VALUES (766, 'reports', '0024_auto_20191122_1559', '2020-04-02 17:58:48.618508+00');
+INSERT INTO [[schema]].django_migrations VALUES (767, 'audit', '0019_engagement_users_notified', '2020-04-02 17:58:49.133381+00');
+INSERT INTO [[schema]].django_migrations VALUES (768, 'audit', '0020_auto_20191125_2045', '2020-04-02 17:58:49.715869+00');
+INSERT INTO [[schema]].django_migrations VALUES (769, 'categories', '0005_auto_20191126_1133', '2020-04-02 17:58:49.916471+00');
+INSERT INTO [[schema]].django_migrations VALUES (770, 'field_monitoring_data_collection', '0001_initial_20191113', '2020-04-02 17:58:51.605952+00');
+INSERT INTO [[schema]].django_migrations VALUES (771, 'field_monitoring_data_collection', '0002_auto_20191116_1045', '2020-04-02 17:58:52.089506+00');
+INSERT INTO [[schema]].django_migrations VALUES (772, 'field_monitoring_planning', '0003_monitoringactivityactionpoint', '2020-04-02 17:58:52.147139+00');
+INSERT INTO [[schema]].django_migrations VALUES (773, 'field_monitoring_planning', '0004_auto_20191204_0804', '2020-04-02 17:58:53.055862+00');
+INSERT INTO [[schema]].django_migrations VALUES (774, 'field_monitoring_planning', '0005_auto_20191211_1414', '2020-04-02 17:58:53.376615+00');
+INSERT INTO [[schema]].django_migrations VALUES (775, 'field_monitoring_planning', '0006_monitoringactivity_report_reject_reason', '2020-04-02 17:58:53.680735+00');
+INSERT INTO [[schema]].django_migrations VALUES (776, 'field_monitoring_planning', '0007_monitoringactivity_number', '2020-04-02 17:58:54.262412+00');
+INSERT INTO [[schema]].django_migrations VALUES (777, 'field_monitoring_settings', '0002_method_use_information_source', '2020-04-02 17:58:54.410402+00');
+INSERT INTO [[schema]].django_migrations VALUES (778, 'field_monitoring_settings', '0003_method_short_name', '2020-04-02 17:58:54.59056+00');
+INSERT INTO [[schema]].django_migrations VALUES (779, 'field_monitoring_settings', '0004_globalconfig', '2020-04-02 17:58:54.733469+00');
+INSERT INTO [[schema]].django_migrations VALUES (780, 'field_monitoring_settings', '0005_auto_20191211_0903', '2020-04-02 17:58:54.816356+00');
+INSERT INTO [[schema]].django_migrations VALUES (781, 'field_monitoring_settings', '0006_auto_20191212_1257', '2020-04-02 17:58:55.101647+00');
+INSERT INTO [[schema]].django_migrations VALUES (782, 'field_monitoring_settings', '0007_auto_20200219_1036', '2020-04-02 17:58:55.372378+00');
+INSERT INTO [[schema]].django_migrations VALUES (783, 'partners', '0040_auto_20191011_1429', '2020-04-02 17:58:55.908134+00');
+INSERT INTO [[schema]].django_migrations VALUES (784, 'partners', '0041_auto_20191209_2039', '2020-04-02 17:58:56.886646+00');
+INSERT INTO [[schema]].django_migrations VALUES (785, 'reports', '0025_auto_20191220_2022', '2020-04-02 17:58:57.112026+00');
+INSERT INTO [[schema]].django_migrations VALUES (786, 't2f', '0016_auto_20191011_1348', '2020-04-02 17:58:57.499747+00');
+INSERT INTO [[schema]].django_migrations VALUES (787, 'tpm', '0009_auto_20191014_1304', '2020-04-02 17:58:58.021261+00');
+INSERT INTO [[schema]].django_migrations VALUES (788, 'tpm', '0010_auto_20191029_1826', '2020-04-02 17:58:58.531936+00');
+INSERT INTO [[schema]].django_migrations VALUES (789, 'unicef_attachments', '0004_filetype_group', '2020-04-02 17:58:58.655025+00');
+INSERT INTO [[schema]].django_migrations VALUES (790, 'unicef_attachments', '0005_auto_20190705_1746', '2020-04-02 17:58:59.143583+00');
+
+
+--
+-- Data for Name: field_monitoring_data_collection_activityoverallfinding; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_data_collection_activityquestion; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_data_collection_activityquestionoverallfinding; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_data_collection_checklistoverallfinding; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_data_collection_finding; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_data_collection_startedchecklist; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_monitoringactivity; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_monitoringactivity_cp_outputs; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_monitoringactivity_interventions; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_monitoringactivity_partners; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_monitoringactivity_sections; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_monitoringactivity_team_members; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_questiontemplate; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_planning_yearplan; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_category; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_globalconfig; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_locationsite; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_logissue; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_method; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_option; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_question; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_question_methods; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+
+
+--
+-- Data for Name: field_monitoring_settings_question_sections; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
 
 
 --
@@ -5971,7 +7097,7 @@ INSERT INTO [[schema]].funds_grant VALUES (22, 'NON-GRANT (GC)', 50, NULL, '', '
 --
 
 INSERT INTO [[schema]].hact_aggregatehact VALUES (1, '2018-02-15 19:31:46.570589+00', '2018-12-31 04:00:59.534836+00', 2018, '"{\"assurance_activities\": {\"programmatic_visits\": {\"completed\": 0, \"min_required\": 0}, \"spot_checks\": {\"completed\": 0, \"min_required\": 0, \"follow_up\": 0}, \"scheduled_audit\": 0, \"special_audit\": 0, \"micro_assessment\": 0, \"missing_micro_assessment\": 0}, \"assurance_coverage\": {\"coverage_by_number_of_ips\": [[\"Coverage by number of IPs\", \"Count\"], [\"Without Assurance\", 0], [\"Partially Met Requirements\", 0], [\"Met Requirements\", 0]], \"coverage_by_cash_transfer\": [[\"Coverage by Cash Transfer (USD) (Total)\", \"Count\"], [\"Without Assurance\", 0.0], [\"Partially Met Requirements\", 0.0], [\"Met Requirements\", 0.0]], \"table\": [{\"label\": \"Active Partners\", \"value\": 0}, {\"label\": \"IPs without required PV\", \"value\": 0}, {\"label\": \"IPs without required SC\", \"value\": 0}, {\"label\": \"IPs without required assurance\", \"value\": 0}]}, \"financial_findings\": [{\"name\": \"Total Audited Expenditure\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Total Financial Findings\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Refunds\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Additional Supporting Documentation Received\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Justification Provided and Accepted\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Impairment\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Outstanding current year (Requires Follow-up)\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Outstanding prior year\", \"value\": 0.0, \"highlighted\": true}], \"financial_findings_numbers\": [{\"name\": \"Number of High Priority Findings\", \"value\": 0}, {\"name\": \"Number of Medium Priority Findings\", \"value\": 0}, {\"name\": \"Number of Low Priority Findings\", \"value\": 0}, {\"name\": \"Audit Opinion\", \"value\": [{\"name\": \"qualified\", \"value\": 0}, {\"name\": \"unqualified\", \"value\": 0}, {\"name\": \"denial\", \"value\": 0}, {\"name\": \"adverse\", \"value\": 0}]}], \"charts\": {\"cash_transfers_amounts\": [[\"Risk Rating\", \"Not Required\", \"Low\", \"Medium\", \"Significant\", \"High\", \"Number of IPs\"], [\"$0-50,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$50,001-100,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$100,001-350,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$350,001-500,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\">$500,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0]], \"cash_transfers_risk_ratings\": [[\"Risk Rating\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of IPs\"], [\"Not Required\", null, \"#D8D8D8\", 0], [\"Low\", null, \"#2BB0F2\", 0], [\"Medium\", null, \"#FECC02\", 0], [\"Significant\", null, \"#F05656\", 0], [\"High\", null, \"#751010\", 0]], \"cash_transfers_partner_type\": [[\"Partner Type\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of Partners\"], [\"CSO\", null, \"#FECC02\", 0], [\"GOV\", null, \"#F05656\", 0]], \"spot_checks_completed\": [[\"Completed by\", \"Count\"], [\"Staff\", 0], [\"Service Providers\", 0]]}}"');
-INSERT INTO [[schema]].hact_aggregatehact VALUES (2, '2019-01-01 04:01:00.24745+00', '2019-04-08 04:01:51.577094+00', 2019, '"{\"assurance_activities\": {\"programmatic_visits\": {\"completed\": 0, \"min_required\": 0}, \"spot_checks\": {\"completed\": 0, \"min_required\": 0, \"follow_up\": 0}, \"scheduled_audit\": 0, \"special_audit\": 0, \"micro_assessment\": 0, \"missing_micro_assessment\": 0}, \"assurance_coverage\": {\"coverage_by_number_of_ips\": [[\"Coverage by number of IPs\", \"Count\"], [\"Without Assurance\", 0], [\"Partially Met Requirements\", 0], [\"Met Requirements\", 0]], \"coverage_by_cash_transfer\": [[\"Coverage by Cash Transfer (USD) (Total)\", \"Count\"], [\"Without Assurance\", 0.0], [\"Partially Met Requirements\", 0.0], [\"Met Requirements\", 0.0]], \"table\": [{\"label\": \"Active Partners\", \"value\": 0}, {\"label\": \"IPs without required PV\", \"value\": 0}, {\"label\": \"IPs without required SC\", \"value\": 0}, {\"label\": \"IPs without required assurance\", \"value\": 0}]}, \"financial_findings\": [{\"name\": \"Total Audited Expenditure\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Total Financial Findings\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Refunds\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Additional Supporting Documentation Received\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Justification Provided and Accepted\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Impairment\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Outstanding current year (Requires Follow-up)\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Outstanding prior year\", \"value\": 0.0, \"highlighted\": true}], \"financial_findings_numbers\": [{\"name\": \"Number of High Priority Findings\", \"value\": 0}, {\"name\": \"Number of Medium Priority Findings\", \"value\": 0}, {\"name\": \"Number of Low Priority Findings\", \"value\": 0}, {\"name\": \"Audit Opinion\", \"value\": [{\"name\": \"qualified\", \"value\": 0}, {\"name\": \"unqualified\", \"value\": 0}, {\"name\": \"denial\", \"value\": 0}, {\"name\": \"adverse\", \"value\": 0}]}], \"charts\": {\"cash_transfers_amounts\": [[\"Risk Rating\", \"Not Required\", \"Low\", \"Medium\", \"Significant\", \"High\", \"Number of IPs\"], [\"$0-50,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$50,001-100,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$100,001-350,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$350,001-500,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\">$500,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0]], \"cash_transfers_risk_ratings\": [[\"Risk Rating\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of IPs\"], [\"Not Required\", null, \"#D8D8D8\", 0], [\"Low\", null, \"#2BB0F2\", 0], [\"Medium\", null, \"#FECC02\", 0], [\"Significant\", null, \"#F05656\", 0], [\"High\", null, \"#751010\", 0]], \"cash_transfers_partner_type\": [[\"Partner Type\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of Partners\"], [\"CSO\", null, \"#FECC02\", 0], [\"GOV\", null, \"#F05656\", 0]], \"spot_checks_completed\": [[\"Completed by\", \"Count\"], [\"Staff\", 0], [\"Service Providers\", 0]]}}"');
+INSERT INTO [[schema]].hact_aggregatehact VALUES (2, '2019-01-01 04:01:00.24745+00', '2019-11-15 04:05:22.763442+00', 2019, '"{\"assurance_activities\": {\"programmatic_visits\": {\"completed\": 0, \"min_required\": 0}, \"spot_checks\": {\"completed\": 0, \"required\": 0, \"follow_up\": 0}, \"scheduled_audit\": 0, \"special_audit\": 0, \"micro_assessment\": 0, \"missing_micro_assessment\": 0}, \"assurance_coverage\": {\"coverage_by_number_of_ips\": [[\"Coverage by number of IPs\", \"Count\"], [\"Without Assurance\", 0], [\"Partially Met Requirements\", 0], [\"Met Requirements\", 0]], \"coverage_by_cash_transfer\": [[\"Coverage by Cash Transfer (USD) (Total)\", \"Count\"], [\"Without Assurance\", 0.0], [\"Partially Met Requirements\", 0.0], [\"Met Requirements\", 0.0]], \"table\": [{\"label\": \"Partners\", \"value\": 0}, {\"label\": \"IPs without required PV\", \"value\": 0}, {\"label\": \"IPs without required SC\", \"value\": 0}, {\"label\": \"IPs without required assurance\", \"value\": 0}]}, \"financial_findings\": [{\"name\": \"Total Audited Expenditure\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Total Financial Findings\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Refunds\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Additional Supporting Documentation Received\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Justification Provided and Accepted\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Impairment\", \"value\": 0.0, \"highlighted\": false}, {\"name\": \"Outstanding current year (Requires Follow-up)\", \"value\": 0.0, \"highlighted\": true}, {\"name\": \"Outstanding prior year\", \"value\": 0.0, \"highlighted\": true}], \"financial_findings_numbers\": [{\"name\": \"Number of High Priority Findings\", \"value\": 0}, {\"name\": \"Number of Medium Priority Findings\", \"value\": 0}, {\"name\": \"Number of Low Priority Findings\", \"value\": 0}, {\"name\": \"Audit Opinion\", \"value\": [{\"name\": \"qualified\", \"value\": 0}, {\"name\": \"unqualified\", \"value\": 0}, {\"name\": \"denial\", \"value\": 0}, {\"name\": \"adverse\", \"value\": 0}]}], \"charts\": {\"cash_transfers_amounts\": [[\"Risk Rating\", \"Not Required\", \"Low\", \"Medium\", \"Significant\", \"High\", \"Number of IPs\"], [\"$0-50,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$50,001-100,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$100,001-350,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\"$350,001-500,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0], [\">$500,000\", 0.0, 0.0, 0.0, 0.0, 0.0, 0]], \"cash_transfers_risk_ratings\": [[\"Risk Rating\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of IPs\"], [\"Not Required\", null, \"#D8D8D8\", 0], [\"Low\", null, \"#2BB0F2\", 0], [\"Medium\", null, \"#FECC02\", 0], [\"Significant\", null, \"#F05656\", 0], [\"High\", null, \"#751010\", 0]], \"cash_transfers_partner_type\": [[\"Partner Type\", \"Total Cash Transfers\", {\"role\": \"style\"}, \"Number of Partners\"], [\"CSO\", null, \"#FECC02\", 0], [\"GOV\", null, \"#F05656\", 0]], \"spot_checks_completed\": [[\"Completed by\", \"Count\"], [\"Staff\", 0], [\"Service Providers\", 0]]}}"');
 
 
 --
@@ -10920,7 +12046,7 @@ INSERT INTO [[schema]].partners_filetype VALUES (48, 'Other');
 -- Data for Name: partners_intervention; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].partners_intervention VALUES (67, '2019-04-02 05:36:14.839343+00', '2019-04-02 05:40:46.514396+00', 'PD', 'UAT/PCA2015146/PD201567', 'Test', 'signed', '2016-10-28', '2017-04-02', '2016-10-01', NULL, NULL, '', '2016-10-06', '2016-10-04', NULL, 146, 171, 2702, '', 1, false, '{}', false, 2015, '', '');
+INSERT INTO [[schema]].partners_intervention VALUES (67, '2019-04-02 05:36:14.839343+00', '2019-05-31 13:42:00.309296+00', 'PD', 'UAT/PCA2015146/PD201567-1', 'Test', 'signed', '2016-10-28', '2017-04-02', '2016-10-01', NULL, NULL, '', '2016-10-06', '2016-10-04', NULL, 146, 171, 2702, '', 1, false, '{}', true, 2015, '', '');
 
 
 --
@@ -10961,12 +12087,14 @@ INSERT INTO [[schema]].partners_intervention_unicef_focal_points VALUES (58, 67,
 -- Data for Name: partners_interventionamendment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].partners_interventionamendment VALUES (34, '2019-05-31 13:42:00.238634+00', '2019-05-31 13:42:00.318817+00', '2019-05-31', 1, '', 67, '{admin_error}', NULL);
 
 
 --
 -- Data for Name: partners_interventionattachment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].partners_interventionattachment VALUES (40, '', 67, 48, '2019-05-13 13:37:20.375921+00', '2019-05-13 13:37:20.376441+00', true);
 
 
 --
@@ -10992,105 +12120,94 @@ INSERT INTO [[schema]].partners_interventionbudget VALUES (53, '2019-04-02 05:36
 -- Data for Name: partners_interventionresultlink; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].partners_interventionresultlink VALUES (46, 60, 67, '2019-05-31 13:42:11.095211+00', '2019-05-31 13:42:11.095834+00');
 
 
 --
 -- Data for Name: partners_interventionresultlink_ram_indicators; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].partners_interventionresultlink_ram_indicators VALUES (46, 46, 35);
 
 
 --
 -- Data for Name: partners_partnerorganization; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].partners_partnerorganization VALUES (229, 'Civil Society Organization', 'NORWEGIAN REFUGEE COUNCIL', '', '', 'LAVINGTON GREEN J GICHURU RD', 'VICTOR.MOSES@NRC.NO', '0708 958927', '2500217623', NULL, NULL, 'Low', '2018-04-09', 'International', true, 'Micro Assessment', '2018-06-22', false, false, NULL, NULL, false, 'NAIROBI', '240', '00100', NULL, NULL, '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2019-02-11 07:57:50.537013+00', '2019-02-11 07:57:50.551057+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (187, 'Civil Society Organization', 'ACTIONAID MYANMAR', '', '', '1 WIN GA BAR ROAD,', 'THIN.THIN@ACTIONAID.ORG', '95-1 546671', '2500231372', NULL, '', 'Not Required', '2016-03-29', 'National', true, 'Micro Assessment', '2016-03-29', true, true, 0.00, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.632123+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (228, 'Civil Society Organization', 'AGENCY FOR TECH COORDINATION AND DEV ACTED', '', '', 'AMMAN', '', '00962 6 463 6275', '2500221381', NULL, 'ATC', 'High', '2013-07-10', 'International', true, 'High Risk Assumed', '2017-01-24', false, false, 0.00, 0.00, false, 'AMMAN', '234', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 1, "q2": 0, "q3": 0, "q4": 0, "total": 1}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2019-04-02 05:34:54.788746+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (2, 'Bilateral / Multilateral', 'Adult Basic Community Org', 'ABCD', '', '2515
-NY10000', 'info@abcd.com', '212445464', NULL, NULL, '', 'high', NULL, 'International', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.651712+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (54, 'Civil Society Organization', 'ASSOCIATION FEMME POUR LE DEVELOPPEMENT AGROPASTORAL', 'AFDA_n', '', 'XXXXX', 'YYYYYYYY', '081 XXXXXXX', NULL, NULL, '', '', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.695776+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (153, 'Civil Society Organization', 'ASIAN DISASTER PREPAREDNESS CENTER', '', '', 'SM TOWER, 24TH FLOOR', 'ADPC@ADPC.NET', '66-2-298-0682-92', '2500000070', NULL, '', 'Not Required', NULL, 'International', true, '', NULL, true, true, 41312.70, 0.00, false, 'PHAYATHAI, BANGKOK', 'Thailand', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.680968+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (44, 'Civil Society Organization', 'Awesome Partner Org', 'APO', '', '', '', '', NULL, NULL, '', 'high', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.710789+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (46, 'Civil Society Organization', 'Campaign to reduce DSA', 'CRDSA', '', 'Kinshasa, and everywhere else', 'crdsa@crdsa.com', '+123', NULL, NULL, '', '', NULL, 'Academic Institution', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.72543+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (36, 'Civil Society Organization', 'Chiild Protection Society ', 'CPS', '', 'Harare, Zimbabwe', 'admin@cps.co.zw', '+263703941/2', NULL, NULL, '', 'high', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.740011+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (28, 'Civil Society Organisation', 'Child King Organization', 'Dc Org', '', '42 Cross Roads
-Fanana
-Lungi', 'kking@yahoo.com', '00 232 40 923456', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.754201+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (35, 'Civil Society Organisation', 'Child Protection Society', 'CPS', '', 'Harare, Zimbabwe', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', '{UNFPA,UNDP}', '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.76844+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (178, 'Civil Society Organization', 'CONSORTIUM DUTCH NGO''S', '', '', '139 D-B, MYINT ZU ROAD,', '', '01-660786 650446', '2500223948', NULL, '', 'Low', NULL, 'International', true, '', '2013-12-18', true, true, 1416163.00, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.782697+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (83, 'Government', 'DEPARTMENT OF EDUCATIONAL PLANNING AND  TRAINING', '', '', '123, NATMAUK ROAD', '', '95-1-557309', '2500201643', NULL, '', 'High', NULL, NULL, true, 'High Risk Assumed', '2015-01-01', true, true, 17212510.32, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.796436+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (118, 'Government', 'DEPARTMENT OF EDUCATIONAL PLANNING AND  TRAINING', '', '', '', '', '', '2500218425', NULL, '', '', NULL, NULL, true, '', NULL, true, true, 1878305.65, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.8108+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (183, 'Government', 'DEPARTMENT OF HEALTH PLANNING (CHEB)', '', '', '4/47,NYAPYITAW', '', '067-411385', '2500201657', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 72755.13, 0.00, false, 'NAYPYITAW,MYANAMR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.825959+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (189, 'Government', 'DEPARTMENT OF LABOUR', '', '', '51,NAYPYITAW', '', '067-430089', '2500201315', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 1629.33, 0.00, false, 'NAYPYITAW,MYANAMR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.841055+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (184, 'Government', 'DEPT OF MYANMAR EDUCATION RESEARCH', '', '', 'MINISTSRY OF EDUCATION', '', '067 430 161', '2500233172', NULL, '', 'High', NULL, NULL, true, 'High Risk Assumed', '2016-03-31', true, true, 10542.25, 0.00, false, 'NAYPYIDAW MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.855856+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (202, 'Government', 'DHP-PLANNING (PLANNING SECTION)', '', '', 'OFF  47 DEPART OF HEALTH PLAN', '', '067-431087', '2500220368', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 32433.09, 0.00, false, 'NAYPYITAW, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.871021+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (158, 'Government', 'DPH (BFHI) DEPARTMENT OF PUBLIC HEALTH', '', '', '', '', '', '2500218429', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 17029.29, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.885248+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (148, 'Government', 'DPH (CMSD) DEPARTMENT OF PUBLIC HEALTH', '', '', '4/47,NAYPYITAW', '', '', '2500201680', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 24761.27, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.899879+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (154, 'Government', 'DPH (PLANNING) NAYPYITAW DEPARTMENT OF PUBLIC HEALTH', '', '', '4/47,NAYPYITAW,', '', '', '2500201713', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 5015.88, 0.00, false, 'NAYPYITAW, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.915059+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (56, 'Civil Society Organization', 'Education au Bandundu', 'EaB', '', 'Bandundu Ville', '', '', NULL, NULL, '', '', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', '{UNDP}', '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.929453+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (52, 'Civil Society Organization', 'Education in DRC', 'Edu DRC', '', 'Boulevard
-Kinshasa', 'Jean@edudrc.org', '0810000000', NULL, NULL, '', '', NULL, 'International', false, '', NULL, true, false, NULL, NULL, false, '', '', '', '{UNDP}', '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.943768+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (61, 'Civil Society Organization', 'ETools Master Fund', 'ETM', '', '', '', '', NULL, NULL, '', '', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.958604+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (48, 'Civil Society Organization', 'For a Better Education in DRC', 'FAB DRC', '', 'Boulevard du 30 juin
-Kinshasa', 'country.director@fabdrc.org', '08181818181', NULL, NULL, '', '', NULL, 'International', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.972968+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (181, 'Government', 'FOREIGN ECONOMIC RELATIONS DEPARTMENT (FERD)', '', '', '26,34,46,NAYPYITAW', '', '067-407346', '2500201716', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 0.00, 0.00, false, 'NAYPYITAW,MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:16.987414+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (43, 'Civil Society Organisation', 'French Natcom', '', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.002216+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (199, 'Government', 'GENERAL ADMINISTRATION DEPARTMENT', '', '', 'MINISTRY OF HOME AFFAIRS,', '', '067 412 403', '2500230720', NULL, '', 'High', NULL, NULL, true, '', NULL, true, true, 1806.00, 0.00, false, 'NAYPYIDAW, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.017203+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (47, 'Government', 'Govt test', 'Govt Test', '', 'dfafa', '', '', NULL, NULL, '', '', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.031467+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (31, 'Civil Society Organisation', 'ICO test Partner', 'ICO TP', '', 'adress', 'e@e.com', '12321', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.046209+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (149, 'Government', 'IMMIGRATION AND NATIONAL REGRISTRAT DEPARTMENT', '', '', 'OFFICE BUILDING (48)', '', '', '2500230681', NULL, '', 'High', NULL, NULL, true, '', NULL, true, true, 1806.00, 0.00, false, 'NAYPYIDAW, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.061078+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (161, 'Government', 'IRRIGATION DEPARTMENT', '', '', 'BUILDING 15, MINISTRY OF', '', '067-410393', '2500221758', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 1264.97, 0.00, false, 'NAYPYITAW, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.07594+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (30, 'Bi-Lateral Organisation', 'Jason', '12345', '', '1707 Interdimensional Street', 'John.Doe@somewhere.com', '770', NULL, 12345, '12345', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.090045+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (14, 'Civil Society Organization', 'Ministry of eTools', 'MoeT', '', '', '', '', NULL, NULL, 'The best ministry in the world', 'high', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.104235+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (29, 'Government', 'Ministry of eTools 2', 'MoE2', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.118129+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (20, 'Government', 'Ministry of Eucation', 'MoE', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.133055+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (32, 'Government', 'Ministry of Pawpaw', 'UPW', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.147101+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (34, 'Government', 'Ministry of Wellbodi', 'MOWB', '', '4th Floor
-Friendship Building
-Brookfields 
-Freetown', 'birthreg@yahoo.com', '34876507697', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.161469+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (126, 'Civil Society Organization', 'MYANMAR COUNCIL CHURCHES', '', '', '601,PYAY ROAD,KAMAYUT TSP,', 'OIKOM@YANGON.NET.MM', '95-1-538262', '2500201650', NULL, '', 'Medium', NULL, 'National', true, '', '2010-06-30', true, true, 114090.40, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.176066+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (180, 'Government', 'MYANMAR NATIONAL HUMAN RIGHT COMMISSION', '', '', '27 PYAY ROAD, HLAING TOWNSHIP', '', '01-654669', '2500220600', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 38576.18, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.190564+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (10, 'UN Agency', 'National Rural Support Programme', 'NRSP', '', '212 High St
-Nairobi', 'nrsp@edu.org', '21200000', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.204972+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (157, 'Civil Society Organization', 'NATIONAL YOUNG WOMEN''S CHRISTIAN ASSOCIATION', '', '', '119,BOGALAY ZAY STREET,', 'NATIONALYWCA@MPTMAIL.COM', '95-1-256990', '2500201661', NULL, '', 'Significant', NULL, 'National', true, '', '2010-06-30', true, true, 46183.65, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.222655+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (41, 'Civil Society Organisation', 'Partner Organization 2', 'PO2', '', '13321', '123@example.com', '12345', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.236335+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (60, 'Civil Society Organization', 'Partners for food', 'PFF', '', 'Rue Rivoli
-Paris', 'pff@pff.org', '669 299229', NULL, NULL, '', '', NULL, 'International', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.25208+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (11, 'Civil Society Organization', 'Pro-poor bank', 'PPB', '', 'Park Garden', 'ppb@gmail.com', '973-624-8880', NULL, NULL, '', 'high', NULL, 'Community Based Organization', false, '', NULL, true, false, NULL, NULL, false, '', '', '', '{}', '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.26712+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (192, 'Civil Society Organization', 'PYI GYI KHIN', '', '', 'ROOM 204,YANKIN GARDEN RESIDEN', '', '95-9-503 1246', '2500201724', NULL, '', 'Medium', NULL, 'National', true, '', '2010-06-30', true, true, 180517.51, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.281902+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (57, 'Government', 'QA Govt Test', '', '', '', '', '', NULL, NULL, '', '', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.296937+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (59, 'Civil Society Organization', 'QA Partner Test', '', '', '', '', '', NULL, NULL, '', '', NULL, 'International', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.311384+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (53, 'Civil Society Organization', 'QA Production Test', '', '', '', '', '', NULL, NULL, '', '', NULL, 'International', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.32589+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (121, 'Civil Society Organization', 'RELIEF INTERNATIONAL', '', '', '4/D KABAE AYE PAGODA ROAD', 'MYANNMARRI@GMAIL.COM', '95-1-661554', '2500201729', NULL, '', 'Not Required', NULL, 'International', true, 'Micro Assessment', NULL, true, true, 0.00, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.340671+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (55, 'Civil Society Organization', 'right to play', 'RTP', '', 'xxxxxxxx', 'xyz@RTP.org', '123456789', NULL, NULL, '', '', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.355443+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (25, 'Civil Society Organisation', 'Save the Chicken', 'StC', '', 'Main St
-Kinshasa', 'stc@stc.org', '+243012345678', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.372064+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (26, 'Civil Society Organisation', 'Save the Congo', 'Save', '', 'Main Street
-Lubumbashi
-DRC', 'save@savethecongo.org', '+24381234567', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.386388+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (38, 'Civil Society Organisation', 'Shafaq', 'Shafaq', '', 'Gaziantep, Turkey', 'g.sheikhdebs@shafak.org', '00968726374', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.400511+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (152, 'Government', 'SOCIAL SECURITY BOARD', '', '', 'BUILDING 51, MINISTRY OF LABOU', 'YULWINAUNG@GMAIL.COM', '067-430096', '2500221380', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 86844.76, 0.00, false, 'NAYPYITAW, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.414601+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (172, 'Government', 'SUPREME COURT', '', '', '101,PANSODAN ROAD,', '', '95-1-370793', '2500201710', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 32602.01, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.431254+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (150, 'Civil Society Organization', 'TERRE DES HOMMES ITALY', '', '', '36-A,INYA MYAING ROAD,', 'ADMIN@TDHITALY.ORG.MM', '95-1-527563', '2500201737', NULL, '', 'Medium', '2013-07-25', 'International', true, '', '2010-07-31', true, true, 72520.97, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.445551+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (39, 'Civil Society Organisation', 'Test3', 'Test3', '', 'In the middle of anywhere ', 'Main@test3.org', '223322223', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.459667+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (45, 'Civil Society Organization', 'test partner 1', 'test1', '', '', '', '', NULL, NULL, '', '', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.474518+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (102, 'Civil Society Organization', 'THEATRICAL & ARTISAN ASSOCIATION KYAUKPADAUNG TOWNSHIP DAW WIN WIN MAW', '', '', 'KONE DAW GYI MINGALAR ZAYDI', '', '061-51625', '2500223485', NULL, '', 'Significant', NULL, 'Community Based Organization', true, '', '2010-06-30', true, true, 8651.75, 0.00, false, 'KYAUKPADAUNG, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.488339+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (197, 'Civil Society Organization', 'THEATRICAL ASSOCIATION, CHAUK TOWNSHIP', '', '', '12 PARAMI ROAD, SHWE TWIN KON', '', '09 401 677 458', '2500229609', NULL, '', 'Not Required', NULL, 'Community Based Organization', true, '', NULL, true, true, 18711.34, 0.00, false, 'MAGWE, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.502013+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (186, 'Civil Society Organization', 'THEATRICAL ASSOCIATION, KYAUKPADAUNG TOWNSHIP', '', '', 'B.7 201:022M 234', '', '061 51625', '2500229007', NULL, '', 'Not Required', NULL, 'National', true, '', NULL, true, true, 19701.65, 0.00, false, 'MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.516659+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (165, 'Civil Society Organization', 'THEATRICAL ASSOCIATION, MAWLAMYAING TOWNSHIP', '', '', 'DAI WIN KWIN ROAD', '', '057 21068', '2500229799', NULL, '', 'Not Required', NULL, 'Community Based Organization', true, '', NULL, true, true, 17698.66, 0.00, false, 'MAWLAMYAING, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.530851+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (37, 'Civil Society Organisation', 'UK National Committee', '', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.54502+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (62, 'Civil Society Organization', 'UNAIR', '', '', '', '', '', NULL, NULL, '', '', NULL, 'National', false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.559025+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (33, 'Civil Society Organisation', 'United pawpaw workers', 'UPW', '', 'Underneath fruit tree', 'UPW@pawpaw.org', '923190432', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.573406+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (175, 'Government', 'UNIVERSITY OF PUBLIC HEALTH', '', '', 'CORNOR OF BOGYOKE AUNG', '', '01 371 527 37...', '2500230101', NULL, '', 'High', NULL, NULL, true, '', NULL, true, true, 2790.00, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.587765+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (42, 'Civil Society Organisation', 'US Fund for UNICEF', 'US Fund', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.602253+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (22, 'Civil Society Organisation', 'World Trust', 'WT', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.616253+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (21, 'Civil Society Organisation', 'World Trust ', 'ET', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.631225+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (24, 'Civil Society Organisation', 'World Trust Org', 'WT', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.645204+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (23, 'Civil Society Organisation', 'World Tust', 'WT', '', '', '', '', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.659132+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (27, 'Civil Society Organisation', 'XXX NGO', 'XXX', '', 'test', 'xxx@xxx.com', '12345', NULL, NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, NULL, NULL, false, '', '', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.673265+00', NULL, NULL, NULL, '', false, NULL, NULL);
-INSERT INTO [[schema]].partners_partnerorganization VALUES (190, 'Government', 'YANGON CITY DEVELOPMENT COMMITTEE', '', '', '14/42, NAYPYITAW', '', '95-1-376942', '2500201679', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 11555.90, 0.00, false, 'YANGON, MYANMAR', 'Myanmar', '', NULL, '', '{"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}}, "outstanding_findings": 0}', '2018-03-15 17:54:12.809984+00', '2018-12-31 13:12:17.687753+00', NULL, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (46, 'Civil Society Organization', 'Partner46', 'CRDSA', '', 'Address46', 'email46@nowhere.org', '46', '46', NULL, '', '', NULL, 'Academic Institution', false, '', NULL, true, false, 46.00, 46.00, false, 'City 46', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.580206+00', 46.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (36, 'Civil Society Organization', 'Partner36', 'CPS', '', 'Address36', 'email36@nowhere.org', '36', '36', NULL, '', 'high', NULL, 'National', false, '', NULL, true, false, 36.00, 36.00, false, 'City 36', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.582254+00', 36.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (28, 'Civil Society Organisation', 'Partner28', 'Dc Org', '', 'Address28', 'email28@nowhere.org', '28', '28', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 28.00, 28.00, false, 'City 28', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.584525+00', 28.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (35, 'Civil Society Organisation', 'Partner35', 'CPS', '', 'Address35', 'email35@nowhere.org', '35', '35', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 35.00, 35.00, false, 'City 35', '', '', '{UNFPA,UNDP}', '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.586619+00', 35.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (178, 'Civil Society Organization', 'Partner178', '', '', 'Address178', 'email178@nowhere.org', '178', '178', NULL, '', 'Low', NULL, 'International', true, '', '2013-12-18', true, true, 178.00, 178.00, false, 'City 178', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.588789+00', 178.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (118, 'Government', 'Partner118', '', '', 'Address118', 'email118@nowhere.org', '118', '118', NULL, '', '', NULL, NULL, true, '', NULL, true, true, 118.00, 118.00, false, 'City 118', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.59099+00', 118.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (83, 'Government', 'Partner83', '', '', 'Address83', 'email83@nowhere.org', '83', '83', NULL, '', 'High', NULL, NULL, true, 'High Risk Assumed', '2015-01-01', true, true, 83.00, 83.00, false, 'City 83', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.593164+00', 83.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (183, 'Government', 'Partner183', '', '', 'Address183', 'email183@nowhere.org', '183', '183', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 183.00, 183.00, false, 'City 183', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.595301+00', 183.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (189, 'Government', 'Partner189', '', '', 'Address189', 'email189@nowhere.org', '189', '189', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 189.00, 189.00, false, 'City 189', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.597484+00', 189.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (184, 'Government', 'Partner184', '', '', 'Address184', 'email184@nowhere.org', '184', '184', NULL, '', 'High', NULL, NULL, true, 'High Risk Assumed', '2016-03-31', true, true, 184.00, 184.00, false, 'City 184', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.599673+00', 184.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (202, 'Government', 'Partner202', '', '', 'Address202', 'email202@nowhere.org', '202', '202', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 202.00, 202.00, false, 'City 202', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.601806+00', 202.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (158, 'Government', 'Partner158', '', '', 'Address158', 'email158@nowhere.org', '158', '158', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 158.00, 158.00, false, 'City 158', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.603938+00', 158.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (47, 'Government', 'Partner47', 'Govt Test', '', 'Address47', 'email47@nowhere.org', '47', '47', NULL, '', '', NULL, NULL, false, '', NULL, true, false, 47.00, 47.00, false, 'City 47', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.626024+00', 47.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (148, 'Government', 'Partner148', '', '', 'Address148', 'email148@nowhere.org', '148', '148', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 148.00, 148.00, false, 'City 148', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.606102+00', 148.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (154, 'Government', 'Partner154', '', '', 'Address154', 'email154@nowhere.org', '154', '154', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 154.00, 154.00, false, 'City 154', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.608224+00', 154.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (56, 'Civil Society Organization', 'Partner56', 'EaB', '', 'Address56', 'email56@nowhere.org', '56', '56', NULL, '', '', NULL, 'National', false, '', NULL, true, false, 56.00, 56.00, false, 'City 56', '', '', '{UNDP}', '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.610618+00', 56.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (52, 'Civil Society Organization', 'Partner52', 'Edu DRC', '', 'Address52', 'email52@nowhere.org', '52', '52', NULL, '', '', NULL, 'International', false, '', NULL, true, false, 52.00, 52.00, false, 'City 52', '', '', '{UNDP}', '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.612818+00', 52.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (61, 'Civil Society Organization', 'Partner61', 'ETM', '', 'Address61', 'email61@nowhere.org', '61', '61', NULL, '', '', NULL, 'National', false, '', NULL, true, false, 61.00, 61.00, false, 'City 61', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.614917+00', 61.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (48, 'Civil Society Organization', 'Partner48', 'FAB DRC', '', 'Address48', 'email48@nowhere.org', '48', '48', NULL, '', '', NULL, 'International', false, '', NULL, true, false, 48.00, 48.00, false, 'City 48', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.61705+00', 48.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (181, 'Government', 'Partner181', '', '', 'Address181', 'email181@nowhere.org', '181', '181', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 181.00, 181.00, false, 'City 181', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.619121+00', 181.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (43, 'Civil Society Organisation', 'Partner43', '', '', 'Address43', 'email43@nowhere.org', '43', '43', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 43.00, 43.00, false, 'City 43', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.621436+00', 43.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (199, 'Government', 'Partner199', '', '', 'Address199', 'email199@nowhere.org', '199', '199', NULL, '', 'High', NULL, NULL, true, '', NULL, true, true, 199.00, 199.00, false, 'City 199', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.623685+00', 199.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (31, 'Civil Society Organisation', 'Partner31', 'ICO TP', '', 'Address31', 'email31@nowhere.org', '31', '31', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 31.00, 31.00, false, 'City 31', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.628299+00', 31.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (32, 'Government', 'Partner32', 'UPW', '', 'Address32', 'email32@nowhere.org', '32', '32', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 32.00, 32.00, false, 'City 32', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.645456+00', 32.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (34, 'Government', 'Partner34', 'MOWB', '', 'Address34', 'email34@nowhere.org', '34', '34', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 34.00, 34.00, false, 'City 34', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.647888+00', 34.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (126, 'Civil Society Organization', 'Partner126', '', '', 'Address126', 'email126@nowhere.org', '126', '126', NULL, '', 'Medium', NULL, 'National', true, '', '2010-06-30', true, true, 126.00, 126.00, false, 'City 126', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.650439+00', 126.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (180, 'Government', 'Partner180', '', '', 'Address180', 'email180@nowhere.org', '180', '180', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 180.00, 180.00, false, 'City 180', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.653029+00', 180.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (10, 'UN Agency', 'Partner10', 'NRSP', '', 'Address10', 'email10@nowhere.org', '10', '10', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 10.00, 10.00, false, 'City 10', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.655533+00', 10.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (157, 'Civil Society Organization', 'Partner157', '', '', 'Address157', 'email157@nowhere.org', '157', '157', NULL, '', 'Significant', NULL, 'National', true, '', '2010-06-30', true, true, 157.00, 157.00, false, 'City 157', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.657969+00', 157.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (229, 'Civil Society Organization', 'Partner229', '', '', 'Address229', 'email229@nowhere.org', '229', '229', NULL, NULL, 'Low', '2018-04-09', 'International', true, 'Micro Assessment', '2018-06-22', false, false, 229.00, 229.00, false, 'City 229', '240', '00100', NULL, NULL, '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2019-02-11 07:57:50.537013+00', '2020-04-02 17:58:56.660507+00', 229.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (41, 'Civil Society Organisation', 'Partner41', 'PO2', '', 'Address41', 'email41@nowhere.org', '41', '41', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 41.00, 41.00, false, 'City 41', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.663008+00', 41.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (60, 'Civil Society Organization', 'Partner60', 'PFF', '', 'Address60', 'email60@nowhere.org', '60', '60', NULL, '', '', NULL, 'International', false, '', NULL, true, false, 60.00, 60.00, false, 'City 60', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.665454+00', 60.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (11, 'Civil Society Organization', 'Partner11', 'PPB', '', 'Address11', 'email11@nowhere.org', '11', '11', NULL, '', 'high', NULL, 'Community Based Organization', false, '', NULL, true, false, 11.00, 11.00, false, 'City 11', '', '', '{}', '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.668033+00', 11.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (192, 'Civil Society Organization', 'Partner192', '', '', 'Address192', 'email192@nowhere.org', '192', '192', NULL, '', 'Medium', NULL, 'National', true, '', '2010-06-30', true, true, 192.00, 192.00, false, 'City 192', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.670528+00', 192.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (59, 'Civil Society Organization', 'Partner59', '', '', 'Address59', 'email59@nowhere.org', '59', '59', NULL, '', '', NULL, 'International', false, '', NULL, true, false, 59.00, 59.00, false, 'City 59', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.675471+00', 59.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (53, 'Civil Society Organization', 'Partner53', '', '', 'Address53', 'email53@nowhere.org', '53', '53', NULL, '', '', NULL, 'International', false, '', NULL, true, false, 53.00, 53.00, false, 'City 53', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.677866+00', 53.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (121, 'Civil Society Organization', 'Partner121', '', '', 'Address121', 'email121@nowhere.org', '121', '121', NULL, '', 'Not Required', NULL, 'International', true, 'Micro Assessment', NULL, true, true, 121.00, 121.00, false, 'City 121', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.680892+00', 121.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (55, 'Civil Society Organization', 'Partner55', 'RTP', '', 'Address55', 'email55@nowhere.org', '55', '55', NULL, '', '', NULL, 'National', false, '', NULL, true, false, 55.00, 55.00, false, 'City 55', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.685377+00', 55.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (25, 'Civil Society Organisation', 'Partner25', 'StC', '', 'Address25', 'email25@nowhere.org', '25', '25', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 25.00, 25.00, false, 'City 25', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.690334+00', 25.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (26, 'Civil Society Organisation', 'Partner26', 'Save', '', 'Address26', 'email26@nowhere.org', '26', '26', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 26.00, 26.00, false, 'City 26', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.695075+00', 26.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (38, 'Civil Society Organisation', 'Partner38', 'Shafaq', '', 'Address38', 'email38@nowhere.org', '38', '38', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 38.00, 38.00, false, 'City 38', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.699797+00', 38.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (152, 'Government', 'Partner152', '', '', 'Address152', 'email152@nowhere.org', '152', '152', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 152.00, 152.00, false, 'City 152', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.704523+00', 152.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (172, 'Government', 'Partner172', '', '', 'Address172', 'email172@nowhere.org', '172', '172', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 172.00, 172.00, false, 'City 172', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.709611+00', 172.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (150, 'Civil Society Organization', 'Partner150', '', '', 'Address150', 'email150@nowhere.org', '150', '150', NULL, '', 'Medium', '2013-07-25', 'International', true, '', '2010-07-31', true, true, 150.00, 150.00, false, 'City 150', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.714766+00', 150.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (39, 'Civil Society Organisation', 'Partner39', 'Test3', '', 'Address39', 'email39@nowhere.org', '39', '39', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 39.00, 39.00, false, 'City 39', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.719749+00', 39.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (45, 'Civil Society Organization', 'Partner45', 'test1', '', 'Address45', 'email45@nowhere.org', '45', '45', NULL, '', '', NULL, 'National', false, '', NULL, true, false, 45.00, 45.00, false, 'City 45', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.724534+00', 45.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (102, 'Civil Society Organization', 'Partner102', '', '', 'Address102', 'email102@nowhere.org', '102', '102', NULL, '', 'Significant', NULL, 'Community Based Organization', true, '', '2010-06-30', true, true, 102.00, 102.00, false, 'City 102', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.729457+00', 102.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (197, 'Civil Society Organization', 'Partner197', '', '', 'Address197', 'email197@nowhere.org', '197', '197', NULL, '', 'Not Required', NULL, 'Community Based Organization', true, '', NULL, true, true, 197.00, 197.00, false, 'City 197', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.734407+00', 197.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (186, 'Civil Society Organization', 'Partner186', '', '', 'Address186', 'email186@nowhere.org', '186', '186', NULL, '', 'Not Required', NULL, 'National', true, '', NULL, true, true, 186.00, 186.00, false, 'City 186', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.739392+00', 186.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (165, 'Civil Society Organization', 'Partner165', '', '', 'Address165', 'email165@nowhere.org', '165', '165', NULL, '', 'Not Required', NULL, 'Community Based Organization', true, '', NULL, true, true, 165.00, 165.00, false, 'City 165', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.744261+00', 165.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (37, 'Civil Society Organisation', 'Partner37', '', '', 'Address37', 'email37@nowhere.org', '37', '37', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 37.00, 37.00, false, 'City 37', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.749199+00', 37.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (62, 'Civil Society Organization', 'Partner62', '', '', 'Address62', 'email62@nowhere.org', '62', '62', NULL, '', '', NULL, 'National', false, '', NULL, true, false, 62.00, 62.00, false, 'City 62', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.753929+00', 62.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (33, 'Civil Society Organisation', 'Partner33', 'UPW', '', 'Address33', 'email33@nowhere.org', '33', '33', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 33.00, 33.00, false, 'City 33', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.758836+00', 33.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (175, 'Government', 'Partner175', '', '', 'Address175', 'email175@nowhere.org', '175', '175', NULL, '', 'High', NULL, NULL, true, '', NULL, true, true, 175.00, 175.00, false, 'City 175', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.763639+00', 175.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (190, 'Government', 'Partner190', '', '', 'Address190', 'email190@nowhere.org', '190', '190', NULL, '', 'Not Required', NULL, NULL, true, '', NULL, true, true, 190.00, 190.00, false, 'City 190', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.797359+00', 190.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (187, 'Civil Society Organization', 'Partner187', '', '', 'Address187', 'email187@nowhere.org', '187', '187', NULL, '', 'Not Required', '2016-03-29', 'National', true, 'Micro Assessment', '2016-03-29', true, true, 187.00, 187.00, false, 'City 187', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.568365+00', 187.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (2, 'Bilateral / Multilateral', 'Partner2', 'ABCD', '', 'Address2', 'email2@nowhere.org', '2', '2', NULL, '', 'high', NULL, 'International', false, '', NULL, true, false, 2.00, 2.00, false, 'City 2', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.57059+00', 2.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (228, 'Civil Society Organization', 'Partner228', '', '', 'Address228', 'email228@nowhere.org', '228', '228', NULL, 'ATC', 'High', '2013-07-10', 'International', true, 'High Risk Assumed', '2017-01-24', false, false, 228.00, 228.00, false, 'City 228', '234', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 1, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 1}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.572145+00', 228.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (153, 'Civil Society Organization', 'Partner153', '', '', 'Address153', 'email153@nowhere.org', '153', '153', NULL, '', 'Not Required', NULL, 'International', true, '', NULL, true, true, 153.00, 153.00, false, 'City 153', 'Thailand', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.573746+00', 153.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (54, 'Civil Society Organization', 'Partner54', 'AFDA_n', '', 'Address54', 'email54@nowhere.org', '54', '54', NULL, '', '', NULL, 'National', false, '', NULL, true, false, 54.00, 54.00, false, 'City 54', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.575977+00', 54.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (44, 'Civil Society Organization', 'Partner44', 'APO', '', 'Address44', 'email44@nowhere.org', '44', '44', NULL, '', 'high', NULL, 'National', false, '', NULL, true, false, 44.00, 44.00, false, 'City 44', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.578068+00', 44.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (149, 'Government', 'Partner149', '', '', 'Address149', 'email149@nowhere.org', '149', '149', NULL, '', 'High', NULL, NULL, true, '', NULL, true, true, 149.00, 149.00, false, 'City 149', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.63059+00', 149.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (161, 'Government', 'Partner161', '', '', 'Address161', 'email161@nowhere.org', '161', '161', NULL, '', 'Not Required', NULL, NULL, true, 'Micro Assessment', NULL, true, true, 161.00, 161.00, false, 'City 161', 'Myanmar', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.632997+00', 161.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (30, 'Bi-Lateral Organisation', 'Partner30', '12345', '', 'Address30', 'email30@nowhere.org', '30', '30', 12345, '12345', 'high', NULL, NULL, false, '', NULL, true, false, 30.00, 30.00, false, 'City 30', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.635558+00', 30.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (14, 'Civil Society Organization', 'Partner14', 'MoeT', '', 'Address14', 'email14@nowhere.org', '14', '14', NULL, 'The best ministry in the world', 'high', NULL, 'National', false, '', NULL, true, false, 14.00, 14.00, false, 'City 14', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.638208+00', 14.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (29, 'Government', 'Partner29', 'MoE2', '', 'Address29', 'email29@nowhere.org', '29', '29', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 29.00, 29.00, false, 'City 29', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.640668+00', 29.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (20, 'Government', 'Partner20', 'MoE', '', 'Address20', 'email20@nowhere.org', '20', '20', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 20.00, 20.00, false, 'City 20', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.643093+00', 20.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (57, 'Government', 'Partner57', '', '', 'Address57', 'email57@nowhere.org', '57', '57', NULL, '', '', NULL, NULL, false, '', NULL, true, false, 57.00, 57.00, false, 'City 57', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.673097+00', 57.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (42, 'Civil Society Organisation', 'Partner42', 'US Fund', '', 'Address42', 'email42@nowhere.org', '42', '42', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 42.00, 42.00, false, 'City 42', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.768478+00', 42.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (22, 'Civil Society Organisation', 'Partner22', 'WT', '', 'Address22', 'email22@nowhere.org', '22', '22', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 22.00, 22.00, false, 'City 22', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.773492+00', 22.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (21, 'Civil Society Organisation', 'Partner21', 'ET', '', 'Address21', 'email21@nowhere.org', '21', '21', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 21.00, 21.00, false, 'City 21', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.778324+00', 21.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (24, 'Civil Society Organisation', 'Partner24', 'WT', '', 'Address24', 'email24@nowhere.org', '24', '24', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 24.00, 24.00, false, 'City 24', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.783091+00', 24.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (23, 'Civil Society Organisation', 'Partner23', 'WT', '', 'Address23', 'email23@nowhere.org', '23', '23', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 23.00, 23.00, false, 'City 23', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.787757+00', 23.00, NULL, NULL, '', false, NULL, NULL);
+INSERT INTO [[schema]].partners_partnerorganization VALUES (27, 'Civil Society Organisation', 'Partner27', 'XXX', '', 'Address27', 'email27@nowhere.org', '27', '27', NULL, '', 'high', NULL, NULL, false, '', NULL, true, false, 27.00, 27.00, false, 'City 27', '', '', NULL, '', '"{\"audits\": {\"completed\": 0, \"minimum_requirements\": null}, \"spot_checks\": {\"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"follow_up_required\": 0, \"minimum_requirements\": null}, \"assurance_coverage\": \"void\", \"programmatic_visits\": {\"planned\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"completed\": {\"q1\": 0, \"q2\": 0, \"q3\": 0, \"q4\": 0, \"total\": 0}, \"minimum_requirements\": null}, \"outstanding_findings\": 0}"', '2018-03-15 17:54:12.809984+00', '2020-04-02 17:58:56.7926+00', 27.00, NULL, NULL, '', false, NULL, NULL);
 
 
 --
@@ -11196,36 +12313,68 @@ INSERT INTO [[schema]].partners_plannedengagement VALUES (73, '2018-03-15 17:54:
 -- Data for Name: psea_answer; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_answer VALUES (2, '2019-11-08 17:08:14.548153+00', '2019-11-08 17:08:14.548153+00', '', 3, 3, 2);
+INSERT INTO [[schema]].psea_answer VALUES (1, '2019-10-04 17:49:41.72498+00', '2019-10-04 17:54:34.387771+00', '', 1, 1, 2);
+INSERT INTO [[schema]].psea_answer VALUES (3, '2019-11-13 16:30:49.800088+00', '2019-11-13 16:30:49.800088+00', '', 5, 1, 3);
+INSERT INTO [[schema]].psea_answer VALUES (4, '2019-11-13 16:30:53.954701+00', '2019-11-13 16:30:53.954701+00', '', 5, 2, 3);
+INSERT INTO [[schema]].psea_answer VALUES (5, '2019-11-13 16:30:57.899636+00', '2019-11-13 16:30:57.899636+00', '', 5, 3, 3);
+INSERT INTO [[schema]].psea_answer VALUES (6, '2019-11-13 16:31:01.59418+00', '2019-11-13 16:31:01.59418+00', '', 5, 4, 3);
+INSERT INTO [[schema]].psea_answer VALUES (7, '2019-11-13 16:31:04.609665+00', '2019-11-13 16:31:04.609665+00', '', 5, 5, 3);
+INSERT INTO [[schema]].psea_answer VALUES (8, '2019-11-13 16:31:07.882319+00', '2019-11-13 16:31:07.882319+00', '', 5, 6, 3);
 
 
 --
 -- Data for Name: psea_answerevidence; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_answerevidence VALUES (1, '2019-10-04 17:54:09.805834+00', '2019-10-04 17:54:34.436011+00', NULL, 1, 2);
+INSERT INTO [[schema]].psea_answerevidence VALUES (2, '2019-10-04 17:54:09.857156+00', '2019-10-04 17:54:34.452887+00', 'kjkj', 1, 3);
 
 
 --
 -- Data for Name: psea_assessment; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_assessment VALUES (2, '2019-10-09 21:28:12.201803+00', '2019-10-09 21:28:12.229025+00', 'UAT/2019PSEA2', NULL, '2019-10-24', 'draft', 228);
+INSERT INTO [[schema]].psea_assessment VALUES (1, '2019-10-04 17:48:33.280451+00', '2019-10-04 17:54:34.415078+00', 'UAT/2019PSEA1', NULL, NULL, 'in_progress', 228);
+INSERT INTO [[schema]].psea_assessment VALUES (3, '2019-11-08 17:06:10.985936+00', '2019-11-08 17:08:14.576776+00', 'UAT/2019PSEA3', NULL, NULL, 'in_progress', 228);
+INSERT INTO [[schema]].psea_assessment VALUES (4, '2019-11-08 21:18:56.796312+00', '2019-11-08 21:19:07.916232+00', 'UAT/2019PSEA4', NULL, NULL, 'in_progress', 229);
+INSERT INTO [[schema]].psea_assessment VALUES (5, '2019-11-13 16:29:35.259213+00', '2019-11-13 16:31:28.759345+00', 'UAT/2019PSEA5', 18, '2019-11-13', 'final', 229);
 
 
 --
 -- Data for Name: psea_assessment_focal_points; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_assessment_focal_points VALUES (1, 1, 2);
+INSERT INTO [[schema]].psea_assessment_focal_points VALUES (2, 2, 123);
+INSERT INTO [[schema]].psea_assessment_focal_points VALUES (3, 3, 2);
+INSERT INTO [[schema]].psea_assessment_focal_points VALUES (4, 4, 3778);
+INSERT INTO [[schema]].psea_assessment_focal_points VALUES (5, 5, 3778);
+INSERT INTO [[schema]].psea_assessment_focal_points VALUES (6, 5, 3199);
 
 
 --
 -- Data for Name: psea_assessmentstatushistory; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_assessmentstatushistory VALUES (1, '2019-10-04 17:49:01.953886+00', '2019-10-04 17:49:01.953886+00', 'assigned', 1, '');
+INSERT INTO [[schema]].psea_assessmentstatushistory VALUES (2, '2019-11-08 17:06:50.683771+00', '2019-11-08 17:06:50.683771+00', 'assigned', 3, '');
+INSERT INTO [[schema]].psea_assessmentstatushistory VALUES (3, '2019-11-08 21:19:07.39083+00', '2019-11-08 21:19:07.39083+00', 'assigned', 4, '');
+INSERT INTO [[schema]].psea_assessmentstatushistory VALUES (4, '2019-11-13 16:30:42.903912+00', '2019-11-13 16:30:42.903912+00', 'assigned', 5, '');
+INSERT INTO [[schema]].psea_assessmentstatushistory VALUES (6, '2019-11-13 16:31:26.34034+00', '2019-11-13 16:31:26.34034+00', 'submitted', 5, '');
+INSERT INTO [[schema]].psea_assessmentstatushistory VALUES (7, '2019-11-13 16:31:28.772264+00', '2019-11-13 16:31:28.772264+00', 'final', 5, '');
 
 
 --
 -- Data for Name: psea_assessor; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_assessor VALUES (1, '2019-10-04 17:48:52.914265+00', '2019-10-04 17:48:52.914265+00', 'staff', '', 1, NULL, 2);
+INSERT INTO [[schema]].psea_assessor VALUES (2, '2019-10-09 21:28:22.917431+00', '2019-10-09 21:28:22.917431+00', 'staff', '', 2, NULL, 123);
+INSERT INTO [[schema]].psea_assessor VALUES (3, '2019-11-08 17:06:19.963741+00', '2019-11-08 17:06:19.963741+00', 'staff', '', 3, NULL, 2);
+INSERT INTO [[schema]].psea_assessor VALUES (4, '2019-11-08 21:19:04.022589+00', '2019-11-08 21:19:04.022589+00', 'staff', '', 4, NULL, 3778);
+INSERT INTO [[schema]].psea_assessor VALUES (5, '2019-11-13 16:30:39.255256+00', '2019-11-13 16:30:39.255256+00', 'staff', '', 5, NULL, 3778);
 
 
 --
@@ -11238,30 +12387,104 @@ INSERT INTO [[schema]].partners_plannedengagement VALUES (73, '2018-03-15 17:54:
 -- Data for Name: psea_evidence; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_evidence VALUES (1, '2019-10-04 17:30:17.570634+00', '2019-10-04 17:30:17.570645+00', 'Code of Conduct', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (2, '2019-10-04 17:30:17.577354+00', '2019-10-04 17:30:17.577364+00', 'PSEA Policy', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (3, '2019-10-04 17:30:17.583764+00', '2019-10-04 17:30:17.583773+00', 'Other (please specify)', true, true);
+INSERT INTO [[schema]].psea_evidence VALUES (4, '2019-10-04 17:30:17.59074+00', '2019-10-04 17:30:17.590769+00', 'Relevant human resources policies', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (5, '2019-10-04 17:30:17.597021+00', '2019-10-04 17:30:17.59703+00', 'Recruitment procedure (e.g. screening of candidates)', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (6, '2019-10-04 17:30:17.603334+00', '2019-10-04 17:30:17.603344+00', 'ToR (e.g. PSEA-related responsibilities)', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (7, '2019-10-04 17:30:17.609328+00', '2019-10-04 17:30:17.609338+00', 'Contracts/partnership agreements', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (8, '2019-10-04 17:30:17.615731+00', '2019-10-04 17:30:17.615745+00', 'Training Agenda', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (9, '2019-10-04 17:30:17.622317+00', '2019-10-04 17:30:17.622327+00', 'Attendance sheets', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (10, '2019-10-04 17:30:17.628606+00', '2019-10-04 17:30:17.628622+00', 'Communication materials', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (11, '2019-10-04 17:30:17.635278+00', '2019-10-04 17:30:17.635289+00', 'Needs assessments', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (12, '2019-10-04 17:30:17.641373+00', '2019-10-04 17:30:17.641397+00', 'Risk assessments', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (13, '2019-10-04 17:30:17.64764+00', '2019-10-04 17:30:17.647659+00', 'M&E framework', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (14, '2019-10-04 17:30:17.654373+00', '2019-10-04 17:30:17.654388+00', 'Description of reporting mechanism(s)', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (15, '2019-10-04 17:30:17.661357+00', '2019-10-04 17:30:17.661375+00', 'Whistleblower policy', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (16, '2019-10-04 17:30:17.668386+00', '2019-10-04 17:30:17.668402+00', 'List of service providers', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (17, '2019-10-04 17:30:17.675447+00', '2019-10-04 17:30:17.675464+00', 'Referral form for survivors of GBV/SEA', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (18, '2019-10-04 17:30:17.682807+00', '2019-10-04 17:30:17.682826+00', 'Name(s) of possible investigator(s)', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (19, '2019-10-04 17:30:17.689942+00', '2019-10-04 17:30:17.689958+00', 'Dedicated resources for investigation(s) and/or commitment of partner for support', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (20, '2019-10-04 17:30:17.697382+00', '2019-10-04 17:30:17.697398+00', 'PSEA investigation policy/procedure', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (21, '2019-10-04 17:30:17.704776+00', '2019-10-04 17:30:17.704822+00', 'Documentation of standard procedure', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (22, '2019-10-04 17:30:17.712355+00', '2019-10-04 17:30:17.712372+00', 'Annual training plan', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (23, '2019-10-04 17:30:17.719847+00', '2019-10-04 17:30:17.719864+00', 'Description of referral process for survivors of GBV/SEA', false, true);
+INSERT INTO [[schema]].psea_evidence VALUES (24, '2019-10-04 17:30:17.727222+00', '2019-10-04 17:30:17.72724+00', 'Written process for review of SEA allegations', false, true);
 
 
 --
 -- Data for Name: psea_indicator; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_indicator VALUES (1, '2019-10-04 17:30:17.734439+00', '2019-10-04 17:30:17.734456+00', 'Core Standard 1: Organizational Policy', 'An organizational policy exists and is signed by all personnel (see:<a href="https://unicef.sharepoint.com/:w:/r/sites/DAPM/_layouts/15/Doc.aspx?sourcedoc=%7B42E6DD24-5001-42C8-9050-B4ACAD0C4289%7D&file=PSEA%20Toolkit%20Field%20Tested%20Draft%20July%2022%202019.docx&action=default&mobileredirect=true&cid=7aa0aeea-cb8e-489c-89bd-2e6e77316cdc"> PSEA</a> Toolkit Section 4.2.1. Policies). (Note that the policy may exist as part of a code of conduct and/or a comprehensive SEA policy.)<ul><li>Criteria 1: Organizational policy includes: <ul><li>a) a definition of SEA (that is aligned with the <a href="https://undocs.org/ST/SGB/2003/13">UN''s definition</a>);</li><li>b) a description of behavior expected of personnel on- and off-duty (reflecting the <a href="https://interagencystandingcommittee.org/principals/documents-public/iasc-six-core-principles-relating-sexual-exploitation-and-abuse-2002">IASC’s Six Core Principles Relating to SEA</a>); </li><li>and c) an explicit statement of zero-tolerance for SEA (i.e. SEA as a ground for disciplinary actions, which may result in termination of employment).</li></ul></li><li>Criteria 2: The organizational policy on PSEA (e.g. code of conduct) is signed by all personnel, including employees, volunteers, contractors, and others.</li><li>Criteria 3: The organization displays information on PSEA policy and procedure, including the code of conduct and reporting channel details, in its own offices and at project sites.</li></ul>', true, 1, '');
+INSERT INTO [[schema]].psea_indicator VALUES (2, '2019-10-04 17:30:17.772602+00', '2019-10-04 17:30:17.772621+00', 'Core Standard 2: Organizational Management and HR Systems', 'The organization’s management and HR systems account for PSEA (see : <a href="https://unicef.sharepoint.com/:w:/r/sites/DAPM/_layouts/15/Doc.aspx?sourcedoc=%7B42E6DD24-5001-42C8-9050-B4ACAD0C4289%7D&file=PSEA%20Toolkit%20Field%20Tested%20Draft%20July%2022%202019.docx&action=default&mobileredirect=true&cid=7aa0aeea-cb8e-489c-89bd-2e6e77316cdc">PSEA Toolkit</a> Section 4.2.2. Procedures).<ul><li>Criteria 1: The organization defines roles and responsibilities of personnel with specific PSEA-related responsibilities in their contracts and/or ToR. </li><li>Criteria 2: The organization’s contracts and partnership agreements include a standard clause requiring contractors, suppliers, consultants and sub-partners to commit to a zero-tolerance policy on SEA and to take measures to prevent and respond to SEA.</li><li>Criteria 3: There is a systematic vetting procedure in place for job candidates (e.g. reference checks, police records, Google searches) in accordance with local laws regarding employment, privacy and data protection, including checking for prior involvement in SEA or other safeguarding concerns.</li></ul>', true, 2, '');
+INSERT INTO [[schema]].psea_indicator VALUES (3, '2019-10-04 17:30:17.805284+00', '2019-10-04 17:30:17.805305+00', 'Core Standard 3: Mandatory Training', 'The organization holds mandatory trainings for personnel on the organization’s SEA policy and procedures (see : <a href="https://unicef.sharepoint.com/:w:/r/sites/DAPM/_layouts/15/Doc.aspx?sourcedoc=%7B42E6DD24-5001-42C8-9050-B4ACAD0C4289%7D&file=PSEA%20Toolkit%20Field%20Tested%20Draft%20July%2022%202019.docx&action=default&mobileredirect=true&cid=7aa0aeea-cb8e-489c-89bd-2e6e77316cdc">PSEA Toolkit</a> Section 4.3.1. Training). (Note this training can be delivered online or in-person.)<ul><li>Criteria 1: The organization has a plan for training all personnel on PSEA.</li><li>Criteria 2: The training includes <ul><li>1) a definition of SEA (that is aligned with the <a href="https://undocs.org/ST/SGB/2003/13">UN''s definition</a>);</li><li>2) a prohibition of SEA; </li><li>and 3) actions that personnel are required to take (i.e. prompt reporting of allegations and referral of survivors).</li></ul></li><li>Criteria 3: The organization requires all personnel to participate in its PSEA training and retains an internal record of attendance (i.e. name of trainees, date of training, type of training, training provider).</li></ul>', true, 3, '');
+INSERT INTO [[schema]].psea_indicator VALUES (4, '2019-10-04 17:30:17.838738+00', '2019-10-04 17:30:17.838757+00', 'Core Standard 4: Reporting', 'The organization has mechanisms and procedures for personnel, beneficiaries and communities, including children, to report SEA allegations that comply with core standards for reporting (i.e. safety, confidentiality, transparency, accessibility) and ensures that beneficiaries are aware of these (see <a href="https://unicef.sharepoint.com/:w:/r/sites/DAPM/_layouts/15/Doc.aspx?sourcedoc=%7B42E6DD24-5001-42C8-9050-B4ACAD0C4289%7D&file=PSEA%20Toolkit%20Field%20Tested%20Draft%20July%2022%202019.docx&action=default&mobileredirect=true&cid=7aa0aeea-cb8e-489c-89bd-2e6e77316cdc">PSEA Toolkit</a> Section 4.3.2. Awareness-raising and Section 5.2. Reporting Mechanisms).<ul><li>Criteria 1: The organization has communication materials on PSEA and reporting channels available in locally relevant languages and presented in a way that all groups, including children, understand. </li><li>Criteria 2: The organization has a description of how personnel and beneficiaries can report SEA allegations and the organization’s procedures for handling these allegations, including those involving personnel of other entities. </li><li>Criteria 3: The organization limits the number of people with access to reported information and removes identifying information of those involved when sharing information.</li></ul>', true, 4, '');
+INSERT INTO [[schema]].psea_indicator VALUES (5, '2019-10-04 17:30:17.871607+00', '2019-10-04 17:30:17.871626+00', 'Core Standard 5: Assistance and Referrals', 'The organization has a system to ensure survivors of SEA, including children, receive immediate professional assistance, referring them to relevant service providers (see <a href="https://unicef.sharepoint.com/:w:/r/sites/DAPM/_layouts/15/Doc.aspx?sourcedoc=%7B42E6DD24-5001-42C8-9050-B4ACAD0C4289%7D&file=PSEA%20Toolkit%20Field%20Tested%20Draft%20July%2022%202019.docx&action=default&mobileredirect=true&cid=7aa0aeea-cb8e-489c-89bd-2e6e77316cdc">PSEA Toolkit</a> Section 6.2. Assistance and Referrals).<ul><li>Criteria 1: The organization has an updated list of local service providers and/or contact with local GBV coordination mechanisms (i.e. GBV sub-cluster) for all programme sites/areas.</li><li>Criteria 2: The organization has a procedure to guide the referral process, outlining the steps that personnel, particularly those receiving complaints, need to take, including follow-up to referrals.</li><li>Criteria 3: The organization has a referral form for survivors of GBV/SEA.</li></ul>', true, 5, '');
+INSERT INTO [[schema]].psea_indicator VALUES (6, '2019-10-04 17:30:17.904569+00', '2019-10-04 17:30:17.90459+00', 'Core Standard 6: Investigations', 'The organization has a process and plan for ensuring investigation into SEA allegations involving its personnel (see <a href="https://unicef.sharepoint.com/:w:/r/sites/DAPM/_layouts/15/Doc.aspx?sourcedoc=%7B42E6DD24-5001-42C8-9050-B4ACAD0C4289%7D&file=PSEA%20Toolkit%20Field%20Tested%20Draft%20July%2022%202019.docx&action=default&mobileredirect=true&cid=7aa0aeea-cb8e-489c-89bd-2e6e77316cdc">PSEA Toolkit</a> Section 7.2. Investigation Procedures).<ul><li>Criteria 1: The organization has a process for reviewing allegations of SEA and deciding on the need for investigation and other next steps (e.g. assistance for adult/child survivors and/or others, need for investigation); this involves a system for recording all SEA allegations involving its personnel and its response measures. </li><li>Criteria 2: The organization has access to an experienced, impartial and trained investigator to conduct an investigation on SEA; this may involve using in-house capacity, hiring an external investigator, or getting a commitment of partner(s) for support.</li><li>Criteria 3: The organization has a system for providing organizational oversight of an investigation (e.g. information-sharing/communications, risk assessments), including disciplinary measures in case of substantiated allegations.</li></ul>', true, 6, '');
 
 
 --
 -- Data for Name: psea_indicator_evidences; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (1, 1, 1);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (2, 1, 2);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (3, 1, 3);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (4, 1, 21);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (5, 2, 3);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (6, 2, 5);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (7, 2, 6);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (8, 2, 7);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (9, 3, 8);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (10, 3, 9);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (11, 3, 3);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (12, 3, 22);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (13, 4, 3);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (14, 4, 14);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (15, 4, 15);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (16, 5, 16);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (17, 5, 17);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (18, 5, 3);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (19, 5, 23);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (20, 6, 19);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (21, 6, 24);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (22, 6, 3);
+INSERT INTO [[schema]].psea_indicator_evidences VALUES (23, 6, 20);
 
 
 --
 -- Data for Name: psea_indicator_ratings; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (1, 1, 1);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (2, 1, 2);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (3, 1, 3);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (4, 2, 1);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (5, 2, 2);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (6, 2, 3);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (7, 3, 1);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (8, 3, 2);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (9, 3, 3);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (10, 4, 1);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (11, 4, 2);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (12, 4, 3);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (13, 5, 1);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (14, 5, 2);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (15, 5, 3);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (16, 6, 1);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (17, 6, 2);
+INSERT INTO [[schema]].psea_indicator_ratings VALUES (18, 6, 3);
 
 
 --
 -- Data for Name: psea_rating; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].psea_rating VALUES (1, '2019-10-04 17:30:17.544952+00', '2019-10-04 17:30:17.544964+00', 'Absent', 1, true);
+INSERT INTO [[schema]].psea_rating VALUES (2, '2019-10-04 17:30:17.557934+00', '2019-10-04 17:30:17.557945+00', 'Progressing', 2, true);
+INSERT INTO [[schema]].psea_rating VALUES (3, '2019-10-04 17:30:17.564203+00', '2019-10-04 17:30:17.564214+00', 'Adeq[[schema]]e', 3, true);
 
 
 --
@@ -11305,73 +12528,73 @@ INSERT INTO [[schema]].reports_countryprogramme VALUES (1, 'Country Programme 0'
 -- Data for Name: reports_indicator; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].reports_indicator VALUES (34, 'Primary Access Rate', '2.1', 92, 95, 91, 91, true, 59, 11, 3, '85', false, '100', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (35, 'Rate of access to Primary in Social Protection Schools', '2.1', 100, 0, 85, 0, true, 60, 11, 3, '85', false, '100', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (36, 'Number of Schools which have received cash transfer', '2.1.1', 356, 0, 0, 0, true, 63, 11, 3, '0', false, '356', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (22, 'aaaaaa', 'indicator 3', NULL, NULL, 0, NULL, false, 39, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (11, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 26, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (12, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 26, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (14, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 31, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (15, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 31, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (16, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 31, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (20, '# children receiving RUFT/in patienat', 'indicator 1', NULL, NULL, 0, NULL, false, 39, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (13, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 26, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (28, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 49, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (29, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 49, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (30, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 49, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (31, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 54, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (32, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 54, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (33, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 54, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (37, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 66, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (38, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 66, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (39, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 66, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (40, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 71, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (41, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 71, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (42, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 71, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (43, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 76, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (44, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 76, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (45, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 76, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (46, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 81, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (47, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 81, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (48, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 81, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (52, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 87, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (53, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 87, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (54, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 87, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (55, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 92, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (56, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 92, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (57, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 92, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (58, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 97, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (59, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 97, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (60, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 97, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (61, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 102, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (62, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 102, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (63, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 102, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (64, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 109, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (65, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 109, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (66, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 109, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (67, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 114, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (68, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 114, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (69, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 114, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (70, '# children receiving RUTF/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (71, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (72, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (73, '# children provided school fees', 'indicator 2', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (74, '# social workers being trained', 'indicator 1', NULL, NULL, 0, NULL, false, 125, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (75, 'modules on case management', 'indicator 2', NULL, NULL, 0, NULL, false, 125, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (76, '# of case management reports', 'indicator 3', NULL, NULL, 0, NULL, false, 125, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (77, '# social workers being trained', 'indicator 1', NULL, NULL, 0, NULL, false, 126, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (78, 'modules on case management', 'indicator 2', NULL, NULL, 0, NULL, false, 126, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (79, '# of case management reports', 'indicator 3', NULL, NULL, 0, NULL, false, 126, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (21, 'aaa', 'indicator 2', NULL, NULL, 0, NULL, true, 39, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (80, '# children receiving RUFT/in patient', 'indicator 1', NULL, NULL, 0, NULL, false, 134, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (81, '# children receiving winterkits community', 'indicator 2', NULL, NULL, 0, NULL, false, 134, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (82, '# children receiving ginger in the community', 'indicator 3', NULL, NULL, 0, NULL, false, 134, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (83, '# children receiving some patient', 'indicator 1', NULL, NULL, 0, NULL, false, 139, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (84, '# children receiving lego in the community', 'indicator 2', NULL, NULL, 0, NULL, false, 139, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (85, '# children receiving playstations community', 'indicator 3', NULL, NULL, 0, NULL, false, 139, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (10, 'Number of pawpaw eaten', '', 25, 30, 10, 15, true, 22, 2, 6, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (9, '# of eToolers', '', 1000, 1400, 200, 300, true, 16, 2, 4, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
-INSERT INTO [[schema]].reports_indicator VALUES (8, 'test', '', 100, 56, 10, 3, true, NULL, 5, 3, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (34, 'Report34', '2.1', 92, 95, 91, 91, true, 59, 11, 3, '85', false, '100', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (30, 'Report30', 'indicator 3', NULL, NULL, 0, NULL, false, 49, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (31, 'Report31', 'indicator 1', NULL, NULL, 0, NULL, false, 54, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (32, 'Report32', 'indicator 2', NULL, NULL, 0, NULL, false, 54, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (33, 'Report33', 'indicator 3', NULL, NULL, 0, NULL, false, 54, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (37, 'Report37', 'indicator 1', NULL, NULL, 0, NULL, false, 66, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (38, 'Report38', 'indicator 2', NULL, NULL, 0, NULL, false, 66, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (39, 'Report39', 'indicator 3', NULL, NULL, 0, NULL, false, 66, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (40, 'Report40', 'indicator 1', NULL, NULL, 0, NULL, false, 71, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (41, 'Report41', 'indicator 2', NULL, NULL, 0, NULL, false, 71, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (42, 'Report42', 'indicator 3', NULL, NULL, 0, NULL, false, 71, 11, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (43, 'Report43', 'indicator 1', NULL, NULL, 0, NULL, false, 76, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (44, 'Report44', 'indicator 2', NULL, NULL, 0, NULL, false, 76, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (45, 'Report45', 'indicator 3', NULL, NULL, 0, NULL, false, 76, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (46, 'Report46', 'indicator 1', NULL, NULL, 0, NULL, false, 81, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (47, 'Report47', 'indicator 2', NULL, NULL, 0, NULL, false, 81, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (48, 'Report48', 'indicator 3', NULL, NULL, 0, NULL, false, 81, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (52, 'Report52', 'indicator 1', NULL, NULL, 0, NULL, false, 87, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (53, 'Report53', 'indicator 2', NULL, NULL, 0, NULL, false, 87, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (54, 'Report54', 'indicator 3', NULL, NULL, 0, NULL, false, 87, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (55, 'Report55', 'indicator 1', NULL, NULL, 0, NULL, false, 92, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (56, 'Report56', 'indicator 2', NULL, NULL, 0, NULL, false, 92, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (57, 'Report57', 'indicator 3', NULL, NULL, 0, NULL, false, 92, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (58, 'Report58', 'indicator 1', NULL, NULL, 0, NULL, false, 97, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (59, 'Report59', 'indicator 2', NULL, NULL, 0, NULL, false, 97, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (60, 'Report60', 'indicator 3', NULL, NULL, 0, NULL, false, 97, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (61, 'Report61', 'indicator 1', NULL, NULL, 0, NULL, false, 102, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (62, 'Report62', 'indicator 2', NULL, NULL, 0, NULL, false, 102, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (63, 'Report63', 'indicator 3', NULL, NULL, 0, NULL, false, 102, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (64, 'Report64', 'indicator 1', NULL, NULL, 0, NULL, false, 109, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (65, 'Report65', 'indicator 2', NULL, NULL, 0, NULL, false, 109, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (66, 'Report66', 'indicator 3', NULL, NULL, 0, NULL, false, 109, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (67, 'Report67', 'indicator 1', NULL, NULL, 0, NULL, false, 114, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (68, 'Report68', 'indicator 2', NULL, NULL, 0, NULL, false, 114, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (69, 'Report69', 'indicator 3', NULL, NULL, 0, NULL, false, 114, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (70, 'Report70', 'indicator 1', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (71, 'Report71', 'indicator 2', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (72, 'Report72', 'indicator 3', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (73, 'Report73', 'indicator 2', NULL, NULL, 0, NULL, false, 120, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (74, 'Report74', 'indicator 1', NULL, NULL, 0, NULL, false, 125, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (75, 'Report75', 'indicator 2', NULL, NULL, 0, NULL, false, 125, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (76, 'Report76', 'indicator 3', NULL, NULL, 0, NULL, false, 125, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (77, 'Report77', 'indicator 1', NULL, NULL, 0, NULL, false, 126, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (78, 'Report78', 'indicator 2', NULL, NULL, 0, NULL, false, 126, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (79, 'Report79', 'indicator 3', NULL, NULL, 0, NULL, false, 126, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (21, 'Report21', 'indicator 2', NULL, NULL, 0, NULL, true, 39, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (80, 'Report80', 'indicator 1', NULL, NULL, 0, NULL, false, 134, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (81, 'Report81', 'indicator 2', NULL, NULL, 0, NULL, false, 134, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (82, 'Report82', 'indicator 3', NULL, NULL, 0, NULL, false, 134, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (83, 'Report83', 'indicator 1', NULL, NULL, 0, NULL, false, 139, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (84, 'Report84', 'indicator 2', NULL, NULL, 0, NULL, false, 139, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (85, 'Report85', 'indicator 3', NULL, NULL, 0, NULL, false, 139, NULL, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (10, 'Report10', '', 25, 30, 10, 15, true, 22, 2, 6, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (9, 'Report9', '', 1000, 1400, 200, 300, true, 16, 2, 4, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (8, 'Report8', '', 100, 56, 10, 3, true, NULL, 5, 3, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (35, 'Report35', '2.1', 100, 0, 85, 0, true, 60, 11, 3, '85', false, '100', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (36, 'Report36', '2.1.1', 356, 0, 0, 0, true, 63, 11, 3, '0', false, '356', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (22, 'Report22', 'indicator 3', NULL, NULL, 0, NULL, false, 39, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (11, 'Report11', 'indicator 1', NULL, NULL, 0, NULL, false, 26, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (12, 'Report12', 'indicator 2', NULL, NULL, 0, NULL, false, 26, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (14, 'Report14', 'indicator 1', NULL, NULL, 0, NULL, false, 31, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (15, 'Report15', 'indicator 2', NULL, NULL, 0, NULL, false, 31, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (16, 'Report16', 'indicator 3', NULL, NULL, 0, NULL, false, 31, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (20, 'Report20', 'indicator 1', NULL, NULL, 0, NULL, false, 39, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (13, 'Report13', 'indicator 3', NULL, NULL, 0, NULL, false, 26, 5, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (28, 'Report28', 'indicator 1', NULL, NULL, 0, NULL, false, 49, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
+INSERT INTO [[schema]].reports_indicator VALUES (29, 'Report29', 'indicator 2', NULL, NULL, 0, NULL, false, 49, 2, NULL, '', false, '', '', true, '2018-03-15 17:54:51.45845+00', '2018-03-15 17:54:51.782461+00');
 
 
 --
@@ -11384,6 +12607,14 @@ INSERT INTO [[schema]].reports_indicator VALUES (8, 'test', '', 100, 56, 10, 3, 
 -- Data for Name: reports_lowerresult; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].reports_lowerresult VALUES (36, 'test', '67-1', 46, '2019-05-31 13:42:17.929452+00', '2019-05-31 13:42:17.991389+00');
+
+
+--
+-- Data for Name: reports_office; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+INSERT INTO [[schema]].reports_office VALUES (2, 'New York');
 
 
 --
@@ -11402,125 +12633,125 @@ INSERT INTO [[schema]].reports_indicator VALUES (8, 'test', '', 100, 56, 10, 3, 
 -- Data for Name: reports_result; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].reports_result VALUES (107, 'QA Govt Test', '', 3, 11, '', '', false, 1, 10, 15, 11, '', '', 1, '', NULL, '', '', false, '2016-06-27', '2016-12-31', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (59, 'Improved Access and Quality in Education', '2', 1, 11, '222', 'Education', false, 0, 1, NULL, 6, '01-02-03', 'Access to Education', 11, '123456789', '0990/A0/006/002/', '111', '---', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (64, 'New Policy on Fee Free Education', '2.2.1', 3, 11, '799', 'Education policy', false, 2, 7, 60, 8, '01-02-04', 'Policy', 11, '--', '0990/A0/006/002/002', '--', '--', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (63, 'Protection Sociale dans l"Education', '2.1.1', 3, 11, '456', 'Access to Education', false, 2, 3, 60, 4, '01-01-01', 'Access to Education', 11, '--', '0990/A0/006/002/001/001', '--', '--', true, '2015-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (60, 'Access to Primary Education', '2.1', 2, 11, '1234', 'Education', false, 1, 2, 59, 9, '01-01-02', 'Access to Education', 11, '111', '0990/A0/006/002', '111', '---', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (65, 'Distribution School in a Box', '2.4.1', 3, 11, '896', 'Education in Emergencies', false, 2, 5, 60, 6, '01-03-05', 'School in a box', 11, '--', '0990/A0/006/002/004', '--', '--', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (24, 'By the end of 2017, annual contributions from', '', 1, 10, '', '', false, 0, 1, NULL, 2, '', '', 4, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (20, 'Eating fruits every day', '', 1, 2, '', '', false, 0, 1, NULL, 6, '', '', 2, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (22, 'Eating pawpaw', '', 3, 2, '', '', false, 2, 3, 21, 4, '', '', 2, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (19, 'Getting some soap', '', 3, 1, '', '', false, 2, 7, 18, 8, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (23, 'Glenis Taylor', '', 2, 5, '', '', false, 0, 1, NULL, 2, '', '', 3, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (16, 'improved etooling', '', 2, 2, '', '', false, 1, 2, 15, 5, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (25, 'PSFR reaches 1Bil', '', 1, 10, '', '', false, 0, 1, NULL, 2, '', '', 5, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (132, 'TESTING 4', '', 1, 3, '', '', false, 0, 1, NULL, 2, '', '', 28, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (18, 'Washing hands for eTools', '', 2, 1, '', '', false, 1, 6, 15, 9, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (15, 'eTools rules', '', 1, 2, '', '', false, 0, 1, NULL, 12, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (108, 'QA Govt Test1', '', 1, NULL, '', '', false, 0, 1, NULL, 2, '', '', 20, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (17, 'activity1', '', 3, 5, '', '', false, 2, 3, 16, 4, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (131, 'dOS', '', 3, NULL, '', '', false, 0, 1, NULL, 2, '', '', 27, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (133, 'TESTING FOR PD', '', 1, 3, '', '', false, 0, 1, NULL, 2, '', '', 29, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (21, 'Working underneath a fruit tree', '', 2, 2, '', '', false, 1, 2, 20, 5, '', '', 2, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (119, 'education', '', 2, 4, '', '', false, 0, 1, NULL, 4, '', '', 23, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (53, 'Programme management and technical supervision', 'activity 1.4', 3, 2, '', '', false, 1, 8, 49, 9, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (43, 'aaaaaaaa', 'activity 1.4', 3, 2, '', '', false, 1, 8, 39, 9, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (35, 'Programme management and technical supervision', 'activity 2.4', 3, 5, '', '', false, 1, 8, 31, 9, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (40, 'aaaa', 'activity 1.1', 3, 2, '', '', false, 1, 2, 39, 3, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (41, 'aaaaaaaaa', 'activity 1.2', 3, 2, '', '', false, 1, 4, 39, 5, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (42, 'aaaaaaaaaaaa', 'activity 1.3', 3, 2, '', '', false, 1, 6, 39, 7, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (39, 'testing etools', 'output 1', 2, 2, '', '', false, 0, 1, NULL, 10, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (116, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 114, 5, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (50, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 1.1', 3, 2, '', '', false, 1, 2, 49, 3, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (51, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 1.2', 3, 2, '', '', false, 1, 4, 49, 5, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (52, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 1.3', 3, 2, '', '', false, 1, 6, 49, 7, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (26, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'output 1', 2, 5, '', '', false, 0, 1, NULL, 10, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (49, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'output 1', 2, 2, '', '', false, 0, 1, NULL, 10, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (27, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 1.1', 3, 5, '', '', false, 1, 2, 26, 3, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (28, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 1.2', 3, 5, '', '', false, 1, 4, 26, 5, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (55, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 2.1', 3, 2, '', '', false, 1, 2, 54, 3, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (77, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 1.1', 3, NULL, '', '', false, 1, 2, 76, 3, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (56, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 2.2', 3, 2, '', '', false, 1, 4, 54, 5, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (78, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 1.2', 3, NULL, '', '', false, 1, 4, 76, 5, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (144, '1000', 'Register U5 children', 3, NULL, '', '', false, 1, 2, 119, 3, '', '', 23, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (29, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 1.3', 3, 5, '', '', false, 1, 6, 26, 7, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (30, 'Programme management and technical supervision', 'activity 1.4', 3, 5, '', '', false, 1, 8, 26, 9, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (31, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'output 2', 2, 5, '', '', false, 0, 1, NULL, 10, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (32, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 2.1', 3, 5, '', '', false, 1, 2, 31, 3, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (33, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 2.2', 3, 5, '', '', false, 1, 4, 31, 5, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (34, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 2.3', 3, 5, '', '', false, 1, 6, 31, 7, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (79, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 1.3', 3, NULL, '', '', false, 1, 6, 76, 7, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (76, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (80, 'Programme management and technical supervision', 'activity 1.4', 3, NULL, '', '', false, 1, 8, 76, 9, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (57, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 2.3', 3, 2, '', '', false, 1, 6, 54, 7, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (54, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'output 2', 2, 2, '', '', false, 0, 1, NULL, 10, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (58, 'Programme management and technical supervision', 'activity 2.4', 3, 2, '', '', false, 1, 8, 54, 9, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (83, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 2.2', 3, NULL, '', '', false, 1, 4, 81, 5, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (84, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 2.3', 3, NULL, '', '', false, 1, 6, 81, 7, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (81, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (70, 'Programme management and technical supervision', 'activity 1.4', 3, 11, '', '', false, 1, 8, 66, 9, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (85, 'Programme management and technical supervision', 'activity 2.4', 3, NULL, '', '', false, 1, 8, 81, 9, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (67, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 1.1', 3, 11, '', '', false, 1, 2, 66, 3, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (68, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 1.2', 3, 11, '', '', false, 1, 4, 66, 5, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (69, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 1.3', 3, 11, '', '', false, 1, 6, 66, 7, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (110, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 109, 3, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (66, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'output 1', 2, 11, '', '', false, 0, 1, NULL, 10, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (111, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 109, 5, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (112, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 109, 7, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (113, 'Programme management and technical supervision', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 109, 9, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (115, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 114, 3, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (72, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 2.1', 3, 11, '', '', false, 1, 2, 71, 3, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (82, 'Organise training of 500 health workers in community nutrition in 10 districts', 'activity 2.1', 3, NULL, '', '', false, 1, 2, 81, 3, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (73, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'activity 2.2', 3, 11, '', '', false, 1, 4, 71, 5, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (74, 'Provide nutrition equipment & supplies in 50 health centres', 'activity 2.3', 3, 11, '', '', false, 1, 6, 71, 7, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (71, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'output 2', 2, 11, '', '', false, 0, 1, NULL, 10, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (75, 'Programme management and technical supervision', 'activity 2.4', 3, 11, '', '', false, 1, 8, 71, 9, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (92, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (87, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (88, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 87, 3, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (121, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 125, 3, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (89, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 87, 5, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (90, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 87, 7, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (91, 'Programme management and technical supervision', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 87, 9, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (97, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (93, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 92, 3, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (94, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 92, 5, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (95, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 92, 7, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (96, 'Programme management and technical supervision', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 92, 9, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (98, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 97, 3, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (99, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 97, 5, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (100, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 97, 7, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (101, 'Programme management and technical supervision', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 97, 9, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (103, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 102, 3, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (104, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 102, 5, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (105, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 102, 7, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (109, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (122, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 125, 5, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (102, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (106, 'Programme management and technical supervision', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 102, 9, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (117, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 114, 7, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (135, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 134, 3, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (136, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 134, 5, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (114, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (123, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 125, 7, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (125, '100 Social workers have skills in case management', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (120, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 2, '', '', 24, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (124, 'Programme management and technical supervision', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 125, 9, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (127, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 126, 3, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (128, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 126, 5, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (129, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 126, 7, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (126, '100 Social workers have skills in case management', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (130, 'Programme management and technical supervision', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 126, 9, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (118, 'Programme management and technical supervision', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 114, 9, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (137, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 134, 7, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (134, 'Community-based management of SAM introduced in 200 villages In 10 districts', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (138, 'Programme management and technical supervision', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 134, 9, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (140, 'Organise training of 500 health workers in community nutrition in 10 districts', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 139, 3, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (141, 'Undertake community outreach activities & referral in 200 villages in 10 districts', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 139, 5, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (142, 'Provide nutrition equipment & supplies in 50 health centres', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 139, 7, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (139, 'Community-based management of XYZ introduced in 500 villages In 10 districts', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
-INSERT INTO [[schema]].reports_result VALUES (143, 'Programme management and technical supervision', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 139, 9, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (107, 'Result107', '', 3, 11, '', '', false, 1, 10, 15, 11, '', '', 1, '', NULL, '', '', false, '2016-06-27', '2016-12-31', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (43, 'Result43', 'activity 1.4', 3, 2, '', '', false, 1, 8, 39, 9, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (35, 'Result35', 'activity 2.4', 3, 5, '', '', false, 1, 8, 31, 9, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (40, 'Result40', 'activity 1.1', 3, 2, '', '', false, 1, 2, 39, 3, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (41, 'Result41', 'activity 1.2', 3, 2, '', '', false, 1, 4, 39, 5, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (42, 'Result42', 'activity 1.3', 3, 2, '', '', false, 1, 6, 39, 7, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (39, 'Result39', 'output 1', 2, 2, '', '', false, 0, 1, NULL, 10, '', '', 8, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (116, 'Result116', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 114, 5, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (50, 'Result50', 'activity 1.1', 3, 2, '', '', false, 1, 2, 49, 3, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (51, 'Result51', 'activity 1.2', 3, 2, '', '', false, 1, 4, 49, 5, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (52, 'Result52', 'activity 1.3', 3, 2, '', '', false, 1, 6, 49, 7, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (26, 'Result26', 'output 1', 2, 5, '', '', false, 0, 1, NULL, 10, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (49, 'Result49', 'output 1', 2, 2, '', '', false, 0, 1, NULL, 10, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (27, 'Result27', 'activity 1.1', 3, 5, '', '', false, 1, 2, 26, 3, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (28, 'Result28', 'activity 1.2', 3, 5, '', '', false, 1, 4, 26, 5, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (55, 'Result55', 'activity 2.1', 3, 2, '', '', false, 1, 2, 54, 3, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (77, 'Result77', 'activity 1.1', 3, NULL, '', '', false, 1, 2, 76, 3, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (56, 'Result56', 'activity 2.2', 3, 2, '', '', false, 1, 4, 54, 5, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (78, 'Result78', 'activity 1.2', 3, NULL, '', '', false, 1, 4, 76, 5, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (144, 'Result144', 'Register U5 children', 3, NULL, '', '', false, 1, 2, 119, 3, '', '', 23, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (29, 'Result29', 'activity 1.3', 3, 5, '', '', false, 1, 6, 26, 7, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (30, 'Result30', 'activity 1.4', 3, 5, '', '', false, 1, 8, 26, 9, '', '', 6, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (31, 'Result31', 'output 2', 2, 5, '', '', false, 0, 1, NULL, 10, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (32, 'Result32', 'activity 2.1', 3, 5, '', '', false, 1, 2, 31, 3, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (33, 'Result33', 'activity 2.2', 3, 5, '', '', false, 1, 4, 31, 5, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (34, 'Result34', 'activity 2.3', 3, 5, '', '', false, 1, 6, 31, 7, '', '', 7, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (79, 'Result79', 'activity 1.3', 3, NULL, '', '', false, 1, 6, 76, 7, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (76, 'Result76', 'output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (80, 'Result80', 'activity 1.4', 3, NULL, '', '', false, 1, 8, 76, 9, '', '', 14, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (57, 'Result57', 'activity 2.3', 3, 2, '', '', false, 1, 6, 54, 7, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (54, 'Result54', 'output 2', 2, 2, '', '', false, 0, 1, NULL, 10, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (58, 'Result58', 'activity 2.4', 3, 2, '', '', false, 1, 8, 54, 9, '', '', 10, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (83, 'Result83', 'activity 2.2', 3, NULL, '', '', false, 1, 4, 81, 5, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (84, 'Result84', 'activity 2.3', 3, NULL, '', '', false, 1, 6, 81, 7, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (81, 'Result81', 'output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (70, 'Result70', 'activity 1.4', 3, 11, '', '', false, 1, 8, 66, 9, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (85, 'Result85', 'activity 2.4', 3, NULL, '', '', false, 1, 8, 81, 9, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (67, 'Result67', 'activity 1.1', 3, 11, '', '', false, 1, 2, 66, 3, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (68, 'Result68', 'activity 1.2', 3, 11, '', '', false, 1, 4, 66, 5, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (69, 'Result69', 'activity 1.3', 3, 11, '', '', false, 1, 6, 66, 7, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (110, 'Result110', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 109, 3, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (66, 'Result66', 'output 1', 2, 11, '', '', false, 0, 1, NULL, 10, '', '', 12, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (111, 'Result111', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 109, 5, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (112, 'Result112', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 109, 7, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (113, 'Result113', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 109, 9, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (115, 'Result115', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 114, 3, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (72, 'Result72', 'activity 2.1', 3, 11, '', '', false, 1, 2, 71, 3, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (82, 'Result82', 'activity 2.1', 3, NULL, '', '', false, 1, 2, 81, 3, '', '', 15, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (73, 'Result73', 'activity 2.2', 3, 11, '', '', false, 1, 4, 71, 5, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (74, 'Result74', 'activity 2.3', 3, 11, '', '', false, 1, 6, 71, 7, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (71, 'Result71', 'output 2', 2, 11, '', '', false, 0, 1, NULL, 10, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (75, 'Result75', 'activity 2.4', 3, 11, '', '', false, 1, 8, 71, 9, '', '', 13, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (92, 'Result92', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (87, 'Result87', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (88, 'Result88', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 87, 3, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (121, 'Result121', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 125, 3, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (89, 'Result89', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 87, 5, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (90, 'Result90', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 87, 7, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (91, 'Result91', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 87, 9, '', '', 16, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (97, 'Result97', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (93, 'Result93', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 92, 3, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (94, 'Result94', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 92, 5, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (95, 'Result95', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 92, 7, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (138, 'Result138', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 134, 9, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (140, 'Result140', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 139, 3, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (141, 'Result141', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 139, 5, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (142, 'Result142', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 139, 7, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (139, 'Result139', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (143, 'Result143', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 139, 9, '', '', 31, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (59, 'Result59', '2', 1, 11, '222', 'Education', false, 0, 1, NULL, 6, '01-02-03', 'Access to Education', 11, '123456789', '0990/A0/006/002/', '111', '---', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (64, 'Result64', '2.2.1', 3, 11, '799', 'Education policy', false, 2, 7, 60, 8, '01-02-04', 'Policy', 11, '--', '0990/A0/006/002/002', '--', '--', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (63, 'Result63', '2.1.1', 3, 11, '456', 'Access to Education', false, 2, 3, 60, 4, '01-01-01', 'Access to Education', 11, '--', '0990/A0/006/002/001/001', '--', '--', true, '2015-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (60, 'Result60', '2.1', 2, 11, '1234', 'Education', false, 1, 2, 59, 9, '01-01-02', 'Access to Education', 11, '111', '0990/A0/006/002', '111', '---', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (65, 'Result65', '2.4.1', 3, 11, '896', 'Education in Emergencies', false, 2, 5, 60, 6, '01-03-05', 'School in a box', 11, '--', '0990/A0/006/002/004', '--', '--', true, '2013-01-01', '2017-12-31', true, 1, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (24, 'Result24', '', 1, 10, '', '', false, 0, 1, NULL, 2, '', '', 4, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (20, 'Result20', '', 1, 2, '', '', false, 0, 1, NULL, 6, '', '', 2, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (22, 'Result22', '', 3, 2, '', '', false, 2, 3, 21, 4, '', '', 2, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (19, 'Result19', '', 3, 1, '', '', false, 2, 7, 18, 8, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (23, 'Result23', '', 2, 5, '', '', false, 0, 1, NULL, 2, '', '', 3, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (16, 'Result16', '', 2, 2, '', '', false, 1, 2, 15, 5, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (25, 'Result25', '', 1, 10, '', '', false, 0, 1, NULL, 2, '', '', 5, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (132, 'Result132', '', 1, 3, '', '', false, 0, 1, NULL, 2, '', '', 28, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (18, 'Result18', '', 2, 1, '', '', false, 1, 6, 15, 9, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (15, 'Result15', '', 1, 2, '', '', false, 0, 1, NULL, 12, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (108, 'Result108', '', 1, NULL, '', '', false, 0, 1, NULL, 2, '', '', 20, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (17, 'Result17', '', 3, 5, '', '', false, 2, 3, 16, 4, '', '', 1, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (131, 'Result131', '', 3, NULL, '', '', false, 0, 1, NULL, 2, '', '', 27, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (133, 'Result133', '', 1, 3, '', '', false, 0, 1, NULL, 2, '', '', 29, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (21, 'Result21', '', 2, 2, '', '', false, 1, 2, 20, 5, '', '', 2, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (119, 'Result119', '', 2, 4, '', '', false, 0, 1, NULL, 4, '', '', 23, '', NULL, '', '', false, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (53, 'Result53', 'activity 1.4', 3, 2, '', '', false, 1, 8, 49, 9, '', '', 9, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (96, 'Result96', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 92, 9, '', '', 17, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (98, 'Result98', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 97, 3, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (99, 'Result99', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 97, 5, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (100, 'Result100', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 97, 7, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (101, 'Result101', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 97, 9, '', '', 18, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (103, 'Result103', 'Activity 2.1', 3, NULL, '', '', false, 1, 2, 102, 3, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (104, 'Result104', 'Activity 2.2', 3, NULL, '', '', false, 1, 4, 102, 5, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (105, 'Result105', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 102, 7, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (109, 'Result109', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 21, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (122, 'Result122', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 125, 5, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (102, 'Result102', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (106, 'Result106', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 102, 9, '', '', 19, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (117, 'Result117', 'Activity 2.3', 3, NULL, '', '', false, 1, 6, 114, 7, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (135, 'Result135', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 134, 3, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (136, 'Result136', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 134, 5, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (114, 'Result114', 'Output 2', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (123, 'Result123', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 125, 7, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (125, 'Result125', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (120, 'Result120', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 2, '', '', 24, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (124, 'Result124', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 125, 9, '', '', 25, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (127, 'Result127', 'Activity 1.1', 3, NULL, '', '', false, 1, 2, 126, 3, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (128, 'Result128', 'Activity 1.2', 3, NULL, '', '', false, 1, 4, 126, 5, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (129, 'Result129', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 126, 7, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (126, 'Result126', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (130, 'Result130', 'Activity 1.4', 3, NULL, '', '', false, 1, 8, 126, 9, '', '', 26, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (118, 'Result118', 'Activity 2.4', 3, NULL, '', '', false, 1, 8, 114, 9, '', '', 22, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (137, 'Result137', 'Activity 1.3', 3, NULL, '', '', false, 1, 6, 134, 7, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
+INSERT INTO [[schema]].reports_result VALUES (134, 'Result134', 'Output 1', 2, NULL, '', '', false, 0, 1, NULL, 10, '', '', 30, '', NULL, '', '', true, '1971-01-01', '1971-01-01', false, NULL, '2018-03-15 17:54:54.104819+00', '2018-03-15 17:54:54.763523+00', NULL, NULL);
 
 
 --
@@ -11564,6 +12795,55 @@ INSERT INTO [[schema]].reports_unit VALUES (3, '12345');
 INSERT INTO [[schema]].reports_unit VALUES (4, 'staff members');
 INSERT INTO [[schema]].reports_unit VALUES (5, 'pawpaw');
 INSERT INTO [[schema]].reports_unit VALUES (6, 'PPP');
+
+
+--
+-- Data for Name: reports_usertenantprofile; Type: TABLE DATA; Schema: [[schema]]; Owner: -
+--
+
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (1, 2, 17819);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (2, 2, 168);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (3, 2, 184);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (4, 2, 36);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (5, 2, 272);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (6, 2, 79);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (7, 2, 39);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (8, 2, 78);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (9, 2, 191);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (10, 2, 50);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (11, 2, 356);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (12, 2, 394);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (13, 2, 33);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (14, 2, 177);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (15, 2, 97);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (16, 2, 29);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (17, 2, 688);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (18, 2, 393);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (19, 2, 392);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (20, 2, 77);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (21, 2, 3287);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (22, 2, 397);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (23, 2, 37);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (24, 2, 81);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (25, 2, 190);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (26, 2, 189);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (27, 2, 395);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (28, 2, 546);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (29, 2, 90);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (30, 2, 185);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (31, 2, 47);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (32, 2, 49);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (33, 2, 7);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (34, 2, 186);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (35, 2, 246);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (36, 2, 410);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (37, 2, 2667);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (38, 2, 183);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (39, 2, 1666);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (40, 2, 254);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (41, 2, 86);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (42, 2, 87);
+INSERT INTO [[schema]].reports_usertenantprofile VALUES (43, 2, 178);
 
 
 --
@@ -11842,14 +13122,30 @@ INSERT INTO [[schema]].t2f_itineraryitem VALUES (490, 'Dhaka', 'Cox''sbazar', '2
 INSERT INTO [[schema]].t2f_itineraryitem VALUES (491, 'Cox''sbazar', 'Dhaka', '2018-12-18', '2018-12-18', false, 'Plane', 824, 609, 1);
 INSERT INTO [[schema]].t2f_itineraryitem VALUES (492, 'Dhaka', 'Khulna', '2019-02-11', '2019-02-11', true, 'Plane', 824, 617, 0);
 INSERT INTO [[schema]].t2f_itineraryitem VALUES (493, 'Khulna', 'Dhaka', '2019-02-13', '2019-02-13', false, 'Plane', 824, 617, 1);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (496, 'Beirut', 'Beqaa', '2019-04-12', '2019-04-12', false, 'Car', 824, 628, 0);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (497, 'Beqaa', 'Beirut', '2019-04-12', '2019-04-12', false, 'Car', 824, 628, 1);
 INSERT INTO [[schema]].t2f_itineraryitem VALUES (494, 'Sittwe', 'Maungdaw', '2019-02-10', '2019-02-10', false, 'Boat', 824, 620, 0);
 INSERT INTO [[schema]].t2f_itineraryitem VALUES (495, 'Maungdaw', 'Sittwe', '2019-02-12', '2019-02-12', false, 'Boat', 824, 620, 1);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (498, 'Manila', 'CDO', '2019-04-22', '2019-04-22', true, 'Plane', 824, 630, 0);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (509, 'UNICEF Lebanon office - Sama Beirut Building', 'LOST Center, Bednayel - Street of the Institute -  Sahl', '2019-09-12', '2019-09-12', false, 'Car', NULL, 656, 0);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (510, 'LOST Center, Bednayel - Street of the Institute -  Sahl', 'LOST Center, Bednayel - Street of the Institute -  Sahl', '2019-09-12', '2019-09-12', false, 'Car', NULL, 656, 1);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (499, '633', '3 UN', '2019-05-12', '2019-05-13', true, 'Rail', 816, 637, 0);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (500, '3 UN', '633', '2019-05-13', '2019-05-14', false, '', 803, 637, 1);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (501, 'Aweil Center, NBeG-South Sudan', 'Aweil West, NBeG-South Sudan', '2019-06-24', '2019-06-24', true, 'Car', NULL, 646, 0);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (502, 'Aweil West, NBeG-South Sudan', 'Aweil Center, NBeG-South Sudan', '2019-06-28', '2019-06-28', true, 'Car', NULL, 646, 1);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (503, 'Diffa', 'Goudoumaria', '2019-09-17', '2019-09-17', true, 'Car', NULL, 654, 0);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (504, 'Goudoumaria', 'NGuelibeli', '2019-09-18', '2019-09-19', true, 'Car', NULL, 654, 1);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (505, 'NGuelibeli', 'Foulatari', '2019-09-19', '2019-09-20', true, 'Car', NULL, 654, 2);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (506, 'Foulatari', 'Diffa', '2019-09-20', '2019-09-20', false, 'Car', NULL, 654, 3);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (507, 'Diffa', 'Goudoumaria', '2019-09-23', '2019-09-23', true, 'Car', NULL, 655, 0);
+INSERT INTO [[schema]].t2f_itineraryitem VALUES (508, 'Goudoumaria', 'Diffa', '2019-09-26', '2019-09-26', false, 'Car', NULL, 655, 1);
 
 
 --
 -- Data for Name: t2f_itineraryitem_airlines; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].t2f_itineraryitem_airlines VALUES (116, 498, 3);
 
 
 --
@@ -11880,14 +13176,13 @@ INSERT INTO [[schema]].t2f_travel VALUES (613, '2019-02-09 08:31:44.189091+00', 
 INSERT INTO [[schema]].t2f_travel VALUES (614, '2019-02-10 03:02:13.673419+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-02-10', '2019-02-10', 'Facilitate joint visit with Divisional Commissioner and DC at Moulvibazar', '', false, false, '2019/596', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 11687, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (616, '2019-02-10 13:21:32.064208+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-02-11', '2019-02-12', 'To attend written test at Dhaka', '', false, false, '2019/598', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 8744, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (617, '2019-02-11 04:05:28.054958+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-02-11', '2019-02-13', 'Visit field programme.', '', false, false, '2019/599', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, 11731, 2054, NULL, NULL, 2);
-INSERT INTO [[schema]].t2f_travel VALUES (608, '2018-12-06 18:53:51.487865+00', '2018-12-06 18:58:52.64438+00', NULL, '2018-12-06 18:53:51.544769+00', NULL, '2018-12-06 18:54:59.149213+00', '', '', '', 'A', '', 'completed', '2018-12-27', '2019-01-04', 'TESTING', '', false, false, '2018/590', false, NULL, 0.0000, false, NULL, 0.0000, 0.0000, 132, 2, 14764, 1576, '2018-12-06 18:53:51.544783+00', NULL, 11);
+INSERT INTO [[schema]].t2f_travel VALUES (648, '2019-07-12 06:28:28.458948+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-06-24', '2019-07-08', 'Programmatic Visit', '', false, false, '2019/630', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, 17370, 29302, NULL, NULL, 3);
 INSERT INTO [[schema]].t2f_travel VALUES (618, '2019-02-11 08:27:42.670871+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, NULL, 'To attend GCM meeting in Nam Kham and Field monitoring trip to Mansi camps and Kut kaing camps', '', false, false, '2019/600', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 22478, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (620, '2019-02-11 09:10:02.997048+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-02-10', '2019-02-12', 'Coordination meeting on WASH Programme in northern Rakhine State', '', false, false, '2019/602', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 16689, NULL, NULL, 1);
 INSERT INTO [[schema]].t2f_travel VALUES (621, '2019-02-13 07:14:24.771289+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-02-19', '2019-02-21', 'Testing 123', '', false, false, '2019/603', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 1136, 622, NULL, NULL, 2);
 INSERT INTO [[schema]].t2f_travel VALUES (622, '2019-02-14 03:00:54.102535+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-03-03', '2019-03-07', 'Assess & monitor PPY training and school visit to assess school governance & management practices.', '', false, false, '2019/604', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 176622, NULL, NULL, 4);
 INSERT INTO [[schema]].t2f_travel VALUES (623, '2019-02-19 13:30:22.668936+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, NULL, '', '', false, false, '2019/605', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 178393, NULL, NULL, 5);
 INSERT INTO [[schema]].t2f_travel VALUES (582, '2017-10-24 13:53:06.31379+00', NULL, NULL, '2017-10-24 13:53:06.37454+00', NULL, NULL, '', '', '', '', '', 'submitted', '2017-10-25', '2017-10-25', 'And', '', false, false, '2017/564', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 4124, 625, '2017-10-24 13:53:06.374549+00', NULL, NULL);
-INSERT INTO [[schema]].t2f_travel VALUES (579, '2017-08-22 20:17:55.965468+00', '2017-08-22 20:19:24.976792+00', NULL, NULL, NULL, NULL, '', '', '', 'test', '', 'completed', '2017-08-23', '2017-08-26', 'test', '', false, false, '2017/561', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 3467, 3195, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (580, '2017-09-15 19:09:41.723906+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2017-08-28', '2017-08-29', 'wat', '', false, false, '2017/562', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 2, 13345, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (581, '2017-10-23 19:01:56.662391+00', NULL, NULL, '2017-10-23 19:02:16.487622+00', NULL, '2017-10-23 21:01:29.493978+00', '', '', '', '', '', 'approved', '2017-12-02', '2017-12-04', 'TEST ACTION POOINT', '', false, false, '2017/563', false, NULL, 0.0000, false, NULL, 0.0000, 0.0000, 132, 2, 14764, 1576, '2017-10-23 19:02:16.48763+00', NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (583, '2017-11-01 13:40:00.210808+00', NULL, NULL, '2017-11-01 13:40:00.28797+00', NULL, NULL, '', '', '', '', '', 'submitted', '2017-10-31', '2017-10-31', 'test', '', false, false, '2017/565', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 3195, 2702, '2017-11-01 13:40:00.28798+00', NULL, NULL);
@@ -11896,6 +13191,12 @@ INSERT INTO [[schema]].t2f_travel VALUES (584, '2017-11-10 16:36:09.850482+00', 
 INSERT INTO [[schema]].t2f_travel VALUES (586, '2017-11-27 19:09:33.673997+00', NULL, NULL, '2017-11-27 19:09:33.736236+00', NULL, NULL, '', '', '', '', '', 'submitted', '2017-11-28', '2017-11-30', 'Test', '', false, false, '2017/568', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 1576, 4124, '2017-11-27 19:09:33.736245+00', NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (626, '2019-03-26 13:35:25.389864+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-04-07', '2019-04-11', 'Facilitation of HACT training in Sao Tome & Principe', '', true, false, '2019/608', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, 8890, 11507, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (624, '2019-03-01 17:36:59.949533+00', '2019-03-01 17:37:10.196226+00', NULL, NULL, NULL, NULL, '', '', '', 'sgdtshgbdfgnfdg', '', 'completed', '2019-03-01', '2019-03-02', 'xcvghgfd', '', false, false, '2019/606', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 23434, 3778, NULL, NULL, 7);
+INSERT INTO [[schema]].t2f_travel VALUES (628, '2019-04-10 11:51:46.044567+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-04-12', '2019-04-12', 'GWA Visit', '', false, false, '2019/610', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, 23129, 189542, NULL, NULL, NULL);
+INSERT INTO [[schema]].t2f_travel VALUES (629, '2019-04-23 12:08:27.740627+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, '2019-04-22', '', '', false, false, '2019/611', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, NULL, 173914, NULL, NULL, NULL);
+INSERT INTO [[schema]].t2f_travel VALUES (631, '2019-04-29 17:51:54.446416+00', NULL, NULL, '2019-04-29 17:51:54.474655+00', NULL, NULL, '', '', '', '', '', 'submitted', '2019-04-29', '2019-04-29', 'test date', '', false, false, '2019/613', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 8720, 123, '2019-04-29 17:51:54.474662+00', NULL, 2);
+INSERT INTO [[schema]].t2f_travel VALUES (630, '2019-04-26 02:19:07.336922+00', NULL, NULL, '2019-04-26 02:19:33.660669+00', NULL, NULL, '', '', '', '', '', 'submitted', '2019-04-22', '2019-04-22', 'hgdsja;lhdksldkj - test', '', false, false, '2019/612', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 16996, 15, '2019-04-26 02:19:33.660678+00', NULL, 2);
+INSERT INTO [[schema]].t2f_travel VALUES (632, '2019-05-09 19:41:39.669921+00', '2019-05-09 19:41:39.712081+00', NULL, NULL, NULL, NULL, '', '', '', 'test', '', 'completed', '2019-01-01', '2019-01-05', 'test', '', false, false, '2019/614', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 123, 19323, NULL, NULL, 5);
+INSERT INTO [[schema]].t2f_travel VALUES (634, '2019-05-09 20:12:41.021242+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-05-09', '2019-05-11', 'test', '', false, false, '2019/616', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 123, 18313, NULL, NULL, 5);
 INSERT INTO [[schema]].t2f_travel VALUES (587, '2018-04-10 18:02:11.28333+00', NULL, NULL, '2018-04-10 18:02:11.365023+00', NULL, '2018-04-10 18:03:17.228105+00', '', '', '', '', '', 'approved', '2018-04-10', '2018-04-11', 'test for dashboard', '', false, false, '2018/569', false, NULL, 0.0000, false, NULL, 0.0000, 0.0000, 132, 2, 19665, 14764, '2018-04-10 18:02:11.365033+00', NULL, 5);
 INSERT INTO [[schema]].t2f_travel VALUES (592, '2018-06-13 09:30:58.740413+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, '2018-06-20', 'Faire un soutien technique aux partenaires régionaux, préfectoraux et communaux de la Protection avant la mi', '', false, false, '2018/573', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 11601, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (594, '2018-06-13 10:03:40.813397+00', NULL, '2018-06-13 10:19:06.195718+00', NULL, NULL, NULL, '', '', '', '', '', 'cancelled', '2018-04-11', '2018-04-13', 'conduct programmatic visit', '', false, false, '2018/575', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 7457, NULL, NULL, NULL);
@@ -11904,6 +13205,96 @@ INSERT INTO [[schema]].t2f_travel VALUES (615, '2019-02-10 03:06:07.448631+00', 
 INSERT INTO [[schema]].t2f_travel VALUES (619, '2019-02-11 08:42:52.404986+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-02-12', '2019-02-13', 'To monitor training', '', false, false, '2019/601', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 23022, NULL, NULL, 5);
 INSERT INTO [[schema]].t2f_travel VALUES (627, '2019-03-26 13:36:25.324034+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, NULL, '', '', false, false, '2019/609', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, NULL, NULL, 11507, NULL, NULL, NULL);
 INSERT INTO [[schema]].t2f_travel VALUES (625, '2019-03-01 17:43:56.810258+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-03-01', '2019-03-02', 'asvgsfagsfvgadr', '', false, false, '2019/607', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 23067, 3778, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (641, '2019-05-30 08:04:16.37948+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, '2019-05-30', 'Testing AP', '', false, false, '2019/623', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 10598, 2702, NULL, NULL, 5);
+INSERT INTO [[schema]].t2f_travel VALUES (633, '2019-05-09 19:42:58.768152+00', NULL, NULL, '2019-05-09 19:42:58.789823+00', NULL, NULL, '', '', '', 'test 2', '', 'submitted', '2019-01-15', '2019-01-24', 'test 2', '', false, false, '2019/615', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 123, 19323, '2019-05-09 19:42:58.789832+00', NULL, 5);
+INSERT INTO [[schema]].t2f_travel VALUES (635, '2019-05-13 10:07:21.816335+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-05-13', '2019-05-13', 'wwww', '', false, false, '2019/617', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 18313, 2702, NULL, NULL, 2);
+INSERT INTO [[schema]].t2f_travel VALUES (639, '2019-05-21 06:26:30.380053+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-05-27', '2019-05-31', 'monitoring and supportive supervision to panyikang  site to identified gaps and on job coaching to the staff at the site', '', false, false, '2019/621', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 23436, 25789, NULL, NULL, 3);
+INSERT INTO [[schema]].t2f_travel VALUES (640, '2019-05-22 12:54:49.343313+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-05-27', '2019-05-27', 'field monitoring and supportive supervision to Tonga health facility site to do some coaching on gaps identified case', '', false, false, '2019/622', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, NULL, 25789, NULL, NULL, 3);
+INSERT INTO [[schema]].t2f_travel VALUES (637, '2019-05-13 19:57:09.771634+00', '2019-05-14 01:51:59.577607+00', NULL, '2019-05-13 19:57:09.796932+00', NULL, '2019-05-13 20:01:21.169866+00', '', '', '', 'csacsa', '', 'completed', '2019-05-12', '2019-05-14', 'casca', '', false, false, '2019/619', false, NULL, 0.0000, false, NULL, 0.0000, 0.0000, 145, 2, 123, 19323, '2019-05-13 19:57:09.79694+00', NULL, 5);
+INSERT INTO [[schema]].t2f_travel VALUES (608, '2018-12-06 18:53:51.487865+00', '2018-12-06 18:58:52.64438+00', NULL, '2018-12-06 18:53:51.544769+00', NULL, '2018-12-06 18:54:59.149213+00', '', '', '', 'A', '', 'completed', '2018-12-27', '2019-01-04', 'TESTING', '', false, false, '2018/590', false, NULL, 0.0000, false, NULL, 0.0000, 0.0000, 132, 2, 14764, 1576, '2018-12-06 18:53:51.544783+00', NULL, 11);
+INSERT INTO [[schema]].t2f_travel VALUES (645, '2019-07-03 13:13:49.000226+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-07-04', '2019-07-04', 'Supportive supervision and corrective actions of the field staffs', '', false, false, '2019/627', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, 15945, 202016, NULL, NULL, 3);
+INSERT INTO [[schema]].t2f_travel VALUES (642, '2019-06-06 13:29:57.849832+00', '2019-06-06 13:30:32.815862+00', NULL, NULL, NULL, NULL, '', '', '', 'test', '', 'completed', '2019-06-17', '2019-06-20', 'test nik', '', false, false, '2019/624', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 189023, 123, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (644, '2019-06-06 18:52:49.958511+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-05-13', '2019-05-13', 'wwww', '', false, false, '2019/626', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 18313, 3892, NULL, NULL, 2);
+INSERT INTO [[schema]].t2f_travel VALUES (647, '2019-07-08 17:52:09.843902+00', '2019-06-06 13:30:32.815862+00', '2019-07-08 17:52:44.868749+00', NULL, NULL, NULL, '', '', '', 'test', '', 'cancelled', '2019-06-17', '2019-06-20', 'test nik', '', false, false, '2019/629', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 189023, 19277, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (649, '2019-07-12 08:02:08.376971+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-07-18', '2019-07-25', 'Programmatic Visit', '', false, false, '2019/631', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, 17370, 29302, NULL, NULL, 3);
+INSERT INTO [[schema]].t2f_travel VALUES (650, '2019-07-20 20:38:47.034962+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-01-02', '2019-01-03', 'vbcvxvxcvxv', '', false, false, '2019/632', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 189023, 123, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (646, '2019-07-05 00:04:52.735298+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-06-24', '2019-06-28', 'Field Monitoring, supportive supervision and corrective actions', '', false, false, '2019/628', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, NULL, 28968, NULL, NULL, 3);
+INSERT INTO [[schema]].t2f_travel VALUES (651, '2019-07-29 08:25:41.978013+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, NULL, '', '', false, false, '2019/633', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, NULL, 186477, NULL, NULL, NULL);
+INSERT INTO [[schema]].t2f_travel VALUES (636, '2019-05-13 16:17:40.859409+00', NULL, NULL, '2019-05-13 16:17:40.878338+00', NULL, '2019-05-13 20:01:08.144286+00', '', '', '', '', '', 'approved', '2019-05-01', '2019-05-08', 'Test', '', false, false, '2019/618', false, NULL, 0.0000, false, NULL, 0.0000, 0.0000, 145, 2, 123, 19294, '2019-05-13 16:17:40.878345+00', NULL, 11);
+INSERT INTO [[schema]].t2f_travel VALUES (652, '2019-07-29 15:12:04.060202+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-01-02', '2019-01-04', 'test', '', false, false, '2019/634', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 189023, 123, NULL, NULL, NULL);
+INSERT INTO [[schema]].t2f_travel VALUES (654, '2019-08-27 10:52:41.362024+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-09-17', '2019-09-20', 'Mission de suivi de l''approche communautaire de protection de L''Enfant (CVPE)', '', false, false, '2019/636', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, NULL, 11789, NULL, NULL, 5);
+INSERT INTO [[schema]].t2f_travel VALUES (656, '2019-09-09 07:26:44.421891+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-09-12', '2019-09-12', 'Programmatic visit to NFE partner LOST in Bekaa on implementing the Akelius Language Learning Platform pilot', '', false, false, '2019/638', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, 22958, 217246, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (657, '2019-09-11 16:13:52.214955+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-03-04', '2019-03-08', 'test', '', false, false, '2019/639', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 19323, 123, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (658, '2019-09-25 06:27:46.810001+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', NULL, '2019-09-26', '', '', false, false, '2019/640', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, NULL, 178387, NULL, NULL, NULL);
+INSERT INTO [[schema]].t2f_travel VALUES (579, '2017-08-22 20:17:55.965468+00', '2017-08-22 20:19:24.976792+00', NULL, NULL, NULL, NULL, '', '', '', 'test', '', 'completed', '2017-08-23', '2017-08-26', 'test', '', false, false, '2017/561', false, NULL, 0.0000, false, NULL, NULL, NULL, 132, 2, 3467, 3195, NULL, NULL, NULL);
+INSERT INTO [[schema]].t2f_travel VALUES (661, '2019-11-06 15:26:43.071021+00', NULL, '2019-11-06 15:28:25.288788+00', NULL, NULL, NULL, '', '', '', '', '', 'cancelled', '2019-11-12', '2019-11-18', 'Revue a mi-parcours', '', false, false, '2019/643', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, NULL, 234455, NULL, NULL, 7);
+INSERT INTO [[schema]].t2f_travel VALUES (659, '2019-10-07 05:16:56.784362+00', NULL, NULL, NULL, NULL, NULL, '', '', '', 'Places Visited / Persons Met
+Polio FO UNICEF Staff
+3rd Party Training Staff, Concerned Field and Partner Staff at relevant Health Facilities. 
+
+Results / Constraints
+Day 1
+Visited Two Induction Training Sessions. Venue was good, required logistics were available, both halls had good seating, heating and lighting arrangements. Expected participants were 25, present were 27 in one and 22 in other where 26 were present. 
+Dr. Inam CBV Manager was present to help as Technical Person. Training was conducted by Master Trainers. Both the sessions were well interactive and participatory. Participants from all the four Towns were there. Today was day 2 of 3 days induction training. Overall good quality training was observed. However most of them were new and they will be provided with Logbooks completed by a CHW in whose place they will be working. – It would have better if they were provided completed Registration Books and training should have a session where they are given examples from their own filled books. 
+
+Day 2  
+Civil Dispensary Pando Road Maskeen Abad was visited: The importance of UC is well known. UC has 2 UCOs, 10 ASs and 34 CHWs in total. Both UCOs and 7 out of 10 ASs were present at the time of visit, working on their Microplans. 
+-	UC Microplan was not available and it was communicated by the staff that it was misplaced 3 days back.  – It was communicated by staff that it has been happening very often and their books, records and logistics get misplaced due to the fact that CBV staff is not having a secure place to place their stuff in Dispensary. There is no room or space for meetings and working and at the time of visit they were sitting in open working. SMT 1 staff is advised to prepare the MP ASAP or get a copy of it from DPCR if it was submitted there. 
+-	None of the AS was having AS Books with them at the time of visit. Microplans are prepared on loose papers, which according to them was the requirement of DPCR. It should be noted that as per NEOC instructions AS Book has most of the components required for MP and only a few additional formats are supposed to be used as loose papers. It was decided, sometime back that DSC Generated Still Missed Children and Still PMC could be seen as soft copies, which may supplemented by Missed Children Lists available in AS Books and in CHWs Books for details. A complete set of  one AS MP was seen, it comprises of a total of 39 pages, including; Checklist for AS MP documents, Summary of UC MP, Area MP Summary, Area MP Sheet for all CHWs working under the AS which is 4 -5 (not required as it can be seen in more details in CHWs Books), Area Maps for all CHWs (not required as part of CHWs Books), summary of missed children in previous campaign (not required again, as part of AS Book), HRMP Coverage Plan (was decided to be part of UC MP), School Madrassa List (was decided to be part of UC MP), Logistic Plan (not required as is part of AS Books), Training Plan (UC MP) Social Mobilization Plan, AS Supervisory Plan (again, is already part of AS Book) and there is another Guest Children Recording was seen as part of the MP. It should also be noted that, FO has invented a Missed Children Lists which is sued in field since long (was actually part of AS Book, supplemented by DSC Generated Soft copy of Still MCL and Still PMC lists), Zero Dose Children List (are actually part of CHW Books, so not needed as a separate list), List of Mosques, List of UPEC Members with contact Numbers, List of Influencers (is again part of AS Book), List of Healthcare Providers in area, AS MP Self-Assessment Sheets etc. As most of these things are actually duplication of papers and forms available in AS Books, hence AS Books are not used by any of the AS (though I was not able to see any AS Books, they told me that all the books are in a room which was found locked as it was Nutrition Staff’s room and lady left early today due to some personal reasons, locking the door, health facility was visited around 12.00 noon).   – NEOC instructions for MP are not followed in the field in Peshawar. It seems that AS Books has no use, these are apparently not used in most of the places in oteh provinces as well. Even Missed children formats which are present in bulk in these books were not seen and instead field staff invented other formats were present in all MP in SMT, this has been reported several times. It is highly recommended that either NEOC instructions for MP preparation, its eval[[schema]]ion and scoring should be implemented properly or AS Book should be discontinued as instead loose peppers formats should be provided to workers to sort out the ambiguity for field workers and to reduce the strenuous un-necessary workload on workers and wastage of resources. 
+-	It was calculated that 3 copies of 39 papers for MP, 25 Missed Children Listing forms, 25 Zero Dose/AFP Forms, added by 15 to 20 Team Monitoring Checklists (only 5 are provided to each AS per campaign while they are supposed to fill at least one each day for each CHW requiring 20 to 25 per campaign). Similarly there are some other documents which are photocopied by AS herself out of her pocket which is costing each AS from Rs. 500 to 1000 per campaign. – AS and CHWs should be provided with these formats in required numbers or they should be compensated for this by programme.
+-	It was communicate by UCOs that Missed Children Lists provided by DSC are complete lists for all UC and it is difficult for them to manage it, while updating it for follow up coverage – DSC is hereby instructed to prepare AS wise lists in different tabs to facilitate their work (Copy of this report is sent separately to DSC Project Manager to start it w.e.f. January 2019 Campaign for all CBV areas).   
+-	It is found in the field that there are gaps in understanding of MP preparation and its eval[[schema]]ion by monitors which need to be dealt at higher level - MP eval[[schema]]ion method in CBV areas needs to be revisited again, it should be noted that it was very thoroughly discussed amongst all partners, PTLs from FOs were called and current modalities were finalized. It seems that written instructions with tools and training of eval[[schema]]ors is needed on this.
+-	FO and DPCR is requested to look in the matter of provision of space which is secure to store CBV Campaign Documents, Records and Logistics for campaign in the health facility of SMT 1.
+-	Umbrellas were found to be distributed to all the CBV staff of SMT 1 by Logistician, however there is shortage for some which should be dealt by the concerned staff.
+Still Missed Lists from 2 ASs were sent to DSC for validation. - It was found that Still Missed NA and Refusals from previous campaign were matching 100%. However out of 10 Still PMC in one AS record only 3 were reaming at DSC as these were reported as covered by files staff as per DSC record. – Needs to be further explored as who has sent these reports to DSC and if they were really coavred why record in AS MP is not updated.  
+On Day 3 (18th Jan 2019) TSCs of 2 UCs were visited.
+EPI Center Akhunabad
+-	Is a 3 room rented building in a small alley, has 2 EPI Technicians providing EPI services, both the technicians were on duty at the time of visit. All the EPI Vaccines were present including OPV, both Daily and Permanent EPI Registers were maintained. Pn average EPOI attendance including TT was calculated to be 10 to 15 / day and 50+ on BCG and Measles days. No other health staff is on this center.
+-	Temperature of ILR was within required range and temperature chart was maintained. Staff requested that ILR was falling short of their requirement especially for cooling packs during SIAs. – District administration is requested to please look for provision of a bigger ILR as electric supply timing in areas is good.
+-	CBV Staff: UC has 1 UCO, 4 AS and 15 CHWs. 1 each UCPO and TTSP are also appointed for Polio SIAs. UCO and all AS were present. UC and AS MPs were seen. All the AS were having AS Books, these were partially filled. It was communicated that these are filled for their own record however as DPCR and MP Validation Teams from District, Provincial and Federal Level don’t consider these formats valid for MP so this is cannot be presented for MP validation. – There is need to finalize the modality for MP Assessment, whatever is decided should actually to ease the work of field staff and avoid duplication of their efforts to remove all the unnecessary documentation to decrease the workload, so either loose papers or AS book should be used. 
+-	Similarly Missed Children Lists Formats are also not used for field use. It is also know that MCL during campaign are prepared by CHWs during field work and not by AS. As per field staff it was tried several times to leave it to AS to complete in evening but due to bulk of data it take time and efforts and could not be completed in time to be sent to DSC in the evening. – The current modalities and practices in the field are there since long, this should not be disturbed the recommended modality of AS filling all MCL may not be feasible and practical in Peshawar Context.
+-	In all the AS Books checked it was seen that almost all the MCL are still blank, these pages may be remove from AS books and distributed to CHWs for filed use. To me these will be more than enough for at least 3 - 4 campaigns. – FO staff to ask the relevant to get estimation and start using these pages in field from now on and inform PCO when they will need supply for MCL Formats next. ( Dr. Jaohar has already informed that during this campaign they will be using these book pages as MCL  and for Zero Dose and AFP Notifying). FO is requested to please see all old supplies for use of these pages for effective used of resources.
+-	Form 2B books were seen, that AS were not oriented/ aware of the fact that why book is having four copies (it should be noted that paper used in From 2B is CCP Carbonless Copy Paper making 4 copies of each record). Despite of the fact that they should read the instructions and should be told in the training where it is clearly written where they need to send these copies. Instead of using these copies to: 1 each to DSC, DPCR, UC MP and AS MP, they are sending scan copy to DSC, Handmade one for UC and DPCR MP, leading extra work and spending money from their own pocket. – FO team are requested to guide the CHWs on use of copies in Form 2B, this will save their time, efforts and resources. Training Team to please make sure that “Written Instructions” attached with all the tools are read at training and CBV staff is asked to read them and consult during their work.    
+-	Very bad binding and use of Poor quality cardboard in title pages of Form 2B was seen leading to tearing off books, with losing record form written pages. AS were in opinion that its Bulk should be shortened, Binding is to be improved, in most of the books pages orientation was not correct, Bleach Card is not provided with all the books – Supplies Section to look in matter relevant to them, as most of the stuff is not of acceptable quality. The final supplies should be approved by programme. Size of the books already shortened for new versions. 
+-	AS inform that for last few campaigns they are supplied with while chalks only, despite of several reminders. White chalk Door Markings are not visible on most of the doors and walls. – Concerns supplying staff should be advised accordingly please. CTC
+-	Staff also informed that Vaccine carries in use are too old and almost all of these need replacement for being in use for more than a year – I suppose a system for ordering new supplies already exists, staff needs proper orientation to put their demands in that that system in time by CTC.
+TSC UC Junaidabad
+Is in a FLCF, very well equipped and posted with  a medical officer, Dr. Usman was present, running OPD, who seemed to be a dedicated health practitioner having good leadership. However, it was informed that UC Microplan failed for this campaign. UCO and all the AS were present at the time of visit, UC MP, AS MP and AS Books were available. Most of the observations are same for the use of AS books and MP. 
+During my visits Ms. Ada along with two more DPCR staff visited for MP improvement and to take CHWs for a chronic Refusal conversion with help of team.   
+-	The observation on MP were discussed in my presence which are as under
+1.	HRMP population clusters were not marked on UC map
+2.	Vaccine requirement for this campaign was not calculated properly as protocol for calculating by using children reached during last campaign was not followed and children covered in street were missed for vaccine demand.
+3.	UC Microplan submitted to DPCR was showing AS boundaries for being not colored copy
+4.	Some of the documents were not labeled by title/headings
+Most of the things were very trivial mistakes, not having major impact on quality of campaign. It is recommended that UC staff including must be properly oriented on MP during training, UPEC chairman seemed to be very receptive, should be oriented on that fact that when endorsing MP should for all eth components and quality of MP before signing it mechanically. It seems that proper protocol for MP Validation is not communicated to Monitors. It is recommended that all the monitors designated must be using same yardstick for eval[[schema]]ion and scoring for standardization. The method must be relevant and predictive for good quality camping and not only for documentation. 
+-	It is seen that in CBV areas, instead of using Micro census TP covered during last campaign recorded on From 2B, they are using actual updated micro census population for this campaign which is updated before each campaign and reflect the actual target age population of the area (which seems to a good practice and must accepted). It must also be kept in mind that this needs to be added with some coverages from previous camping for data in Form 2B is available, which are not part of Microcensus. These are: Children Covered in Street, Guest Children Covered, School children, Fixed and PTP coverages and children who were recorded as missed.', '', 'planned', '2019-01-16', '2019-01-18', 'Support Peshawar Pre-Campaign Activities', '', false, false, '2019/641', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, 207468, 7344, NULL, NULL, NULL);
+INSERT INTO [[schema]].t2f_travel VALUES (643, '2019-06-06 13:36:28.134719+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-06-06', '2019-06-13', 'tests', '', false, false, '2019/625', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 189023, 123, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (638, '2019-05-20 11:17:56.740927+00', NULL, NULL, '2019-05-20 12:04:04.613502+00', NULL, NULL, '', '', '', 'Progress/Achievements of the target
+In all the three (03) nutrition sites visited (OTPs); nutrition services were being provided to the vulnerable children under the age of five years and pregnant and lactating women. 
+capacity building on seven staff was done on 7 were males and 2 females [3 nurses-5, Nutrition Assistant-1 Community Nutrition Volunteers. 
+Areas capacity building and on job training provided on include; filling of registers, cards and reporting, preparation of sugar water solution, anthropometric measurements, Z-score, oedema identification and grading, admission and discharge criteria, identification of medical complications and referral, malaria screening and reporting and nutrition supplies stock monitoring and control.
+ OTP/TSFP centres
+Three (3) OTP/TSFP sites were visit in akoka, in all the sites, nutrition services were provided to the vulnerable target groups (Children under 5yrs & PLW) are receiver service in the health facility and there is integration of health and nutrition services was observed. Malaria testing for children with SAM was being done 
+Both active and passive screening of children and PLW for malnutrition was been conducted although no proper data is being kept at the health facility level. 
+MIYCN activities included MtMSGs and health education at the health facilities. In all the sites, information on the activities (MtMSGs) they are not active. However, HLSS should encourage them to pass key message in the community as volunteers to identified case to refer to the site 
+
+4	Constraints:
+Gaps identified 
+•	Appetite test is not being done during the OTP services provision in all the sites and none of the sites visited had sugar water solution for treatment of SAM children suspected of having hypoglycaemia. 
+•	follow up visits was not being recorded in majority of the OTP sites and partners like OTP were not recording absentees making it difficult to trace out absentees and defaulters in the programme.
+•	There were supervisors recruited by IPs to supervisor OTP services provision, but they did not have organised supportive supervision plan with specific targets to address gaps they may identified during visits to their OPT sites
+6 Equipment: Gaps identified 
+Follow the visits to the 3 OTP sites, the following are some of the gaps identified:
+•	No ration cards 
+•	No visit books
+•	No CMAM & MIYCN Guideline 
+•	Amoxicillin is out of stock in all three sites
+•	No palate for keeping the supplies 
+7 Human resources
+•	Shortage of skilled human resources was witnessed in all the 3sites require a lot of training on identification of danger signs in children with SAM 
+•	Mother to mother support group is not active to identified SAM case in community in all the site', '', 'submitted', '2019-05-10', '2019-05-10', 'monitoring and supportive supervision visit akoka to strengthen capacity building and job aid training to staff at site', '', false, false, '2019/620', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 23436, 25789, '2019-05-20 12:04:04.61351+00', NULL, 3);
+INSERT INTO [[schema]].t2f_travel VALUES (653, '2019-07-29 15:13:45.188596+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-01-15', '2019-01-17', 'test', '', false, false, '2019/635', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, 2, 189023, 123, NULL, NULL, 4);
+INSERT INTO [[schema]].t2f_travel VALUES (655, '2019-08-27 11:57:35.776205+00', NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 'planned', '2019-09-23', '2019-09-26', 'uivi sortie des enfamnts au centre de Goudoumaria et transfert a Niamey', '', false, false, '2019/637', false, NULL, 0.0000, false, NULL, NULL, NULL, 145, NULL, NULL, 11789, NULL, NULL, 5);
 
 
 --
@@ -11959,6 +13350,35 @@ INSERT INTO [[schema]].t2f_travelactivity VALUES (480, 'Programmatic Visit', NUL
 INSERT INTO [[schema]].t2f_travelactivity VALUES (481, 'Programmatic Visit', '2019-03-01', 228, NULL, 3778, NULL);
 INSERT INTO [[schema]].t2f_travelactivity VALUES (483, 'Programmatic Visit', NULL, NULL, NULL, 11507, NULL);
 INSERT INTO [[schema]].t2f_travelactivity VALUES (482, 'Programmatic Visit', '2019-03-01', 229, NULL, 3778, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (484, 'Advocacy', NULL, NULL, NULL, 189542, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (486, 'Advocacy', '2019-04-29', NULL, NULL, 123, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (485, 'Programmatic Visit', '2019-05-22', 228, 67, 15, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (487, 'Technical Support', '2019-01-03', 228, 67, 19323, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (488, 'Staff Entitlement', '2019-01-15', 228, 67, 19323, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (489, 'Staff Development', '2019-05-09', NULL, NULL, 18313, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (490, 'Meeting', '2019-05-13', 228, 67, 2702, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (491, 'Technical Support', '2019-05-06', 228, 67, 19294, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (494, 'Programmatic Visit', '2019-05-27', 228, 67, 25789, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (495, 'Programmatic Visit', '2019-05-27', NULL, NULL, 25789, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (492, 'Meeting', '2019-05-13', 228, 67, 19323, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (496, 'Meeting', '2019-05-30', 228, NULL, 2702, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (497, 'Programmatic Visit', '2019-05-30', 228, NULL, 2702, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (493, 'Programmatic Visit', '2019-05-10', 228, 67, 25789, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (502, 'Programmatic Visit', '2019-07-01', NULL, NULL, 29302, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (500, 'Programmatic Visit', '2019-07-04', 229, NULL, 202016, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (503, 'Programmatic Visit', '2019-07-18', NULL, NULL, 29302, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (499, 'Meeting', '2019-06-11', NULL, NULL, 123, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (498, 'Meeting', '2019-06-18', NULL, NULL, 19277, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (504, 'Programmatic Visit', '2019-01-03', 228, 67, 123, 60);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (505, 'Meeting', '2019-01-02', NULL, NULL, 123, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (501, 'Programmatic Visit', '2019-06-24', NULL, NULL, 28968, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (506, 'Programmatic Visit', '2019-01-15', 228, 67, 123, 60);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (507, 'Technical Support', '2019-09-17', NULL, NULL, 11789, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (508, 'Technical Support', '2019-09-23', NULL, NULL, 11789, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (509, 'Programmatic Visit', '2019-09-12', NULL, NULL, 217246, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (510, 'Programmatic Visit', '2019-03-05', 228, 67, 123, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (511, 'Technical Support', '2019-01-16', NULL, NULL, 7344, NULL);
+INSERT INTO [[schema]].t2f_travelactivity VALUES (512, 'Programmatic Visit', '2019-10-22', NULL, NULL, 22479, NULL);
 
 
 --
@@ -11970,6 +13390,11 @@ INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (382, 446, 4549);
 INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (383, 481, 3326);
 INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (384, 482, 316);
 INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (385, 482, 3326);
+INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (386, 487, 4550);
+INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (387, 488, 4625);
+INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (388, 490, 4623);
+INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (389, 500, 4628);
+INSERT INTO [[schema]].t2f_travelactivity_locations VALUES (390, 504, 4551);
 
 
 --
@@ -12026,6 +13451,36 @@ INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (522, 480, 622);
 INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (523, 481, 624);
 INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (524, 482, 625);
 INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (525, 483, 627);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (526, 484, 628);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (527, 485, 630);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (528, 486, 631);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (529, 487, 632);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (530, 488, 633);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (531, 489, 634);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (532, 490, 635);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (533, 491, 636);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (534, 492, 637);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (535, 493, 638);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (536, 494, 639);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (537, 495, 640);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (538, 496, 641);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (539, 497, 641);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (540, 498, 642);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (541, 499, 643);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (542, 490, 644);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (543, 500, 645);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (544, 501, 646);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (545, 498, 647);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (546, 502, 648);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (547, 503, 649);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (548, 504, 650);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (549, 505, 652);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (550, 506, 653);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (551, 507, 654);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (552, 508, 655);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (553, 509, 656);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (554, 510, 657);
+INSERT INTO [[schema]].t2f_travelactivity_travels VALUES (555, 511, 659);
 
 
 --
@@ -12036,6 +13491,7 @@ INSERT INTO [[schema]].t2f_travelattachment VALUES (93, 'Report', 'Andre Moussa 
 INSERT INTO [[schema]].t2f_travelattachment VALUES (94, 'Other', 'vp.pdf', 'travels/[[schema]]/594/vp.pdf', 594);
 INSERT INTO [[schema]].t2f_travelattachment VALUES (95, 'Report', 'PMV FMWASD 2018.pdf', 'travels/[[schema]]/595/PMV_FMWASD_2018.pdf', 595);
 INSERT INTO [[schema]].t2f_travelattachment VALUES (96, 'Cleareance Doc', 'trp report mialy febroary.doc', 'travels/[[schema]]/623/trp_report_mialy_febroary.doc', 623);
+INSERT INTO [[schema]].t2f_travelattachment VALUES (98, 'Other', '1-Peshawar Pre Campaign Support 16 -18 Jan 2019.pdf', 'travels/[[schema]]/659/1-Peshawar_Pre_Campaign_Support_16_-18_Jan_2019.pdf', 659);
 
 
 --
@@ -12043,7 +13499,15 @@ INSERT INTO [[schema]].t2f_travelattachment VALUES (96, 'Cleareance Doc', 'trp r
 --
 
 INSERT INTO [[schema]].tpm_tpmactivity VALUES (1, '', false, 2, 2);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (4, '', false, 5, 4);
 INSERT INTO [[schema]].tpm_tpmactivity VALUES (3, '', false, 4, 13);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (5, '', false, 6, 4);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (6, '', false, 7, 4);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (7, 'this is a test', false, 9, 11);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (9, 'this is a test', false, 9, 11);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (8, 'this is a test', true, 9, 11);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (10, '', false, 10, 2);
+INSERT INTO [[schema]].tpm_tpmactivity VALUES (11, '', false, 1, 4);
 
 
 --
@@ -12051,7 +13515,15 @@ INSERT INTO [[schema]].tpm_tpmactivity VALUES (3, '', false, 4, 13);
 --
 
 INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (1, 1, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (4, 4, 2);
 INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (3, 3, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (5, 5, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (6, 6, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (7, 7, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (8, 8, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (9, 9, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (10, 10, 2);
+INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (11, 11, 2);
 
 
 --
@@ -12059,16 +13531,32 @@ INSERT INTO [[schema]].tpm_tpmactivity_offices VALUES (3, 3, 2);
 --
 
 INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (1, 1, 2702);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (4, 4, 123);
 INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (3, 3, 19323);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (5, 5, 123);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (6, 6, 123);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (7, 7, 2702);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (8, 8, 2702);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (9, 9, 2702);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (10, 10, 17380);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (11, 11, 17374);
+INSERT INTO [[schema]].tpm_tpmactivity_unicef_focal_points VALUES (12, 11, 10934);
 
 
 --
 -- Data for Name: tpm_tpmvisit; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].tpm_tpmvisit VALUES (1, '1970-01-01 00:00:00+00', '2019-03-22 17:27:42.547359+00', '2019-03-22 17:28:30.672974+00', 'draft', '', '', 'test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, '', 123);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (11, '1970-01-01 00:00:00+00', '2019-10-09 21:25:45.278532+00', '2019-10-09 21:25:45.278532+00', 'draft', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 16, '', 123);
 INSERT INTO [[schema]].tpm_tpmvisit VALUES (2, '1970-01-01 00:00:00+00', '2019-04-02 05:37:43.410152+00', '2019-04-07 07:36:49.717395+00', 'tpm_reported', '', '', 'ee', '2019-04-02', NULL, '2019-04-02', NULL, '2019-04-07', NULL, NULL, 18, '', 2702);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (8, '1970-01-01 00:00:00+00', '2019-05-30 19:54:15.330032+00', '2019-05-30 19:54:15.330582+00', 'draft', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 16, '', 123);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (5, '1970-01-01 00:00:00+00', '2019-05-16 10:50:36.113721+00', '2019-06-04 20:01:29.998201+00', 'assigned', '', '', '', '2019-05-16', NULL, NULL, '2019-06-04', NULL, NULL, NULL, 16, '', 123);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (6, '1970-01-01 00:00:00+00', '2019-05-16 11:05:45.710234+00', '2019-05-16 11:07:02.825719+00', 'assigned', '', '', 'test emails', '2019-05-16', NULL, NULL, NULL, NULL, NULL, NULL, 16, '', 123);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (1, '1970-01-01 00:00:00+00', '2019-03-22 17:27:42.547359+00', '2019-07-23 14:39:24.565685+00', 'assigned', '', '', 'test', '2019-07-23', NULL, NULL, NULL, NULL, NULL, NULL, 18, '', 123);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (7, '1970-01-01 00:00:00+00', '2019-05-16 11:11:00.541048+00', '2019-05-16 11:11:46.504753+00', 'assigned', '', '', 'test gmail', '2019-05-16', NULL, NULL, NULL, NULL, NULL, NULL, 16, '', 123);
 INSERT INTO [[schema]].tpm_tpmvisit VALUES (4, '1970-01-01 00:00:00+00', '2019-04-02 23:08:09.366206+00', '2019-04-02 23:10:25.870081+00', 'tpm_accepted', '', '', '', '2019-04-02', NULL, '2019-04-02', NULL, NULL, NULL, NULL, 18, '', 19323);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (9, '1970-01-01 00:00:00+00', '2019-07-20 19:55:52.415537+00', '2019-07-20 20:12:00.229516+00', 'unicef_approved', '', '', 'Testing before Iraq', '2019-07-20', NULL, '2019-07-20', NULL, '2019-07-20', NULL, '2019-07-20', 18, '', 2702);
+INSERT INTO [[schema]].tpm_tpmvisit VALUES (10, '1970-01-01 00:00:00+00', '2019-07-20 20:12:18.238232+00', '2019-07-20 20:14:28.377461+00', 'tpm_reported', '', '', 'Test2', '2019-07-20', NULL, '2019-07-20', NULL, '2019-07-20', NULL, NULL, 18, '', 2702);
 
 
 --
@@ -12077,7 +13565,15 @@ INSERT INTO [[schema]].tpm_tpmvisit VALUES (4, '1970-01-01 00:00:00+00', '2019-0
 
 INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (1, 1, 32);
 INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (2, 2, 35);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (5, 5, 28);
 INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (4, 4, 37);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (6, 6, 43);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (7, 7, 44);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (8, 5, 3);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (9, 9, 74);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (10, 10, 74);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (11, 1, 75);
+INSERT INTO [[schema]].tpm_tpmvisit_tpm_partner_focal_points VALUES (12, 1, 76);
 
 
 --
@@ -12165,6 +13661,15 @@ INSERT INTO [[schema]].unicef_attachments_attachment VALUES (83, '2019-04-05 16:
 INSERT INTO [[schema]].unicef_attachments_attachment VALUES (82, '2019-04-02 05:40:31.738282+00', '2019-04-02 05:40:46.25744+00', 'public/files/unknown/tmp/etoolslogo_4_ZISdM4n.jpg', '', 67, 'partners_intervention_signed_pd', 151, 39, 2702);
 INSERT INTO [[schema]].unicef_attachments_attachment VALUES (84, '2019-04-07 07:36:28.565813+00', '2019-04-07 07:36:28.576186+00', 'public/files/tpm/tpmvisit/visit_report_attachments/2/etoolslogo_4.jpg', '', 2, 'visit_report_attachments', 96, 33, NULL);
 INSERT INTO [[schema]].unicef_attachments_attachment VALUES (85, '2019-04-07 07:36:44.637143+00', '2019-04-07 07:36:44.638025+00', 'public/files/tpm/tpmactivity/activity_report/1/etoolslogo_4.jpg', '', 1, 'activity_report', 261, 19, NULL);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (90, '2019-07-20 19:58:42.018751+00', '2019-07-20 19:58:42.019371+00', 'public/files/tpm/tpmactivity/activity_attachments/8/etoolslogo_4.jpg', '', 8, 'activity_attachments', 261, 18, NULL);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (87, '2019-05-13 13:37:18.255146+00', '2019-05-13 13:37:20.467848+00', 'public/files/unknown/tmp/IRQ_PCA201759_PD2019506_results.docx', '', 40, 'partners_intervention_attachment', 156, 42, 123);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (88, '2019-05-21 12:57:52.45272+00', '2019-05-21 12:57:52.461181+00', 'public/files/audit/microassessment/audit_engagement/4/Etools_issues.JPG', '', 4, 'audit_engagement', 222, 10, NULL);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (89, '2019-05-31 13:41:58.285228+00', '2019-05-31 13:42:00.34261+00', 'public/files/unknown/tmp/Screen_Shot_2019-05-29_at_7.49.21_AM.png', '', 34, 'partners_intervention_amendment_signed', 152, 40, 123);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (91, '2019-07-20 19:59:00.977756+00', '2019-07-20 19:59:00.978208+00', 'public/files/tpm/tpmactivity/activity_attachments/9/etoolslogo_4.jpg', '', 9, 'activity_attachments', 261, 18, NULL);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (92, '2019-07-20 19:59:15.497872+00', '2019-07-20 19:59:15.509905+00', 'public/files/tpm/tpmvisit/visit_attachments/9/etoolslogo_4.jpg', '', 9, 'visit_attachments', 96, 18, NULL);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (93, '2019-07-20 20:07:15.622238+00', '2019-07-20 20:07:15.634294+00', 'public/files/tpm/tpmvisit/visit_report_attachments/9/etoolslogo_4.jpg', '', 9, 'visit_report_attachments', 96, 33, NULL);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (94, '2019-07-20 20:14:20.972708+00', '2019-07-20 20:14:20.973063+00', 'public/files/tpm/tpmactivity/activity_report/10/etoolslogo_4.jpg', '', 10, 'activity_report', 261, 19, NULL);
+INSERT INTO [[schema]].unicef_attachments_attachment VALUES (96, '2019-10-04 17:54:30.048529+00', '2019-10-04 17:54:30.048529+00', 'public/files/unknown/tmp/Screen_Shot_2019-05-16_at_11.08.29_AM.png', '', 1, 'psea_answer', 293, 35, 2);
 INSERT INTO [[schema]].unicef_attachments_attachment VALUES (1, '2018-03-29 09:41:17.064218+00', '2018-12-11 01:22:22.943892+00', '', '', 1, 'partners_partner_assessment', 275, 35, NULL);
 INSERT INTO [[schema]].unicef_attachments_attachment VALUES (28, '2018-03-29 09:41:19.293705+00', '2018-12-11 01:22:24.981805+00', '', '', 28, 'partners_partner_assessment', 275, 35, NULL);
 INSERT INTO [[schema]].unicef_attachments_attachment VALUES (32, '2018-03-29 09:41:19.54269+00', '2018-12-11 01:22:25.260387+00', 'partners/core_values/WebInspectGenerated_AxDn3D2.txt', '', 32, 'partners_partner_assessment', 275, 35, NULL);
@@ -12187,50 +13692,64 @@ INSERT INTO [[schema]].unicef_attachments_attachment VALUES (80, '2018-03-29 09:
 -- Data for Name: unicef_attachments_attachmentlink; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
+INSERT INTO [[schema]].unicef_attachments_attachmentlink VALUES (1, 7, 82, 261);
 
 
 --
 -- Data for Name: unicef_attachments_filetype; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (34, 0, 'attached_agreement', 'Signed Agreement', 'partners_agreement');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (37, 0, 'agreement_signed_amendment', 'Agreement Amendment', 'partners_agreement_amendment');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (36, 0, 'assessment_report', 'Assessment Report', 'partners_assessment_report');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (40, 0, 'intervention_amendment_signed', 'PD/SSFA Amendment', 'partners_intervention_amendment_signed');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (42, 0, 'intervention_attachment', 'Intervention Attachment', 'partners_intervention_attachment');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (38, 0, 'intervention_prc_review', 'PRC Review', 'partners_intervention_prc_review');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (39, 0, 'intervention_signed_pd', 'Signed PD/SSFA', 'partners_intervention_signed_pd');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (35, 0, 'core_values_assessment', 'Core Values Assessment', 'partners_partner_assessment');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (43, 0, 'activation_letter', 'PD Activation Letter', 'partners_intervention_activation_letter');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (44, 0, 'termination_doc', 'PD Termination Document', 'partners_intervention_termination_doc');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (45, 17, 'internal_prc_review', 'Internal PRC Review', 'partners_intervention_amendment_internal_prc_review');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (1, 0, 'programme_document', 'FACE', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (2, 1, 'supply_manual_list', 'Progress report', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (3, 2, 'unicef_trip_report_action_point_report', 'Partnership review', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (4, 3, 'partner_report', 'Final Partnership Review', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (5, 4, 'previous_trip_reports', 'Correspondence', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (6, 5, 'training_materials', 'Supply/Distribution Plan', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (7, 6, 'tors', 'Workplan', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (8, 4, 'ice_form', 'ICE', 'audit_engagement');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (9, 3, 'face_form', 'FACE form', 'audit_engagement');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (10, 5, 'other', 'Other', 'audit_engagement');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (11, 0, 'report', 'Report', 'audit_report');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (14, 1, 'other', 'Other', 'audit_report');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (17, 2, 'workplan', 'Workplan', 'audit_engagement');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (18, 7, 'other', 'Other', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (19, 0, 'report', 'Report', 'tpm_report');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (22, 9, 'signed_pd/ssfa', 'Signed PD/SSFA', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (23, 10, 'prc_submission', 'PRC Submission', 'tpm');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (24, 11, 'other', 'Other', 'tpm_report');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (25, 12, 'terms_of_reference', 'Terms of Reference', 'tpm_partner');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (26, 13, 'training_material', 'Training Material', 'tpm_partner');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (27, 14, 'contract', 'Contract', 'tpm_partner');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (28, 15, 'questionnaires', 'Questionnaires', 'tpm_partner');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (29, 16, 'other', 'Other', 'tpm_partner');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (30, 1, 'picture_dataset', 'Picture Dataset', 'tpm_report_attachments');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (31, 2, 'questionnaire', 'Questionnaire', 'tpm_report_attachments');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (32, 3, 'other', 'Other', 'tpm_report_attachments');
-INSERT INTO [[schema]].unicef_attachments_filetype VALUES (33, 0, 'overall_report', 'Overall Report', 'tpm_report_attachments');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (17, 2, 'workplan', 'Workplan', 'audit_engagement', '{audit_engagement}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (9, 3, 'face_form', 'FACE form', 'audit_engagement', '{audit_engagement}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (8, 4, 'ice_form', 'ICE', 'audit_engagement', '{audit_engagement}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (10, 5, 'other', 'Other', 'audit_engagement', '{audit_engagement}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (11, 0, 'report', 'Report', 'audit_report', '{audit_report}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (14, 1, 'other', 'Other', 'audit_report', '{audit_report}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (52, 0, 'psea_investigation_policy_procedure', 'PSEA investigation policy/procedure', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (51, 0, 'dedicated_resources_for_investigations', 'Dedicated resources for investigation(s)', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (50, 0, 'names_of_possible_investigators', 'Name(s) of possible investigator(s)', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (49, 0, 'referral_form_for_survivors_of_gbv_sea', 'Referral form for survivors of GBV/SEA', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (48, 0, 'list_of_service_providers', 'List of service providers', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (47, 0, 'whistleblower_policy', 'Whistleblower policy', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (46, 0, 'description_of_reporting_mechanisms', 'Description of reportings mechanism(s)', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (45, 0, 'm_e_framework', 'M&E framework', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (44, 0, 'risk_assessments', 'Risk assessments', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (43, 0, 'needs_assessments', 'Needs assessments', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (42, 0, 'communication_materials', 'Communication materials', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (41, 0, 'attendance_sheets', 'Attendance sheets', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (40, 0, 'training_agenda', 'Training Agenda', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (39, 0, 'contracts_partnership_agreements', 'Contracts/partnership agreements', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (38, 0, 'tor', 'ToR', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (34, 0, 'code_of_conduct', 'Code of Conduct', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (35, 0, 'psea_policy', 'PSEA Policy', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (37, 0, 'recruitment_procedure', 'Recruitment procedure', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (36, 0, 'relevant_human_resources_policies', 'Relevant human resources policies', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (57, 0, 'written_process_for_review_of_sea', 'Written process for review of SEA', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (56, 0, 'description_of_referral_process_for_survivors_of_gbvsea', 'Description of referral process for survivors of GBV/SEA', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (55, 0, 'annual_training_plan', 'Annual training plan', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (54, 0, 'documentation_of_standard_procedure', 'Documentation of standard procedure', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (53, 0, 'other', 'Other', 'psea_answer', '{psea_answer}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (1, 0, 'programme_document', 'FACE', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (2, 1, 'supply_manual_list', 'Progress report', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (3, 2, 'unicef_trip_report_action_point_report', 'Partnership review', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (4, 3, 'partner_report', 'Final Partnership Review', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (5, 4, 'previous_trip_reports', 'Correspondence', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (6, 5, 'training_materials', 'Supply/Distribution Plan', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (7, 6, 'tors', 'Workplan', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (18, 7, 'other', 'Other', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (22, 9, 'signed_pd/ssfa', 'Signed PD/SSFA', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (23, 10, 'prc_submission', 'PRC Submission', 'tpm', '{tpm}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (25, 12, 'terms_of_reference', 'Terms of Reference', 'tpm_partner', '{tpm_partner}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (26, 13, 'training_material', 'Training Material', 'tpm_partner', '{tpm_partner}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (27, 14, 'contract', 'Contract', 'tpm_partner', '{tpm_partner}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (28, 15, 'questionnaires', 'Questionnaires', 'tpm_partner', '{tpm_partner}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (29, 16, 'other', 'Other', 'tpm_partner', '{tpm_partner}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (19, 0, 'report', 'Report', 'tpm_report', '{tpm_report}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (24, 11, 'other', 'Other', 'tpm_report', '{tpm_report}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (33, 0, 'overall_report', 'Overall Report', 'tpm_report_attachments', '{tpm_report_attachments}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (30, 1, 'picture_dataset', 'Picture Dataset', 'tpm_report_attachments', '{tpm_report_attachments}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (31, 2, 'questionnaire', 'Questionnaire', 'tpm_report_attachments', '{tpm_report_attachments}');
+INSERT INTO [[schema]].unicef_attachments_filetype VALUES (32, 3, 'other', 'Other', 'tpm_report_attachments', '{tpm_report_attachments}');
 
 
 --
@@ -12242,32 +13761,37 @@ INSERT INTO [[schema]].unicef_snapshot_activity VALUES (2, '2018-10-04 06:14:12.
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (3, '2018-10-04 06:28:45.019233+00', '2018-10-04 06:28:45.019716+00', '7', 'create', '{"id": 7, "author": 123, "office": 2, "status": "open", "history": [], "partner": "None", "section": 5, "category": "None", "comments": [], "due_date": "2018-10-12", "location": "None", "cp_output": "None", "engagement": "None", "key_events": [], "assigned_by": 123, "assigned_to": 123, "description": "test nik1", "intervention": "None", "tpm_activity": "None", "high_priority": false, "travel_activity": "None", "date_of_completion": "None"}', '{}', 123, 270);
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (4, '2019-02-08 07:23:27.263727+00', '2019-02-08 07:23:27.264173+00', '146', 'create', '{"id": 146, "end": "2017-09-17", "start": "None", "status": "draft", "partner": 228, "signed_by": "None", "amendments": [], "attachment": [], "interventions": [], "agreement_type": "PCA", "partner_manager": "None", "agreement_number": "UAT/PCA2019146", "country_programme": 1, "attached_agreement": "", "authorized_officers": [], "reference_number_year": 2019, "signed_by_unicef_date": "None", "signed_by_partner_date": "None", "special_conditions_pca": false}', '{}', 4199, 72);
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (5, '2019-04-02 05:34:54.828054+00', '2019-04-02 05:34:54.834872+00', '228', 'update', '{"id": 228, "city": "AMMAN", "name": "AGENCY FOR TECH COORDINATION AND DEV ACTED", "email": "", "hidden": false, "rating": "High", "address": "AMMAN", "blocked": false, "country": "234", "cso_type": "International", "net_ct_cy": "None", "agreements": [146], "short_name": "", "assessments": [], "description": "", "hact_values": {"audits": {"completed": 0, "minimum_requirements": 0}, "spot_checks": {"completed": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "follow_up_required": 0}, "assurance_coverage": "void", "programmatic_visits": {"planned": {"q1": 0, "q2": 0, "q3": 0, "q4": 0, "total": 0}, "completed": {"q1": 1, "q2": 0, "q3": 0, "q4": 0, "total": 1}}, "outstanding_findings": 0}, "postal_code": "", "reported_cy": "None", "shared_with": "None", "total_ct_cp": "0.00", "total_ct_cy": "0.00", "alternate_id": "None", "deleted_flag": false, "partner_type": "Civil Society Organization", "phone_number": "00962 6 463 6275", "total_ct_ytd": "None", "staff_members": [], "vendor_number": "2500221381", "vision_synced": true, "alternate_name": "ATC", "planned_visits": [], "street_address": "", "related_partner": [], "manually_blocked": false, "type_of_assessment": "High Risk Assumed", "last_assessment_date": "2017-01-24", "basis_for_risk_rating": "", "core_values_assessments": [3], "core_values_assessment_date": "2013-07-10", "outstanding_dct_amount_6_to_9_months_usd": "None", "outstanding_dct_amount_more_than_9_months_usd": "None"}', '{}', 2702, 68);
+INSERT INTO [[schema]].unicef_snapshot_activity VALUES (15, '2019-05-20 12:15:12.076218+00', '2019-05-20 12:15:12.076611+00', '8', 'create', '{"id": 8, "author": 25789, "office": 2, "status": "open", "history": [], "partner": 228, "section": 3, "category": "None", "comments": [], "due_date": "2019-05-10", "location": "None", "cp_output": 97, "engagement": "None", "key_events": [], "assigned_by": 25789, "assigned_to": 23436, "description": "4\tRecommendations and action points for follow up\n•\tHLSS should follow up the issue for M&E tools with UNICEF\n•\tamoxicillin syrups should be provided to the site for medical complication issue\n•\tHLSS should provide palate for keeping the supplies in all the site \n•\tHLSS should met with CHD on the issue of the store for keeping the supplies before rain come in akoka\n provision of sugar water solution at OTP centers for children suspected of being hypoglycemia as per the CMAM protocol\nEnsure appetite test is conducted in all the sites during OTP services provision\t\nReorient staff and provide continuous support on the admission and discharge criteria\t\nEnsure all required information is recorded in the OTP treatment cards\tOn going\t  HLSS", "intervention": 67, "tpm_activity": "None", "high_priority": false, "travel_activity": 493, "date_of_completion": "None"}', '{}', 25789, 270);
+INSERT INTO [[schema]].unicef_snapshot_activity VALUES (16, '2019-05-23 12:35:34.064137+00', '2019-05-23 12:35:34.065616+00', '9', 'create', '{"id": 9, "author": 14764, "office": 2, "status": "open", "history": [], "partner": 229, "section": 5, "category": "None", "comments": [], "due_date": "2019-05-25", "location": "None", "cp_output": 120, "engagement": "None", "key_events": [], "assigned_by": 14764, "assigned_to": 123, "description": "Testing w/ Nik", "intervention": "None", "tpm_activity": "None", "high_priority": false, "travel_activity": "None", "date_of_completion": "None"}', '{}', 14764, 270);
+INSERT INTO [[schema]].unicef_snapshot_activity VALUES (17, '2019-05-30 08:05:15.683456+00', '2019-05-30 08:05:15.683986+00', '10', 'create', '{"id": 10, "author": 2702, "office": 2, "status": "open", "history": [], "partner": 228, "section": 9, "category": "None", "comments": [], "due_date": "2019-05-30", "location": "None", "cp_output": 18, "engagement": "None", "key_events": [], "assigned_by": 2702, "assigned_to": 2702, "description": "test", "intervention": 67, "tpm_activity": "None", "high_priority": false, "travel_activity": 497, "date_of_completion": "None"}', '{}', 2702, 270);
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (8, '2019-04-02 05:35:55.601444+00', '2019-04-02 05:35:55.603132+00', '146', 'update', '{"id": 146, "end": "2017-09-17", "start": "2016-09-17", "status": "draft", "partner": 228, "signed_by": "None", "amendments": [], "attachment": [], "interventions": [], "agreement_type": "PCA", "partner_manager": 171, "agreement_number": "UAT/PCA2015146", "country_programme": 1, "attached_agreement": "", "authorized_officers": [171], "reference_number_year": 2015, "signed_by_unicef_date": "2015-04-02", "signed_by_partner_date": "2015-04-02", "special_conditions_pca": false}', '{"start": {"after": "2016-09-17", "before": "None"}, "partner_manager": {"after": 171, "before": "None"}, "agreement_number": {"after": "UAT/PCA2015146", "before": "UAT/PCA2019146"}, "authorized_officers": {"after": [171], "before": []}, "reference_number_year": {"after": 2015, "before": 2019}, "signed_by_unicef_date": {"after": "2015-04-02", "before": "None"}, "signed_by_partner_date": {"after": "2015-04-02", "before": "None"}}', 2702, 72);
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (9, '2019-04-02 05:36:15.758738+00', '2019-04-02 05:36:15.760526+00', '67', 'create', '{"id": 67, "end": "None", "frs": [], "start": "None", "title": "Test", "number": "UAT/PCA2015146/PD201567", "status": "draft", "offices": [], "metadata": {}, "sections": [], "agreement": 146, "amendments": [], "attachments": [], "in_amendment": false, "result_links": [], "document_type": "PD", "contingency_pd": false, "flat_locations": [], "planned_visits": [], "review_date_prc": "None", "submission_date": "None", "termination_doc": "", "population_focus": "None", "unicef_signatory": "None", "activation_letter": "", "country_programme": 1, "reporting_periods": [], "travel_activities": [], "signed_pd_document": "", "prc_review_document": "", "submission_date_prc": "None", "unicef_focal_points": [], "partner_focal_points": [], "signed_pd_attachment": [], "prc_review_attachment": [], "reference_number_year": 2015, "signed_by_unicef_date": "None", "reporting_requirements": [], "signed_by_partner_date": "None", "termination_doc_attachment": [], "activation_letter_attachment": [], "special_reporting_requirements": [], "partner_authorized_officer_signatory": "None"}', '{}', 2702, 151);
+INSERT INTO [[schema]].unicef_snapshot_activity VALUES (18, '2019-06-06 13:33:26.829216+00', '2019-06-06 13:33:26.831535+00', '11', 'create', '{"id": 11, "author": 123, "office": 2, "status": "open", "history": [], "partner": "None", "section": 4, "category": "None", "comments": [], "due_date": "2019-06-27", "location": "None", "cp_output": "None", "engagement": "None", "key_events": [], "assigned_by": 123, "assigned_to": 189023, "description": "test", "intervention": "None", "tpm_activity": "None", "high_priority": false, "travel_activity": 498, "date_of_completion": "None"}', '{}', 123, 270);
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (12, '2019-04-02 05:39:09.607587+00', '2019-04-02 05:39:09.608096+00', '67', 'update', '{"id": 67, "end": "2017-04-02", "frs": [], "start": "2016-10-28", "title": "Test", "number": "UAT/PCA2015146/PD201567", "status": "draft", "offices": [], "metadata": {}, "sections": [6], "agreement": 146, "amendments": [], "attachments": [], "in_amendment": false, "result_links": [], "document_type": "PD", "contingency_pd": false, "flat_locations": [], "planned_visits": [], "review_date_prc": "None", "submission_date": "None", "termination_doc": "", "population_focus": "None", "unicef_signatory": "None", "activation_letter": "", "country_programme": 1, "reporting_periods": [], "travel_activities": [], "signed_pd_document": "", "prc_review_document": "", "submission_date_prc": "None", "unicef_focal_points": [], "partner_focal_points": [], "signed_pd_attachment": [], "prc_review_attachment": [], "reference_number_year": 2015, "signed_by_unicef_date": "None", "reporting_requirements": [], "signed_by_partner_date": "None", "termination_doc_attachment": [], "activation_letter_attachment": [], "special_reporting_requirements": [], "partner_authorized_officer_signatory": "None"}', '{"end": {"after": "2017-04-02", "before": "None"}, "start": {"after": "2016-10-28", "before": "None"}, "sections": {"after": [6], "before": []}}', 2702, 151);
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (13, '2019-04-02 05:39:24.201819+00', '2019-04-02 05:39:24.202579+00', '67', 'update', '{"id": 67, "end": "2017-04-02", "frs": [], "start": "2016-10-28", "title": "Test", "number": "UAT/PCA2015146/PD201567", "status": "draft", "offices": [], "metadata": {}, "sections": [6], "agreement": 146, "amendments": [], "attachments": [], "in_amendment": false, "result_links": [], "document_type": "PD", "contingency_pd": false, "flat_locations": [], "planned_visits": [], "review_date_prc": "None", "submission_date": "None", "termination_doc": "", "population_focus": "None", "unicef_signatory": "None", "activation_letter": "", "country_programme": 1, "reporting_periods": [], "travel_activities": [], "signed_pd_document": "", "prc_review_document": "", "submission_date_prc": "None", "unicef_focal_points": [], "partner_focal_points": [], "signed_pd_attachment": [], "prc_review_attachment": [], "reference_number_year": 2015, "signed_by_unicef_date": "None", "reporting_requirements": [], "signed_by_partner_date": "None", "termination_doc_attachment": [], "activation_letter_attachment": [], "special_reporting_requirements": [], "partner_authorized_officer_signatory": "None"}', '{}', 2702, 151);
 INSERT INTO [[schema]].unicef_snapshot_activity VALUES (14, '2019-04-02 05:40:46.25282+00', '2019-04-02 05:40:46.253185+00', '67', 'update', '{"id": 67, "end": "2017-04-02", "frs": [], "start": "2016-10-28", "title": "Test", "number": "UAT/PCA2015146/PD201567", "status": "draft", "offices": [2], "metadata": {}, "sections": [6], "agreement": 146, "amendments": [], "attachments": [], "in_amendment": false, "result_links": [], "document_type": "PD", "contingency_pd": false, "flat_locations": [], "planned_visits": [], "review_date_prc": "None", "submission_date": "2016-10-01", "termination_doc": "", "population_focus": "None", "unicef_signatory": 2702, "activation_letter": "", "country_programme": 1, "reporting_periods": [], "travel_activities": [], "signed_pd_document": "", "prc_review_document": "", "submission_date_prc": "None", "unicef_focal_points": [2702], "partner_focal_points": [171], "signed_pd_attachment": [], "prc_review_attachment": [], "reference_number_year": 2015, "signed_by_unicef_date": "2016-10-06", "reporting_requirements": [], "signed_by_partner_date": "2016-10-04", "termination_doc_attachment": [], "activation_letter_attachment": [], "special_reporting_requirements": [], "partner_authorized_officer_signatory": 171}', '{"offices": {"after": [2], "before": []}, "submission_date": {"after": "2016-10-01", "before": "None"}, "unicef_signatory": {"after": 2702, "before": "None"}, "unicef_focal_points": {"after": [2702], "before": []}, "partner_focal_points": {"after": [171], "before": []}, "signed_by_unicef_date": {"after": "2016-10-06", "before": "None"}, "signed_by_partner_date": {"after": "2016-10-04", "before": "None"}, "partner_authorized_officer_signatory": {"after": 171, "before": "None"}}', 2702, 151);
+INSERT INTO [[schema]].unicef_snapshot_activity VALUES (19, '2019-06-06 13:34:16.472463+00', '2019-06-06 13:34:16.476335+00', '12', 'create', '{"id": 12, "author": 123, "office": 2, "status": "open", "history": [], "partner": "None", "section": 4, "category": "None", "comments": [], "due_date": "2019-06-19", "location": "None", "cp_output": "None", "engagement": "None", "key_events": [], "assigned_by": 123, "assigned_to": 189023, "description": "test 2", "intervention": "None", "tpm_activity": "None", "high_priority": false, "travel_activity": 498, "date_of_completion": "None"}', '{}', 123, 270);
 
 
 --
 -- Name: action_points_actionpoint_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].action_points_actionpoint_id_seq', 7, true);
+SELECT pg_catalog.setval('[[schema]].action_points_actionpoint_id_seq', 12, true);
 
 
 --
 -- Name: activities_activity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].activities_activity_id_seq', 3, true);
+SELECT pg_catalog.setval('[[schema]].activities_activity_id_seq', 11, true);
 
 
 --
 -- Name: activities_activity_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].activities_activity_locations_id_seq', 3, true);
+SELECT pg_catalog.setval('[[schema]].activities_activity_locations_id_seq', 13, true);
 
 
 --
@@ -12285,24 +13809,10 @@ SELECT pg_catalog.setval('[[schema]].actstream_follow_id_seq', 1, false);
 
 
 --
--- Name: attachments_attachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].attachments_attachment_id_seq', 80, true);
-
-
---
 -- Name: attachments_attachmentflat_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].attachments_attachmentflat_id_seq', 85, true);
-
-
---
--- Name: attachments_filetype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
---
-
-SELECT pg_catalog.setval('[[schema]].attachments_filetype_id_seq', 42, true);
+SELECT pg_catalog.setval('[[schema]].attachments_attachmentflat_id_seq', 96, true);
 
 
 --
@@ -12316,28 +13826,49 @@ SELECT pg_catalog.setval('[[schema]].audit_detailedfindinginfo_id_seq', 1, false
 -- Name: audit_engagement_active_pd_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].audit_engagement_active_pd_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].audit_engagement_active_pd_id_seq', 2, true);
 
 
 --
 -- Name: audit_engagement_authorized_officers_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].audit_engagement_authorized_officers_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].audit_engagement_authorized_officers_id_seq', 3, true);
 
 
 --
 -- Name: audit_engagement_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].audit_engagement_id_seq', 1, true);
+SELECT pg_catalog.setval('[[schema]].audit_engagement_id_seq', 6, true);
+
+
+--
+-- Name: audit_engagement_offices_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_engagement_offices_id_seq', 1, false);
+
+
+--
+-- Name: audit_engagement_sections_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_engagement_sections_id_seq', 1, false);
 
 
 --
 -- Name: audit_engagement_staff_members1_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].audit_engagement_staff_members1_id_seq', 1, true);
+SELECT pg_catalog.setval('[[schema]].audit_engagement_staff_members1_id_seq', 10, true);
+
+
+--
+-- Name: audit_engagement_users_notified_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].audit_engagement_users_notified_id_seq', 1, false);
 
 
 --
@@ -12365,7 +13896,7 @@ SELECT pg_catalog.setval('[[schema]].audit_keyinternalcontrol_id_seq', 1, false)
 -- Name: audit_risk_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].audit_risk_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].audit_risk_id_seq', 1, true);
 
 
 --
@@ -12414,7 +13945,161 @@ SELECT pg_catalog.setval('[[schema]].django_comments_id_seq', 5, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 747, true);
+SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 790, true);
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_data_collection_activityoverallfinding_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_data_collection_activityquestion_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverall_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_data_collection_activityquestionoverall_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_data_collection_checklistoverallfinding_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_data_collection_finding_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_data_collection_finding_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_data_collection_startedchecklist_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_planning_monitoringactivity_cp_outputs_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_planning_monitoringactivity_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventio_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_planning_monitoringactivity_interventio_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_planning_monitoringactivity_partners_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_planning_monitoringactivity_sections_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_member_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_planning_monitoringactivity_team_member_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_planning_questiontemplate_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_category_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_category_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_globalconfig_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_globalconfig_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_locationsite_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_locationsite_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_logissue_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_logissue_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_method_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_method_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_option_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_option_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_question_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_question_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_question_methods_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_question_methods_id_seq', 1, false);
+
+
+--
+-- Name: field_monitoring_settings_question_sections_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].field_monitoring_settings_question_sections_id_seq', 1, false);
 
 
 --
@@ -12617,14 +14302,14 @@ SELECT pg_catalog.setval('[[schema]].partners_intervention_unicef_focal_points_i
 -- Name: partners_interventionamendment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].partners_interventionamendment_id_seq', 33, true);
+SELECT pg_catalog.setval('[[schema]].partners_interventionamendment_id_seq', 34, true);
 
 
 --
 -- Name: partners_interventionattachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].partners_interventionattachment_id_seq', 39, true);
+SELECT pg_catalog.setval('[[schema]].partners_interventionattachment_id_seq', 40, true);
 
 
 --
@@ -12652,14 +14337,14 @@ SELECT pg_catalog.setval('[[schema]].partners_interventionreportingperiod_id_seq
 -- Name: partners_interventionresultlink_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_id_seq', 45, true);
+SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_id_seq', 46, true);
 
 
 --
 -- Name: partners_interventionresultlink_ram_indicators_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_ram_indicators_id_seq', 45, true);
+SELECT pg_catalog.setval('[[schema]].partners_interventionresultlink_ram_indicators_id_seq', 46, true);
 
 
 --
@@ -12701,35 +14386,35 @@ SELECT pg_catalog.setval('[[schema]].partners_workspacefiletype_id_seq', 1, fals
 -- Name: psea_answer_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_answer_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_answer_id_seq', 8, true);
 
 
 --
 -- Name: psea_answerevidence_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_answerevidence_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_answerevidence_id_seq', 2, true);
 
 
 --
 -- Name: psea_assessment_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_assessment_focal_points_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_assessment_focal_points_id_seq', 6, true);
 
 
 --
 -- Name: psea_assessment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_assessment_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_assessment_id_seq', 5, true);
 
 
 --
 -- Name: psea_assessmentstatushistory_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_assessmentstatushistory_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_assessmentstatushistory_id_seq', 7, true);
 
 
 --
@@ -12743,42 +14428,42 @@ SELECT pg_catalog.setval('[[schema]].psea_assessor_auditor_firm_staff_id_seq', 1
 -- Name: psea_assessor_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_assessor_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_assessor_id_seq', 5, true);
 
 
 --
 -- Name: psea_evidence_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_evidence_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_evidence_id_seq', 24, true);
 
 
 --
 -- Name: psea_indicator_evidences_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_indicator_evidences_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_indicator_evidences_id_seq', 23, true);
 
 
 --
 -- Name: psea_indicator_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_indicator_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_indicator_id_seq', 6, true);
 
 
 --
 -- Name: psea_indicator_ratings_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_indicator_ratings_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_indicator_ratings_id_seq', 18, true);
 
 
 --
 -- Name: psea_rating_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].psea_rating_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].psea_rating_id_seq', 3, true);
 
 
 --
@@ -12841,7 +14526,14 @@ SELECT pg_catalog.setval('[[schema]].reports_indicatorblueprint_id_seq', 33, tru
 -- Name: reports_lowerresult_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].reports_lowerresult_id_seq', 35, true);
+SELECT pg_catalog.setval('[[schema]].reports_lowerresult_id_seq', 36, true);
+
+
+--
+-- Name: reports_office_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_office_id_seq', 2, true);
 
 
 --
@@ -12894,6 +14586,13 @@ SELECT pg_catalog.setval('[[schema]].reports_unit_id_seq', 6, true);
 
 
 --
+-- Name: reports_usertenantprofile_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
+--
+
+SELECT pg_catalog.setval('[[schema]].reports_usertenantprofile_id_seq', 43, true);
+
+
+--
 -- Name: reversion_revision_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
@@ -12918,77 +14617,77 @@ SELECT pg_catalog.setval('[[schema]].snapshot_activity_id_seq', 1, true);
 -- Name: t2f_iteneraryitem_airlines_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_airlines_id_seq', 115, true);
+SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_airlines_id_seq', 116, true);
 
 
 --
 -- Name: t2f_iteneraryitem_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_id_seq', 495, true);
+SELECT pg_catalog.setval('[[schema]].t2f_iteneraryitem_id_seq', 512, true);
 
 
 --
 -- Name: t2f_travel_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].t2f_travel_id_seq', 627, true);
+SELECT pg_catalog.setval('[[schema]].t2f_travel_id_seq', 661, true);
 
 
 --
 -- Name: t2f_travelactivity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_id_seq', 483, true);
+SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_id_seq', 512, true);
 
 
 --
 -- Name: t2f_travelactivity_locations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_locations_id_seq', 385, true);
+SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_locations_id_seq', 390, true);
 
 
 --
 -- Name: t2f_travelactivity_travels_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_travels_id_seq', 525, true);
+SELECT pg_catalog.setval('[[schema]].t2f_travelactivity_travels_id_seq', 556, true);
 
 
 --
 -- Name: t2f_travelattachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].t2f_travelattachment_id_seq', 96, true);
+SELECT pg_catalog.setval('[[schema]].t2f_travelattachment_id_seq', 98, true);
 
 
 --
 -- Name: tpm_tpmactivity_offices_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_offices_id_seq', 3, true);
+SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_offices_id_seq', 11, true);
 
 
 --
 -- Name: tpm_tpmactivity_unicef_focal_points_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_unicef_focal_points_id_seq', 3, true);
+SELECT pg_catalog.setval('[[schema]].tpm_tpmactivity_unicef_focal_points_id_seq', 12, true);
 
 
 --
 -- Name: tpm_tpmvisit_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_id_seq', 4, true);
+SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_id_seq', 11, true);
 
 
 --
 -- Name: tpm_tpmvisit_tpm_partner_focal_points1_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_tpm_partner_focal_points1_id_seq', 4, true);
+SELECT pg_catalog.setval('[[schema]].tpm_tpmvisit_tpm_partner_focal_points1_id_seq', 12, true);
 
 
 --
@@ -13002,7 +14701,7 @@ SELECT pg_catalog.setval('[[schema]].tpm_tpmvisitreportrejectcomment_id_seq', 1,
 -- Name: unicef_attachments_attachment_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachment_id_seq', 85, true);
+SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachment_id_seq', 96, true);
 
 
 --
@@ -13016,21 +14715,21 @@ SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachmentflat_id_seq', 
 -- Name: unicef_attachments_attachmentlink_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachmentlink_id_seq', 1, false);
+SELECT pg_catalog.setval('[[schema]].unicef_attachments_attachmentlink_id_seq', 1, true);
 
 
 --
 -- Name: unicef_attachments_filetype_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].unicef_attachments_filetype_id_seq', 45, true);
+SELECT pg_catalog.setval('[[schema]].unicef_attachments_filetype_id_seq', 57, true);
 
 
 --
 -- Name: unicef_snapshot_activity_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].unicef_snapshot_activity_id_seq', 14, true);
+SELECT pg_catalog.setval('[[schema]].unicef_snapshot_activity_id_seq', 19, true);
 
 
 --
@@ -13090,35 +14789,11 @@ ALTER TABLE ONLY [[schema]].actstream_follow
 
 
 --
--- Name: attachments_attachment attachments_attachment_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_attachment
-    ADD CONSTRAINT attachments_attachment_pkey PRIMARY KEY (id);
-
-
---
 -- Name: attachments_attachmentflat attachments_attachmentflat_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].attachments_attachmentflat
     ADD CONSTRAINT attachments_attachmentflat_pkey PRIMARY KEY (id);
-
-
---
--- Name: attachments_filetype attachments_filetype_name_83f82570_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_filetype
-    ADD CONSTRAINT attachments_filetype_name_83f82570_uniq UNIQUE (name, code);
-
-
---
--- Name: attachments_filetype attachments_filetype_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_filetype
-    ADD CONSTRAINT attachments_filetype_pkey PRIMARY KEY (id);
 
 
 --
@@ -13170,11 +14845,43 @@ ALTER TABLE ONLY [[schema]].audit_engagement_authorized_officers
 
 
 --
+-- Name: audit_engagement_offices audit_engagement_offices_engagement_id_office_id_2f1d3560_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_offices
+    ADD CONSTRAINT audit_engagement_offices_engagement_id_office_id_2f1d3560_uniq UNIQUE (engagement_id, office_id);
+
+
+--
+-- Name: audit_engagement_offices audit_engagement_offices_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_offices
+    ADD CONSTRAINT audit_engagement_offices_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: audit_engagement audit_engagement_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].audit_engagement
     ADD CONSTRAINT audit_engagement_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: audit_engagement_sections audit_engagement_section_engagement_id_section_id_3373e89a_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_sections
+    ADD CONSTRAINT audit_engagement_section_engagement_id_section_id_3373e89a_uniq UNIQUE (engagement_id, section_id);
+
+
+--
+-- Name: audit_engagement_sections audit_engagement_sections_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_sections
+    ADD CONSTRAINT audit_engagement_sections_pkey PRIMARY KEY (id);
 
 
 --
@@ -13191,6 +14898,22 @@ ALTER TABLE ONLY [[schema]].audit_engagement_staff_members
 
 ALTER TABLE ONLY [[schema]].audit_engagement_staff_members
     ADD CONSTRAINT audit_engagement_staff_members1_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: audit_engagement_users_notified audit_engagement_users_n_engagement_id_user_id_e40756d1_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_users_notified
+    ADD CONSTRAINT audit_engagement_users_n_engagement_id_user_id_e40756d1_uniq UNIQUE (engagement_id, user_id);
+
+
+--
+-- Name: audit_engagement_users_notified audit_engagement_users_notified_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_users_notified
+    ADD CONSTRAINT audit_engagement_users_notified_pkey PRIMARY KEY (id);
 
 
 --
@@ -13311,6 +15034,270 @@ ALTER TABLE ONLY [[schema]].django_comments
 
 ALTER TABLE ONLY [[schema]].django_migrations
     ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverallfinding field_monitoring_data_collection_activ_activity_question_id_key; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestionoverallfinding
+    ADD CONSTRAINT field_monitoring_data_collection_activ_activity_question_id_key UNIQUE (activity_question_id);
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding field_monitoring_data_collection_activityoverallfinding_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityoverallfinding
+    ADD CONSTRAINT field_monitoring_data_collection_activityoverallfinding_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion field_monitoring_data_collection_activityquestion_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestion
+    ADD CONSTRAINT field_monitoring_data_collection_activityquestion_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverallfinding field_monitoring_data_collection_activityquestionoverallfi_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestionoverallfinding
+    ADD CONSTRAINT field_monitoring_data_collection_activityquestionoverallfi_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding field_monitoring_data_collection_checklistoverallfinding_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_checklistoverallfinding
+    ADD CONSTRAINT field_monitoring_data_collection_checklistoverallfinding_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_data_collection_finding field_monitoring_data_collection_finding_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_finding
+    ADD CONSTRAINT field_monitoring_data_collection_finding_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist field_monitoring_data_collection_startedchecklist_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_startedchecklist
+    ADD CONSTRAINT field_monitoring_data_collection_startedchecklist_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventions field_monitoring_plannin_monitoringactivity_id_in_c6dc7863_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_interventions
+    ADD CONSTRAINT field_monitoring_plannin_monitoringactivity_id_in_c6dc7863_uniq UNIQUE (monitoringactivity_id, intervention_id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners field_monitoring_plannin_monitoringactivity_id_pa_086ef6ae_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_partners
+    ADD CONSTRAINT field_monitoring_plannin_monitoringactivity_id_pa_086ef6ae_uniq UNIQUE (monitoringactivity_id, partnerorganization_id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs field_monitoring_plannin_monitoringactivity_id_re_e7354c33_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs
+    ADD CONSTRAINT field_monitoring_plannin_monitoringactivity_id_re_e7354c33_uniq UNIQUE (monitoringactivity_id, result_id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections field_monitoring_plannin_monitoringactivity_id_se_a086a488_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_sections
+    ADD CONSTRAINT field_monitoring_plannin_monitoringactivity_id_se_a086a488_uniq UNIQUE (monitoringactivity_id, section_id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_members field_monitoring_plannin_monitoringactivity_id_us_cedbcf40_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_team_members
+    ADD CONSTRAINT field_monitoring_plannin_monitoringactivity_id_us_cedbcf40_uniq UNIQUE (monitoringactivity_id, user_id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs field_monitoring_planning_monitoringactivity_cp_outputs_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs
+    ADD CONSTRAINT field_monitoring_planning_monitoringactivity_cp_outputs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventions field_monitoring_planning_monitoringactivity_interventions_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_interventions
+    ADD CONSTRAINT field_monitoring_planning_monitoringactivity_interventions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity field_monitoring_planning_monitoringactivity_number_key; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity
+    ADD CONSTRAINT field_monitoring_planning_monitoringactivity_number_key UNIQUE (number);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners field_monitoring_planning_monitoringactivity_partners_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_partners
+    ADD CONSTRAINT field_monitoring_planning_monitoringactivity_partners_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity field_monitoring_planning_monitoringactivity_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity
+    ADD CONSTRAINT field_monitoring_planning_monitoringactivity_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections field_monitoring_planning_monitoringactivity_sections_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_sections
+    ADD CONSTRAINT field_monitoring_planning_monitoringactivity_sections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_members field_monitoring_planning_monitoringactivity_team_members_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_team_members
+    ADD CONSTRAINT field_monitoring_planning_monitoringactivity_team_members_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate field_monitoring_planning_questiontemplate_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_questiontemplate
+    ADD CONSTRAINT field_monitoring_planning_questiontemplate_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_planning_yearplan field_monitoring_planning_yearplan_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_yearplan
+    ADD CONSTRAINT field_monitoring_planning_yearplan_pkey PRIMARY KEY (year);
+
+
+--
+-- Name: field_monitoring_settings_question_methods field_monitoring_setting_question_id_method_id_9ccc661e_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_methods
+    ADD CONSTRAINT field_monitoring_setting_question_id_method_id_9ccc661e_uniq UNIQUE (question_id, method_id);
+
+
+--
+-- Name: field_monitoring_settings_question_sections field_monitoring_setting_question_id_section_id_fd04b3a8_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_sections
+    ADD CONSTRAINT field_monitoring_setting_question_id_section_id_fd04b3a8_uniq UNIQUE (question_id, section_id);
+
+
+--
+-- Name: field_monitoring_settings_option field_monitoring_setting_question_id_value_3b661631_uniq; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_option
+    ADD CONSTRAINT field_monitoring_setting_question_id_value_3b661631_uniq UNIQUE (question_id, value);
+
+
+--
+-- Name: field_monitoring_settings_category field_monitoring_settings_category_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_category
+    ADD CONSTRAINT field_monitoring_settings_category_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_globalconfig field_monitoring_settings_globalconfig_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_globalconfig
+    ADD CONSTRAINT field_monitoring_settings_globalconfig_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_locationsite field_monitoring_settings_locationsite_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_locationsite
+    ADD CONSTRAINT field_monitoring_settings_locationsite_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_logissue field_monitoring_settings_logissue_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_logissue
+    ADD CONSTRAINT field_monitoring_settings_logissue_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_method field_monitoring_settings_method_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_method
+    ADD CONSTRAINT field_monitoring_settings_method_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_option field_monitoring_settings_option_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_option
+    ADD CONSTRAINT field_monitoring_settings_option_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_question_methods field_monitoring_settings_question_methods_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_methods
+    ADD CONSTRAINT field_monitoring_settings_question_methods_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_question field_monitoring_settings_question_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question
+    ADD CONSTRAINT field_monitoring_settings_question_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_monitoring_settings_question_sections field_monitoring_settings_question_sections_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_sections
+    ADD CONSTRAINT field_monitoring_settings_question_sections_pkey PRIMARY KEY (id);
 
 
 --
@@ -14178,6 +16165,14 @@ ALTER TABLE ONLY [[schema]].reports_lowerresult
 
 
 --
+-- Name: reports_office reports_office_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].reports_office
+    ADD CONSTRAINT reports_office_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: reports_quarter reports_quarter_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -14263,6 +16258,22 @@ ALTER TABLE ONLY [[schema]].reports_unit
 
 ALTER TABLE ONLY [[schema]].reports_unit
     ADD CONSTRAINT reports_unit_type_key UNIQUE (type);
+
+
+--
+-- Name: reports_usertenantprofile reports_usertenantprofile_pkey; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].reports_usertenantprofile
+    ADD CONSTRAINT reports_usertenantprofile_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reports_usertenantprofile reports_usertenantprofile_profile_id_key; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].reports_usertenantprofile
+    ADD CONSTRAINT reports_usertenantprofile_profile_id_key UNIQUE (profile_id);
 
 
 --
@@ -14589,6 +16600,13 @@ CREATE INDEX action_points_actionpoint_ea71e3b4 ON [[schema]].action_points_acti
 
 
 --
+-- Name: action_points_actionpoint_monitoring_activity_id_cc56cf8e; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX action_points_actionpoint_monitoring_activity_id_cc56cf8e ON [[schema]].action_points_actionpoint USING btree (monitoring_activity_id);
+
+
+--
 -- Name: action_points_actionpoint_psea_assessment_id_008f62ed; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -14757,38 +16775,10 @@ CREATE INDEX actstream_follow_object_id_d790e00d_like ON [[schema]].actstream_fo
 
 
 --
--- Name: attachments_attachment_4095e96b; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX attachments_attachment_4095e96b ON [[schema]].attachments_attachment USING btree (uploaded_by_id);
-
-
---
--- Name: attachments_attachment_417f1b1c; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX attachments_attachment_417f1b1c ON [[schema]].attachments_attachment USING btree (content_type_id);
-
-
---
--- Name: attachments_attachment_4cc23034; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX attachments_attachment_4cc23034 ON [[schema]].attachments_attachment USING btree (file_type_id);
-
-
---
 -- Name: attachments_attachmentflat_07ba63f5; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
 CREATE INDEX attachments_attachmentflat_07ba63f5 ON [[schema]].attachments_attachmentflat USING btree (attachment_id);
-
-
---
--- Name: attachments_filetype_70a17ffa; Type: INDEX; Schema: [[schema]]; Owner: -
---
-
-CREATE INDEX attachments_filetype_70a17ffa ON [[schema]].attachments_filetype USING btree ("order");
 
 
 --
@@ -14848,6 +16838,34 @@ CREATE INDEX audit_engagement_d80896d1 ON [[schema]].audit_engagement USING btre
 
 
 --
+-- Name: audit_engagement_offices_engagement_id_0611124d; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX audit_engagement_offices_engagement_id_0611124d ON [[schema]].audit_engagement_offices USING btree (engagement_id);
+
+
+--
+-- Name: audit_engagement_offices_office_id_546ae09e; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX audit_engagement_offices_office_id_546ae09e ON [[schema]].audit_engagement_offices USING btree (office_id);
+
+
+--
+-- Name: audit_engagement_sections_engagement_id_e21eccb1; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX audit_engagement_sections_engagement_id_e21eccb1 ON [[schema]].audit_engagement_sections USING btree (engagement_id);
+
+
+--
+-- Name: audit_engagement_sections_section_id_03d30795; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX audit_engagement_sections_section_id_03d30795 ON [[schema]].audit_engagement_sections USING btree (section_id);
+
+
+--
 -- Name: audit_engagement_staff_members1_7d43d41c; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -14859,6 +16877,20 @@ CREATE INDEX audit_engagement_staff_members1_7d43d41c ON [[schema]].audit_engage
 --
 
 CREATE INDEX audit_engagement_staff_members1_cd7ada3b ON [[schema]].audit_engagement_staff_members USING btree (engagement_id);
+
+
+--
+-- Name: audit_engagement_users_notified_engagement_id_32d85871; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX audit_engagement_users_notified_engagement_id_32d85871 ON [[schema]].audit_engagement_users_notified USING btree (engagement_id);
+
+
+--
+-- Name: audit_engagement_users_notified_user_id_b249b03c; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX audit_engagement_users_notified_user_id_b249b03c ON [[schema]].audit_engagement_users_notified USING btree (user_id);
 
 
 --
@@ -14992,6 +17024,370 @@ CREATE INDEX django_comments_e8701ad4 ON [[schema]].django_comments USING btree 
 --
 
 CREATE INDEX django_comments_submit_date_514ed2d9_uniq ON [[schema]].django_comments USING btree (submit_date);
+
+
+--
+-- Name: field_monitoring_data_coll_activity_question_id_0b0015dc; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_activity_question_id_0b0015dc ON [[schema]].field_monitoring_data_collection_finding USING btree (activity_question_id);
+
+
+--
+-- Name: field_monitoring_data_coll_author_id_0ab0ed52; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_author_id_0ab0ed52 ON [[schema]].field_monitoring_data_collection_startedchecklist USING btree (author_id);
+
+
+--
+-- Name: field_monitoring_data_coll_cp_output_id_0047ac65; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_cp_output_id_0047ac65 ON [[schema]].field_monitoring_data_collection_checklistoverallfinding USING btree (cp_output_id);
+
+
+--
+-- Name: field_monitoring_data_coll_cp_output_id_60422760; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_cp_output_id_60422760 ON [[schema]].field_monitoring_data_collection_activityoverallfinding USING btree (cp_output_id);
+
+
+--
+-- Name: field_monitoring_data_coll_cp_output_id_86d1609b; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_cp_output_id_86d1609b ON [[schema]].field_monitoring_data_collection_activityquestion USING btree (cp_output_id);
+
+
+--
+-- Name: field_monitoring_data_coll_intervention_id_622718ca; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_intervention_id_622718ca ON [[schema]].field_monitoring_data_collection_activityoverallfinding USING btree (intervention_id);
+
+
+--
+-- Name: field_monitoring_data_coll_intervention_id_8340ee1a; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_intervention_id_8340ee1a ON [[schema]].field_monitoring_data_collection_activityquestion USING btree (intervention_id);
+
+
+--
+-- Name: field_monitoring_data_coll_intervention_id_c42feb00; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_intervention_id_c42feb00 ON [[schema]].field_monitoring_data_collection_checklistoverallfinding USING btree (intervention_id);
+
+
+--
+-- Name: field_monitoring_data_coll_method_id_4ad53a63; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_method_id_4ad53a63 ON [[schema]].field_monitoring_data_collection_startedchecklist USING btree (method_id);
+
+
+--
+-- Name: field_monitoring_data_coll_monitoring_activity_id_5a71e452; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_monitoring_activity_id_5a71e452 ON [[schema]].field_monitoring_data_collection_startedchecklist USING btree (monitoring_activity_id);
+
+
+--
+-- Name: field_monitoring_data_coll_monitoring_activity_id_8cda2800; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_monitoring_activity_id_8cda2800 ON [[schema]].field_monitoring_data_collection_activityquestion USING btree (monitoring_activity_id);
+
+
+--
+-- Name: field_monitoring_data_coll_monitoring_activity_id_f2fb1a54; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_monitoring_activity_id_f2fb1a54 ON [[schema]].field_monitoring_data_collection_activityoverallfinding USING btree (monitoring_activity_id);
+
+
+--
+-- Name: field_monitoring_data_coll_partner_id_5e2b7bd3; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_partner_id_5e2b7bd3 ON [[schema]].field_monitoring_data_collection_activityquestion USING btree (partner_id);
+
+
+--
+-- Name: field_monitoring_data_coll_partner_id_9a014f3f; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_partner_id_9a014f3f ON [[schema]].field_monitoring_data_collection_checklistoverallfinding USING btree (partner_id);
+
+
+--
+-- Name: field_monitoring_data_coll_partner_id_a58543e8; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_partner_id_a58543e8 ON [[schema]].field_monitoring_data_collection_activityoverallfinding USING btree (partner_id);
+
+
+--
+-- Name: field_monitoring_data_coll_question_id_197829ee; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_question_id_197829ee ON [[schema]].field_monitoring_data_collection_activityquestion USING btree (question_id);
+
+
+--
+-- Name: field_monitoring_data_coll_started_checklist_id_1c248532; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_started_checklist_id_1c248532 ON [[schema]].field_monitoring_data_collection_finding USING btree (started_checklist_id);
+
+
+--
+-- Name: field_monitoring_data_coll_started_checklist_id_9f6f3f7d; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_data_coll_started_checklist_id_9f6f3f7d ON [[schema]].field_monitoring_data_collection_checklistoverallfinding USING btree (started_checklist_id);
+
+
+--
+-- Name: field_monitoring_plannin_number_0ff490af_like; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_plannin_number_0ff490af_like ON [[schema]].field_monitoring_planning_monitoringactivity USING btree (number varchar_pattern_ops);
+
+
+--
+-- Name: field_monitoring_planning__cp_output_id_b103adb0; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__cp_output_id_b103adb0 ON [[schema]].field_monitoring_planning_questiontemplate USING btree (cp_output_id);
+
+
+--
+-- Name: field_monitoring_planning__field_office_id_8262e61f; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__field_office_id_8262e61f ON [[schema]].field_monitoring_planning_monitoringactivity USING btree (field_office_id);
+
+
+--
+-- Name: field_monitoring_planning__intervention_id_d05d6a02; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__intervention_id_d05d6a02 ON [[schema]].field_monitoring_planning_questiontemplate USING btree (intervention_id);
+
+
+--
+-- Name: field_monitoring_planning__intervention_id_e94156a4; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__intervention_id_e94156a4 ON [[schema]].field_monitoring_planning_monitoringactivity_interventions USING btree (intervention_id);
+
+
+--
+-- Name: field_monitoring_planning__location_id_29818917; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__location_id_29818917 ON [[schema]].field_monitoring_planning_monitoringactivity USING btree (location_id);
+
+
+--
+-- Name: field_monitoring_planning__location_site_id_d8d558fb; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__location_site_id_d8d558fb ON [[schema]].field_monitoring_planning_monitoringactivity USING btree (location_site_id);
+
+
+--
+-- Name: field_monitoring_planning__monitoringactivity_id_0021d5cb; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__monitoringactivity_id_0021d5cb ON [[schema]].field_monitoring_planning_monitoringactivity_interventions USING btree (monitoringactivity_id);
+
+
+--
+-- Name: field_monitoring_planning__monitoringactivity_id_17e556fa; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__monitoringactivity_id_17e556fa ON [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs USING btree (monitoringactivity_id);
+
+
+--
+-- Name: field_monitoring_planning__monitoringactivity_id_9d54a666; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__monitoringactivity_id_9d54a666 ON [[schema]].field_monitoring_planning_monitoringactivity_partners USING btree (monitoringactivity_id);
+
+
+--
+-- Name: field_monitoring_planning__monitoringactivity_id_9f85de74; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__monitoringactivity_id_9f85de74 ON [[schema]].field_monitoring_planning_monitoringactivity_team_members USING btree (monitoringactivity_id);
+
+
+--
+-- Name: field_monitoring_planning__monitoringactivity_id_bed3cc06; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__monitoringactivity_id_bed3cc06 ON [[schema]].field_monitoring_planning_monitoringactivity_sections USING btree (monitoringactivity_id);
+
+
+--
+-- Name: field_monitoring_planning__partnerorganization_id_372f9148; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__partnerorganization_id_372f9148 ON [[schema]].field_monitoring_planning_monitoringactivity_partners USING btree (partnerorganization_id);
+
+
+--
+-- Name: field_monitoring_planning__person_responsible_id_78095256; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__person_responsible_id_78095256 ON [[schema]].field_monitoring_planning_monitoringactivity USING btree (person_responsible_id);
+
+
+--
+-- Name: field_monitoring_planning__result_id_a4dd22f2; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__result_id_a4dd22f2 ON [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs USING btree (result_id);
+
+
+--
+-- Name: field_monitoring_planning__section_id_e9c134f2; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__section_id_e9c134f2 ON [[schema]].field_monitoring_planning_monitoringactivity_sections USING btree (section_id);
+
+
+--
+-- Name: field_monitoring_planning__tpm_partner_id_1ec7ebbd; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__tpm_partner_id_1ec7ebbd ON [[schema]].field_monitoring_planning_monitoringactivity USING btree (tpm_partner_id);
+
+
+--
+-- Name: field_monitoring_planning__user_id_8e1bf82e; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning__user_id_8e1bf82e ON [[schema]].field_monitoring_planning_monitoringactivity_team_members USING btree (user_id);
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate_partner_id_b90726cd; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning_questiontemplate_partner_id_b90726cd ON [[schema]].field_monitoring_planning_questiontemplate USING btree (partner_id);
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate_question_id_8fe58309; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_planning_questiontemplate_question_id_8fe58309 ON [[schema]].field_monitoring_planning_questiontemplate USING btree (question_id);
+
+
+--
+-- Name: field_monitoring_settings__question_id_fa8bd45e; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings__question_id_fa8bd45e ON [[schema]].field_monitoring_settings_question_sections USING btree (question_id);
+
+
+--
+-- Name: field_monitoring_settings_category_order_1bec9ad6; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_category_order_1bec9ad6 ON [[schema]].field_monitoring_settings_category USING btree ("order");
+
+
+--
+-- Name: field_monitoring_settings_locationsite_parent_id_068e81cb; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_locationsite_parent_id_068e81cb ON [[schema]].field_monitoring_settings_locationsite USING btree (parent_id);
+
+
+--
+-- Name: field_monitoring_settings_locationsite_point_id; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_locationsite_point_id ON [[schema]].field_monitoring_settings_locationsite USING gist (point);
+
+
+--
+-- Name: field_monitoring_settings_logissue_author_id_18882eaf; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_logissue_author_id_18882eaf ON [[schema]].field_monitoring_settings_logissue USING btree (author_id);
+
+
+--
+-- Name: field_monitoring_settings_logissue_cp_output_id_96837022; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_logissue_cp_output_id_96837022 ON [[schema]].field_monitoring_settings_logissue USING btree (cp_output_id);
+
+
+--
+-- Name: field_monitoring_settings_logissue_location_id_7e76754c; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_logissue_location_id_7e76754c ON [[schema]].field_monitoring_settings_logissue USING btree (location_id);
+
+
+--
+-- Name: field_monitoring_settings_logissue_location_site_id_2a0fef66; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_logissue_location_site_id_2a0fef66 ON [[schema]].field_monitoring_settings_logissue USING btree (location_site_id);
+
+
+--
+-- Name: field_monitoring_settings_logissue_partner_id_b4e46a37; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_logissue_partner_id_b4e46a37 ON [[schema]].field_monitoring_settings_logissue USING btree (partner_id);
+
+
+--
+-- Name: field_monitoring_settings_option_question_id_4a4c670c; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_option_question_id_4a4c670c ON [[schema]].field_monitoring_settings_option USING btree (question_id);
+
+
+--
+-- Name: field_monitoring_settings_question_category_id_73bfe0b4; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_question_category_id_73bfe0b4 ON [[schema]].field_monitoring_settings_question USING btree (category_id);
+
+
+--
+-- Name: field_monitoring_settings_question_methods_method_id_955b3f19; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_question_methods_method_id_955b3f19 ON [[schema]].field_monitoring_settings_question_methods USING btree (method_id);
+
+
+--
+-- Name: field_monitoring_settings_question_methods_question_id_214c0c5c; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_question_methods_question_id_214c0c5c ON [[schema]].field_monitoring_settings_question_methods USING btree (question_id);
+
+
+--
+-- Name: field_monitoring_settings_question_sections_section_id_b6bd4e4c; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX field_monitoring_settings_question_sections_section_id_b6bd4e4c ON [[schema]].field_monitoring_settings_question_sections USING btree (section_id);
 
 
 --
@@ -15765,6 +18161,13 @@ CREATE INDEX reports_unit_type_111e83d6c65ff8e3_like ON [[schema]].reports_unit 
 
 
 --
+-- Name: reports_usertenantprofile_office_id_4bcf150c; Type: INDEX; Schema: [[schema]]; Owner: -
+--
+
+CREATE INDEX reports_usertenantprofile_office_id_4bcf150c ON [[schema]].reports_usertenantprofile USING btree (office_id);
+
+
+--
 -- Name: reversion_revision_b16b0f06; Type: INDEX; Schema: [[schema]]; Owner: -
 --
 
@@ -16240,6 +18643,22 @@ ALTER TABLE ONLY [[schema]].action_points_actionpoint
 
 
 --
+-- Name: action_points_actionpoint action_points_action_monitoring_activity__cc56cf8e_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].action_points_actionpoint
+    ADD CONSTRAINT action_points_action_monitoring_activity__cc56cf8e_fk_field_mon FOREIGN KEY (monitoring_activity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: action_points_actionpoint action_points_action_office_id_8247345a_fk_reports_o; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].action_points_actionpoint
+    ADD CONSTRAINT action_points_action_office_id_8247345a_fk_reports_o FOREIGN KEY (office_id) REFERENCES [[schema]].reports_office(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: action_points_actionpoint action_points_action_psea_assessment_id_008f62ed_fk_psea_asse; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -16285,14 +18704,6 @@ ALTER TABLE ONLY [[schema]].action_points_actionpoint
 
 ALTER TABLE ONLY [[schema]].action_points_actionpoint
     ADD CONSTRAINT action_points_actionpoint_author_id_62635fb4_fk_auth_user_id FOREIGN KEY (author_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: action_points_actionpoint action_points_actionpoint_office_id_8247345a_fk_users_office_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].action_points_actionpoint
-    ADD CONSTRAINT action_points_actionpoint_office_id_8247345a_fk_users_office_id FOREIGN KEY (office_id) REFERENCES public.users_office(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -16384,30 +18795,6 @@ ALTER TABLE ONLY [[schema]].attachments_attachmentflat
 
 
 --
--- Name: attachments_attachment attachments__content_type_id_35dd9d5d_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_attachment
-    ADD CONSTRAINT attachments__content_type_id_35dd9d5d_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: attachments_attachment attachments_at_file_type_id_9b87232b_fk_attachments_filetype_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_attachment
-    ADD CONSTRAINT attachments_at_file_type_id_9b87232b_fk_attachments_filetype_id FOREIGN KEY (file_type_id) REFERENCES [[schema]].attachments_filetype(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: attachments_attachment attachments_attachment_uploaded_by_id_17a1c093_fk_auth_user_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].attachments_attachment
-    ADD CONSTRAINT attachments_attachment_uploaded_by_id_17a1c093_fk_auth_user_id FOREIGN KEY (uploaded_by_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: audit_finding aud_spot_check_id_0a087ac9_fk_audit_spotcheck_engagement_ptr_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -16488,11 +18875,59 @@ ALTER TABLE ONLY [[schema]].audit_engagement_active_pd
 
 
 --
+-- Name: audit_engagement_offices audit_engagement_off_engagement_id_0611124d_fk_audit_eng; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_offices
+    ADD CONSTRAINT audit_engagement_off_engagement_id_0611124d_fk_audit_eng FOREIGN KEY (engagement_id) REFERENCES [[schema]].audit_engagement(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: audit_engagement_offices audit_engagement_off_office_id_546ae09e_fk_reports_o; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_offices
+    ADD CONSTRAINT audit_engagement_off_office_id_546ae09e_fk_reports_o FOREIGN KEY (office_id) REFERENCES [[schema]].reports_office(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: audit_engagement audit_engagement_po_item_id_5da58b83_fk_purchase_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].audit_engagement
     ADD CONSTRAINT audit_engagement_po_item_id_5da58b83_fk_purchase_ FOREIGN KEY (po_item_id) REFERENCES public.purchase_order_purchaseorderitem(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: audit_engagement_sections audit_engagement_sec_engagement_id_e21eccb1_fk_audit_eng; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_sections
+    ADD CONSTRAINT audit_engagement_sec_engagement_id_e21eccb1_fk_audit_eng FOREIGN KEY (engagement_id) REFERENCES [[schema]].audit_engagement(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: audit_engagement_sections audit_engagement_sec_section_id_03d30795_fk_reports_s; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_sections
+    ADD CONSTRAINT audit_engagement_sec_section_id_03d30795_fk_reports_s FOREIGN KEY (section_id) REFERENCES [[schema]].reports_sector(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: audit_engagement_users_notified audit_engagement_use_engagement_id_32d85871_fk_audit_eng; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_users_notified
+    ADD CONSTRAINT audit_engagement_use_engagement_id_32d85871_fk_audit_eng FOREIGN KEY (engagement_id) REFERENCES [[schema]].audit_engagement(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: audit_engagement_users_notified audit_engagement_use_user_id_b249b03c_fk_auth_user; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].audit_engagement_users_notified
+    ADD CONSTRAINT audit_engagement_use_user_id_b249b03c_fk_auth_user FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -16637,6 +19072,406 @@ ALTER TABLE ONLY [[schema]].audit_engagement_staff_members
 
 ALTER TABLE ONLY [[schema]].funds_fundscommitmentitem
     ADD CONSTRAINT f_fund_commitment_id_efde5c22_fk_funds_fundscommitmentheader_id FOREIGN KEY (fund_commitment_id) REFERENCES [[schema]].funds_fundscommitmentheader(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_finding field_monitoring_dat_activity_question_id_0b0015dc_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_finding
+    ADD CONSTRAINT field_monitoring_dat_activity_question_id_0b0015dc_fk_field_mon FOREIGN KEY (activity_question_id) REFERENCES [[schema]].field_monitoring_data_collection_activityquestion(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestionoverallfinding field_monitoring_dat_activity_question_id_d9cb104e_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestionoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_activity_question_id_d9cb104e_fk_field_mon FOREIGN KEY (activity_question_id) REFERENCES [[schema]].field_monitoring_data_collection_activityquestion(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist field_monitoring_dat_author_id_0ab0ed52_fk_auth_user; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_startedchecklist
+    ADD CONSTRAINT field_monitoring_dat_author_id_0ab0ed52_fk_auth_user FOREIGN KEY (author_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding field_monitoring_dat_cp_output_id_0047ac65_fk_reports_r; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_checklistoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_cp_output_id_0047ac65_fk_reports_r FOREIGN KEY (cp_output_id) REFERENCES [[schema]].reports_result(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding field_monitoring_dat_cp_output_id_60422760_fk_reports_r; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_cp_output_id_60422760_fk_reports_r FOREIGN KEY (cp_output_id) REFERENCES [[schema]].reports_result(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion field_monitoring_dat_cp_output_id_86d1609b_fk_reports_r; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestion
+    ADD CONSTRAINT field_monitoring_dat_cp_output_id_86d1609b_fk_reports_r FOREIGN KEY (cp_output_id) REFERENCES [[schema]].reports_result(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding field_monitoring_dat_intervention_id_622718ca_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_intervention_id_622718ca_fk_partners_ FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion field_monitoring_dat_intervention_id_8340ee1a_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestion
+    ADD CONSTRAINT field_monitoring_dat_intervention_id_8340ee1a_fk_partners_ FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding field_monitoring_dat_intervention_id_c42feb00_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_checklistoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_intervention_id_c42feb00_fk_partners_ FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist field_monitoring_dat_method_id_4ad53a63_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_startedchecklist
+    ADD CONSTRAINT field_monitoring_dat_method_id_4ad53a63_fk_field_mon FOREIGN KEY (method_id) REFERENCES [[schema]].field_monitoring_settings_method(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_startedchecklist field_monitoring_dat_monitoring_activity__5a71e452_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_startedchecklist
+    ADD CONSTRAINT field_monitoring_dat_monitoring_activity__5a71e452_fk_field_mon FOREIGN KEY (monitoring_activity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion field_monitoring_dat_monitoring_activity__8cda2800_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestion
+    ADD CONSTRAINT field_monitoring_dat_monitoring_activity__8cda2800_fk_field_mon FOREIGN KEY (monitoring_activity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding field_monitoring_dat_monitoring_activity__f2fb1a54_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_monitoring_activity__f2fb1a54_fk_field_mon FOREIGN KEY (monitoring_activity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion field_monitoring_dat_partner_id_5e2b7bd3_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestion
+    ADD CONSTRAINT field_monitoring_dat_partner_id_5e2b7bd3_fk_partners_ FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding field_monitoring_dat_partner_id_9a014f3f_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_checklistoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_partner_id_9a014f3f_fk_partners_ FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityoverallfinding field_monitoring_dat_partner_id_a58543e8_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_partner_id_a58543e8_fk_partners_ FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_activityquestion field_monitoring_dat_question_id_197829ee_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_activityquestion
+    ADD CONSTRAINT field_monitoring_dat_question_id_197829ee_fk_field_mon FOREIGN KEY (question_id) REFERENCES [[schema]].field_monitoring_settings_question(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_finding field_monitoring_dat_started_checklist_id_1c248532_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_finding
+    ADD CONSTRAINT field_monitoring_dat_started_checklist_id_1c248532_fk_field_mon FOREIGN KEY (started_checklist_id) REFERENCES [[schema]].field_monitoring_data_collection_startedchecklist(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_data_collection_checklistoverallfinding field_monitoring_dat_started_checklist_id_9f6f3f7d_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_data_collection_checklistoverallfinding
+    ADD CONSTRAINT field_monitoring_dat_started_checklist_id_9f6f3f7d_fk_field_mon FOREIGN KEY (started_checklist_id) REFERENCES [[schema]].field_monitoring_data_collection_startedchecklist(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate field_monitoring_pla_cp_output_id_b103adb0_fk_reports_r; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_questiontemplate
+    ADD CONSTRAINT field_monitoring_pla_cp_output_id_b103adb0_fk_reports_r FOREIGN KEY (cp_output_id) REFERENCES [[schema]].reports_result(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity field_monitoring_pla_field_office_id_8262e61f_fk_reports_o; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity
+    ADD CONSTRAINT field_monitoring_pla_field_office_id_8262e61f_fk_reports_o FOREIGN KEY (field_office_id) REFERENCES [[schema]].reports_office(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate field_monitoring_pla_intervention_id_d05d6a02_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_questiontemplate
+    ADD CONSTRAINT field_monitoring_pla_intervention_id_d05d6a02_fk_partners_ FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventions field_monitoring_pla_intervention_id_e94156a4_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_interventions
+    ADD CONSTRAINT field_monitoring_pla_intervention_id_e94156a4_fk_partners_ FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity field_monitoring_pla_location_id_29818917_fk_locations; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity
+    ADD CONSTRAINT field_monitoring_pla_location_id_29818917_fk_locations FOREIGN KEY (location_id) REFERENCES [[schema]].locations_location(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity field_monitoring_pla_location_site_id_d8d558fb_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity
+    ADD CONSTRAINT field_monitoring_pla_location_site_id_d8d558fb_fk_field_mon FOREIGN KEY (location_site_id) REFERENCES [[schema]].field_monitoring_settings_locationsite(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_interventions field_monitoring_pla_monitoringactivity_i_0021d5cb_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_interventions
+    ADD CONSTRAINT field_monitoring_pla_monitoringactivity_i_0021d5cb_fk_field_mon FOREIGN KEY (monitoringactivity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs field_monitoring_pla_monitoringactivity_i_17e556fa_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs
+    ADD CONSTRAINT field_monitoring_pla_monitoringactivity_i_17e556fa_fk_field_mon FOREIGN KEY (monitoringactivity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners field_monitoring_pla_monitoringactivity_i_9d54a666_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_partners
+    ADD CONSTRAINT field_monitoring_pla_monitoringactivity_i_9d54a666_fk_field_mon FOREIGN KEY (monitoringactivity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_members field_monitoring_pla_monitoringactivity_i_9f85de74_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_team_members
+    ADD CONSTRAINT field_monitoring_pla_monitoringactivity_i_9f85de74_fk_field_mon FOREIGN KEY (monitoringactivity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections field_monitoring_pla_monitoringactivity_i_bed3cc06_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_sections
+    ADD CONSTRAINT field_monitoring_pla_monitoringactivity_i_bed3cc06_fk_field_mon FOREIGN KEY (monitoringactivity_id) REFERENCES [[schema]].field_monitoring_planning_monitoringactivity(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate field_monitoring_pla_partner_id_b90726cd_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_questiontemplate
+    ADD CONSTRAINT field_monitoring_pla_partner_id_b90726cd_fk_partners_ FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_partners field_monitoring_pla_partnerorganization__372f9148_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_partners
+    ADD CONSTRAINT field_monitoring_pla_partnerorganization__372f9148_fk_partners_ FOREIGN KEY (partnerorganization_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity field_monitoring_pla_person_responsible_i_78095256_fk_auth_user; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity
+    ADD CONSTRAINT field_monitoring_pla_person_responsible_i_78095256_fk_auth_user FOREIGN KEY (person_responsible_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_questiontemplate field_monitoring_pla_question_id_8fe58309_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_questiontemplate
+    ADD CONSTRAINT field_monitoring_pla_question_id_8fe58309_fk_field_mon FOREIGN KEY (question_id) REFERENCES [[schema]].field_monitoring_settings_question(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_cp_outputs field_monitoring_pla_result_id_a4dd22f2_fk_reports_r; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_cp_outputs
+    ADD CONSTRAINT field_monitoring_pla_result_id_a4dd22f2_fk_reports_r FOREIGN KEY (result_id) REFERENCES [[schema]].reports_result(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_sections field_monitoring_pla_section_id_e9c134f2_fk_reports_s; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_sections
+    ADD CONSTRAINT field_monitoring_pla_section_id_e9c134f2_fk_reports_s FOREIGN KEY (section_id) REFERENCES [[schema]].reports_sector(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity field_monitoring_pla_tpm_partner_id_1ec7ebbd_fk_tpmpartne; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity
+    ADD CONSTRAINT field_monitoring_pla_tpm_partner_id_1ec7ebbd_fk_tpmpartne FOREIGN KEY (tpm_partner_id) REFERENCES public.tpmpartners_tpmpartner(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_planning_monitoringactivity_team_members field_monitoring_pla_user_id_8e1bf82e_fk_auth_user; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_planning_monitoringactivity_team_members
+    ADD CONSTRAINT field_monitoring_pla_user_id_8e1bf82e_fk_auth_user FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_logissue field_monitoring_set_author_id_18882eaf_fk_auth_user; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_logissue
+    ADD CONSTRAINT field_monitoring_set_author_id_18882eaf_fk_auth_user FOREIGN KEY (author_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_question field_monitoring_set_category_id_73bfe0b4_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question
+    ADD CONSTRAINT field_monitoring_set_category_id_73bfe0b4_fk_field_mon FOREIGN KEY (category_id) REFERENCES [[schema]].field_monitoring_settings_category(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_logissue field_monitoring_set_cp_output_id_96837022_fk_reports_r; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_logissue
+    ADD CONSTRAINT field_monitoring_set_cp_output_id_96837022_fk_reports_r FOREIGN KEY (cp_output_id) REFERENCES [[schema]].reports_result(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_logissue field_monitoring_set_location_id_7e76754c_fk_locations; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_logissue
+    ADD CONSTRAINT field_monitoring_set_location_id_7e76754c_fk_locations FOREIGN KEY (location_id) REFERENCES [[schema]].locations_location(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_logissue field_monitoring_set_location_site_id_2a0fef66_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_logissue
+    ADD CONSTRAINT field_monitoring_set_location_site_id_2a0fef66_fk_field_mon FOREIGN KEY (location_site_id) REFERENCES [[schema]].field_monitoring_settings_locationsite(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_question_methods field_monitoring_set_method_id_955b3f19_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_methods
+    ADD CONSTRAINT field_monitoring_set_method_id_955b3f19_fk_field_mon FOREIGN KEY (method_id) REFERENCES [[schema]].field_monitoring_settings_method(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_locationsite field_monitoring_set_parent_id_068e81cb_fk_locations; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_locationsite
+    ADD CONSTRAINT field_monitoring_set_parent_id_068e81cb_fk_locations FOREIGN KEY (parent_id) REFERENCES [[schema]].locations_location(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_logissue field_monitoring_set_partner_id_b4e46a37_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_logissue
+    ADD CONSTRAINT field_monitoring_set_partner_id_b4e46a37_fk_partners_ FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_question_methods field_monitoring_set_question_id_214c0c5c_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_methods
+    ADD CONSTRAINT field_monitoring_set_question_id_214c0c5c_fk_field_mon FOREIGN KEY (question_id) REFERENCES [[schema]].field_monitoring_settings_question(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_option field_monitoring_set_question_id_4a4c670c_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_option
+    ADD CONSTRAINT field_monitoring_set_question_id_4a4c670c_fk_field_mon FOREIGN KEY (question_id) REFERENCES [[schema]].field_monitoring_settings_question(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_question_sections field_monitoring_set_question_id_fa8bd45e_fk_field_mon; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_sections
+    ADD CONSTRAINT field_monitoring_set_question_id_fa8bd45e_fk_field_mon FOREIGN KEY (question_id) REFERENCES [[schema]].field_monitoring_settings_question(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: field_monitoring_settings_question_sections field_monitoring_set_section_id_b6bd4e4c_fk_reports_s; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].field_monitoring_settings_question_sections
+    ADD CONSTRAINT field_monitoring_set_section_id_b6bd4e4c_fk_reports_s FOREIGN KEY (section_id) REFERENCES [[schema]].reports_sector(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -16848,14 +19683,6 @@ ALTER TABLE ONLY [[schema]].partners_interventionamendment
 
 
 --
--- Name: partners_intervention_offices partners_i_intervention_id_9e1a86b1_fk_partners_intervention_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].partners_intervention_offices
-    ADD CONSTRAINT partners_i_intervention_id_9e1a86b1_fk_partners_intervention_id FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: partners_intervention_unicef_focal_points partners_i_intervention_id_a29eb115_fk_partners_intervention_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -16936,11 +19763,19 @@ ALTER TABLE ONLY [[schema]].partners_interventionresultlink
 
 
 --
--- Name: partners_intervention_offices partners_intervention_off_office_id_9db4b723_fk_users_office_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+-- Name: partners_intervention_offices partners_interventio_intervention_id_9e1a86b1_fk_partners_; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].partners_intervention_offices
-    ADD CONSTRAINT partners_intervention_off_office_id_9db4b723_fk_users_office_id FOREIGN KEY (office_id) REFERENCES public.users_office(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT partners_interventio_intervention_id_9e1a86b1_fk_partners_ FOREIGN KEY (intervention_id) REFERENCES [[schema]].partners_intervention(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: partners_intervention_offices partners_interventio_office_id_9db4b723_fk_reports_o; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].partners_intervention_offices
+    ADD CONSTRAINT partners_interventio_office_id_9db4b723_fk_reports_o FOREIGN KEY (office_id) REFERENCES [[schema]].reports_office(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -17304,6 +20139,22 @@ ALTER TABLE ONLY [[schema]].reports_specialreportingrequirement
 
 
 --
+-- Name: reports_usertenantprofile reports_usertenantpr_office_id_4bcf150c_fk_reports_o; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].reports_usertenantprofile
+    ADD CONSTRAINT reports_usertenantpr_office_id_4bcf150c_fk_reports_o FOREIGN KEY (office_id) REFERENCES [[schema]].reports_office(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reports_usertenantprofile reports_usertenantpr_profile_id_78b81e97_fk_users_use; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].reports_usertenantprofile
+    ADD CONSTRAINT reports_usertenantpr_profile_id_78b81e97_fk_users_use FOREIGN KEY (profile_id) REFERENCES public.users_userprofile(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: reversion_revision reversion_revision_user_id_17095f45_fk_auth_user_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -17392,11 +20243,11 @@ ALTER TABLE ONLY [[schema]].t2f_travel
 
 
 --
--- Name: t2f_travel t2f_travel_office_id_5dacac5a_fk_users_office_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+-- Name: t2f_travel t2f_travel_office_id_5dacac5a_fk_reports_office_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].t2f_travel
-    ADD CONSTRAINT t2f_travel_office_id_5dacac5a_fk_users_office_id FOREIGN KEY (office_id) REFERENCES public.users_office(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT t2f_travel_office_id_5dacac5a_fk_reports_office_id FOREIGN KEY (office_id) REFERENCES [[schema]].reports_office(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -17496,14 +20347,6 @@ ALTER TABLE ONLY [[schema]].tpm_tpmactivity_unicef_focal_points
 
 
 --
--- Name: tpm_tpmactivity_offices tpm__tpmactivity_id_760ccefe_fk_tpm_tpmactivity_activity_ptr_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
---
-
-ALTER TABLE ONLY [[schema]].tpm_tpmactivity_offices
-    ADD CONSTRAINT tpm__tpmactivity_id_760ccefe_fk_tpm_tpmactivity_activity_ptr_id FOREIGN KEY (tpmactivity_id) REFERENCES [[schema]].tpm_tpmactivity(activity_ptr_id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: tpm_tpmactivity tpm_tpmactiv_activity_ptr_id_3ca6cc19_fk_activities_activity_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
@@ -17512,11 +20355,19 @@ ALTER TABLE ONLY [[schema]].tpm_tpmactivity
 
 
 --
--- Name: tpm_tpmactivity_offices tpm_tpmactivity_offices_office_id_b388619e_fk_users_office_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+-- Name: tpm_tpmactivity_offices tpm_tpmactivity_offi_tpmactivity_id_760ccefe_fk_tpm_tpmac; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
 --
 
 ALTER TABLE ONLY [[schema]].tpm_tpmactivity_offices
-    ADD CONSTRAINT tpm_tpmactivity_offices_office_id_b388619e_fk_users_office_id FOREIGN KEY (office_id) REFERENCES public.users_office(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT tpm_tpmactivity_offi_tpmactivity_id_760ccefe_fk_tpm_tpmac FOREIGN KEY (tpmactivity_id) REFERENCES [[schema]].tpm_tpmactivity(activity_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: tpm_tpmactivity_offices tpm_tpmactivity_offices_office_id_b388619e_fk_reports_office_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].tpm_tpmactivity_offices
+    ADD CONSTRAINT tpm_tpmactivity_offices_office_id_b388619e_fk_reports_office_id FOREIGN KEY (office_id) REFERENCES [[schema]].reports_office(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

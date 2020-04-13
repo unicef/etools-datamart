@@ -45,4 +45,4 @@ fail_under = 80
 ignore_errors = True
 
 [html]
-directory = ~build/coverage
+directory = build/coverage
