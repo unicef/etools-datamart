@@ -48,6 +48,7 @@ RUN apk add --no-cache --virtual .run-deps \
 #        libzmq \
 #        jpeg \
         mailcap \
+        postgresql-client \
 #        xmlsec \
         zlib
 

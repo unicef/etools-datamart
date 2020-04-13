@@ -199,6 +199,9 @@ class ActionPoint(LocationMixin, EtoolsDataMartModel):
 
     loader = ActionPointLoader()
 
+    class Meta:
+        ordering = ("id",)
+
     class Options:
         source = ActionPointsActionpoint
         depends = (Intervention,)

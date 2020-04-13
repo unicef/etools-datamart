@@ -240,6 +240,9 @@ class SpotCheck(EtoolsDataMartModel):
     # datamart
     loader = SpotCheckLoader()
 
+    class Meta:
+        ordering = ("id",)
+
     class Options:
         source = AuditFinding
         sync_deleted_records = lambda a: False

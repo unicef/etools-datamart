@@ -1,3 +1,13 @@
+2.13
+----
+* Add new office endpoint
+* Update etools source to match latest etools
+* Add ordering to model Meta for pagination where needed
+
+2.12
+----
+* Add disaggregation field to PRP data report
+
 2.11
 ----
 * fixes #18276 - Add `Achievement in reporting period` field to the prp/datareport endpoint

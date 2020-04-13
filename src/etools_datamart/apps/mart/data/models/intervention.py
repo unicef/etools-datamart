@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models import F
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
+from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
                                                         PartnersIntervention, PartnersInterventionplannedvisits,
@@ -15,7 +16,6 @@ from .base import EtoolsDataMartModel
 from .location import Location
 from .mixins import add_location_mapping, LocationMixin, NestedLocationLoaderMixin, NestedLocationMixin
 from .partner import Partner
-from .user_office import Office
 
 logger = logging.getLogger(__name__)
 
@@ -216,7 +216,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return record.planned
 
     def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = record.attachments.all()
+        qs = record.PartnersInterventionattachment_intervention.all()
         values['number_of_attachments'] = qs.count()
         return ", ".join(qs.values_list('type__name', flat=True))
 
@@ -269,10 +269,9 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionOffices
         data = []
-        for office in record.offices.select_related('zonal_chief').order_by('id'):
+        for office in record.offices.order_by('id'):
             data.append(dict(source_id=office.id,
                              name=office.name,
-                             zonal_chief_email=getattr(office.zonal_chief, 'email', ''),
                              ))
         values['offices_data'] = data
         return ", ".join([l['name'] for l in data])

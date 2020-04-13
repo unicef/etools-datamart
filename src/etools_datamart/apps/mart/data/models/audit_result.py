@@ -65,6 +65,9 @@ class AuditResult(EtoolsDataMartModel):
 
     loader = AuditResultLoader()
 
+    class Meta:
+        ordering = ("id",)
+
     class Options:
         source = AuditAudit
         sync_deleted_records = lambda loader: False

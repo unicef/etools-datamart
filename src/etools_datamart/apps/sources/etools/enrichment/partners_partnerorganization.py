@@ -12,7 +12,7 @@ PartnersPartnerorganization.CSO_TYPES = (
 
 PartnersPartnerorganization.current_core_value_assessment = property(
     lambda self:
-    self.core_values_assessments.filter(archived=False).first())
+    self.PartnersCorevaluesassessment_partner.filter(archived=False).first())
 
 aliases = (
     # CoreValuesAssessment.partner

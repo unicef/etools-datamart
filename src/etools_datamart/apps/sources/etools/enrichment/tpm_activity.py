@@ -1,8 +1,8 @@
 from django.db import models
 
 from etools_datamart.apps.sources.etools.models import (ActivitiesActivity, ActivitiesActivityLocations, AuthUser,
-                                                        LocationsLocation, TpmTpmactivity, TpmTpmactivityOffices,
-                                                        TpmTpmactivityUnicefFocalPoints, UsersOffice,)
+                                                        LocationsLocation, ReportsOffice, TpmTpmactivity,
+                                                        TpmTpmactivityOffices, TpmTpmactivityUnicefFocalPoints,)
 
 from .utils import set_primary_key
 
@@ -14,7 +14,7 @@ models.ManyToManyField(AuthUser,
                        through=TpmTpmactivityUnicefFocalPoints,
                        ).contribute_to_class(TpmTpmactivity, 'unicef_focal_points')
 
-models.ManyToManyField(UsersOffice,
+models.ManyToManyField(ReportsOffice,
                        through=TpmTpmactivityOffices,
                        ).contribute_to_class(TpmTpmactivity, 'offices')
 
