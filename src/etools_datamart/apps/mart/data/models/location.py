@@ -83,6 +83,7 @@ class Location(EtoolsDataMartModel):
 
     class Meta:
         unique_together = ('schema_name', 'source_id')
+        ordering = ("name",)
 
     class Options:
         depends = (GatewayType,)

@@ -13,7 +13,7 @@ def test_intervention_location():
 
 def test_intervention_frs():
     i = PartnersIntervention.objects.first()
-    assert i.frs.all().count() >= 0
+    assert i.FundsFundsreservationheader_intervention.all().count() >= 0
 
 
 def test_intervention_sections():

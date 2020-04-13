@@ -5,8 +5,8 @@ from etools_datamart.apps.sources.etools.models import (AuthUser, LocationsLocat
                                                         PartnersInterventionPartnerFocalPoints,
                                                         PartnersInterventionresultlink, PartnersInterventionSections,
                                                         PartnersInterventionUnicefFocalPoints,
-                                                        PartnersPartnerstaffmember, ReportsResult, ReportsSector,
-                                                        UsersOffice,)
+                                                        PartnersPartnerstaffmember, ReportsOffice, ReportsResult,
+                                                        ReportsSector,)
 
 from .utils import create_alias
 
@@ -38,7 +38,7 @@ models.ManyToManyField(PartnersPartnerstaffmember,
                        through=PartnersInterventionPartnerFocalPoints,
                        ).contribute_to_class(PartnersIntervention, 'partner_focal_points')
 
-models.ManyToManyField(UsersOffice,
+models.ManyToManyField(ReportsOffice,
                        through=PartnersInterventionOffices,
                        ).contribute_to_class(PartnersIntervention, 'offices')
 

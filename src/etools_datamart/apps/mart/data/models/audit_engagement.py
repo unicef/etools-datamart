@@ -293,6 +293,9 @@ class Engagement(EtoolsDataMartModel):
     # datamart
     loader = EngagementlLoader()
 
+    class Meta:
+        ordering = ("id",)
+
     class Options:
         source = AuditEngagement
         sync_deleted_records = lambda a: False

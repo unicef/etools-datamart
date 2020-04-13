@@ -136,4 +136,4 @@ class UnicefAttachmentsAttachmentflatAdmin(TenantModelAdmin):
 
 @register(models.UnicefAttachmentsAttachmentlink)
 class UnicefAttachmentsAttachmentlinkAdmin(TenantModelAdmin):
-    list_display = ('object_id', 'attachment', 'content_type')
+    list_display = ('object_id', 'attachment',)
