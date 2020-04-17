@@ -9,9 +9,11 @@ from etools_datamart.apps.sources.etools.models import (FundsFundsreservationhea
 
 
 class InterventionBudgetLoader(InterventionLoader):
+    def get_queryset(self):
+        return PartnersInterventionbudget.objects
+
     def process_country(self):
-        qs = PartnersInterventionbudget.objects.all()
-        for record in qs.all():
+        for record in self.get_queryset().all():
             filters = self.config.key(self, record)
             values = self.get_values(record.intervention)
             values['source_id'] = record.id
