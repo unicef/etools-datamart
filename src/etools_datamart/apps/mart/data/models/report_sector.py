@@ -5,7 +5,7 @@ from etools_datamart.apps.sources.etools.models import ReportsSector
 
 
 class Section(EtoolsDataMartModel):
-    name = models.CharField(max_length=45, blank=True, null=True)
+    name = models.CharField(max_length=128, blank=True, null=True)
     description = models.CharField(max_length=256, blank=True, null=True)
     alternate_id = models.IntegerField(blank=True, null=True)
     alternate_name = models.CharField(max_length=255, blank=True, null=True)
