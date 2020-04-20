@@ -66,7 +66,12 @@ class LocationLoader(EtoolsLoader):
             Location.objects.batch_update_centroid()
 
     def get_geonameid(self, record: LocationsLocation, values: dict, **kwargs):
-        geoname = GeoName.objects.get_or_add(lat=record.lat, lng=record.lng)
+        if not record.latitude or not record.longitude:
+            return None
+        geoname = GeoName.objects.get_or_add(
+            lat=record.latitude,
+            lng=record.longitude,
+        )
         return geoname.geoname_id
 
 
@@ -106,7 +111,7 @@ class Location(EtoolsDataMartModel):
                    # 'area_code': lambda loader, record: loader.context['country'].business_area_code,
                    'parent': '__self__',
                    'gateway': GatewayType,
-                   'geonameid': 'i',
+                   'geonameid': '-',
                    }
 
     def __str__(self):
@@ -122,6 +127,8 @@ class GeoNameManager(models.Manager):
         # if so, return that record
         # otherwise create a new record based on results
         # of request to geonames.org
+        if not lat or not lng:
+            return None
         try:
             geoname = self.get_queryset().get(lat=lat, lng=lng)
         except GeoName.DoesNotExist:
@@ -151,7 +158,7 @@ class GeoNameManager(models.Manager):
             data = {}
             for k, f in mapping:
                 data[k] = geoname.find(f).text
-            geoname = GeoName.objects.create(**data)
+            geoname, __ = GeoName.objects.get_or_create(**data)
         return geoname
 
 
