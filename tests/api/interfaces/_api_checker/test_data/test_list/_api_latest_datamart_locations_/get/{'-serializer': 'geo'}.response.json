@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"e55ef31bde4617bb74da202f1a868acf\""
+            "\"7b1c8f06afa1b55cf60e751b25230b12\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "e55ef31bde4617bb74da202f1a868acf"
+            "7b1c8f06afa1b55cf60e751b25230b12"
         ],
         "cache-hit": [
             "cache-hit",
@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1198"
+            "1192"
         ]
     },
     "data": {
@@ -85,11 +85,11 @@
                         "longitude": null,
                         "p_code": "",
                         "point": null,
-                        "geonameid": null,
                         "created": "16 Sep 2019 18:29:02",
                         "modified": "16 Sep 2019 18:29:02",
                         "is_active": true,
                         "gateway": 1514,
+                        "geoname": null,
                         "parent": null
                     }
                 },
@@ -107,11 +107,11 @@
                         "longitude": null,
                         "p_code": "",
                         "point": null,
-                        "geonameid": null,
                         "created": "16 Sep 2019 18:29:02",
                         "modified": "16 Sep 2019 18:29:02",
                         "is_active": true,
                         "gateway": 1515,
+                        "geoname": null,
                         "parent": null
                     }
                 },
@@ -129,11 +129,11 @@
                         "longitude": null,
                         "p_code": "",
                         "point": null,
-                        "geonameid": null,
                         "created": "16 Sep 2019 18:29:02",
                         "modified": "16 Sep 2019 18:29:02",
                         "is_active": true,
                         "gateway": 1516,
+                        "geoname": null,
                         "parent": null
                     }
                 }

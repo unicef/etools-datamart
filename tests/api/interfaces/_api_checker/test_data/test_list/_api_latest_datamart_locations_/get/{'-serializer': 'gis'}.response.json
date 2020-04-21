@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"c103699c1133008507285bf7143e88c9\""
+            "\"7ca2df9eb73a74de5a1ae12f402b4375\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "c103699c1133008507285bf7143e88c9"
+            "7ca2df9eb73a74de5a1ae12f402b4375"
         ],
         "cache-hit": [
             "cache-hit",
@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1050"
+            "1044"
         ]
     },
     "data": {
@@ -81,11 +81,11 @@
                 "p_code": "",
                 "point": null,
                 "geom": null,
-                "geonameid": null,
                 "created": "16 Sep 2019 18:29:02",
                 "modified": "16 Sep 2019 18:29:02",
                 "is_active": true,
                 "gateway": 1514,
+                "geoname": null,
                 "parent": null
             },
             {
@@ -100,11 +100,11 @@
                 "p_code": "",
                 "point": null,
                 "geom": null,
-                "geonameid": null,
                 "created": "16 Sep 2019 18:29:02",
                 "modified": "16 Sep 2019 18:29:02",
                 "is_active": true,
                 "gateway": 1515,
+                "geoname": null,
                 "parent": null
             },
             {
@@ -119,11 +119,11 @@
                 "p_code": "",
                 "point": null,
                 "geom": null,
-                "geonameid": null,
                 "created": "16 Sep 2019 18:29:02",
                 "modified": "16 Sep 2019 18:29:02",
                 "is_active": true,
                 "gateway": 1516,
+                "geoname": null,
                 "parent": null
             }
         ]
