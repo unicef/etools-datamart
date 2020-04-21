@@ -35,7 +35,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
     def get_geonameid(self, obj):
         if obj.geoname:
-            return geoname.geoname_id
+            return obj.geoname.geoname_id
         return None
 
 
