@@ -65,14 +65,14 @@ class LocationLoader(EtoolsLoader):
         finally:
             Location.objects.batch_update_centroid()
 
-    def get_geonameid(self, record: LocationsLocation, values: dict, **kwargs):
+    def get_geoname(self, record: LocationsLocation, values: dict, **kwargs):
         if not record.latitude or not record.longitude:
             return None
         geoname = GeoName.objects.get_or_add(
             lat=record.latitude,
             lng=record.longitude,
         )
-        return geoname.geoname_id
+        return geoname
 
 
 class Location(EtoolsDataMartModel):
@@ -83,7 +83,7 @@ class Location(EtoolsDataMartModel):
     point = geomodels.PointField(blank=True, null=True)
     gateway = models.ForeignKey(GatewayType, models.DO_NOTHING, blank=True, null=True)
     geom = geomodels.MultiPolygonField(blank=True, null=True)
-    geonameid = models.CharField(max_length=50, null=True)
+    geoname = models.ForeignKey("GeoName", models.DO_NOTHING, blank=True, null=True)
     level = models.IntegerField(db_index=True)
     lft = models.IntegerField()
     parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
@@ -105,13 +105,13 @@ class Location(EtoolsDataMartModel):
         source = LocationsLocation
         queryset = lambda: LocationsLocation.objects.order_by('-parent')
         last_modify_field = 'modified'
-        exclude_from_compare = ['latitude', 'longitude', 'point', 'geonameid']
+        exclude_from_compare = ['latitude', 'longitude', 'point', 'geoname']
         # sync_deleted_records = False
         mapping = {'source_id': 'id',
                    # 'area_code': lambda loader, record: loader.context['country'].business_area_code,
                    'parent': '__self__',
                    'gateway': GatewayType,
-                   'geonameid': '-',
+                   'geoname': '-',
                    }
 
     def __str__(self):

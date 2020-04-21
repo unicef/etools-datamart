@@ -6,15 +6,10 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('data', '0113_auto_20200408_1747'),
+        ('data', '0115_pdindicator_pd_url'),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='location',
-            name='geonameid',
-            field=models.CharField(max_length=50, null=True),
-        ),
         migrations.CreateModel(
             name='GeoName',
             fields=[
@@ -33,5 +28,10 @@ class Migration(migrations.Migration):
             options={
                 'unique_together': {('lat', 'lng')},
             },
+        ),
+        migrations.AddField(
+            model_name='location',
+            name='geoname',
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.DO_NOTHING, to='data.GeoName'),
         ),
     ]
