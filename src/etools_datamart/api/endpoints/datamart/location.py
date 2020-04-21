@@ -26,10 +26,17 @@ class LocationSerializerPos(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    geonameid = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Location
         exclude = ('schema_name', 'tree_id', 'lft', 'rght', 'level', 'source_id',
                    'geom', 'point', 'latitude', 'longitude')
+
+    def get_geonameid(self, obj):
+        if obj.geoname:
+            return geoname.geoname_id
+        return None
 
 
 class LocationViewSet(common.DataMartViewSet):
