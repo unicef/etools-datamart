@@ -1,3 +1,5 @@
+from django.shortcuts import reverse
+
 from etools_datamart.apps.mart.data.fields import SafeDecimal
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models import Location
@@ -29,6 +31,12 @@ class PDIndicatorLoader(EtoolsLoader):
                     values = self.get_values(indicator)
                     op = self.process_record(filters, values)
                     self.increment_counter(op)
+
+    def get_pd_url(self, record: ReportsAppliedindicator, values: dict, **kwargs):
+        return reverse(
+            "api:intervention-detail",
+            args=["latest", record.lower_result.result_link.intervention.pk],
+        )
 
 
 class PDIndicator(LocationMixin, EtoolsDataMartModel):
@@ -73,6 +81,7 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     # from lower_result
     lower_result_name = models.CharField(max_length=500, blank=True, null=True)
     result_link_intervention = models.IntegerField(blank=True, null=True)
+    pd_url = models.CharField(max_length=254, blank=True, null=True)
 
     # from section
     section_name = models.CharField(max_length=45, blank=True, null=True)
@@ -126,6 +135,7 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
             section_name='section.name',
             lower_result_name='lower_result.name',
             result_link_intervention='lower_result.result_link.intervention.pk',
+            pd_url='-',
 
             disaggregation_name='disaggregation.name',
             disaggregation_active='disaggregation.active',
