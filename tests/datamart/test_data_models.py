@@ -4,6 +4,10 @@ from unittest.mock import Mock
 from django.apps import apps
 from django.db import connections
 
+EXCLUDED_MODELS = [
+    'GeoName',
+]
+
 
 def pytest_generate_tests(metafunc):
     if 'context' in metafunc.fixturenames:
@@ -11,13 +15,20 @@ def pytest_generate_tests(metafunc):
         models = []
         ids = []
         for m in config.get_models():
-            ctx = {'country': 1, 'year': 2019}
-            models.append([m, ctx])
-            ids.append(m.__name__)
+            if m.__name__ not in EXCLUDED_MODELS:
+                ctx = {'country': 1, 'year': 2019}
+                models.append([m, ctx])
+                ids.append(m.__name__)
         metafunc.parametrize("model,context", models, ids=ids)
     elif 'model' in metafunc.fixturenames:
         config = apps.get_app_config('data')
-        metafunc.parametrize("model", config.get_models())
+        metafunc.parametrize(
+            "model",
+            [
+                m for m in config.get_models()
+                if m.__name__ not in EXCLUDED_MODELS
+            ],
+        )
 
 
 def test_model_str(model):
