@@ -79,6 +79,9 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   URL_PREFIX=(str, ''),
                   USE_X_FORWARDED_HOST=(bool, False),
                   X_FRAME_OPTIONS=(str, 'DENY'),
+                  GEONAMES_URL=(str, 'http://api.geonames.org/findNearby'),
+                  GEONAMES_USERNAME=(str, 'ntrncic'),
+                  REQUEST_TIMEOUT=(int, 300),
                   )
 
 DEBUG = env.bool('DEBUG')
@@ -737,3 +740,7 @@ AZURE_LOCATION = env('AZURE_STORAGE_LOCATION')
 AZURE_AUTO_SIGN = env('AZURE_STORAGE_AUTO_SIGN')
 AZURE_ACCESS_MODE = env('AZURE_STORAGE_ACCESS_MODE')
 AZURE_ACCESS_TTL = env('AZURE_STORAGE_ACCESS_TTL')
+
+REQUEST_TIMEOUT = env('REQUEST_TIMEOUT')
+GEONAMES_URL = env('GEONAMES_URL')
+GEONAMES_USERNAME = env('GEONAMES_USERNAME')

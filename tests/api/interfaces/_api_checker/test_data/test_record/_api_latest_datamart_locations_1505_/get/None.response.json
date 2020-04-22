@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"79ff1e8816ef69c2d9436bbffae91cd2\""
+            "\"9fc96177d97286f9f0ad7e47f1947f41\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -29,6 +29,14 @@
             "service",
             "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
         ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
         "cache-hit": [
             "cache-hit",
             "False"
@@ -39,11 +47,12 @@
         ],
         "content-length": [
             "Content-Length",
-            "247"
+            "279"
         ]
     },
     "data": {
         "id": 1505,
+        "geonameid": null,
         "last_modify_date": "16 Sep 2019 18:29:18",
         "seen": null,
         "country_name": "bolivia",
@@ -54,6 +63,7 @@
         "modified": "16 Sep 2019 18:29:02",
         "is_active": true,
         "gateway": 1517,
+        "geoname": null,
         "parent": null
     },
     "content_type": null
