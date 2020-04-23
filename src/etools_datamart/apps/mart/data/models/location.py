@@ -49,11 +49,13 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
                 latitude__isnull=False,
                 longitude__isnull=False,
         ).all():
-            record.geoname = GeoName.objects.get_or_add(
+            geoname = GeoName.objects.get_or_add(
                 lat=record.latitude,
                 lng=record.longitude,
             )
-            record.save()
+            if record.geoname != geoname:
+                record.geoname = geoname
+                record.save()
 
     def update_centroid(self):
         clone = self._chain()
@@ -162,7 +164,10 @@ class GeoNameManager(models.Manager):
             ]
             data = {}
             for k, f in mapping:
-                data[k] = geoname.find(f).text
+                try:
+                    data[k] = geoname.find(f).text
+                except AttributeError:
+                    return None
             lat = data.pop("lat")
             lng = data.pop("lng")
             geoname, __ = GeoName.objects.get_or_create(
