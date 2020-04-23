@@ -50,6 +50,10 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
             each.point = each.cent
             each.latitude = each.point.y
             each.longitude = each.point.x
+            each.geoname = GeoName.objects.get_or_add(
+                lat=each.point.y,
+                lng=each.point.x,
+            )
             each.save()
 
 
@@ -64,15 +68,6 @@ class LocationLoader(EtoolsLoader):
             return super().load(**kwargs)
         finally:
             Location.objects.batch_update_centroid()
-
-    def get_geoname(self, record: LocationsLocation, values: dict, **kwargs):
-        if not record.latitude or not record.longitude:
-            return None
-        geoname = GeoName.objects.get_or_add(
-            lat=record.latitude,
-            lng=record.longitude,
-        )
-        return geoname
 
 
 class Location(EtoolsDataMartModel):
@@ -111,7 +106,6 @@ class Location(EtoolsDataMartModel):
                    # 'area_code': lambda loader, record: loader.context['country'].business_area_code,
                    'parent': '__self__',
                    'gateway': GatewayType,
-                   'geoname': '-',
                    }
 
     def __str__(self):
