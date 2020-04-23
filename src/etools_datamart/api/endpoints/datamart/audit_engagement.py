@@ -85,6 +85,48 @@ class EngagementSerializer(DataMartSerializer):
             return 'N/A'
 
 
+class EngagementActionPointSerializer(DataMartSerializer):
+    partner = serializers.SerializerMethodField()
+    vendor_number = serializers.SerializerMethodField()
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.Engagement
+        exclude = None
+        fields = (
+            "po_item",
+            "engagement_type",
+            "start_date",
+            "end_date",
+            "partner",
+            "partner_contacted_at",
+            "vendor_number",
+            "auditor",
+            "total_value",  # Value of FACE forms
+            "spotcheck_total_amount_tested",
+            "date_of_field_visit",  # FACE Form period
+            "final_report",  # Findings
+            "agreement",  # Agreed actions by partner
+            # Ratings ???
+            "spotcheck_total_amount_of_ineligible_expenditure",
+            "financial_findings",  # Financial findings
+            "action_points",
+            "status",
+            "audit_opinion",
+        )
+
+    def get_partner(self, obj):
+        try:
+            return obj.partner['name']
+        except KeyError:
+            return 'N/A'
+
+    def get_vendor_number(self, obj):
+        try:
+            return obj.partner['vendor_number']
+        except KeyError:
+            return 'N/A'
+
+
 class EngagementFilterForm(forms.Form):
     engagement_type__in = Select2MultipleChoiceField(label='Engagement Type',
                                                      choices=models.Engagement.TYPES,
@@ -121,6 +163,20 @@ class EngagementViewSet(DataMartViewSet):
     querystringfilter_form_base_class = EngagementFilterForm
 
     serializer_class = EngagementSerializer
+    queryset = models.Engagement.objects.all()
+    filter_fields = ('engagement_type', 'partner_contacted_at',
+                     'start_date', 'end_date', 'status', 'audit_opinion')
+    serializers_fieldsets = {'std': None,
+                             'simple': EngagementSerializerSimple}
+
+    def get_querystringfilter_form(self, request, filter):
+        return EngagementFilterForm(request.GET, filter.form_prefix)
+
+
+class EngagementActionPointViewSet(DataMartViewSet):
+    querystringfilter_form_base_class = EngagementFilterForm
+
+    serializer_class = EngagementActionPointSerializer
     queryset = models.Engagement.objects.all()
     filter_fields = ('engagement_type', 'partner_contacted_at',
                      'start_date', 'end_date', 'status', 'audit_opinion')
