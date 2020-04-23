@@ -44,6 +44,17 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
         with connection.cursor() as cursor:
             cursor.execute(sql)
 
+        # need to update geoname
+        for record in super().filter(
+                latitude__isnull=False,
+                longitude__isnull=False,
+        ).all():
+            record.geoname = GeoName.objects.get_or_add(
+                lat=record.latitude,
+                lng=record.longitude,
+            )
+            record.save()
+
     def update_centroid(self):
         clone = self._chain()
         for each in clone.annotate(cent=Centroid('geom')):
@@ -152,7 +163,13 @@ class GeoNameManager(models.Manager):
             data = {}
             for k, f in mapping:
                 data[k] = geoname.find(f).text
-            geoname, __ = GeoName.objects.get_or_create(**data)
+            lat = data.pop("lat")
+            lng = data.pop("lng")
+            geoname, __ = GeoName.objects.get_or_create(
+                lat=lat,
+                lng=lng,
+                defaults=data,
+            )
         return geoname
 
 
