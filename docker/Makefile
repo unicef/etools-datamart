@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.13.1a
+TARGET?=2.14.1a
 PUSH_BASE?=1
 BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" )
 #BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" | echo "`xargs`xx" )
@@ -55,7 +55,7 @@ build-test:
 	TARGET=dev $(MAKE) .build test
 
 build:
-	$(MAKE) .build test
+	$(MAKE) .build
 
 
 .run:

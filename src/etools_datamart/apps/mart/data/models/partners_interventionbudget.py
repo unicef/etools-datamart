@@ -3,19 +3,24 @@ from django.contrib.postgres.fields import JSONField
 from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.mart.data.models.intervention import InterventionAbstract, InterventionLoader
-from etools_datamart.apps.mart.data.models.mixins import extend
 from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, models,
                                                         PartnersIntervention, PartnersInterventionbudget,)
 
 
 class InterventionBudgetLoader(InterventionLoader):
+    def get_queryset(self):
+        return PartnersInterventionbudget.objects
+
     def process_country(self):
-        qs = PartnersInterventionbudget.objects.all()
-        for record in qs.all():
-            record.intervention.budget = record
+        for record in self.get_queryset().all():
             filters = self.config.key(self, record)
             values = self.get_values(record.intervention)
             values['source_id'] = record.id
+            values['budget_cso_contribution'] = record.partner_contribution_local
+            values['budget_unicef_cash'] = record.unicef_cash_local
+            values['budget_total'] = record.total_local
+            values['budget_currency'] = record.currency
+            values['budget_unicef_supply'] = record.in_kind_amount_local
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
@@ -57,13 +62,4 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
         model = PartnersInterventionbudget
         depends = (Location,)
         key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.intervention.budget.pk)
-
-        mapping = extend(InterventionAbstract.Options.mapping,
-                         dict(
-                             budget_cso_contribution='budget.partner_contribution_local',
-                             budget_unicef_cash='budget.unicef_cash_local',
-                             budget_total='budget.total_local',
-                             budget_currency='budget.currency',
-                             budget_unicef_supply='budget.in_kind_amount_local',
-                         ))
+                                          source_id=record.pk)

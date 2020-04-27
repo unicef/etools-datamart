@@ -11,9 +11,9 @@ ENV TEST ${TEST}
 
 
 RUN apk add --no-cache --virtual .build-deps \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
+        --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/testing \
+        --repository http://dl-3.alpinelinux.org/alpine/latest-stable/community/ \
         gcc \
         g++ \
         gdal-dev \
