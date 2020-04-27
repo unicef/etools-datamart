@@ -1,3 +1,10 @@
+2.14
+----
+* Add geonameid to locations endpoint
+* Add pd_url to pd indicator endpoint
+* Set budget values in process_country and not through mapping
+* Fix InterventionBudget loader queryset
+
 2.13
 ----
 * Add new office endpoint
