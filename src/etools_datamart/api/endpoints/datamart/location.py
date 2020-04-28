@@ -40,11 +40,23 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class LocationRamSerializer(serializers.ModelSerializer):
+    geonameid = serializers.SerializerMethodField()
+    admin_level = serializers.SerializerMethodField()
     class Meta:
         model = models.Location
         fields = ('id', 'source_id', 'name', 'latitude', 'longitude', 'parent',
-                  'schema_name', 'area_code', 'p_code', 'gateway', 'is_active', 'last_modify_date',
-                  'created', 'modified')
+                  'schema_name', 'area_code', 'p_code', 'admin_level', 'geonameid',
+                  'is_active', 'last_modify_date', 'created', 'modified')
+
+    def get_geonameid(self, obj):
+        if obj.geoname:
+            return obj.geoname.geoname_id
+        return None
+
+    def get_admin_level(self, obj):
+        if obj.gateway:
+            return obj.gateway.admin_level
+        return None
 
 
 class LocationViewSet(common.DataMartViewSet):
