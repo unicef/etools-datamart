@@ -57,6 +57,11 @@ class FundsReservation(EtoolsDataMartModel):
     donor = models.CharField(max_length=256, blank=True, null=True)
     donor_code = models.CharField(max_length=30, blank=True, null=True)
     intervention_title = models.CharField(max_length=256, blank=True, null=True)
+    pd_reference_number = models.CharField(
+        max_length=256,
+        blank=True,
+        null=True,
+    )
 
     # extras
     pd_ssfa_number = models.CharField(max_length=64, null=True)
@@ -125,4 +130,5 @@ class FundsReservation(EtoolsDataMartModel):
             modified="=",
             donor="=",
             donor_code="=",
+            pd_reference_number="fund_reservation.intervention.reference_number",
         )
