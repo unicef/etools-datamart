@@ -61,7 +61,8 @@ from etools_datamart.apps.sources.source_prp.models import (CoreCountry, CoreGat
                                                             IndicatorIndicatorlocationdata, IndicatorIndicatorreport,
                                                             IndicatorReportable, IndicatorReportablelocationgoal,
                                                             UnicefLowerleveloutput, UnicefPdresultlink,
-                                                            UnicefProgrammedocument, UnicefProgressreport,)
+                                                            UnicefProgrammedocument, UnicefProgrammedocumentSections,
+                                                            UnicefProgressreport,)
 from etools_datamart.sentry import process_exception
 
 from .base import PrpDataMartModel
@@ -286,6 +287,10 @@ class DataReportLoader(PrpBaseLoader):
 
             record._programme_document = cp_output.programme_document
             record.indicator_report.reportable.lower_level_output = ll
+            section_qs = UnicefProgrammedocumentSections.objects.filter(
+                programmedocument=cp_output.programme_document.pk,
+            )
+            values["section"] = ", ".join([s.section.name for s in section_qs.all()])
             return cp_output.programme_document.title
         return None
 
@@ -454,7 +459,7 @@ class DataReport(PrpDataMartModel):
                    'pd_result': 'indicator_report.reportable.lower_level_output.title',
                    'etools_pd_result_id': 'indicator_report.reportable.lower_level_output.external_id',
                    'performance_indicator': 'indicator_report.reportable.blueprint.title',
-                   'section': 'N/A',
+                   'section': 'i',
                    'cluster_indicator': 'indicator_report.reportable.is_cluster_indicator',
                    'indicator_type': 'indicator_report.reportable.blueprint.display_type',
                    'baseline': 'indicator_report.reportable.calculated_baseline',
