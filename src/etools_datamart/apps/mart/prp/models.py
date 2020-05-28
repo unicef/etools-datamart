@@ -384,6 +384,7 @@ class DataReport(PrpDataMartModel):
     target = models.CharField(max_length=2048, blank=True, null=True)
     # | high_frequency | r.is_unicef_hf_indicator |
     high_frequency = models.CharField(max_length=2048, blank=True, null=True)
+    report_status = models.CharField(max_length=256, blank=True, null=True)
     # | means_of_verification | r.means_of_verification |
     means_of_verification = models.CharField(max_length=2048, blank=True, null=True)
     # | locations | r.lower_level_output.locations.all()  # magic by stefano|
@@ -457,6 +458,7 @@ class DataReport(PrpDataMartModel):
                    'baseline': 'indicator_report.reportable.calculated_baseline',
                    'target': 'indicator_report.reportable.calculated_target',
                    'high_frequency': 'indicator_report.reportable.is_unicef_hf_indicator',
+                   'report_status': 'indicator_report.reportable.report_status',
                    'means_of_verification': 'indicator_report.reportable.means_of_verification',
                    'locations': '-',
                    'locations_data': 'i',
