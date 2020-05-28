@@ -334,6 +334,7 @@ class DataReport(PrpDataMartModel):
     indicator_report = models.CharField(max_length=2048, blank=True, null=True)
     # | progres_report | indicator_report.progres_report |
     progress_report = models.CharField(max_length=2048, blank=True, null=True)
+    report_type = models.CharField(max_length=256, blank=True, null=True)
     # | programme_document | r.lower_level_output.cp_output.programme_document |
     programme_document = models.CharField(max_length=2048, blank=True, null=True)
 
@@ -438,6 +439,7 @@ class DataReport(PrpDataMartModel):
         key = lambda loader, record: {'source_id': record.id}
         mapping = {'indicator_report': 'indicator_report.title',
                    'progress_report': 'indicator_report.progress_report',
+                   'report_type': 'indicator_report.progress_report.report_type',
                    # 'programme_document': 'indicator_report.reportable.lower_level_output.cp_output.programme_document',
                    'programme_document': '-',
                    'country_name': '_programme_document.workspace.title',
