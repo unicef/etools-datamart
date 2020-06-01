@@ -41,6 +41,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   DATABASE_URL=(str, "postgis://postgres:@127.0.0.1:5432/etools_datamart"),
                   DATABASE_URL_ETOOLS=(str, "postgis://postgres:@127.0.0.1:15432/etools"),
                   DATABASE_URL_PRP=(str, "postgis://postgres:@127.0.0.1:5432/prp"),
+                  DATABASE_URL_UNPP=(str, "postgis://postgres:@127.0.0.1:5432/unpp"),
                   DEBUG=(bool, False),
                   STACK=(str, 'DEVELOPMENT'),
                   API_PAGINATION_OVERRIDE_KEY=(str, 'disable-pagination'),
@@ -111,13 +112,15 @@ DATABASES = {
     'etools': env.db('DATABASE_URL_ETOOLS',
                      engine='etools_datamart.apps.multitenant.postgresql'
                      ),
-    'prp': env.db('DATABASE_URL_PRP')
+    'prp': env.db('DATABASE_URL_PRP'),
+    'unpp': env.db('DATABASE_URL_UNPP'),
 
 }
 
 # DATABASES['default']['CONN_MAX_AGE'] = 60
 DATABASES['etools']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 DATABASES['prp']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
+DATABASES['unpp']['AUTOCOMMIT'] = env('AUTOCOMMIT_EXTERNAL')
 
 DATABASE_ROUTERS = [
     # 'tenant_schemas.routers.TenantSyncRouter',
@@ -127,6 +130,7 @@ DATABASE_ROUTERS = [
     #                            'django_db_logging'], syncdb=True),
     router_factory('etools', ['etools'], syncdb=False),
     router_factory('prp', ['source_prp'], syncdb=False),
+    router_factory('unpp', ['unpp'], syncdb=False),
 ]
 
 LOGIN_URL = '/login/'
@@ -319,10 +323,12 @@ INSTALLED_APPS = [
 
     'etools_datamart.apps.sources.etools',
     'etools_datamart.apps.sources.source_prp.apps.Config',
+    'etools_datamart.apps.sources.unpp.apps.Config',
 
     'etools_datamart.apps.mart.data',
     'etools_datamart.apps.mart.rapidpro',
     'etools_datamart.apps.mart.prp',
+    # 'etools_datamart.apps.mart.unpp',
 
     'etools_datamart.api',
     'impersonate',
