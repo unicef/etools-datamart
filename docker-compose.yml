@@ -13,6 +13,7 @@ x-datamart-defaults: &datamart_defaults
       DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
       DATABASE_URL_ETOOLS: postgis://postgres:@db-etools:5432/etools
       DATABASE_URL_PRP: postgis://postgres:@db-prp:5432/prp
+      DATABASE_URL_UNPP: postgis://postgres:@db-unpp:5432/unpp
       AUTOCREATE_USERS: "admin,123"
       CACHE_URL: "redis://redis:6379/1"
       CACHE_URL_LOCK: "redis://redis:6379/1"
@@ -74,7 +75,7 @@ services:
     volumes:
       - "$PWD/build/db:/var/lib/postgresql/data"
 
-  # Rely on etools and prp database instances running locally
+  # Rely on etools, prp, and unpp database instances running locally
   db-etools:
     image: mdillon/postgis:9.6
     container_name: datamart_etools
@@ -96,6 +97,17 @@ services:
       POSTGRES_DB: prp
     volumes:
       - "$PWD/build/prp:/var/lib/postgresql/data"
+
+  db-unpp:
+    image: mdillon/postgis:9.6
+    shm_size: '1gb'
+    container_name: datamart_unpp
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:
+      POSTGRES_DB: unpp
+    volumes:
+      - "$PWD/build/unpp:/var/lib/postgresql/data"
 
   redis:
     image: redis:alpine
