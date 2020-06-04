@@ -328,7 +328,7 @@ INSTALLED_APPS = [
     'etools_datamart.apps.mart.data',
     'etools_datamart.apps.mart.rapidpro',
     'etools_datamart.apps.mart.prp',
-    # 'etools_datamart.apps.mart.unpp',
+    'etools_datamart.apps.mart.unpp',
 
     'etools_datamart.api',
     'impersonate',
