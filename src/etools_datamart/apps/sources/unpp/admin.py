@@ -323,4 +323,3 @@ class SanctionslistSanctionednamematchAdmin(DatamartSourceModelAdmin, ModelAdmin
 @register(models.SequencesSequence)
 class SequencesSequenceAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
-
