@@ -44,12 +44,29 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
         with connection.cursor() as cursor:
             cursor.execute(sql)
 
+        # need to update geoname
+        for record in super().filter(
+                latitude__isnull=False,
+                longitude__isnull=False,
+        ).all():
+            geoname = GeoName.objects.get_or_add(
+                lat=record.latitude,
+                lng=record.longitude,
+            )
+            if record.geoname != geoname:
+                record.geoname = geoname
+                record.save()
+
     def update_centroid(self):
         clone = self._chain()
         for each in clone.annotate(cent=Centroid('geom')):
             each.point = each.cent
             each.latitude = each.point.y
             each.longitude = each.point.x
+            each.geoname = GeoName.objects.get_or_add(
+                lat=each.point.y,
+                lng=each.point.x,
+            )
             each.save()
 
 
@@ -64,15 +81,6 @@ class LocationLoader(EtoolsLoader):
             return super().load(**kwargs)
         finally:
             Location.objects.batch_update_centroid()
-
-    def get_geoname(self, record: LocationsLocation, values: dict, **kwargs):
-        if not record.latitude or not record.longitude:
-            return None
-        geoname = GeoName.objects.get_or_add(
-            lat=record.latitude,
-            lng=record.longitude,
-        )
-        return geoname
 
 
 class Location(EtoolsDataMartModel):
@@ -111,7 +119,6 @@ class Location(EtoolsDataMartModel):
                    # 'area_code': lambda loader, record: loader.context['country'].business_area_code,
                    'parent': '__self__',
                    'gateway': GatewayType,
-                   'geoname': '-',
                    }
 
     def __str__(self):
@@ -157,8 +164,17 @@ class GeoNameManager(models.Manager):
             ]
             data = {}
             for k, f in mapping:
-                data[k] = geoname.find(f).text
-            geoname, __ = GeoName.objects.get_or_create(**data)
+                try:
+                    data[k] = geoname.find(f).text
+                except AttributeError:
+                    return None
+            lat = data.pop("lat")
+            lng = data.pop("lng")
+            geoname, __ = GeoName.objects.get_or_create(
+                lat=lat,
+                lng=lng,
+                defaults=data,
+            )
         return geoname
 
 
