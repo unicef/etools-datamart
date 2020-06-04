@@ -9,8 +9,8 @@ from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.sources.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
                                                         AuditEngagementActivePd, AuditMicroassessment,
-                                                        AuditSpecialaudit, AuditSpotcheck, DjangoContentType,
-                                                        UnicefAttachmentsAttachment,)
+                                                        AuditSpecialaudit, AuditSpotcheck, DjangoContentType, AuditRisk,
+                                                        AuditRiskcategory, UnicefAttachmentsAttachment,)
 
 from .partner import Partner
 
@@ -36,11 +36,15 @@ MODULEMAP = {'AuditSpotcheck': "fam",
 
 
 class EngagementlLoader(EtoolsLoader):
+    OVERALL_RISK_MAP = {}
 
     def get_queryset(self):
-        return AuditEngagement.objects.select_related('partner',
-                                                      'agreement',
-                                                      'po_item').all()
+        return AuditEngagement.objects.select_related(
+            'partner',
+            'agreement',
+            'po_item',
+            'risks',
+        ).all()
 
     def get_content_type(self, sub_type):
         mapping = {AuditAudit: 'audit',
@@ -168,6 +172,35 @@ class EngagementlLoader(EtoolsLoader):
             ret.append(ActionPointSimpleSerializer(r).data)
         return ret
 
+    def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
+        schema = self.context['country']
+        category_id = self.OVERALL_RISK_MAP.get(schema, None)
+        if category_id is None:
+            try:
+                category = AuditRiskcategory.objects.get(
+                    header="Overall Risk Assessment",
+                )
+            except AuditRiskcategory.DoesNotExist:
+                pass
+            else:
+                self.OVERALL_RISK_MAP[schema] = category.pk
+                category_id = category.pk
+
+        try:
+            risk = AuditRisk.objects.get(
+                engagement=record,
+                blueprint__category__pk=category_id,
+            )
+        except AuditRisk.DoesNotExist:
+            extra = ""
+            value = ""
+        else:
+            extra = risk.extra
+            value = risk.value
+
+        values["rating_extra"] = extra
+        return value
+
     def process_country(self):
         for m in [AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck, AuditAudit]:
             for record in m.objects.select_related('engagement_ptr'):
@@ -278,6 +311,8 @@ class Engagement(EtoolsDataMartModel):
     # MicroAssessment
     # final_report = CodedGenericRelation(Attachment, code='micro_assessment_final_report')
     # Audit
+    rating = models.CharField(max_length=100, blank=True, null=True)
+    rating_extra = JSONField(blank=True, null=True)
 
     AUDIT_OPTION_UNQUALIFIED = "unqualified"
     AUDIT_OPTION_QUALIFIED = "qualified"
@@ -337,4 +372,6 @@ class Engagement(EtoolsDataMartModel):
             financial_findings='_impl.financial_findings',
             audit_opinion='_impl.audit_opinion',
             action_points="-",
+            rating="-",
+            rating_extra="i",
         )

@@ -85,7 +85,7 @@ class EngagementSerializer(DataMartSerializer):
             return 'N/A'
 
 
-class EngagementActionPointSerializer(DataMartSerializer):
+class EngagementDetailSerializer(DataMartSerializer):
     partner = serializers.SerializerMethodField()
     vendor_number = serializers.SerializerMethodField()
 
@@ -106,7 +106,8 @@ class EngagementActionPointSerializer(DataMartSerializer):
             "date_of_field_visit",  # FACE Form period
             "final_report",  # Findings
             "agreement",  # Agreed actions by partner
-            # Ratings ???
+            "rating",
+            "rating_extra",
             "spotcheck_total_amount_of_ineligible_expenditure",
             "financial_findings",  # Financial findings
             "action_points",
@@ -173,10 +174,10 @@ class EngagementViewSet(DataMartViewSet):
         return EngagementFilterForm(request.GET, filter.form_prefix)
 
 
-class EngagementActionPointViewSet(DataMartViewSet):
+class EngagementDetailViewSet(DataMartViewSet):
     querystringfilter_form_base_class = EngagementFilterForm
 
-    serializer_class = EngagementActionPointSerializer
+    serializer_class = EngagementDetailSerializer
     queryset = models.Engagement.objects.all()
     filter_fields = ('engagement_type', 'partner_contacted_at',
                      'start_date', 'end_date', 'status', 'audit_opinion')
