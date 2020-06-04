@@ -19,18 +19,18 @@ class AccountUser(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'account_user'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AccountUserGroups(ReadOnlyModel):
     user = models.ForeignKey(AccountUser, models.PROTECT, related_name='AccountUserGroups_user')
-    group = models.ForeignKey('unpp.AuthGroup', models.PROTECT, related_name='AccountUserGroups_group')
+    group = models.ForeignKey('source_unpp.AuthGroup', models.PROTECT, related_name='AccountUserGroups_group')
 
     class Meta:
         managed = False
         db_table = 'account_user_groups'
         unique_together = (('user', 'group'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AccountUserprofile(ReadOnlyModel):
@@ -43,7 +43,7 @@ class AccountUserprofile(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'account_userprofile'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AgencyAgency(ReadOnlyModel):
@@ -52,13 +52,13 @@ class AgencyAgency(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'agency_agency'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AgencyAgencymember(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    office = models.ForeignKey('unpp.AgencyAgencyoffice', models.PROTECT, related_name='AgencyAgencymember_office')
+    office = models.ForeignKey('source_unpp.AgencyAgencyoffice', models.PROTECT, related_name='AgencyAgencymember_office')
     user = models.ForeignKey(AccountUser, models.PROTECT, related_name='AgencyAgencymember_user')
     telephone = models.CharField(max_length=255, blank=True, null=True)
     role = models.TextField()
@@ -67,7 +67,7 @@ class AgencyAgencymember(ReadOnlyModel):
         managed = False
         db_table = 'agency_agencymember'
         unique_together = (('user', 'office'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AgencyAgencyoffice(ReadOnlyModel):
@@ -80,7 +80,7 @@ class AgencyAgencyoffice(ReadOnlyModel):
         managed = False
         db_table = 'agency_agencyoffice'
         unique_together = (('agency', 'country'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AgencyAgencyprofile(ReadOnlyModel):
@@ -92,7 +92,7 @@ class AgencyAgencyprofile(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'agency_agencyprofile'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AgencyOtheragency(ReadOnlyModel):
@@ -103,7 +103,7 @@ class AgencyOtheragency(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'agency_otheragency'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class AuthGroup(ReadOnlyModel):
@@ -112,7 +112,7 @@ class AuthGroup(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'auth_group'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class CommonAdminlevel1(ReadOnlyModel):
@@ -123,7 +123,7 @@ class CommonAdminlevel1(ReadOnlyModel):
         managed = False
         db_table = 'common_adminlevel1'
         unique_together = (('name', 'country_code'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class CommonCommonfile(ReadOnlyModel):
@@ -134,7 +134,7 @@ class CommonCommonfile(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'common_commonfile'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class CommonPoint(ReadOnlyModel):
@@ -145,7 +145,7 @@ class CommonPoint(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'common_point'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class CommonSector(ReadOnlyModel):
@@ -154,7 +154,7 @@ class CommonSector(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'common_sector'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class CommonSpecialization(ReadOnlyModel):
@@ -164,7 +164,7 @@ class CommonSpecialization(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'common_specialization'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class DjangoContentType(ReadOnlyModel):
@@ -175,7 +175,7 @@ class DjangoContentType(ReadOnlyModel):
         managed = False
         db_table = 'django_content_type'
         unique_together = (('app_label', 'model'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class DjangoSite(ReadOnlyModel):
@@ -185,7 +185,7 @@ class DjangoSite(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'django_site'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ExternalsPartnervendornumber(ReadOnlyModel):
@@ -193,14 +193,14 @@ class ExternalsPartnervendornumber(ReadOnlyModel):
     modified = models.DateTimeField()
     number = models.TextField()
     agency = models.ForeignKey(AgencyAgency, models.PROTECT, related_name='ExternalsPartnervendornumber_agency')
-    partner = models.ForeignKey('unpp.PartnerPartner', models.PROTECT, related_name='ExternalsPartnervendornumber_partner')
+    partner = models.ForeignKey('source_unpp.PartnerPartner', models.PROTECT, related_name='ExternalsPartnervendornumber_partner')
     business_area = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'externals_partnervendornumber'
         unique_together = (('agency', 'partner', 'business_area', 'number'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ExternalsUnicefvendordata(ReadOnlyModel):
@@ -217,7 +217,7 @@ class ExternalsUnicefvendordata(ReadOnlyModel):
         managed = False
         db_table = 'externals_unicefvendordata'
         unique_together = (('business_area', 'vendor_number', 'year'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class NotificationNotification(ReadOnlyModel):
@@ -232,7 +232,7 @@ class NotificationNotification(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'notification_notification'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class NotificationNotifieduser(ReadOnlyModel):
@@ -247,7 +247,7 @@ class NotificationNotifieduser(ReadOnlyModel):
         managed = False
         db_table = 'notification_notifieduser'
         unique_together = (('notification', 'recipient'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartner(ReadOnlyModel):
@@ -275,7 +275,7 @@ class PartnerPartner(ReadOnlyModel):
         managed = False
         db_table = 'partner_partner'
         unique_together = (('legal_name', 'country_code', 'hq'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerLocationFieldOffices(ReadOnlyModel):
@@ -286,7 +286,7 @@ class PartnerPartnerLocationFieldOffices(ReadOnlyModel):
         managed = False
         db_table = 'partner_partner_location_field_offices'
         unique_together = (('partner', 'point'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerauditassessment(ReadOnlyModel):
@@ -302,7 +302,7 @@ class PartnerPartnerauditassessment(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerauditassessment'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerauditreport(ReadOnlyModel):
@@ -317,7 +317,7 @@ class PartnerPartnerauditreport(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerauditreport'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerauthorisedofficer(ReadOnlyModel):
@@ -335,7 +335,7 @@ class PartnerPartnerauthorisedofficer(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerauthorisedofficer'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerbudget(ReadOnlyModel):
@@ -350,7 +350,7 @@ class PartnerPartnerbudget(ReadOnlyModel):
         managed = False
         db_table = 'partner_partnerbudget'
         unique_together = (('partner', 'year'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnercapacityassessment(ReadOnlyModel):
@@ -365,7 +365,7 @@ class PartnerPartnercapacityassessment(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnercapacityassessment'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnercollaborationevidence(ReadOnlyModel):
@@ -382,7 +382,7 @@ class PartnerPartnercollaborationevidence(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnercollaborationevidence'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnercollaborationpartnership(ReadOnlyModel):
@@ -398,7 +398,7 @@ class PartnerPartnercollaborationpartnership(ReadOnlyModel):
         managed = False
         db_table = 'partner_partnercollaborationpartnership'
         unique_together = (('partner', 'agency'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerdirector(ReadOnlyModel):
@@ -417,7 +417,7 @@ class PartnerPartnerdirector(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerdirector'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerexperience(ReadOnlyModel):
@@ -431,7 +431,7 @@ class PartnerPartnerexperience(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerexperience'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerfunding(ReadOnlyModel):
@@ -445,7 +445,7 @@ class PartnerPartnerfunding(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerfunding'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnergoverningdocument(ReadOnlyModel):
@@ -453,13 +453,13 @@ class PartnerPartnergoverningdocument(ReadOnlyModel):
     modified = models.DateTimeField()
     editable = models.BooleanField()
     document = models.ForeignKey(CommonCommonfile, models.PROTECT, related_name='PartnerPartnergoverningdocument_document')
-    profile = models.ForeignKey('unpp.PartnerPartnerprofile', models.PROTECT, related_name='PartnerPartnergoverningdocument_profile')
+    profile = models.ForeignKey('source_unpp.PartnerPartnerprofile', models.PROTECT, related_name='PartnerPartnergoverningdocument_profile')
     created_by = models.ForeignKey(AccountUser, models.PROTECT, related_name='PartnerPartnergoverningdocument_created_by')
 
     class Meta:
         managed = False
         db_table = 'partner_partnergoverningdocument'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerheadorganization(ReadOnlyModel):
@@ -479,7 +479,7 @@ class PartnerPartnerheadorganization(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerheadorganization'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerinternalcontrol(ReadOnlyModel):
@@ -494,7 +494,7 @@ class PartnerPartnerinternalcontrol(ReadOnlyModel):
         managed = False
         db_table = 'partner_partnerinternalcontrol'
         unique_together = (('partner', 'functional_responsibility'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnermailingaddress(ReadOnlyModel):
@@ -515,7 +515,7 @@ class PartnerPartnermailingaddress(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnermailingaddress'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnermandatemission(ReadOnlyModel):
@@ -542,7 +542,7 @@ class PartnerPartnermandatemission(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnermandatemission'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnermember(ReadOnlyModel):
@@ -557,7 +557,7 @@ class PartnerPartnermember(ReadOnlyModel):
         managed = False
         db_table = 'partner_partnermember'
         unique_together = (('user', 'partner'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerotherinfo(ReadOnlyModel):
@@ -575,7 +575,7 @@ class PartnerPartnerotherinfo(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerotherinfo'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerpolicyarea(ReadOnlyModel):
@@ -590,7 +590,7 @@ class PartnerPartnerpolicyarea(ReadOnlyModel):
         managed = False
         db_table = 'partner_partnerpolicyarea'
         unique_together = (('partner', 'area'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerprofile(ReadOnlyModel):
@@ -636,7 +636,7 @@ class PartnerPartnerprofile(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerprofile'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerregistrationdocument(ReadOnlyModel):
@@ -654,7 +654,7 @@ class PartnerPartnerregistrationdocument(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerregistrationdocument'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerreporting(ReadOnlyModel):
@@ -670,7 +670,7 @@ class PartnerPartnerreporting(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerreporting'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class PartnerPartnerreview(ReadOnlyModel):
@@ -684,14 +684,14 @@ class PartnerPartnerreview(ReadOnlyModel):
     does_recommend = models.BooleanField(blank=True, null=True)
     comment = models.TextField()
     agency = models.ForeignKey(AgencyAgency, models.PROTECT, related_name='PartnerPartnerreview_agency')
-    eoi = models.ForeignKey('unpp.ProjectEoi', models.PROTECT, related_name='PartnerPartnerreview_eoi')
+    eoi = models.ForeignKey('source_unpp.ProjectEoi', models.PROTECT, related_name='PartnerPartnerreview_eoi')
     partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='PartnerPartnerreview_partner')
     reviewer = models.ForeignKey(AccountUser, models.PROTECT, related_name='PartnerPartnerreview_reviewer')
 
     class Meta:
         managed = False
         db_table = 'partner_partnerreview'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectApplication(ReadOnlyModel):
@@ -703,7 +703,7 @@ class ProjectApplication(ReadOnlyModel):
     did_accept = models.BooleanField()
     ds_justification_select = models.TextField(blank=True, null=True)  # This field type is a guess.
     justification_reason = models.TextField(blank=True, null=True)
-    eoi = models.ForeignKey('unpp.ProjectEoi', models.PROTECT, related_name='ProjectApplication_eoi', blank=True, null=True)
+    eoi = models.ForeignKey('source_unpp.ProjectEoi', models.PROTECT, related_name='ProjectApplication_eoi', blank=True, null=True)
     partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='ProjectApplication_partner')
     submitter = models.ForeignKey(AccountUser, models.PROTECT, related_name='ProjectApplication_submitter')
     proposal_of_eoi_details = models.TextField()  # This field type is a guess.
@@ -711,7 +711,7 @@ class ProjectApplication(ReadOnlyModel):
     did_withdraw = models.BooleanField()
     withdraw_reason = models.TextField(blank=True, null=True)
     did_decline = models.BooleanField()
-    eoi_converted = models.OneToOneField('unpp.ProjectEoi', models.PROTECT, related_name='ProjectApplication_eoi_converted', blank=True, null=True)
+    eoi_converted = models.OneToOneField('source_unpp.ProjectEoi', models.PROTECT, related_name='ProjectApplication_eoi_converted', blank=True, null=True)
     cn = models.ForeignKey(CommonCommonfile, models.PROTECT, related_name='ProjectApplication_cn', blank=True, null=True)
     accept_notification = models.OneToOneField(NotificationNotification, models.PROTECT, related_name='ProjectApplication_accept_notification', blank=True, null=True)
     partner_decision_date = models.DateField(blank=True, null=True)
@@ -726,7 +726,7 @@ class ProjectApplication(ReadOnlyModel):
         managed = False
         db_table = 'project_application'
         unique_together = (('eoi', 'partner'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectApplicationLocationsProposalOfEoi(ReadOnlyModel):
@@ -737,7 +737,7 @@ class ProjectApplicationLocationsProposalOfEoi(ReadOnlyModel):
         managed = False
         db_table = 'project_application_locations_proposal_of_eoi'
         unique_together = (('application', 'point'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectApplicationfeedback(ReadOnlyModel):
@@ -750,7 +750,7 @@ class ProjectApplicationfeedback(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'project_applicationfeedback'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectAssessment(ReadOnlyModel):
@@ -772,7 +772,7 @@ class ProjectAssessment(ReadOnlyModel):
         managed = False
         db_table = 'project_assessment'
         unique_together = (('reviewer', 'application'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectClarificationrequestanswerfile(ReadOnlyModel):
@@ -780,13 +780,13 @@ class ProjectClarificationrequestanswerfile(ReadOnlyModel):
     modified = models.DateTimeField()
     title = models.TextField()
     created_by = models.ForeignKey(AccountUser, models.PROTECT, related_name='ProjectClarificationrequestanswerfile_created_by')
-    eoi = models.ForeignKey('unpp.ProjectEoi', models.PROTECT, related_name='ProjectClarificationrequestanswerfile_eoi')
+    eoi = models.ForeignKey('source_unpp.ProjectEoi', models.PROTECT, related_name='ProjectClarificationrequestanswerfile_eoi')
     file = models.ForeignKey(CommonCommonfile, models.PROTECT, related_name='ProjectClarificationrequestanswerfile_file')
 
     class Meta:
         managed = False
         db_table = 'project_clarificationrequestanswerfile'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectClarificationrequestquestion(ReadOnlyModel):
@@ -794,13 +794,13 @@ class ProjectClarificationrequestquestion(ReadOnlyModel):
     modified = models.DateTimeField()
     question = models.TextField()
     created_by = models.ForeignKey(AccountUser, models.PROTECT, related_name='ProjectClarificationrequestquestion_created_by')
-    eoi = models.ForeignKey('unpp.ProjectEoi', models.PROTECT, related_name='ProjectClarificationrequestquestion_eoi')
+    eoi = models.ForeignKey('source_unpp.ProjectEoi', models.PROTECT, related_name='ProjectClarificationrequestquestion_eoi')
     partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='ProjectClarificationrequestquestion_partner')
 
     class Meta:
         managed = False
         db_table = 'project_clarificationrequestquestion'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectEoi(ReadOnlyModel):
@@ -842,7 +842,7 @@ class ProjectEoi(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'project_eoi'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectEoiFocalPoints(ReadOnlyModel):
@@ -853,7 +853,7 @@ class ProjectEoiFocalPoints(ReadOnlyModel):
         managed = False
         db_table = 'project_eoi_focal_points'
         unique_together = (('eoi', 'user'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectEoiInvitedPartners(ReadOnlyModel):
@@ -864,7 +864,7 @@ class ProjectEoiInvitedPartners(ReadOnlyModel):
         managed = False
         db_table = 'project_eoi_invited_partners'
         unique_together = (('eoi', 'partner'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectEoiLocations(ReadOnlyModel):
@@ -875,7 +875,7 @@ class ProjectEoiLocations(ReadOnlyModel):
         managed = False
         db_table = 'project_eoi_locations'
         unique_together = (('eoi', 'point'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectEoiReviewers(ReadOnlyModel):
@@ -886,7 +886,7 @@ class ProjectEoiReviewers(ReadOnlyModel):
         managed = False
         db_table = 'project_eoi_reviewers'
         unique_together = (('eoi', 'user'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectEoiSpecializations(ReadOnlyModel):
@@ -897,7 +897,7 @@ class ProjectEoiSpecializations(ReadOnlyModel):
         managed = False
         db_table = 'project_eoi_specializations'
         unique_together = (('eoi', 'specialization'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectEoiattachment(ReadOnlyModel):
@@ -911,7 +911,7 @@ class ProjectEoiattachment(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'project_eoiattachment'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ProjectPin(ReadOnlyModel):
@@ -925,7 +925,7 @@ class ProjectPin(ReadOnlyModel):
         managed = False
         db_table = 'project_pin'
         unique_together = (('eoi', 'partner'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ReviewPartnerflag(ReadOnlyModel):
@@ -940,7 +940,7 @@ class ReviewPartnerflag(ReadOnlyModel):
     partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='ReviewPartnerflag_partner')
     submitter = models.ForeignKey(AccountUser, models.PROTECT, related_name='ReviewPartnerflag_submitter', blank=True, null=True)
     attachment = models.ForeignKey(CommonCommonfile, models.PROTECT, related_name='ReviewPartnerflag_attachment', blank=True, null=True)
-    sanctions_match = models.ForeignKey('unpp.SanctionslistSanctionednamematch', models.PROTECT, related_name='ReviewPartnerflag_sanctions_match', blank=True, null=True)
+    sanctions_match = models.ForeignKey('source_unpp.SanctionslistSanctionednamematch', models.PROTECT, related_name='ReviewPartnerflag_sanctions_match', blank=True, null=True)
     category = models.TextField(blank=True, null=True)
     type_history = models.TextField(blank=True, null=True)  # This field type is a guess.
     validation_comment = models.TextField(blank=True, null=True)
@@ -949,7 +949,7 @@ class ReviewPartnerflag(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'review_partnerflag'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class ReviewPartnerverification(ReadOnlyModel):
@@ -973,7 +973,7 @@ class ReviewPartnerverification(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'review_partnerverification'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class SanctionslistSanctioneditem(ReadOnlyModel):
@@ -988,7 +988,7 @@ class SanctionslistSanctioneditem(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'sanctionslist_sanctioneditem'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class SanctionslistSanctionedname(ReadOnlyModel):
@@ -1002,7 +1002,7 @@ class SanctionslistSanctionedname(ReadOnlyModel):
         managed = False
         db_table = 'sanctionslist_sanctionedname'
         unique_together = (('item', 'name'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class SanctionslistSanctionednamematch(ReadOnlyModel):
@@ -1019,7 +1019,7 @@ class SanctionslistSanctionednamematch(ReadOnlyModel):
         managed = False
         db_table = 'sanctionslist_sanctionednamematch'
         unique_together = (('name', 'partner'),)
-        app_label = 'unpp'
+        app_label = 'source_unpp'
 
 
 class SequencesSequence(ReadOnlyModel):
@@ -1029,4 +1029,4 @@ class SequencesSequence(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'sequences_sequence'
-        app_label = 'unpp'
+        app_label = 'source_unpp'
