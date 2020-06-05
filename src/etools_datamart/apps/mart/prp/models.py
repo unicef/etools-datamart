@@ -65,6 +65,7 @@ from etools_datamart.apps.sources.source_prp.models import (
     UnicefLowerleveloutput,
     UnicefPdresultlink,
     UnicefProgrammedocument,
+    UnicefProgrammedocumentSections,
     UnicefProgressreport,
 )
 
@@ -193,6 +194,10 @@ class DataReportLoader(CommonLoader):
 
             record._programme_document = cp_output.programme_document
             record.indicator_report.reportable.lower_level_output = ll
+            section_qs = UnicefProgrammedocumentSections.objects.filter(
+                programmedocument=cp_output.programme_document.pk,
+            )
+            values["section"] = ", ".join([s.section.name for s in section_qs.all()])
             return cp_output.programme_document.title
         return None
 
@@ -241,6 +246,7 @@ class DataReport(PrpDataMartModel):
     indicator_report = models.CharField(max_length=2048, blank=True, null=True)
     # | progres_report | indicator_report.progres_report |
     progress_report = models.CharField(max_length=2048, blank=True, null=True)
+    report_type = models.CharField(max_length=256, blank=True, null=True)
     # | programme_document | r.lower_level_output.cp_output.programme_document |
     programme_document = models.CharField(max_length=2048, blank=True, null=True)
 
@@ -291,6 +297,7 @@ class DataReport(PrpDataMartModel):
     target = models.CharField(max_length=2048, blank=True, null=True)
     # | high_frequency | r.is_unicef_hf_indicator |
     high_frequency = models.CharField(max_length=2048, blank=True, null=True)
+    report_status = models.CharField(max_length=256, blank=True, null=True)
     # | means_of_verification | r.means_of_verification |
     means_of_verification = models.CharField(max_length=2048, blank=True, null=True)
     # | locations | r.lower_level_output.locations.all()  # magic by stefano|
@@ -344,6 +351,7 @@ class DataReport(PrpDataMartModel):
         key = lambda loader, record: {'source_id': record.id}
         mapping = {'indicator_report': 'indicator_report.title',
                    'progress_report': 'indicator_report.progress_report',
+                   'report_type': 'indicator_report.progress_report.report_type',
                    # 'programme_document': 'indicator_report.reportable.lower_level_output.cp_output.programme_document',
                    'programme_document': '-',
                    'country_name': '_programme_document.workspace.title',
@@ -358,12 +366,13 @@ class DataReport(PrpDataMartModel):
                    'pd_result': 'indicator_report.reportable.lower_level_output.title',
                    'etools_pd_result_id': 'indicator_report.reportable.lower_level_output.external_id',
                    'performance_indicator': 'indicator_report.reportable.blueprint.title',
-                   'section': 'N/A',
+                   'section': 'i',
                    'cluster_indicator': 'indicator_report.reportable.is_cluster_indicator',
                    'indicator_type': 'indicator_report.reportable.blueprint.display_type',
                    'baseline': 'indicator_report.reportable.calculated_baseline',
                    'target': 'indicator_report.reportable.calculated_target',
                    'high_frequency': 'indicator_report.reportable.is_unicef_hf_indicator',
+                   'report_status': 'indicator_report.reportable.report_status',
                    'means_of_verification': 'indicator_report.reportable.means_of_verification',
                    'locations': '-',
                    'locations_data': 'i',

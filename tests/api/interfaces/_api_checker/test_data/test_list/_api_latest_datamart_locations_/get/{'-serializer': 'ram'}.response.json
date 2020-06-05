@@ -15,7 +15,11 @@
         ],
         "etag": [
             "ETag",
+<<<<<<< HEAD
             "\"3bf63e22138428bd992384e533aefac9\""
+=======
+            "\"1a4210be6c15a661aabadcacce0b9ecb\""
+>>>>>>> develop
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +43,11 @@
         ],
         "cache-key": [
             "cache-key",
+<<<<<<< HEAD
             "3bf63e22138428bd992384e533aefac9"
+=======
+            "1a4210be6c15a661aabadcacce0b9ecb"
+>>>>>>> develop
         ],
         "cache-hit": [
             "cache-hit",
