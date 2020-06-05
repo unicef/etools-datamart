@@ -67,8 +67,12 @@ router.register(r'prp/datareport', endpoints.DataReportViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)
 
+router.register(r'unpp/application', endpoints.ApplicationViewSet)
+
 from etools_datamart.apps.sources.source_prp import api_urls  # noqa isort:skip
 from etools_datamart.apps.sources.source_prp.backward_api_urls import backward_compatible_router  # noqa isort:skip
+
+from etools_datamart.apps.sources.unpp import api_urls  # noqa isort:skip
 
 from .endpoints.rapidpro import _urls_  # noqa isort:skip
 
