@@ -11,16 +11,16 @@ from etools_datamart.apps.sources.etools.models import (AuthUser, LocationsLocat
 from .utils import create_alias
 
 PartnersIntervention.total_unicef_cash = property(
-    lambda self: self.planned_budget.unicef_cash_local if hasattr(self, 'planned_budget') else 0)
+    lambda self: self.PartnersInterventionbudget_intervention.unicef_cash_local if hasattr(self, 'PartnersInterventionbudget_intervention') else 0)
 
 PartnersIntervention.total_in_kind_amount = property(
-    lambda self: self.planned_budget.in_kind_amount_local if hasattr(self, 'planned_budget') else 0)
+    lambda self: self.PartnersInterventionbudget_intervention.in_kind_amount_local if hasattr(self, 'PartnersInterventionbudget_intervention') else 0)
 
 PartnersIntervention.total_budget = property(
     lambda self: self.total_unicef_cash + self.total_partner_contribution + self.total_in_kind_amount)
 
 PartnersIntervention.total_partner_contribution = property(
-    lambda self: self.planned_budget.partner_contribution_local if hasattr(self, 'planned_budget') else 0)
+    lambda self: self.PartnersInterventionbudget_intervention.partner_contribution_local if hasattr(self, 'PartnersInterventionbudget_intervention') else 0)
 
 PartnersIntervention.total_unicef_budget = property(
     lambda self: self.total_unicef_cash + self.total_in_kind_amount)
