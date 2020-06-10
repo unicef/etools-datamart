@@ -6,11 +6,11 @@ from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
+from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts, RiskConst
 from etools_datamart.apps.sources.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
-                                                        AuditEngagementActivePd, AuditMicroassessment,
-                                                        AuditSpecialaudit, AuditSpotcheck, DjangoContentType, AuditRisk,
-                                                        AuditRiskcategory, UnicefAttachmentsAttachment,)
+                                                        AuditEngagementActivePd, AuditMicroassessment, AuditRisk,
+                                                        AuditRiskcategory, AuditSpecialaudit, AuditSpotcheck,
+                                                        DjangoContentType, UnicefAttachmentsAttachment,)
 
 from .partner import Partner
 
@@ -311,7 +311,12 @@ class Engagement(EtoolsDataMartModel):
     # MicroAssessment
     # final_report = CodedGenericRelation(Attachment, code='micro_assessment_final_report')
     # Audit
-    rating = models.CharField(max_length=100, blank=True, null=True)
+    rating = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        choices=RiskConst.VALUES,
+    )
     rating_extra = JSONField(blank=True, null=True)
 
     AUDIT_OPTION_UNQUALIFIED = "unqualified"
