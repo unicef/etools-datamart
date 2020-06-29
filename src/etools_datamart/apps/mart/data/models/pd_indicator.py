@@ -64,6 +64,11 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     label = models.TextField(blank=True, null=True)
     measurement_specifications = models.TextField(blank=True, null=True)
     numerator_label = models.CharField(max_length=256, blank=True, null=True)
+    pd_reference_number = models.CharField(
+        max_length=256,
+        blank=True,
+        null=True,
+    )
 
     # target = models.TextField()  # This field type is a guess.
     target_denominator = models.DecimalField(blank=True, null=True,
@@ -135,6 +140,7 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
             section_name='section.name',
             lower_result_name='lower_result.name',
             result_link_intervention='lower_result.result_link.intervention.pk',
+            pd_reference_number='lower_result.result_link.intervention.reference_number',
             pd_url='-',
 
             disaggregation_name='disaggregation.name',
