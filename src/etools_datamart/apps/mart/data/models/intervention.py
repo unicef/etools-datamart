@@ -376,9 +376,12 @@ class InterventionByLocationLoader(InterventionLoader):
 
     def get_values(self, record):
         values = super().get_values(record)
-        values['location'] = Location.objects.filter(
+        location = Location.objects.filter(
             schema_name=self.context['country'].schema_name,
-            source_id=record.location.id).first()
+            source_id=record.location.pk,
+        ).first()
+        values['location'] = location
+        values['p_code'] = location.p_code
         return values
 
     def process_country(self):
@@ -393,6 +396,8 @@ class InterventionByLocationLoader(InterventionLoader):
 
 
 class InterventionByLocation(LocationMixin, InterventionAbstract, EtoolsDataMartModel):
+    p_code = models.CharField(max_length=32, blank=True, null=True)
+
     loader = InterventionByLocationLoader()
 
     class Meta:
@@ -401,7 +406,9 @@ class InterventionByLocation(LocationMixin, InterventionAbstract, EtoolsDataMart
         unique_together = ('schema_name', 'intervention_id', 'location_source_id')
 
     class Options(InterventionAbstract.Options):
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          intervention_id=record.pk,
-                                          location_source_id=record.location.pk)
+        key = lambda loader, record: dict(
+            schema_name=loader.context['country'].schema_name,
+            intervention_id=record.pk,
+            location_source_id=record.location.pk,
+        )
         mapping = add_location_mapping(InterventionAbstract.Options.mapping)
