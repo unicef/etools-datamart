@@ -20,29 +20,6 @@ class FMQuestionLoader(EtoolsLoader):
     ):
         return ", ".join([m.name for m in question.methods.all()])
 
-    def get_action_point(
-            self,
-            record: FieldMonitoringDataCollectionActivityquestion,
-            values: dict,
-            **kwargs,
-    ):
-        try:
-            action_point = ActionPoint.objects.filter(
-                monitoring_activity=record.monitoring_activity,
-            )
-        except ActionPoint.DoesNotExist:
-            date_of_capture = None
-            location = None
-        except ActionPoint.MultipleResults:
-            # TODO find out what should happen in this scenario
-            date_of_capture = None
-            location = None
-        else:
-            date_of_capture = action_point.date_of_completion
-            location = action_point.location
-        values["date_of_capture"] = date_of_capture
-        return action_point
-
 
 class FMQuestion(EtoolsDataMartModel):
     title = models.TextField(
@@ -125,18 +102,18 @@ class FMQuestion(EtoolsDataMartModel):
             summary_answer="",
             monitoring_activity_id="monitoring_activity.pk",
             specific_details="i",
-            date_of_capture="i",
+            date_of_capture="",
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
         ))
 
 
-class FMOntrackLoader():
+class FMOntrackLoader(EtoolsLoader):
     """Loader for FM Ontrack"""
     def get_overall_finding_rating(
             self,
-            record: FieldMonitoringDataCollectionChecklistoverallfinding,
+            record: FieldMonitoringDataCollectionActivityoverallfinding,
             values: dict,
             **kwargs,
     ):
@@ -144,16 +121,22 @@ class FMOntrackLoader():
 
     def get_outcome(
             self,
-            record: FieldMonitoringDataCollectionChecklistoverallfinding,
+            record: FieldMonitoringDataCollectionActivityoverallfinding,
             values: dict,
             **kwargs,
     ):
-        return ", ".join([r.wbs for r in record.cp_outputs.all()])
+        # Needs to be from monitoring activity if entity output grab parent
+        if not record.monitoring_activity.cp_outputs.exist():
+            return None
+        return ", ".join([
+            r.parent.wbs for r in record.monitoring_activity.cp_outputs.all()
+            if r.parent
+        ])
 
 
 class FMOntrack(EtoolsDataMartModel):
     entity = models.CharField()
-    overall_finding_narrative = models.TextField(
+    narrative_finding = models.TextField(
         verbose_name=_("Overall Finding Narrative"),
         null=True,
         blank=True,
@@ -200,10 +183,10 @@ class FMOntrack(EtoolsDataMartModel):
         ordering = ("id",)
 
     class Options:
-        source = FieldMonitoringDataCollectionChecklistoverallfinding
+        source = FieldMonitoringDataCollectionActivityoverallfinding
         mapping = add_location_mapping(dict(
             entity="",
-            overall_finding_narrative="i",
+            narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
             monitoring_activity_end_date="monitoring_activity.end_date",
