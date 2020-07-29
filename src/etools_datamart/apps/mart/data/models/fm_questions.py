@@ -1,24 +1,58 @@
+from django.contrib.postgres.fields import JSONField
+from django.db import models
+from django.utils.translation import gettext as _
+
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
+from etools_datamart.apps.sources.etools.models import (FieldMonitoringDataCollectionActivityoverallfinding,
+                                                        FieldMonitoringDataCollectionFinding,)
 
 
 class FMQuestionLoader(EtoolsLoader):
     """Loader for FM Questions"""
     def get_answer_options(
             self,
-            record: FieldMonitoringDataCollectionActivityquestion,
+            record: FieldMonitoringDataCollectionFinding,
             values: dict,
             **kwargs,
     ):
-        return ", ".join([o.label for o in question.options.all()])
+        return ", ".join(
+            [o.label for o in record.activity_question.options.all()]
+        )
 
     def get_question_collection_methods(
             self,
-            record: FieldMonitoringDataCollectionActivityquestion,
+            record: FieldMonitoringDataCollectionFinding,
             values: dict,
             **kwargs,
     ):
-        return ", ".join([m.name for m in question.methods.all()])
+        return ", ".join(
+            [m.name for m in record.activity_question.methods.all()]
+        )
+
+    def process_country(self):
+        for rec in self.get_queryset():
+            filters = self.config.key(self, rec)
+            values = self.get_values(rec)
+            activity = rec.activity_question.monitoring_activity
+            for partner in activity.partners.all():
+                values["entity_type"] = "Partner"
+                values["entity_instance"] = partner.name
+                values["outcome"] = None
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
+            for pd in activity.interventions.all():
+                values["entity_type"] = "PD/SSFA"
+                values["entity_instance"] = pd.reference_number
+                values["outcome"] = None
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
+            for cp_output in activity.cp_output.all():
+                values["entity_type"] = "CP Output"
+                values["entity_instance"] = cp_output.name
+                values["outcome"] = cp_output.parent.wbs if cp_output.parent else None
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
 
 class FMQuestion(EtoolsDataMartModel):
@@ -38,16 +72,39 @@ class FMQuestion(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
-    entity_type = models.CharField()
-    entity_instance = models.CharField()
+    entity_type = models.CharField(
+        verbose_name=_("Entity Type"),
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    entity_instance = models.CharField(
+        verbose_name=_("Entity Instance"),
+        max_length=255,
+        null=True,
+        blank=True,
+    )
     question_collection_methods = models.TextField(
         verbose_name=_("Question Collection Methods"),
         null=True,
         blank=True,
     )
-    collection_method = models.CharField()
-    answer = models.CharField()
-    summary_answer = models.CharField()
+    collection_method = models.CharField(
+        verbose_name=_("Collection Method"),
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    answer = JSONField(
+        verbose_name=_("Answer"),
+        null=True,
+        blank=True,
+    )
+    summary_answer = JSONField(
+        verbose_name=_("Summary Answer"),
+        null=True,
+        blank=True,
+    )
     monitoring_activity_id = models.IntegerField(
         verbose_name=_("Monitoring Activity ID"),
         null=True,
@@ -89,24 +146,24 @@ class FMQuestion(EtoolsDataMartModel):
         ordering = ("id",)
 
     class Options:
-        source = FieldMonitoringDataCollectionActivityquestion
-        mapping = add_location_mapping(dict(
-            title="question.text",
-            answer_type="question.answer_type",
+        source = FieldMonitoringDataCollectionFinding
+        mapping = dict(
+            title="activity_question.text",
+            answer_type="activity_question.answer_type",
             answer_options="-",
-            entity_type="",
-            entity_instance="",
+            entity_type="i",
+            entity_instance="i",
             question_collection_methods="-",
-            collection_method="",
-            answer="",
-            summary_answer="",
-            monitoring_activity_id="monitoring_activity.pk",
+            collection_method="started_checklist.method",
+            answer="value",
+            summary_answer="activity_question.overall_finding.value",
+            monitoring_activity_id="activity_question.monitoring_activity.pk",
             specific_details="i",
             date_of_capture="",
-            monitoring_activity_end_date="monitoring_activity.end_date",
-            location="monitoring_activity.location.name",
-            site="monitoring_activity.locationsite.name",
-        ))
+            monitoring_activity_end_date="activity_question.monitoring_activity.end_date",
+            location="activity_question.monitoring_activity.location.name",
+            site="activity_question.monitoring_activity.locationsite.name",
+        )
 
 
 class FMOntrackLoader(EtoolsLoader):
@@ -119,23 +176,34 @@ class FMOntrackLoader(EtoolsLoader):
     ):
         return "On track" if record.on_track else "Off track"
 
-    def get_outcome(
-            self,
-            record: FieldMonitoringDataCollectionActivityoverallfinding,
-            values: dict,
-            **kwargs,
-    ):
-        # Needs to be from monitoring activity if entity output grab parent
-        if not record.monitoring_activity.cp_outputs.exist():
-            return None
-        return ", ".join([
-            r.parent.wbs for r in record.monitoring_activity.cp_outputs.all()
-            if r.parent
-        ])
+    def process_country(self):
+        for rec in self.get_queryset():
+            filters = self.config.key(self, rec)
+            values = self.get_values(rec)
+            for partner in rec.monitoring_activity.partners.all():
+                values["entity"] = partner.name
+                values["outcome"] = None
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
+            for pd in rec.monitoring_activity.interventions.all():
+                values["entity"] = pd.reference_number
+                values["outcome"] = None
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
+            for cp_output in rec.monitoring_activity.cp_output.all():
+                values["entity"] = cp_output.name
+                values["outcome"] = cp_output.parent.wbs if cp_output.parent else None
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
 
 class FMOntrack(EtoolsDataMartModel):
-    entity = models.CharField()
+    entity = models.CharField(
+        verbose_name=_("Entity"),
+        max_length=255,
+        null=True,
+        blank=True,
+    )
     narrative_finding = models.TextField(
         verbose_name=_("Overall Finding Narrative"),
         null=True,
@@ -173,6 +241,7 @@ class FMOntrack(EtoolsDataMartModel):
     )
     outcome = models.CharField(
         verbose_name=_("Outcome WBS"),
+        max_length=30,
         null=True,
         blank=True,
     )
@@ -184,13 +253,13 @@ class FMOntrack(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringDataCollectionActivityoverallfinding
-        mapping = add_location_mapping(dict(
-            entity="",
+        mapping = dict(
+            entity="i",
             narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
-            outcome="-",
-        ))
+            outcome="i",
+        )
