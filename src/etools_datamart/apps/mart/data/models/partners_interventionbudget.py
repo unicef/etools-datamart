@@ -43,7 +43,7 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
     budget_cso_contribution = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    budget_currency = models.CharField(max_length=4, blank=True, null=True)
+    budget_currency = models.CharField(max_length=5, blank=True, null=True)
     budget_total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     budget_unicef_cash = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     budget_unicef_supply = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
