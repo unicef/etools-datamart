@@ -9,15 +9,20 @@ import pytest
 from strategy_field.utils import fqn
 from test_utilities.factories import factories_registry
 
+EXCLUDED_MODELS = [
+    'GeoName',
+]
+
 
 def pytest_generate_tests(metafunc):
     if 'modeladmin' in metafunc.fixturenames:
         m = []
         ids = []
         for model, admin in site._registry.items():
-            if model._meta.app_label == 'data':
-                m.append(admin)
-                ids.append(admin.__class__.__name__)
+            if model.__name__ not in EXCLUDED_MODELS:
+                if model._meta.app_label == 'data':
+                    m.append(admin)
+                    ids.append(admin.__class__.__name__)
         metafunc.parametrize("modeladmin", m, ids=ids)
 
 
