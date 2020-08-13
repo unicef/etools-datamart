@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('data', '0124_fmontract_fmquestion'),
+        ('data', '0124_fmontrack_fmquestion'),
     ]
 
     operations = [
