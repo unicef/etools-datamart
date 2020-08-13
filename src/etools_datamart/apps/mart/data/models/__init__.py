@@ -9,7 +9,7 @@ from .funds_reservation import FundsReservation  # noqa
 from .hact import HACT  # noqa
 from .hact_detail import HACTHistory  # noqa
 from .intervention import Intervention, InterventionByLocation  # noqa
-from .location import GatewayType, Location  # noqa
+from .location import GatewayType, GeoName, Location  # noqa
 from .partner import Partner  # noqa
 from .partners_agreement import Agreement  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
