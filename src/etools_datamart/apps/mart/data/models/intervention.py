@@ -38,7 +38,7 @@ class InterventionAbstract(models.Model):
     country_programme = models.CharField(max_length=300, blank=True, null=True)
     country_programme_id = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
-    currency = models.CharField(max_length=4, blank=True, null=True)
+    currency = models.CharField(max_length=5, blank=True, null=True)
     days_from_prc_review_to_signature = models.IntegerField(blank=True, null=True)
     days_from_submission_to_signature = models.IntegerField(blank=True, null=True)
     document_type = models.CharField(max_length=255, null=True,
@@ -133,13 +133,13 @@ class InterventionAbstract(models.Model):
             cp_outputs='-',
             created='=',
             cso_type='agreement.partner.cso_type',
-            currency='planned_budget.currency',
+            currency='PartnersInterventionbudget_intervention.currency',
             days_from_submission_to_signature='-',
             days_from_prc_review_to_signature='-',
             end_date='end',
             fr_number='-',
-            in_kind_amount='planned_budget.in_kind_amount',
-            in_kind_amount_local='planned_budget.in_kind_amount_local',
+            in_kind_amount='PartnersInterventionbudget_intervention.in_kind_amount',
+            in_kind_amount_local='PartnersInterventionbudget_intervention.in_kind_amount_local',
             intervention_id='id',
             last_amendment_date='i',
             last_pv_date='-',
@@ -151,8 +151,8 @@ class InterventionAbstract(models.Model):
             offices='-',
             offices_data='i',
             partner_authorized_officer_signatory_id='partner_authorized_officer_signatory.pk',
-            partner_contribution='planned_budget.partner_contribution',
-            partner_contribution_local='planned_budget.partner_contribution_local',
+            partner_contribution='PartnersInterventionbudget_intervention.partner_contribution',
+            partner_contribution_local='PartnersInterventionbudget_intervention.partner_contribution_local',
             partner_focal_points='-',
             partner_focal_points_data='i',
             partner_id='-',
@@ -170,10 +170,10 @@ class InterventionAbstract(models.Model):
             sections='-',
             start_date='start',
             status='=',
-            total='planned_budget.total',
-            total_local='planned_budget.total_local',
-            unicef_cash='planned_budget.unicef_cash',
-            unicef_cash_local='planned_budget.unicef_cash_local',
+            total='PartnersInterventionbudget_intervention.total',
+            total_local='PartnersInterventionbudget_intervention.total_local',
+            unicef_cash='PartnersInterventionbudget_intervention.unicef_cash',
+            unicef_cash_local='PartnersInterventionbudget_intervention.unicef_cash_local',
             unicef_focal_points='-',
             unicef_focal_points_data='i',
             # unicef_signatory_email='unicef_signatory.email',

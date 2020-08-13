@@ -290,3 +290,13 @@ class PartnersInterventionConst:
         (TERMINATED, "Terminated"),
         (CANCELLED, "Cancelled"),
     )
+
+
+class RiskConst:
+    VALUES = Choices(
+        (0, 'na', 'N/A'),
+        (1, 'low', 'Low'),
+        (2, 'medium', 'Medium'),
+        (3, 'significant', 'Significant'),
+        (4, 'high', 'High'),
+    )

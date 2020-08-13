@@ -1122,7 +1122,7 @@ class PartnersInterventionbudget(models.TenantModel):
     total = models.DecimalField(max_digits=20, decimal_places=2)
     intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionbudget_intervention', blank=True, null=True)
     total_local = models.DecimalField(max_digits=20, decimal_places=2)
-    currency = models.CharField(max_length=4)
+    currency = models.CharField(max_length=5)
 
     class Meta:
         managed = False

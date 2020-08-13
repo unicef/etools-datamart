@@ -46,11 +46,11 @@ class PMPIndicatorLoader(EtoolsLoader):
                           'total_budget': intervention.total_budget or 0,
                           'unicef_budget': intervention.total_unicef_budget or 0,
 
-                          'currency': intervention.planned_budget.currency if planned_budget else '-',
-                          'partner_contribution': intervention.planned_budget.partner_contribution if planned_budget else '-',
-                          'unicef_cash': intervention.planned_budget.unicef_cash if planned_budget else '-',
-                          'in_kind_amount': intervention.planned_budget.in_kind_amount if planned_budget else '-',
-                          'total': intervention.planned_budget.total if planned_budget else '-',
+                          'currency': intervention.PartnersInterventionbudget_intervention.currency if planned_budget else '-',
+                          'partner_contribution': intervention.PartnersInterventionbudget_intervention.partner_contribution if planned_budget else '-',
+                          'unicef_cash': intervention.PartnersInterventionbudget_intervention.unicef_cash if planned_budget else '-',
+                          'in_kind_amount': intervention.PartnersInterventionbudget_intervention.in_kind_amount if planned_budget else '-',
+                          'total': intervention.PartnersInterventionbudget_intervention.total if planned_budget else '-',
                           'fr_numbers_against_pd_ssfa': ' - '.join(
                               [fh.fr_number for fh in intervention.FundsFundsreservationheader_intervention.all()]
                           ),

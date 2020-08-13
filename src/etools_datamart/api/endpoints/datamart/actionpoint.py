@@ -97,6 +97,20 @@ class ActionPointSerializer(UrlsMixin, DataMartSerializer):
         exclude = ()
 
 
+class ActionPointSimpleSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.ActionPoint
+        exclude = None
+        fields = (
+            'actions_taken',
+            'assigned_by_name',
+            'assigned_by_email',
+            'assigned_to_name',
+            'assigned_to_email',
+            'status',
+        )
+
+
 class ActionPointFilterForm(forms.Form):
     created = DateRangePickerField(label='Created between', required=False)
 
