@@ -70,7 +70,7 @@ router.register(r'system/monitor', endpoints.MonitorViewSet)
 router.register(r'unpp/application', endpoints.ApplicationViewSet)
 
 import etools_datamart.apps.sources.source_prp.api_urls  # noqa isort:skip
-import etools_datamart.apps.sources.source_prp.backward_api_urls.backward_compatible_router  # noqa isort:skip
+from etools_datamart.apps.sources.source_prp.backward_api_urls import backward_compatible_router  # noqa isort:skip
 
 import etools_datamart.apps.sources.unpp.api_urls  # noqa isort:skip
 
