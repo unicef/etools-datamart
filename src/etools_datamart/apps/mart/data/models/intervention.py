@@ -381,7 +381,7 @@ class InterventionByLocationLoader(InterventionLoader):
             source_id=record.location.pk,
         ).first()
         values['location'] = location
-        values['p_code'] = location.p_code
+        values['p_code'] = location.p_code if location else None
         return values
 
     def process_country(self):
