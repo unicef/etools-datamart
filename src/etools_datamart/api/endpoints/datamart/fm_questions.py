@@ -8,7 +8,6 @@ from etools_datamart.apps.mart.data import models
 class FMQuestionSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.FMQuestion
-        fields = "__all__"
 
 
 class FMQuestionViewSet(DataMartViewSet):
@@ -19,7 +18,6 @@ class FMQuestionViewSet(DataMartViewSet):
 class FMOntrackSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.FMOntrack
-        fields = "__all__"
 
 
 class FMOntrackViewSet(DataMartViewSet):
