@@ -434,6 +434,8 @@ class DataReport(PrpDataMartModel):
     total_cumulative_progress = models.CharField(max_length=2048, blank=True, null=True)
     achievement_in_reporting_period = models.CharField(max_length=2048, blank=True, null=True)
     disaggregation = JSONField(blank=True, null=True)
+    p_code = models.CharField(max_length=32, blank=True, null=True)
+    admin_level = models.SmallIntegerField(null=True)
 
     loader = DataReportLoader()
 
@@ -468,7 +470,6 @@ class DataReport(PrpDataMartModel):
                    'report_status': 'indicator_report.reportable.report_status',
                    'means_of_verification': 'indicator_report.reportable.means_of_verification',
                    'locations': '-',
-                   'locations_data': 'i',
                    'report_number': 'indicator_report.progress_report.report_number',
                    'due_date': 'indicator_report.progress_report.due_date',
                    'reporting_period_start_date': 'indicator_report.progress_report.start_date',
@@ -482,6 +483,8 @@ class DataReport(PrpDataMartModel):
                    'calculation_method_across_location': 'indicator_report.reportable.blueprint.calculation_formula_across_locations',
                    'calculation_method_across_reporting_periods': 'indicator_report.reportable.blueprint.calculation_formula_across_periods',
                    'current_location': 'location.title',
+                   'p_code': 'location.p_code',
+                   'admin_level': 'location.type.admin_level',
                    'previous_location_progress': 'previous_location_data.title',
                    'total_cumulative_progress_in_location': 'N/A',
                    'total_cumulative_progress': '-',

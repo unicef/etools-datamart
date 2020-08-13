@@ -153,6 +153,12 @@ class InterventionAdmin(DataModelAdmin, TruncateTableMixin):
     date_hierarchy = 'start_date'
 
 
+@register(models.GeoName)
+class GeoNameAdmin(ModelAdmin):
+    list_display = ("lat", "lng", "name", "geoname_id",)
+    search_fields = ("lat", "lng", "name",)
+
+
 @register(models.InterventionByLocation)
 class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
     list_display = ('country_name', 'title', 'document_type',
@@ -203,7 +209,7 @@ class LocationAdmin(DataModelAdmin):
     # readonly_fields = ('parent', 'gateway')
     list_filter = ('level',)
     search_fields = ('name',)
-    autocomplete_fields = ('parent', 'gateway')
+    autocomplete_fields = ('parent', 'gateway', 'geoname',)
     actions = ['update_centroid', mass_update]
     mass_update_exclude = ['geom', 'id']
     mass_update_hints = []

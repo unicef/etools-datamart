@@ -4,12 +4,13 @@ from .audit_engagement import Engagement  # noqa
 from .audit_result import AuditResult  # noqa
 from .audit_spotcheck import SpotCheck  # noqa
 from .fam import FAMIndicator  # noqa
+from .fm_questions import FMOntrack, FMQuestion  # noqa
 from .funds_grant import Grant  # noqa
 from .funds_reservation import FundsReservation  # noqa
 from .hact import HACT  # noqa
 from .hact_detail import HACTHistory  # noqa
 from .intervention import Intervention, InterventionByLocation  # noqa
-from .location import GatewayType, Location  # noqa
+from .location import GatewayType, GeoName, Location  # noqa
 from .partner import Partner  # noqa
 from .partners_agreement import Agreement  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
