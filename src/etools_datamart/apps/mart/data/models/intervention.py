@@ -38,7 +38,7 @@ class InterventionAbstract(models.Model):
     country_programme = models.CharField(max_length=300, blank=True, null=True)
     country_programme_id = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
-    currency = models.CharField(max_length=4, blank=True, null=True)
+    currency = models.CharField(max_length=5, blank=True, null=True)
     days_from_prc_review_to_signature = models.IntegerField(blank=True, null=True)
     days_from_submission_to_signature = models.IntegerField(blank=True, null=True)
     document_type = models.CharField(max_length=255, null=True,
