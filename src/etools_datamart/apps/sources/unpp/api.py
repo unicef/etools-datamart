@@ -158,14 +158,14 @@ class NotificationNotifieduserViewSet(URFReadOnlyModelViewSet):
     queryset = models.NotificationNotifieduser.objects.all()
 
 
-class PartnerPartnerSerializer(serializers.ModelSerializer):
+class UNPPPartnerPartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PartnerPartner
         exclude = ()
 
 
 class PartnerPartnerViewSet(URFReadOnlyModelViewSet):
-    serializer_class = PartnerPartnerSerializer
+    serializer_class = UNPPPartnerPartnerSerializer
     queryset = models.PartnerPartner.objects.all()
 
 
