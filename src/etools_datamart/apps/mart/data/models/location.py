@@ -182,7 +182,7 @@ class GeoName(models.Model):
         geoname = geonames["geonames"][0]
         # to prevent unique exception as lat/lng
         # returned in response may be altered
-        geo, created = GeoName.objects.get_or_create(
+        geo, __ = GeoName.objects.get_or_create(
             lat=geoname.get("lat"),
             lng=geoname.get("lng"),
         )
@@ -191,7 +191,7 @@ class GeoName(models.Model):
                 setattr(geo, k, geoname.get(f))
             except AttributeError:
                 return None
-        if created:
+        if self != geo:
             # geoname wioth lat/lng already exists
             # update all related locations to existing geoname
             # and delete this instance
