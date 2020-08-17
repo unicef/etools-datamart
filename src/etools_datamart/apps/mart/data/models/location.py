@@ -179,7 +179,10 @@ class GeoName(models.Model):
             ("fcode", "fcode"),
             ("distance", "distance"),
         ]
-        geoname = geonames["geonames"][0]
+        try:
+            geoname = geonames["geonames"][0]
+        except KeyError:
+            return None
         # to prevent unique exception as lat/lng
         # returned in response may be altered
         geo, __ = GeoName.objects.get_or_create(
