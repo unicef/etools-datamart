@@ -181,7 +181,7 @@ class GeoName(models.Model):
         ]
         try:
             geoname = geonames["geonames"][0]
-        except KeyError:
+        except IndexError:
             return None
         # to prevent unique exception as lat/lng
         # returned in response may be altered
