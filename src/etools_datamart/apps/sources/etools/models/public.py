@@ -908,6 +908,7 @@ class UsersCountry(models.Model):
     vision_last_synced = models.DateTimeField(blank=True, null=True)
     local_currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='UsersCountry_local_currency', blank=True, null=True)
     long_name = models.CharField(max_length=255)
+    iso3_code = models.CharField(max_length=10)
 
     class Meta:
         managed = False
