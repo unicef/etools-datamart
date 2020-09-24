@@ -27,6 +27,7 @@ class InterventionAbstract(models.Model):
     amendment_types = models.TextField(blank=True, null=True)
     attachment_types = models.TextField(blank=True, null=True)
     agreement_id = models.IntegerField(blank=True, null=True)
+    cfei_number = models.CharField(max_length=150, null=True, blank=True)
     clusters = models.TextField(blank=True, null=True)
     contingency_pd = models.NullBooleanField(null=True)
     # cp_output = models.CharField(max_length=300, blank=True, null=True)
@@ -98,7 +99,6 @@ class InterventionAbstract(models.Model):
     unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     unicef_focal_points = models.TextField(blank=True, null=True)
     unicef_focal_points_data = JSONField(blank=True, null=True, default=dict)
-
     unicef_signatory_name = models.CharField(max_length=500, null=True)
     # unicef_signatory_first_name = models.CharField(max_length=30, null=True)
     # unicef_signatory_id = models.IntegerField(blank=True, null=True)
@@ -181,6 +181,7 @@ class InterventionAbstract(models.Model):
             # unicef_signatory_id='unicef_signatory.pk',
             # unicef_signatory_last_name='unicef_signatory.last_name',
             updated='modified',
+            cfei_number='i',
         )
 
 
