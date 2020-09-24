@@ -68,6 +68,7 @@ class InterventionAbstract(models.Model):
     # partner_focal_point_title = models.CharField(max_length=64, null=True)
     partner_id = models.IntegerField(blank=True, null=True)
     partner_name = models.CharField(max_length=200, null=True)
+    partner_sea_risk_rating = models.CharField(max_length=150, null=True, blank=True)
     partner_signatory_name = models.CharField(max_length=300, null=True)
     partner_signatory_email = models.CharField(max_length=128, null=True)
     partner_signatory_first_name = models.CharField(max_length=64, null=True)
@@ -157,6 +158,7 @@ class InterventionAbstract(models.Model):
             partner_focal_points_data='i',
             partner_id='-',
             partner_name='agreement.partner.name',
+            partner_sea_risk_rating='i',
             partner_signatory_email='partner_authorized_officer_signatory.email',
             partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
             partner_signatory_last_name='partner_authorized_officer_signatory.last_name',
@@ -203,9 +205,14 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     def get_partner_id(self, record: PartnersIntervention, values: dict, **kwargs):
         try:
-            return Partner.objects.get(schema_name=self.context['country'].schema_name,
-                                       source_id=record.agreement.partner.id).pk
+            data = Partner.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=record.agreement.partner.id,
+            )
+            values['partner_sea_risk_rating'] = data.sea_risk_rating_name
+            return data.pk
         except Partner.DoesNotExist:
+            values['partner_sea_risk_rating'] = None
             return None
 
     def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):

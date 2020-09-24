@@ -102,6 +102,11 @@ class Partner(EtoolsDataMartModel):
     planned_engagement = JSONField(default=dict, blank=True, null=True)
 
     last_pv_date = models.DateField(blank=True, null=True, db_index=True)
+    sea_risk_rating_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         ordering = ("name",)
