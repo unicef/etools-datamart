@@ -29,6 +29,9 @@ jobs:
             mkdir -p /usr/share/man/man1
             mkdir -p /usr/share/man/man7
             apk add \
+                --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/main \
+                --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/testing \
+                --repository http://dl-3.alpinelinux.org/alpine/latest-stable/community/ \
                   libc-dev \
                   git \
                   gcc \
