@@ -28,8 +28,7 @@ jobs:
           command: |
             mkdir -p /usr/share/man/man1
             mkdir -p /usr/share/man/man7
-            apt-get update
-            apt-get install -y \
+            apk add \
                   libc-bin \
                   libzmq3-dev \
                   git \
