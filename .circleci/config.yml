@@ -29,13 +29,12 @@ jobs:
             mkdir -p /usr/share/man/man1
             mkdir -p /usr/share/man/man7
             apk add \
-                  libc-bin \
-                  libzmq3-dev \
+                  libc-dev \
                   git \
                   gcc \
                   curl \
-                  gdal-bin \
-                  python-dev \
+                  gdal-dev \
+                  python3-dev \
                   postgresql-client
 
       - restore_cache:
