@@ -29,16 +29,26 @@ jobs:
             mkdir -p /usr/share/man/man1
             mkdir -p /usr/share/man/man7
             apk add \
-                --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/main \
-                --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/testing \
-                --repository http://dl-3.alpinelinux.org/alpine/latest-stable/community/ \
-                  libc-dev \
-                  git \
-                  gcc \
-                  curl \
-                  gdal-dev \
-                  python3-dev \
-                  postgresql-client
+              --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/main \
+              --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/testing \
+              --repository http://dl-3.alpinelinux.org/alpine/latest-stable/community/ \
+              gcc \
+              g++ \
+              gdal-dev \
+              geos-dev \
+              jpeg-dev \
+              libc-dev \
+              libffi-dev \
+              libressl-dev \
+              libxml2-dev \
+              libxslt-dev \
+              linux-headers \
+              musl-dev \
+              openldap-dev \
+              postgresql-dev \
+              python3-dev \
+              xmlsec-dev \
+              zeromq-dev
 
       - restore_cache:
           keys:
