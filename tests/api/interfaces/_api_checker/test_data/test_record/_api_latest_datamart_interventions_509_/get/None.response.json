@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"3382aedc4b5f5f220a2f85edb537c2b8\""
+            "\"860993eebe01fdb20e5d742098c5d626\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -47,7 +47,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1817"
+            "1848"
         ]
     },
     "data": {
@@ -87,6 +87,7 @@
         "partner_focal_points_data": {},
         "partner_id": null,
         "partner_name": null,
+        "partner_sea_risk_rating": null,
         "partner_signatory_name": null,
         "partner_signatory_email": null,
         "partner_signatory_first_name": null,

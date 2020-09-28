@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"d8d4c3937de8677ad910cc577dc6f34c\""
+            "\"7c6e221439eb1f62d420039e02eceae6\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "d8d4c3937de8677ad910cc577dc6f34c"
+            "7c6e221439eb1f62d420039e02eceae6"
         ],
         "cache-hit": [
             "cache-hit",
@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "5664"
+            "5757"
         ]
     },
     "data": {
@@ -115,6 +115,7 @@
                 "partner_focal_points": null,
                 "partner_id": null,
                 "partner_name": null,
+                "partner_sea_risk_rating": null,
                 "partner_signatory_name": null,
                 "partner_signatory_email": null,
                 "partner_signatory_first_name": null,
@@ -194,6 +195,7 @@
                 "partner_focal_points": null,
                 "partner_id": null,
                 "partner_name": null,
+                "partner_sea_risk_rating": null,
                 "partner_signatory_name": null,
                 "partner_signatory_email": null,
                 "partner_signatory_first_name": null,
@@ -273,6 +275,7 @@
                 "partner_focal_points": null,
                 "partner_id": null,
                 "partner_name": null,
+                "partner_sea_risk_rating": null,
                 "partner_signatory_name": null,
                 "partner_signatory_email": null,
                 "partner_signatory_first_name": null,
