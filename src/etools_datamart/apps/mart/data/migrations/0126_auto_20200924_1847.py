@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('data', '0124_fmontrack_fmquestion'),
+        ('data', '0125_auto_20200924_1740'),
     ]
 
     operations = [
