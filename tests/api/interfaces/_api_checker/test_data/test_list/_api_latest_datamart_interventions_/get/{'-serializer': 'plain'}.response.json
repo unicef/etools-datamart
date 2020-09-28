@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "6381"
+            "6474"
         ]
     },
     "data": {
@@ -120,6 +120,7 @@
                 "partner_focal_points": null,
                 "partner_id": null,
                 "partner_name": null,
+                "partner_sea_risk_rating": null,
                 "partner_signatory_name": null,
                 "partner_signatory_email": null,
                 "partner_signatory_first_name": null,
@@ -204,6 +205,7 @@
                 "partner_focal_points": null,
                 "partner_id": null,
                 "partner_name": null,
+                "partner_sea_risk_rating": null,
                 "partner_signatory_name": null,
                 "partner_signatory_email": null,
                 "partner_signatory_first_name": null,
@@ -288,6 +290,7 @@
                 "partner_focal_points": null,
                 "partner_id": null,
                 "partner_name": null,
+                "partner_sea_risk_rating": null,
                 "partner_signatory_name": null,
                 "partner_signatory_email": null,
                 "partner_signatory_first_name": null,
