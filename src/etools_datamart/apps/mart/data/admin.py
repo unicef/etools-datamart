@@ -253,7 +253,14 @@ class PartnerAdmin(DataModelAdmin):
 
 @register(models.PartnerStaffMember)
 class PartnerStaffMemberAdmin(DataModelAdmin):
-    list_display = ('title', 'last_name', 'first_name', 'email', 'phone')
+    list_display = (
+        'title',
+        'last_name',
+        'first_name',
+        'user',
+        'email',
+        'phone',
+    )
     date_hierarchy = 'created'
     list_filter = ('active',)
 
