@@ -941,7 +941,7 @@ class UsersUserprofile(models.Model):
     office = models.ForeignKey(UsersOffice, models.DO_NOTHING, related_name='UsersUserprofile_office', blank=True, null=True)
     user_id = models.IntegerField(unique=True)
     country_override = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersUserprofile_country_override', blank=True, null=True)
-    partner_staff_member = models.IntegerField(blank=True, null=True)
+    field_partner_staff_member = models.IntegerField(db_column='_partner_staff_member', blank=True, null=True)  # Field renamed because it started with '_'.
     guid = models.CharField(unique=True, max_length=40, blank=True, null=True)
     org_unit_code = models.CharField(max_length=32, blank=True, null=True)
     org_unit_name = models.CharField(max_length=64, blank=True, null=True)

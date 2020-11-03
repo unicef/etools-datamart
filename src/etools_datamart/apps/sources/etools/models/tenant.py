@@ -1254,6 +1254,7 @@ class PartnersPartnerstaffmember(models.TenantModel):
     active = models.BooleanField()
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    user = models.OneToOneField('AuthUser', models.DO_NOTHING, related_name='PartnersPartnerstaffmember_user', blank=True, null=True)
 
     class Meta:
         managed = False

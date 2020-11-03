@@ -3036,7 +3036,8 @@ CREATE TABLE [[schema]].partners_partnerstaffmember (
     partner_id integer NOT NULL,
     active boolean NOT NULL,
     created timestamp with time zone NOT NULL,
-    modified timestamp with time zone NOT NULL
+    modified timestamp with time zone NOT NULL,
+    user_id integer
 );
 
 
@@ -6693,6 +6694,9 @@ INSERT INTO [[schema]].django_migrations VALUES (792, 'partners', '0042_auto_202
 INSERT INTO [[schema]].django_migrations VALUES (793, 'partners', '0043_auto_20200729_2123', '2020-09-24 15:23:15.774755+00');
 INSERT INTO [[schema]].django_migrations VALUES (794, 'partners', '0044_auto_20200914_1428', '2020-09-24 15:23:16.044669+00');
 INSERT INTO [[schema]].django_migrations VALUES (795, 'users', '0014_auto_20200611_1747', '2020-09-24 15:23:16.257031+00');
+INSERT INTO [[schema]].django_migrations VALUES (796, 'users', '0015_auto_20200924_1453', '2020-11-03 18:57:59.531838+00');
+INSERT INTO [[schema]].django_migrations VALUES (797, 'partners', '0045_partnerstaffmember_user', '2020-11-03 18:57:59.86012+00');
+INSERT INTO [[schema]].django_migrations VALUES (798, 'partners', '0046_auto_20200924_1453', '2020-11-03 18:57:59.966965+00');
 
 
 --
@@ -12251,7 +12255,7 @@ INSERT INTO [[schema]].partners_partnerorganization VALUES (175, 'Government', '
 -- Data for Name: partners_partnerstaffmember; Type: TABLE DATA; Schema: [[schema]]; Owner: -
 --
 
-INSERT INTO [[schema]].partners_partnerstaffmember VALUES (171, 'test', 'Test', 'Test', 'test@test.crom', NULL, 228, true, '2019-04-02 05:34:54.882+00', '2019-04-02 05:34:54.882631+00');
+INSERT INTO [[schema]].partners_partnerstaffmember VALUES (171, 'test', 'Test', 'Test', 'test@test.crom', NULL, 228, true, '2019-04-02 05:34:54.882+00', '2020-11-03 18:57:59.908797+00', 285645);
 
 
 --
@@ -14029,7 +14033,7 @@ SELECT pg_catalog.setval('[[schema]].django_comments_id_seq', 5, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: [[schema]]; Owner: -
 --
 
-SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 795, true);
+SELECT pg_catalog.setval('[[schema]].django_migrations_id_seq', 798, true);
 
 
 --
@@ -15926,6 +15930,14 @@ ALTER TABLE ONLY [[schema]].partners_partnerstaffmember
 
 ALTER TABLE ONLY [[schema]].partners_partnerstaffmember
     ADD CONSTRAINT partners_partnerstaffmember_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: partners_partnerstaffmember partners_partnerstaffmember_user_id_key; Type: CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].partners_partnerstaffmember
+    ADD CONSTRAINT partners_partnerstaffmember_user_id_key UNIQUE (user_id);
 
 
 --
@@ -19932,6 +19944,14 @@ ALTER TABLE ONLY [[schema]].partners_partnerstaffmember
 
 ALTER TABLE ONLY [[schema]].partners_partnerplannedvisits
     ADD CONSTRAINT partners_partner_id_dde73d25_fk_partners_partnerorganization_id FOREIGN KEY (partner_id) REFERENCES [[schema]].partners_partnerorganization(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: partners_partnerstaffmember partners_partnerstaffmember_user_id_08ef0077_fk_auth_user_id; Type: FK CONSTRAINT; Schema: [[schema]]; Owner: -
+--
+
+ALTER TABLE ONLY [[schema]].partners_partnerstaffmember
+    ADD CONSTRAINT partners_partnerstaffmember_user_id_08ef0077_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
