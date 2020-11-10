@@ -183,7 +183,7 @@ class InterventionAbstract(models.Model):
             # unicef_signatory_id='unicef_signatory.pk',
             # unicef_signatory_last_name='unicef_signatory.last_name',
             updated='modified',
-            cfei_number='i',
+            cfei_number='=',
         )
 
 
