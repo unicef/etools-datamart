@@ -2,6 +2,7 @@ import json
 import time
 from uuid import UUID
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.utils import timezone
@@ -314,6 +315,14 @@ class BaseLoader:
                 continue
             else:
                 ret[k] = self.get_value(k, v, record, ret)
+
+            # enforce field size limit
+            try:
+                ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
+            except TypeError:
+                # not subscriptable so ignoring
+                pass
+
         return ret
 
     def get_value(self, field_name, value_or_func, original_record, current_mapping):
@@ -394,8 +403,9 @@ class BaseLoader:
         self.etl_task.update(**defs)
 
     def on_end(self, error=None, retry=False):
-        from etools_datamart.apps.subscriptions.models import Subscription
         from django.utils import timezone
+
+        from etools_datamart.apps.subscriptions.models import Subscription
         self.results.total_records = self.model.objects.count()
 
         cost = time.time() - self._start
