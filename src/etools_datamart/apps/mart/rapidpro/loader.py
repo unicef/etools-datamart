@@ -1,5 +1,6 @@
 import inspect
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import ForeignKey
 from django.utils import timezone
@@ -94,6 +95,13 @@ class TembaLoader(BaseLoader):
                 ret[dm_field_name] = get_attr(record, resolver)
             else:
                 raise Exception("Invalid field name or mapping '%s:%s'" % (dm_field_name, resolver))
+
+            # enforce field size limit
+            try:
+                ret[dm_field_name] = ret[dm_field_name][:settings.FIELD_SIZE_LIMIT]
+            except TypeError:
+                # not subscriptable so ignoring
+                pass
 
         return ret
 
