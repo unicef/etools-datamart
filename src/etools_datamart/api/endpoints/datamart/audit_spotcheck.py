@@ -121,8 +121,9 @@ class SpotCheckViewSet(DataMartViewSet):
     queryset = models.SpotCheck.objects.all()
     filter_fields = ('partner_contacted_at',
                      'start_date', 'end_date', 'status', 'audit_opinion')
-    serializers_fieldsets = {'std': None,
-                             'simple': SpotCheckSerializerSimple}
+    serializers_fieldsets = {
+        'simple': SpotCheckSerializerSimple,
+    }
 
     def get_querystringfilter_form(self, request, filter):
         return SpotCheckFilterForm(request.GET, filter.form_prefix)
