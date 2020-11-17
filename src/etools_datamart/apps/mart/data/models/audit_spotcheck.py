@@ -99,10 +99,13 @@ class SpotCheckLoader(EtoolsLoader):
             p = Partner.objects.get(
                 schema_name=self.context['country'].schema_name,
                 source_id=record.partner.id)
-            return {'name': p.name,
-                    'vendor_number': p.vendor_number,
-                    'id': p.id,
-                    'source_id': p.source_id}
+            return {
+                'name': p.name,
+                'vendor_number': p.vendor_number,
+                'id': p.id,
+                'source_id': p.source_id,
+                'partner_type': p.partner_type,
+            }
         except Partner.DoesNotExist:
             return {'name': 'N/A',
                     'vendor_number': 'N/A',
