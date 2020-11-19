@@ -8,9 +8,10 @@ from django.db.models import F
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
-from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
-                                                        PartnersIntervention, PartnersInterventionplannedvisits,
-                                                        ReportsAppliedindicator, T2FTravelactivity,)
+from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersIntervention,
+                                                        PartnersInterventionamendment,
+                                                        PartnersInterventionplannedvisits, ReportsAppliedindicator,
+                                                        T2FTravelactivity,)
 from etools_datamart.sentry import process_exception
 
 from .base import EtoolsDataMartModel
@@ -230,7 +231,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(qs.values_list('type__name', flat=True))
 
     def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersAgreementamendment.objects.filter(agreement=record.agreement).order_by('signed_date')
+        qs = PartnersInterventionamendment.objects.filter(intervention=record).order_by('signed_date')
         values['number_of_amendments'] = qs.count()
         if qs:
             values['last_amendment_date'] = qs.latest('signed_date').signed_date
