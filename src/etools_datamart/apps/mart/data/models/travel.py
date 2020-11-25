@@ -43,7 +43,7 @@ class Travel(EtoolsDataMartModel):
     rejection_note = models.TextField(blank=True, null=True, )
     report_note = models.TextField(blank=True, null=True, )
     # section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='reportssector_t2f_travel_section_id', blank=True, null=True)
-    section_name = models.CharField(max_length=45, blank=True, null=True, db_index=True)
+    section_name = models.CharField(max_length=128, blank=True, null=True, db_index=True)
     start_date = models.DateField(blank=True, null=True, db_index=True)
     status = models.CharField(max_length=50, choices=T2FTravelConsts.CHOICES, db_index=True)
     submitted_at = models.DateTimeField(blank=True, null=True)
