@@ -2,8 +2,15 @@
 # import django_filters
 from django.db import models
 
+from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import PartnersPartnerstaffmember
+
+
+class PartnerStaffMemberLoader(EtoolsLoader):
+    def get_user(self, record: PartnersPartnerstaffmember, values: dict, **kwargs):
+        if record.user:
+            return "{0.last_name} {0.first_name} ({0.email})".format(record.user)
 
 
 class PartnerStaffMember(EtoolsDataMartModel):
@@ -19,7 +26,12 @@ class PartnerStaffMember(EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
 
+    loader = PartnerStaffMemberLoader()
+
     class Options:
         source = PartnersPartnerstaffmember
-        mapping = {'partner': 'partner.name',
-                   'vendor_number': 'partner.vendor_number'}
+        mapping = {
+            'partner': 'partner.name',
+            'vendor_number': 'partner.vendor_number',
+            'user': '-',
+        }
