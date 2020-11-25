@@ -4,8 +4,11 @@ from django.utils.translation import gettext as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import (FieldMonitoringDataCollectionActivityoverallfinding,
-                                                        FieldMonitoringDataCollectionFinding,)
+from etools_datamart.apps.sources.etools.models import (
+    FieldMonitoringDataCollectionActivityoverallfinding,
+    FieldMonitoringDataCollectionFinding,
+    FieldMonitoringSettingsOption,
+)
 
 
 class FMQuestionLoader(EtoolsLoader):
@@ -16,9 +19,10 @@ class FMQuestionLoader(EtoolsLoader):
             values: dict,
             **kwargs,
     ):
-        return ", ".join(
-            [o.label for o in record.activity_question.options.all()]
+        option_qs = FieldMonitoringSettingsOption.objects.filter(
+            question=record.activity_question,
         )
+        return ", ".join([o.label for o in option_qs.all()])
 
     def get_question_collection_methods(
             self,
