@@ -7,10 +7,10 @@ from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringDataCollectionActivityoverallfinding,
     FieldMonitoringDataCollectionFinding,
-    FieldMonitoringSettingsOption,
     FieldMonitoringPlanningMonitoringactivityCpOutputs,
     FieldMonitoringPlanningMonitoringactivityInterventions,
     FieldMonitoringPlanningMonitoringactivityPartners,
+    FieldMonitoringSettingsOption,
 )
 
 
