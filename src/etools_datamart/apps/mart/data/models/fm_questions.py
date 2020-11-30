@@ -8,6 +8,9 @@ from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringDataCollectionActivityoverallfinding,
     FieldMonitoringDataCollectionFinding,
     FieldMonitoringSettingsOption,
+    FieldMonitoringPlanningMonitoringactivityCpOutputs,
+    FieldMonitoringPlanningMonitoringactivityInterventions,
+    FieldMonitoringPlanningMonitoringactivityPartners,
 )
 
 
@@ -39,19 +42,31 @@ class FMQuestionLoader(EtoolsLoader):
             filters = self.config.key(self, rec)
             values = self.get_values(rec)
             activity = rec.activity_question.monitoring_activity
-            for partner in activity.partners.all():
+            partner_qs = FieldMonitoringPlanningMonitoringactivityPartners.objects.filter(
+                monitoringactivity=activity,
+            )
+            intervention_qs = FieldMonitoringPlanningMonitoringactivityInterventions.objects.filter(
+                monitoringactivity=activity,
+            )
+            cp_output_qs = FieldMonitoringPlanningMonitoringactivityCpOutputs.objects.filter(
+                monitoringactivity=activity,
+            )
+            for rec in partner_qs.all():
+                partner = rec.partnerorganization
                 values["entity_type"] = "Partner"
                 values["entity_instance"] = partner.name
                 values["outcome"] = None
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
-            for pd in activity.interventions.all():
+            for rec in intervention_qs.all():
+                pd = rec.intervention
                 values["entity_type"] = "PD/SSFA"
                 values["entity_instance"] = pd.reference_number
                 values["outcome"] = None
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
-            for cp_output in activity.cp_output.all():
+            for rec in cp_output_qs.all():
+                cp_ouput = rec.result
                 values["entity_type"] = "CP Output"
                 values["entity_instance"] = cp_output.name
                 values["outcome"] = cp_output.parent.wbs if cp_output.parent else None
