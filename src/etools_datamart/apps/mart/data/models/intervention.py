@@ -8,6 +8,7 @@ from django.db.models import F
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
+
 from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersIntervention,
                                                         PartnersInterventionamendment,
                                                         PartnersInterventionplannedvisits, ReportsAppliedindicator,
@@ -311,14 +312,8 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(ret)
 
     def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
-        try:
-            return FundsFundsreservationheader.objects.get(intervention=record,
-                                                           end_date__isnull=True).fr_number
-        except FundsFundsreservationheader.MultipleObjectsReturned as e:
-            process_exception(e)
-            return None
-        except FundsFundsreservationheader.DoesNotExist:
-            return None
+        return ", ".join(FundsFundsreservationheader.objects.filter(intervention=record)
+                         .values_list('fr_number', flat=True))
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
         values['cp_outputs_data'] = list(record.result_links.values("name", "code"))
