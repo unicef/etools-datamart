@@ -1,5 +1,3 @@
-from xml.etree import ElementTree
-
 from django.conf import settings
 from django.contrib.gis.db import models as geomodels
 from django.contrib.gis.db.models.functions import Centroid
@@ -49,7 +47,7 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
                 latitude__isnull=False,
                 longitude__isnull=False,
         ).all():
-            geoname = GeoName.objects.get_or_add(
+            geoname, __ = GeoName.objects.get_or_create(
                 lat=record.latitude,
                 lng=record.longitude,
             )
@@ -63,7 +61,7 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
             each.point = each.cent
             each.latitude = each.point.y
             each.longitude = each.point.x
-            each.geoname = GeoName.objects.get_or_add(
+            each.geoname, __ = GeoName.objects.get_or_create(
                 lat=each.point.y,
                 lng=each.point.x,
             )
@@ -125,57 +123,9 @@ class Location(EtoolsDataMartModel):
         return self.name
 
 
-# store geo names pulled from http://api.geonames.org
-# Using lat and lng get geoname data with
-# http://api.geonames.org/findNearby?lat=47.3&lng=9&username=ntrncic
-class GeoNameManager(models.Manager):
-    def get_or_add(self, lat, lng):
-        # check if we have a matching lat, lng record
-        # if so, return that record
-        # otherwise create a new record based on results
-        # of request to geonames.org
-        if not lat or not lng:
-            return None
-        try:
-            geoname = self.get_queryset().get(lat=lat, lng=lng)
-        except GeoName.DoesNotExist:
-            payload = {
-                "lat": lat,
-                "lng": lng,
-                "username": settings.GEONAMES_USERNAME,
-            }
-            res = requests.get(
-                settings.GEONAMES_URL,
-                params=payload,
-                timeout=settings.REQUEST_TIMEOUT,
-            )
-            geoname = ElementTree.fromstring(res.content)[0]
-            mapping = [
-                ("toponym_name", "toponymName"),
-                ("name", "name"),
-                ("lat", "lat"),
-                ("lng", "lng"),
-                ("geoname_id", "geonameId"),
-                ("country_code", "countryCode"),
-                ("country_name", "countryName"),
-                ("fcl", "fcl"),
-                ("fcode", "fcode"),
-                ("distance", "distance"),
-            ]
-            data = {}
-            for k, f in mapping:
-                try:
-                    data[k] = geoname.find(f).text
-                except AttributeError:
-                    return None
-            lat = data.pop("lat")
-            lng = data.pop("lng")
-            geoname, __ = GeoName.objects.get_or_create(
-                lat=lat,
-                lng=lng,
-                defaults=data,
-            )
-        return geoname
+class GeoNameLimitException(Exception):
+    # GeoName requests have reached their limit
+    pass
 
 
 class GeoName(models.Model):
@@ -190,10 +140,64 @@ class GeoName(models.Model):
     fcode = models.CharField(max_length=50, null=True)
     distance = models.FloatField(null=True)
 
-    objects = GeoNameManager()
-
     class Meta:
         unique_together = ('lat', 'lng')
 
     def __str__(self):
         return f"{self.name} ({self.lat}, {self.lng})"
+
+    def sync(self):
+        # store geo names pulled from http://api.geonames.org
+        # Using lat and lng get geoname data with
+        # http://api.geonames.org/findNearbyJSON?lat=47.3&lng=9&username=ntrncic
+        payload = {
+            "lat": self.lat,
+            "lng": self.lng,
+            "username": settings.GEONAMES_USERNAME,
+        }
+        res = requests.get(
+            settings.GEONAMES_URL,
+            params=payload,
+            timeout=30,
+        )
+        geonames = res.json()
+        # check for exception
+        if "status" in geonames:
+            if geonames["status"]["value"] in [18, 19, 20]:
+                raise GeoNameLimitException
+            return None
+
+        mapping = [
+            ("toponym_name", "toponymName"),
+            ("name", "name"),
+            ("lat", "lat"),
+            ("lng", "lng"),
+            ("geoname_id", "geonameId"),
+            ("country_code", "countryCode"),
+            ("country_name", "countryName"),
+            ("fcl", "fcl"),
+            ("fcode", "fcode"),
+            ("distance", "distance"),
+        ]
+        try:
+            geoname = geonames["geonames"][0]
+        except IndexError:
+            return None
+        # to prevent unique exception as lat/lng
+        # returned in response may be altered
+        geo, __ = GeoName.objects.get_or_create(
+            lat=geoname.get("lat"),
+            lng=geoname.get("lng"),
+        )
+        for k, f in mapping:
+            try:
+                setattr(geo, k, geoname.get(f))
+            except AttributeError:
+                return None
+        if self != geo:
+            # geoname wioth lat/lng already exists
+            # update all related locations to existing geoname
+            # and delete this instance
+            Location.objects.filter(geoname=self).update(geoname=geo)
+            self.delete()
+        geo.save()

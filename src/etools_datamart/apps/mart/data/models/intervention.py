@@ -8,9 +8,12 @@ from django.db.models import F
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
-from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersAgreementamendment,
-                                                        PartnersIntervention, PartnersInterventionplannedvisits,
-                                                        ReportsAppliedindicator, T2FTravelactivity,)
+
+from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersIntervention,
+                                                        PartnersInterventionamendment,
+                                                        PartnersInterventionplannedvisits, ReportsAppliedindicator,
+                                                        T2FTravelactivity,)
+from etools_datamart.sentry import process_exception
 
 from .base import EtoolsDataMartModel
 from .location import Location
@@ -26,6 +29,7 @@ class InterventionAbstract(models.Model):
     amendment_types = models.TextField(blank=True, null=True)
     attachment_types = models.TextField(blank=True, null=True)
     agreement_id = models.IntegerField(blank=True, null=True)
+    cfei_number = models.CharField(max_length=150, null=True, blank=True)
     clusters = models.TextField(blank=True, null=True)
     contingency_pd = models.NullBooleanField(null=True)
     # cp_output = models.CharField(max_length=300, blank=True, null=True)
@@ -37,7 +41,7 @@ class InterventionAbstract(models.Model):
     country_programme = models.CharField(max_length=300, blank=True, null=True)
     country_programme_id = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
-    currency = models.CharField(max_length=4, blank=True, null=True)
+    currency = models.CharField(max_length=5, blank=True, null=True)
     days_from_prc_review_to_signature = models.IntegerField(blank=True, null=True)
     days_from_submission_to_signature = models.IntegerField(blank=True, null=True)
     document_type = models.CharField(max_length=255, null=True,
@@ -66,6 +70,7 @@ class InterventionAbstract(models.Model):
     # partner_focal_point_title = models.CharField(max_length=64, null=True)
     partner_id = models.IntegerField(blank=True, null=True)
     partner_name = models.CharField(max_length=200, null=True)
+    partner_sea_risk_rating = models.CharField(max_length=150, null=True, blank=True)
     partner_signatory_name = models.CharField(max_length=300, null=True)
     partner_signatory_email = models.CharField(max_length=128, null=True)
     partner_signatory_first_name = models.CharField(max_length=64, null=True)
@@ -97,7 +102,6 @@ class InterventionAbstract(models.Model):
     unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     unicef_focal_points = models.TextField(blank=True, null=True)
     unicef_focal_points_data = JSONField(blank=True, null=True, default=dict)
-
     unicef_signatory_name = models.CharField(max_length=500, null=True)
     # unicef_signatory_first_name = models.CharField(max_length=30, null=True)
     # unicef_signatory_id = models.IntegerField(blank=True, null=True)
@@ -156,6 +160,7 @@ class InterventionAbstract(models.Model):
             partner_focal_points_data='i',
             partner_id='-',
             partner_name='agreement.partner.name',
+            partner_sea_risk_rating='i',
             partner_signatory_email='partner_authorized_officer_signatory.email',
             partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
             partner_signatory_last_name='partner_authorized_officer_signatory.last_name',
@@ -180,6 +185,7 @@ class InterventionAbstract(models.Model):
             # unicef_signatory_id='unicef_signatory.pk',
             # unicef_signatory_last_name='unicef_signatory.last_name',
             updated='modified',
+            cfei_number='=',
         )
 
 
@@ -201,9 +207,14 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     def get_partner_id(self, record: PartnersIntervention, values: dict, **kwargs):
         try:
-            return Partner.objects.get(schema_name=self.context['country'].schema_name,
-                                       source_id=record.agreement.partner.id).pk
+            data = Partner.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=record.agreement.partner.id,
+            )
+            values['partner_sea_risk_rating'] = data.sea_risk_rating_name
+            return data.pk
         except Partner.DoesNotExist:
+            values['partner_sea_risk_rating'] = None
             return None
 
     def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
@@ -221,7 +232,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(qs.values_list('type__name', flat=True))
 
     def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersAgreementamendment.objects.filter(agreement=record.agreement).order_by('signed_date')
+        qs = PartnersInterventionamendment.objects.filter(intervention=record).order_by('signed_date')
         values['number_of_amendments'] = qs.count()
         if qs:
             values['last_amendment_date'] = qs.latest('signed_date').signed_date

@@ -6,9 +6,10 @@ from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
-from etools_datamart.apps.sources.etools.models import (AuditAudit, AuditEngagement, AuditEngagementActivePd,
-                                                        AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
+from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts, RiskConst
+from etools_datamart.apps.sources.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
+                                                        AuditEngagementActivePd, AuditMicroassessment, AuditRisk,
+                                                        AuditRiskcategory, AuditSpecialaudit, AuditSpotcheck,
                                                         DjangoContentType, UnicefAttachmentsAttachment,)
 
 from .partner import Partner
@@ -35,11 +36,15 @@ MODULEMAP = {'AuditSpotcheck': "fam",
 
 
 class EngagementlLoader(EtoolsLoader):
+    OVERALL_RISK_MAP = {}
 
     def get_queryset(self):
-        return AuditEngagement.objects.select_related('partner',
-                                                      'agreement',
-                                                      'po_item').all()
+        return AuditEngagement.objects.select_related(
+            'partner',
+            'agreement',
+            'po_item',
+            'risks',
+        ).all()
 
     def get_content_type(self, sub_type):
         mapping = {AuditAudit: 'audit',
@@ -159,6 +164,43 @@ class EngagementlLoader(EtoolsLoader):
     # def get_active_pd(self, original: AuditEngagement, values: dict):
     #     return None
 
+    def get_action_points(self, record: AuditEngagement, values: dict, **kwargs):
+        from etools_datamart.api.endpoints.datamart.actionpoint import ActionPointSimpleSerializer
+
+        ret = []
+        for r in ActionPointsActionpoint.objects.filter(engagement=record).all():
+            ret.append(ActionPointSimpleSerializer(r).data)
+        return ret
+
+    def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
+        schema = self.context['country']
+        category_id = self.OVERALL_RISK_MAP.get(schema, None)
+        if category_id is None:
+            try:
+                category = AuditRiskcategory.objects.get(
+                    header="Overall Risk Assessment",
+                )
+            except AuditRiskcategory.DoesNotExist:
+                pass
+            else:
+                self.OVERALL_RISK_MAP[schema] = category.pk
+                category_id = category.pk
+
+        try:
+            risk = AuditRisk.objects.get(
+                engagement=record,
+                blueprint__category__pk=category_id,
+            )
+        except AuditRisk.DoesNotExist:
+            extra = ""
+            value = ""
+        else:
+            extra = risk.extra
+            value = risk.value
+
+        values["rating_extra"] = extra
+        return value
+
     def process_country(self):
         for m in [AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck, AuditAudit]:
             for record in m.objects.select_related('engagement_ptr'):
@@ -213,6 +255,7 @@ class Engagement(EtoolsDataMartModel):
     additional_supporting_documentation_provided = models.DecimalField(blank=True, null=True, decimal_places=2,
                                                                        max_digits=20)
     agreement = models.CharField(max_length=300, blank=True, null=True)
+    auditor = models.CharField(max_length=255, blank=True, null=True)
     amount_refunded = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     authorized_officers = models.TextField(blank=True, null=True)
     authorized_officers_data = JSONField(blank=True, null=True)
@@ -268,6 +311,13 @@ class Engagement(EtoolsDataMartModel):
     # MicroAssessment
     # final_report = CodedGenericRelation(Attachment, code='micro_assessment_final_report')
     # Audit
+    rating = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        choices=RiskConst.VALUES,
+    )
+    rating_extra = JSONField(blank=True, null=True)
 
     AUDIT_OPTION_UNQUALIFIED = "unqualified"
     AUDIT_OPTION_QUALIFIED = "qualified"
@@ -290,6 +340,9 @@ class Engagement(EtoolsDataMartModel):
     # SpecialAudit
     # final_report = CodedGenericRelation(Attachment, code='special_audit_final_report')
 
+    # ActionPoints
+    action_points = JSONField(blank=True, null=True)
+
     # datamart
     loader = EngagementlLoader()
 
@@ -304,6 +357,7 @@ class Engagement(EtoolsDataMartModel):
             active_pd="-",
             active_pd_data="i",
             agreement="agreement.order_number",  # PurchaseOrder
+            auditor="agreement.auditor_firm.name",
             authorized_officers="-",
             reference_number="-",
             engagement_attachments='-',
@@ -322,5 +376,7 @@ class Engagement(EtoolsDataMartModel):
             audited_expenditure='_impl.audited_expenditure',
             financial_findings='_impl.financial_findings',
             audit_opinion='_impl.audit_opinion',
-
+            action_points="-",
+            rating="-",
+            rating_extra="i",
         )

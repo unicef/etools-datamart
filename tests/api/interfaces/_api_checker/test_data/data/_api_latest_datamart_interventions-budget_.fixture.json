@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.interventionbudget",
-                "pk": 1205,
+                "pk": 397,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-09-16T18:29:15.312Z",
+                    "last_modify_date": "2020-09-24T20:11:19.889Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -15,6 +15,7 @@
                     "amendment_types": null,
                     "attachment_types": null,
                     "agreement_id": null,
+                    "cfei_number": null,
                     "clusters": null,
                     "contingency_pd": null,
                     "cp_outputs": null,
@@ -93,10 +94,10 @@
             },
             {
                 "model": "data.interventionbudget",
-                "pk": 1206,
+                "pk": 398,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-09-16T18:29:15.319Z",
+                    "last_modify_date": "2020-09-24T20:11:19.894Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -105,6 +106,7 @@
                     "amendment_types": null,
                     "attachment_types": null,
                     "agreement_id": null,
+                    "cfei_number": null,
                     "clusters": null,
                     "contingency_pd": null,
                     "cp_outputs": null,
@@ -183,10 +185,10 @@
             },
             {
                 "model": "data.interventionbudget",
-                "pk": 1207,
+                "pk": 399,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-09-16T18:29:15.322Z",
+                    "last_modify_date": "2020-09-24T20:11:19.898Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -195,6 +197,7 @@
                     "amendment_types": null,
                     "attachment_types": null,
                     "agreement_id": null,
+                    "cfei_number": null,
                     "clusters": null,
                     "contingency_pd": null,
                     "cp_outputs": null,

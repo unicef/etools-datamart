@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: python:3.7-slim
+      - image: unicef/etools-base:latest
         environment:
           PGHOST: 127.0.0.1
           DATABASE_URL: "postgis://postgres:postgres@127.0.0.1:5432/etools_datamart"
@@ -23,22 +23,6 @@ jobs:
           POSTGRES_DB: etools_datamart
           POSTGRES_PASSWORD: postgres
     steps:
-      - run:
-          name: Install dependencies
-          command: |
-            mkdir -p /usr/share/man/man1
-            mkdir -p /usr/share/man/man7
-            apt-get update
-            apt-get install -y \
-                  libc-bin \
-                  libzmq3-dev \
-                  git \
-                  gcc \
-                  curl \
-                  gdal-bin \
-                  python-dev \
-                  postgresql-client
-
       - restore_cache:
           keys:
             - source-{{ .Branch }}-{{ .Revision }}

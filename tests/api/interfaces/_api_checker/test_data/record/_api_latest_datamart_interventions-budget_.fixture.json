@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.interventionbudget",
-            "pk": 1208,
+            "pk": 400,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-09-16T18:29:20.015Z",
+                "last_modify_date": "2020-09-24T20:11:22.981Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -14,6 +14,7 @@
                 "amendment_types": null,
                 "attachment_types": null,
                 "agreement_id": null,
+                "cfei_number": null,
                 "clusters": null,
                 "contingency_pd": null,
                 "cp_outputs": null,
