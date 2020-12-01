@@ -1,4 +1,4 @@
-FROM python:3.7.3-alpine
+FROM python:3.7.9-alpine3.11
 
 ARG BUILD_DATE
 ARG PIPENV_ARGS
@@ -11,9 +11,6 @@ ENV TEST ${TEST}
 
 
 RUN apk add --no-cache --virtual .build-deps \
-        --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/main \
-        --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/testing \
-        --repository http://dl-3.alpinelinux.org/alpine/latest-stable/community/ \
         gcc \
         g++ \
         gdal-dev \
@@ -33,23 +30,15 @@ RUN apk add --no-cache --virtual .build-deps \
         zeromq-dev
 
 RUN apk add --no-cache --virtual .run-deps \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
         bash \
-#        binutils \
         geos \
         gdal \
-        gosu \
+#        gosu \
         libmagic \
-#        libpq \
         libuuid \
         libxslt \
-#        libzmq \
-#        jpeg \
         mailcap \
         postgresql-client \
-#        xmlsec \
         zlib
 
 
