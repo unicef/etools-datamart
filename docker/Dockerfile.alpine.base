@@ -33,7 +33,6 @@ RUN apk add --no-cache --virtual .run-deps \
         bash \
         geos \
         gdal \
-#        gosu \
         libmagic \
         libuuid \
         libxslt \
@@ -41,6 +40,9 @@ RUN apk add --no-cache --virtual .run-deps \
         postgresql-client \
         zlib
 
+RUN wget https://github.com/tianon/gosu/releases/download/1.12/gosu-amd64
+RUN mv gosu-amd64 /usr/local/bin/gosu
+RUN chmod +x /usr/local/bin/gosu
 
 RUN mkdir -p /code
 COPY poetry.lock pyproject.toml /code/
