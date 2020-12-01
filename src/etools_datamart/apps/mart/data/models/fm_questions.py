@@ -10,6 +10,7 @@ from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringPlanningMonitoringactivityCpOutputs,
     FieldMonitoringPlanningMonitoringactivityInterventions,
     FieldMonitoringPlanningMonitoringactivityPartners,
+    FieldMonitoringSettingsOption,
 )
 
 
@@ -21,9 +22,10 @@ class FMQuestionLoader(EtoolsLoader):
             values: dict,
             **kwargs,
     ):
-        return ", ".join(
-            [o.label for o in record.activity_question.options.all()]
+        option_qs = FieldMonitoringSettingsOption.objects.filter(
+            question=record.activity_question,
         )
+        return ", ".join([o.label for o in option_qs.all()])
 
     def get_question_collection_methods(
             self,
