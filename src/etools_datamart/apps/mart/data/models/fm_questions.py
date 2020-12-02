@@ -11,6 +11,7 @@ from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringPlanningMonitoringactivityInterventions,
     FieldMonitoringPlanningMonitoringactivityPartners,
     FieldMonitoringSettingsOption,
+    FieldMonitoringSettingsQuestionMethods,
 )
 
 
@@ -23,7 +24,7 @@ class FMQuestionLoader(EtoolsLoader):
             **kwargs,
     ):
         option_qs = FieldMonitoringSettingsOption.objects.filter(
-            question=record.activity_question,
+            question=record.activity_question.question,
         )
         return ", ".join([o.label for o in option_qs.all()])
 
@@ -33,8 +34,11 @@ class FMQuestionLoader(EtoolsLoader):
             values: dict,
             **kwargs,
     ):
+        methods_qs = FieldMonitoringSettingsQuestionMethods.objects.filter(
+            question=record.activity_question.question,
+        )
         return ", ".join(
-            [m.name for m in record.activity_question.methods.all()]
+            [m.name for m in methods_qs.all()]
         )
 
     def process_country(self):
