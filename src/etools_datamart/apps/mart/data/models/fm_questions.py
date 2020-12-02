@@ -199,17 +199,28 @@ class FMOntrackLoader(EtoolsLoader):
         for rec in self.get_queryset():
             filters = self.config.key(self, rec)
             values = self.get_values(rec)
-            for partner in rec.monitoring_activity.partners.all():
-                values["entity"] = partner.name
+            activity = rec.monitoring_activity
+            partner_qs = FieldMonitoringPlanningMonitoringactivityPartners.objects.filter(
+                monitoringactivity=activity,
+            )
+            intervention_qs = FieldMonitoringPlanningMonitoringactivityInterventions.objects.filter(
+                monitoringactivity=activity,
+            )
+            cp_output_qs = FieldMonitoringPlanningMonitoringactivityCpOutputs.objects.filter(
+                monitoringactivity=activity,
+            )
+            for rec in partner_qs.all():
+                values["entity"] = rec.partnerorganization.name
                 values["outcome"] = None
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
-            for pd in rec.monitoring_activity.interventions.all():
-                values["entity"] = pd.reference_number
+            for rec in intervention_qs.all():
+                values["entity"] = rec.intervention.reference_number
                 values["outcome"] = None
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
-            for cp_output in rec.monitoring_activity.cp_output.all():
+            for rec in cp_output_qs.all():
+                cp_putput = rec.result
                 values["entity"] = cp_output.name
                 values["outcome"] = cp_output.parent.wbs if cp_output.parent else None
                 op = self.process_record(filters, values)
