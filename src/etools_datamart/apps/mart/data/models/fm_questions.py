@@ -38,7 +38,7 @@ class FMQuestionLoader(EtoolsLoader):
             question=record.activity_question.question,
         )
         return ", ".join(
-            [m.name for m in methods_qs.all()]
+            [m.method.name for m in methods_qs.all()]
         )
 
     def process_country(self):
