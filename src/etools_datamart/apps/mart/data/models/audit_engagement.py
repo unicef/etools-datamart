@@ -35,8 +35,41 @@ MODULEMAP = {'AuditSpotcheck': "fam",
              'T2FTravelactivity': "trips"}
 
 
-class EngagementlLoader(EtoolsLoader):
+class EngagementRiskMixin:
     OVERALL_RISK_MAP = {}
+
+    def _get_risk(self, record: AuditEngagement, code: str):
+        schema = self.context['country']
+        category_id = self.OVERALL_RISK_MAP.get(schema, None)
+        if category_id is None:
+            try:
+                category = AuditRiskcategory.objects.get(code=code)
+            except AuditRiskcategory.DoesNotExist:
+                pass
+            else:
+                self.OVERALL_RISK_MAP[schema] = category.pk
+                category_id = category.pk
+
+        try:
+            risk = AuditRisk.objects.get(
+                engagement=record,
+                blueprint__category__pk=category_id,
+            )
+        except AuditRisk.DoesNotExist:
+            extra = ""
+            value = ""
+        else:
+            extra = risk.extra
+            value = risk.value
+        return extra, value
+
+    def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
+        value, extra = self._get_risk(record, code="ma_global_assessment")
+        values["rating_extra"] = extra
+        return value
+
+
+class EngagementlLoader(EngagementRiskMixin, EtoolsLoader):
 
     def get_queryset(self):
         return AuditEngagement.objects.select_related(
@@ -171,35 +204,6 @@ class EngagementlLoader(EtoolsLoader):
         for r in ActionPointsActionpoint.objects.filter(engagement=record).all():
             ret.append(ActionPointSimpleSerializer(r).data)
         return ret
-
-    def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
-        schema = self.context['country']
-        category_id = self.OVERALL_RISK_MAP.get(schema, None)
-        if category_id is None:
-            try:
-                category = AuditRiskcategory.objects.get(
-                    header="Overall Risk Assessment",
-                )
-            except AuditRiskcategory.DoesNotExist:
-                pass
-            else:
-                self.OVERALL_RISK_MAP[schema] = category.pk
-                category_id = category.pk
-
-        try:
-            risk = AuditRisk.objects.get(
-                engagement=record,
-                blueprint__category__pk=category_id,
-            )
-        except AuditRisk.DoesNotExist:
-            extra = ""
-            value = ""
-        else:
-            extra = risk.extra
-            value = risk.value
-
-        values["rating_extra"] = extra
-        return value
 
     def process_country(self):
         for m in [AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck, AuditAudit]:
