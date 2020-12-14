@@ -29,20 +29,20 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - deps-v2-{{ checksum "poetry.lock" }}
+            - deps-v2-{{ checksum "Pipfile.lock" }}
 
       - run:
           name: install deps
           command: |
-            pip install poetry
-            poetry install
+            pip install pipenv
+            pipenv install --dev --ignore-pipfile
 
       - run:
           name: create db
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            poetry run pytest tests/ --create-db
+            pipenv run pytest tests/ --create-db
 
       - store_artifacts:
           path: ~build/coverage
@@ -54,7 +54,7 @@ jobs:
             - ".git"
 
       - save_cache:
-          key: deps-v2-{{ checksum "poetry.lock" }}
+          key: deps-v2-{{ checksum "Pipfile.lock" }}
           paths:
             - ".tox"
             - ".venv"
