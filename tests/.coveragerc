@@ -10,7 +10,7 @@ omit =
         **/apps/etools/models/public_old.py
         **/apps/etools/models/tenant_old.py
         **/db_router.py
-        **/etools_datamart/apps/data/management/commands/load.py
+        src/etools_datamart/apps/data/management/commands/load.py
         **/inspectschema.py
         **/introspection.py
         **/libs/mystica.py
@@ -19,9 +19,10 @@ omit =
         **/reset-migrations.py
         **/tracking/management/commands/track.py
         **/data/management/commands/sqlall.py
-        **/etools_datamart/apps/prp/management/commands/inspectprp.py
+        **/source_prp/management/commands/inspectprp.py
         tests/**
         **/migrations/**
+        **/custom_migrations/**
 
 
 [report]
@@ -41,7 +42,7 @@ exclude_lines =
     #if 0:
     if __name__ == .__main__.:
 
-fail_under = 70
+fail_under = 60
 
 ignore_errors = True
 
