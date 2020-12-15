@@ -101,43 +101,46 @@ def django_db_setup(request,
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
 
     # """Top level fixture to ensure test databases are available"""
-    # from pytest_django.compat import setup_databases, teardown_databases
-    # from pytest_django.fixtures import _disable_native_migrations
-    # setup_databases_args = {}
+    from django.test.utils import setup_databases, teardown_databases
 
-    # if not django_db_use_migrations:
-    #     _disable_native_migrations()
+    from pytest_django.fixtures import _disable_native_migrations
+    setup_databases_args = {}
 
-    # if django_db_keepdb and not django_db_createdb:
-    #     setup_databases_args["keepdb"] = True
-    # # this patch is logically wrong, but we do not use constance permissions
-    # # otherwise test fails with
-    # #
-    # # .venv/lib/python3.7/site-packages/django/db/backends/utils.py:84: in _execute
-    # #     return self.cursor.execute(sql, params)
-    # # E   django.db.utils.ProgrammingError: relation "django_content_type" does not exist
-    # # E   LINE 1: ..."."app_label", "django_content_type"."model" FROM "django_co...
-    # # E                                                                ^
-    # #
-    # signals.post_migrate.disconnect(dispatch_uid='constance.create_perm')
-    # with django_db_blocker.unblock():
-    #     db_cfg = setup_databases(
-    #         verbosity=request.config.option.verbose,
-    #         interactive=False,
-    #         **setup_databases_args
-    #     )
+    if not django_db_use_migrations:
+        _disable_native_migrations()
 
-    # def _teardown_database():
-    #     with django_db_blocker.unblock():
-    #         teardown_databases(db_cfg, verbosity=request.config.option.verbose)
+    if django_db_keepdb and not django_db_createdb:
+        setup_databases_args["keepdb"] = True
+    # this patch is logically wrong, but we do not use constance permissions
+    # otherwise test fails with
+    #
+    # .venv/lib/python3.7/site-packages/django/db/backends/utils.py:84: in _execute
+    #     return self.cursor.execute(sql, params)
+    # E   django.db.utils.ProgrammingError: relation "django_content_type" does not exist
+    # E   LINE 1: ..."."app_label", "django_content_type"."model" FROM "django_co...
+    # E                                                                ^
+    #
+    signals.post_migrate.disconnect(dispatch_uid='constance.create_perm')
+    with django_db_blocker.unblock():
+        db_cfg = setup_databases(
+            verbosity=request.config.option.verbose,
+            interactive=False,
+            **setup_databases_args
+        )
 
-    # if not django_db_keepdb:
-    #     request.addfinalizer(_teardown_database)
+    def _teardown_database():
+        with django_db_blocker.unblock():
+            teardown_databases(db_cfg, verbosity=request.config.option.verbose)
+
+    if not django_db_keepdb:
+        request.addfinalizer(_teardown_database)
+
+    from test_utilities.factories import UserFactory
 
     from unicef_rest_framework.models import Service, UserAccessControl
-    from etools_datamart.apps.tracking.models import APIRequestLog
-    from test_utilities.factories import UserFactory
+
     from etools_datamart.apps.etl.models import EtlTask
+    from etools_datamart.apps.tracking.models import APIRequestLog
 
     with django_db_blocker.unblock():
         EtlTask.objects.inspect()
