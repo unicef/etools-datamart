@@ -43,7 +43,7 @@ jobs:
   test:
     working_directory: ~/code
     docker:
-      - image: unicef/datamart:latest
+      - image: unicef/datamart:$BASE_TAG
         environment:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
