@@ -21,6 +21,7 @@ omit =
         **/data/management/commands/sqlall.py
         **/etools_datamart/apps/prp/management/commands/inspectprp.py
         tests/**
+        **/migrations/**
 
 
 [report]
