@@ -1,5 +1,6 @@
 from .actionpoint import ActionPoint  # noqa
 from .attachments_attachment import Attachment  # noqa
+from .audit_audit import Audit  # noqa
 from .audit_engagement import Engagement  # noqa
 from .audit_micro_assessment import MicroAssessment
 from .audit_result import AuditResult  # noqa
