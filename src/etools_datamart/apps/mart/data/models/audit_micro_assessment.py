@@ -14,25 +14,6 @@ from .partner import Partner
 
 
 class MicroAssessmentLoader(EngagementRiskMixin, EtoolsLoader):
-    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
-        try:
-            p = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.pk)
-            return {
-                'name': p.name,
-                'vendor_number': p.vendor_number,
-                'id': p.pk,
-                'source_id': p.source_id,
-            }
-        except Partner.DoesNotExist:
-            return {
-                'name': 'N/A',
-                'vendor_number': 'N/A',
-                'id': 'N/A',
-                'source_id': 'N/A',
-            }
-
     def get_subject_area(self, record: AuditEngagement, values: dict, **kwargs):
         value, extra = self._get_risk(record, "ma_subject_areas")
         values["subject_area_extra"] = extra

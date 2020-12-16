@@ -38,6 +38,25 @@ MODULEMAP = {'AuditSpotcheck': "fam",
 class EngagementRiskMixin:
     OVERALL_RISK_MAP = {}
 
+    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
+        try:
+            p = Partner.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=record.partner.pk)
+            return {
+                'name': p.name,
+                'vendor_number': p.vendor_number,
+                'id': p.pk,
+                'source_id': p.source_id,
+            }
+        except Partner.DoesNotExist:
+            return {
+                'name': 'N/A',
+                'vendor_number': 'N/A',
+                'id': 'N/A',
+                'source_id': 'N/A',
+            }
+
     def _get_risk(self, record: AuditEngagement, code: str):
         schema = self.context['country']
         category_id = self.OVERALL_RISK_MAP.get(schema, None)
@@ -70,7 +89,6 @@ class EngagementRiskMixin:
 
 
 class EngagementlLoader(EngagementRiskMixin, EtoolsLoader):
-
     def get_queryset(self):
         return AuditEngagement.objects.select_related(
             'partner',
@@ -160,21 +178,6 @@ class EngagementlLoader(EngagementRiskMixin, EtoolsLoader):
 
         values['active_pd_data'] = ret
         return ", ".join([o['number'] for o in ret])
-
-    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
-        try:
-            p = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.id)
-            return {'name': p.name,
-                    'vendor_number': p.vendor_number,
-                    'id': p.id,
-                    'source_id': p.source_id}
-        except Partner.DoesNotExist:
-            return {'name': 'N/A',
-                    'vendor_number': 'N/A',
-                    'id': 'N/A',
-                    'source_id': 'N/A'}
 
     def get_partner_id(self, record: AuditEngagement, values: dict, **kwargs):
         try:

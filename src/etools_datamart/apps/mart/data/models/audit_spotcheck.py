@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
+from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.sources.etools.models import (
@@ -27,13 +28,7 @@ URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s", }
 MODULEMAP = {'AuditSpotcheck': "fam"}
 
 
-class SpotCheckLoader(EtoolsLoader):
-
-    # def get_queryset(self):
-    #     return AuditEngagement.objects.select_related('partner',
-    #                                                   'agreement',
-    #                                                   'po_item').filter(engagement_type='sc')
-
+class SpotCheckLoader(EngagementRiskMixin, EtoolsLoader):
     def get_content_type(self, sub_type):
         return DjangoContentType.objects.get(app_label='audit', model='spotcheck')
 
@@ -100,21 +95,6 @@ class SpotCheckLoader(EtoolsLoader):
 
         values['active_pd_data'] = ret
         return ", ".join([o['number'] for o in ret])
-
-    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
-        try:
-            p = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.id)
-            return {'name': p.name,
-                    'vendor_number': p.vendor_number,
-                    'id': p.id,
-                    'source_id': p.source_id}
-        except Partner.DoesNotExist:
-            return {'name': 'N/A',
-                    'vendor_number': 'N/A',
-                    'id': 'N/A',
-                    'source_id': 'N/A'}
 
     def get_partner_id(self, record: AuditEngagement, values: dict, **kwargs):
         try:
@@ -280,26 +260,7 @@ class SpotCheck(EtoolsDataMartModel):
         )
 
 
-class SpotCheckFindingsLoader(EtoolsLoader):
-    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
-        try:
-            p = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.pk)
-            return {
-                'name': p.name,
-                'vendor_number': p.vendor_number,
-                'id': p.pk,
-                'source_id': p.source_id,
-            }
-        except Partner.DoesNotExist:
-            return {
-                'name': 'N/A',
-                'vendor_number': 'N/A',
-                'id': 'N/A',
-                'source_id': 'N/A',
-            }
-
+class SpotCheckFindingsLoader(EngagementRiskMixin, EtoolsLoader):
     def _get_priority_findings(self, record: AuditEngagement, priority: str):
         return AuditFinding.objects.filter(
             spot_check=record._impl,
