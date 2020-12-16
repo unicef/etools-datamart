@@ -1,8 +1,8 @@
 ARG BASE_IMAGE
 FROM unicef/datamart:${BASE_IMAGE}
 
-Add poetry.lock .
-Add pyproject.toml .
+ADD Pipfile .
+Add Pipfile.lock .
 
 RUN apk add bash
 RUN mkdir /tmp/static

@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import Group
 from django.utils import timezone
 
@@ -26,7 +25,7 @@ class AutoRegisterFactoryMetaClass(FactoryMetaClass):
         return new_class
 
 
-class RegisterModelFactory(factory.DjangoModelFactory, metaclass=AutoRegisterFactoryMetaClass):
+class RegisterModelFactory(factory.django.DjangoModelFactory, metaclass=AutoRegisterFactoryMetaClass):
     pass
 
 

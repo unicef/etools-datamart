@@ -101,7 +101,8 @@ def django_db_setup(request,
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
 
     # """Top level fixture to ensure test databases are available"""
-    from pytest_django.compat import setup_databases, teardown_databases
+    from django.test.utils import setup_databases, teardown_databases
+
     from pytest_django.fixtures import _disable_native_migrations
     setup_databases_args = {}
 
@@ -134,10 +135,12 @@ def django_db_setup(request,
     if not django_db_keepdb:
         request.addfinalizer(_teardown_database)
 
-    from unicef_rest_framework.models import Service, UserAccessControl
-    from etools_datamart.apps.tracking.models import APIRequestLog
     from test_utilities.factories import UserFactory
+
+    from unicef_rest_framework.models import Service, UserAccessControl
+
     from etools_datamart.apps.etl.models import EtlTask
+    from etools_datamart.apps.tracking.models import APIRequestLog
 
     with django_db_blocker.unblock():
         EtlTask.objects.inspect()

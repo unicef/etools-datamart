@@ -119,7 +119,7 @@ CMD ["datamart"]
 #RUN find /usr/local/lib/python3.8/site-packages/bitcaster -name *.pyc | xargs rm -f \
 #    && python -O -m compileall -fqb /usr/local/lib/python3.8/site-packages/bitcaster \
 #    && find /usr/local/lib/python3.8/site-packages/bitcaster -name *.py | xargs rm -f \
-#    && pip uninstall -y pip poetry
+#    && pip uninstall -y pip pipenv
 #
 #RUN addgroup --gid 1024 bitcaster \
 #    && adduser --disabled-password --ingroup bitcaster -S bitcaster
