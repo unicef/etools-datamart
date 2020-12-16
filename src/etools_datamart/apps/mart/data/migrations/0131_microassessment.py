@@ -30,8 +30,9 @@ class Migration(migrations.Migration):
                 ('shared_ip_with', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=20, null=True), blank=True, default=list, null=True, size=None, verbose_name='Shared Audit with')),
                 ('rating', models.CharField(blank=True, max_length=50, null=True)),
                 ('rating_extra', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True)),
+                ('subject_area', models.CharField(blank=True, max_length=50, null=True)),
+                ('subject_area_extra', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True)),
                 ('test_subject_areas', models.CharField(blank=True, max_length=50, null=True)),
-                ('test_subject_areas_extra', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True)),
             ],
             options={
                 'ordering': ('id',),

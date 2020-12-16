@@ -8,7 +8,7 @@ from model_utils import Choices
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import AuditEngagement, AuditFinding, AuditMicroassessment
+from etools_datamart.apps.sources.etools.models import AuditEngagement, AuditFinding, AuditMicroassessment, AuditRisk
 
 from .partner import Partner
 
@@ -33,10 +33,18 @@ class MicroAssessmentLoader(EngagementRiskMixin, EtoolsLoader):
                 'source_id': 'N/A',
             }
 
-    def get_test_subject_areas(self, record: AuditEngagement, values: dict, **kwargs):
+    def get_subject_area(self, record: AuditEngagement, values: dict, **kwargs):
         value, extra = self._get_risk(record, "ma_subject_areas")
-        values["test_subject_areas_extra"] = extra
+        values["subject_area_extra"] = extra
         return value
+
+    def get_test_subject_areas(self, record: AuditEngagement, values: dict, **kwargs):
+        return AuditRisk.objects.filter(
+            engagement=record,
+            blueprint__category__parent__code="ma_subject_areas",
+        ).values("blueprint__category__header").annotate(
+            count=Count("blueprint__category__header"),
+        ).order_by("blueprint__category__header")
 
     def process_country(self):
         for record in AuditMicroassessment.objects.select_related('engagement_ptr'):
@@ -78,12 +86,17 @@ class MicroAssessment(EtoolsDataMartModel):
         null=True,
     )
     rating_extra = JSONField(blank=True, null=True, default=dict)
+    subject_area = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+    subject_area_extra = JSONField(blank=True, null=True, default=dict)
     test_subject_areas = models.CharField(
         max_length=50,
         blank=True,
         null=True,
     )
-    test_subject_areas_extra = JSONField(blank=True, null=True, default=dict)
 
     loader = MicroAssessmentLoader()
 
@@ -99,6 +112,7 @@ class MicroAssessment(EtoolsDataMartModel):
             partner="-",
             rating="-",
             rating_extra="i",
+            subject_area="-",
+            subject_area_extra="i",
             test_subject_areas="-",
-            test_subject_areas_extra="i",
         )
