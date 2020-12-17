@@ -350,7 +350,7 @@ INSTALLED_APPS = [
     'adminfilters',
     'django_sysinfo',
     'post_office',
-    # 'djcelery_email',
+    'djcelery_email',
 
     'django_celery_beat',
 
