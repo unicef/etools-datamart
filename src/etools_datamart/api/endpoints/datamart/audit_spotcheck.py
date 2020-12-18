@@ -164,10 +164,10 @@ class SpotCheckFindingViewSet(DataMartViewSet):
     filter_fields = (
         'date_of_final_report',
     )
-    serializers_fieldsets = {
-        'std': SpotCheckFindingSerializer,
-        'simple': None,
-    }
+    # serializers_fieldsets = {
+    #     'std': None,
+    #     'simple': None,
+    # }
 
     def get_querystringfilter_form(self, request, filter):
         return SpotCheckFindingFilterForm(request.GET, filter.form_prefix)
