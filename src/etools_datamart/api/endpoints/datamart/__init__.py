@@ -4,7 +4,7 @@ from .actionpoint import ActionPointViewSet
 from .attachment import AttachmentViewSet
 from .audit_engagement import EngagementDetailViewSet, EngagementViewSet
 from .audit_result import AuditResultViewSet
-from .audit_spotcheck import SpotCheckViewSet
+from .audit_spotcheck import SpotCheckViewSet, SpotCheckFindingViewSet
 from .famindicator import FAMIndicatorViewSet
 from .fm_questions import FMOntrackViewSet, FMQuestionViewSet
 from .funds_grant import GrantViewSet

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# import django_filters
 from django import forms
 
 from constance import config
@@ -126,3 +124,50 @@ class SpotCheckViewSet(DataMartViewSet):
 
     def get_querystringfilter_form(self, request, filter):
         return SpotCheckFilterForm(request.GET, filter.form_prefix)
+
+
+class SpotCheckFindingSerializer(DataMartSerializer):
+    partner_name = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.SpotCheckFindings
+        exclude = ('seen', 'source_id',)
+
+    def get_url(self, obj):
+        try:
+            return "{}/ap/spot-checks/{}/overview".format(
+                config.ETOOLS_ADDRESS,
+                obj.source_id,
+            )
+        except KeyError:
+            return ""
+
+    def get_partner_name(self, obj):
+        try:
+            return obj.partner['name']
+        except KeyError:
+            return 'N/A'
+
+
+class SpotCheckFindingFilterForm(forms.Form):
+    date_of_final_report = DateRangePickerField(
+        label='Date of Final Report',
+        required=False,
+    )
+
+class SpotCheckFindingViewSet(DataMartViewSet):
+    querystringfilter_form_base_class = SpotCheckFindingFilterForm
+
+    serializer_class = SpotCheckFindingSerializer
+    queryset = models.SpotCheckFindings.objects.all()
+    filter_fields = (
+        'date_of_final_report',
+    )
+    serializers_fieldsets = {
+        'std': SpotCheckFindingSerializer,
+        'simple': None,
+    }
+
+    def get_querystringfilter_form(self, request, filter):
+        return SpotCheckFindingFilterForm(request.GET, filter.form_prefix)
