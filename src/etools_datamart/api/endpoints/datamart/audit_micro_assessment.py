@@ -21,7 +21,7 @@ class MicroAssessmentSerializer(DataMartSerializer):
 
     def get_url(self, obj):
         try:
-            return "{}/ap/micro-assessment/{}/overview".format(
+            return "{}/ap/micro-assessments/{}/overview".format(
                 config.ETOOLS_ADDRESS,
                 obj.source_id,
             )
