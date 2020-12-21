@@ -30,13 +30,11 @@ class {model}Admin(TenantModelAdmin):
 
 """
 
-SER_MODULE = """# -*- coding: utf-8 -*-
-from etools_datamart.apps.etools import models
+SER_MODULE = """from etools_datamart.apps.etools import models
 from rest_framework import serializers
 """
 
-VIEWSET_MODULE = """# -*- coding: utf-8 -*-
-from etools_datamart.apps.etools import models
+VIEWSET_MODULE = """from etools_datamart.apps.etools import models
 
 from . import common
 from .. import serializers

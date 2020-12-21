@@ -7,11 +7,26 @@ from django.apps import apps
 
 def apply():
     # flake8: noqa: F401
-    from . import (actionpoint, audit_engagement, auth_user, auth_usergroups, partners_intervention,
-                   partners_partnerorganization, partners_plannedengagement, reports_appliedindicator,
-                   tpm_activity, tpm_visit, partners_agreement, reports_lowerresult,
-                   t2f_travel, t2f_travelactivity, users_userprofile, utils, tpm_partner)  # noqa
-    from . import consts
+    from . import (  # noqa
+        actionpoint,
+        audit_engagement,
+        auth_user,
+        auth_usergroups,
+        consts,
+        partners_agreement,
+        partners_intervention,
+        partners_partnerorganization,
+        partners_plannedengagement,
+        reports_appliedindicator,
+        reports_lowerresult,
+        t2f_travel,
+        t2f_travelactivity,
+        tpm_activity,
+        tpm_partner,
+        tpm_visit,
+        users_userprofile,
+        utils,
+    )
 
     app_models = apps.get_app_config('etools').get_models()
     for model in app_models:

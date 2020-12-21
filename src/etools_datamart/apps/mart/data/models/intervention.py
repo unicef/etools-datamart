@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 from django.contrib.postgres.fields import JSONField
@@ -8,11 +7,14 @@ from django.db.models import F
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
-
-from etools_datamart.apps.sources.etools.models import (FundsFundsreservationheader, PartnersIntervention,
-                                                        PartnersInterventionamendment,
-                                                        PartnersInterventionplannedvisits, ReportsAppliedindicator,
-                                                        T2FTravelactivity,)
+from etools_datamart.apps.sources.etools.models import (
+    FundsFundsreservationheader,
+    PartnersIntervention,
+    PartnersInterventionamendment,
+    PartnersInterventionplannedvisits,
+    ReportsAppliedindicator,
+    T2FTravelactivity,
+)
 from etools_datamart.sentry import process_exception
 
 from .base import EtoolsDataMartModel

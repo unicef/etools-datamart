@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.contrib.auth.models import Group
 from django.contrib.postgres.fields import ArrayField
 from django.db import models

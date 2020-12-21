@@ -2,8 +2,13 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from etools_datamart.apps.sources.etools.models import (ActionPointsActionpoint, AuditAudit,
-                                                        AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,)
+from etools_datamart.apps.sources.etools.models import (
+    ActionPointsActionpoint,
+    AuditAudit,
+    AuditMicroassessment,
+    AuditSpecialaudit,
+    AuditSpotcheck,
+)
 
 logger = logging.getLogger()
 

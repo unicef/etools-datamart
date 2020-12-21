@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from functools import wraps
 
@@ -22,8 +21,8 @@ class MyRecorder(Recorder):
 
 def frozenfixture2(use_request=False):
     def deco(func):
-        from drf_api_checker.utils import load_fixtures, dump_fixtures
         from drf_api_checker.fs import mktree
+        from drf_api_checker.utils import dump_fixtures, load_fixtures
 
         @wraps(func)
         def _inner(*args, **kwargs):

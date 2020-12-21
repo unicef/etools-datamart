@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# import django_filters
 from django import forms
 
 from unicef_rest_framework.forms import DateRangePickerField

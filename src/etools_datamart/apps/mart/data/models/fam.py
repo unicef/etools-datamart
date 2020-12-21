@@ -7,8 +7,13 @@ from month_field.models import MonthField
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import (AuditAudit, AuditEngagement, AuditMicroassessment,
-                                                        AuditSpecialaudit, AuditSpotcheck,)
+from etools_datamart.apps.sources.etools.models import (
+    AuditAudit,
+    AuditEngagement,
+    AuditMicroassessment,
+    AuditSpecialaudit,
+    AuditSpotcheck,
+)
 
 
 class FAMIndicatorLoader(EtoolsLoader):

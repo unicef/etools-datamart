@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from .acl import UserAccessControl  # noqa
 from .application import Application  # noqa
 from .base import MasterDataModel  # noqa

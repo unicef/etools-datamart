@@ -1,7 +1,12 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (LocationsLocation, T2FTravel, T2FTravelactivity,
-                                                        T2FTravelactivityLocations, T2FTravelactivityTravels,)
+from etools_datamart.apps.sources.etools.models import (
+    LocationsLocation,
+    T2FTravel,
+    T2FTravelactivity,
+    T2FTravelactivityLocations,
+    T2FTravelactivityTravels,
+)
 
 from .utils import add_m2m
 

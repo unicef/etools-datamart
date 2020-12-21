@@ -23,7 +23,7 @@ test:
 	pipenv run py.test -v --create-db
 
 lint:
-	pipenv run flake8 *; exit 0;
+	pipenv run flake8 src/ tests/; exit 0;
 	pipenv run isort . --check-only; exit 0;
 
 clean:

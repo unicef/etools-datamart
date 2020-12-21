@@ -15,8 +15,12 @@ from redis.exceptions import LockError
 from sentry_sdk import capture_exception
 from strategy_field.utils import fqn, get_attr
 
-from etools_datamart.apps.etl.exceptions import (LoaderException, MaxRecordsException,
-                                                 RequiredIsMissing, RequiredIsRunning,)
+from etools_datamart.apps.etl.exceptions import (
+    LoaderException,
+    MaxRecordsException,
+    RequiredIsMissing,
+    RequiredIsRunning,
+)
 from etools_datamart.celery import app
 
 loadeables = set()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.admin import register
 
 from etools_datamart.apps.multitenant.admin import EToolsModelAdmin, TenantModelAdmin

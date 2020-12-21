@@ -2,8 +2,12 @@ from django.db import connections
 
 import pytest
 
-from etools_datamart.apps.sources.etools.models import (AuditAudit, AuditMicroassessment,
-                                                        AuditSpecialaudit, AuditSpotcheck,)
+from etools_datamart.apps.sources.etools.models import (
+    AuditAudit,
+    AuditMicroassessment,
+    AuditSpecialaudit,
+    AuditSpotcheck,
+)
 
 conn = connections['etools']
 

@@ -8,14 +8,14 @@
 
 
 
-setup local en0 alias 
+setup local en0 alias
 
     $ sudo ifconfig en0 alias 192.168.66.66
 
 ### Initialize app
-   
+
    Create a `.env` file in the root folder based on the content for `.env.tpl`
-   
+
     $ pipenv sync
     $ pipenv shell
     $ ./manage.py init-setup --all

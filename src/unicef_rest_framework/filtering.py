@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 from drf_querystringfilter.backend import QueryStringFilterBackend

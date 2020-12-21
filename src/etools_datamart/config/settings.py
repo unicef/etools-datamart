@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import datetime
 import os
 from pathlib import Path
@@ -693,8 +692,8 @@ SENTRY_DSN = env('SENTRY_DSN', '')
 
 if SENTRY_ENABLED:
     import sentry_sdk
-    from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.django import DjangoIntegration
 
     # from sentry_sdk.integrations.redis import RedisIntegration
 

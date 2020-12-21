@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*-
 from django.db import connections
 
 import pytest
 
-from etools_datamart.apps.sources.etools.models import (ActionPointsActionpoint, AuthGroup,
-                                                        PartnersPartnerorganization, ReportsResult,)
+from etools_datamart.apps.sources.etools.models import (
+    ActionPointsActionpoint,
+    AuthGroup,
+    PartnersPartnerorganization,
+    ReportsResult,
+)
 
 conn = connections['etools']
 
