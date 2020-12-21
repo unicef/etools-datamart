@@ -24,6 +24,7 @@ router.register(r'sources/etools/workspaces', endpoints.EtoolsWorkspaceViewSet)
 
 router.register(r'datamart/attachment/attachment', endpoints.AttachmentViewSet)
 router.register(r'datamart/funds/grants', endpoints.GrantViewSet)
+router.register(r'datamart/audit/audit', endpoints.AuditViewSet)
 router.register(r'datamart/audit/engagements', endpoints.EngagementViewSet)
 router.register(r'datamart/audit/engagement-details', endpoints.EngagementDetailViewSet, basename="engagement-details")
 router.register(r'datamart/audit/micro-assessment', endpoints.MicroAssessmentViewSet)
