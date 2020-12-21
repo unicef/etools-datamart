@@ -36,10 +36,6 @@ class AuditSerializer(DataMartSerializer):
 
 
 class AuditFilterForm(forms.Form):
-    date_of_field_visit = DateRangePickerField(
-        label='Date of Field Visit',
-        required=False,
-    )
     date_of_final_report = DateRangePickerField(
         label='Date of Final Report',
         required=False,
@@ -51,7 +47,6 @@ class AuditViewSet(DataMartViewSet):
     serializer_class = AuditSerializer
     queryset = models.Audit.objects.all()
     filter_fields = (
-        'date_of_field_visit',
         'date_of_final_report',
     )
 
