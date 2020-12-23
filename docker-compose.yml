@@ -13,9 +13,7 @@ services:
   datamart:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.dev
-      args:
-        BASE_IMAGE: "2.14-base"
+      dockerfile: ./Dockerfile
     container_name: datamart
     environment:
       DEBUG: 1

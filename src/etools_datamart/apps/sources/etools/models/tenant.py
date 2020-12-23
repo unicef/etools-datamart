@@ -164,7 +164,7 @@ class AuditEngagement(models.TenantModel):
     po_item = models.ForeignKey('PurchaseOrderPurchaseorderitem', models.DO_NOTHING, related_name='AuditEngagement_po_item', blank=True, null=True)
     shared_ip_with = models.TextField()  # This field type is a guess.
     exchange_rate = models.DecimalField(max_digits=20, decimal_places=2)
-    currency_of_report = models.CharField(max_length=4, blank=True, null=True)
+    currency_of_report = models.CharField(max_length=5, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1026,6 +1026,7 @@ class PartnersIntervention(models.TenantModel):
     reference_number_year = models.IntegerField(blank=True, null=True)
     activation_letter = models.CharField(max_length=1024, blank=True, null=True)
     termination_doc = models.CharField(max_length=1024, blank=True, null=True)
+    cfei_number = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1216,6 +1217,10 @@ class PartnersPartnerorganization(models.TenantModel):
     manually_blocked = models.BooleanField()
     outstanding_dct_amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     outstanding_dct_amount_more_than_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    highest_risk_rating_name = models.CharField(max_length=150)
+    highest_risk_rating_type = models.CharField(max_length=150)
+    psea_assessment_date = models.DateTimeField(blank=True, null=True)
+    sea_risk_rating_name = models.CharField(max_length=150)
 
     class Meta:
         managed = False
@@ -1249,6 +1254,7 @@ class PartnersPartnerstaffmember(models.TenantModel):
     active = models.BooleanField()
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    user = models.OneToOneField('AuthUser', models.DO_NOTHING, related_name='PartnersPartnerstaffmember_user', blank=True, null=True)
 
     class Meta:
         managed = False

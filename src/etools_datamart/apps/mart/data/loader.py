@@ -1,6 +1,7 @@
 import time
 from inspect import isclass
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
 from django.utils import timezone
@@ -93,6 +94,13 @@ class EtoolsLoader(BaseLoader):
                 ret[k] = get_attr(record, v)
             else:
                 raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
+
+            # enforce field size limit
+            try:
+                ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
+            except TypeError:
+                # not subscriptable so ignoring
+                pass
 
         return ret
 
@@ -304,6 +312,13 @@ class CommonSchemaLoader(EtoolsLoader):
                 ret[k] = getter(record, ret)
             else:
                 ret[k] = get_attr(record, v)
+
+            # enforce field size limit
+            try:
+                ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
+            except TypeError:
+                # not subscriptable so ignoring
+                pass
 
         return ret
 

@@ -1,4 +1,4 @@
-FROM python:3.7.3-alpine
+FROM python:3.7.9-alpine3.11
 
 ARG BUILD_DATE
 ARG PIPENV_ARGS
@@ -11,9 +11,6 @@ ENV TEST ${TEST}
 
 
 RUN apk add --no-cache --virtual .build-deps \
-        --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/main \
-        --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/testing \
-        --repository http://dl-3.alpinelinux.org/alpine/latest-stable/community/ \
         gcc \
         g++ \
         gdal-dev \
@@ -33,36 +30,27 @@ RUN apk add --no-cache --virtual .build-deps \
         zeromq-dev
 
 RUN apk add --no-cache --virtual .run-deps \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
         bash \
-#        binutils \
         geos \
         gdal \
-        gosu \
+#        gosu \
         libmagic \
-#        libpq \
         libuuid \
         libxslt \
-#        libzmq \
-#        jpeg \
         mailcap \
         postgresql-client \
-#        xmlsec \
         zlib
 
 
 RUN mkdir -p /code
-COPY poetry.lock pyproject.toml /code/
+COPY Pipfile.lock /code/
 WORKDIR /code
 
 RUN set -ex \
     ls -al /code \
-    && pip install pip poetry==1.0 \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-dev --no-interaction --no-ansi \
-    && sha1sum poetry.lock > /CHECKSUM
+    && pip install pip pipenv \
+    && pipenv install --no-dev --no-interaction --no-ansi \
+    && sha1sum Pipfile.lock > /CHECKSUM
 
 RUN export SITE_PACKAGES="/usr/local/lib/python3.7/site-packages"\
     && for TEST_DIR in waitress/tests/ zmq/tests/ tests/ \

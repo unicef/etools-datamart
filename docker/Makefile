@@ -4,7 +4,7 @@ DATABASE_URL_ETOOLS?=
 DEVELOP?=1
 DOCKER_PASS?=
 DOCKER_USER?=
-TARGET?=2.14.1b
+TARGET?=2.15.1a
 PUSH_BASE?=1
 BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" )
 #BASE?=$(shell echo "${TARGET}" | sed "s/\([0-9]*\)\.\([0-9]*\)\.\(.*\)/\1.\2/g" | echo "`xargs`xx" )
@@ -174,4 +174,3 @@ shell:
 
 docker-remove:
 	docker-remove.sh ${IMAGE_NAME} -o ${ORGANIZATION}
-

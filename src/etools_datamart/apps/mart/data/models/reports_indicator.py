@@ -123,7 +123,7 @@ class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):
     pd_sffa_reference_number = models.CharField(max_length=256, blank=True, null=True)
     response_plan_name = models.CharField(max_length=1024, blank=True, null=True, )
     result_link_intervention = models.IntegerField(blank=True, null=True)
-    section_name = models.CharField(max_length=45, blank=True, null=True)
+    section_name = models.CharField(max_length=128, blank=True, null=True)
     # source_disaggregation_id = models.IntegerField(blank=True, null=True)
     # source_location_id = models.IntegerField(blank=True, null=True)
     target = JSONField(default=dict, blank=True, null=True)

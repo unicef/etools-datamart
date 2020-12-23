@@ -356,7 +356,7 @@ INSTALLED_APPS = [
     'adminfilters',
     'django_sysinfo',
     'post_office',
-    # 'djcelery_email',
+    'djcelery_email',
 
     'django_celery_beat',
 
@@ -750,3 +750,5 @@ AZURE_ACCESS_TTL = env('AZURE_STORAGE_ACCESS_TTL')
 REQUEST_TIMEOUT = env('REQUEST_TIMEOUT')
 GEONAMES_URL = env('GEONAMES_URL')
 GEONAMES_USERNAME = env('GEONAMES_USERNAME')
+
+FIELD_SIZE_LIMIT = 32000

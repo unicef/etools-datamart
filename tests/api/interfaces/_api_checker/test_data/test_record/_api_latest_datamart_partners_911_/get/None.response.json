@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"68f9af627fae4adaf01cb232d256ff6a\""
+            "\"0f879a1c80237d96cd8e608d73fa9c6b\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -29,6 +29,14 @@
             "service",
             "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
         ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
         "cache-hit": [
             "cache-hit",
             "False"
@@ -39,7 +47,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1004"
+            "1032"
         ]
     },
     "data": {
@@ -88,7 +96,8 @@
         "vision_synced": true,
         "min_req_programme_visits": 0,
         "hact_min_requirements": {},
-        "min_req_spot_checks": 0
+        "min_req_spot_checks": 0,
+        "sea_risk_rating_name": null
     },
     "content_type": null
 }
