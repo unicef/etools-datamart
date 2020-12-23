@@ -1,14 +1,22 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
+from django.db.models import Count
 from django.utils.translation import gettext as _
 
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
+from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
-from etools_datamart.apps.sources.etools.models import (AuditEngagement, AuditEngagementActivePd, AuditFinding,
-                                                        AuditSpotcheck, DjangoContentType, UnicefAttachmentsAttachment,)
+from etools_datamart.apps.sources.etools.models import (
+    AuditEngagement,
+    AuditEngagementActivePd,
+    AuditFinding,
+    AuditSpotcheck,
+    DjangoContentType,
+    UnicefAttachmentsAttachment,
+)
 
 from .partner import Partner
 
@@ -20,13 +28,7 @@ URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s", }
 MODULEMAP = {'AuditSpotcheck': "fam"}
 
 
-class SpotCheckLoader(EtoolsLoader):
-
-    # def get_queryset(self):
-    #     return AuditEngagement.objects.select_related('partner',
-    #                                                   'agreement',
-    #                                                   'po_item').filter(engagement_type='sc')
-
+class SpotCheckLoader(EngagementRiskMixin, EtoolsLoader):
     def get_content_type(self, sub_type):
         return DjangoContentType.objects.get(app_label='audit', model='spotcheck')
 
@@ -93,21 +95,6 @@ class SpotCheckLoader(EtoolsLoader):
 
         values['active_pd_data'] = ret
         return ", ".join([o['number'] for o in ret])
-
-    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
-        try:
-            p = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.id)
-            return {'name': p.name,
-                    'vendor_number': p.vendor_number,
-                    'id': p.id,
-                    'source_id': p.source_id}
-        except Partner.DoesNotExist:
-            return {'name': 'N/A',
-                    'vendor_number': 'N/A',
-                    'id': 'N/A',
-                    'source_id': 'N/A'}
 
     def get_partner_id(self, record: AuditEngagement, values: dict, **kwargs):
         try:
@@ -270,4 +257,106 @@ class SpotCheck(EtoolsDataMartModel):
             financial_findings='_impl.financial_findings',
             audit_opinion='_impl.audit_opinion',
 
+        )
+
+
+class SpotCheckFindingsLoader(EngagementRiskMixin, EtoolsLoader):
+    def _get_priority_findings(self, record: AuditEngagement, priority: str):
+        return AuditFinding.objects.filter(
+            spot_check=record._impl,
+            priority=priority,
+        ).values("category_of_observation").annotate(
+            count=Count("category_of_observation"),
+        ).order_by("category_of_observation")
+
+    def get_high_priority_findings(self, record: AuditSpotcheck, values: dict, **kwargs):
+        return self._get_priority_findings(record, "high")
+
+    def get_low_priority_findings(self, record: AuditSpotcheck, values: dict, **kwargs):
+        return self._get_priority_findings(record, "low")
+
+    def get_sections(self, record: AuditEngagement, values: dict, **kwargs):
+        data = []
+        for rec in record.AuditEngagementSections_engagement.all():
+            data.append(
+                dict(
+                    source_id=rec.section.pk,
+                    name=rec.section.name,
+                    description=rec.section.description,
+                ),
+            )
+        values['sections_data'] = data
+        return ", ".join([l['name'] for l in data])
+
+    def process_country(self):
+        for record in AuditSpotcheck.objects.select_related('engagement_ptr'):
+            record.id = record.engagement_ptr_id
+            record.sub_type = AuditSpotcheck
+            record.engagement_ptr._impl = record
+            filters = self.config.key(self, record.engagement_ptr)
+            values = self.get_values(record.engagement_ptr)
+
+
+class SpotCheckFindings(EtoolsDataMartModel):
+    TYPE_SPOT_CHECK = 'sc'
+
+    TYPES = Choices(
+        (TYPE_SPOT_CHECK, _('Spot Check')),
+    )
+
+    auditor = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+    engagement_type = models.CharField(
+        max_length=300,
+        blank=True,
+        null=True,
+        choices=TYPES,
+        db_index=True,
+    )
+    date_of_final_report = models.DateField(null=True, blank=True)
+    high_priorty_findings = JSONField(blank=True, null=True, default=dict)
+    low_priorty_findings = JSONField(blank=True, null=True, default=dict)
+    partner = JSONField(blank=True, null=True, default=dict)
+    sections = models.TextField(blank=True, null=True)
+    sections_data = JSONField(blank=True, null=True, default=dict)
+    spotcheck_total_amount_tested = models.DecimalField(
+        blank=True,
+        null=True,
+        decimal_places=2,
+        max_digits=20,
+    )
+    spotcheck_total_amount_of_ineligible_expenditure = models.DecimalField(
+        null=True,
+        blank=True,
+        decimal_places=2,
+        max_digits=20,
+    )
+    total_value = models.DecimalField(
+        blank=True,
+        null=True,
+        default=0,
+        decimal_places=2,
+        max_digits=20,
+    )
+
+    loader = SpotCheckFindingsLoader()
+
+    class Meta:
+        ordering = ("id",)
+
+    class Options:
+        source = AuditSpotcheck
+        sync_deleted_records = lambda a: False
+        depends = (Partner,)
+        mapping = dict(
+            auditor="agreement.auditor_firm.name",
+            partner="-",
+            high_priority_findings="-",
+            low_priority_findings="-",
+            sections="-",
+            spotcheck_total_amount_tested="_impl.total_amount_tested",
+            spotcheck_total_amount_of_ineligible_expenditure="_impl.total_amount_of_ineligible_expenditure",
         )
