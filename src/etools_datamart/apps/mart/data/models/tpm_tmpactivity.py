@@ -102,14 +102,14 @@ class TPMActivityLoader(EtoolsLoader):
         # PartnersInterventionFlatLocations
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention
-        # for location in original.activity.locations.select_related('gateway').order_by('id'):
+        # for location in original.activity.locations.order_by('id'):
         for location in record.activity.locations.order_by('id'):
             locs.append(dict(
                 source_id=location.id,
                 name=location.name,
                 pcode=location.p_code,
-                level=location.level,
-                levelname=location.gateway.name
+                level=location.admin_level,
+                levelname=location.admin_level_name
             ))
         values['locations_data'] = locs
         return ", ".join([l['name'] for l in locs])

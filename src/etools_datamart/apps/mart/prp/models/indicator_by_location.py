@@ -14,10 +14,10 @@ class IndicatorByLocationLoader(PrpBaseLoader):
         ).annotate(
             country=F('indicator_report__progress_report__programme_document__workspace__title'),
             location_source_id=F('location__id'),
-            location_name=F('location__title'),
+            location_name=F('location__name'),
             location_pcode=F('location__p_code'),
-            location_level=F('location__level'),
-            location_levelname=F('location__gateway__name'),
+            location_level=F('location__admin_level'),
+            location_levelname=F('location__admin_level_name'),
             title_of_indicator=F('indicator_report__title'),
             reference_number=F('indicator_report__progress_report__programme_document__reference_number'),
             project=F('indicator_report__project__title'),

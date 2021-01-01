@@ -1,6 +1,6 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2019-12-13 11:17:44.226293
+# Generated on 2021-01-01 00:18:01.691561
 from django.contrib.gis.db import models
 
 from etools_datamart.apps.core.readonly import ReadOnlyModel
@@ -50,7 +50,7 @@ class AccountUserprofile(ReadOnlyModel):
 
 
 class AuthGroup(ReadOnlyModel):
-    name = models.CharField(unique=True, max_length=80)
+    name = models.CharField(unique=True, max_length=150)
 
     class Meta:
         managed = False
@@ -144,13 +144,18 @@ class CoreCartodbtable(ReadOnlyModel):
     rght = models.IntegerField()
     tree_id = models.IntegerField()
     level = models.IntegerField()
-    country = models.ForeignKey('source_prp.CoreCountry', models.PROTECT, related_name='CoreCartodbtable_country')
-    location_type = models.ForeignKey('source_prp.CoreGatewaytype', models.PROTECT, related_name='CoreCartodbtable_location_type')
     parent = models.ForeignKey('self', models.PROTECT, related_name='CoreCartodbtable_parent', blank=True, null=True)
     display_name = models.CharField(max_length=254)
     name_col = models.CharField(max_length=254)
     parent_code_col = models.CharField(max_length=254)
     pcode_col = models.CharField(max_length=254)
+    admin_level = models.SmallIntegerField()
+    admin_level_name = models.CharField(max_length=64)
+    api_key = models.CharField(max_length=254)
+    color = models.CharField(max_length=7)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    remap_table_name = models.CharField(max_length=254, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -164,6 +169,7 @@ class CoreCountry(ReadOnlyModel):
     name = models.CharField(max_length=100)
     country_short_code = models.CharField(max_length=10, blank=True, null=True)
     long_name = models.CharField(max_length=255, blank=True, null=True)
+    iso3_code = models.CharField(max_length=10)
 
     class Meta:
         managed = False
@@ -177,7 +183,6 @@ class CoreGatewaytype(ReadOnlyModel):
     name = models.CharField(unique=True, max_length=64)
     admin_level = models.SmallIntegerField()
     country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='CoreGatewaytype_country')
-    display_name = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -189,24 +194,35 @@ class CoreGatewaytype(ReadOnlyModel):
 class CoreLocation(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
-    title = models.CharField(max_length=255)
-    latitude = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
-    p_code = models.CharField(max_length=32, blank=True, null=True)
+    name = models.CharField(max_length=254)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    p_code = models.CharField(max_length=32)
     geom = models.GeometryField(blank=True, null=True)
     point = models.GeometryField(blank=True, null=True)
-    carto_db_table = models.ForeignKey(CoreCartodbtable, models.PROTECT, related_name='CoreLocation_carto_db_table', blank=True, null=True)
-    gateway = models.ForeignKey(CoreGatewaytype, models.PROTECT, related_name='CoreLocation_gateway')
     parent = models.ForeignKey('self', models.PROTECT, related_name='CoreLocation_parent', blank=True, null=True)
     level = models.IntegerField()
     lft = models.IntegerField()
     rght = models.IntegerField()
     tree_id = models.IntegerField()
+    admin_level = models.SmallIntegerField(blank=True, null=True)
+    admin_level_name = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'core_location'
-        unique_together = (('title', 'p_code'),)
+        unique_together = (('name', 'p_code', 'admin_level'),)
+        app_label = 'source_prp'
+
+
+class CoreLocationWorkspaces(ReadOnlyModel):
+    location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='CoreLocationWorkspaces_location')
+    workspace = models.ForeignKey('source_prp.CoreWorkspace', models.PROTECT, related_name='CoreLocationWorkspaces_workspace')
+
+    class Meta:
+        managed = False
+        db_table = 'core_location_workspaces'
+        unique_together = (('location', 'workspace'),)
         app_label = 'source_prp'
 
 
@@ -278,7 +294,6 @@ class CoreWorkspaceCountries(ReadOnlyModel):
 
 class DjangoCeleryBeatClockedschedule(ReadOnlyModel):
     clocked_time = models.DateTimeField()
-    enabled = models.BooleanField()
 
     class Meta:
         managed = False
@@ -332,6 +347,7 @@ class DjangoCeleryBeatPeriodictask(ReadOnlyModel):
     priority = models.IntegerField(blank=True, null=True)
     headers = models.TextField()
     clocked = models.ForeignKey(DjangoCeleryBeatClockedschedule, models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_clocked', blank=True, null=True)
+    expire_seconds = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -369,11 +385,12 @@ class DjangoCeleryResultsTaskresult(ReadOnlyModel):
     result = models.TextField(blank=True, null=True)
     date_done = models.DateTimeField()
     traceback = models.TextField(blank=True, null=True)
-    hidden = models.BooleanField()
     meta = models.TextField(blank=True, null=True)
     task_args = models.TextField(blank=True, null=True)
     task_kwargs = models.TextField(blank=True, null=True)
     task_name = models.CharField(max_length=255, blank=True, null=True)
+    worker = models.CharField(max_length=100, blank=True, null=True)
+    date_created = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -384,9 +401,6 @@ class DjangoCeleryResultsTaskresult(ReadOnlyModel):
 class DjangoContentType(ReadOnlyModel):
     app_label = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f'{self.app_label}:{self.model}'
 
     class Meta:
         managed = False
@@ -462,7 +476,7 @@ class IndicatorIndicatorblueprint(ReadOnlyModel):
 class IndicatorIndicatorlocationdata(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    disaggregation = models.TextField()  # This field type is a guess.
+    disaggregation = models.JSONField()
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = models.TextField()  # This field type is a guess.
@@ -486,7 +500,7 @@ class IndicatorIndicatorreport(ReadOnlyModel):
     due_date = models.DateField()
     submission_date = models.DateField(blank=True, null=True)
     frequency = models.CharField(max_length=3)
-    total = models.TextField()  # This field type is a guess.
+    total = models.JSONField()
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(max_length=3)
     overall_status = models.CharField(max_length=3)
@@ -510,9 +524,9 @@ class IndicatorReportable(ReadOnlyModel):
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
-    target = models.TextField()  # This field type is a guess.
-    baseline = models.TextField()  # This field type is a guess.
-    in_need = models.TextField(blank=True, null=True)  # This field type is a guess.
+    target = models.JSONField()
+    baseline = models.JSONField()
+    in_need = models.JSONField(blank=True, null=True)
     assumptions = models.TextField(blank=True, null=True)
     means_of_verification = models.CharField(max_length=255, blank=True, null=True)
     comments = models.TextField(blank=True, null=True)
@@ -524,7 +538,7 @@ class IndicatorReportable(ReadOnlyModel):
     is_cluster_indicator = models.BooleanField()
     is_unicef_hf_indicator = models.BooleanField()
     contributes_to_partner = models.BooleanField()
-    total = models.TextField()  # This field type is a guess.
+    total = models.JSONField()
     context_code = models.CharField(max_length=50, blank=True, null=True)
     object_id = models.IntegerField()
     frequency = models.CharField(max_length=3)
@@ -556,9 +570,9 @@ class IndicatorReportableDisaggregations(ReadOnlyModel):
 class IndicatorReportablelocationgoal(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    target = models.TextField()  # This field type is a guess.
-    baseline = models.TextField()  # This field type is a guess.
-    in_need = models.TextField(blank=True, null=True)  # This field type is a guess.
+    target = models.JSONField()
+    baseline = models.JSONField()
+    in_need = models.JSONField(blank=True, null=True)
     location = models.ForeignKey(CoreLocation, models.PROTECT, related_name='IndicatorReportablelocationgoal_location')
     reportable = models.ForeignKey(IndicatorReportable, models.PROTECT, related_name='IndicatorReportablelocationgoal_reportable')
     is_active = models.BooleanField()
@@ -607,6 +621,12 @@ class PartnerPartner(ReadOnlyModel):
     rating = models.CharField(max_length=50, blank=True, null=True)
     basis_for_risk_rating = models.CharField(max_length=50, blank=True, null=True)
     ocha_external_id = models.CharField(unique=True, max_length=128, blank=True, null=True)
+    sea_risk_rating_name = models.CharField(max_length=150)
+    psea_assessment_date = models.DateTimeField(blank=True, null=True)
+    overall_risk_rating = models.CharField(max_length=50)
+    highest_risk_rating_name = models.CharField(max_length=150)
+    highest_risk_rating_type = models.CharField(max_length=150)
+    type_of_assessment = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -673,11 +693,11 @@ class PartnerPartnerproject(ReadOnlyModel):
     external_id = models.CharField(max_length=32, blank=True, null=True)
     external_source = models.TextField(blank=True, null=True)
     code = models.TextField(unique=True, blank=True, null=True)
-    type = models.CharField(max_length=3, blank=True, null=True)
+    type = models.CharField(max_length=8, blank=True, null=True)
     title = models.CharField(max_length=1024)
     description = models.TextField(blank=True, null=True)
     additional_information = models.CharField(max_length=255, blank=True, null=True)
-    custom_fields = models.TextField()  # This field type is a guess.
+    custom_fields = models.JSONField(blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=3)
@@ -817,7 +837,7 @@ class UnicefProgrammedocument(ReadOnlyModel):
     in_kind_amount_currency = models.CharField(max_length=16)
     funds_received_to_date = models.DecimalField(max_digits=64, decimal_places=2, blank=True, null=True)
     funds_received_to_date_currency = models.CharField(max_length=16, blank=True, null=True)
-    amendments = models.TextField()  # This field type is a guess.
+    amendments = models.JSONField()
     partner = models.ForeignKey(PartnerPartner, models.PROTECT, related_name='UnicefProgrammedocument_partner')
     workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='UnicefProgrammedocument_workspace')
     external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
@@ -898,6 +918,8 @@ class UnicefProgressreport(ReadOnlyModel):
     reviewed_by_email = models.CharField(max_length=256, blank=True, null=True)
     reviewed_by_external_id = models.IntegerField(blank=True, null=True)
     reviewed_by_name = models.CharField(max_length=256, blank=True, null=True)
+    financial_contribution_currency = models.CharField(max_length=16)
+    financial_contribution_to_date = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -943,8 +965,10 @@ class UnicefSection(ReadOnlyModel):
     modified = models.DateTimeField()
     external_id = models.CharField(max_length=32, blank=True, null=True)
     name = models.CharField(max_length=255)
+    external_business_area_code = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'unicef_section'
+        unique_together = (('external_id', 'external_business_area_code'),)
         app_label = 'source_prp'

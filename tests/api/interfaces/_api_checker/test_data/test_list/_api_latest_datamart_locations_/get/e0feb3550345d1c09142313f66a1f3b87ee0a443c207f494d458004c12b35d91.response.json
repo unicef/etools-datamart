@@ -4,18 +4,18 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"3457552b7cf99e18a1b74c198b24c386\"",
+        "ETag": "\"3d23dc0de70f3325a81794f4742acf91\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.location.LocationViewSet",
         "service": "etools_datamart.api.endpoints.datamart.location.LocationViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "3457552b7cf99e18a1b74c198b24c386",
+        "cache-key": "3d23dc0de70f3325a81794f4742acf91",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "990",
+        "Content-Length": "996",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -26,7 +26,7 @@
         "previous": null,
         "results": [
             {
-                "id": 1,
+                "id": 595,
                 "source_id": null,
                 "name": "name000",
                 "latitude": null,
@@ -38,12 +38,12 @@
                 "admin_level": null,
                 "geonameid": null,
                 "is_active": true,
-                "last_modify_date": "04 Aug 2021 21:01:52",
-                "created": "04 Aug 2021 20:42:03",
-                "modified": "04 Aug 2021 20:42:03"
+                "last_modify_date": "22 Feb 2022 14:07:41",
+                "created": "22 Feb 2022 14:07:29",
+                "modified": "22 Feb 2022 14:07:29"
             },
             {
-                "id": 2,
+                "id": 596,
                 "source_id": null,
                 "name": "name001",
                 "latitude": null,
@@ -55,12 +55,12 @@
                 "admin_level": null,
                 "geonameid": null,
                 "is_active": true,
-                "last_modify_date": "04 Aug 2021 21:01:52",
-                "created": "04 Aug 2021 20:42:03",
-                "modified": "04 Aug 2021 20:42:03"
+                "last_modify_date": "22 Feb 2022 14:07:41",
+                "created": "22 Feb 2022 14:07:29",
+                "modified": "22 Feb 2022 14:07:29"
             },
             {
-                "id": 3,
+                "id": 597,
                 "source_id": null,
                 "name": "name002",
                 "latitude": null,
@@ -72,9 +72,9 @@
                 "admin_level": null,
                 "geonameid": null,
                 "is_active": true,
-                "last_modify_date": "04 Aug 2021 21:01:52",
-                "created": "04 Aug 2021 20:42:03",
-                "modified": "04 Aug 2021 20:42:03"
+                "last_modify_date": "22 Feb 2022 14:07:41",
+                "created": "22 Feb 2022 14:07:29",
+                "modified": "22 Feb 2022 14:07:29"
             }
         ]
     },

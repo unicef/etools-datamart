@@ -164,23 +164,6 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
         return DjangoContentType.objects.get(app_label='audit',
                                              model=mapping[sub_type])
 
-    def get_reference_number(self, record: AuditEngagement, values: dict, **kwargs):
-        engagement_code = 'a' if record.engagement_type == AuditEngagementConsts.TYPE_AUDIT else record.engagement_type
-        return "/".join([self.context['country'].country_short_code,
-                         record.partner.name[:5],
-                         engagement_code.upper(),
-                         str(record.created.year),
-                         str(record.id)
-                         ])
-        # return '{}/{}/{}/{}/{}'.format(
-        #     self.context['country'].short_code,
-        #     # connection.tenant.country_short_code or '',
-        #     original.partner.name[:5],
-        #     engagement_code.upper(),
-        #     original.created.year,
-        #     original.id
-        # )
-
     def get_engagement_attachments(self, record: AuditEngagement, values: dict, **kwargs):
         # audit_engagement
         ret = UnicefAttachmentsAttachment.objects.filter(
@@ -424,7 +407,6 @@ class Engagement(EtoolsDataMartModel):
             auditor="agreement.auditor_firm.name",
             auditor_number="agreement.auditor_firm.vendor_number",
             authorized_officers="-",
-            reference_number="-",
             engagement_attachments='-',
             report_attachments='-',
             staff_members='-',
