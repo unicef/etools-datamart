@@ -61,12 +61,12 @@ humanfriendly = "==8.1"
 humanize = "==2.2.0"
 Pygments = "==2.6.1"
 xhtml2pdf = "==0.2.4"
-
 #asn1crypto = "==1.3.0"
 #circus = "==0.16.1"
 #pyreadline = "==2.1"
 #pyzmq = "==19.0.0"
 #tornado = "==4.5.3"
+gunicorn = "*"
 #uWSGI = "==2.0.18"
 
 [dev-packages]
@@ -82,7 +82,6 @@ isort = "*"
 vcrpy = "*"
 drf-api-checker = "*"
 freezegun = "*"
-
 #appnope = "==0.1.0"
 #"aspy.yaml" = "==1.3.0"
 #atomicwrites = "==1.3.0"
