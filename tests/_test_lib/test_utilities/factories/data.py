@@ -292,6 +292,46 @@ class SpotCheckFactory(DataMartModelFactory):
         model = models.SpotCheck
 
 
+class SpotCheckFindingsFactory(DataMartModelFactory):
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
+
+    class Meta:
+        model = models.SpotCheckFindings
+
+
+class MicroAssessmentFactory(DataMartModelFactory):
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
+
+    class Meta:
+        model = models.MicroAssessment
+
+
+class AuditFactory(DataMartModelFactory):
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
+
+    class Meta:
+        model = models.Audit
+
+
+class AuditSpecialFactory(DataMartModelFactory):
+    partner = {'name': 'Partner1',
+               'vendor_number': '123',
+               'id': 100,
+               'source_id': 101}
+
+    class Meta:
+        model = models.AuditSpecial
+
+
 class PartnerStaffMemberFactory(DataMartModelFactory):
     class Meta:
         model = models.PartnerStaffMember
