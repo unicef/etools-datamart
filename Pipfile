@@ -68,6 +68,7 @@ xhtml2pdf = "==0.2.4"
 #tornado = "==4.5.3"
 gunicorn = "*"
 #uWSGI = "==2.0.18"
+dj-static = "*"
 
 [dev-packages]
 factory-boy = "*"
