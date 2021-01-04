@@ -95,17 +95,6 @@ ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
 URL_PREFIX = env('URL_PREFIX')
 
-ADMINS = (
-    ('Stefano', 'saxix@saxix.onmicrosoft.com'),
-    ('Stefano', 'sapostolico@unicef.org'),
-    ('Nik', 'ntrncic@unicef.org'),
-    ('Greg', 'greinbach@unicef.org'),
-    ('Zack', 'zadams@unicef.org'),
-    ('Robert', 'ravram@unicef.org'),
-    ('Domenico', 'ddinicola@unicef.org'),
-    ('Evan', 'ewheeler@unicef.org')
-)
-
 DATABASES = {
     'default': env.db(),
     'etools': env.db('DATABASE_URL_ETOOLS',
