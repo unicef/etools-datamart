@@ -89,7 +89,7 @@ class EngagementRiskMixin:
         else:
             extra = risk.extra
             value = risk.value
-        return extra, value
+        return value, extra
 
     def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
         value, extra = self._get_risk(record, code="ma_global_assessment")
