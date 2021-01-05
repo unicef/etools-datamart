@@ -1,7 +1,11 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (AuthUser, UsersCountry, UsersUserprofile,
-                                                        UsersUserprofileCountriesAvailable,)
+from etools_datamart.apps.sources.etools.models import (
+    AuthUser,
+    UsersCountry,
+    UsersUserprofile,
+    UsersUserprofileCountriesAvailable,
+)
 
 f = [f for f in UsersUserprofile._meta.local_fields if f.name != 'user_id']
 UsersUserprofile._meta.local_fields = f

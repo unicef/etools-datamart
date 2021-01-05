@@ -1,5 +1,9 @@
 from etools_datamart.apps.sources.etools.models import (
-    PartnersAgreement, PartnersAgreementamendment, PartnersAgreementAuthorizedOfficers, PartnersPartnerstaffmember,)
+    PartnersAgreement,
+    PartnersAgreementamendment,
+    PartnersAgreementAuthorizedOfficers,
+    PartnersPartnerstaffmember,
+)
 
 from .utils import add_m2m
 

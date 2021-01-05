@@ -7,8 +7,12 @@ from celery.local import class_property
 #                                             EtoolsLoader, EToolsLoaderOptions, )
 from etools_datamart.apps.core.models import DataMartManager
 from etools_datamart.apps.etl.base import DataMartModelBase
-from etools_datamart.apps.mart.data.loader import (CommonSchemaLoader, CommonSchemaLoaderOptions,
-                                                   EtoolsLoader, EToolsLoaderOptions,)
+from etools_datamart.apps.mart.data.loader import (
+    CommonSchemaLoader,
+    CommonSchemaLoaderOptions,
+    EtoolsLoader,
+    EToolsLoaderOptions,
+)
 
 
 class CommonDataMartModelModelBase(DataMartModelBase):

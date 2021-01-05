@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib import messages
 from django.contrib.admin import ListFilter, ModelAdmin
 from django.contrib.admin.utils import quote

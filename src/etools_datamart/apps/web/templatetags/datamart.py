@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import template
 
 from etools_datamart.libs.version import get_full_version

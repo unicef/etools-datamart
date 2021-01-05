@@ -1,8 +1,12 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (LocationsLocation, ReportsAppliedindicator,
-                                                        ReportsAppliedindicatorDisaggregation,
-                                                        ReportsAppliedindicatorLocations, ReportsDisaggregation,)
+from etools_datamart.apps.sources.etools.models import (
+    LocationsLocation,
+    ReportsAppliedindicator,
+    ReportsAppliedindicatorDisaggregation,
+    ReportsAppliedindicatorLocations,
+    ReportsDisaggregation,
+)
 
 models.ManyToManyField(ReportsDisaggregation,
                        through=ReportsAppliedindicatorDisaggregation,

@@ -29,7 +29,8 @@ if __name__ == '__main__':
         execute_from_command_line(args)
     except Exception:
         if debug_on_error:
-            import pdb, traceback  # noqa
+            import pdb  # noqa
+            import traceback
 
             __, __, tb = sys.exc_info()
             traceback.print_exc()

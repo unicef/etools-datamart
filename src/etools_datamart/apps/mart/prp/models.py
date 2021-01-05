@@ -57,12 +57,20 @@ from strategy_field.utils import get_attr
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
-from etools_datamart.apps.sources.source_prp.models import (CoreCountry, CoreGatewaytype, IndicatorDisaggregationvalue,
-                                                            IndicatorIndicatorlocationdata, IndicatorIndicatorreport,
-                                                            IndicatorReportable, IndicatorReportablelocationgoal,
-                                                            UnicefLowerleveloutput, UnicefPdresultlink,
-                                                            UnicefProgrammedocument, UnicefProgrammedocumentSections,
-                                                            UnicefProgressreport,)
+from etools_datamart.apps.sources.source_prp.models import (
+    CoreCountry,
+    CoreGatewaytype,
+    IndicatorDisaggregationvalue,
+    IndicatorIndicatorlocationdata,
+    IndicatorIndicatorreport,
+    IndicatorReportable,
+    IndicatorReportablelocationgoal,
+    UnicefLowerleveloutput,
+    UnicefPdresultlink,
+    UnicefProgrammedocument,
+    UnicefProgrammedocumentSections,
+    UnicefProgressreport,
+)
 from etools_datamart.sentry import process_exception
 
 from .base import PrpDataMartModel

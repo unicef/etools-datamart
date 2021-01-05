@@ -113,7 +113,7 @@ class TembaLoader(BaseLoader):
 
     def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
              only_delta=True, run_type=RUN_UNKNOWN, api_token=None, **kwargs):
-        from .models import Source, Organization
+        from .models import Organization, Source
         sources = Source.objects.filter(is_active=True)
         self.results = EtlResult()
         with push_scope() as scope:

@@ -7,10 +7,19 @@ from model_utils import Choices
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts, RiskConst
-from etools_datamart.apps.sources.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
-                                                        AuditEngagementActivePd, AuditMicroassessment, AuditRisk,
-                                                        AuditRiskcategory, AuditSpecialaudit, AuditSpotcheck,
-                                                        DjangoContentType, UnicefAttachmentsAttachment,)
+from etools_datamart.apps.sources.etools.models import (
+    ActionPointsActionpoint,
+    AuditAudit,
+    AuditEngagement,
+    AuditEngagementActivePd,
+    AuditMicroassessment,
+    AuditRisk,
+    AuditRiskcategory,
+    AuditSpecialaudit,
+    AuditSpotcheck,
+    DjangoContentType,
+    UnicefAttachmentsAttachment,
+)
 
 from .partner import Partner
 

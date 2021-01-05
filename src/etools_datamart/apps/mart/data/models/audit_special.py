@@ -8,11 +8,7 @@ from model_utils import Choices
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import (
-    AuditSpecialaudit,
-    AuditEngagement,
-    AuditFinancialfinding,
-)
+from etools_datamart.apps.sources.etools.models import AuditEngagement, AuditFinancialfinding, AuditSpecialaudit
 
 from .partner import Partner
 

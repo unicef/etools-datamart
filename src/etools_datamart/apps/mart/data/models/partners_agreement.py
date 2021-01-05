@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# import django_filters
 from django.db import models
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader

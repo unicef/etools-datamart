@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from unicef_security import models
 
 from .. import common

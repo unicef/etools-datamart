@@ -1,7 +1,11 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (TpmpartnersTpmpartnerstaffmember, TpmTpmactivity,
-                                                        TpmTpmvisit, TpmTpmvisitTpmPartnerFocalPoints,)
+from etools_datamart.apps.sources.etools.models import (
+    TpmpartnersTpmpartnerstaffmember,
+    TpmTpmactivity,
+    TpmTpmvisit,
+    TpmTpmvisitTpmPartnerFocalPoints,
+)
 
 from .utils import create_alias
 

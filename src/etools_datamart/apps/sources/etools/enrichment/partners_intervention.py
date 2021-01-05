@@ -1,12 +1,20 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (AuthUser, LocationsLocation, PartnersIntervention,
-                                                        PartnersInterventionFlatLocations, PartnersInterventionOffices,
-                                                        PartnersInterventionPartnerFocalPoints,
-                                                        PartnersInterventionresultlink, PartnersInterventionSections,
-                                                        PartnersInterventionUnicefFocalPoints,
-                                                        PartnersPartnerstaffmember, ReportsOffice, ReportsResult,
-                                                        ReportsSector,)
+from etools_datamart.apps.sources.etools.models import (
+    AuthUser,
+    LocationsLocation,
+    PartnersIntervention,
+    PartnersInterventionFlatLocations,
+    PartnersInterventionOffices,
+    PartnersInterventionPartnerFocalPoints,
+    PartnersInterventionresultlink,
+    PartnersInterventionSections,
+    PartnersInterventionUnicefFocalPoints,
+    PartnersPartnerstaffmember,
+    ReportsOffice,
+    ReportsResult,
+    ReportsSector,
+)
 
 from .utils import create_alias
 

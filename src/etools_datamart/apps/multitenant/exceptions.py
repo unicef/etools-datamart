@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.template.defaultfilters import pluralize
 
 from rest_framework.exceptions import PermissionDenied
