@@ -61,6 +61,7 @@ class Audit(EtoolsDataMartModel):
         blank=True,
         null=True,
     )
+    partner = JSONField(blank=True, null=True, default=dict)
     shared_ip_with = ArrayField(
         models.CharField(max_length=20, blank=True, null=True),
         blank=True,
