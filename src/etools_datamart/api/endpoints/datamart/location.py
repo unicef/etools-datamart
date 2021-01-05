@@ -42,6 +42,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class LocationRamSerializer(serializers.ModelSerializer):
     geonameid = serializers.SerializerMethodField()
     admin_level = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Location
         fields = ('id', 'source_id', 'name', 'latitude', 'longitude', 'parent',

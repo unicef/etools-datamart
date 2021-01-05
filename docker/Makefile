@@ -174,4 +174,3 @@ shell:
 
 docker-remove:
 	docker-remove.sh ${IMAGE_NAME} -o ${ORGANIZATION}
-
