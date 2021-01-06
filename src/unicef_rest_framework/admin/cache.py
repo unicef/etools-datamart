@@ -34,7 +34,7 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     fieldsets = [("", {"fields": ('name', 'cache_version', 'cache_ttl', 'cache_key')})]
 
     def get_queryset(self, request):
-        return super(CacheVersionAdmin, self).get_queryset(request). \
+        return super().get_queryset(request). \
             defer('linked_models'). \
             select_related(*self.raw_id_fields)
 

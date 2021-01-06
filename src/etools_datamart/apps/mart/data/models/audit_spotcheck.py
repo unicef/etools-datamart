@@ -69,7 +69,7 @@ class SpotCheckLoader(EngagementRiskMixin, EtoolsLoader):
     def get_values(self, record, ):
         values = {}
         self.mapping.update(**values)
-        return super(SpotCheckLoader, self).get_values(record)
+        return super().get_values(record)
 
     def get_authorized_officers(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []

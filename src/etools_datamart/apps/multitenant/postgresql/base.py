@@ -63,7 +63,7 @@ class TenantCursor(CursorWrapper):
 
     def execute(self, sql, params=None):
         if isinstance(sql, RawSql):
-            return super(TenantCursor, self).execute(sql, params)
+            return super().execute(sql, params)
         msg = f"""
 schemas: {self.db.schemas}
 
@@ -71,9 +71,9 @@ sql: {sql}
 """
         try:
             if len(self.db.schemas) == 0:
-                return super(TenantCursor, self).execute(sql, params)
+                return super().execute(sql, params)
             # if not sql.strip().startswith('SELECT'):
-            #     return super(TenantCursor, self).execute(sql, params)
+            #     return super().execute(sql, params)
 
             # cleanup field 'id', it does not exists in
             # in django inherited table.
@@ -95,7 +95,7 @@ tenant: {tenant_sql}
 """
 
             logger.debug(msg)
-            return super(TenantCursor, self).execute(tenant_sql, params * len(self.db.schemas))
+            return super().execute(tenant_sql, params * len(self.db.schemas))
         except django.db.utils.ProgrammingError as e:  # pragma: no cover
             logger.error(f"{e} {msg}")
             raise django.db.utils.ProgrammingError(f"{type(e)}:{e} {msg}") from e
@@ -152,7 +152,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     introspection_class = DatabaseSchemaIntrospection
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Use a patched version of the DatabaseIntrospection that only returns the table list for the
         # currently selected schema.
@@ -163,7 +163,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     def close(self):
         self.search_path_set = False
         self._schemas = []
-        super(DatabaseWrapper, self).close()
+        super().close()
 
     @property
     def schemas(self):
@@ -257,9 +257,9 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     # def single_cursor(self, name=None, ):
     #     if name:
     #         # Only supported and required by Django 1.11 (server-side cursor)
-    #         cursor = super(DatabaseWrapper, self)._cursor(name=name)
+    #         cursor = super()._cursor(name=name)
     #     else:
-    #         cursor = super(DatabaseWrapper, self)._cursor()
+    #         cursor = super()._cursor()
     #     return cursor
 
     # def set_search_paths(self, cursor, *schemas):
@@ -280,9 +280,9 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
         if name:  # pragma: no cover
             # Only supported and required by Django 1.11 (server-side cursor)
-            cursor = super(DatabaseWrapper, self)._cursor(name=name)
+            cursor = super()._cursor(name=name)
         else:
-            cursor = super(DatabaseWrapper, self)._cursor()
+            cursor = super()._cursor()
 
         # optionally limit the number of executions - under load, the execution
         # of `set search_path` can be quite time consuming

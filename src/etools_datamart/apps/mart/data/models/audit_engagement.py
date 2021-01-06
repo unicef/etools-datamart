@@ -161,7 +161,7 @@ class EngagementlLoader(EngagementRiskMixin, EtoolsLoader):
     def get_values(self, record: AuditEngagement):
         values = {}
         self.mapping.update(**values)
-        return super(EngagementlLoader, self).get_values(record)
+        return super().get_values(record)
 
     def get_authorized_officers(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []

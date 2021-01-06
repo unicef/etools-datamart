@@ -66,7 +66,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
     """Override SimpleMetadata, adding info about filters"""
 
     def determine_metadata(self, request, view):
-        metadata = super(SimpleMetadataWithFilters, self).determine_metadata(request, view)
+        metadata = super().determine_metadata(request, view)
         metadata['filters'] = getattr(view, 'filter_fields', '')
         metadata['filter_blacklist'] = getattr(view, 'filter_blacklist', '')
         metadata['ordering'] = getattr(view, 'ordering_fields', '')

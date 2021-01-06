@@ -45,7 +45,7 @@ class RexList(list):
         if seq:
             for el in seq:
                 regexx.append(self._compile(el))
-        super(RexList, self).__init__(regexx)
+        super().__init__(regexx)
 
     def __repr__(self):
         return str([r.pattern for r in self])
@@ -58,11 +58,11 @@ class RexList(list):
 
     def __setitem__(self, i, pattern):
         rex = self._compile(pattern)
-        super(RexList, self).__setitem__(i, rex)
+        super().__setitem__(i, rex)
 
     def append(self, pattern):
         rex = self._compile(pattern)
-        super(RexList, self).append(rex)
+        super().append(rex)
 
     def __contains__(self, target):
         t = str(target)

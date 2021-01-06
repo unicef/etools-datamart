@@ -172,4 +172,4 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #     return HttpResponse(code, content_type='text/plain')
 
     # def changelist_view(self, request, extra_context=None):
-    #     return super(ServiceAdmin, self).changelist_view(request, extra_context)
+    #     return super().changelist_view(request, extra_context)

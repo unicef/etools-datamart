@@ -21,7 +21,7 @@ class Camera(Polaroid):
     worker_update_freq = WORKER_UPDATE_FREQ
 
     def __init__(self, *args, **kwargs):
-        super(Camera, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Expiry can be timedelta or None for never expire.
         self.app.add_defaults({
             'monitors_expire_success': timedelta(days=1),
@@ -39,7 +39,7 @@ class Camera(Polaroid):
         django.setup()
 
     def install(self):
-        super(Camera, self).install()
+        super().install()
         self.django_setup()
 
     def handle_task(self, uuid_task, worker=None):

@@ -17,7 +17,7 @@ import etools_datamart
 class ClientHandler(ForceAuthClientHandler):
     def get_response(self, request):
         request._is_preload_internal_request = True
-        return super(ClientHandler, self).get_response(request)
+        return super().get_response(request)
 
 
 class Client(APIClient):
@@ -27,7 +27,7 @@ class Client(APIClient):
         self._credentials = {}
 
     def _base_environ(self, **request):
-        env = super(Client, self)._base_environ(**request)
+        env = super()._base_environ(**request)
         env['HTTP_USER_AGENT'] = 'Datamart/%s' % etools_datamart.VERSION
         env['REMOTE_ADDR'] = '127.0.0.1'
         env['SERVER_NAME'] = 'localhost'

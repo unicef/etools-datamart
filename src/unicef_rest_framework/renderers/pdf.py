@@ -61,7 +61,7 @@ class PDFRenderer(ContentDispositionMixin, HTMLRenderer):
         if response.status_code != 200:
             return ''
         try:
-            html = super(PDFRenderer, self).render(data, accepted_media_type, renderer_context)
+            html = super().render(data, accepted_media_type, renderer_context)
 
             # create a pdf
             buffer = io.BytesIO()

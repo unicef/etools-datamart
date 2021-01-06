@@ -78,7 +78,7 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
             return None
 
         try:
-            user, jwt_value = super(JWTAuthentication, self).authenticate(request)
+            user, jwt_value = super().authenticate(request)
             request.user = user
             # login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
         except TypeError:  # pragma: no cover
