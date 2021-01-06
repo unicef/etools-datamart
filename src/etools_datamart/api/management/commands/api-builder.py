@@ -52,7 +52,7 @@ class Command(LabelCommand):
     label = 'model name'
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument(
             '--serializers', action='store', dest='serializers',
             default='etools_datamart.api.serializers',

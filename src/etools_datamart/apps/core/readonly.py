@@ -52,7 +52,7 @@ class ReadOnlyModel(models.Model):
         pass
 
     def delete(self, using=None, keep_parents=False):
-        super(ReadOnlyModel, self).delete(using)
+        super().delete(using)
 
     class Meta:
         abstract = True

@@ -88,7 +88,7 @@ class TenantModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin
     list_filter = [SchemaFilter, ]
 
     # def get_queryset(self, request):
-    #     super(TenantModelAdmin, self).get_queryset(request)
+    #     super().get_queryset(request)
 
     def get_object(self, request, object_id, from_field=None):
         pk, schema = object_id.split('-')

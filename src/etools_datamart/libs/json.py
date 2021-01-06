@@ -12,7 +12,7 @@ class SmartEncoder(json.JSONEncoder):
             return float(o)
         elif isinstance(o, (datetime,)):
             return str(o)
-        return super(SmartEncoder, self).default(o)
+        return super().default(o)
 
 
 def print_json(obj, *args):

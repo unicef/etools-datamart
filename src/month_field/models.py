@@ -51,4 +51,4 @@ class MonthField(models.DateField):
             'form_class': forms.MonthField
         }
         defaults.update(kwargs)
-        return super(MonthField, self).formfield(**defaults)
+        return super().formfield(**defaults)

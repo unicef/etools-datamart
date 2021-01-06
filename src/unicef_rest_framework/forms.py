@@ -77,7 +77,7 @@ class DateRangePickerWidget(forms.MultiWidget):
 
     def __init__(self, till_today=True, attrs=None):
         widgets = (DateInput(), DateInput(),)
-        super(DateRangePickerWidget, self).__init__(widgets, attrs=attrs)
+        super().__init__(widgets, attrs=attrs)
 
     def value_from_datadict(self, data, files, name):
         return [self.widgets[0].value_from_datadict(data, files, name + '__gte'),
@@ -134,7 +134,7 @@ class DateRangePickerField(forms.MultiValueField):
                             localize=localize,
                             **kwargs)
         )
-        super(DateRangePickerField, self).__init__(fields, **kwargs)
+        super().__init__(fields, **kwargs)
 
     def widget_attrs(self, widget):
         return {"class": "form-control"}

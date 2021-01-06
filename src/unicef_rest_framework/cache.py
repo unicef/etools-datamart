@@ -200,7 +200,7 @@ class APICacheResponse(CacheResponse):
                  cache=None,
                  cache_errors=None):
         self.cache_name = cache or extensions_api_settings.DEFAULT_USE_CACHE
-        super(APICacheResponse, self).__init__(timeout=timeout, key_func=key_func,
+        super().__init__(timeout=timeout, key_func=key_func,
                                                cache=cache, cache_errors=cache_errors)
 
     def process_cache_response(self,

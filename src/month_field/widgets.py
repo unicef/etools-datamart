@@ -21,7 +21,7 @@ class MonthSelectorWidget(widgets.MultiWidget):
         _widgets = [widgets.Select(attrs=_attrs, choices=months.items()),
                     widgets.NumberInput(attrs=_attrs)
                     ]
-        super(MonthSelectorWidget, self).__init__(_widgets, attrs)
+        super().__init__(_widgets, attrs)
 
     @property
     def media(self):

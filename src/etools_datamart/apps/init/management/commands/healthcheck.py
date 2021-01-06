@@ -16,10 +16,10 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument(
             '--pidfile',
             dest='pidfile',
