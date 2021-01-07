@@ -39,6 +39,7 @@ services:
       STATIC_ROOT: /code/src/etools_datamart/apps/web/static/
       GEOS_LIBRARY_PATH: "/usr/lib/libgeos_c.so.1"
       GDAL_LIBRARY_PATH: "/usr/lib/libgdal.so.26"
+      EXPORT_FILE_STORAGE: "django.core.files.storage.FileSystemStorage"
     command: bash -c "python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8080"
     volumes:
       - "$PWD:/code"
