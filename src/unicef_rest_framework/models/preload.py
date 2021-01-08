@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from crashlog.middleware import process_exception
 from rest_framework.test import APIClient, ForceAuthClientHandler
 
 from unicef_security.models import User
@@ -106,7 +105,6 @@ class AbstractPreload(models.Model):
                 pre_save(self, response)
             return response
         except Exception as e:
-            process_exception(e)
             self.status_code = 501
             self.etag = ""
             self.response_ms = 0

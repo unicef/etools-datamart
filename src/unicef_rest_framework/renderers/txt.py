@@ -2,7 +2,6 @@ import logging
 
 from django.template import loader
 
-from crashlog.middleware import process_exception
 from rest_framework.renderers import BaseRenderer
 
 logger = logging.getLogger(__name__)
@@ -46,6 +45,5 @@ class TextRenderer(BaseRenderer):
                      'headers': []}
             return template.render(c)
         except Exception as e:
-            process_exception(e)
             logger.exception(e)
             raise Exception('Error processing request') from e

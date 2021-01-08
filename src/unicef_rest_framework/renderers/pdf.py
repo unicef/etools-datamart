@@ -5,7 +5,6 @@ import os
 from django.conf import settings
 from django.template import loader
 
-from crashlog.middleware import process_exception
 from xhtml2pdf import pisa
 
 from unicef_rest_framework.renderers.mixin import ContentDispositionMixin
@@ -72,6 +71,5 @@ class PDFRenderer(ContentDispositionMixin, HTMLRenderer):
             buffer.seek(0)
             return buffer.read()
         except Exception as e:
-            process_exception(e)
             logger.exception(e)
             raise Exception('Error processing request') from e
