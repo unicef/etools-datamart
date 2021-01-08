@@ -1,6 +1,5 @@
 import logging
 
-from crashlog.middleware import process_exception
 from rest_framework_csv import renderers as r
 
 from unicef_rest_framework.renderers.mixin import ContentDispositionMixin
@@ -20,6 +19,5 @@ class CSVRenderer(ContentDispositionMixin, r.CSVRenderer):
                 data = dict(data)['results']
             return super().render(data, media_type, renderer_context, writer_opts)
         except Exception as e:
-            process_exception(e)
             logger.exception(e)
             raise Exception('Error processing request')

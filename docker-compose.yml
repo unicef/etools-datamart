@@ -47,7 +47,7 @@ services:
   datamart:
     container_name: datamart
     << : *datamart_defaults
-    command: bash -c "python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8080"
+    command: bash -c "python /code/manage.py init-setup --migrate && python /code/manage.py runserver 0.0.0.0:8080"
     labels:
       - "traefik.http.routers.datamart.rule=PathPrefix(`/`)"
       - traefik.http.routers.datamart.service=datamart

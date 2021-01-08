@@ -1,6 +1,5 @@
 import logging
 
-from crashlog.middleware import process_exception
 from rest_framework_yaml.renderers import YAMLRenderer as BaseRenderer
 
 from unicef_rest_framework.renderers.mixin import ContentDispositionMixin
@@ -24,6 +23,5 @@ class YAMLRenderer(ContentDispositionMixin, BaseRenderer):
             return super().render(data, accepted_media_type, renderer_context)
 
         except Exception as e:
-            process_exception(e)
             logger.exception(e)
             raise Exception(f'Error processing request {e}') from e

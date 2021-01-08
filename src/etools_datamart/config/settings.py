@@ -201,7 +201,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'impersonate.middleware.ImpersonateMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
-    'crashlog.middleware.CrashLogMiddleware',
     'unicef_rest_framework.middleware.ApiMiddleware',
     # 'etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware',
     'etools_datamart.apps.tracking.middleware.StatsMiddleware',
@@ -459,7 +458,7 @@ CELERY_TASK_SERIALIZER = 'etljson'
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_EMAIL_BACKEND = env.str(
     'CELERY_EMAIL_BACKEND',
-    default='django.core.mail.backends.smtp.EmailBackend',
+    default='post_office.backends.EmailBackend',
 )
 CELERY_EMAIL_CHUNK_SIZE = 10
 
