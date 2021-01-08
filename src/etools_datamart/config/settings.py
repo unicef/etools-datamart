@@ -201,7 +201,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'impersonate.middleware.ImpersonateMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
-    'crashlog.middleware.CrashLogMiddleware',
     'unicef_rest_framework.middleware.ApiMiddleware',
     # 'etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware',
     'etools_datamart.apps.tracking.middleware.StatsMiddleware',
