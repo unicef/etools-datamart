@@ -43,3 +43,4 @@ xml
 **/dual-listbox-master/
 #src/etools_datamart/apps/security/static/security/dual-listbox-master
 build/
+celerybeat.pid
