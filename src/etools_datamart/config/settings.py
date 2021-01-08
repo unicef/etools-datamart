@@ -368,8 +368,7 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M',  # '10/25/06 14:30'
     '%m/%d/%y',  # '10/25/06'
 ]
-EMAIL_BACKEND = 'post_office.EmailBackend'
-EMAIL_POST_OFFICE_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'post_office.backends.EmailBackend'
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_HOST = env('EMAIL_HOST')
@@ -382,8 +381,6 @@ POST_OFFICE = {
         'default': 'djcelery_email.backends.CeleryEmailBackend'
     }
 }
-# celery-mail
-CELERY_EMAIL_CHUNK_SIZE = 10
 
 # crispy-forms
 CRISPY_FAIL_SILENTLY = not DEBUG
@@ -460,6 +457,11 @@ CELERY_RESULT_SERIALIZER = 'etljson'
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
 CELERY_TASK_SERIALIZER = 'etljson'
 CELERY_TIMEZONE = 'America/New_York'
+CELERY_EMAIL_BACKEND = env.str(
+    'CELERY_EMAIL_BACKEND',
+    default='django.core.mail.backends.smtp.EmailBackend',
+)
+CELERY_EMAIL_CHUNK_SIZE = 10
 
 CONCURRENCY_IGNORE_DEFAULT = False
 
