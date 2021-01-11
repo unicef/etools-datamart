@@ -10,7 +10,6 @@ from django.core.cache import cache
 
 import requests
 from constance import config as constance
-from crashlog.middleware import process_exception
 from jwt import decode as jwt_decode, DecodeError, ExpiredSignature
 from social_core.backends.azuread_tenant import AzureADTenantOAuth2
 from social_core.exceptions import AuthTokenError
@@ -103,15 +102,12 @@ def get_unicef_user(backend, details, response, *args, **kwargs):
         for k, v in response.items():
             if k in ['email', 'family_name', 'unique_name']:
                 details[k] = v
-        try:
-            sync = Synchronizer()
-            data = sync.get_user(details['email'])
 
-            for k, v in data.items():
-                details[k] = v
+        sync = Synchronizer()
+        data = sync.get_user(details['email'])
 
-        except Exception as e:
-            process_exception(e)
+        for k, v in data.items():
+            details[k] = v
 
         user, created = User.objects.get_or_create(
             username=details['unique_name'],

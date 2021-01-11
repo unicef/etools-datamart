@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 from functools import lru_cache
 
@@ -34,7 +33,7 @@ class InvalidOperator(InvalidRule):
 class SystemFilterHandler(object):
     def __init__(self, filter):
         self.filter = filter
-        super(SystemFilterHandler, self).__init__()
+        super().__init__()
 
     def filter_queryset(self, queryset):
         return queryset

@@ -1,10 +1,18 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (AuditAudit, AuditEngagement, AuditEngagementActivePd,
-                                                        AuditEngagementAuthorizedOfficers, AuditEngagementStaffMembers,
-                                                        AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck,
-                                                        PartnersIntervention, PartnersPartnerstaffmember,
-                                                        PurchaseOrderAuditorstaffmember,)
+from etools_datamart.apps.sources.etools.models import (
+    AuditAudit,
+    AuditEngagement,
+    AuditEngagementActivePd,
+    AuditEngagementAuthorizedOfficers,
+    AuditEngagementStaffMembers,
+    AuditMicroassessment,
+    AuditSpecialaudit,
+    AuditSpotcheck,
+    PartnersIntervention,
+    PartnersPartnerstaffmember,
+    PurchaseOrderAuditorstaffmember,
+)
 
 from .utils import set_primary_key
 

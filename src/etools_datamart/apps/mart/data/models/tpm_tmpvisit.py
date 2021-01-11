@@ -3,8 +3,13 @@ from django.db import models
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import (DjangoContentType, TpmTpmactivityUnicefFocalPoints, TpmTpmvisit,
-                                                        TpmTpmvisitTpmPartnerFocalPoints, UnicefAttachmentsAttachment,)
+from etools_datamart.apps.sources.etools.models import (
+    DjangoContentType,
+    TpmTpmactivityUnicefFocalPoints,
+    TpmTpmvisit,
+    TpmTpmvisitTpmPartnerFocalPoints,
+    UnicefAttachmentsAttachment,
+)
 from etools_datamart.sentry import process_exception
 
 

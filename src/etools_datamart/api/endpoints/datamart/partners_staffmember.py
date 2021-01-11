@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# import django_filters
 from rest_framework import serializers
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer

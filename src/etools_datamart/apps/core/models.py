@@ -7,7 +7,7 @@ class DataMartQuerySet(QuerySet):
 
     def get(self, *args, **kwargs):
         try:
-            return super(DataMartQuerySet, self).get(*args, **kwargs)
+            return super().get(*args, **kwargs)
         except self.model.DoesNotExist as e:
             raise self.model.DoesNotExist(
                 "%s  (%s %s)" % (e, args, kwargs)

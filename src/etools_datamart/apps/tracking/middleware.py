@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import logging
 
@@ -155,7 +154,7 @@ class StatsMiddleware(object):
 #
 # class ThreadedStatsMiddleware(StatsMiddleware):
 #     def __init__(self, get_response):
-#         super(ThreadedStatsMiddleware, self).__init__(get_response)
+#         super().__init__(get_response)
 #         self.worker = AsyncLogger()
 #
 #     def log(self, request, response):

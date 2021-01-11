@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 from time import time
 
@@ -384,5 +383,29 @@ class AuditResultAdmin(DataModelAdmin):
 
 @register(models.SpotCheck)
 class SpotCheckAdmin(DataModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()
+
+
+@register(models.SpotCheckFindings)
+class SpotCheckFindingsAdmin(DataModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()
+
+
+@register(models.MicroAssessment)
+class MicroAssessmentAdmin(DataModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()
+
+
+@register(models.Audit)
+class AuditAdmin(DataModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()
+
+
+@register(models.AuditSpecial)
+class AuditSpecialAdmin(DataModelAdmin):
     list_display = ('__str__',)
     list_filter = ()

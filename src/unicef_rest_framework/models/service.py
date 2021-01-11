@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 
 from django.contrib.contenttypes.models import ContentType
@@ -177,7 +175,7 @@ class Service(MasterDataModel):
                 self.linked_models.add(ct)
             except Exception as e:
                 logger.exception(e)
-        super(Service, self).save(force_insert, force_update, using, update_fields)
+        super().save(force_insert, force_update, using, update_fields)
 
     def __str__(self):
         return self.name

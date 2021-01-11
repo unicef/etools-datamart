@@ -1,8 +1,15 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (ActivitiesActivity, ActivitiesActivityLocations, AuthUser,
-                                                        LocationsLocation, ReportsOffice, TpmTpmactivity,
-                                                        TpmTpmactivityOffices, TpmTpmactivityUnicefFocalPoints,)
+from etools_datamart.apps.sources.etools.models import (
+    ActivitiesActivity,
+    ActivitiesActivityLocations,
+    AuthUser,
+    LocationsLocation,
+    ReportsOffice,
+    TpmTpmactivity,
+    TpmTpmactivityOffices,
+    TpmTpmactivityUnicefFocalPoints,
+)
 
 from .utils import set_primary_key
 

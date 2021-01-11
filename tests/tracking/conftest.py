@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 
 import pytest
@@ -24,8 +23,15 @@ def log_with_params(db):
 
 @pytest.fixture
 def reset_stats(db):
-    from etools_datamart.apps.tracking.models import APIRequestLog, DailyCounter, UserCounter, MonthlyCounter, PathCounter
+    from etools_datamart.apps.tracking.models import (
+        APIRequestLog,
+        DailyCounter,
+        MonthlyCounter,
+        PathCounter,
+        UserCounter,
+    )
     from etools_datamart.apps.tracking.utils import refresh_all_counters
+
     APIRequestLog.objects.truncate()
     DailyCounter.objects.truncate()
     MonthlyCounter.objects.truncate()

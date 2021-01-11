@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import lru_cache
 
 from django.conf import settings
@@ -33,8 +32,19 @@ from .filtering import SystemFilterBackend
 from .negotiation import CT
 from .ordering import OrderingFilter
 from .permissions import ServicePermission
-from .renderers import (CSVRenderer, HTMLRenderer, IQYRenderer, JSONRenderer, MSJSONRenderer, MSXmlRenderer,
-                        PDFRenderer, TextRenderer, URFBrowsableAPIRenderer, XLSXRenderer, YAMLRenderer,)
+from .renderers import (
+    CSVRenderer,
+    HTMLRenderer,
+    IQYRenderer,
+    JSONRenderer,
+    MSJSONRenderer,
+    MSXmlRenderer,
+    PDFRenderer,
+    TextRenderer,
+    URFBrowsableAPIRenderer,
+    XLSXRenderer,
+    YAMLRenderer,
+)
 
 
 class classproperty(object):

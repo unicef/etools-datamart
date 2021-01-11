@@ -1,4 +1,3 @@
-# # -*- coding: utf-8 -*-
 # from celery.utils.log import get_task_logger
 #
 # from etools_datamart.celery import app
@@ -8,7 +7,6 @@
 # task_logger = get_task_logger(__name__)
 #
 #
-# # -*- coding: utf-8 -*-
 # import logging
 # from datetime import datetime, timedelta
 #

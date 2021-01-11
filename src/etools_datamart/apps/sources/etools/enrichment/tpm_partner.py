@@ -1,7 +1,10 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import (TpmpartnersTpmpartner,
-                                                        TpmpartnersTpmpartnerCountries, UsersCountry,)
+from etools_datamart.apps.sources.etools.models import (
+    TpmpartnersTpmpartner,
+    TpmpartnersTpmpartnerCountries,
+    UsersCountry,
+)
 
 models.ManyToManyField(UsersCountry,
                        through=TpmpartnersTpmpartnerCountries,

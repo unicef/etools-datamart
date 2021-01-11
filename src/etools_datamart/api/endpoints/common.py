@@ -181,7 +181,7 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
         return super().list(request, *args, **kwargs)
 
     def get_schema_fields(self):
-        ret = super(APIMultiTenantReadOnlyModelViewSet, self).get_schema_fields()
+        ret = super().get_schema_fields()
         ret.append(coreapi.Field(
             name='_schema',
             required=False,

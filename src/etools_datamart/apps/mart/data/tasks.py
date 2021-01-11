@@ -1,4 +1,5 @@
 from django.db.models import Q
+
 from etools_datamart.apps.mart.data.models.location import GeoName, GeoNameLimitException
 from etools_datamart.celery import app
 

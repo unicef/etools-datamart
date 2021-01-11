@@ -3,8 +3,12 @@ from django import forms
 from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
 
 from etools_datamart.api.endpoints import common
-from etools_datamart.api.endpoints.datamart.intervention import (InterventionSerializer, InterventionSerializerFull,
-                                                                 InterventionSerializerPlain, InterventionSerializerV2,)
+from etools_datamart.api.endpoints.datamart.intervention import (
+    InterventionSerializer,
+    InterventionSerializerFull,
+    InterventionSerializerPlain,
+    InterventionSerializerV2,
+)
 from etools_datamart.apps.mart.data import models
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib import admin
 
 from django_celery_beat.models import CrontabSchedule
@@ -11,13 +10,12 @@ from unicef_rest_framework.models.acl import GroupAccessControl
 from .. import models
 from .acl import GroupAccessControlAdmin, UserAccessControlAdmin
 from .application import ApplicationAdmin
-from .base import ListDisplayAllMixin, ReadOnlyAdminMixin, TruncateTableMixin  # noqa
+from .base import APIModelAdmin  # noqa; noqa; noqa
+from .base import ListDisplayAllMixin, ReadOnlyAdminMixin, TruncateTableMixin
 from .beat import CrontabScheduleAdmin, PeriodicTaskAdmin
 from .cache import CacheVersionAdmin
 from .filter import SystemFilterAdmin
 from .service import ServiceAdmin
-
-from .base import APIModelAdmin  # noqa; noqa
 
 __all__ = ['ApplicationAdmin',
            'GroupAccessControlAdmin',

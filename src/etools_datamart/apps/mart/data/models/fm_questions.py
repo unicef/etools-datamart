@@ -11,6 +11,7 @@ from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringPlanningMonitoringactivityInterventions,
     FieldMonitoringPlanningMonitoringactivityPartners,
     FieldMonitoringSettingsOption,
+    FieldMonitoringSettingsQuestionMethods,
 )
 
 
@@ -23,7 +24,7 @@ class FMQuestionLoader(EtoolsLoader):
             **kwargs,
     ):
         option_qs = FieldMonitoringSettingsOption.objects.filter(
-            question=record.activity_question,
+            question=record.activity_question.question,
         )
         return ", ".join([o.label for o in option_qs.all()])
 
@@ -33,8 +34,11 @@ class FMQuestionLoader(EtoolsLoader):
             values: dict,
             **kwargs,
     ):
+        methods_qs = FieldMonitoringSettingsQuestionMethods.objects.filter(
+            question=record.activity_question.question,
+        )
         return ", ".join(
-            [m.name for m in record.activity_question.methods.all()]
+            [m.method.name for m in methods_qs.all()]
         )
 
     def process_country(self):
@@ -199,17 +203,28 @@ class FMOntrackLoader(EtoolsLoader):
         for rec in self.get_queryset():
             filters = self.config.key(self, rec)
             values = self.get_values(rec)
-            for partner in rec.monitoring_activity.partners.all():
-                values["entity"] = partner.name
+            activity = rec.monitoring_activity
+            partner_qs = FieldMonitoringPlanningMonitoringactivityPartners.objects.filter(
+                monitoringactivity=activity,
+            )
+            intervention_qs = FieldMonitoringPlanningMonitoringactivityInterventions.objects.filter(
+                monitoringactivity=activity,
+            )
+            cp_output_qs = FieldMonitoringPlanningMonitoringactivityCpOutputs.objects.filter(
+                monitoringactivity=activity,
+            )
+            for rec in partner_qs.all():
+                values["entity"] = rec.partnerorganization.name
                 values["outcome"] = None
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
-            for pd in rec.monitoring_activity.interventions.all():
-                values["entity"] = pd.reference_number
+            for rec in intervention_qs.all():
+                values["entity"] = rec.intervention.reference_number
                 values["outcome"] = None
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
-            for cp_output in rec.monitoring_activity.cp_output.all():
+            for rec in cp_output_qs.all():
+                cp_putput = rec.result
                 values["entity"] = cp_output.name
                 values["outcome"] = cp_output.parent.wbs if cp_output.parent else None
                 op = self.process_record(filters, values)

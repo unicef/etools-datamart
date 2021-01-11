@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 import os
 from urllib.parse import urlencode
@@ -49,6 +48,7 @@ class Command(BaseCommand):
         self.verbosity = options['verbosity']
         tid = options['tid']
         import requests
+
         # """https://www.google-analytics.com/r/collect?v=1&_v=j72&a=1254325655&t=pageview&_s=1&dl=http%3A%2F%2Flocalhost%2F&ul=en-gb&de=UTF-8&dt=Title&sd=24-bit&sr=1440x900&vp=1425x459&je=0&_u=IEBAAUAB~&jid=243210006&gjid=1351824934&cid=778822076.1544038618&tid=UA-130479575-1&_gid=909229133.1544038618&_r=1&gtm=2oubc0&z=118711575"""
         values = {
             "v": 1,

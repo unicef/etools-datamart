@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from etools_datamart.apps.etl import models
 
 from .. import common

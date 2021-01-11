@@ -57,7 +57,7 @@ class EtlEncoder(encoders.JSONEncoder):
                 '__type__': '__EtlResult__',
                 'data': obj.as_dict()
             }
-        return super(EtlEncoder, self).default(obj)
+        return super().default(obj)
 
 
 def etl_decoder(obj):

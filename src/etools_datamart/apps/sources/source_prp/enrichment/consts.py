@@ -1,6 +1,5 @@
 from model_utils import Choices
 
-
 REPORTING_TYPES = Choices(
     ('QPR', 'Quarterly Progress Report'),
     ('HR', 'Humanitarian Report'),

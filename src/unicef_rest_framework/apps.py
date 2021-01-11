@@ -1,4 +1,3 @@
-# -*- coding: utf-8
 from django.apps import AppConfig
 
 
@@ -7,5 +6,5 @@ class Config(AppConfig):
     verbose_name = 'API Configuration'
 
     def ready(self):
-        from . import tasks  # noqa
         from . import handlers  # noqa
+        from . import tasks  # noqa

@@ -8,7 +8,6 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from constance import config
-from crashlog.middleware import process_exception
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
@@ -78,7 +77,7 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
             return None
 
         try:
-            user, jwt_value = super(JWTAuthentication, self).authenticate(request)
+            user, jwt_value = super().authenticate(request)
             request.user = user
             # login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
         except TypeError:  # pragma: no cover
@@ -104,7 +103,6 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
                     user, created = User.objects.update_or_create(**pk,
                                                                   defaults=values)
                 except Exception as e:
-                    process_exception(e)
                     raise exceptions.AuthenticationFailed("Unable to retrieve user data")
             else:
                 user, created = User.objects.update_or_create(username=username,

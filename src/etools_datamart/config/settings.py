@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import datetime
 import os
 from pathlib import Path
@@ -94,17 +93,6 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 ABSOLUTE_BASE_URL = env('ABSOLUTE_BASE_URL')
 API_PREFIX = env('API_PREFIX')
 URL_PREFIX = env('URL_PREFIX')
-
-ADMINS = (
-    ('Stefano', 'saxix@saxix.onmicrosoft.com'),
-    ('Stefano', 'sapostolico@unicef.org'),
-    ('Nik', 'ntrncic@unicef.org'),
-    ('Greg', 'greinbach@unicef.org'),
-    ('Zack', 'zadams@unicef.org'),
-    ('Robert', 'ravram@unicef.org'),
-    ('Domenico', 'ddinicola@unicef.org'),
-    ('Evan', 'ewheeler@unicef.org')
-)
 
 DATABASES = {
     'default': env.db(),
@@ -213,7 +201,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'impersonate.middleware.ImpersonateMiddleware',
     # 'django.contrib.auth.middleware.RemoteUserMiddleware',
-    'crashlog.middleware.CrashLogMiddleware',
     'unicef_rest_framework.middleware.ApiMiddleware',
     # 'etools_datamart.apps.tracking.middleware.ThreadedStatsMiddleware',
     'etools_datamart.apps.tracking.middleware.StatsMiddleware',
@@ -350,7 +337,7 @@ INSTALLED_APPS = [
     'adminfilters',
     'django_sysinfo',
     'post_office',
-    # 'djcelery_email',
+    'djcelery_email',
 
     'django_celery_beat',
 
@@ -380,8 +367,7 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M',  # '10/25/06 14:30'
     '%m/%d/%y',  # '10/25/06'
 ]
-EMAIL_BACKEND = 'post_office.EmailBackend'
-EMAIL_POST_OFFICE_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'post_office.backends.EmailBackend'
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_HOST = env('EMAIL_HOST')
@@ -394,8 +380,6 @@ POST_OFFICE = {
         'default': 'djcelery_email.backends.CeleryEmailBackend'
     }
 }
-# celery-mail
-CELERY_EMAIL_CHUNK_SIZE = 10
 
 # crispy-forms
 CRISPY_FAIL_SILENTLY = not DEBUG
@@ -459,16 +443,24 @@ CONSTANCE_CONFIG = {
 }
 
 CELERY_ACCEPT_CONTENT = ['etljson']
-CELERY_BEAT_SCHEDULER = 'unicef_rest_framework.schedulers.DatabaseScheduler'
-CELERY_BROKER_POOL_LIMIT = 0
+CELERY_BEAT_SCHEDULER = env.str(
+    'CELERY_BEAT_SCHEDULER',
+    default='unicef_rest_framework.schedulers:DatabaseScheduler',
+)
+CELERY_BROKER_POOL_LIMIT = env.int('CELERY_BROKER_POOL_LIMIT', default=0)
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = env.bool('CELERY_ALWAYS_EAGER')
-CELERY_REDIS_MAX_CONNECTIONS = 10
+CELERY_REDIS_MAX_CONNECTIONS = env.int('CELERY_REDIS_MAX_CONNECTIONS', 10)
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_RESULT_SERIALIZER = 'etljson'
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
 CELERY_TASK_SERIALIZER = 'etljson'
 CELERY_TIMEZONE = 'America/New_York'
+CELERY_EMAIL_BACKEND = env.str(
+    'CELERY_EMAIL_BACKEND',
+    default='post_office.backends.EmailBackend',
+)
+CELERY_EMAIL_CHUNK_SIZE = 10
 
 CONCURRENCY_IGNORE_DEFAULT = False
 
@@ -693,8 +685,8 @@ SENTRY_DSN = env('SENTRY_DSN', '')
 
 if SENTRY_ENABLED:
     import sentry_sdk
-    from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.django import DjangoIntegration
 
     # from sentry_sdk.integrations.redis import RedisIntegration
 

@@ -7,10 +7,19 @@ from model_utils import Choices
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts, RiskConst
-from etools_datamart.apps.sources.etools.models import (ActionPointsActionpoint, AuditAudit, AuditEngagement,
-                                                        AuditEngagementActivePd, AuditMicroassessment, AuditRisk,
-                                                        AuditRiskcategory, AuditSpecialaudit, AuditSpotcheck,
-                                                        DjangoContentType, UnicefAttachmentsAttachment,)
+from etools_datamart.apps.sources.etools.models import (
+    ActionPointsActionpoint,
+    AuditAudit,
+    AuditEngagement,
+    AuditEngagementActivePd,
+    AuditMicroassessment,
+    AuditRisk,
+    AuditRiskcategory,
+    AuditSpecialaudit,
+    AuditSpotcheck,
+    DjangoContentType,
+    UnicefAttachmentsAttachment,
+)
 
 from .partner import Partner
 
@@ -35,9 +44,60 @@ MODULEMAP = {'AuditSpotcheck': "fam",
              'T2FTravelactivity': "trips"}
 
 
-class EngagementlLoader(EtoolsLoader):
+class EngagementRiskMixin:
     OVERALL_RISK_MAP = {}
 
+    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
+        try:
+            p = Partner.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=record.partner.pk)
+            return {
+                'name': p.name,
+                'vendor_number': p.vendor_number,
+                'id': p.pk,
+                'source_id': p.source_id,
+            }
+        except Partner.DoesNotExist:
+            return {
+                'name': 'N/A',
+                'vendor_number': 'N/A',
+                'id': 'N/A',
+                'source_id': 'N/A',
+            }
+
+    def _get_risk(self, record: AuditEngagement, code: str):
+        schema = self.context['country']
+        category_id = self.OVERALL_RISK_MAP.get(schema, None)
+        if category_id is None:
+            try:
+                category = AuditRiskcategory.objects.get(code=code)
+            except AuditRiskcategory.DoesNotExist:
+                pass
+            else:
+                self.OVERALL_RISK_MAP[schema] = category.pk
+                category_id = category.pk
+
+        try:
+            risk = AuditRisk.objects.get(
+                engagement=record,
+                blueprint__category__pk=category_id,
+            )
+        except AuditRisk.DoesNotExist:
+            extra = ""
+            value = ""
+        else:
+            extra = risk.extra
+            value = risk.value
+        return value, extra
+
+    def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
+        value, extra = self._get_risk(record, code="ma_global_assessment")
+        values["rating_extra"] = extra
+        return value
+
+
+class EngagementlLoader(EngagementRiskMixin, EtoolsLoader):
     def get_queryset(self):
         return AuditEngagement.objects.select_related(
             'partner',
@@ -101,7 +161,7 @@ class EngagementlLoader(EtoolsLoader):
     def get_values(self, record: AuditEngagement):
         values = {}
         self.mapping.update(**values)
-        return super(EngagementlLoader, self).get_values(record)
+        return super().get_values(record)
 
     def get_authorized_officers(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
@@ -127,21 +187,6 @@ class EngagementlLoader(EtoolsLoader):
 
         values['active_pd_data'] = ret
         return ", ".join([o['number'] for o in ret])
-
-    def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
-        try:
-            p = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.id)
-            return {'name': p.name,
-                    'vendor_number': p.vendor_number,
-                    'id': p.id,
-                    'source_id': p.source_id}
-        except Partner.DoesNotExist:
-            return {'name': 'N/A',
-                    'vendor_number': 'N/A',
-                    'id': 'N/A',
-                    'source_id': 'N/A'}
 
     def get_partner_id(self, record: AuditEngagement, values: dict, **kwargs):
         try:
@@ -171,35 +216,6 @@ class EngagementlLoader(EtoolsLoader):
         for r in ActionPointsActionpoint.objects.filter(engagement=record).all():
             ret.append(ActionPointSimpleSerializer(r).data)
         return ret
-
-    def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
-        schema = self.context['country']
-        category_id = self.OVERALL_RISK_MAP.get(schema, None)
-        if category_id is None:
-            try:
-                category = AuditRiskcategory.objects.get(
-                    header="Overall Risk Assessment",
-                )
-            except AuditRiskcategory.DoesNotExist:
-                pass
-            else:
-                self.OVERALL_RISK_MAP[schema] = category.pk
-                category_id = category.pk
-
-        try:
-            risk = AuditRisk.objects.get(
-                engagement=record,
-                blueprint__category__pk=category_id,
-            )
-        except AuditRisk.DoesNotExist:
-            extra = ""
-            value = ""
-        else:
-            extra = risk.extra
-            value = risk.value
-
-        values["rating_extra"] = extra
-        return value
 
     def process_country(self):
         for m in [AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck, AuditAudit]:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 import os
 from glob import iglob
@@ -16,7 +15,7 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument(
             '--noinput', action='store_false',
             dest='interactive', default=True,

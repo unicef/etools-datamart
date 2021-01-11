@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 from django.template import loader
@@ -55,7 +54,7 @@ class URFBrowsableAPIRenderer(_BrowsableAPIRenderer):
     #             }
 
     def get_context(self, data, accepted_media_type, renderer_context):
-        ctx = super(URFBrowsableAPIRenderer, self).get_context(data, accepted_media_type, renderer_context)
+        ctx = super().get_context(data, accepted_media_type, renderer_context)
         # in the real flow, this is added by the MultiTenant Middleware
         # but this function is called before the middleware system is involved
         request = ctx['request']

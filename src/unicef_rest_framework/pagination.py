@@ -118,7 +118,7 @@ class APIPagination(PageNumberPagination):
         # self._handle_backwards_compat(view)
         if self.get_page_size(request) == sys.maxsize:
             return queryset
-        return super(APIPagination, self).paginate_queryset(queryset, request, view)
+        return super().paginate_queryset(queryset, request, view)
 
     def get_next_link(self):
         if not self.page.has_next():

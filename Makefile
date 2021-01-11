@@ -17,17 +17,14 @@ help:
 
 
 develop:
-	@poetry run
-	poetry run pre-commit install
-	poetry run pre-commit install --hook-type pre-push.
+	pipenv sync --dev
 
 test:
-	poetry run py.test -v --create-db
+	pipenv run py.test -v --create-db
 
 lint:
-	poetry run pre-commit run --all-files
-	poetry run pre-commit run --all-files --hook-stage push
-	poetry run pre-commit run --all-files --hook-stage manual
+	pipenv run flake8 src/ tests/; exit 0;
+	pipenv run isort . --check-only; exit 0;
 
 clean:
 	rm -fr ${BUILDDIR} dist *.egg-info .coverage coverage.xml .eggs
@@ -46,9 +43,6 @@ docs:
 	.mkbuilddir
 	mkdir -p ${BUILDDIR}/docs
 	sphinx-build -aE docs/ ${BUILDDIR}/docs
-ifdef BROWSE
-	firefox ${BUILDDIR}/docs/index.html
-endif
 
 run:
 	docker-compose up

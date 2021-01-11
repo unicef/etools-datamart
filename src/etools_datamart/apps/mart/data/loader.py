@@ -125,7 +125,7 @@ class EtoolsLoader(BaseLoader):
             except AttributeError:  # pragma: no cover
                 pass
         else:
-            return super(EtoolsLoader, self).get_value(field_name, value_or_func,
+            return super().get_value(field_name, value_or_func,
                                                        original_record, current_mapping)
 
     def filter_queryset(self, qs):
@@ -329,7 +329,7 @@ class CommonSchemaLoader(EtoolsLoader):
             except AttributeError:  # pragma: no cover
                 pass
         else:
-            return super(CommonSchemaLoader, self).get_value(field_name, value_or_func, original_record,
+            return super().get_value(field_name, value_or_func, original_record,
                                                              current_mapping)
 
     def load(self, *, verbosity=0, stdout=None,

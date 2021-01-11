@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,7 +14,7 @@ class ApiException(APIException):
         self._cause = kwargs.pop('cause', None)
         self._tb = kwargs.pop('tb', None)
 
-        super(ApiException, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class TokenExpired(Exception):
@@ -31,7 +30,7 @@ class TokenDecodeError(Exception):
 class InvalidQueryArgumentError(ApiException):
     def __init__(self, field, *args, **kwargs):
         self.field = field
-        super(InvalidQueryArgumentError, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __str__(self):
         return "Invalid parameter '{}'".format(self.field)
@@ -40,7 +39,7 @@ class InvalidQueryArgumentError(ApiException):
 class InvalidFilterError(ApiException):
     def __init__(self, field, *args, **kwargs):
         self.field = field
-        super(InvalidFilterError, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __str__(self):
         return "Invalid filter '{}'".format(self.field)
@@ -53,7 +52,7 @@ class InvalidPaginationError(ApiException):
 class FilteringError(ApiException):
     def __init__(self, reason, *args, **kwargs):
         self.reason = reason
-        super(FilteringError, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __str__(self):
         return "Invalid query: '{}'".format(self.reason)

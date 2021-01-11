@@ -30,13 +30,11 @@ class {model}Admin(TenantModelAdmin):
 
 """
 
-SER_MODULE = """# -*- coding: utf-8 -*-
-from etools_datamart.apps.etools import models
+SER_MODULE = """from etools_datamart.apps.etools import models
 from rest_framework import serializers
 """
 
-VIEWSET_MODULE = """# -*- coding: utf-8 -*-
-from etools_datamart.apps.etools import models
+VIEWSET_MODULE = """from etools_datamart.apps.etools import models
 
 from . import common
 from .. import serializers
@@ -54,7 +52,7 @@ class Command(LabelCommand):
     label = 'model name'
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument(
             '--serializers', action='store', dest='serializers',
             default='etools_datamart.api.serializers',
