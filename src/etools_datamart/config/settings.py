@@ -210,7 +210,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     # 'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
-    'unicef_security.graph.AzureADTenantOAuth2Ext',
+    'unicef_security.backends.UNICEFAzureADTenantOAuth2Ext',
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 ]
