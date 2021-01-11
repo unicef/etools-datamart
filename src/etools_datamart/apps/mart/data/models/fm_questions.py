@@ -224,7 +224,7 @@ class FMOntrackLoader(EtoolsLoader):
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
             for rec in cp_output_qs.all():
-                cp_putput = rec.result
+                cp_output = rec.result
                 values["entity"] = cp_output.name
                 values["outcome"] = cp_output.parent.wbs if cp_output.parent else None
                 op = self.process_record(filters, values)
