@@ -1,5 +1,7 @@
 import logging
 
+from django.conf import settings
+
 from celery.app import default_app
 from post_office import mail
 from rest_framework.reverse import reverse
@@ -37,13 +39,14 @@ def preload(target_id):
 def export(target_id):
     target = Export.objects.get(id=target_id)
     response = target.run()
-    if target.notify and target.as_user.email:
-        mail.send(
-            target.as_user.email,  # List of email addresses also accepted
-            'notification@datamart.unicef.io',
-            template='export_ready',
-            context={'target': target,
-                     'user': target.as_user,
-                     'download_url': reverse('urf:export-fetch', args=[target.id])}
-        )
+    if settings.EXPORT_NOTIFICATIONS_ENABLED:
+        if target.notify and target.as_user.email:
+            mail.send(
+                target.as_user.email,  # List of email addresses also accepted
+                'notification@datamart.unicef.io',
+                template='export_ready',
+                context={'target': target,
+                         'user': target.as_user,
+                         'download_url': reverse('urf:export-fetch', args=[target.id])}
+            )
     return response.status_code
