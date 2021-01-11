@@ -1,0 +1,114 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"ecf12569115bdf311cfc961298b4db68\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.userstats.UserStatsViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.userstats.UserStatsViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "ecf12569115bdf311cfc961298b4db68"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "654"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 368,
+                "month": "Feb 2019",
+                "source_id": null,
+                "last_modify_date": "16 Sep 2019 18:29:16",
+                "seen": null,
+                "country_name": "bolivia",
+                "area_code": "",
+                "total": 0,
+                "unicef": 0,
+                "logins": 0,
+                "unicef_logins": 0
+            },
+            {
+                "id": 369,
+                "month": "Jan 2019",
+                "source_id": null,
+                "last_modify_date": "16 Sep 2019 18:29:16",
+                "seen": null,
+                "country_name": "chad",
+                "area_code": "",
+                "total": 0,
+                "unicef": 0,
+                "logins": 0,
+                "unicef_logins": 0
+            },
+            {
+                "id": 370,
+                "month": "Jan 2019",
+                "source_id": null,
+                "last_modify_date": "16 Sep 2019 18:29:16",
+                "seen": null,
+                "country_name": "lebanon",
+                "area_code": "",
+                "total": 0,
+                "unicef": 0,
+                "logins": 0,
+                "unicef_logins": 0
+            }
+        ]
+    },
+    "content_type": null
+}

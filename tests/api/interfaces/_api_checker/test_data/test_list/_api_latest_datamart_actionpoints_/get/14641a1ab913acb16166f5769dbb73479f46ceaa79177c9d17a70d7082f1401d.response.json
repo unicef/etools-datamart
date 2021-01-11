@@ -1,0 +1,183 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"9076b1270970332dea3e0cf130b04dd9\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.actionpoint.ActionPointViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.actionpoint.ActionPointViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "9076b1270970332dea3e0cf130b04dd9"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "2583"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "reference_number": null,
+                "created": null,
+                "status": null,
+                "assigned_by_name": null,
+                "assigned_by_email": null,
+                "assigned_to_name": null,
+                "assigned_to_email": null,
+                "office": null,
+                "section": null,
+                "due_date": null,
+                "date_of_completion": null,
+                "high_priority": null,
+                "description": null,
+                "actions_taken": null,
+                "country_name": "bolivia",
+                "area_code": "",
+                "location_name": null,
+                "location_pcode": null,
+                "location_level": null,
+                "location_levelname": null,
+                "partner_name": null,
+                "vendor_number": null,
+                "cp_output": null,
+                "cp_output_id": null,
+                "pd_ssfa_title": null,
+                "pd_ssfa_reference_number": null,
+                "category_module": null,
+                "module_reference_number": null,
+                "module_task_activity_reference_number": null,
+                "fam_category": null,
+                "related_module": null,
+                "related_module_class": null,
+                "related_module_url": null,
+                "action_point_url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=bolivia"
+            },
+            {
+                "reference_number": null,
+                "created": null,
+                "status": null,
+                "assigned_by_name": null,
+                "assigned_by_email": null,
+                "assigned_to_name": null,
+                "assigned_to_email": null,
+                "office": null,
+                "section": null,
+                "due_date": null,
+                "date_of_completion": null,
+                "high_priority": null,
+                "description": null,
+                "actions_taken": null,
+                "country_name": "chad",
+                "area_code": "",
+                "location_name": null,
+                "location_pcode": null,
+                "location_level": null,
+                "location_levelname": null,
+                "partner_name": null,
+                "vendor_number": null,
+                "cp_output": null,
+                "cp_output_id": null,
+                "pd_ssfa_title": null,
+                "pd_ssfa_reference_number": null,
+                "category_module": null,
+                "module_reference_number": null,
+                "module_task_activity_reference_number": null,
+                "fam_category": null,
+                "related_module": null,
+                "related_module_class": null,
+                "related_module_url": null,
+                "action_point_url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=chad"
+            },
+            {
+                "reference_number": null,
+                "created": null,
+                "status": null,
+                "assigned_by_name": null,
+                "assigned_by_email": null,
+                "assigned_to_name": null,
+                "assigned_to_email": null,
+                "office": null,
+                "section": null,
+                "due_date": null,
+                "date_of_completion": null,
+                "high_priority": null,
+                "description": null,
+                "actions_taken": null,
+                "country_name": "lebanon",
+                "area_code": "",
+                "location_name": null,
+                "location_pcode": null,
+                "location_level": null,
+                "location_levelname": null,
+                "partner_name": null,
+                "vendor_number": null,
+                "cp_output": null,
+                "cp_output_id": null,
+                "pd_ssfa_title": null,
+                "pd_ssfa_reference_number": null,
+                "category_module": null,
+                "module_reference_number": null,
+                "module_task_activity_reference_number": null,
+                "fam_category": null,
+                "related_module": null,
+                "related_module_class": null,
+                "related_module_url": null,
+                "action_point_url": "https://etools.unicef.org/apd/action-points/detail/None/?schema=lebanon"
+            }
+        ]
+    },
+    "content_type": null
+}
