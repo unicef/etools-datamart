@@ -23,6 +23,8 @@ class XLSXRenderer(ContentDispositionMixin, _XLSXRenderer):
                 for item in v:
                     if isinstance(item, dict):
                         vv.append("\n".join([f"{ki}: {vi}" for ki, vi in item.items() if vi]))
+                    elif isinstance(item, list):
+                        vv.append(': '.join(item))
                     else:
                         vv.append(item)
                 items.append((new_key, list_sep.join(vv)))
