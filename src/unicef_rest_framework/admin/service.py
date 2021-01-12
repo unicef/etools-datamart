@@ -7,7 +7,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import ExtraUrlMixin
 from adminactions.mass_update import mass_update
 from constance import config
 from strategy_field.utils import fqn
@@ -120,7 +121,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     visible.boolean = True
 
-    @link()
+    @action()
     def refresh(self, request):
         msgs = {False: 'No new services found',
                 True: 'Found {} new services. Removed {}'}
@@ -129,7 +130,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
         return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % info))
 
-    @link(label='Invalidate Cache')
+    @action(label='Invalidate Cache')
     def invalidate_all_cache(self, request):
         Service.objects.invalidate_cache()
 

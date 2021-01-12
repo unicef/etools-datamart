@@ -4,7 +4,7 @@ import uuid
 from django import forms
 from django.contrib import admin
 
-from admin_extra_urls.extras import ExtraUrlMixin
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 from unicef_rest_framework.models import Application
 

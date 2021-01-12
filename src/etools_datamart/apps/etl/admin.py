@@ -14,12 +14,12 @@ from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
-from admin_extra_urls.mixins import _confirm_action
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import _confirm_action, ExtraUrlMixin
 from adminactions.mass_update import mass_update
 from django_celery_beat.models import PeriodicTask
 from pygments import highlight
-from pygments.formatters import HtmlFormatter
+from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
 
 from unicef_rest_framework.models import Service
@@ -38,7 +38,7 @@ cache = caches['default']
 def queue(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
-        modeladmin.queue(request, obj.pk, message=False)
+        modeladmin.queue(request, pk=obj.pk, message=False)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
                             messages.SUCCESS)
@@ -274,7 +274,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #         return HttpResponseRedirect(redirect_url)
     #     return self._changeform_view(request, object_id, form_url, extra_context)
 
-    @link()
+    @action()
     def check_running(self, request, message=True):
         # {'celery@gundam.local': [{'id': '7a570647-89cd-4c47-84e4-c8569ef48f28',
         #                           'name': 'load_data_hact',
@@ -333,7 +333,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 """,
                                "Successfully executed", )
 
-    @link()
+    @action()
     def inspect(self, request):
         created, updated = self.model.objects.inspect()
         self.message_user(request, f"{created} task created. {updated} have been updated",
@@ -381,7 +381,7 @@ class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     time.admin_order_field = 'elapsed'
 
-    @link()
+    @action()
     def delta(self, request):
         qs = self.get_queryset(request).order_by('-timestamp')
         for e in qs.filter(delta__isnull=True):
