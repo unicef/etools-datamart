@@ -70,7 +70,7 @@ def test_api(django_app, admin_user, modeladmin):
     opts = modeladmin.model._meta
     url = reverse(f"admin:{opts.app_label}_{opts.model_name}_changelist")
     res = django_app.get(url, user=admin_user)
-    res = res.click("Api").follow()
+    res = res.click("Api").maybe_follow()
     assert res.status_code == 200
 
 
@@ -89,7 +89,7 @@ def test_invalidate_cache(django_app, admin_user, modeladmin):
     opts = modeladmin.model._meta
     url = reverse(f"admin:{opts.app_label}_{opts.model_name}_changelist")
     res = django_app.get(url, user=admin_user)
-    res = res.click("Invalidate Cache").follow()
+    res = res.click("Invalidate Cache").maybe_follow()
     assert res.status_code == 200
 
 

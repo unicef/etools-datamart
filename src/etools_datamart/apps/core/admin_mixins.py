@@ -1,6 +1,6 @@
 from django.db import models
 
-from admin_extra_urls.extras import ExtraUrlMixin
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 
 class ReadOnlyMixin:

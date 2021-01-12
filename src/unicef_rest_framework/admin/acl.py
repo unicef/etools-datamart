@@ -8,7 +8,8 @@ from django.contrib.auth.models import Group
 from django.contrib.postgres.forms import SimpleArrayField
 from django.template.response import TemplateResponse
 
-from admin_extra_urls.extras import ExtraUrlMixin, link
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import ExtraUrlMixin
 from adminactions.mass_update import mass_update, MassUpdateForm
 
 from unicef_rest_framework.models import Service, UserAccessControl
@@ -87,7 +88,7 @@ class GroupAccessControlAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-    @link()
+    @action()
     def add_acl(self, request):
         opts = self.model._meta
         ctx = {

@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin, register
 
-from admin_extra_urls.extras import ExtraUrlMixin
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 from etools_datamart.apps.core.admin_mixins import ReadOnlyMixin
 from etools_datamart.apps.mart.data.admin import DataModelAdmin

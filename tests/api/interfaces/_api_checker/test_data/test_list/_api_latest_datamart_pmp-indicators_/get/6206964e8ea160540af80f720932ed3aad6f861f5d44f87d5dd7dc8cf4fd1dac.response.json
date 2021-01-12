@@ -1,0 +1,102 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"303d3c88dd2b1fdb8e7f84e47a2a6626\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "303d3c88dd2b1fdb8e7f84e47a2a6626"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "483"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 2504,
+                "country_name": "bolivia",
+                "partner_name": null,
+                "partner_type": null,
+                "total_budget": null,
+                "unicef_budget": null,
+                "currency": null
+            },
+            {
+                "id": 2505,
+                "country_name": "chad",
+                "partner_name": null,
+                "partner_type": null,
+                "total_budget": null,
+                "unicef_budget": null,
+                "currency": null
+            },
+            {
+                "id": 2506,
+                "country_name": "lebanon",
+                "partner_name": null,
+                "partner_type": null,
+                "total_budget": null,
+                "unicef_budget": null,
+                "currency": null
+            }
+        ]
+    },
+    "content_type": null
+}

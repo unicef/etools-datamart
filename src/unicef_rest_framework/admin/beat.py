@@ -10,7 +10,8 @@ from django.utils.html import format_html
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import ExtraUrlMixin
 from adminactions.mass_update import mass_update, MassUpdateForm
 from django_celery_beat import admin
 from django_celery_beat.admin import PeriodicTaskForm
@@ -97,7 +98,7 @@ class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
 
         self.message_user(request, _('task successfully queued'))
 
-    @link()
+    @action()
     def preload(self, request):
         opts = self.model._meta
         app_label = opts.app_label

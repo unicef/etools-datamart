@@ -1,0 +1,99 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"c74223ad125d80341ca3ef88b58f5d4f\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "c74223ad125d80341ca3ef88b58f5d4f"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "552"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "country_name": "bolivia",
+                "month": "2019-09-01",
+                "spotcheck_ip_contacted": 0,
+                "spotcheck_report_submitted": 0,
+                "spotcheck_final_report": 0,
+                "spotcheck_cancelled": 0
+            },
+            {
+                "country_name": "chad",
+                "month": "2019-09-01",
+                "spotcheck_ip_contacted": 0,
+                "spotcheck_report_submitted": 0,
+                "spotcheck_final_report": 0,
+                "spotcheck_cancelled": 0
+            },
+            {
+                "country_name": "lebanon",
+                "month": "2019-09-01",
+                "spotcheck_ip_contacted": 0,
+                "spotcheck_report_submitted": 0,
+                "spotcheck_final_report": 0,
+                "spotcheck_cancelled": 0
+            }
+        ]
+    },
+    "content_type": null
+}
