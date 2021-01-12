@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.admin.sites import site
 from django.db import connections
 from django.urls import reverse

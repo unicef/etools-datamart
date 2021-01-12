@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from etools_datamart.apps.etl.tasks import healthcheck
 
 
