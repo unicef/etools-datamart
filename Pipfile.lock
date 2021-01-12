@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0b4cfaeb92d0a82b9a2be30ca1e3ac18fbc31a6eed22c96861da8f1b70a0642d"
+            "sha256": "296e1cf67855fb489b344bf7280f857b9ebd08f10780177c80aeddf0adc478d6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,14 +16,6 @@
         ]
     },
     "default": {
-        "admin-extra-urls": {
-            "hashes": [
-                "sha256:5b886ed045559f308d50f53f04b16a44fb2b1894e395dba6fb055306726a748f",
-                "sha256:75441038a916f0a5eb10d2c2a60c45aa2047b0e475d82a016408bad755bd9c78"
-            ],
-            "index": "pypi",
-            "version": "==2.2.0"
-        },
         "amqp": {
             "hashes": [
                 "sha256:70cdb10628468ff14e57ec2f751c7aa9e48e7e3651cfd62d431213c0c4e58f21",
@@ -199,6 +191,13 @@
             ],
             "index": "pypi",
             "version": "==2.2.17"
+        },
+        "django-admin-extra-urls": {
+            "hashes": [
+                "sha256:74e0816132edb770a0d15bef84315dcf5ca8b0ee5ebcb6ce307827a582a5369b"
+            ],
+            "index": "pypi",
+            "version": "==3.1"
         },
         "django-adminactions": {
             "hashes": [

@@ -11,7 +11,8 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 from unicef_security.graph import default_group, Synchronizer, SyncResult
 from unicef_security.models import BusinessArea, Region, User
@@ -28,7 +29,7 @@ def admin_reverse(model, page="changelist"):
 class RegionAdmin(ExtraUrlMixin, ModelAdmin):
     list_display = ['code', 'name']
 
-    @link()
+    @action()
     def sync(self, request):
         load_region()
 
@@ -39,7 +40,7 @@ class BusinessAreaAdmin(ExtraUrlMixin, ModelAdmin):
     list_filter = ['region', 'country']
     search_fields = ('name',)
 
-    @link()
+    @action()
     def sync(self, request):
         try:
             load_business_area()
@@ -133,7 +134,7 @@ class UserAdmin2(ExtraUrlMixin, UserAdmin):
         except Exception as e:
             self.message_user(request, str(e), messages.ERROR)
 
-    @link()
+    @action()
     def load(self, request):
         opts = self.model._meta
         ctx = {
@@ -183,7 +184,7 @@ class RoleForm(forms.Form):
 #     def has_add_permission(self, request):
 #         return False
 #
-#     @link()
+#     @action()
 #     def add_grants(self, request):
 #         opts = self.model._meta
 #         ctx = {
