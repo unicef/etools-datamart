@@ -16,7 +16,9 @@ from strategy_field.utils import fqn
 
 from unicef_rest_framework import acl
 from unicef_rest_framework.config import conf
-from unicef_security.graph import default_group, Synchronizer
+from unicef_security.graph import default_group
+
+from etools_datamart.apps.core.graph import DatamartSynchronizer
 
 logger = logging.getLogger()
 
@@ -97,12 +99,12 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
         except User.DoesNotExist:
             if config.AZURE_USE_GRAPH:
                 try:
-                    s = Synchronizer()
+                    s = DatamartSynchronizer()
                     user_info = s.get_user(username)
                     pk, values = s.get_record(user_info)
                     user, created = User.objects.update_or_create(**pk,
                                                                   defaults=values)
-                except Exception as e:
+                except Exception:
                     raise exceptions.AuthenticationFailed("Unable to retrieve user data")
             else:
                 user, created = User.objects.update_or_create(username=username,
