@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import time
 from io import StringIO
 from unittest import mock

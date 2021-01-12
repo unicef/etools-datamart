@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from etools_datamart.apps.multitenant.sql import Parser

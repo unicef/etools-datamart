@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
-
 class ArgsDecorator:
     """
         base class to create py.test markers on the fly using multiple arguments as Mark `names`

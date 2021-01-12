@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import collections
 from contextlib import contextmanager
 from functools import partial

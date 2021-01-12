@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 from time import sleep
 from unittest.mock import Mock

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from unittest.mock import Mock
 
 from etools_datamart.apps.tracking import utils
