@@ -3,7 +3,7 @@ from django.urls import reverse
 
 import pytest
 
-from etools_datamart.apps.multitenant.exceptions import InvalidSchema
+from etools_datamart.api.exceptions import InvalidSchema
 
 conn = connections['etools']
 

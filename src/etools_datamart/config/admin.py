@@ -16,8 +16,7 @@ from etools_datamart.libs.version import get_full_version
 cache = caches['default']
 
 DEFAULT_INDEX_SECTIONS = {
-    'Administration': ['unicef_rest_framework', 'constance',
-                       'dbtemplates', 'subscriptions', 'etl'],
+    'Administration': ['unicef_rest_framework', 'constance', 'subscriptions', 'etl'],
     'Data': ['data', 'prp', 'rapidpro'],
 
     'Source/eTools': ['etools'],

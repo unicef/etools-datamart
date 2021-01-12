@@ -23,7 +23,7 @@ from unicef_rest_framework.views import URFReadOnlyModelViewSet
 
 from etools_datamart.api.filtering import CountryFilter, DatamartQueryStringFilterBackend, TenantCountryFilter
 from etools_datamart.apps.etl.models import EtlTask
-from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
+from etools_datamart.api.exceptions import InvalidSchema, NotAuthorizedSchema
 from etools_datamart.apps.security.cache import SchemaAccessKeyBit
 from etools_datamart.libs.mystica import MysticaBasicAuthentication
 

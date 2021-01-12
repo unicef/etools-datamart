@@ -4,7 +4,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.db import ProgrammingError
-from django.db.backends.postgresql_psycopg2 import creation as original_creation
+from django.db.backends.postgresql import creation as original_creation
 
 from etools_datamart.apps.multitenant.postgresql.utils import raw_sql
 

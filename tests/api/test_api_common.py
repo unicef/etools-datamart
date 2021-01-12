@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 
 from etools_datamart.api.endpoints.common import APIReadOnlyModelViewSet
 from etools_datamart.api.urls import router
-from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
+from etools_datamart.api.exceptions import InvalidSchema, NotAuthorizedSchema
 
 
 def pytest_generate_tests(metafunc):
