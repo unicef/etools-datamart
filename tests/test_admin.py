@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.core.cache import caches
 from django.db import connections
 from django.urls import reverse

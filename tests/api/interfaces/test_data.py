@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 
 from drf_api_checker.pytest import contract, frozenfixture

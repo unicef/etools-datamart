@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from io import StringIO
 from unittest import mock
