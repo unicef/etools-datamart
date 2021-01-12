@@ -11,7 +11,8 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from admin_extra_urls.extras import action, ExtraUrlMixin, link
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 from unicef_rest_framework.cache import humanize_ttl, parse_ttl
 from unicef_rest_framework.forms import CacheVersionForm
@@ -58,7 +59,7 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
         url = reverse("admin:unicef_rest_framework_service_change", args=[pk])
         return HttpResponseRedirect(url)
 
-    @link(label='Reset cache', css_class="btn btn-danger", icon="fa fa-warning icon-white")
+    @action(label='Reset cache', css_class="btn btn-danger", icon="fa fa-warning icon-white")
     def reset_cache(self, request):
         opts = self.model._meta
         context = dict(

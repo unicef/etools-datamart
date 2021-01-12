@@ -7,7 +7,7 @@ from django.db import connections
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from admin_extra_urls.extras import ExtraUrlMixin
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 from etools_datamart.apps.core.admin_mixins import DisplayAllMixin, ReadOnlyMixin
 

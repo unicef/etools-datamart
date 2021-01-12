@@ -7,7 +7,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 import requests
-from admin_extra_urls.extras import action, ExtraUrlMixin
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 from ..models.filter import SystemFilter, SystemFilterFieldRule
 

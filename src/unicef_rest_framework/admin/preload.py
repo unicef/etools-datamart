@@ -2,7 +2,8 @@ from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.extras import action, ExtraUrlMixin
+from admin_extra_urls.decorators import action
+from admin_extra_urls.mixins import ExtraUrlMixin
 
 from unicef_rest_framework.utils import humanize_size
 
