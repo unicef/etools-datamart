@@ -174,7 +174,7 @@ class FMQuestion(EtoolsDataMartModel):
             entity_type="i",
             entity_instance="i",
             question_collection_methods="-",
-            collection_method="started_checklist.method",
+            collection_method="started_checklist.method.name",
             answer="value",
             summary_answer="activity_question.overall_finding.value",
             monitoring_activity_id="activity_question.monitoring_activity.pk",
