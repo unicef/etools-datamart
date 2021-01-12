@@ -18,8 +18,8 @@ x-datamart-defaults: &datamart_defaults
       CACHE_URL_LOCK: "redis://redis:6379/1"
       CACHE_URL_API: "redis://redis:6379/1"
       CACHE_URL_TEMPLATE: "redis://redis:6379/1"
-      CELERY_BROKER_URL: "redis://redis:6379/1"
-      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/2"
       CSRF_COOKIE_SECURE: 0
       SECURE_BROWSER_XSS_FILTER: 0
       SECURE_CONTENT_TYPE_NOSNIFF: 0
@@ -55,12 +55,12 @@ services:
       - traefik.enable=true
 
   beat:
-    container_name: beat
+    container_name: datamart_beat
     << : *datamart_defaults
     command: celery -A etools_datamart beat --loglevel=info --workdir=/code/src
 
   worker:
-    container_name: worker
+    container_name: datamart_worker
     << : *datamart_defaults
     command: celery -A etools_datamart worker --loglevel=info --workdir=/code/src
 
