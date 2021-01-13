@@ -16,7 +16,6 @@ from humanize import naturaldelta
 from unicef_rest_framework.models import Service
 
 from etools_datamart.apps.core.admin_mixins import DisplayAllMixin
-from etools_datamart.apps.multitenant.admin import SchemaFilter
 from etools_datamart.config import settings
 from etools_datamart.libs.truncate import TruncateTableMixin
 from etools_datamart.sentry import process_exception
@@ -175,14 +174,14 @@ class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
 @register(models.FAMIndicator)
 class FAMIndicatorAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month',)
-    list_filter = (SchemaFilter, 'month',)
+    list_filter = ('month',)
     date_hierarchy = 'month'
 
 
 @register(models.UserStats)
 class UserStatsAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month', 'total', 'unicef', 'logins', 'unicef_logins')
-    list_filter = (SchemaFilter, 'month',)
+    list_filter = ('month',)
     date_hierarchy = 'month'
 
 
@@ -193,7 +192,7 @@ class HACTAdmin(DataModelAdmin):
                     'programmaticvisits_total',
                     'followup_spotcheck', 'completed_spotcheck',
                     'completed_hact_audits', 'completed_special_audits')
-    list_filter = (SchemaFilter, 'year', 'last_modify_date')
+    list_filter = ('year', 'last_modify_date')
 
 
 @register(models.GatewayType)
