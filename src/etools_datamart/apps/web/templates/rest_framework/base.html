@@ -230,7 +230,7 @@
                                style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
                                class="btn btn-primary">Data</a>
                         {% endif %}
-                        {% if export_button %}
+                        {% if export_button and request.user.is_staff %}
                             <a href="{% url 'urf:export-create' %}?url={{ request.get_full_path|urlencode:"" }}"
                                style="float: right; color:black; background-color: #ffd600; margin-bottom:10px; margin-right: 0;margin-top:5px; margin-left: 10px;"
                                class="btn btn-primary">Request Export</a>
