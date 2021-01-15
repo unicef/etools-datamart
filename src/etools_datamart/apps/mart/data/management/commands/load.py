@@ -160,6 +160,7 @@ class Command(BaseCommand):
         if countries:
             connection = connections['etools']
             schemas = [c for c in connection.get_tenants() if c.schema_name in countries.split(',')]
+            # schemas = [c for c in connection.get_tenants() if c.schema_name in ['bangladesh', 'uganda']]
         else:
             schemas = None
         if not model_names:
