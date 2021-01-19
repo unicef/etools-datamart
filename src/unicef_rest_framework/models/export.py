@@ -52,10 +52,8 @@ class Export(AbstractPreload):
             return self.format.split('/')[1]
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        from ..tasks import export
         self.filename = Path(self.filename).with_suffix('.%s' % self.stem)
         super().save(force_insert, force_update, using, update_fields)
-        export.apply_async(args=[self.pk])
 
     def check_access(self, user):
         params = dict(self.params)
@@ -79,7 +77,7 @@ class Export(AbstractPreload):
                       HTTP_PAGINATION_KEY=settings.API_PAGINATION_OVERRIDE_KEY,
                       **kwargs)
 
-    def run(self, target=None, params=None, pre_save=None):
+    def run(self, *, target=None, params=None, pre_save=None):
         def save_file(me, response):
             if me.status_code == 200:
                 storage.save(self.file_id, BytesIO(response.content))
