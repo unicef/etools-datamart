@@ -73,7 +73,7 @@ class IPBasedAuthentication(BaseAuthentication):
 class JWTAuthentication(authentication.JSONWebTokenAuthentication):
     def authenticate(self, request):
 
-        jwt_value = self.get_jwt_value(request)
+        jwt_value = self.get_token_from_request(request)
 
         if jwt_value is None:  # pragma: no cover
             return None
