@@ -10,9 +10,7 @@ from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRis
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     AuditAudit,
-    AuditEngagement,
     AuditFinancialfinding,
-    AuditKeyinternalcontrol,
 )
 
 from .partner import Partner
@@ -123,7 +121,7 @@ class Audit(EtoolsDataMartModel):
     class Options:
         source = AuditAudit
         sync_deleted_records = lambda a: False
-        depends = (Partner,)
+        depends = (Partner, )
         mapping = dict(
             auditor="agreement.auditor_firm.name",
             agreement="agreement.order_number",  # PurchaseOrder

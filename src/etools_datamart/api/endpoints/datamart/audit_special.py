@@ -1,12 +1,12 @@
 from django import forms
 
+from constance import config
 from rest_framework import serializers
 
-from unicef_rest_framework.forms import DateRangePickerField, Select2MultipleChoiceField
+from unicef_rest_framework.forms import DateRangePickerField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.mart.data import models
-from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 
 from ..common import DataMartViewSet
 
