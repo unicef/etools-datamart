@@ -10,9 +10,7 @@ from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRis
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     AuditAudit,
-    AuditEngagement,
     AuditFinancialfinding,
-    AuditKeyinternalcontrol,
 )
 
 from .partner import Partner
@@ -26,16 +24,18 @@ class AuditLoader(EngagementRiskMixin, EtoolsLoader):
             record.engagement_ptr._impl = record
             filters = self.config.key(self, record.engagement_ptr)
             values = self.get_values(record.engagement_ptr)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
 
     def get_financial_findings_count(self, record, values, field_name):
         return AuditFinancialfinding.objects.filter(audit=record._impl).count()
 
     def get_financial_findings_titles(self, record, values, field_name):
-        return AuditFinancialfinding.objects.filter(
+        return list(AuditFinancialfinding.objects.filter(
             audit=record._impl,
         ).values("title").annotate(
             count=Count("title"),
-        ).order_by("title")
+        ).order_by("title"))
 
     def get_key_internal_control_count(self, record, values, field_name):
         return AuditFinancialfinding.objects.filter(audit=record._impl).count()
@@ -121,9 +121,10 @@ class Audit(EtoolsDataMartModel):
     class Options:
         source = AuditAudit
         sync_deleted_records = lambda a: False
-        depends = (Partner,)
+        depends = (Partner, )
         mapping = dict(
             auditor="agreement.auditor_firm.name",
+            agreement="agreement.order_number",  # PurchaseOrder
             partner="-",
             financial_findings_count="-",
             financial_findings_titles="-",

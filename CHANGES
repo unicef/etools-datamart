@@ -1,19 +1,32 @@
+3.1
+----
+* fix jwt integration
+* added fam exports
+
+3.0
+----
+* fix ETL
+* disable notifications
+* update requirements celery 5, drf 3.12
+* extract unicef-security
+
+
 2.14
 ----
-* Add geonameid to locations endpoint
-* Add pd_url to pd indicator endpoint
-* Set budget values in process_country and not through mapping
-* Fix InterventionBudget loader queryset
+* add geonameid to locations endpoint
+* add pd_url to pd indicator endpoint
+* set budget values in process_country and not through mapping
+* fix InterventionBudget loader queryset
 
 2.13
 ----
-* Add new office endpoint
-* Update etools source to match latest etools
-* Add ordering to model Meta for pagination where needed
+* add new office endpoint
+* update etools source to match latest etools
+* add ordering to model Meta for pagination where needed
 
 2.12
 ----
-* Add disaggregation field to PRP data report
+* add disaggregation field to PRP data report
 
 2.11
 ----
