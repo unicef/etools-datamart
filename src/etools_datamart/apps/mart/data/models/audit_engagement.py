@@ -44,7 +44,7 @@ MODULEMAP = {'AuditSpotcheck': "fam",
              'T2FTravelactivity': "trips"}
 
 
-class EngagementRiskMixin:
+class EngagementMixin:
     OVERALL_RISK_MAP = {}
 
     def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
@@ -97,7 +97,7 @@ class EngagementRiskMixin:
         return value
 
 
-class EngagementlLoader(EngagementRiskMixin, EtoolsLoader):
+class EngagementlLoader(EngagementMixin, EtoolsLoader):
     def get_queryset(self):
         return AuditEngagement.objects.select_related(
             'partner',

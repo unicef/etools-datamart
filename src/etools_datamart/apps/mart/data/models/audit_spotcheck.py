@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
+from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.sources.etools.models import (
@@ -28,7 +28,7 @@ URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s", }
 MODULEMAP = {'AuditSpotcheck': "fam"}
 
 
-class SpotCheckLoader(EngagementRiskMixin, EtoolsLoader):
+class SpotCheckLoader(EngagementMixin, EtoolsLoader):
     def get_content_type(self, sub_type):
         return DjangoContentType.objects.get(app_label='audit', model='spotcheck')
 
@@ -260,7 +260,7 @@ class SpotCheck(EtoolsDataMartModel):
         )
 
 
-class SpotCheckFindingsLoader(EngagementRiskMixin, EtoolsLoader):
+class SpotCheckFindingsLoader(EngagementMixin, EtoolsLoader):
     def _get_priority_findings(self, record: AuditEngagement, priority: str):
         return AuditFinding.objects.filter(
             spot_check=record._impl,
