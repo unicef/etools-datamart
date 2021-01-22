@@ -338,8 +338,8 @@ INSTALLED_APPS = [
     'django_sysinfo',
     'post_office',
     'djcelery_email',
-
     'django_celery_beat',
+    'django_extensions',
 
 ]
 DATE_FORMAT = '%d %b %Y'
