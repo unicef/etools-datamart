@@ -20,12 +20,12 @@ class MicroAssessmentLoader(EngagementRiskMixin, EtoolsLoader):
         return value
 
     def get_test_subject_areas(self, record: AuditEngagement, values: dict, **kwargs):
-        return AuditRisk.objects.filter(
+        return list(AuditRisk.objects.filter(
             engagement=record,
             blueprint__category__parent__code="ma_subject_areas",
         ).values("blueprint__category__header").annotate(
             count=Count("blueprint__category__header"),
-        ).order_by("blueprint__category__header")
+        ).order_by("blueprint__category__header"))
 
     def process_country(self):
         for record in AuditMicroassessment.objects.select_related('engagement_ptr'):
@@ -34,6 +34,8 @@ class MicroAssessmentLoader(EngagementRiskMixin, EtoolsLoader):
             record.engagement_ptr._impl = record
             filters = self.config.key(self, record.engagement_ptr)
             values = self.get_values(record.engagement_ptr)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
 
 
 class MicroAssessment(EtoolsDataMartModel):
@@ -67,17 +69,9 @@ class MicroAssessment(EtoolsDataMartModel):
         null=True,
     )
     rating_extra = JSONField(blank=True, null=True, default=dict)
-    subject_area = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-    )
+    subject_area = models.TextField(blank=True, null=True)
     subject_area_extra = JSONField(blank=True, null=True, default=dict)
-    test_subject_areas = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-    )
+    test_subject_areas = models.TextField(blank=True, null=True)
 
     loader = MicroAssessmentLoader()
 
@@ -89,7 +83,7 @@ class MicroAssessment(EtoolsDataMartModel):
         sync_deleted_records = lambda a: False
         depends = (Partner,)
         mapping = dict(
-            agreement="agreement.order_number",
+            agreement="agreement.order_number",  # PurchaseOrder
             partner="-",
             rating="-",
             rating_extra="i",

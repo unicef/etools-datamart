@@ -11,7 +11,7 @@ def pytest_generate_tests(metafunc):
     if 'loader' in metafunc.fixturenames:
         m = []
         ids = []
-        for model_name in loadeables:
+        for model_name in sorted(loadeables):
             model = apps.get_model(model_name)
             # # if model_name in ['data.pdindicator', 'data.location', 'data.travelactivity',
             # #                   'data.actionpoint', 'data.tpmactivity', 'data.tpmvisit', ]:

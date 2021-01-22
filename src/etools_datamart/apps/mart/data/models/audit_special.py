@@ -1,6 +1,5 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
-from django.db.models import Count
 from django.utils.translation import gettext as _
 
 from model_utils import Choices
@@ -8,7 +7,7 @@ from model_utils import Choices
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import AuditEngagement, AuditFinancialfinding, AuditSpecialaudit
+from etools_datamart.apps.sources.etools.models import AuditSpecialaudit
 
 from .partner import Partner
 
@@ -21,6 +20,8 @@ class AuditSpecialLoader(EngagementRiskMixin, EtoolsLoader):
             record.engagement_ptr._impl = record
             filters = self.config.key(self, record.engagement_ptr)
             values = self.get_values(record.engagement_ptr)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
 
 
 class AuditSpecial(EtoolsDataMartModel):
@@ -75,5 +76,6 @@ class AuditSpecial(EtoolsDataMartModel):
         depends = (Partner,)
         mapping = dict(
             auditor="agreement.auditor_firm.name",
+            agreement="agreement.order_number",  # PurchaseOrder
             partner="-",
         )
