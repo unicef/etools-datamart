@@ -49,12 +49,8 @@ def test_loader_load(loader):
     # factory = factories_registry.get(source)
 
     ignored_models = [
-        'Audit',
-        'AuditResult',
-        'AuditSpecial',
         'FMOntrack',
         'FMQuestion',
-        'SpotCheckFindings',
     ]
 
     with freeze_time("2018-12-31", tz_offset=1):
