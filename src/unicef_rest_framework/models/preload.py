@@ -7,7 +7,6 @@ from django.db import models
 from django.utils import timezone
 
 from rest_framework.test import APIClient, ForceAuthClientHandler
-
 from unicef_security.models import User
 
 import etools_datamart
