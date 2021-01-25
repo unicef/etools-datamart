@@ -2,7 +2,6 @@ import json
 
 import pytest
 from test_utilities.factories import APIRequestLogFactory
-
 from unicef_security.models import User
 
 

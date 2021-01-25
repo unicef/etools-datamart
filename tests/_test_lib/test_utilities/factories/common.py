@@ -2,12 +2,12 @@ from django.contrib.auth.models import Group
 from django.utils import timezone
 
 import factory
+import unicef_security.models
 from factory import SubFactory
 from factory.base import FactoryMetaClass
 from post_office.models import EmailTemplate
 
 import unicef_rest_framework.models
-import unicef_security.models
 
 from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.apps.subscriptions.models import Subscription
