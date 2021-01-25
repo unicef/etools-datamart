@@ -1,5 +1,4 @@
 import pytest
-
 from unicef_security.models import User
 
 from etools_datamart.apps.etl.models import EtlTask

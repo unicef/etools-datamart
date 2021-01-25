@@ -2,9 +2,9 @@
 import pytest
 from rest_framework.test import APIClient
 from test_utilities.factories import UserFactory
+from unicef_security.models import User
 
 from unicef_rest_framework.test_utils import user_allow_country, user_allow_service
-from unicef_security.models import User
 
 from etools_datamart.api.endpoints import (
     FAMIndicatorViewSet,

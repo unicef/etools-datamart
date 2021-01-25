@@ -1,5 +1,6 @@
-import unicef_rest_framework
 import unicef_security
+
+import unicef_rest_framework
 
 from etools_datamart.apps.init.checks import check_imports
 
