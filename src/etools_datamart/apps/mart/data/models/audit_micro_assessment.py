@@ -6,14 +6,14 @@ from django.utils.translation import gettext as _
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
+from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import AuditEngagement, AuditMicroassessment, AuditRisk
 
 from .partner import Partner
 
 
-class MicroAssessmentLoader(EngagementRiskMixin, EtoolsLoader):
+class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
     def get_subject_area(self, record: AuditEngagement, values: dict, **kwargs):
         value, extra = self._get_risk(record, "ma_subject_areas")
         values["subject_area_extra"] = extra

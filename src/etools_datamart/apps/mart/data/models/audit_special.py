@@ -5,14 +5,14 @@ from django.utils.translation import gettext as _
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models.audit_engagement import EngagementRiskMixin
+from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import AuditSpecialaudit
 
 from .partner import Partner
 
 
-class AuditSpecialLoader(EngagementRiskMixin, EtoolsLoader):
+class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
     def process_country(self):
         for record in AuditSpecialaudit.objects.select_related('engagement_ptr'):
             record.id = record.engagement_ptr_id
