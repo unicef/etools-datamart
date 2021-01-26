@@ -57,6 +57,7 @@ class EngagementMixin:
                 'vendor_number': p.vendor_number,
                 'id': p.pk,
                 'source_id': p.source_id,
+                'type': p.cso_type
             }
         except Partner.DoesNotExist:
             return {
@@ -64,6 +65,7 @@ class EngagementMixin:
                 'vendor_number': 'N/A',
                 'id': 'N/A',
                 'source_id': 'N/A',
+                'type': 'N/A'
             }
 
     def _get_risk(self, record: AuditEngagement, **kwargs):
