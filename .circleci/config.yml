@@ -68,8 +68,8 @@ jobs:
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
-            pipenv install -d --system --ignore-pipfile
-            pytest tests/ --cov=etools_datamart --cov-config=tests/.coveragerc --cov-report=term --create-db
+            pip install tox
+            tox
       - save_cache:
           key: source-{{ .Branch }}--{{ checksum "Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
           paths:
