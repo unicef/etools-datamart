@@ -10,6 +10,7 @@ from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMix
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.sources.etools.models import (
+    ActionPointsActionpoint,
     AuditEngagement,
     AuditEngagementActivePd,
     AuditFinding,
@@ -261,32 +262,6 @@ class SpotCheck(EtoolsDataMartModel):
 
 
 class SpotCheckFindingsLoader(EngagementMixin, EtoolsLoader):
-    def _get_priority_findings(self, record: AuditEngagement, priority: str):
-        return AuditFinding.objects.filter(
-            spot_check=record._impl,
-            priority=priority,
-        ).values("category_of_observation").annotate(
-            count=Count("category_of_observation"),
-        ).order_by("category_of_observation")
-
-    def get_high_priority_findings(self, record: AuditSpotcheck, values: dict, **kwargs):
-        return self._get_priority_findings(record, "high")
-
-    def get_low_priority_findings(self, record: AuditSpotcheck, values: dict, **kwargs):
-        return self._get_priority_findings(record, "low")
-
-    def get_sections(self, record: AuditEngagement, values: dict, **kwargs):
-        data = []
-        for rec in record.AuditEngagementSections_engagement.all():
-            data.append(
-                dict(
-                    source_id=rec.section.pk,
-                    name=rec.section.name,
-                    description=rec.section.description,
-                ),
-            )
-        values['sections_data'] = data
-        return ", ".join([l['name'] for l in data])
 
     def process_country(self):
         for record in AuditSpotcheck.objects.select_related('engagement_ptr'):
@@ -295,6 +270,26 @@ class SpotCheckFindingsLoader(EngagementMixin, EtoolsLoader):
             record.engagement_ptr._impl = record
             filters = self.config.key(self, record.engagement_ptr)
             values = self.get_values(record.engagement_ptr)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
+
+    def _get_priority_findings(self, record: AuditEngagement, priority: str):
+        return list(AuditFinding.objects.filter(
+            spot_check=record._impl,
+            priority=priority,
+        ).order_by("category_of_observation").values("category_of_observation").annotate(
+            count=Count("category_of_observation"),
+        ))
+
+    def get_high_priority_findings(self, record: AuditSpotcheck, values: dict, **kwargs):
+        return self._get_priority_findings(record, "high")
+
+    def get_low_priority_findings(self, record: AuditSpotcheck, values: dict, **kwargs):
+        return self._get_priority_findings(record, "low")
+
+    def get_pending_unsupported_amount(self, record, values, field_name):
+        return record._impl.total_amount_of_ineligible_expenditure - record.additional_supporting_documentation_provided \
+            - record.justification_provided_and_accepted - record.write_off_required
 
 
 class SpotCheckFindings(EtoolsDataMartModel):
@@ -304,11 +299,7 @@ class SpotCheckFindings(EtoolsDataMartModel):
         (TYPE_SPOT_CHECK, _('Spot Check')),
     )
 
-    auditor = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-    )
+
     engagement_type = models.CharField(
         max_length=300,
         blank=True,
@@ -316,31 +307,34 @@ class SpotCheckFindings(EtoolsDataMartModel):
         choices=TYPES,
         db_index=True,
     )
-    date_of_final_report = models.DateField(null=True, blank=True)
-    high_priorty_findings = JSONField(blank=True, null=True, default=dict)
-    low_priorty_findings = JSONField(blank=True, null=True, default=dict)
+    created = models.DateField(blank=True, null=True)
+
+    # Overview Section
+    auditor = models.CharField(max_length=255, blank=True, null=True)
     partner = JSONField(blank=True, null=True, default=dict)
+    date_of_final_report = models.DateField(null=True, blank=True)
+    total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
+    amount_refunded = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
+    write_off_required = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
+    pending_unsupported_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+
+    # Overview Card
+    spotcheck_total_amount_tested = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
+    spotcheck_total_amount_of_ineligible_expenditure = models.DecimalField(
+        null=True, blank=True, decimal_places=2, max_digits=20)
+    additional_supporting_documentation_provided = models.DecimalField(blank=True, null=True, decimal_places=2,
+                                                                       max_digits=20)
+    justification_provided_and_accepted = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
     sections = models.TextField(blank=True, null=True)
     sections_data = JSONField(blank=True, null=True, default=dict)
-    spotcheck_total_amount_tested = models.DecimalField(
-        blank=True,
-        null=True,
-        decimal_places=2,
-        max_digits=20,
-    )
-    spotcheck_total_amount_of_ineligible_expenditure = models.DecimalField(
-        null=True,
-        blank=True,
-        decimal_places=2,
-        max_digits=20,
-    )
-    total_value = models.DecimalField(
-        blank=True,
-        null=True,
-        default=0,
-        decimal_places=2,
-        max_digits=20,
-    )
+
+    # Report Section
+    high_priority_findings = JSONField(blank=True, null=True, default=dict)
+    low_priority_findings = JSONField(blank=True, null=True, default=dict)
+
+    # Action Points
+    action_points = JSONField(blank=True, null=True, default=dict)
+    action_points_data = JSONField(blank=True, null=True, default=dict)
 
     loader = SpotCheckFindingsLoader()
 
@@ -353,10 +347,13 @@ class SpotCheckFindings(EtoolsDataMartModel):
         depends = (Partner,)
         mapping = dict(
             auditor="agreement.auditor_firm.name",
-            partner="-",
-            high_priority_findings="-",
-            low_priority_findings="-",
-            sections="-",
             spotcheck_total_amount_tested="_impl.total_amount_tested",
             spotcheck_total_amount_of_ineligible_expenditure="_impl.total_amount_of_ineligible_expenditure",
+            partner="-",
+            sections="-",
+            pending_unsupported_amount='-',
+            high_priority_findings="-",
+            low_priority_findings="-",
+            action_points='-',
+            action_points_data='i',
         )

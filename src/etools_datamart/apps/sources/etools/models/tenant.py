@@ -278,6 +278,14 @@ class AuditMicroassessment(models.TenantModel):
 
 
 class AuditRisk(models.TenantModel):
+    VALUES = {
+        0: 'N/A',
+        1: 'Low',
+        2: 'Medium',
+        3: 'Significant',
+        4: 'High',
+    }
+
     value = models.SmallIntegerField(blank=True, null=True)
     extra = models.TextField(blank=True, null=True)  # This field type is a guess.
     blueprint = models.ForeignKey('AuditRiskblueprint', models.DO_NOTHING, related_name='AuditRisk_blueprint')
