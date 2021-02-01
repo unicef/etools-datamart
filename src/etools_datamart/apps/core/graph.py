@@ -3,7 +3,6 @@ import logging
 from django.core.cache import cache
 
 import requests
-
 from unicef_security import config
 from unicef_security.graph import AZURE_GRAPH_API_TOKEN_CACHE_KEY, Synchronizer
 

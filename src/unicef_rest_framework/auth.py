@@ -13,10 +13,10 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework_jwt import authentication
 from strategy_field.utils import fqn
+from unicef_security.graph import default_group
 
 from unicef_rest_framework import acl
 from unicef_rest_framework.config import conf
-from unicef_security.graph import default_group
 
 from etools_datamart.apps.core.graph import DatamartSynchronizer
 

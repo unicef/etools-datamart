@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
+from django.db.models import Count
 from django.utils.translation import gettext as _
 
 from model_utils import Choices
@@ -14,7 +15,6 @@ from etools_datamart.apps.sources.etools.models import (
     AuditEngagementActivePd,
     AuditMicroassessment,
     AuditRisk,
-    AuditRiskcategory,
     AuditSpecialaudit,
     AuditSpotcheck,
     DjangoContentType,
@@ -44,7 +44,7 @@ MODULEMAP = {'AuditSpotcheck': "fam",
              'T2FTravelactivity': "trips"}
 
 
-class EngagementRiskMixin:
+class EngagementMixin:
     OVERALL_RISK_MAP = {}
 
     def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
@@ -57,6 +57,7 @@ class EngagementRiskMixin:
                 'vendor_number': p.vendor_number,
                 'id': p.pk,
                 'source_id': p.source_id,
+                'type': p.cso_type
             }
         except Partner.DoesNotExist:
             return {
@@ -64,40 +65,73 @@ class EngagementRiskMixin:
                 'vendor_number': 'N/A',
                 'id': 'N/A',
                 'source_id': 'N/A',
+                'type': 'N/A'
             }
 
-    def _get_risk(self, record: AuditEngagement, code: str):
-        schema = self.context['country']
-        category_id = self.OVERALL_RISK_MAP.get(schema, None)
-        if category_id is None:
-            try:
-                category = AuditRiskcategory.objects.get(code=code)
-            except AuditRiskcategory.DoesNotExist:
-                pass
-            else:
-                self.OVERALL_RISK_MAP[schema] = category.pk
-                category_id = category.pk
-
+    def _get_risk(self, record: AuditEngagement, **kwargs):
         try:
             risk = AuditRisk.objects.get(
                 engagement=record,
-                blueprint__category__pk=category_id,
+                **kwargs
             )
-        except AuditRisk.DoesNotExist:
-            extra = ""
-            value = ""
-        else:
             extra = risk.extra
             value = risk.value
-        return value, extra
+            text = AuditRisk.VALUES[value]
+        except AuditRisk.DoesNotExist:
+            extra, value, text = "", "", ""
+        return value, extra, text
+
+    def _get_risks(self, record: AuditEngagement, **kwargs):
+        try:
+            risks = AuditRisk.objects.filter(
+                engagement=record,
+                **kwargs
+            )
+            value = ', '.join([risk.blueprint.header for risk in risks])
+            count = risks.count()
+        except AuditRisk.DoesNotExist:
+            value, count = "", -1
+        return value, count
 
     def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
-        value, extra = self._get_risk(record, code="ma_global_assessment")
+        filters = {'blueprint__category__code': "ma_global_assessment"}
+        value, extra, text = self._get_risk(record, **filters)
         values["rating_extra"] = extra
-        return value
+        return text
+
+    def get_sections(self, record: AuditEngagement, values: dict, **kwargs):
+        data = []
+        for rec in record.AuditEngagementSections_engagement.all():
+            data.append(
+                dict(
+                    source_id=rec.section.pk,
+                    name=rec.section.name,
+                    description=rec.section.description,
+                ),
+            )
+        values['sections_data'] = data
+        return ", ".join([loc['name'] for loc in data])
+
+    def get_offices(self, record: AuditEngagement, values: dict, **kwargs):
+        data = []
+        for rec in record.AuditEngagementOffices_engagement.all():
+            data.append(dict(source_id=rec.office.id,
+                             name=rec.office.name,
+                             ))
+        values['offices_data'] = data
+        return ", ".join([l['name'] for l in data])
+
+    def get_action_points(self, record, values, **kwargs):
+        aggr = "category__description"
+        st, pr = 'status', 'high_priority'
+        qs = ActionPointsActionpoint.objects.filter(engagement=record)
+        by_status = list(qs.order_by(st).values(st).annotate(count=Count(st)))
+        by_priority = list(qs.order_by(pr).values(pr).annotate(count=Count(pr)))
+        values['action_points_data'] = by_status + by_priority
+        return list(qs.order_by(aggr).values(aggr).annotate(count=Count(aggr)))
 
 
-class EngagementlLoader(EngagementRiskMixin, EtoolsLoader):
+class EngagementlLoader(EngagementMixin, EtoolsLoader):
     def get_queryset(self):
         return AuditEngagement.objects.select_related(
             'partner',

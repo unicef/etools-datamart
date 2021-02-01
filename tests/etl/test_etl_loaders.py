@@ -45,14 +45,24 @@ def truncate_model_table(model):
 
 @pytest.mark.django_db
 def test_loader_load(loader):
-    # source  = loader.model._etl_config.source
+    # source = loader.model._etl_config.source
     # factory = factories_registry.get(source)
+
+    ignored_models = [
+        'FMOntrack',
+        'FMQuestion',
+    ]
+
     with freeze_time("2018-12-31", tz_offset=1):
         truncate_model_table(loader.model)
         loader.unlock()
         ret = loader.load(max_records=2, ignore_dependencies=True, only_delta=False)
-    assert loader.model.objects.count() >= 0
-    assert ret.processed >= 0
-    # assert ret.deleted == 0
-    # assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
-    # assert not loader.model.objects.filter(id=to_delete.pk).exists()
+
+    if loader.model.objects.count() > 0 or loader.model.__name__ not in ignored_models:
+        assert loader.model.objects.count() >= 0
+        assert ret.processed >= 0
+        assert ret.deleted == 0
+        assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
+        assert ret.deleted == 0
+    else:
+        print('------------skipping {}'.format(loader.model.__name__))
