@@ -5,14 +5,14 @@ from django.utils.translation import gettext as _
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
+from etools_datamart.apps.mart.data.models.audit_engagement import AbstractEngagement, Engagement, EngagementLoaderMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import AuditDetailedfindinginfo, AuditEngagement, AuditMicroassessment
 
 from .partner import Partner
 
 
-class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
+class MicroAssessmentLoader(EngagementLoaderMixin, EtoolsLoader):
     def process_country(self):
         for record in AuditMicroassessment.objects.select_related('engagement_ptr'):
             record.id = record.engagement_ptr_id
@@ -69,24 +69,9 @@ class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
         return self.risk_rating_helper(record, "Procurement")
 
 
-class MicroAssessment(EtoolsDataMartModel):
-    TYPE_MICRO_ASSESSMENT = 'ma'
-
-    TYPES = Choices(
-        (TYPE_MICRO_ASSESSMENT, _('Micro Assessment')),
-    )
-
-    engagement_type = models.CharField(
-        max_length=300,
-        blank=True,
-        null=True,
-        choices=TYPES,
-        db_index=True,
-    )
-    created = models.DateField(blank=True, null=True)
+class MicroAssessment(AbstractEngagement, EtoolsDataMartModel):
 
     # Engagement Overview
-    partner = JSONField(blank=True, null=True, default=dict)
     agreement = models.CharField(max_length=300, blank=True, null=True)
     shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
         blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
@@ -118,10 +103,6 @@ class MicroAssessment(EtoolsDataMartModel):
     fixed_assets_and_inventory_risk_rating = models.CharField(max_length=16, blank=True, null=True)
     financial_reporting_and_monitoring_risk_rating = models.CharField(max_length=16, blank=True, null=True)
     procurement_and_contract_administration_risk_rating = models.CharField(max_length=16, blank=True, null=True)
-
-    # Action Points
-    action_points = JSONField(blank=True, null=True, default=dict)
-    action_points_data = JSONField(blank=True, null=True, default=dict)
 
     loader = MicroAssessmentLoader()
 

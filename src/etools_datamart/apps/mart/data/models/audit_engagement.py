@@ -44,7 +44,7 @@ MODULEMAP = {'AuditSpotcheck': "fam",
              'T2FTravelactivity': "trips"}
 
 
-class EngagementMixin:
+class EngagementLoaderMixin:
     OVERALL_RISK_MAP = {}
 
     def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
@@ -131,7 +131,7 @@ class EngagementMixin:
         return list(qs.order_by(aggr).values(aggr).annotate(count=Count(aggr)))
 
 
-class EngagementlLoader(EngagementMixin, EtoolsLoader):
+class EngagementlLoader(EngagementLoaderMixin, EtoolsLoader):
     def get_queryset(self):
         return AuditEngagement.objects.select_related(
             'partner',
@@ -263,7 +263,7 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
                 self.increment_counter(op)
 
 
-class Engagement(EtoolsDataMartModel):
+class AbstractEngagement(models.Model):
     TYPE_AUDIT = 'audit'
     TYPE_MICRO_ASSESSMENT = 'ma'
     TYPE_SPOT_CHECK = 'sc'
@@ -276,28 +276,18 @@ class Engagement(EtoolsDataMartModel):
         (TYPE_SPECIAL_AUDIT, _('Special Audit')),
     )
 
-    # DISPLAY_STATUSES = Choices(
-    #     ('partner_contacted', _('IP Contacted')),
-    #     ('field_visit', _('Field Visit')),
-    #     ('draft_issued_to_partner', _('Draft Report Issued to IP')),
-    #     ('comments_received_by_partner', _('Comments Received from IP')),
-    #     ('draft_issued_to_unicef', _('Draft Report Issued to UNICEF')),
-    #     ('comments_received_by_unicef', _('Comments Received from UNICEF')),
-    #     ('report_submitted', _('Report Submitted')),
-    #     ('final', _('Final Report')),
-    #     ('cancelled', _('Cancelled')),
-    # )
-    # DISPLAY_STATUSES_DATES = {
-    #     DISPLAY_STATUSES.partner_contacted: 'partner_contacted_at',
-    #     DISPLAY_STATUSES.field_visit: 'date_of_field_visit',
-    #     DISPLAY_STATUSES.draft_issued_to_partner: 'date_of_draft_report_to_ip',
-    #     DISPLAY_STATUSES.comments_received_by_partner: 'date_of_comments_by_ip',
-    #     DISPLAY_STATUSES.draft_issued_to_unicef: 'date_of_draft_report_to_unicef',
-    #     DISPLAY_STATUSES.comments_received_by_unicef: 'date_of_comments_by_unicef',
-    #     DISPLAY_STATUSES.report_submitted: 'date_of_report_submit',
-    #     DISPLAY_STATUSES.final: 'date_of_final_report',
-    #     DISPLAY_STATUSES.cancelled: 'date_of_cancel'
-    # }
+    engagement_type = models.CharField(max_length=300, blank=True, null=True, choices=TYPES, db_index=True)
+    created = models.DateTimeField(blank=True, null=True)
+    partner = JSONField(blank=True, null=True, default=dict)
+
+    # Action Points
+    action_points = JSONField(blank=True, null=True, default=dict)
+    action_points_data = JSONField(blank=True, null=True, default=dict)
+    class Meta:
+        abstract=True
+
+
+class Engagement(AbstractEngagement, EtoolsDataMartModel):
 
     # Base fields
     active_pd = models.TextField(blank=True, null=True)
@@ -310,7 +300,6 @@ class Engagement(EtoolsDataMartModel):
     authorized_officers = models.TextField(blank=True, null=True)
     authorized_officers_data = JSONField(blank=True, null=True)
     cancel_comment = models.TextField(blank=True, null=True)
-    created = models.DateField(blank=True, null=True)
     date_of_cancel = models.DateField(null=True, blank=True)
     date_of_comments_by_ip = models.DateField(blank=True, null=True)
     date_of_comments_by_unicef = models.DateField(blank=True, null=True)
@@ -321,18 +310,12 @@ class Engagement(EtoolsDataMartModel):
     date_of_report_submit = models.DateField(null=True, blank=True)
     end_date = models.DateField(blank=True, null=True, db_index=True)
     engagement_attachments = models.TextField(blank=True, null=True)
-    engagement_type = models.CharField(max_length=300, blank=True,
-                                       null=True, choices=TYPES, db_index=True)
     exchange_rate = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     explanation_for_additional_information = models.TextField(blank=True, null=True)
     joint_audit = models.BooleanField(default=False, blank=True, null=True)
     justification_provided_and_accepted = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
     modified = models.DateField(blank=True, null=True)
     partner_contacted_at = models.DateField(blank=True, null=True, db_index=True)
-    partner = JSONField(blank=True, null=True, default=dict)
-    # partner_name = models.CharField(max_length=300, blank=True, null=True)
-    # partner_id = models.IntegerField(blank=True, null=True)
-    # partner_source_id = models.IntegerField(blank=True, null=True)
     po_item = models.IntegerField(blank=True, null=True)
     report_attachments = models.TextField(blank=True, null=True)
     staff_members = models.TextField(blank=True, null=True)
@@ -389,9 +372,6 @@ class Engagement(EtoolsDataMartModel):
 
     # SpecialAudit
     # final_report = CodedGenericRelation(Attachment, code='special_audit_final_report')
-
-    # ActionPoints
-    action_points = JSONField(blank=True, null=True)
 
     # datamart
     loader = EngagementlLoader()

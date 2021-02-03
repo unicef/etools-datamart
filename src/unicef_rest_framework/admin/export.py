@@ -5,6 +5,7 @@ from django.utils.safestring import mark_safe
 
 from admin_extra_urls.decorators import action
 from admin_extra_urls.mixins import ExtraUrlMixin
+from adminfilters.filters import TextFieldFilter
 
 from unicef_rest_framework.utils import humanize_size
 
@@ -33,7 +34,10 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     'status_code', 'size', 'response_ms', 'api', 'download')
     date_hierarchy = 'last_run'
     search_fields = ('url',)
-    list_filter = (StatusFilter, 'enabled', SizeFilter, 'refresh')
+    list_filter = (
+        TextFieldFilter.factory('as_user__username__icontains', "User"),
+        StatusFilter, SizeFilter, 'enabled', 'refresh', 'format',
+    )
     actions = [queue, check]
 
     def format(self, obj):
