@@ -1,8 +1,9 @@
-from functools import lru_cache
+from functools import lru_cache, reduce
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -175,7 +176,19 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
 
 
 class ExportList(ListView):
+
     model = Export
+    filterable = ('name__icontains', 'filename__icontains', 'as_user__username__icontains')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        query = self.request.GET.get('search')
+        orderby = self.request.GET.get('orderby')
+        if query:
+            qs = qs.filter(reduce(lambda x, y: x | Q(**{y: query}), self.filterable, Q()))
+        if orderby:
+            qs.order_by(orderby)
+        return qs
 
 
 @method_decorator(basicauth, 'dispatch')
