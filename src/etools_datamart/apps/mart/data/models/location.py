@@ -17,8 +17,7 @@ class GatewayType(EtoolsDataMartModel):
     admin_level = models.SmallIntegerField(blank=True, null=True)
 
     class Meta:
-        unique_together = (('schema_name', 'source_id'),
-                           )
+        unique_together = (('schema_name', 'source_id'), )
 
     class Options:
         source = LocationsGatewaytype

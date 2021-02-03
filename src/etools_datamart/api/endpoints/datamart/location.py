@@ -1,7 +1,11 @@
+from django import forms
+
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeoModelSerializer
 
 from etools_datamart.api.endpoints import common
+from etools_datamart.api.endpoints.common import DataMartViewSet
+from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.mart.data import models
 
 
@@ -42,6 +46,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class LocationRamSerializer(serializers.ModelSerializer):
     geonameid = serializers.SerializerMethodField()
     admin_level = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Location
         fields = ('id', 'source_id', 'name', 'latitude', 'longitude', 'parent',
@@ -71,3 +76,20 @@ class LocationViewSet(common.DataMartViewSet):
                              'latlng': LocationSerializerPos,
                              'ram': LocationRamSerializer,
                              }
+
+
+class GatewayTypeSerializer(DataMartSerializer):
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.GatewayType
+        exclude = ('seen', 'source_id',)
+
+
+class GatewayTypeViewSet(DataMartViewSet):
+    querystringfilter_form_base_class = forms.Form
+
+    serializer_class = GatewayTypeSerializer
+    queryset = models.GatewayType.objects.all()
+
+    def get_querystringfilter_form(self, request, filter):
+        return forms.Form(request.GET, filter.form_prefix)
