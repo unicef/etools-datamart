@@ -33,6 +33,7 @@ app.conf.task_default_queue = 'default'
 app.conf.task_default_exchange_type = 'direct'
 app.conf.task_default_routing_key = 'default'
 app.conf.task_routes = {'send_queued_mail': {'queue': 'mail'}}
+app.conf.task_routes = {'djcelery_email_send_multiple': {'queue': 'mail'}}
 app.conf.task_routes = {'etools_datamart.apps.etl.subscriptions.tasks.*': {'queue': 'subscription'}}
 
 register('etljson', etl_dumps, etl_loads,
