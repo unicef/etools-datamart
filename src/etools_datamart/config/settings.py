@@ -456,6 +456,10 @@ CELERY_RESULT_SERIALIZER = 'etljson'
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
 CELERY_TASK_SERIALIZER = 'etljson'
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_EMAIL_TASK_CONFIG = {
+    'queue' : 'mail',
+}
+
 CELERY_EMAIL_BACKEND = env.str(
     'CELERY_EMAIL_BACKEND',
     default='post_office.backends.EmailBackend',
