@@ -31,12 +31,13 @@ def queue(modeladmin, request, queryset):
 class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('name', 'filename', 'as_user', 'format',
                     'enabled', 'refresh', 'last_run',
-                    'status_code', 'size', 'response_ms', 'api', 'download')
+                    'status_code', 'size', 'response_ms', 'api', 'download', 'queue_task')
     date_hierarchy = 'last_run'
     search_fields = ('url', 'name', 'filename')
     list_filter = (
         TextFieldFilter.factory('as_user__username__icontains', "User"),
-        StatusFilter, SizeFilter, 'enabled', 'refresh', 'format',
+        ('status_code', StatusFilter),
+        SizeFilter, 'enabled', 'refresh', 'format',
     )
     actions = [queue, check]
 
@@ -51,6 +52,11 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
             url = reverse('urf:export-fetch', args=[obj.pk])
             return mark_safe("<a href='{0}' title='{0}' target='_new'>download</a>".format(url))
         return '--'
+
+    def queue_task(self, obj):
+        opts = self.model._meta
+        url = reverse('admin:%s_%s_queue' % (opts.app_label, opts.model_name), args=[obj.id])
+        return mark_safe(f'<a href="{url}">queue</a>')
 
     def size(self, obj):
         if obj.response_length:
@@ -74,7 +80,10 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
     @action()
     def queue(self, request, pk):
         from unicef_rest_framework.tasks import export
+        obj = self.get_object(request, pk)
         export.apply_async(args=[pk])
+        self.message_user(request, f"Export generation '{obj.name}' queued", messages.SUCCESS)
+        return HttpResponseRedirect(reverse("admin:unicef_rest_framework_export_changelist"))
 
     @action()
     def run(self, request, pk):
