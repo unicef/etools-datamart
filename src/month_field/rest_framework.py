@@ -7,7 +7,8 @@ from django.utils.dates import MONTHS_3
 
 import coreapi
 import coreschema
-from coreapi.compat import force_str
+from django.utils.encoding import force_str
+
 from drf_querystringfilter.exceptions import InvalidQueryValueError
 from month_field.forms import MonthField
 from rest_framework.filters import BaseFilterBackend
