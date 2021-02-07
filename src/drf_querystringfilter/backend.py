@@ -7,7 +7,7 @@ from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models import BooleanField, FieldDoesNotExist
 from django.template import loader
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 import coreapi
 import coreschema
@@ -79,7 +79,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
                 required=False,
                 location='query',
                 schema=coreapi_type(
-                    title=force_text(field),
+                    title=force_str(field),
                     description=description
 
                 ),

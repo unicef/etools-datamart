@@ -2,7 +2,7 @@ import re
 import time
 
 from django.core.cache import caches
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from constance import config
 from humanize.i18n import ngettext
