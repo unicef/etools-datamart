@@ -13,7 +13,6 @@ def cache_random_prefix(*args, **kwargs):
 # CACHES['default']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
 CACHES['api']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
 # CACHES['lock']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
-CACHES['dbtemplates']['BACKEND'] = "django.core.cache.backends.dummy.DummyCache"  # noqa
 
 CACHES['locmem'] = {  # noqa
     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

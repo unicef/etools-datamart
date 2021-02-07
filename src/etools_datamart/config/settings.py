@@ -220,7 +220,6 @@ CACHES = {
     'default': env.cache(),
     'lock': env.cache('CACHE_URL_LOCK'),
     'api': env.cache('CACHE_URL_API'),
-    'dbtemplates': env.cache('CACHE_URL_TEMPLATE')
 }
 
 ROOT_URLCONF = 'etools_datamart.config.urls'
@@ -235,7 +234,6 @@ TEMPLATES = [
         'APP_DIRS': False,
         'OPTIONS': {
             'loaders': [
-                'dbtemplates.loader.Loader',
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
             ],
@@ -332,7 +330,6 @@ INSTALLED_APPS = [
     'month_field',
     'drf_querystringfilter',
     'crispy_forms',
-    'dbtemplates',
     'drf_yasg',
     'adminfilters',
     'django_sysinfo',
@@ -679,8 +676,7 @@ def extra(r):
 
 SYSINFO = {"extra": {'Azure': extra}}
 
-MIGRATION_MODULES = {'dbtemplates': 'etools_datamart.custom_migrations.dbtemplates',
-                     'explorer': 'etools_datamart.custom_migrations.explorer', }
+MIGRATION_MODULES = {'explorer': 'etools_datamart.custom_migrations.explorer', }
 
 IMPERSONATE = {
     'PAGINATE_COUNT': 50,
