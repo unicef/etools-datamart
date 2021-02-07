@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.backends import ModelBackend
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from constance import config
 from rest_framework import exceptions
