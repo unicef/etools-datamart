@@ -1,5 +1,5 @@
 import logging
-from collections import Iterable, MutableMapping
+from collections.abc import Iterable, MutableMapping
 
 from drf_renderer_xlsx.renderers import XLSXRenderer as _XLSXRenderer
 

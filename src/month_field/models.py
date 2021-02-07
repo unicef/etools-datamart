@@ -2,7 +2,7 @@ import datetime
 
 from django.core import exceptions
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from . import forms, Month, widgets
 
@@ -38,7 +38,7 @@ class MonthField(models.DateField):
             return month.first_day()
         return None
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return self.to_python(value)
 
     def clean(self, value, instance):

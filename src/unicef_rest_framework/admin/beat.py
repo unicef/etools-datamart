@@ -8,7 +8,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.http import urlquote
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from admin_extra_urls.decorators import action
 from admin_extra_urls.mixins import ExtraUrlMixin

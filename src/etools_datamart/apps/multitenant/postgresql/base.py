@@ -15,7 +15,6 @@ from django.utils.functional import cached_property
 import psycopg2
 
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema
-# from etools_datamart.state import state
 from etools_datamart.apps.sources.etools.models import UsersCountry
 
 from ..sql import Parser
@@ -33,33 +32,7 @@ dj_logger = logging.getLogger('django.db.backends')
 logger = logging.getLogger(__name__)
 
 
-# SINGLE_TENANT = 1
-# MULTI_TENANT = 2
-
-
-# def _is_valid_identifier(identifier):
-#     return bool(SQL_IDENTIFIER_RE.match(identifier))
-#
-#
-# def _check_identifier(identifier):
-#     if not _is_valid_identifier(identifier):
-#         raise ValidationError("Invalid string used for the identifier.")
-#
-#
-# def _is_valid_schema_name(name):
-#     return _is_valid_identifier(name) and not SQL_SCHEMA_NAME_RESERVED_RE.match(name)
-#
-#
-# def _check_schema_name(name):
-#     if not _is_valid_schema_name(name):
-#         raise ValidationError("Invalid string used for the schema name.")
-#
-
 class TenantCursor(CursorWrapper):
-
-    # def fetchall(self):
-    #     with self.db.wrap_database_errors:
-    #         return self.cursor.fetchall()
 
     def execute(self, sql, params=None):
         if isinstance(sql, RawSql):
@@ -313,13 +286,3 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
                 cursor_for_search_path.close()
 
         return cursor
-
-#
-# class FakeTenant:
-#     """
-#     We can't import any db model in a backend (apparently?), so this class is used
-#     for wrapping schema names in a tenant-like structure.
-#     """
-#
-#     def __init__(self, schema_name):
-#         self.schema_name = schema_name

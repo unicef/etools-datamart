@@ -30,9 +30,11 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
         1083: 'TimeField',
         1114: 'DateTimeField',
         1184: 'DateTimeField',
+        # 1186: 'DurationField',
         1266: 'TimeField',
         1700: 'DecimalField',
         2950: 'UUIDField',
+        3802: 'JSONField',
     }
 
     ignored_tables = []
@@ -164,14 +166,14 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef;
     """)
 
-    def get_field_type(self, data_type, description):
-        field_type = super().get_field_type(data_type, description)
-        if description.default and 'nextval' in description.default:
-            if field_type == 'IntegerField':
-                return 'AutoField'
-            elif field_type == 'BigIntegerField':
-                return 'BigAutoField'
-        return field_type
+    # def get_field_type(self, data_type, description):
+    #     field_type = super().get_field_type(data_type, description)
+    #     if description.default and 'nextval' in description.default:
+    #         if field_type == 'IntegerField':
+    #             return 'AutoField'
+    #         elif field_type == 'BigIntegerField':
+    #             return 'BigAutoField'
+    #     return field_type
 
     def get_table_list(self, cursor):
         """
