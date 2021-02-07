@@ -2,6 +2,9 @@
 ----
 * gateway-type endpoint
 * tweaked admin
+* migrate do Django 3.0
+* removed dbtemplates
+* added location gateway endpoint
 
 
 3.2
