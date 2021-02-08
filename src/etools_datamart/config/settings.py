@@ -332,7 +332,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'drf_yasg',
     'adminfilters',
-    'django_sysinfo',
     'post_office',
     'djcelery_email',
     'django_celery_beat',

@@ -68,6 +68,7 @@ jobs:
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
+            pip install pip==21.0.1
             pip install tox
             tox
       - save_cache:
