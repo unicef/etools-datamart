@@ -60,7 +60,8 @@ sentry-sdk = "*"
 swagger-spec-validator = "==2.7.3"
 unicef-security = "==0.6"
 xhtml2pdf = "==0.2.5"
-rust = "*"
+cryptography = "<3.4"  # PEP517 dependency
+
 
 [dev-packages]
 drf-api-checker = "*"
