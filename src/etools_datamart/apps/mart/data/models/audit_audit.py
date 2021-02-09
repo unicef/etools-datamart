@@ -7,14 +7,14 @@ from _decimal import DivisionByZero, InvalidOperation
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
+from etools_datamart.apps.mart.data.models.audit_engagement import AbstractEngagement, Engagement, EngagementLoaderMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import AuditAudit, AuditFinancialfinding, AuditKeyinternalcontrol
 
 from .partner import Partner
 
 
-class AuditLoader(EngagementMixin, EtoolsLoader):
+class AuditLoader(EngagementLoaderMixin, EtoolsLoader):
     def process_country(self):
         for record in AuditAudit.objects.select_related('engagement_ptr'):
             record.id = record.engagement_ptr_id
@@ -49,20 +49,10 @@ class AuditLoader(EngagementMixin, EtoolsLoader):
         return []
 
 
-class Audit(EtoolsDataMartModel):
-    created = models.DateField(blank=True, null=True)
-    TYPE_AUDIT = 'audit'
-
-    TYPES = Choices(
-        (TYPE_AUDIT, _('Audit')),
-    )
-
-    engagement_type = models.CharField(max_length=300, blank=True, null=True, choices=TYPES, db_index=True)
-
+class Audit(AbstractEngagement, EtoolsDataMartModel):
     # Engagement Overview Card
     agreement = models.CharField(max_length=300, blank=True, null=True)
     auditor = models.CharField(max_length=255, blank=True, null=True)
-    partner = JSONField(blank=True, null=True, default=dict)
     shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
                                 blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
     total_value = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
@@ -94,11 +84,6 @@ class Audit(EtoolsDataMartModel):
 
     key_internal_control_by_category = JSONField(blank=True, null=True, default=dict)
     key_internal_control_count = models.IntegerField(blank=True, null=True)
-
-
-    # Action Points
-    action_points = JSONField(blank=True, null=True, default=dict)
-    action_points_data = JSONField(blank=True, null=True, default=dict)
 
 
     loader = AuditLoader()

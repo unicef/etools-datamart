@@ -5,14 +5,14 @@ from django.utils.translation import gettext as _
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
+from etools_datamart.apps.mart.data.models.audit_engagement import AbstractEngagement, Engagement, EngagementLoaderMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import AuditSpecialaudit, AuditSpecialauditrecommendation
 
 from .partner import Partner
 
 
-class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
+class AuditSpecialLoader(EngagementLoaderMixin, EtoolsLoader):
     def process_country(self):
         for record in AuditSpecialaudit.objects.select_related('engagement_ptr'):
             record.id = record.engagement_ptr_id
@@ -28,22 +28,7 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
         return AuditSpecialauditrecommendation.objects.filter(audit=record._impl).count()
 
 
-class AuditSpecial(EtoolsDataMartModel):
-    TYPE_SPECIAL_AUDIT = 'sa'
-
-    TYPES = Choices(
-        (TYPE_SPECIAL_AUDIT, _('Special Audit')),
-    )
-
-    engagement_type = models.CharField(
-        max_length=300,
-        blank=True,
-        null=True,
-        choices=TYPES,
-        db_index=True,
-    )
-    created = models.DateField(blank=True, null=True)
-
+class AuditSpecial(AbstractEngagement, EtoolsDataMartModel):
     # Engagement Overview Section
     agreement = models.CharField(max_length=300, blank=True, null=True)
     auditor = models.CharField(
@@ -53,7 +38,6 @@ class AuditSpecial(EtoolsDataMartModel):
     )
 
     # Engagement Overview Section
-    partner = JSONField(blank=True, null=True, default=dict)
     date_of_final_report = models.DateField(null=True, blank=True)
     total_value = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
     joint_audit = models.BooleanField(null=True, blank=True)
@@ -70,10 +54,6 @@ class AuditSpecial(EtoolsDataMartModel):
     date_of_draft_report_to_ip = models.DateField(null=True, blank=True)
     date_of_comments_by_ip = models.DateField(null=True, blank=True)
     date_of_draft_report_to_unicef = models.DateField(null=True, blank=True)
-
-    # Action Points
-    action_points = JSONField(blank=True, null=True, default=dict)
-    action_points_data = JSONField(blank=True, null=True, default=dict)
 
     loader = AuditSpecialLoader()
 

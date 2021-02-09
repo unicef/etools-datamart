@@ -6,11 +6,10 @@ from django.utils.translation import gettext as _
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
+from etools_datamart.apps.mart.data.models.audit_engagement import AbstractEngagement, Engagement, EngagementLoaderMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.sources.etools.models import (
-    ActionPointsActionpoint,
     AuditEngagement,
     AuditEngagementActivePd,
     AuditFinding,
@@ -29,7 +28,7 @@ URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s", }
 MODULEMAP = {'AuditSpotcheck': "fam"}
 
 
-class SpotCheckLoader(EngagementMixin, EtoolsLoader):
+class SpotCheckLoader(EngagementLoaderMixin, EtoolsLoader):
     def get_content_type(self, sub_type):
         return DjangoContentType.objects.get(app_label='audit', model='spotcheck')
 
@@ -261,7 +260,7 @@ class SpotCheck(EtoolsDataMartModel):
         )
 
 
-class SpotCheckFindingsLoader(EngagementMixin, EtoolsLoader):
+class SpotCheckFindingsLoader(EngagementLoaderMixin, EtoolsLoader):
 
     def process_country(self):
         for record in AuditSpotcheck.objects.select_related('engagement_ptr'):
@@ -292,26 +291,9 @@ class SpotCheckFindingsLoader(EngagementMixin, EtoolsLoader):
             - record.justification_provided_and_accepted - record.write_off_required
 
 
-class SpotCheckFindings(EtoolsDataMartModel):
-    TYPE_SPOT_CHECK = 'sc'
-
-    TYPES = Choices(
-        (TYPE_SPOT_CHECK, _('Spot Check')),
-    )
-
-
-    engagement_type = models.CharField(
-        max_length=300,
-        blank=True,
-        null=True,
-        choices=TYPES,
-        db_index=True,
-    )
-    created = models.DateField(blank=True, null=True)
-
+class SpotCheckFindings(AbstractEngagement, EtoolsDataMartModel):
     # Overview Section
     auditor = models.CharField(max_length=255, blank=True, null=True)
-    partner = JSONField(blank=True, null=True, default=dict)
     date_of_final_report = models.DateField(null=True, blank=True)
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     amount_refunded = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
@@ -331,10 +313,6 @@ class SpotCheckFindings(EtoolsDataMartModel):
     # Report Section
     high_priority_findings = JSONField(blank=True, null=True, default=dict)
     low_priority_findings = JSONField(blank=True, null=True, default=dict)
-
-    # Action Points
-    action_points = JSONField(blank=True, null=True, default=dict)
-    action_points_data = JSONField(blank=True, null=True, default=dict)
 
     loader = SpotCheckFindingsLoader()
 
