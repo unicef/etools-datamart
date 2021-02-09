@@ -60,6 +60,7 @@ sentry-sdk = "*"
 swagger-spec-validator = "==2.7.3"
 unicef-security = "==0.6"
 xhtml2pdf = "==0.2.5"
+rust = "*"
 
 [dev-packages]
 drf-api-checker = "*"
