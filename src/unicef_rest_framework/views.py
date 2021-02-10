@@ -7,9 +7,10 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DetailView, UpdateView
 
 import rest_framework_extensions.utils
+from django_filters.views import FilterView
 from drf_querystringfilter.backend import QueryStringFilterBackend
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
@@ -29,7 +30,7 @@ from . import acl
 from .auth import AnonymousAuthentication, basicauth, IPBasedAuthentication, JWTAuthentication, URLTokenAuthentication
 from .cache import cache_response, etag, ListKeyConstructor
 from .ds import DynamicSerializerFilter, DynamicSerializerMixin
-from .filtering import SystemFilterBackend
+from .filtering import ExportFilter, SystemFilterBackend
 from .negotiation import CT
 from .ordering import OrderingFilter
 from .permissions import ServicePermission
@@ -175,20 +176,10 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
         return super().get_paginated_response(data)
 
 
-class ExportList(ListView):
+class ExportList(FilterView):
 
     model = Export
-    filterable = ('name__icontains', 'filename__icontains', 'as_user__username__icontains')
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        query = self.request.GET.get('search')
-        orderby = self.request.GET.get('orderby')
-        if query:
-            qs = qs.filter(reduce(lambda x, y: x | Q(**{y: query}), self.filterable, Q()))
-        if orderby:
-            qs = qs.order_by(orderby)
-        return qs
+    filterset_class = ExportFilter
 
 
 @method_decorator(basicauth, 'dispatch')
