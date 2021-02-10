@@ -7,6 +7,7 @@ from model_utils import Choices
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
+from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
 from etools_datamart.apps.sources.etools.models import AuditSpecialaudit, AuditSpecialauditrecommendation
 
 from .partner import Partner
@@ -42,6 +43,9 @@ class AuditSpecial(EtoolsDataMartModel):
         choices=TYPES,
         db_index=True,
     )
+    status = models.CharField(max_length=30, blank=True, null=True,
+                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
+                              db_index=True)
     created = models.DateField(blank=True, null=True)
 
     # Engagement Overview Section
