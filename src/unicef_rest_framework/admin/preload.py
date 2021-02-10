@@ -32,7 +32,7 @@ class PreloadAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     'status_code', 'size', 'response_ms', 'preview')
     date_hierarchy = 'last_run'
     search_fields = ('url',)
-    list_filter = (StatusFilter, 'enabled', SizeFilter)
+    list_filter = (('status_code', StatusFilter), 'enabled', SizeFilter)
     actions = [queue, ]
 
     def format(self, obj):

@@ -1,6 +1,19 @@
+3.3
+----
+* gateway-type endpoint
+* tweaked admin
+* migrate do Django 3.0
+* removed dbtemplates
+* added location gateway endpoint
+* fixed xls illegal char issue
+* fam added status
+* disable export by default
+
+
 3.2
 ----
 * adjust email settings
+* added filters
 
 
 3.1

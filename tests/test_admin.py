@@ -11,12 +11,6 @@ def test_constance(django_app, admin_user):
     assert res.status_code == 200
 
 
-def test_sysinfo(django_app, admin_user):
-    url = reverse("sys-admin-info")
-    res = django_app.get(url, user=admin_user)
-    assert res.status_code == 200
-
-
 def test_index_default(django_app, admin_user, monkeypatch):
     url = reverse("admin:index")
     monkeypatch.setattr('etools_datamart.config.admin.cache', caches['redis'])

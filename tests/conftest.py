@@ -82,7 +82,7 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def django_db_setup(request,
                     django_test_environment,
                     django_db_blocker,

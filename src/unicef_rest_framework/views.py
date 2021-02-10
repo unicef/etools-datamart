@@ -187,7 +187,7 @@ class ExportList(ListView):
         if query:
             qs = qs.filter(reduce(lambda x, y: x | Q(**{y: query}), self.filterable, Q()))
         if orderby:
-            qs.order_by(orderby)
+            qs = qs.order_by(orderby)
         return qs
 
 

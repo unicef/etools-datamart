@@ -4,10 +4,10 @@ from functools import lru_cache
 from django.forms import forms
 from django.template import loader
 from django.utils.dates import MONTHS_3
+from django.utils.encoding import force_str
 
 import coreapi
 import coreschema
-from coreapi.compat import force_text
 from drf_querystringfilter.exceptions import InvalidQueryValueError
 from month_field.forms import MonthField
 from rest_framework.filters import BaseFilterBackend
@@ -78,7 +78,7 @@ class MonthFilterBackend(BaseFilterBackend):
             required=False,
             location='query',
             schema=coreschema.String(
-                title=force_text('month'),
+                title=force_str('month'),
                 description=r"""selected month. Month can be expressed as:<br/>
                 <ul>
 <li>[1..12]: month number from jan to dec</li>

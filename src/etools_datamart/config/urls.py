@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.admin import site
 from django.urls import include, path, re_path
 
-from django_sysinfo.views import admin_sysinfo, http_basic_login, sysinfo, version
 from oauth2_provider.views import AuthorizationView
 
 import unicef_rest_framework.urls
@@ -22,11 +21,7 @@ urlpatterns = [
 
     path(r'admin/', site.urls),
     path(r'admin/schemas/', SelectSchema.as_view(), name='select-schema'),
-    path(r'admin/sysinfo/', admin_sysinfo, name="sys-admin-info"),
     path(r'impersonate/', include('impersonate.urls')),
-
-    path(r'sys/info/', http_basic_login(sysinfo), name='sys-info'),
-    path(r'sys/version/<name>/', http_basic_login(version), name='sys-version'),
     path(r'explorer/', include('explorer.urls')),
 
 ]

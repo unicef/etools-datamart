@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from django.db.backends.base.introspection import BaseDatabaseIntrospection, FieldInfo, TableInfo
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from .utils import raw_sql
 
@@ -30,9 +30,11 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
         1083: 'TimeField',
         1114: 'DateTimeField',
         1184: 'DateTimeField',
+        # 1186: 'DurationField',
         1266: 'TimeField',
         1700: 'DecimalField',
         2950: 'UUIDField',
+        3802: 'JSONField',
     }
 
     ignored_tables = []
@@ -164,14 +166,14 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef;
     """)
 
-    def get_field_type(self, data_type, description):
-        field_type = super().get_field_type(data_type, description)
-        if description.default and 'nextval' in description.default:
-            if field_type == 'IntegerField':
-                return 'AutoField'
-            elif field_type == 'BigIntegerField':
-                return 'BigAutoField'
-        return field_type
+    # def get_field_type(self, data_type, description):
+    #     field_type = super().get_field_type(data_type, description)
+    #     if description.default and 'nextval' in description.default:
+    #         if field_type == 'IntegerField':
+    #             return 'AutoField'
+    #         elif field_type == 'BigIntegerField':
+    #             return 'BigAutoField'
+    #     return field_type
 
     def get_table_list(self, cursor):
         """
@@ -205,9 +207,9 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
 
         return [
             FieldInfo(*(
-                (force_text(line[0]),) +
+                (force_str(line[0]),) +
                 line[1:6] +
-                (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])
+                (field_map[force_str(line[0])][0] == 'YES', field_map[force_str(line[0])][1])
             )) for line in cursor.description
         ]
 
