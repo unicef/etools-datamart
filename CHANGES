@@ -5,6 +5,7 @@
 * migrate do Django 3.0
 * removed dbtemplates
 * added location gateway endpoint
+* fixed xls illegal char issue
 
 
 3.2
