@@ -27,6 +27,7 @@ class Export(AbstractPreload):
     name = models.CharField(max_length=100)
     format = models.CharField(max_length=30, choices=FORMATS)
     refresh = models.BooleanField(default=False, help_text='If true data are refreshed every day')
+    enabled = models.BooleanField(default=False, blank=True)
     filename = models.CharField(max_length=100,
                                 help_text='Optional file name')
     save_as = models.BooleanField(default=False,
