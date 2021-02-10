@@ -1,7 +1,8 @@
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import JSONField
 
 from celery.local import class_property
 from constance import config
@@ -245,7 +246,7 @@ class FlowStart(RapidProDataMartModel):
     flow = models.ForeignKey(Flow, null=True, blank=True, on_delete=models.CASCADE)
     groups = models.ManyToManyField(Group)
     contacts = models.ManyToManyField(Contact)
-    restart_participants = models.NullBooleanField()
+    restart_participants = models.BooleanField(null=True)
     status = models.CharField(max_length=100)
     extra = JSONField(default=dict)
     created_on = models.DateTimeField(null=True, blank=True)

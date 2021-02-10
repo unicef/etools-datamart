@@ -1,7 +1,7 @@
 import json
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import JSONField
 
 from etools_datamart.apps.mart.data.fields import SafeDecimal
 from etools_datamart.apps.mart.data.loader import EtoolsLoader

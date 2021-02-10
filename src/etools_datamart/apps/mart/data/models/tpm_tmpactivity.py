@@ -1,5 +1,5 @@
-from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import JSONField
 from django.utils.functional import cached_property
 
 from dynamic_serializer.core import get_attr

@@ -1,6 +1,6 @@
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import F
+from django.db.models import F, JSONField
 from django.utils.translation import gettext_lazy as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
