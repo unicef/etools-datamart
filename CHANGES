@@ -7,6 +7,7 @@
 * added location gateway endpoint
 * fixed xls illegal char issue
 * fam added status
+* disable export by default
 
 
 3.2
