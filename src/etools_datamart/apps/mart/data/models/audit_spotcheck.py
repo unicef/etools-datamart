@@ -308,6 +308,9 @@ class SpotCheckFindings(EtoolsDataMartModel):
         db_index=True,
     )
     created = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=30, blank=True, null=True,
+                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
+                              db_index=True)
 
     # Overview Section
     auditor = models.CharField(max_length=255, blank=True, null=True)
