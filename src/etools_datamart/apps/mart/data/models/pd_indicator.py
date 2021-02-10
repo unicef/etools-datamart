@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import reverse
 
 from etools_datamart.apps.mart.data.fields import SafeDecimal
@@ -131,10 +133,10 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
         mapping = add_location_mapping(dict(
             title='indicator.title',
             unit='indicator.unit',
-            target_denominator=lambda loader, record: record.target['d'],
-            target_numerator=lambda loader, record: record.target['v'],
-            baseline_denominator=lambda loader, record: record.baseline['d'],
-            baseline_numerator=lambda loader, record: record.baseline['v'],
+            target_denominator=lambda loader, record: json.loads(record.target)['d'],
+            target_numerator=lambda loader, record: json.loads(record.target)['v'],
+            baseline_denominator=lambda loader, record: json.loads(record.baseline)['d'],
+            baseline_numerator=lambda loader, record: json.loads(record.baseline)['v'],
 
             display_type='indicator.display_type`',
             section_name='section.name',

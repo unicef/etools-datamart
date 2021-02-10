@@ -215,8 +215,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Create anonymous")
                 anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
                                                                      defaults={"is_superuser": False,
-                                                                               "is_staff": False,
-                                                                               "password": make_password(uuid.uuid4())})
+                                                                               "is_staff": False})
 
                 if os.environ.get('AUTOCREATE_USERS'):
                     self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")

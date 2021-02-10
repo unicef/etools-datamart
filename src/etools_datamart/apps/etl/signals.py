@@ -1,3 +1,3 @@
 from django.db.models.signals import ModelSignal
 
-data_refreshed = ModelSignal(providing_args=["model"])
+data_refreshed = ModelSignal()
