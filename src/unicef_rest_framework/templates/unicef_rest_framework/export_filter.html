@@ -18,15 +18,23 @@
 {#    </div>#}
 {% endblock %}
 {% block api-response %}
-    <h1>Files</h1>
+    <h1>Exports</h1>
+    <div style="width:45%">
+        <form action="" method="get">
+            {{ filter.form.as_p }}
+            <input type="submit" />
+        </form>
+    </div>
+    <br>
+    <br>
     {% if export_list %}
         <table class="container table">
 <thead>
                 <tr>
-                    <th>description</th>
-                    <th>filename</th>
-                    <th>refresh</th>
-                    <th>enabled</th>
+                    <th>Description</th>
+                    <th>Filename</th>
+                    <th>Refresh</th>
+                    <th>Enabled</th>
                     <th>Owner</th>
                     <th>Updated On</th>
                     <th>Size</th>

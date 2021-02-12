@@ -781,7 +781,7 @@ class HactAggregatehact(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     year = models.IntegerField(unique=True)
-    partner_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    partner_values = models.JSONField(blank=True, null=True)  # This field type is a guess.
 
     class Meta:
         managed = False
@@ -792,7 +792,7 @@ class HactHacthistory(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     year = models.IntegerField()
-    partner_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    partner_values = models.JSONField(blank=True, null=True)  # This field type is a guess.
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='HactHacthistory_partner')
 
     class Meta:

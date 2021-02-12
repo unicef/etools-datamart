@@ -57,16 +57,11 @@ class EngagementMixin:
                 'vendor_number': p.vendor_number,
                 'id': p.pk,
                 'source_id': p.source_id,
-                'type': p.cso_type
+                'type': p.partner_type,
+                'cso_type': p.cso_type
             }
         except Partner.DoesNotExist:
-            return {
-                'name': 'N/A',
-                'vendor_number': 'N/A',
-                'id': 'N/A',
-                'source_id': 'N/A',
-                'type': 'N/A'
-            }
+            return {key: 'N/A' for key in ['name', 'vendor_number', 'id', 'source_id', 'type', 'cso_type']}
 
     def _get_risk(self, record: AuditEngagement, **kwargs):
         try:
@@ -119,7 +114,7 @@ class EngagementMixin:
                              name=rec.office.name,
                              ))
         values['offices_data'] = data
-        return ", ".join([l['name'] for l in data])
+        return ", ".join([office['name'] for office in data])
 
     def get_action_points(self, record, values, **kwargs):
         aggr = "category__description"
@@ -330,9 +325,6 @@ class Engagement(EtoolsDataMartModel):
     modified = models.DateField(blank=True, null=True)
     partner_contacted_at = models.DateField(blank=True, null=True, db_index=True)
     partner = JSONField(blank=True, null=True, default=dict)
-    # partner_name = models.CharField(max_length=300, blank=True, null=True)
-    # partner_id = models.IntegerField(blank=True, null=True)
-    # partner_source_id = models.IntegerField(blank=True, null=True)
     po_item = models.IntegerField(blank=True, null=True)
     report_attachments = models.TextField(blank=True, null=True)
     staff_members = models.TextField(blank=True, null=True)
@@ -414,9 +406,6 @@ class Engagement(EtoolsDataMartModel):
             report_attachments='-',
             staff_members='-',
             partner="-",
-            # partner_name="partner.name",
-            # partner_source_id="partner.id",
-            # partner_id="-",
             po_item="po_item.number",  # PurchaseOrderItem
             final_report="-",
             spotcheck_total_amount_tested='_impl.total_amount_tested',
