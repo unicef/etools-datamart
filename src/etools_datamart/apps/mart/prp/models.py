@@ -47,14 +47,12 @@ Report  #
 """
 from ast import literal_eval
 
-from django.db import models, transaction
+from django.db import models
 from django.db.models import JSONField, Q
-from django.utils import timezone
 
 from strategy_field.utils import get_attr
 
-from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import CommonLoader
 from etools_datamart.apps.sources.source_prp.models import (
     CoreCountry,
     CoreGatewaytype,
@@ -69,7 +67,6 @@ from etools_datamart.apps.sources.source_prp.models import (
     UnicefProgrammedocumentSections,
     UnicefProgressreport,
 )
-from etools_datamart.sentry import process_exception
 
 from .base import PrpDataMartModel
 
@@ -177,7 +174,7 @@ class DataReportLoader(CommonLoader):
                 levelname=location.gateway.name
             ))
         values['locations_data'] = locs
-        return ", ".join([l['name'] for l in locs])
+        return ", ".join([loc['name'] for loc in locs])
 
     def get_submitted_by(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         user = get_attr(record, 'indicator_report.progress_report.submitted_by')
