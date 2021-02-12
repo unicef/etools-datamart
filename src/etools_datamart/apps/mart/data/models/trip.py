@@ -1,5 +1,6 @@
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import JSONField
 from django.utils.translation import gettext as _
 
 from dynamic_serializer.core import get_attr
@@ -115,7 +116,7 @@ class Trip(EtoolsDataMartModel):
     first_submission_date = models.DateTimeField(blank=True, null=True)
     hact_visit_report = models.CharField(max_length=300, blank=True, null=True)
     hidden = models.BooleanField(blank=True, null=True)
-    international_travel = models.NullBooleanField(blank=True, null=True)
+    international_travel = models.BooleanField(blank=True, null=True)
     is_driver = models.BooleanField(blank=True, null=True)
     is_second_traveler = models.CharField(max_length=300, blank=True, null=True)
     locations = models.TextField(blank=True, null=True)
@@ -146,7 +147,7 @@ class Trip(EtoolsDataMartModel):
     submitted_at = models.DateTimeField(blank=True, null=True)
     supervisor_email = models.CharField(max_length=300, blank=True, null=True)
     supervisor_name = models.CharField(max_length=300, blank=True, null=True)
-    ta_required = models.NullBooleanField(blank=True, null=True)
+    ta_required = models.BooleanField(blank=True, null=True)
     traveler_email = models.CharField(max_length=300, blank=True, null=True)
     traveler_name = models.CharField(max_length=300, blank=True, null=True)
     trip_attachments = models.TextField(blank=True, null=True)

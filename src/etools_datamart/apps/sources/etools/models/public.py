@@ -333,7 +333,7 @@ class EasyThumbnailsThumbnaildimensions(models.Model):
 class EnvironmentTenantflag(models.Model):
     authenticated = models.BooleanField()
     created = models.DateTimeField()
-    everyone = models.NullBooleanField()
+    everyone = models.BooleanField(null=True)
     languages = models.TextField()
     modified = models.DateTimeField()
     name = models.CharField(unique=True, max_length=100)

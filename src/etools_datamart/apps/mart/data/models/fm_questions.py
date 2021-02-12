@@ -1,5 +1,5 @@
-from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import JSONField
 from django.utils.translation import gettext as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
