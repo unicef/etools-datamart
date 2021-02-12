@@ -3,9 +3,9 @@ from collections import OrderedDict
 from functools import lru_cache
 
 from django import forms
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
-from django.db.models import BooleanField, FieldDoesNotExist
+from django.db.models import BooleanField
 from django.template import loader
 from django.utils.encoding import force_str
 

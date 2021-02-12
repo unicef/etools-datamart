@@ -60,7 +60,7 @@ def test_refresh(django_app, admin_user, modeladmin, monkeypatch):
 
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
-    res = res.click("Refresh").follow()
+    res = res.click("Refresh$").follow()
     assert res.status_code == 200
     storage = res.context['messages']
     assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]

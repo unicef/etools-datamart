@@ -21,7 +21,7 @@ class DatabaseCreation(original_creation.DatabaseCreation):
             'suffix': self.sql_table_creation_suffix(),
         }
         # Create the test database and connect to it.
-        with self._nodb_connection.cursor() as cursor:
+        with self._nodb_cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception as e:
