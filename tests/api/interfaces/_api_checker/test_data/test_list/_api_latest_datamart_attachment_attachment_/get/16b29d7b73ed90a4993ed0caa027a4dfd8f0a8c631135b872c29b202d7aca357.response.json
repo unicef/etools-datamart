@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"907ec27b8caedb55507ea7de42a56e85\""
+            "\"f9cf05b0a0e4be9587e9e7993e21e057\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "907ec27b8caedb55507ea7de42a56e85"
+            "f9cf05b0a0e4be9587e9e7993e21e057"
         ],
         "cache-hit": [
             "cache-hit",
@@ -59,7 +59,11 @@
         ],
         "content-length": [
             "Content-Length",
-            "1005"
+            "1041"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
         ]
     },
     "data": {
@@ -85,7 +89,8 @@
                 "source": null,
                 "uploaded_by": null,
                 "created": null,
-                "attachment": null
+                "attachment": null,
+                "code": null
             },
             {
                 "schema_name": "chad",
@@ -103,7 +108,8 @@
                 "source": null,
                 "uploaded_by": null,
                 "created": null,
-                "attachment": null
+                "attachment": null,
+                "code": null
             },
             {
                 "schema_name": "lebanon",
@@ -121,7 +127,8 @@
                 "source": null,
                 "uploaded_by": null,
                 "created": null,
-                "attachment": null
+                "attachment": null,
+                "code": null
             }
         ]
     },

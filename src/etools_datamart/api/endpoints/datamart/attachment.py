@@ -51,7 +51,8 @@ class AttachmentSerializerEtools(AttachmentSerializerFull):
                   "source",
                   "uploaded_by",
                   "created",
-                  "attachment")
+                  "attachment",
+                  "code")
 
 
 class AttachmentFilterForm(forms.Form):
