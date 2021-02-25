@@ -29,7 +29,7 @@ class Travel(EtoolsDataMartModel):
     estimated_travel_cost = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=4)
     first_submission_date = models.DateTimeField(blank=True, null=True)
     hidden = models.BooleanField(blank=True, null=True, )
-    international_travel = models.NullBooleanField(blank=True, null=True, )
+    international_travel = models.BooleanField(blank=True, null=True, )
     is_driver = models.BooleanField(blank=True, null=True, )
     misc_expenses = models.TextField(blank=True, null=True, )
     mode_of_travel = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -49,7 +49,7 @@ class Travel(EtoolsDataMartModel):
     submitted_at = models.DateTimeField(blank=True, null=True)
     # supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_travel_supervisor_id', blank=True, null=True)
     supervisor_email = models.CharField(max_length=200, blank=True, null=True)
-    ta_required = models.NullBooleanField(blank=True, null=True, )
+    ta_required = models.BooleanField(blank=True, null=True, )
     # traveler = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='authuser_t2f_travel_traveler_id', blank=True, null=True)
     traveler_email = models.CharField(max_length=200, blank=True, null=True, db_index=True)
 

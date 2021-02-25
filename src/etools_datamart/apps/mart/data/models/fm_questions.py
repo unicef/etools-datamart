@@ -1,5 +1,5 @@
-from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import JSONField
 from django.utils.translation import gettext as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
@@ -68,7 +68,7 @@ class FMQuestionLoader(EtoolsLoader):
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
             for rec in cp_output_qs.all():
-                cp_ouput = rec.result
+                cp_output = rec.result
                 values["entity_type"] = "CP Output"
                 values["entity_instance"] = cp_output.name
                 op = self.process_record(filters, values)

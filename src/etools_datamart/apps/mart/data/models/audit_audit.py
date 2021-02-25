@@ -1,6 +1,6 @@
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Count, Sum
+from django.db.models import Count, JSONField, Sum
 from django.utils.translation import gettext as _
 
 from _decimal import DivisionByZero, InvalidOperation

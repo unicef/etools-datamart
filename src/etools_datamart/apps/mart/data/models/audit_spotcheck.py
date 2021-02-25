@@ -1,6 +1,6 @@
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, JSONField
 from django.utils.translation import gettext as _
 
 from model_utils import Choices

@@ -1,6 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import JSONField
 from django.utils.functional import cached_property
 
 from django_celery_beat.models import PeriodicTask

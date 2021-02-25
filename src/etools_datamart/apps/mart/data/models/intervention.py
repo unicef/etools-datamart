@@ -1,8 +1,7 @@
 import logging
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models import F
+from django.db.models import F, JSONField
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
@@ -33,7 +32,7 @@ class InterventionAbstract(models.Model):
     agreement_id = models.IntegerField(blank=True, null=True)
     cfei_number = models.CharField(max_length=150, null=True, blank=True)
     clusters = models.TextField(blank=True, null=True)
-    contingency_pd = models.NullBooleanField(null=True)
+    contingency_pd = models.BooleanField(null=True)
     # cp_output = models.CharField(max_length=300, blank=True, null=True)
     # cp_output_id = models.IntegerField(blank=True, null=True)
     cp_outputs = models.TextField(blank=True, null=True)

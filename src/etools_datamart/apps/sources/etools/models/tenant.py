@@ -392,7 +392,7 @@ class DjangoComments(models.TenantModel):
 
 class FieldMonitoringDataCollectionActivityoverallfinding(models.TenantModel):
     narrative_finding = models.TextField()
-    on_track = models.NullBooleanField()
+    on_track = models.BooleanField(null=True)
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_cp_output', blank=True, null=True)
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_intervention', blank=True, null=True)
     monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_monitoring_activity')
@@ -1757,8 +1757,8 @@ class T2FTravel(models.TenantModel):
     end_date = models.DateField(blank=True, null=True)
     purpose = models.CharField(max_length=500)
     additional_note = models.TextField()
-    international_travel = models.NullBooleanField()
-    ta_required = models.NullBooleanField()
+    international_travel = models.BooleanField(null=True)
+    ta_required = models.BooleanField(null=True)
     reference_number = models.CharField(unique=True, max_length=12)
     hidden = models.BooleanField()
     mode_of_travel = models.TextField(blank=True, null=True)  # This field type is a guess.

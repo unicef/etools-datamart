@@ -1,9 +1,9 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import JSONField
 from django.utils import timezone
 
 from rest_framework.test import APIClient, ForceAuthClientHandler

@@ -47,9 +47,8 @@ Report  #
 """
 from ast import literal_eval
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import JSONField, Q
 from django.utils import timezone
 
 from redis.exceptions import LockError
