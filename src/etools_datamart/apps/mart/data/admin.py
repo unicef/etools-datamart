@@ -221,6 +221,11 @@ class LocationAdmin(DataModelAdmin):
         models.Location.objects.batch_update_centroid()
 
 
+@register(models.Locationsite)
+class LocationsiteAdmin(DataModelAdmin):
+    list_display = ('name', 'p_code', 'is_active')
+
+
 @register(models.FMOntrack)
 class FMOntrackAdmin(DataModelAdmin):
     list_display = ('entity', 'narrative_finding', 'overall_finding_rating')

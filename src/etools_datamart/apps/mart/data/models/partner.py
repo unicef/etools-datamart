@@ -37,7 +37,7 @@ class PartnerLoader(EtoolsLoader):
                     'special_audit': rec.special_audit,
                     'spot_check_follow_up': rec.spot_check_follow_up,
                     }
-        except Exception:
+        except BaseException:
             data = {}
         return data
 
