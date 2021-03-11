@@ -253,6 +253,18 @@ class EngagementFactory(DataMartModelFactory):
         model = models.Engagement
 
 
+class FMOntrackFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.FMOntrack
+
+
+class FMQuestionFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.FMQuestion
+
+
 class GrantFactory(DataMartModelFactory):
     class Meta:
         model = models.Grant

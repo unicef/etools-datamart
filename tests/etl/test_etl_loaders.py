@@ -50,7 +50,6 @@ def test_loader_load(loader):
 
     ignored_models = [
         'FMOntrack',
-        'FMQuestion',
     ]
 
     with freeze_time("2018-12-31", tz_offset=1):
