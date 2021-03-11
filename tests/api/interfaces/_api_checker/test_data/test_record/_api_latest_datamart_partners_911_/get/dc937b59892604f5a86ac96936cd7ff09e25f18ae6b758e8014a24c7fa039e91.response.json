@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"0f879a1c80237d96cd8e608d73fa9c6b\""
+            "\"715a4c4d6b5bb443375b24e47dc340d1\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -47,7 +47,11 @@
         ],
         "content-length": [
             "Content-Length",
-            "1032"
+            "1096"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
         ]
     },
     "data": {
@@ -97,7 +101,9 @@
         "min_req_programme_visits": 0,
         "hact_min_requirements": {},
         "min_req_spot_checks": 0,
-        "sea_risk_rating_name": null
+        "sea_risk_rating_name": null,
+        "highest_risk_rating_name": null,
+        "highest_risk_rating_type": null
     },
     "content_type": null
 }
