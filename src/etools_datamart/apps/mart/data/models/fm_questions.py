@@ -168,8 +168,8 @@ class FMQuestion(EtoolsDataMartModel):
     class Options:
         source = FieldMonitoringDataCollectionFinding
         mapping = dict(
-            title="activity_question.text",
-            answer_type="activity_question.answer_type",
+            title="activity_question.question.text",
+            answer_type="activity_question.question.answer_type",
             answer_options="-",
             entity_type="i",
             entity_instance="i",
