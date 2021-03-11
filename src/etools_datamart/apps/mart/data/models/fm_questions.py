@@ -12,6 +12,7 @@ from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringPlanningMonitoringactivityPartners,
     FieldMonitoringSettingsOption,
     FieldMonitoringSettingsQuestionMethods,
+    ReportsSector,
 )
 
 
@@ -227,6 +228,41 @@ class FMOntrackLoader(EtoolsLoader):
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
+    def get_sections(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
+        data = []
+        qs = ReportsSector.objects.filter(
+            FieldMonitoringPlanningMonitoringactivitySections_section__monitoringactivity=record.monitoring_activity)
+        for rec in qs:
+            data.append(
+                dict(
+                    source_id=rec.pk,
+                    name=rec.name,
+                    description=rec.description,
+                ),
+            )
+        values['sections_data'] = data
+        return ", ".join([sec['name'] for sec in data])
+
+    def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
+        from etools_datamart.apps.mart.data.models import Location
+        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'gateway_name']
+
+        try:
+            instance = Location.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=record.monitoring_activity.pk
+            )
+            return {
+                'id': instance.pk,
+                'name': instance.name,
+                'p_code': instance.p_code,
+                'level': instance.level,
+                'source_id': instance.source_id,
+                'gateway_name': instance.gateway.name
+            }
+        except Location.DoesNotExist:
+            return {key: 'N/A' for key in loc_fields}
+
 
 class FMOntrack(EtoolsDataMartModel):
     entity = models.CharField(
@@ -258,12 +294,7 @@ class FMOntrack(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
-    location = models.CharField(
-        verbose_name=_("Location"),
-        max_length=254,
-        null=True,
-        blank=True,
-    )
+    location = JSONField(blank=True, null=True, default=dict)
     site = models.CharField(
         verbose_name=_("Location"),
         max_length=254,
@@ -276,6 +307,11 @@ class FMOntrack(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    vendor_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
+    reference_number = models.CharField(max_length=100, null=True)
+    field_office = models.CharField(max_length=254, blank=True, null=True)
+    sections = models.TextField(blank=True, null=True)
+    sections_data = JSONField(blank=True, null=True, default=dict)
 
     loader = FMOntrackLoader()
 
@@ -293,4 +329,8 @@ class FMOntrack(EtoolsDataMartModel):
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
             outcome="i",
+            vendor_number="partner.vendor_number",
+            reference_number='intervention.reference_number',
+            field_office='monitoring_activity.field_office.name',
+            sections="-",
         )
