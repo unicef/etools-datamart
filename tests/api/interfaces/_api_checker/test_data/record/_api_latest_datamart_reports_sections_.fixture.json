@@ -1,0 +1,25 @@
+{
+    "record": {
+        "master": {
+            "model": "data.section",
+            "pk": 33,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2021-03-11T19:51:36.932Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "name": null,
+                "description": null,
+                "alternate_id": null,
+                "alternate_name": null,
+                "dashboard": null,
+                "color": null,
+                "created": null,
+                "modified": null
+            }
+        },
+        "deps": []
+    }
+}

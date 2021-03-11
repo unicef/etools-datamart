@@ -1,0 +1,107 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"9c328a5a9b06b83efb171ffe9d2699c6\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.hact_history.HACTHistoryViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.hact_history.HACTHistoryViewSet"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "1005"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "id": 33,
+        "source_id": null,
+        "last_modify_date": "11 Mar 2021 19:51:35",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "year": null,
+        "partner_name": null,
+        "partner_source_id": null,
+        "vendor_number": null,
+        "partner_type": null,
+        "shared_ip": null,
+        "assessment_type": null,
+        "ct_1oct_30sep": null,
+        "liqu_1oct_30sep": null,
+        "ct_jan_dec": null,
+        "risk_rating": null,
+        "expiring_threshold": null,
+        "approach_threshold": null,
+        "pv_planned_year": null,
+        "pv_planned_q1": null,
+        "pv_planned_q2": null,
+        "pv_planned_q3": null,
+        "pv_planned_q4": null,
+        "pv_mr": null,
+        "pv_completed_year": null,
+        "pv_completed_q1": null,
+        "pv_completed_q2": null,
+        "pv_completed_q3": null,
+        "pv_completed_q4": null,
+        "sc_planned_year": null,
+        "sc_planned_q1": null,
+        "sc_planned_q2": null,
+        "sc_planned_q3": null,
+        "sc_planned_q4": null,
+        "sc_mr": null,
+        "sc_follow_up": null,
+        "sc_completed_year": null,
+        "sc_completed_q1": null,
+        "sc_completed_q2": null,
+        "sc_completed_q3": null,
+        "sc_completed_q4": null,
+        "audits_mr": null,
+        "audits_completed": null,
+        "audits_outstanding_findings": null,
+        "source_history": null,
+        "source_partner": null
+    },
+    "content_type": null
+}

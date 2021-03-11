@@ -37,7 +37,7 @@ class PartnerAgreementSerializer(DataMartSerializer):
                   )
 
     def get_agreement_url(self, obj):
-        return '%s/pmp/agreements/%d/details?schema=%s' % (config.ETOOLS_ADDRESS,
+        return '%s/pmp/agreements/%s/details?schema=%s' % (config.ETOOLS_ADDRESS,
                                                            obj.source_id,
                                                            obj.schema_name)
 

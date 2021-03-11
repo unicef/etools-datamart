@@ -1,0 +1,151 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"d0edac6bc5becc9e605abc430ed9bf4b\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.travel_activity.TravelActivityViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.travel_activity.TravelActivityViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "d0edac6bc5becc9e605abc430ed9bf4b"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "1563"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 30,
+                "last_modify_date": "11 Mar 2021 19:51:32",
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "location_name": null,
+                "location_pcode": null,
+                "location_level": null,
+                "location_levelname": null,
+                "travel_reference_number": "name000",
+                "travel_type": null,
+                "date": null,
+                "partner_name": null,
+                "partnership_number": null,
+                "primary_traveler": null,
+                "source_travel_id": null,
+                "source_partner_id": null,
+                "source_partnership_id": null,
+                "result_name": null,
+                "result_code": null,
+                "result_type": null,
+                "location": null
+            },
+            {
+                "id": 31,
+                "last_modify_date": "11 Mar 2021 19:51:32",
+                "country_name": "chad",
+                "schema_name": "chad",
+                "area_code": "",
+                "location_name": null,
+                "location_pcode": null,
+                "location_level": null,
+                "location_levelname": null,
+                "travel_reference_number": "name001",
+                "travel_type": null,
+                "date": null,
+                "partner_name": null,
+                "partnership_number": null,
+                "primary_traveler": null,
+                "source_travel_id": null,
+                "source_partner_id": null,
+                "source_partnership_id": null,
+                "result_name": null,
+                "result_code": null,
+                "result_type": null,
+                "location": null
+            },
+            {
+                "id": 32,
+                "last_modify_date": "11 Mar 2021 19:51:32",
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "area_code": "",
+                "location_name": null,
+                "location_pcode": null,
+                "location_level": null,
+                "location_levelname": null,
+                "travel_reference_number": "name002",
+                "travel_type": null,
+                "date": null,
+                "partner_name": null,
+                "partnership_number": null,
+                "primary_traveler": null,
+                "source_travel_id": null,
+                "source_partner_id": null,
+                "source_partnership_id": null,
+                "result_name": null,
+                "result_code": null,
+                "result_type": null,
+                "location": null
+            }
+        ]
+    },
+    "content_type": null
+}

@@ -1,0 +1,112 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"d4002d71c2a6e2b53d9f73b16a0c29e8\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.partners_staffmember.PartnerStaffMemberViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.partners_staffmember.PartnerStaffMemberViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "d4002d71c2a6e2b53d9f73b16a0c29e8"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "570"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "partner": null,
+                "user": null,
+                "vendor_number": null,
+                "position": null,
+                "first_name": null,
+                "last_name": null,
+                "email_address": null,
+                "phone_number": null,
+                "active_staff": null
+            },
+            {
+                "partner": null,
+                "user": null,
+                "vendor_number": null,
+                "position": null,
+                "first_name": null,
+                "last_name": null,
+                "email_address": null,
+                "phone_number": null,
+                "active_staff": null
+            },
+            {
+                "partner": null,
+                "user": null,
+                "vendor_number": null,
+                "position": null,
+                "first_name": null,
+                "last_name": null,
+                "email_address": null,
+                "phone_number": null,
+                "active_staff": null
+            }
+        ]
+    },
+    "content_type": null
+}
