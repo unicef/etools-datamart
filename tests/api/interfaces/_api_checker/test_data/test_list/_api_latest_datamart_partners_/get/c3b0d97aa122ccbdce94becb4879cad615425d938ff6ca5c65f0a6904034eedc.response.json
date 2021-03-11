@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"a7d7ead7fdf0ec52f0ccb2f03b7ea262\""
+            "\"397692d61053593ddae809273133a615\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "a7d7ead7fdf0ec52f0ccb2f03b7ea262"
+            "397692d61053593ddae809273133a615"
         ],
         "cache-hit": [
             "cache-hit",
@@ -60,6 +60,10 @@
         "content-length": [
             "Content-Length",
             "351"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
         ]
     },
     "data": {
