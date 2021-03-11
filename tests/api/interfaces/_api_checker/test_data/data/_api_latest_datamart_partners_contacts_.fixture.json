@@ -1,0 +1,76 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.partnerstaffmember",
+                "pk": 30,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:30.602Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "title": null,
+                    "first_name": null,
+                    "last_name": null,
+                    "email": null,
+                    "user": null,
+                    "phone": null,
+                    "partner": null,
+                    "vendor_number": null,
+                    "active": null,
+                    "created": null,
+                    "modified": null
+                }
+            },
+            {
+                "model": "data.partnerstaffmember",
+                "pk": 31,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:30.603Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "title": null,
+                    "first_name": null,
+                    "last_name": null,
+                    "email": null,
+                    "user": null,
+                    "phone": null,
+                    "partner": null,
+                    "vendor_number": null,
+                    "active": null,
+                    "created": null,
+                    "modified": null
+                }
+            },
+            {
+                "model": "data.partnerstaffmember",
+                "pk": 32,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:30.604Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "title": null,
+                    "first_name": null,
+                    "last_name": null,
+                    "email": null,
+                    "user": null,
+                    "phone": null,
+                    "partner": null,
+                    "vendor_number": null,
+                    "active": null,
+                    "created": null,
+                    "modified": null
+                }
+            }
+        ],
+        "deps": []
+    }
+}

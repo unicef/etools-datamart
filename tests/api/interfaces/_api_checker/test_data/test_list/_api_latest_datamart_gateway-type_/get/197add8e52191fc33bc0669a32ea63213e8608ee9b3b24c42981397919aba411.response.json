@@ -1,0 +1,106 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"d0bebc0beb6e70fffe577deb1c6be307\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.location.GatewayTypeViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.location.GatewayTypeViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "d0bebc0beb6e70fffe577deb1c6be307"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "534"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 64,
+                "last_modify_date": "11 Mar 2021 19:51:27",
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "name": "name000",
+                "admin_level": null
+            },
+            {
+                "id": 65,
+                "last_modify_date": "11 Mar 2021 19:51:27",
+                "country_name": "chad",
+                "schema_name": "chad",
+                "area_code": "",
+                "name": "name001",
+                "admin_level": null
+            },
+            {
+                "id": 66,
+                "last_modify_date": "11 Mar 2021 19:51:27",
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "area_code": "",
+                "name": "name002",
+                "admin_level": null
+            }
+        ]
+    },
+    "content_type": null
+}

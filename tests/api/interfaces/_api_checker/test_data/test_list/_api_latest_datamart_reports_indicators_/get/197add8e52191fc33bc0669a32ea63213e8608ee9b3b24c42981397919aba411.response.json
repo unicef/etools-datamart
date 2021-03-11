@@ -1,0 +1,148 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"fb61ebcfe6f1493b5069c07248c23a05\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "fb61ebcfe6f1493b5069c07248c23a05"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "1662"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "pd_sffa_reference_number": null,
+                "cluster_indicator_id": null,
+                "cluster_indicator_title": null,
+                "cluster_name": null,
+                "response_plan_name": null,
+                "is_active": true,
+                "is_high_frequency": false,
+                "means_of_verification": null,
+                "measurement_specifications": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "unit": null,
+                "label": null,
+                "denominator_label": null,
+                "baseline_denominator": null,
+                "target_denominator": null,
+                "numerator_label": null,
+                "baseline_numerator": null,
+                "target_numerator": null,
+                "last_modify_date": "11 Mar 2021 19:51:32"
+            },
+            {
+                "pd_sffa_reference_number": null,
+                "cluster_indicator_id": null,
+                "cluster_indicator_title": null,
+                "cluster_name": null,
+                "response_plan_name": null,
+                "is_active": true,
+                "is_high_frequency": false,
+                "means_of_verification": null,
+                "measurement_specifications": null,
+                "country_name": "chad",
+                "schema_name": "chad",
+                "area_code": "",
+                "unit": null,
+                "label": null,
+                "denominator_label": null,
+                "baseline_denominator": null,
+                "target_denominator": null,
+                "numerator_label": null,
+                "baseline_numerator": null,
+                "target_numerator": null,
+                "last_modify_date": "11 Mar 2021 19:51:32"
+            },
+            {
+                "pd_sffa_reference_number": null,
+                "cluster_indicator_id": null,
+                "cluster_indicator_title": null,
+                "cluster_name": null,
+                "response_plan_name": null,
+                "is_active": true,
+                "is_high_frequency": false,
+                "means_of_verification": null,
+                "measurement_specifications": null,
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "area_code": "",
+                "unit": null,
+                "label": null,
+                "denominator_label": null,
+                "baseline_denominator": null,
+                "target_denominator": null,
+                "numerator_label": null,
+                "baseline_numerator": null,
+                "target_numerator": null,
+                "last_modify_date": "11 Mar 2021 19:51:32"
+            }
+        ]
+    },
+    "content_type": null
+}

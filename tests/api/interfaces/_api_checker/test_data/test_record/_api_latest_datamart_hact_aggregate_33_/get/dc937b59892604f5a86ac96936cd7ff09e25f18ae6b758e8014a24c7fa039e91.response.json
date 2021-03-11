@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"cc345a3c20925a025ec632dd53068158\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.hact_aggregate.HACTAggreagateViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.hact_aggregate.HACTAggreagateViewSet"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "290"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "id": 33,
+        "source_id": null,
+        "last_modify_date": "11 Mar 2021 19:51:35",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "year": 2021,
+        "microassessments_total": 0,
+        "programmaticvisits_total": 0,
+        "followup_spotcheck": 0,
+        "completed_spotcheck": 0,
+        "completed_hact_audits": 0,
+        "completed_special_audits": 0
+    },
+    "content_type": null
+}

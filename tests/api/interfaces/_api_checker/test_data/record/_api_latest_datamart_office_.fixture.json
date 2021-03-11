@@ -1,0 +1,18 @@
+{
+    "record": {
+        "master": {
+            "model": "data.office",
+            "pk": 33,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2021-03-11T19:51:35.019Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "name": null
+            }
+        },
+        "deps": []
+    }
+}

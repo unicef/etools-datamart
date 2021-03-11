@@ -1,0 +1,64 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.hact",
+                "pk": 30,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:28.221Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "year": 2021,
+                    "microassessments_total": 0,
+                    "programmaticvisits_total": 0,
+                    "followup_spotcheck": 0,
+                    "completed_spotcheck": 0,
+                    "completed_hact_audits": 0,
+                    "completed_special_audits": 0
+                }
+            },
+            {
+                "model": "data.hact",
+                "pk": 31,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:28.223Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "year": 2021,
+                    "microassessments_total": 0,
+                    "programmaticvisits_total": 0,
+                    "followup_spotcheck": 0,
+                    "completed_spotcheck": 0,
+                    "completed_hact_audits": 0,
+                    "completed_special_audits": 0
+                }
+            },
+            {
+                "model": "data.hact",
+                "pk": 32,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:28.226Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "year": 2021,
+                    "microassessments_total": 0,
+                    "programmaticvisits_total": 0,
+                    "followup_spotcheck": 0,
+                    "completed_spotcheck": 0,
+                    "completed_hact_audits": 0,
+                    "completed_special_audits": 0
+                }
+            }
+        ],
+        "deps": []
+    }
+}

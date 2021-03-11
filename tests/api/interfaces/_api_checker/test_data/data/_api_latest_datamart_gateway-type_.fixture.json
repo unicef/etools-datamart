@@ -1,0 +1,49 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.gatewaytype",
+                "pk": 64,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:27.221Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "name": "name000",
+                    "admin_level": null
+                }
+            },
+            {
+                "model": "data.gatewaytype",
+                "pk": 65,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:27.226Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "name": "name001",
+                    "admin_level": null
+                }
+            },
+            {
+                "model": "data.gatewaytype",
+                "pk": 66,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:27.230Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "name": "name002",
+                    "admin_level": null
+                }
+            }
+        ],
+        "deps": []
+    }
+}

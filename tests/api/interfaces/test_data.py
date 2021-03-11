@@ -56,9 +56,13 @@ def pytest_generate_tests(metafunc, *args):
                 pass
             elif prefix.startswith('datamart/'):
                 sers = viewset.serializers_fieldsets.keys()
-                for ser in sers:
-                    params.append([viewset, ser])
-                    ids.append(f'{viewset.__name__}-{ser}')
+                if sers:
+                    for ser in sers:
+                        params.append([viewset, ser])
+                        ids.append(f'{viewset.__name__}-{ser}')
+                else:
+                    params.append([viewset, 'std'])
+                    ids.append(f'{viewset.__name__}-std')
                 # params.append(viewset)
                 # ids.append(f'{viewset.__name__}')
         metafunc.parametrize("viewset,serializer", params, ids=ids)
