@@ -37,6 +37,8 @@ class Locationsite(EtoolsDataMartModel):
     is_active = models.BooleanField()
     parent = models.JSONField(blank=True, null=True, default=dict)
 
+    loader = LocationsiteLoader()
+
     class Options:
         source = FieldMonitoringSettingsLocationsite
         mapping = dict(

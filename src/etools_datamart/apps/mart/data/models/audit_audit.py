@@ -104,7 +104,6 @@ class Audit(EtoolsDataMartModel):
     action_points = JSONField(blank=True, null=True, default=dict)
     action_points_data = JSONField(blank=True, null=True, default=dict)
 
-
     loader = AuditLoader()
 
     class Meta:
