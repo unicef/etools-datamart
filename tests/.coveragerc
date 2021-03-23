@@ -20,6 +20,8 @@ omit =
         **/tracking/management/commands/track.py
         **/data/management/commands/sqlall.py
         **/source_prp/management/commands/inspectprp.py
+        **/etools_datamart/apps/prp/management/commands/inspectprp.py
+        **/etools_datamart/apps/unpp/management/commands/inspectunpp.py
         tests/**
         **/migrations/**
         **/custom_migrations/**

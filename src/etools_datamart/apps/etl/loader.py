@@ -5,6 +5,7 @@ from uuid import UUID
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
+from django.db import transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -22,6 +23,7 @@ from etools_datamart.apps.etl.exceptions import (
     RequiredIsRunning,
 )
 from etools_datamart.celery import app
+from etools_datamart.sentry import process_exception
 
 loadeables = set()
 locks = caches['lock']
@@ -461,3 +463,112 @@ class BaseLoader:
 
     def consistency_check(self):
         pass
+
+
+class CommonLoader(BaseLoader):
+    IGNORED_FIELDS = ['source_id', 'id', 'last_modify_date']
+
+    def get_queryset(self):
+        if self.config.queryset:
+            ret = self.config.queryset()
+        elif self.config.source:
+            ret = self.config.source.objects.all()
+        else:  # pragma: no cover
+            raise ValueError(
+                "Option must define 'queryset' or 'source' attribute"
+            )
+        return ret
+
+    def filter_queryset(self, qs):
+        use_delta = self.context['only_delta'] and not self.context['is_empty']
+        if self.config.filters:
+            qs = qs.filter(**self.config.filters)
+        if use_delta and (self.config.last_modify_field and self.last_run):
+            logger.debug(f"Loader {self}: use deltas")
+            qs = qs.filter(
+                **{f"{self.config.last_modify_field}__gte": self.last_run}
+            )
+        return qs
+
+    def load(
+            self,
+            *,
+            verbosity=0,
+            stdout=None,
+            ignore_dependencies=False,
+            max_records=None,
+            only_delta=True,
+            run_type=RUN_UNKNOWN,
+            **kwargs,
+    ):
+        self.on_start(run_type)
+        self.results = EtlResult()
+        logger.debug(f"Running loader {self}")
+        lock = self.lock()
+        truncate = self.config.truncate
+        try:
+            if lock:  # pragma: no branch
+                if not ignore_dependencies:
+                    for requirement in self.config.depends:
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        if requirement.loader.need_refresh(self):
+                            raise RequiredIsMissing(requirement)
+                        else:
+                            logger.info(f"Loader {requirement} is uptodate")
+                self.mapping = {}
+                mart_fields = self.model._meta.concrete_fields
+                for field in mart_fields:
+                    if field.name not in self.IGNORED_FIELDS:
+                        self.mapping[field.name] = field.name
+                if self.config.mapping:  # pragma: no branch
+                    self.mapping.update(self.config.mapping)
+                self.update_context(today=timezone.now(),
+                                    max_records=max_records,
+                                    verbosity=verbosity,
+                                    records=0,
+                                    only_delta=only_delta,
+                                    is_empty=not self.model.objects.exists(),
+                                    stdout=stdout)
+                sid = transaction.savepoint()
+                try:
+                    self.results.context = self.context
+                    self.fields_to_compare = [
+                        f for f in self.mapping.keys() if f not in ["seen"]
+                    ]
+                    if truncate:
+                        self.model.objects.truncate()
+                    qs = self.filter_queryset(self.get_queryset())
+                    for record in qs.all():
+                        filters = self.config.key(self, record)
+                        values = self.get_values(record)
+                        op = self.process_record(filters, values)
+                        self.increment_counter(op)
+
+                    if stdout and verbosity > 0:
+                        stdout.write("\n")
+                except MaxRecordsException:
+                    pass
+                except Exception:
+                    transaction.savepoint_rollback(sid)
+                    raise
+            else:
+                logger.info(f"Unable to get lock for {self}")
+
+        except (RequiredIsMissing, RequiredIsRunning) as e:
+            self.on_end(error=e, retry=True)
+            raise
+        except BaseException as e:
+            self.on_end(e)
+            process_exception(e)
+            raise
+        else:
+            self.on_end(None)
+        finally:
+            if lock:  # pragma: no branch
+                try:
+                    lock.release()
+                except LockError as e:  # pragma: no cover
+                    logger.warning(e)
+
+        return self.results
