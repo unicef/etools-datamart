@@ -45,6 +45,7 @@ Totalbudget(ideally at most granular level tied to activity / result)
 Utilised budget(same conditions as above)
 Report  #
 """
+import json
 from ast import literal_eval
 
 from django.db import models, transaction
@@ -302,10 +303,12 @@ class DataReportLoader(PrpBaseLoader):
         return None
 
     def get_achievement_in_reporting_period(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-        return record._indicator.total["c"]
+        indicator = json.loads(record._indicator.total)
+        return indicator["c"]
 
     def get_total_cumulative_progress(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-        return record._reportable.total["c"]
+        reportable = json.loads(record._reportable.total)
+        return reportable["c"]
 
     def get_progress_report(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         ir: IndicatorIndicatorreport = record.indicator_report
@@ -327,7 +330,8 @@ class DataReportLoader(PrpBaseLoader):
                 pass
             disaggKeyValues[pk] = value
         disagg = {}
-        for k, v in record.disaggregation.items():
+        disaggregation = json.loads(record.disaggregation)
+        for k, v in disaggregation.items():
             k = literal_eval(k)
             if len(k):
                 nk = []
