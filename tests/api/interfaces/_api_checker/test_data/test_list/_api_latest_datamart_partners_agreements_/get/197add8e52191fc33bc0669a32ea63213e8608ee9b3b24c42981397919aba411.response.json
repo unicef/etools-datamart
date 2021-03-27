@@ -1,0 +1,136 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"d9b520ddbe93de783c32df725c3ec480\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.partners_agreement.PartnerAgreementViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.partners_agreement.PartnerAgreementViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "d9b520ddbe93de783c32df725c3ec480"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "1470"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "agreement_type": null,
+                "reference_number": null,
+                "status": null,
+                "start": null,
+                "end": null,
+                "partner_name": null,
+                "vendor_number": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "country_programme": null,
+                "signed_by_partner": null,
+                "signed_by_partner_date": null,
+                "signed_by_unicef_date": null,
+                "partner_authorized_officers": null,
+                "special_conditions_pca": null,
+                "agreement_amendments": null,
+                "agreement_url": "https://etools.unicef.org/pmp/agreements/None/details?schema=bolivia"
+            },
+            {
+                "agreement_type": null,
+                "reference_number": null,
+                "status": null,
+                "start": null,
+                "end": null,
+                "partner_name": null,
+                "vendor_number": null,
+                "country_name": "chad",
+                "schema_name": "chad",
+                "country_programme": null,
+                "signed_by_partner": null,
+                "signed_by_partner_date": null,
+                "signed_by_unicef_date": null,
+                "partner_authorized_officers": null,
+                "special_conditions_pca": null,
+                "agreement_amendments": null,
+                "agreement_url": "https://etools.unicef.org/pmp/agreements/None/details?schema=chad"
+            },
+            {
+                "agreement_type": null,
+                "reference_number": null,
+                "status": null,
+                "start": null,
+                "end": null,
+                "partner_name": null,
+                "vendor_number": null,
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "country_programme": null,
+                "signed_by_partner": null,
+                "signed_by_partner_date": null,
+                "signed_by_unicef_date": null,
+                "partner_authorized_officers": null,
+                "special_conditions_pca": null,
+                "agreement_amendments": null,
+                "agreement_url": "https://etools.unicef.org/pmp/agreements/None/details?schema=lebanon"
+            }
+        ]
+    },
+    "content_type": null
+}
