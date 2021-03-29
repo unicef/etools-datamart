@@ -44,5 +44,5 @@ setup(name=name,
           'Framework :: Django',
           'License :: OSI Approved :: MIT',
           'Natural Language :: English',
-          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
       ])
