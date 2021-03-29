@@ -5,6 +5,11 @@
 * added higher risk rating for partner endpoint
 
 
+3.5.1 Hotfix
+-----
+* prp hotfix
+
+
 3.5
 ----
 * migrate jsonfield
