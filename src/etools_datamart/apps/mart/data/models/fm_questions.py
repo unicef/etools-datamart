@@ -307,7 +307,7 @@ class FMOntrack(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
-    vendor_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
+    vendor_number = models.CharField(max_length=30, blank=True, null=True)
     reference_number = models.CharField(max_length=100, null=True)
     field_office = models.CharField(max_length=254, blank=True, null=True)
     sections = models.TextField(blank=True, null=True)
