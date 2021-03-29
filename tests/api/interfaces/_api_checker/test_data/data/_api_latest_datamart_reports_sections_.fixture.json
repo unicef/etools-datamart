@@ -1,0 +1,67 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.section",
+                "pk": 30,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:32.096Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "name": null,
+                    "description": null,
+                    "alternate_id": null,
+                    "alternate_name": null,
+                    "dashboard": null,
+                    "color": null,
+                    "created": null,
+                    "modified": null
+                }
+            },
+            {
+                "model": "data.section",
+                "pk": 31,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:32.097Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "name": null,
+                    "description": null,
+                    "alternate_id": null,
+                    "alternate_name": null,
+                    "dashboard": null,
+                    "color": null,
+                    "created": null,
+                    "modified": null
+                }
+            },
+            {
+                "model": "data.section",
+                "pk": 32,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-03-11T19:51:32.098Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "name": null,
+                    "description": null,
+                    "alternate_id": null,
+                    "alternate_name": null,
+                    "dashboard": null,
+                    "color": null,
+                    "created": null,
+                    "modified": null
+                }
+            }
+        ],
+        "deps": []
+    }
+}

@@ -1,0 +1,53 @@
+{
+    "record": {
+        "master": {
+            "model": "data.reportindicator",
+            "pk": 33,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2021-03-11T19:51:36.982Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "locations": null,
+                "locations_data": {},
+                "assumptions": null,
+                "baseline": {},
+                "baseline_denominator": null,
+                "baseline_numerator": null,
+                "cluster_indicator_id": null,
+                "cluster_indicator_title": null,
+                "cluster_name": null,
+                "context_code": null,
+                "cp_output_name": null,
+                "cp_output_type": null,
+                "denominator_label": null,
+                "disaggregations": null,
+                "disaggregations_data": null,
+                "display_type": null,
+                "is_active": true,
+                "is_high_frequency": false,
+                "label": null,
+                "lower_result_name": null,
+                "means_of_verification": null,
+                "measurement_specifications": null,
+                "numerator_label": null,
+                "pd_outputs": null,
+                "pd_outputs_data": null,
+                "pd_output_indicator_title": null,
+                "pd_sffa_reference_number": null,
+                "response_plan_name": null,
+                "result_link_intervention": null,
+                "section_name": null,
+                "target": {},
+                "target_denominator": null,
+                "target_numerator": null,
+                "title": null,
+                "total": 0,
+                "unit": null
+            }
+        },
+        "deps": []
+    }
+}

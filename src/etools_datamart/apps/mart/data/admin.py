@@ -221,6 +221,21 @@ class LocationAdmin(DataModelAdmin):
         models.Location.objects.batch_update_centroid()
 
 
+@register(models.Locationsite)
+class LocationsiteAdmin(DataModelAdmin):
+    list_display = ('name', 'p_code', 'is_active')
+
+
+@register(models.FMOntrack)
+class FMOntrackAdmin(DataModelAdmin):
+    list_display = ('entity', 'narrative_finding', 'overall_finding_rating')
+
+
+@register(models.FMQuestion)
+class FMQuestionAdmin(DataModelAdmin):
+    list_display = ('title', 'answer_type', 'collection_method', 'answer')
+
+
 @register(models.FundsReservation)
 class FundsReservationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'fr_number', 'fr_type', 'wbs')

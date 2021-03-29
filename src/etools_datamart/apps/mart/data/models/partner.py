@@ -37,7 +37,7 @@ class PartnerLoader(EtoolsLoader):
                     'special_audit': rec.special_audit,
                     'spot_check_follow_up': rec.spot_check_follow_up,
                     }
-        except Exception:
+        except BaseException:
             data = {}
         return data
 
@@ -107,6 +107,8 @@ class Partner(EtoolsDataMartModel):
         blank=True,
         null=True,
     )
+    highest_risk_rating_name = models.CharField(max_length=150, blank=True, null=True)
+    highest_risk_rating_type = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         ordering = ("name",)

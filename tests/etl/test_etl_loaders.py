@@ -48,10 +48,7 @@ def test_loader_load(loader):
     # source = loader.model._etl_config.source
     # factory = factories_registry.get(source)
 
-    ignored_models = [
-        'FMOntrack',
-        'FMQuestion',
-    ]
+    ignored_models = []
 
     with freeze_time("2018-12-31", tz_offset=1):
         truncate_model_table(loader.model)

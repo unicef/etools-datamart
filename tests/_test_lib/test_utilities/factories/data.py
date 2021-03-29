@@ -116,6 +116,15 @@ class LocationFactory(DataMartModelFactory):
         django_get_or_create = ('name',)
 
 
+class LocationsiteFactory(DataMartModelFactory):
+    name = factory.Sequence(lambda n: "name%03d" % n)
+    is_active = True
+
+    class Meta:
+        model = models.Locationsite
+        django_get_or_create = ('name',)
+
+
 class FuzzyMonth(BaseFuzzyAttribute):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -251,6 +260,18 @@ class EngagementFactory(DataMartModelFactory):
 
     class Meta:
         model = models.Engagement
+
+
+class FMOntrackFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.FMOntrack
+
+
+class FMQuestionFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.FMQuestion
 
 
 class GrantFactory(DataMartModelFactory):

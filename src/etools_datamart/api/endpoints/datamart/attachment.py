@@ -29,6 +29,22 @@ class AttachmentSerializer(AttachmentSerializerFull):
         exclude = ('schema_name', 'file_type_id')
 
 
+class AttachmentSerializerMinimalEtools(AttachmentSerializerFull):
+
+    class Meta(DataMartSerializer.Meta):
+        model = models.Attachment
+        exclude = None
+        fields = ("schema_name",
+                  "vendor_number",
+                  "pd_ssfa_number",
+                  "file_link",
+                  "filename",
+                  "source",
+                  "uploaded_by",
+                  "created",
+                  "code")
+
+
 class AttachmentSerializerEtools(AttachmentSerializerFull):
     attachment = serializers.IntegerField(source='attachment_source_id')
 
@@ -65,7 +81,8 @@ class AttachmentViewSet(common.DataMartViewSet):
     filter_fields = ('created', 'date_of_completion', 'due_date')
     serializers_fieldsets = {'std': AttachmentSerializer,
                              'full': AttachmentSerializerFull,
-                             'etools': AttachmentSerializerEtools
+                             'etools': AttachmentSerializerEtools,
+                             'etools-min': AttachmentSerializerMinimalEtools
                              }
     querystringfilter_form_base_class = AttachmentFilterForm
 

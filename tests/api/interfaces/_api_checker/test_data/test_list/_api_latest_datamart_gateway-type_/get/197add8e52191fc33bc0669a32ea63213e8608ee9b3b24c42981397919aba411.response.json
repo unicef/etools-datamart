@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"9c674ac793328f0e46d9333e2e50a0db\""
+            "\"d0bebc0beb6e70fffe577deb1c6be307\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -23,11 +23,11 @@
         ],
         "view": [
             "view",
-            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+            "etools_datamart.api.endpoints.datamart.location.GatewayTypeViewSet"
         ],
         "service": [
             "service",
-            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
+            "etools_datamart.api.endpoints.datamart.location.GatewayTypeViewSet"
         ],
         "cache-version": [
             "cache-version",
@@ -39,11 +39,19 @@
         ],
         "cache-key": [
             "cache-key",
-            "9c674ac793328f0e46d9333e2e50a0db"
+            "d0bebc0beb6e70fffe577deb1c6be307"
         ],
         "cache-hit": [
             "cache-hit",
             "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
         ],
         "cache-ttl": [
             "cache-ttl",
@@ -51,7 +59,11 @@
         ],
         "content-length": [
             "Content-Length",
-            "351"
+            "534"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
         ]
     },
     "data": {
@@ -62,25 +74,31 @@
         "previous": null,
         "results": [
             {
+                "id": 64,
+                "last_modify_date": "11 Mar 2021 19:51:27",
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
                 "name": "name000",
-                "alternate_name": null,
-                "partner_type": null,
-                "country": null,
-                "email": null
+                "admin_level": null
             },
             {
+                "id": 65,
+                "last_modify_date": "11 Mar 2021 19:51:27",
+                "country_name": "chad",
+                "schema_name": "chad",
+                "area_code": "",
                 "name": "name001",
-                "alternate_name": null,
-                "partner_type": null,
-                "country": null,
-                "email": null
+                "admin_level": null
             },
             {
+                "id": 66,
+                "last_modify_date": "11 Mar 2021 19:51:27",
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "area_code": "",
                 "name": "name002",
-                "alternate_name": null,
-                "partner_type": null,
-                "country": null,
-                "email": null
+                "admin_level": null
             }
         ]
     },

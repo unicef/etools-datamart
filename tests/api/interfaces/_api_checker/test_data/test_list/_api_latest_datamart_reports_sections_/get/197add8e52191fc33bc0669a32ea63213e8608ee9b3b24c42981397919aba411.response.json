@@ -1,0 +1,127 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"b55f7e7321df5f0030bcd3583029ecbb\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.report_section.SectionViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.report_section.SectionViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "b55f7e7321df5f0030bcd3583029ecbb"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "846"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 30,
+                "source_id": null,
+                "last_modify_date": "11 Mar 2021 19:51:32",
+                "seen": null,
+                "country_name": "bolivia",
+                "area_code": "",
+                "name": null,
+                "description": null,
+                "alternate_id": null,
+                "alternate_name": null,
+                "dashboard": null,
+                "color": null,
+                "created": null,
+                "modified": null
+            },
+            {
+                "id": 31,
+                "source_id": null,
+                "last_modify_date": "11 Mar 2021 19:51:32",
+                "seen": null,
+                "country_name": "chad",
+                "area_code": "",
+                "name": null,
+                "description": null,
+                "alternate_id": null,
+                "alternate_name": null,
+                "dashboard": null,
+                "color": null,
+                "created": null,
+                "modified": null
+            },
+            {
+                "id": 32,
+                "source_id": null,
+                "last_modify_date": "11 Mar 2021 19:51:32",
+                "seen": null,
+                "country_name": "lebanon",
+                "area_code": "",
+                "name": null,
+                "description": null,
+                "alternate_id": null,
+                "alternate_name": null,
+                "dashboard": null,
+                "color": null,
+                "created": null,
+                "modified": null
+            }
+        ]
+    },
+    "content_type": null
+}
