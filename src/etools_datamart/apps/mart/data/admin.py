@@ -396,14 +396,8 @@ class AuditResultAdmin(DataModelAdmin):
     list_filter = ()
 
 
-@register(models.SpotCheck)
-class SpotCheckAdmin(DataModelAdmin):
-    list_display = ('__str__',)
-    list_filter = ()
-
-
 @register(models.SpotCheckFindings)
-class SpotCheckFindingsAdmin(DataModelAdmin):
+class SpotCheckAdmin(DataModelAdmin):
     list_display = ('__str__',)
     list_filter = ()
 
