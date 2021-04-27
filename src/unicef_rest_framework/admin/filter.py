@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 import requests
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
 
 from ..models.filter import SystemFilter, SystemFilterFieldRule
@@ -32,7 +32,7 @@ class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
     search_fields = ('service__name',)
     inlines = [SystemFilterRuleInline]
 
-    @action()
+    @button()
     def test(self, request, pk):
         if not pk:
             return
@@ -47,7 +47,7 @@ class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return HttpResponseRedirect(reverse('admin:%s_%s_change' % info,
                                             args=[pk]))
 
-    @action()
+    @button()
     def view(self, request, pk):
         if not pk:
             return

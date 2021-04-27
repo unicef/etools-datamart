@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
 
 from unicef_rest_framework.cache import humanize_ttl, parse_ttl
@@ -54,12 +54,12 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
     get_cache_ttl.short_description = 'ttl'
     get_cache_ttl.admin_order_field = 'cache_ttl'
 
-    @action(label='View Service')
+    @button(label='View Service')
     def goto_service(self, request, pk):
         url = reverse("admin:unicef_rest_framework_service_change", args=[pk])
         return HttpResponseRedirect(url)
 
-    @action(label='Reset cache', css_class="btn btn-danger", icon="fa fa-warning icon-white")
+    @button(label='Reset cache', css_class="btn btn-danger", icon="fa fa-warning icon-white")
     def reset_cache(self, request):
         opts = self.model._meta
         context = dict(
@@ -84,12 +84,12 @@ class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
                                 'admin/unicef_rest_framework/confirm.html',
                                 context)
 
-    @action(label='Invalidate Cache')
+    @button(label='Invalidate Cache')
     def increment(self, request, pk):
         service = Service.objects.get(id=pk)
         service.invalidate_cache()
 
-    @action(label='Generate Cache Token')
+    @button(label='Generate Cache Token')
     def generate_cache_token_single(self, request, pk):
         self.generate_cache_token(request, Service.objects.filter(id=pk))
 

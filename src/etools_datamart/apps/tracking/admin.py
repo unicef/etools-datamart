@@ -8,7 +8,7 @@ from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 
 from unicef_rest_framework.admin import APIModelAdmin, TruncateTableMixin
 from unicef_rest_framework.utils import humanize_size
@@ -53,12 +53,12 @@ class APIRequestLogAdmin(TruncateTableMixin, admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-    @action(icon="fa fa-compress icon-white")
+    @button(icon="fa fa-compress icon-white")
     def aggregate(self, request):
         processed = APIRequestLog.objects.aggregate()
         self.message_user(request, "{} {} aggregated".format(processed, pluralize(processed, 'day,days')))
 
-    @action()
+    @button()
     def preload(self, request, pk):
         obj = APIRequestLog.objects.get(id=pk)
         from unicef_rest_framework.models import Preload

@@ -8,7 +8,7 @@ from django.contrib.admin.views.main import ChangeList
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from adminactions.actions import export_as_csv, export_as_xls, mass_update
 from adminfilters.filters import AllValuesComboFilter
 from humanize import naturaldelta
@@ -70,20 +70,20 @@ class DataModelAdmin(TruncateTableMixin, DisplayAllMixin, ModelAdmin):
     #         return HttpResponseRedirect(redirect_url)
     #     return self._changeform_view(request, object_id, form_url, extra_context)
 
-    @action()
+    @button()
     def invalidate_cache(self, request):
         for s in Service.objects.all():
             if s.managed_model == self.model:
                 s.invalidate_cache()
 
-    @action()
+    @button()
     def api(self, request):
         for s in Service.objects.all():
             if s.managed_model == self.model:
                 return HttpResponseRedirect(s.endpoint)
         return ""  # pragma: no cover
 
-    @action()
+    @button()
     def service(self, request):
         for s in Service.objects.all():
             if s.managed_model == self.model:
@@ -92,7 +92,7 @@ class DataModelAdmin(TruncateTableMixin, DisplayAllMixin, ModelAdmin):
                 return HttpResponseRedirect(url)
         return ""  # pragma: no cover
 
-    @action()
+    @button()
     def queue(self, request):
         try:
             start = time()
@@ -112,7 +112,7 @@ class DataModelAdmin(TruncateTableMixin, DisplayAllMixin, ModelAdmin):
             return HttpResponseRedirect(reverse(admin_urlname(self.model._meta,
                                                               'changelist')))
 
-    @action()
+    @button()
     def refresh(self, request):
         try:
             start = time()
@@ -216,7 +216,7 @@ class LocationAdmin(DataModelAdmin):
     def update_centroid(self, request, queryset):
         queryset.update_centroid()
 
-    @action()
+    @button()
     def batch_update_centroid(self, request):
         models.Location.objects.batch_update_centroid()
 

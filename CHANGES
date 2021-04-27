@@ -1,5 +1,6 @@
 3.7
 ----
+* migrated to Django 3.2
 * removed obsolete spotcheck model
 
 
