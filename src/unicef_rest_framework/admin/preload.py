@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
 
 from unicef_rest_framework.utils import humanize_size
@@ -41,7 +41,7 @@ class PreloadAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def preview(self, obj):
         return mark_safe("<a href='{0}' title='{0}' target='_new'>preview</a>".format(obj.get_full_url()))
 
-    @action(label='Goto API')
+    @button(label='Goto API')
     def goto(self, request, pk):
         obj = self.model.objects.get(id=pk)
         return HttpResponseRedirect(obj.get_full_url())
@@ -52,12 +52,12 @@ class PreloadAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     size.admin_order_field = 'response_length'
 
-    @action()
+    @button()
     def queue(self, request, id):
         from unicef_rest_framework.tasks import preload
         preload.apply_async(args=[id])
 
-    @action()
+    @button()
     def check_url(self, request, id):
         target = self.model.objects.get(id=id)
         try:

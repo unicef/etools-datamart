@@ -2,7 +2,7 @@ import logging
 
 from django.contrib import admin
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import _confirm_action, ExtraUrlMixin
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class TruncateTableMixin(ExtraUrlMixin):
     def _truncate(self, request):
         self.model.objects.truncate()
 
-    @action(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
+    @button(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
     def truncate(self, request):
         return _confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
                                "Successfully executed", )

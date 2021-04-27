@@ -14,7 +14,7 @@ from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import _confirm_action, ExtraUrlMixin
 from adminactions.mass_update import mass_update
 from django_celery_beat.models import PeriodicTask
@@ -274,7 +274,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #         return HttpResponseRedirect(redirect_url)
     #     return self._changeform_view(request, object_id, form_url, extra_context)
 
-    @action()
+    @button()
     def check_running(self, request, message=True):
         # {'celery@gundam.local': [{'id': '7a570647-89cd-4c47-84e4-c8569ef48f28',
         #                           'name': 'load_data_hact',
@@ -303,7 +303,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     models.EtlTask.objects.filter(task=task['name']).update(task_id=task['id'])
         models.EtlTask.objects.exclude(task__in=founds).update(task_id=None)
 
-    @action()
+    @button()
     def queue(self, request, pk, message=True):
         obj = self.get_object(request, pk)
         try:
@@ -319,7 +319,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
         return HttpResponseRedirect(reverse("admin:etl_etltask_changelist"))
 
-    @action()
+    @button()
     def unlock(self, request, pk):
 
         obj = self.get_object(request, pk)
@@ -333,7 +333,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
 """,
                                "Successfully executed", )
 
-    @action()
+    @button()
     def inspect(self, request):
         created, updated = self.model.objects.inspect()
         self.message_user(request, f"{created} task created. {updated} have been updated",
@@ -381,7 +381,7 @@ class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     time.admin_order_field = 'elapsed'
 
-    @action()
+    @button()
     def delta(self, request):
         qs = self.get_queryset(request).order_by('-timestamp')
         for e in qs.filter(delta__isnull=True):

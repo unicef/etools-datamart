@@ -71,7 +71,7 @@ class APIReadOnlyRouter(APIRouter):
             initkwargs={'suffix': 'List'}
         ),
         # Dynamically generated list routes. Generated using
-        # @action(detail=False) decorator on methods of the viewset.
+        # @button(detail=False) decorator on methods of the viewset.
         DynamicRoute(
             url=r'^{prefix}/{url_path}{trailing_slash}$',
             name='{basename}-{url_name}',
@@ -89,7 +89,7 @@ class APIReadOnlyRouter(APIRouter):
             initkwargs={'suffix': 'Instance'}
         ),
         # Dynamically generated detail routes. Generated using
-        # @action(detail=True) decorator on methods of the viewset.
+        # @button(detail=True) decorator on methods of the viewset.
         DynamicRoute(
             url=r'^{prefix}/{lookup}/{url_path}{trailing_slash}$',
             name='{basename}-{url_name}',
