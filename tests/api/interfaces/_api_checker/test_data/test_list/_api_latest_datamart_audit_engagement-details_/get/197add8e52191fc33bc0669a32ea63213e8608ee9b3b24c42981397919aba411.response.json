@@ -1,66 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"dd2ea4fa503624c919b1adc5ac3e5bb7\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.audit_engagement.EngagementDetailViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.audit_engagement.EngagementDetailViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "dd2ea4fa503624c919b1adc5ac3e5bb7"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "1452"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"73eca3716ab7f42c4104f671f3c7101e\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.audit_engagement.EngagementDetailViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.audit_engagement.EngagementDetailViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "73eca3716ab7f42c4104f671f3c7101e",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "1452",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -137,5 +93,5 @@
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }

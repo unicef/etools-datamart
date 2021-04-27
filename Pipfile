@@ -8,7 +8,7 @@ azure-storage-blob = "<12.0"
 celery = "*"
 cryptography = "<3.4"  # PEP517 dependency
 dj-static = "*"
-Django = "<3.2"
+Django = "*"
 django-admin-extra-urls = "*"
 django-adminactions = "*"
 django-adminfilters = "*"
@@ -64,7 +64,7 @@ xhtml2pdf = "*"
 
 
 [dev-packages]
-drf-api-checker = "<0.11"
+drf-api-checker = "*"
 django-webtest = "*"
 factory-boy = "*"
 freezegun = "*"

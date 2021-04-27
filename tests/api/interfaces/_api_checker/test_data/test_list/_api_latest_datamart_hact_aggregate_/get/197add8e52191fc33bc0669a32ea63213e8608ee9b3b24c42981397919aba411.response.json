@@ -1,70 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"af8fe3df3df2ba691c6fe6d836bdb3f2\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.hact_aggregate.HACTAggreagateViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.hact_aggregate.HACTAggreagateViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "af8fe3df3df2ba691c6fe6d836bdb3f2"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "954"
-        ],
-        "referrer-policy": [
-            "Referrer-Policy",
-            "same-origin"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"edf8238ff1b327292e71a31f45b12ed4\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.hact_aggregate.HACTAggreagateViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.hact_aggregate.HACTAggreagateViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "edf8238ff1b327292e71a31f45b12ed4",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "952",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -74,9 +26,9 @@
         "previous": null,
         "results": [
             {
-                "id": 30,
+                "id": 8,
                 "source_id": null,
-                "last_modify_date": "11 Mar 2021 19:51:28",
+                "last_modify_date": "27 Apr 2021 22:55:11",
                 "seen": null,
                 "country_name": "bolivia",
                 "area_code": "",
@@ -89,9 +41,9 @@
                 "completed_special_audits": 0
             },
             {
-                "id": 31,
+                "id": 9,
                 "source_id": null,
-                "last_modify_date": "11 Mar 2021 19:51:28",
+                "last_modify_date": "27 Apr 2021 22:55:11",
                 "seen": null,
                 "country_name": "chad",
                 "area_code": "",
@@ -104,9 +56,9 @@
                 "completed_special_audits": 0
             },
             {
-                "id": 32,
+                "id": 10,
                 "source_id": null,
-                "last_modify_date": "11 Mar 2021 19:51:28",
+                "last_modify_date": "27 Apr 2021 22:55:11",
                 "seen": null,
                 "country_name": "lebanon",
                 "area_code": "",
@@ -120,5 +72,5 @@
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }

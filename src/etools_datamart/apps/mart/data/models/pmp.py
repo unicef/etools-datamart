@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from django.db import models
 from django.db.models import Sum
@@ -55,7 +56,7 @@ class PMPIndicatorLoader(EtoolsLoader):
                           ),
                           'fr_currencies': ', '.join(fr for fr in fr_currencies),
                           'sum_of_all_fr_planned_amount': intervention.FundsFundsreservationheader_intervention.aggregate(
-                              total=Coalesce(Sum('intervention_amt'), 0))[
+                              total=Coalesce(Sum('intervention_amt'), Decimal(0.0)))[
                               'total'] if fr_currencies.count() <= 1 else '-',
                           'core_value_attached': has_assessment,
                           # 'partner_link': '{}/pmp/partners/{}/details'.format(base_url, partner.pk),

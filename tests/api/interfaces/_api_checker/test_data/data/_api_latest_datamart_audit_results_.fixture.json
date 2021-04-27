@@ -3,15 +3,16 @@
         "master": [
             {
                 "model": "data.auditresult",
-                "pk": 180,
+                "pk": 100,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-10-15T16:02:18.374Z",
+                    "last_modify_date": "2021-04-27T22:55:10.514Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
                     "area_code": "",
                     "vendor": null,
+                    "vendor_number": null,
                     "partner_type": null,
                     "risk_rating": null,
                     "audited_expenditure": "1.00",
@@ -19,20 +20,22 @@
                     "audit_opinion": "--",
                     "count_high_risk_findings": null,
                     "count_financial_findings": null,
-                    "count_key_control_weaknesses": null
+                    "count_key_control_weaknesses": null,
+                    "status": null
                 }
             },
             {
                 "model": "data.auditresult",
-                "pk": 181,
+                "pk": 101,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-10-15T16:02:18.381Z",
+                    "last_modify_date": "2021-04-27T22:55:10.515Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
                     "area_code": "",
                     "vendor": null,
+                    "vendor_number": null,
                     "partner_type": null,
                     "risk_rating": null,
                     "audited_expenditure": "1.00",
@@ -40,20 +43,22 @@
                     "audit_opinion": "--",
                     "count_high_risk_findings": null,
                     "count_financial_findings": null,
-                    "count_key_control_weaknesses": null
+                    "count_key_control_weaknesses": null,
+                    "status": null
                 }
             },
             {
                 "model": "data.auditresult",
-                "pk": 182,
+                "pk": 102,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-10-15T16:02:18.383Z",
+                    "last_modify_date": "2021-04-27T22:55:10.516Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
                     "area_code": "",
                     "vendor": null,
+                    "vendor_number": null,
                     "partner_type": null,
                     "risk_rating": null,
                     "audited_expenditure": "1.00",
@@ -61,7 +66,8 @@
                     "audit_opinion": "--",
                     "count_high_risk_findings": null,
                     "count_financial_findings": null,
-                    "count_key_control_weaknesses": null
+                    "count_key_control_weaknesses": null,
+                    "status": null
                 }
             }
         ],

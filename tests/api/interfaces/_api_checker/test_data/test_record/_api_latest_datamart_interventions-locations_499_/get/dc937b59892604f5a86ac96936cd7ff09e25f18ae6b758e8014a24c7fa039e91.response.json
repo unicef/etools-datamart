@@ -1,59 +1,24 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"8e751ae6d378e34bcc94a6ccf9296395\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "1768"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"8e751ae6d378e34bcc94a6ccf9296395\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "1766",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "id": 499,
         "source_id": null,
-        "last_modify_date": "24 Sep 2020 20:11:22",
+        "last_modify_date": "27 Apr 2021 22:55:17",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
@@ -81,9 +46,9 @@
         "document_type": null,
         "end_date": null,
         "fr_number": null,
-        "intervention_id": 498,
+        "intervention_id": 3,
         "last_amendment_date": null,
-        "number": "#498",
+        "number": "#003",
         "number_of_attachments": null,
         "number_of_amendments": null,
         "offices": null,
@@ -117,7 +82,7 @@
         "status": null,
         "submission_date": null,
         "submission_date_prc": null,
-        "title": "title498",
+        "title": "title003",
         "unicef_focal_points": null,
         "unicef_focal_points_data": {},
         "unicef_signatory_name": null,
@@ -125,5 +90,5 @@
         "last_pv_date": null,
         "location": null
     },
-    "content_type": null
+    "content_type": "application/json"
 }

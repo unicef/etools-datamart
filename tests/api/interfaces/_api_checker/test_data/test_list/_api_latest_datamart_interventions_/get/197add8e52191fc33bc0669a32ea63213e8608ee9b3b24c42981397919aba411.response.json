@@ -1,66 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"472d4b045203e47e6cfe19c3194ce1c1\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "2"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "472d4b045203e47e6cfe19c3194ce1c1"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "5625"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"9fd37b44c2001390d1b4c9fc2251763a\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "9fd37b44c2001390d1b4c9fc2251763a",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "5619",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -70,9 +26,9 @@
         "previous": null,
         "results": [
             {
-                "id": 506,
+                "id": 509,
                 "source_id": null,
-                "last_modify_date": "24 Sep 2020 20:11:18",
+                "last_modify_date": "27 Apr 2021 22:55:12",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -95,9 +51,9 @@
                 "document_type": null,
                 "end_date": null,
                 "fr_number": null,
-                "intervention_id": 505,
+                "intervention_id": 3,
                 "last_amendment_date": null,
-                "number": "#505",
+                "number": "#003",
                 "number_of_attachments": null,
                 "number_of_amendments": null,
                 "offices_data": {},
@@ -130,7 +86,7 @@
                 "status": null,
                 "submission_date": null,
                 "submission_date_prc": null,
-                "title": "title505",
+                "title": "title003",
                 "unicef_focal_points": null,
                 "unicef_focal_points_data": {},
                 "unicef_signatory_name": null,
@@ -150,9 +106,9 @@
                 ]
             },
             {
-                "id": 507,
+                "id": 510,
                 "source_id": null,
-                "last_modify_date": "24 Sep 2020 20:11:18",
+                "last_modify_date": "27 Apr 2021 22:55:12",
                 "seen": null,
                 "country_name": "chad",
                 "schema_name": "chad",
@@ -175,9 +131,9 @@
                 "document_type": null,
                 "end_date": null,
                 "fr_number": null,
-                "intervention_id": 506,
+                "intervention_id": 4,
                 "last_amendment_date": null,
-                "number": "#506",
+                "number": "#004",
                 "number_of_attachments": null,
                 "number_of_amendments": null,
                 "offices_data": {},
@@ -210,7 +166,7 @@
                 "status": null,
                 "submission_date": null,
                 "submission_date_prc": null,
-                "title": "title506",
+                "title": "title004",
                 "unicef_focal_points": null,
                 "unicef_focal_points_data": {},
                 "unicef_signatory_name": null,
@@ -230,9 +186,9 @@
                 ]
             },
             {
-                "id": 508,
+                "id": 511,
                 "source_id": null,
-                "last_modify_date": "24 Sep 2020 20:11:18",
+                "last_modify_date": "27 Apr 2021 22:55:12",
                 "seen": null,
                 "country_name": "lebanon",
                 "schema_name": "lebanon",
@@ -255,9 +211,9 @@
                 "document_type": null,
                 "end_date": null,
                 "fr_number": null,
-                "intervention_id": 507,
+                "intervention_id": 5,
                 "last_amendment_date": null,
-                "number": "#507",
+                "number": "#005",
                 "number_of_attachments": null,
                 "number_of_amendments": null,
                 "offices_data": {},
@@ -290,7 +246,7 @@
                 "status": null,
                 "submission_date": null,
                 "submission_date_prc": null,
-                "title": "title507",
+                "title": "title005",
                 "unicef_focal_points": null,
                 "unicef_focal_points_data": {},
                 "unicef_signatory_name": null,
@@ -311,5 +267,5 @@
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }

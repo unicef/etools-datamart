@@ -1,66 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"821be8fa7b906d683785bae1c79bb976\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "821be8fa7b906d683785bae1c79bb976"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "999"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"da0d07e2dbb1c36d420af0ceba3e2fb5\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.location.LocationViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.location.LocationViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "da0d07e2dbb1c36d420af0ceba3e2fb5",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "996",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -70,7 +26,7 @@
         "previous": null,
         "results": [
             {
-                "id": 1502,
+                "id": 595,
                 "source_id": null,
                 "name": "name000",
                 "latitude": null,
@@ -82,12 +38,12 @@
                 "admin_level": null,
                 "geonameid": null,
                 "is_active": true,
-                "last_modify_date": "16 Sep 2019 18:29:12",
-                "created": "16 Sep 2019 18:29:02",
-                "modified": "16 Sep 2019 18:29:02"
+                "last_modify_date": "27 Apr 2021 22:55:10",
+                "created": "27 Apr 2021 22:55:01",
+                "modified": "27 Apr 2021 22:55:01"
             },
             {
-                "id": 1503,
+                "id": 596,
                 "source_id": null,
                 "name": "name001",
                 "latitude": null,
@@ -99,12 +55,12 @@
                 "admin_level": null,
                 "geonameid": null,
                 "is_active": true,
-                "last_modify_date": "16 Sep 2019 18:29:12",
-                "created": "16 Sep 2019 18:29:02",
-                "modified": "16 Sep 2019 18:29:02"
+                "last_modify_date": "27 Apr 2021 22:55:10",
+                "created": "27 Apr 2021 22:55:01",
+                "modified": "27 Apr 2021 22:55:01"
             },
             {
-                "id": 1504,
+                "id": 597,
                 "source_id": null,
                 "name": "name002",
                 "latitude": null,
@@ -116,11 +72,11 @@
                 "admin_level": null,
                 "geonameid": null,
                 "is_active": true,
-                "last_modify_date": "16 Sep 2019 18:29:12",
-                "created": "16 Sep 2019 18:29:02",
-                "modified": "16 Sep 2019 18:29:02"
+                "last_modify_date": "27 Apr 2021 22:55:10",
+                "created": "27 Apr 2021 22:55:01",
+                "modified": "27 Apr 2021 22:55:01"
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }
