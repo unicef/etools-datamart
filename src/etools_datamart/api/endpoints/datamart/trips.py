@@ -24,6 +24,51 @@ class TripSerializer(DataMartSerializer):
                                     obj.schema_name)
 
 
+class TripLightSerializer(DataMartSerializer):
+    trip_url = serializers.SerializerMethodField()
+
+    def get_trip_url(self, obj):
+        return "%s/%s?schema=%s" % (config.ETOOLS_ADDRESS,
+                                    obj.trip_url,
+                                    obj.schema_name)
+
+    class Meta:
+        model = models.Trip
+        fields = (
+            'trip_url',
+            'seen',
+            'last_modify_date',
+            'country_name',
+            'additional_note',
+            'created',
+            'currency_code',
+            'end_date',
+            'international_travel',
+            'locations',
+            'mode_of_travel',
+            'office_name',
+            'partner_name',
+            'pd_ssfa_reference_number',
+            'pd_ssfa_title',
+            'primary_traveler',
+            'purpose',
+            'reference_number',
+            'report_note',
+            'section_name',
+            'start_date',
+            'status',
+            'supervisor_email',
+            'ta_required',
+            'traveler_email',
+            'trip_attachments',
+            'trip_activity_date',
+            'trip_activity_type',
+            'trip_activity_reference_number',
+            'vendor_number',
+            'source_activity_id'
+        )
+
+
 class TripFilterForm(forms.Form):
     # travel_reference_number__istartswith = forms.CharField(label='Reference Number',
     #                                                        required=False)
@@ -65,6 +110,9 @@ class TripViewSet(common.DataMartViewSet):
     querystringfilter_form_base_class = TripFilterForm
 
     serializer_class = TripSerializer
+    serializers_fieldsets = {
+        'light': TripLightSerializer,
+    }
     queryset = models.Trip.objects.all()
     filter_fields = ('travel_type',
                      'result_type',
