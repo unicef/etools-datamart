@@ -2,15 +2,15 @@
     "record": {
         "master": {
             "model": "data.gatewaytype",
-            "pk": 67,
+            "pk": 602,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-03-11T19:51:34.988Z",
+                "last_modify_date": "2021-04-27T22:55:16.510Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "name": "name003",
+                "name": "name007",
                 "admin_level": null
             }
         },

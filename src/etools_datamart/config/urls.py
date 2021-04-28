@@ -19,8 +19,8 @@ urlpatterns = [
     path(r'api/', include(etools_datamart.api.urls)),
     path(r'urf/', include(unicef_rest_framework.urls, namespace='urf')),
 
-    path(r'admin/', site.urls),
     path(r'admin/schemas/', SelectSchema.as_view(), name='select-schema'),
+    path(r'admin/', site.urls),
     path(r'impersonate/', include('impersonate.urls')),
     path(r'explorer/', include('explorer.urls')),
 

@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.trip",
-                "pk": 30,
+                "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-03-11T19:51:32.671Z",
+                    "last_modify_date": "2021-04-27T22:55:14.277Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -67,10 +67,10 @@
             },
             {
                 "model": "data.trip",
-                "pk": 31,
+                "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-03-11T19:51:32.674Z",
+                    "last_modify_date": "2021-04-27T22:55:14.772Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -131,10 +131,10 @@
             },
             {
                 "model": "data.trip",
-                "pk": 32,
+                "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-03-11T19:51:32.676Z",
+                    "last_modify_date": "2021-04-27T22:55:14.774Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",

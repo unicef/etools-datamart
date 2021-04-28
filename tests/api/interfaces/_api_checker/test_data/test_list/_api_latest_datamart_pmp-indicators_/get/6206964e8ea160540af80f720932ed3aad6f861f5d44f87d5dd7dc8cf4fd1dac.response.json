@@ -1,66 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"303d3c88dd2b1fdb8e7f84e47a2a6626\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "303d3c88dd2b1fdb8e7f84e47a2a6626"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "483"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"6002e0c4fc5e3c0f2d291a9c8cdbea48\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.pmpindicators.PMPIndicatorsViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "6002e0c4fc5e3c0f2d291a9c8cdbea48",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "480",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -70,7 +26,7 @@
         "previous": null,
         "results": [
             {
-                "id": 2504,
+                "id": 298,
                 "country_name": "bolivia",
                 "partner_name": null,
                 "partner_type": null,
@@ -79,7 +35,7 @@
                 "currency": null
             },
             {
-                "id": 2505,
+                "id": 299,
                 "country_name": "chad",
                 "partner_name": null,
                 "partner_type": null,
@@ -88,7 +44,7 @@
                 "currency": null
             },
             {
-                "id": 2506,
+                "id": 300,
                 "country_name": "lebanon",
                 "partner_name": null,
                 "partner_type": null,
@@ -98,5 +54,5 @@
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }

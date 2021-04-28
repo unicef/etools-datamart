@@ -5,7 +5,7 @@
             "pk": 400,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2020-09-24T20:11:22.981Z",
+                "last_modify_date": "2021-04-27T22:55:17.887Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -45,6 +45,7 @@
                 "partner_focal_points_data": {},
                 "partner_id": null,
                 "partner_name": null,
+                "partner_sea_risk_rating": null,
                 "partner_signatory_name": null,
                 "partner_signatory_email": null,
                 "partner_signatory_first_name": null,

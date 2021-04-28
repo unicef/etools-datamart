@@ -1,66 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"27e033617ce6f9bcd70990311462c11b\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "27e033617ce6f9bcd70990311462c11b"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "1881"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"d9bf870960393c55b9217dc6b70531e1\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "d9bf870960393c55b9217dc6b70531e1",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "1878",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -70,13 +26,13 @@
         "previous": null,
         "results": [
             {
-                "id": 1538,
+                "id": 508,
                 "source_id": null,
-                "last_modify_date": "16 Sep 2019 18:29:13",
+                "last_modify_date": "27 Apr 2021 22:55:11",
                 "seen": null,
                 "country_name": "bolivia",
                 "area_code": "",
-                "month": "2019-09-01",
+                "month": "2021-04-01",
                 "spotcheck_ip_contacted": 0,
                 "spotcheck_report_submitted": 0,
                 "spotcheck_final_report": 0,
@@ -95,13 +51,13 @@
                 "microassessment_cancelled": 0
             },
             {
-                "id": 1539,
+                "id": 509,
                 "source_id": null,
-                "last_modify_date": "16 Sep 2019 18:29:13",
+                "last_modify_date": "27 Apr 2021 22:55:11",
                 "seen": null,
                 "country_name": "chad",
                 "area_code": "",
-                "month": "2019-09-01",
+                "month": "2021-04-01",
                 "spotcheck_ip_contacted": 0,
                 "spotcheck_report_submitted": 0,
                 "spotcheck_final_report": 0,
@@ -120,13 +76,13 @@
                 "microassessment_cancelled": 0
             },
             {
-                "id": 1540,
+                "id": 510,
                 "source_id": null,
-                "last_modify_date": "16 Sep 2019 18:29:13",
+                "last_modify_date": "27 Apr 2021 22:55:11",
                 "seen": null,
                 "country_name": "lebanon",
                 "area_code": "",
-                "month": "2019-09-01",
+                "month": "2021-04-01",
                 "spotcheck_ip_contacted": 0,
                 "spotcheck_report_submitted": 0,
                 "spotcheck_final_report": 0,
@@ -146,5 +102,5 @@
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }
