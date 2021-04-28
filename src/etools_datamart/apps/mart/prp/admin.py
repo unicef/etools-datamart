@@ -16,4 +16,5 @@ class IndicatorByLocationAdmin(TruncateTableMixin, ModelAdmin):
 
 @register(models.DataReport)
 class DataReportAdmin(TruncateTableMixin, ModelAdmin):
-    list_display = ('__str__',)
+    list_display = ('country_name', 'partner_name', 'cp_output', 'intervention_reference_number', 'pd_result')
+    list_filter = ('country_name', 'partner_name', 'cp_output', 'intervention_reference_number')
