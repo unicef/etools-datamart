@@ -62,13 +62,13 @@ class DatamartAdminSite(AdminSite):
         return super().app_index(request, app_label, extra_context)
 
     def get_urls(self):
-        from django.urls import path
+        from django.urls import re_path
 
         urls = super().get_urls()
-        urls += [
-            path('tracking/reset/', self.admin_view(reset_counters), name='tracking-reset'),
-            path('tracking/refresh/', self.admin_view(refresh_counters), name='tracking-refresh')
-        ]
+        urls = [
+            re_path('tracking/reset/', self.admin_view(reset_counters), name='tracking-reset'),
+            re_path('tracking/refresh/', self.admin_view(refresh_counters), name='tracking-refresh')
+        ] + urls
         return urls
 
     @never_cache

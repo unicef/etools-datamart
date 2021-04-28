@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
 from adminactions.mass_update import mass_update
 from constance import config
@@ -121,7 +121,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     visible.boolean = True
 
-    @action()
+    @button()
     def refresh(self, request):
         msgs = {False: 'No new services found',
                 True: 'Found {} new services. Removed {}'}
@@ -130,21 +130,21 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
         return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % info))
 
-    @action(label='Invalidate Cache')
+    @button(label='Invalidate Cache')
     def invalidate_all_cache(self, request):
         Service.objects.invalidate_cache()
 
-    @action()
+    @button()
     def doc(self, request, pk):
         service = Service.objects.get(pk=pk)
         return HttpResponseRedirect(service.doc_url)
 
-    @action()
+    @button()
     def api(self, request, pk):
         service = Service.objects.get(pk=pk)
         return HttpResponseRedirect(service.endpoint)
 
-    @action()
+    @button()
     def data(self, request, pk):
         service = Service.objects.get(pk=pk)
         model = service.managed_model
@@ -152,7 +152,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
                                                   model._meta.model_name))
         return HttpResponseRedirect(url)
 
-    @action()
+    @button()
     def invalidate_cache(self, request, pk):
         service = Service.objects.get(pk=pk)
         service.invalidate_cache()
@@ -161,7 +161,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
         else:
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-    # @action(visible=False)
+    # @button(visible=False)
     # def code(self, request, pk):
     #     cls = request.GET.get('c', None)
     #     if cls:

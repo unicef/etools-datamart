@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.location",
-            "pk": 1505,
+            "pk": 598,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2019-09-16T18:29:18.125Z",
+                "last_modify_date": "2021-04-27T22:55:16.284Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -15,30 +15,31 @@
                 "longitude": null,
                 "p_code": "",
                 "point": null,
-                "gateway": 1517,
+                "gateway": 601,
                 "geom": null,
+                "geoname": null,
                 "level": 3,
                 "lft": 1,
                 "parent": null,
                 "rght": 1,
                 "tree_id": 1,
-                "created": "2019-09-16T18:29:02.524Z",
-                "modified": "2019-09-16T18:29:02.524Z",
+                "created": "2021-04-27T22:55:01.788Z",
+                "modified": "2021-04-27T22:55:01.788Z",
                 "is_active": true
             }
         },
         "deps": [
             {
                 "model": "data.gatewaytype",
-                "pk": 1517,
+                "pk": 601,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2019-09-16T18:29:18.111Z",
+                    "last_modify_date": "2021-04-27T22:55:16.275Z",
                     "seen": null,
                     "country_name": "Bolivia",
                     "schema_name": "Bolivia",
                     "area_code": "",
-                    "name": "name003",
+                    "name": "name006",
                     "admin_level": null
                 }
             }

@@ -276,7 +276,7 @@ class DataReportLoader(PrpBaseLoader):
                 levelname=location.gateway.name
             ))
         values['locations_data'] = locs
-        return ", ".join([l['name'] for l in locs])
+        return ", ".join([loc['name'] for loc in locs])
 
     def get_submitted_by(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         user = get_attr(record, 'indicator_report.progress_report.submitted_by')
@@ -452,6 +452,9 @@ class DataReport(PrpDataMartModel):
 
     class Meta:
         app_label = 'prp'
+
+    def __str__(self):
+        return f'{self.country_name} | {self.partner_name} | {self.cp_output} | {self.intervention_reference_number} | {self.pd_result}'
 
     class Options:
         key = lambda loader, record: {'source_id': record.id}

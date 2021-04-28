@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
 from adminfilters.filters import TextFieldFilter
 
@@ -64,7 +64,7 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     size.admin_order_field = 'response_length'
 
-    @action()
+    @button()
     def check_file(self, request, pk):
         obj = self.model.objects.get(id=pk)
         if obj.check_file():
@@ -72,12 +72,12 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
         else:
             self.message_user(request, 'File does not exists.', messages.ERROR)
 
-    @action(label='Goto API')
+    @button(label='Goto API')
     def goto(self, request, pk):
         obj = self.model.objects.get(id=pk)
         return HttpResponseRedirect(obj.get_full_url())
 
-    @action()
+    @button()
     def queue(self, request, pk):
         from unicef_rest_framework.tasks import export
         obj = self.get_object(request, pk)
@@ -85,12 +85,12 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
         self.message_user(request, f"Export generation '{obj.name}' queued", messages.SUCCESS)
         return HttpResponseRedirect(reverse("admin:unicef_rest_framework_export_changelist"))
 
-    @action()
+    @button()
     def run(self, request, pk):
         from unicef_rest_framework.tasks import export
         export(pk)
 
-    @action(label='download')
+    @button(label='download')
     def _download(self, request, pk):
         obj = self.model.objects.get(id=pk)
         url = reverse('urf:export-fetch', args=[obj.pk])

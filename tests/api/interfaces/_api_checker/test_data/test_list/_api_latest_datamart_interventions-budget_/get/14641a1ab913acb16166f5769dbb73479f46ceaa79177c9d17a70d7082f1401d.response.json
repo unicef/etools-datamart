@@ -1,66 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"753da872402516f50088a6960a453ce7\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "753da872402516f50088a6960a453ce7"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "4170"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"c858f4316b76d58e536ae779ad595603\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.partners_interventionbudget.InterventionBudgetViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "c858f4316b76d58e536ae779ad595603",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "4170",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -113,7 +69,7 @@
                 "attachment_types": null,
                 "created": null,
                 "updated": null,
-                "pd_ssfa_last_modify_date": "24 Sep 2020 20:11:19",
+                "pd_ssfa_last_modify_date": "27 Apr 2021 22:55:12",
                 "pd_ssfa_url": "https://etools.unicef.org/pmp/interventions/None/details/?schema=bolivia",
                 "budget_cso_contribution": null,
                 "budget_currency": null,
@@ -166,7 +122,7 @@
                 "attachment_types": null,
                 "created": null,
                 "updated": null,
-                "pd_ssfa_last_modify_date": "24 Sep 2020 20:11:19",
+                "pd_ssfa_last_modify_date": "27 Apr 2021 22:55:12",
                 "pd_ssfa_url": "https://etools.unicef.org/pmp/interventions/None/details/?schema=chad",
                 "budget_cso_contribution": null,
                 "budget_currency": null,
@@ -219,7 +175,7 @@
                 "attachment_types": null,
                 "created": null,
                 "updated": null,
-                "pd_ssfa_last_modify_date": "24 Sep 2020 20:11:19",
+                "pd_ssfa_last_modify_date": "27 Apr 2021 22:55:12",
                 "pd_ssfa_url": "https://etools.unicef.org/pmp/interventions/None/details/?schema=lebanon",
                 "budget_cso_contribution": null,
                 "budget_currency": null,
@@ -230,5 +186,5 @@
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }

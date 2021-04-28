@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"be95c2ef9a69962915f61445839b24bf\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.fm_questions.FMQuestionViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.fm_questions.FMQuestionViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "452",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "id": 4,
+        "source_id": null,
+        "last_modify_date": "27 Apr 2021 22:55:16",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "title": null,
+        "answer_type": null,
+        "answer_options": null,
+        "entity_type": null,
+        "entity_instance": null,
+        "question_collection_methods": null,
+        "collection_method": null,
+        "answer": null,
+        "summary_answer": null,
+        "monitoring_activity_id": null,
+        "specific_details": null,
+        "date_of_capture": null,
+        "monitoring_activity_end_date": null,
+        "location": null,
+        "site": null
+    },
+    "content_type": "application/json"
+}

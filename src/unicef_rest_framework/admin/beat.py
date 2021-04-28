@@ -10,7 +10,7 @@ from django.utils.html import format_html
 from django.utils.http import urlquote
 from django.utils.translation import gettext_lazy as _
 
-from admin_extra_urls.decorators import action
+from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
 from adminactions.mass_update import mass_update, MassUpdateForm
 from django_celery_beat import admin
@@ -88,7 +88,7 @@ class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
 
     run_tasks.short_description = _('Run selected tasks')
 
-    @action()
+    @button()
     def queue_task(self, request, pk):
         periodic_task = PeriodicTask.objects.get(pk=pk)
         self.celery_app.loader.import_default_modules()
@@ -98,7 +98,7 @@ class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
 
         self.message_user(request, _('task successfully queued'))
 
-    @action()
+    @button()
     def preload(self, request):
         opts = self.model._meta
         app_label = opts.app_label

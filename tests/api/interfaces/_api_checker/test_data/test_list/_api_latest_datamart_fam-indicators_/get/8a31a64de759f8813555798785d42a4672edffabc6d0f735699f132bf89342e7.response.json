@@ -1,66 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"008776258e77e2c6975025bdf318f08c\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "008776258e77e2c6975025bdf318f08c"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "624"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"2d2a44ac2c663ed83776375d07b7d0f4\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "2d2a44ac2c663ed83776375d07b7d0f4",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "624",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -71,7 +27,7 @@
         "results": [
             {
                 "country_name": "bolivia",
-                "month": "2019-09-01",
+                "month": "2021-04-01",
                 "microassessment_ip_contacted": 0,
                 "microassessment_report_submitted": 0,
                 "microassessment_final_report": 0,
@@ -79,7 +35,7 @@
             },
             {
                 "country_name": "chad",
-                "month": "2019-09-01",
+                "month": "2021-04-01",
                 "microassessment_ip_contacted": 0,
                 "microassessment_report_submitted": 0,
                 "microassessment_final_report": 0,
@@ -87,7 +43,7 @@
             },
             {
                 "country_name": "lebanon",
-                "month": "2019-09-01",
+                "month": "2021-04-01",
                 "microassessment_ip_contacted": 0,
                 "microassessment_report_submitted": 0,
                 "microassessment_final_report": 0,
@@ -95,5 +51,5 @@
             }
         ]
     },
-    "content_type": null
+    "content_type": "application/json"
 }
