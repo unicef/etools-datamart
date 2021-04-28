@@ -49,7 +49,6 @@ class Attachment(EtoolsDataMartModel):
         mapping = dict(
             file='attachment.file',
             attachment_source_id='attachment.pk',
-            file_type='file_type.name',
             file_type_id='file_type.pk',
             content_type='content_type.name',
             hyperlink='attachment.hyperlink',
