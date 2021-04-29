@@ -1,0 +1,103 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"adce0c0887be420f3a01fb18328cafcf\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.funds_reservation.FundsReservationViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.funds_reservation.FundsReservationViewSet"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "900"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "id": 16,
+        "last_modify_date": "29 Apr 2021 13:28:52",
+        "seen": null,
+        "country_name": "bolivia",
+        "schema_name": "bolivia",
+        "area_code": "",
+        "vendor_code": "",
+        "fr_number": "",
+        "document_date": null,
+        "fr_type": "",
+        "currency": "",
+        "document_text": "",
+        "start_date": null,
+        "end_date": null,
+        "actual_amt": "101.00",
+        "intervention_amt": "102.00",
+        "outstanding_amt": "103.00",
+        "total_amt": "104.00",
+        "actual_amt_local": "105.00",
+        "outstanding_amt_local": "106.00",
+        "total_amt_local": null,
+        "multi_curr_flag": false,
+        "completed_flag": null,
+        "delegated": null,
+        "fr_ref_number": "",
+        "line_item": 1,
+        "wbs": "",
+        "grant_number": "",
+        "fund": "",
+        "overall_amount": "107.00",
+        "overall_amount_dc": "108.00",
+        "due_date": null,
+        "line_item_text": "",
+        "created": "29 Apr 2021 13:28:38",
+        "modified": "29 Apr 2021 13:28:38",
+        "donor": null,
+        "donor_code": null,
+        "intervention_title": null,
+        "pd_reference_number": null,
+        "pd_ssfa_number": null,
+        "source_id": 1,
+        "source_intervention_id": 1,
+        "intervention": 1198
+    },
+    "content_type": "application/json"
+}

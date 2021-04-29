@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.partner",
-            "pk": 301,
+            "pk": 705,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-04-27T22:55:19.087Z",
+                "last_modify_date": "2021-04-29T13:28:53.986Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2021-04-27T22:55:01.789Z",
+                "created": "2021-04-29T13:28:38.543Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",

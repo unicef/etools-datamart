@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.location",
-                "pk": 595,
+                "pk": 1791,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:10.872Z",
+                    "last_modify_date": "2021-04-29T13:28:47.448Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -16,7 +16,7 @@
                     "longitude": null,
                     "p_code": "",
                     "point": null,
-                    "gateway": 595,
+                    "gateway": 1799,
                     "geom": null,
                     "geoname": null,
                     "level": 0,
@@ -24,17 +24,17 @@
                     "parent": null,
                     "rght": 1,
                     "tree_id": 1,
-                    "created": "2021-04-27T22:55:01.788Z",
-                    "modified": "2021-04-27T22:55:01.788Z",
+                    "created": "2021-04-29T13:28:38.542Z",
+                    "modified": "2021-04-29T13:28:38.542Z",
                     "is_active": true
                 }
             },
             {
                 "model": "data.location",
-                "pk": 596,
+                "pk": 1792,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:10.880Z",
+                    "last_modify_date": "2021-04-29T13:28:47.454Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -44,7 +44,7 @@
                     "longitude": null,
                     "p_code": "",
                     "point": null,
-                    "gateway": 596,
+                    "gateway": 1800,
                     "geom": null,
                     "geoname": null,
                     "level": 1,
@@ -52,17 +52,17 @@
                     "parent": null,
                     "rght": 1,
                     "tree_id": 1,
-                    "created": "2021-04-27T22:55:01.788Z",
-                    "modified": "2021-04-27T22:55:01.788Z",
+                    "created": "2021-04-29T13:28:38.542Z",
+                    "modified": "2021-04-29T13:28:38.542Z",
                     "is_active": true
                 }
             },
             {
                 "model": "data.location",
-                "pk": 597,
+                "pk": 1793,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:10.885Z",
+                    "last_modify_date": "2021-04-29T13:28:47.460Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -72,7 +72,7 @@
                     "longitude": null,
                     "p_code": "",
                     "point": null,
-                    "gateway": 597,
+                    "gateway": 1801,
                     "geom": null,
                     "geoname": null,
                     "level": 2,
@@ -80,8 +80,8 @@
                     "parent": null,
                     "rght": 1,
                     "tree_id": 1,
-                    "created": "2021-04-27T22:55:01.788Z",
-                    "modified": "2021-04-27T22:55:01.788Z",
+                    "created": "2021-04-29T13:28:38.542Z",
+                    "modified": "2021-04-29T13:28:38.542Z",
                     "is_active": true
                 }
             }
@@ -89,10 +89,10 @@
         "deps": [
             {
                 "model": "data.gatewaytype",
-                "pk": 595,
+                "pk": 1799,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:10.866Z",
+                    "last_modify_date": "2021-04-29T13:28:47.441Z",
                     "seen": null,
                     "country_name": "Bolivia",
                     "schema_name": "Bolivia",
@@ -103,10 +103,10 @@
             },
             {
                 "model": "data.gatewaytype",
-                "pk": 596,
+                "pk": 1800,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:10.876Z",
+                    "last_modify_date": "2021-04-29T13:28:47.452Z",
                     "seen": null,
                     "country_name": "Chad",
                     "schema_name": "Chad",
@@ -117,10 +117,10 @@
             },
             {
                 "model": "data.gatewaytype",
-                "pk": 597,
+                "pk": 1801,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:10.882Z",
+                    "last_modify_date": "2021-04-29T13:28:47.457Z",
                     "seen": null,
                     "country_name": "Lebanon",
                     "schema_name": "Lebanon",
