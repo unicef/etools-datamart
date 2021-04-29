@@ -1,0 +1,94 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"5665b3f0fd22f9d4ddcd8007c33e2667\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.user.EtoolsUserViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.user.EtoolsUserViewSet"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "654"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "id": 474,
+        "source_id": null,
+        "last_modify_date": "29 Apr 2021 13:28:53",
+        "seen": null,
+        "schema_name": "bolivia",
+        "area_code": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "username003",
+        "first_name": "",
+        "last_name": "",
+        "email": "email003@example.com",
+        "is_staff": null,
+        "is_active": null,
+        "date_joined": null,
+        "middle_name": null,
+        "created": null,
+        "modified": null,
+        "job_title": null,
+        "partner_staff_member": null,
+        "guid": null,
+        "org_unit_code": null,
+        "org_unit_name": null,
+        "post_number": null,
+        "post_title": null,
+        "staff_id": null,
+        "vendor_number": null,
+        "groups": null,
+        "countries_available": null,
+        "country_name": "bolivia",
+        "country_override": null,
+        "office": null,
+        "supervisor": null,
+        "oic": null
+    },
+    "content_type": "application/json"
+}

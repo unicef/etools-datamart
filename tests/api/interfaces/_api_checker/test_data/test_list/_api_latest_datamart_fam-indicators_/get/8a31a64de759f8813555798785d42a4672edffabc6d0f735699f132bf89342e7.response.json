@@ -1,22 +1,70 @@
 {
     "status_code": 200,
     "headers": {
-        "Content-Type": "application/json",
-        "Vary": "Accept, Origin, Cookie",
-        "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"2d2a44ac2c663ed83776375d07b7d0f4\"",
-        "X-Frame-Options": "DENY",
-        "view": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
-        "service": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
-        "cache-version": "1",
-        "system-filters": "",
-        "cache-key": "2d2a44ac2c663ed83776375d07b7d0f4",
-        "cache-hit": "False",
-        "qs_filter": "{}",
-        "qs_exclude": "{}",
-        "cache-ttl": "1y",
-        "Content-Length": "624",
-        "Referrer-Policy": "same-origin"
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"ce65a060dac784f44a5365b1096d86b9\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "ce65a060dac784f44a5365b1096d86b9"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "624"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
     },
     "data": {
         "count": 3,

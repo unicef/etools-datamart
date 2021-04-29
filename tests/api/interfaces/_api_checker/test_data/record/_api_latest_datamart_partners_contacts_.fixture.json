@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.partnerstaffmember",
-            "pk": 4,
+            "pk": 12,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-04-27T22:55:18.565Z",
+                "last_modify_date": "2021-04-29T13:28:53.459Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
