@@ -1,22 +1,70 @@
 {
     "status_code": 200,
     "headers": {
-        "Content-Type": "application/json",
-        "Vary": "Accept, Origin, Cookie",
-        "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"8076a8122e256a8eb2fc552c83daa01c\"",
-        "X-Frame-Options": "DENY",
-        "view": "etools_datamart.api.endpoints.datamart.location.LocationViewSet",
-        "service": "etools_datamart.api.endpoints.datamart.location.LocationViewSet",
-        "cache-version": "1",
-        "system-filters": "",
-        "cache-key": "8076a8122e256a8eb2fc552c83daa01c",
-        "cache-hit": "False",
-        "qs_filter": "{}",
-        "qs_exclude": "{}",
-        "cache-ttl": "1y",
-        "Content-Length": "1186",
-        "Referrer-Policy": "same-origin"
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"67a6aa6f3aea493543f7d4ff7e4848cc\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.location.LocationViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "67a6aa6f3aea493543f7d4ff7e4848cc"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "1192"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
     },
     "data": {
         "count": 3,
@@ -28,11 +76,11 @@
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": 595,
+                    "id": 1791,
                     "type": "Feature",
                     "geometry": null,
                     "properties": {
-                        "last_modify_date": "27 Apr 2021 22:55:10",
+                        "last_modify_date": "29 Apr 2021 13:28:47",
                         "seen": null,
                         "country_name": "bolivia",
                         "area_code": "",
@@ -41,20 +89,20 @@
                         "longitude": null,
                         "p_code": "",
                         "point": null,
-                        "created": "27 Apr 2021 22:55:01",
-                        "modified": "27 Apr 2021 22:55:01",
+                        "created": "29 Apr 2021 13:28:38",
+                        "modified": "29 Apr 2021 13:28:38",
                         "is_active": true,
-                        "gateway": 595,
+                        "gateway": 1799,
                         "geoname": null,
                         "parent": null
                     }
                 },
                 {
-                    "id": 596,
+                    "id": 1792,
                     "type": "Feature",
                     "geometry": null,
                     "properties": {
-                        "last_modify_date": "27 Apr 2021 22:55:10",
+                        "last_modify_date": "29 Apr 2021 13:28:47",
                         "seen": null,
                         "country_name": "chad",
                         "area_code": "",
@@ -63,20 +111,20 @@
                         "longitude": null,
                         "p_code": "",
                         "point": null,
-                        "created": "27 Apr 2021 22:55:01",
-                        "modified": "27 Apr 2021 22:55:01",
+                        "created": "29 Apr 2021 13:28:38",
+                        "modified": "29 Apr 2021 13:28:38",
                         "is_active": true,
-                        "gateway": 596,
+                        "gateway": 1800,
                         "geoname": null,
                         "parent": null
                     }
                 },
                 {
-                    "id": 597,
+                    "id": 1793,
                     "type": "Feature",
                     "geometry": null,
                     "properties": {
-                        "last_modify_date": "27 Apr 2021 22:55:10",
+                        "last_modify_date": "29 Apr 2021 13:28:47",
                         "seen": null,
                         "country_name": "lebanon",
                         "area_code": "",
@@ -85,10 +133,10 @@
                         "longitude": null,
                         "p_code": "",
                         "point": null,
-                        "created": "27 Apr 2021 22:55:01",
-                        "modified": "27 Apr 2021 22:55:01",
+                        "created": "29 Apr 2021 13:28:38",
+                        "modified": "29 Apr 2021 13:28:38",
                         "is_active": true,
-                        "gateway": 597,
+                        "gateway": 1801,
                         "geoname": null,
                         "parent": null
                     }

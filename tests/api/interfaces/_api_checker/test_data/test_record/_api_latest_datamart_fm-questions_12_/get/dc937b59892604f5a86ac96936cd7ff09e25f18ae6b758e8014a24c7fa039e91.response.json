@@ -1,0 +1,81 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"f03761d647646ba17534567226f0cfd0\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.fm_questions.FMQuestionViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.fm_questions.FMQuestionViewSet"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "453"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "id": 12,
+        "source_id": null,
+        "last_modify_date": "29 Apr 2021 13:28:52",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "title": null,
+        "answer_type": null,
+        "answer_options": null,
+        "entity_type": null,
+        "entity_instance": null,
+        "question_collection_methods": null,
+        "collection_method": null,
+        "answer": null,
+        "summary_answer": null,
+        "monitoring_activity_id": null,
+        "specific_details": null,
+        "date_of_capture": null,
+        "monitoring_activity_end_date": null,
+        "location": null,
+        "site": null
+    },
+    "content_type": "application/json"
+}

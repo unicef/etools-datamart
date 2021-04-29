@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.partner",
-                "pk": 298,
+                "pk": 702,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:15.068Z",
+                    "last_modify_date": "2021-04-29T13:28:50.933Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -19,7 +19,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2021-04-27T22:55:01.789Z",
+                    "created": "2021-04-29T13:28:38.543Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -59,10 +59,10 @@
             },
             {
                 "model": "data.partner",
-                "pk": 299,
+                "pk": 703,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:15.070Z",
+                    "last_modify_date": "2021-04-29T13:28:50.935Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -75,7 +75,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2021-04-27T22:55:01.789Z",
+                    "created": "2021-04-29T13:28:38.543Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -115,10 +115,10 @@
             },
             {
                 "model": "data.partner",
-                "pk": 300,
+                "pk": 704,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-27T22:55:15.071Z",
+                    "last_modify_date": "2021-04-29T13:28:50.936Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -131,7 +131,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2021-04-27T22:55:01.789Z",
+                    "created": "2021-04-29T13:28:38.543Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",

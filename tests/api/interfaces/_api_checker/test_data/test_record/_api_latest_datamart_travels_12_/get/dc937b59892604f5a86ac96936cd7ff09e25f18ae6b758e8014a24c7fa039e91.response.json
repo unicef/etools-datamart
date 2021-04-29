@@ -1,0 +1,100 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"a0e4f9588f6e6453d7bb8178c1a1df0d\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.travel.TravelViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.travel.TravelViewSet"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "883"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "id": 12,
+        "source_id": null,
+        "last_modify_date": "29 Apr 2021 13:28:53",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "additional_note": null,
+        "approved_at": null,
+        "approved_cost_travel_agencies": null,
+        "approved_cost_traveler": null,
+        "canceled_at": null,
+        "cancellation_note": null,
+        "certification_note": null,
+        "completed_at": null,
+        "created": "29 Apr 2021 13:28:38",
+        "currency_code": null,
+        "end_date": null,
+        "estimated_travel_cost": null,
+        "first_submission_date": null,
+        "hidden": null,
+        "international_travel": null,
+        "is_driver": null,
+        "misc_expenses": null,
+        "mode_of_travel": null,
+        "office_name": null,
+        "preserved_expenses_local": null,
+        "preserved_expenses_usd": null,
+        "purpose": null,
+        "reference_number": null,
+        "rejected_at": null,
+        "rejection_note": null,
+        "report_note": null,
+        "section_name": null,
+        "start_date": null,
+        "status": "",
+        "submitted_at": null,
+        "supervisor_email": null,
+        "ta_required": null,
+        "traveler_email": null,
+        "attachments": null
+    },
+    "content_type": "application/json"
+}
