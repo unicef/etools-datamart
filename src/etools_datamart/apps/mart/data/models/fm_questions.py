@@ -131,6 +131,12 @@ class FMQuestion(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    monitoring_activity = models.CharField(
+        verbose_name=_("Monitoring Activity"),
+        max_length=64,
+        blank=True,
+        null=True,
+    )
     specific_details = models.TextField(
         verbose_name=_("Specific Details"),
         null=True,
@@ -179,6 +185,7 @@ class FMQuestion(EtoolsDataMartModel):
             answer="value",
             summary_answer="activity_question.overall_finding.value",
             monitoring_activity_id="activity_question.monitoring_activity.pk",
+            monitoring_activity="activity_question.monitoring_activity.number",
             specific_details="i",
             date_of_capture="",
             monitoring_activity_end_date="activity_question.monitoring_activity.end_date",
@@ -288,6 +295,11 @@ class FMOntrack(EtoolsDataMartModel):
         blank=True,
         null=True,
     )
+    monitoring_activity_id = models.IntegerField(
+        verbose_name=_("Monitoring Activity ID"),
+        null=True,
+        blank=True,
+    )
     monitoring_activity_end_date = models.CharField(
         verbose_name=_("Monitoring Activity End Date"),
         max_length=50,
@@ -325,6 +337,7 @@ class FMOntrack(EtoolsDataMartModel):
             narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
+            monitoring_activity_id="activity_question.monitoring_activity.pk",
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
