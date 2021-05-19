@@ -125,8 +125,7 @@ class EtoolsLoader(BaseLoader):
             except AttributeError:  # pragma: no cover
                 pass
         else:
-            return super().get_value(field_name, value_or_func,
-                                                       original_record, current_mapping)
+            return super().get_value(field_name, value_or_func, original_record, current_mapping)
 
     def filter_queryset(self, qs):
         use_delta = self.context['only_delta'] and not self.context['is_empty']
