@@ -197,7 +197,7 @@ class ExportFetch(LoginRequiredMixin, DetailView):
 
             response = StreamingHttpResponse(c, status=200,
                                              content_type=record.format)
-            if record.save_as:
+            if record.save_as or record.format != 'application/json':
                 response['Content-Disposition'] = u'attachment; filename="%s"' % record.filename
             return response
         return JsonResponse({"error": "Permission denied"}, status=403)
