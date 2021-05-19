@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"8f72fa3f432b7b01bd54ab5fc984c748\""
+            "\"9bc02dedb267aceb8cd8d71145a24358\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -47,7 +47,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "393"
+            "475"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -65,6 +65,7 @@
         "narrative_finding": null,
         "overall_finding_rating": null,
         "monitoring_activity": null,
+        "monitoring_activity_id": null,
         "monitoring_activity_end_date": null,
         "location": {},
         "site": null,
@@ -73,7 +74,9 @@
         "reference_number": null,
         "field_office": null,
         "sections": null,
-        "sections_data": {}
+        "sections_data": {},
+        "person_responsible_email": null,
+        "team_members": null
     },
     "content_type": "application/json"
 }

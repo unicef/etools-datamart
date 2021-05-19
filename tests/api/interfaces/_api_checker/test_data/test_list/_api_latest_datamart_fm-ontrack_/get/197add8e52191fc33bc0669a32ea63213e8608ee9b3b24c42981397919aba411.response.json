@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"cccc63f278fad2c092571dc21e3f4787\""
+            "\"44f69651dd5476c8e8a4331f1edbe322\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "cccc63f278fad2c092571dc21e3f4787"
+            "44f69651dd5476c8e8a4331f1edbe322"
         ],
         "cache-hit": [
             "cache-hit",
@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1262"
+            "1508"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -84,6 +84,7 @@
                 "narrative_finding": null,
                 "overall_finding_rating": null,
                 "monitoring_activity": null,
+                "monitoring_activity_id": null,
                 "monitoring_activity_end_date": null,
                 "location": {},
                 "site": null,
@@ -92,7 +93,9 @@
                 "reference_number": null,
                 "field_office": null,
                 "sections": null,
-                "sections_data": {}
+                "sections_data": {},
+                "person_responsible_email": null,
+                "team_members": null
             },
             {
                 "id": 10,
@@ -105,6 +108,7 @@
                 "narrative_finding": null,
                 "overall_finding_rating": null,
                 "monitoring_activity": null,
+                "monitoring_activity_id": null,
                 "monitoring_activity_end_date": null,
                 "location": {},
                 "site": null,
@@ -113,7 +117,9 @@
                 "reference_number": null,
                 "field_office": null,
                 "sections": null,
-                "sections_data": {}
+                "sections_data": {},
+                "person_responsible_email": null,
+                "team_members": null
             },
             {
                 "id": 11,
@@ -126,6 +132,7 @@
                 "narrative_finding": null,
                 "overall_finding_rating": null,
                 "monitoring_activity": null,
+                "monitoring_activity_id": null,
                 "monitoring_activity_end_date": null,
                 "location": {},
                 "site": null,
@@ -134,7 +141,9 @@
                 "reference_number": null,
                 "field_office": null,
                 "sections": null,
-                "sections_data": {}
+                "sections_data": {},
+                "person_responsible_email": null,
+                "team_members": null
             }
         ]
     },

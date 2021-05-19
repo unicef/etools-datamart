@@ -131,6 +131,12 @@ class FMQuestion(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    monitoring_activity = models.CharField(
+        verbose_name=_("Monitoring Activity"),
+        max_length=64,
+        blank=True,
+        null=True,
+    )
     specific_details = models.TextField(
         verbose_name=_("Specific Details"),
         null=True,
@@ -160,6 +166,9 @@ class FMQuestion(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    category = models.CharField(max_length=100, null=True, blank=True)
+    information_source = models.CharField(max_length=100, null=True, blank=True)
+    is_hact = models.BooleanField(null=True, blank=True)
 
     loader = FMQuestionLoader()
 
@@ -179,11 +188,15 @@ class FMQuestion(EtoolsDataMartModel):
             answer="value",
             summary_answer="activity_question.overall_finding.value",
             monitoring_activity_id="activity_question.monitoring_activity.pk",
+            monitoring_activity="activity_question.monitoring_activity.number",
             specific_details="i",
             date_of_capture="",
             monitoring_activity_end_date="activity_question.monitoring_activity.end_date",
             location="activity_question.monitoring_activity.location.name",
             site="activity_question.monitoring_activity.locationsite.name",
+            category='activity_question.question.category.name',
+            information_source='monitoring_activity.information_source',
+            is_hact='activity_question.question.is_hact',
         )
 
 
@@ -263,6 +276,11 @@ class FMOntrackLoader(EtoolsLoader):
         except Location.DoesNotExist:
             return {key: 'N/A' for key in loc_fields}
 
+    def get_team_members(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
+        return ', '.join(record.monitoring_activity.
+                         FieldMonitoringPlanningMonitoringactivityTeamMembers_monitoringactivity.values_list(
+            'user__email', flat=True))
+
 
 class FMOntrack(EtoolsDataMartModel):
     entity = models.CharField(
@@ -288,6 +306,11 @@ class FMOntrack(EtoolsDataMartModel):
         blank=True,
         null=True,
     )
+    monitoring_activity_id = models.IntegerField(
+        verbose_name=_("Monitoring Activity ID"),
+        null=True,
+        blank=True,
+    )
     monitoring_activity_end_date = models.CharField(
         verbose_name=_("Monitoring Activity End Date"),
         max_length=50,
@@ -312,6 +335,8 @@ class FMOntrack(EtoolsDataMartModel):
     field_office = models.CharField(max_length=254, blank=True, null=True)
     sections = models.TextField(blank=True, null=True)
     sections_data = JSONField(blank=True, null=True, default=dict)
+    person_responsible_email = models.CharField(max_length=254, null=True, blank=True)
+    team_members = models.TextField(blank=True, null=True)
 
     loader = FMOntrackLoader()
 
@@ -325,6 +350,7 @@ class FMOntrack(EtoolsDataMartModel):
             narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
+            monitoring_activity_id="activity_question.monitoring_activity.pk",
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
@@ -333,4 +359,6 @@ class FMOntrack(EtoolsDataMartModel):
             reference_number='intervention.reference_number',
             field_office='monitoring_activity.field_office.name',
             sections="-",
+            person_responsible_email="monitoring_activity.person_responsible.email",
+            team_members='-',
         )

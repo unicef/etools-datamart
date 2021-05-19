@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"f03761d647646ba17534567226f0cfd0\""
+            "\"34810d47ae3e0fa2269a8ef7a409b178\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -47,7 +47,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "453"
+            "537"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -71,11 +71,15 @@
         "answer": null,
         "summary_answer": null,
         "monitoring_activity_id": null,
+        "monitoring_activity": null,
         "specific_details": null,
         "date_of_capture": null,
         "monitoring_activity_end_date": null,
         "location": null,
-        "site": null
+        "site": null,
+        "category": null,
+        "information_source": null,
+        "is_hact": null
     },
     "content_type": "application/json"
 }
