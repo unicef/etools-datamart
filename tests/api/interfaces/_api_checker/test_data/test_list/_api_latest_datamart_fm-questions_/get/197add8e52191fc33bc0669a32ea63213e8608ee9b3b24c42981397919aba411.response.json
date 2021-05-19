@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1523"
+            "1694"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -95,7 +95,10 @@
                 "date_of_capture": null,
                 "monitoring_activity_end_date": null,
                 "location": null,
-                "site": null
+                "site": null,
+                "category": null,
+                "information_source": null,
+                "is_hact": null
             },
             {
                 "id": 10,
@@ -119,7 +122,10 @@
                 "date_of_capture": null,
                 "monitoring_activity_end_date": null,
                 "location": null,
-                "site": null
+                "site": null,
+                "category": null,
+                "information_source": null,
+                "is_hact": null
             },
             {
                 "id": 11,
@@ -143,7 +149,10 @@
                 "date_of_capture": null,
                 "monitoring_activity_end_date": null,
                 "location": null,
-                "site": null
+                "site": null,
+                "category": null,
+                "information_source": null,
+                "is_hact": null
             }
         ]
     },

@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1352"
+            "1508"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -93,7 +93,9 @@
                 "reference_number": null,
                 "field_office": null,
                 "sections": null,
-                "sections_data": {}
+                "sections_data": {},
+                "person_responsible_email": null,
+                "team_members": null
             },
             {
                 "id": 10,
@@ -115,7 +117,9 @@
                 "reference_number": null,
                 "field_office": null,
                 "sections": null,
-                "sections_data": {}
+                "sections_data": {},
+                "person_responsible_email": null,
+                "team_members": null
             },
             {
                 "id": 11,
@@ -137,7 +141,9 @@
                 "reference_number": null,
                 "field_office": null,
                 "sections": null,
-                "sections_data": {}
+                "sections_data": {},
+                "person_responsible_email": null,
+                "team_members": null
             }
         ]
     },
