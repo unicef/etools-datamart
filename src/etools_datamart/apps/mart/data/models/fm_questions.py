@@ -195,7 +195,7 @@ class FMQuestion(EtoolsDataMartModel):
             location="activity_question.monitoring_activity.location.name",
             site="activity_question.monitoring_activity.locationsite.name",
             category='activity_question.question.category.name',
-            information_source='monitoring_activity.information_source',
+            information_source='activity_question.monitoring_activity.information_source',
             is_hact='activity_question.question.is_hact',
         )
 
