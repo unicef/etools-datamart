@@ -350,7 +350,7 @@ class FMOntrack(EtoolsDataMartModel):
             narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
-            monitoring_activity_id="activity_question.monitoring_activity.pk",
+            monitoring_activity_id="monitoring_activity.pk",
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
