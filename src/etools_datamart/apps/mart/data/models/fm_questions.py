@@ -195,7 +195,7 @@ class FMQuestion(EtoolsDataMartModel):
             location="activity_question.monitoring_activity.location.name",
             site="activity_question.monitoring_activity.locationsite.name",
             category='activity_question.question.category.name',
-            information_source='monitoring_activity.information_source',
+            information_source='activity_question.monitoring_activity.information_source',
             is_hact='activity_question.question.is_hact',
         )
 
@@ -350,7 +350,7 @@ class FMOntrack(EtoolsDataMartModel):
             narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
-            monitoring_activity_id="activity_question.monitoring_activity.pk",
+            monitoring_activity_id="monitoring_activity.pk",
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
