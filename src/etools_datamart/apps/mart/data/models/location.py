@@ -32,9 +32,9 @@ class GatewayType(EtoolsDataMartModel):
 
 class LocationQuerySet(DataMartQuerySet):
     def batch_update_centroid(self):
-        sql = '''UPDATE "{0}" SET point = ST_Centroid(geom),
-latitude = ST_Y(ST_Centroid(geom)),
-longitude = ST_X(ST_Centroid(geom))
+        sql = '''UPDATE "{0}" SET point = ST_Centroid(geom::geometry),
+latitude = ST_Y(ST_Centroid(geom::geometry)),
+longitude = ST_X(ST_Centroid(geom::geometry))
 WHERE point IS NULL AND geom IS NOT NULL;
 UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
 '''.format(self.model._meta.db_table)
@@ -87,7 +87,7 @@ class Location(EtoolsDataMartModel):
     p_code = models.CharField(max_length=32)
     point = geomodels.PointField(blank=True, null=True)
     gateway = models.ForeignKey(GatewayType, models.DO_NOTHING, blank=True, null=True)
-    geom = geomodels.MultiPolygonField(blank=True, null=True)
+    geom = geomodels.MultiPolygonField(geography=True, blank=True, null=True)
     geoname = models.ForeignKey("GeoName", models.DO_NOTHING, blank=True, null=True)
     level = models.IntegerField(db_index=True)
     lft = models.IntegerField()
