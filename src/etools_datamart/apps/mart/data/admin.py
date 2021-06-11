@@ -304,6 +304,7 @@ class ActionPointAdmin(DataModelAdmin):
     list_filter = ('high_priority', 'engagement_type', 'status',
                    'related_module_class',
                    'category_module')
+    search_fields = ('reference_number', )
 
 
 @register(models.TPMVisit)
