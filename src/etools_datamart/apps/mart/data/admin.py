@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from admin_extra_urls.decorators import button
 from adminactions.actions import export_as_csv, export_as_xls, mass_update
-from adminfilters.filters import AllValuesComboFilter
+from adminfilters.filters import AllValuesComboFilter, TextFieldFilter
 from humanize import naturaldelta
 
 from unicef_rest_framework.models import Service
@@ -206,7 +206,7 @@ class GatewayTypeAdmin(DataModelAdmin):
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'gateway', 'latitude', 'longitude', 'point')
     # readonly_fields = ('parent', 'gateway')
-    list_filter = ('level', 'parent', 'tree_id')
+    list_filter = ('level', TextFieldFilter.factory('parent__name__icontains', "Parent"), 'tree_id')
     search_fields = ('name',)
     autocomplete_fields = ('parent', 'gateway', 'geoname',)
     actions = ['update_centroid', mass_update]
