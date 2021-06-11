@@ -96,11 +96,11 @@ class EtoolsLoader(BaseLoader):
                 raise Exception("Invalid field name or mapping '%s:%s'" % (k, v))
 
             # enforce field size limit
-            try:
-                ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
-            except TypeError:
-                # not subscriptable so ignoring
-                pass
+            # try:
+            #     ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
+            # except TypeError:
+            #     not subscriptable so ignoring
+            #     pass
 
         return ret
 
@@ -313,11 +313,11 @@ class CommonSchemaLoader(EtoolsLoader):
                 ret[k] = get_attr(record, v)
 
             # enforce field size limit
-            try:
-                ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
-            except TypeError:
-                # not subscriptable so ignoring
-                pass
+            # try:
+            #     ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
+            # except TypeError:
+            #     # not subscriptable so ignoring
+            #     pass
 
         return ret
 

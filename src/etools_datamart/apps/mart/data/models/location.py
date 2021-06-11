@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.db import models as geomodels
 from django.contrib.gis.db.models.functions import Centroid
+from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from django.db import connection, models
 
 import requests

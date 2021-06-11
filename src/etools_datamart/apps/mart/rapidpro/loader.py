@@ -97,11 +97,11 @@ class TembaLoader(BaseLoader):
                 raise Exception("Invalid field name or mapping '%s:%s'" % (dm_field_name, resolver))
 
             # enforce field size limit
-            try:
-                ret[dm_field_name] = ret[dm_field_name][:settings.FIELD_SIZE_LIMIT]
-            except TypeError:
-                # not subscriptable so ignoring
-                pass
+            # try:
+            #     ret[dm_field_name] = ret[dm_field_name][:settings.FIELD_SIZE_LIMIT]
+            # except TypeError:
+            #     # not subscriptable so ignoring
+            #     pass
 
         return ret
 
