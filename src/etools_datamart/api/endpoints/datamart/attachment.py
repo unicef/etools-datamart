@@ -6,6 +6,7 @@ from rest_framework import serializers
 from unicef_rest_framework.forms import DateRangePickerField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
+from etools_datamart.api.endpoints.etools.serializers.base import CountrySerializerMixin
 from etools_datamart.apps.mart.data import models
 
 from .. import common
@@ -45,14 +46,15 @@ class AttachmentSerializerMinimalEtools(AttachmentSerializerFull):
                   "code")
 
 
-class AttachmentSerializerEtools(AttachmentSerializerFull):
+class AttachmentSerializerEtools(CountrySerializerMixin, AttachmentSerializerFull):
     attachment = serializers.IntegerField(source='attachment_source_id')
 
     class Meta(DataMartSerializer.Meta):
         model = models.Attachment
         exclude = None
 
-        fields = ("schema_name",
+        fields = ("country",
+                  "schema_name",
                   "file_type_id",
                   "partner",
                   "partner_type",
