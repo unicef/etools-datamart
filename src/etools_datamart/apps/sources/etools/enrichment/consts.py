@@ -154,6 +154,8 @@ class CategoryConsts:
         ('t2f', _('Trip Management')),
         ('tpm', _('Third Party Monitoring')),
         ('audit', _('Financial Assurance')),
+        ('psea', _('PSEA Assessment')),
+        ('fm', _('Field Monitoring')),
     )
 
 
