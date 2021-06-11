@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.partner",
-            "pk": 705,
+            "pk": 706,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-04-29T13:28:53.986Z",
+                "last_modify_date": "2021-06-11T14:09:13.873Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2021-04-29T13:28:38.543Z",
+                "created": "2021-06-11T14:08:56.668Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -28,7 +28,7 @@
                 "last_assessment_date": null,
                 "manually_blocked": false,
                 "modified": null,
-                "name": "name003",
+                "name": "name000",
                 "net_ct_cy": null,
                 "outstanding_dct_amount_6_to_9_months_usd": null,
                 "outstanding_dct_amount_more_than_9_months_usd": null,
@@ -53,7 +53,8 @@
                 "last_pv_date": null,
                 "sea_risk_rating_name": null,
                 "highest_risk_rating_name": null,
-                "highest_risk_rating_type": null
+                "highest_risk_rating_type": null,
+                "psea_assessment_date": null
             }
         },
         "deps": []
