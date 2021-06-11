@@ -109,6 +109,7 @@ class Partner(EtoolsDataMartModel):
     )
     highest_risk_rating_name = models.CharField(max_length=150, blank=True, null=True)
     highest_risk_rating_type = models.CharField(max_length=150, blank=True, null=True)
+    psea_assessment_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ("name",)

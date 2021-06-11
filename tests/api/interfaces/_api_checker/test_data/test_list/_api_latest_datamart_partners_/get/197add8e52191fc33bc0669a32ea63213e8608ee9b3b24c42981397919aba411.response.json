@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"7a323bc1827ee5542bfdb0ab813f4663\""
+            "\"f74e0d33c7bafaf86b5fd107aa7f9801\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "7a323bc1827ee5542bfdb0ab813f4663"
+            "f74e0d33c7bafaf86b5fd107aa7f9801"
         ],
         "cache-hit": [
             "cache-hit",
@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "3369"
+            "3453"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -122,7 +122,8 @@
                 "min_req_spot_checks": 0,
                 "sea_risk_rating_name": null,
                 "highest_risk_rating_name": null,
-                "highest_risk_rating_type": null
+                "highest_risk_rating_type": null,
+                "psea_assessment_date": null
             },
             {
                 "id": 703,
@@ -173,7 +174,8 @@
                 "min_req_spot_checks": 0,
                 "sea_risk_rating_name": null,
                 "highest_risk_rating_name": null,
-                "highest_risk_rating_type": null
+                "highest_risk_rating_type": null,
+                "psea_assessment_date": null
             },
             {
                 "id": 704,
@@ -224,7 +226,8 @@
                 "min_req_spot_checks": 0,
                 "sea_risk_rating_name": null,
                 "highest_risk_rating_name": null,
-                "highest_risk_rating_type": null
+                "highest_risk_rating_type": null,
+                "psea_assessment_date": null
             }
         ]
     },
