@@ -321,11 +321,11 @@ class BaseLoader:
                 ret[k] = self.get_value(k, v, record, ret)
 
             # enforce field size limit
-            try:
-                ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
-            except TypeError:
-                # not subscriptable so ignoring
-                pass
+            # try:
+            #     ret[k] = ret[k][:settings.FIELD_SIZE_LIMIT]
+            # except TypeError:
+            #     # not subscriptable so ignoring
+            #     pass
 
         return ret
 

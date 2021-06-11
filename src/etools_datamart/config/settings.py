@@ -712,10 +712,6 @@ if SENTRY_ENABLED:
                     return None
             elif isinstance(exc_value, AttributeError) and str(exc_value) == "'Run' object has no attribute 'source_id'":
                 return None
-            # TODO: remove me
-            print(111, "settings.py:703", event['tags'])
-            print(111, "settings.py:704", event['breadcrumbs'])
-            print(111, "settings.py:705", hint)
             event['tags']['stack'] = env('STACK')
         return event
 
@@ -741,4 +737,4 @@ REQUEST_TIMEOUT = env('REQUEST_TIMEOUT')
 GEONAMES_URL = env('GEONAMES_URL')
 GEONAMES_USERNAME = env('GEONAMES_USERNAME')
 
-FIELD_SIZE_LIMIT = 32000
+# FIELD_SIZE_LIMIT = 32000

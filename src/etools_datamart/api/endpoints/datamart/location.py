@@ -67,8 +67,7 @@ class LocationRamSerializer(serializers.ModelSerializer):
 class LocationViewSet(common.DataMartViewSet):
     serializer_class = LocationSerializer
     queryset = models.Location.objects.all()
-    filter_fields = ('area_code', 'country_name', 'last_modify_date',
-                     )
+    filter_fields = ('area_code', 'country_name', 'last_modify_date', 'gateway', 'parent')
     serializers_fieldsets = {'std': None,
                              'light': ('country_name', 'area_code', 'p_code', 'name'),
                              'gis': LocationSerializerGIS,
@@ -87,6 +86,7 @@ class GatewayTypeSerializer(DataMartSerializer):
 
 class GatewayTypeViewSet(DataMartViewSet):
     querystringfilter_form_base_class = forms.Form
+    filter_fields = ('admin_level', )
 
     serializer_class = GatewayTypeSerializer
     queryset = models.GatewayType.objects.all()

@@ -21,6 +21,8 @@ from etools_datamart.apps.sources.etools.models import (
     AuditSpotcheck,
     DjangoComments,
     DjangoContentType,
+    FieldMonitoringPlanningMonitoringactivity,
+    PseaAssessment,
     T2FTravelactivity,
     TpmTpmactivity,
 )
@@ -36,7 +38,12 @@ from .intervention import Intervention
 ENGAGEMENTS = [AuditSpotcheck, AuditMicroassessment, AuditSpecialaudit, AuditAudit]
 ENGAGEMENTS_NAMES = [c.__name__ for c in ENGAGEMENTS]
 
-RELATED_MODULES = ENGAGEMENTS + [TpmTpmactivity, T2FTravelactivity]
+RELATED_MODULES = ENGAGEMENTS + [
+    TpmTpmactivity,
+    T2FTravelactivity,
+    PseaAssessment,
+    FieldMonitoringPlanningMonitoringactivity
+]
 
 RELATED_MODULE_NAMES = [c.__name__ for c in RELATED_MODULES]
 RELATED_MODULE_CHOICES = zip(RELATED_MODULE_NAMES, RELATED_MODULE_NAMES)
@@ -73,6 +80,10 @@ class ActionPointLoader(EtoolsLoader):
             return record.tpm_activity.tpm_visit_id
         elif module == 'T2FTravelactivity':
             return record.travel_activity.pk
+        elif module == 'PseaAssessment':
+            return record.psea_assessment.pk
+        elif module == 'FieldMonitoringPlanningMonitoringactivity':
+            return record.monitoring_activity.pk
         elif module is None:
             return None
         raise ValueError(values['related_module_class'])
@@ -90,6 +101,10 @@ class ActionPointLoader(EtoolsLoader):
             return 'TpmTpmactivity'
         elif record.travel_activity:
             return 'T2FTravelactivity'
+        elif record.psea_assessment:
+            return 'PseaAssessment'
+        elif record.monitoring_activity:
+            return 'FieldMonitoringPlanningMonitoringactivity'
         return None
 
     def get_engagement_subclass(self, record: ActionPointsActionpoint, values: dict, **kwargs):
@@ -121,7 +136,8 @@ class ActionPointLoader(EtoolsLoader):
 
     def get_module_reference_number(self, record: ActionPointsActionpoint, values: dict, **kwargs):
         if record.engagement:
-            engagement_code = 'a' if record.engagement.engagement_type == AuditEngagementConsts.TYPE_AUDIT else record.engagement.engagement_type
+            eng_type = record.engagement.engagement_type
+            engagement_code = 'a' if eng_type == AuditEngagementConsts.TYPE_AUDIT else eng_type
             return '{}/{}/{}/{}/{}'.format(
                 self.context['country'].country_short_code or '',
                 record.partner.name[:5],
@@ -131,6 +147,10 @@ class ActionPointLoader(EtoolsLoader):
             )
         elif record.tpm_activity:
             return record.tpm_activity.tpm_visit.reference_number
+        elif record.psea_assessment:
+            return record.psea_assessment.reference_number
+        elif record.monitoring_activity:
+            return record.monitoring_activity.number
         elif record.travel_activity:
             ta = record.travel_activity
             travel = ta.travels.filter(traveler=ta.primary_traveler).first()

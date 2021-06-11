@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"140969a66044befd881083d09a07a9e4\""
+            "\"d0621d5fc6ff275acf1ef699e0b2dbf6\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -47,7 +47,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1096"
+            "1124"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -55,9 +55,9 @@
         ]
     },
     "data": {
-        "id": 705,
+        "id": 706,
         "source_id": null,
-        "last_modify_date": "29 Apr 2021 13:28:53",
+        "last_modify_date": "11 Jun 2021 14:09:13",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
@@ -70,7 +70,7 @@
         "city": null,
         "core_values_assessment_date": null,
         "country": null,
-        "created": "29 Apr 2021 13:28:38",
+        "created": "11 Jun 2021 14:08:56",
         "cso_type": null,
         "deleted_flag": false,
         "description": "",
@@ -80,7 +80,7 @@
         "last_assessment_date": null,
         "manually_blocked": false,
         "modified": null,
-        "name": "name003",
+        "name": "name000",
         "net_ct_cy": null,
         "outstanding_dct_amount_6_to_9_months_usd": null,
         "outstanding_dct_amount_more_than_9_months_usd": null,
@@ -103,7 +103,8 @@
         "min_req_spot_checks": 0,
         "sea_risk_rating_name": null,
         "highest_risk_rating_name": null,
-        "highest_risk_rating_type": null
+        "highest_risk_rating_type": null,
+        "psea_assessment_date": null
     },
     "content_type": "application/json"
 }
