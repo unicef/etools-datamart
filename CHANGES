@@ -1,3 +1,10 @@
+3.12
+-----
+* tweaked location admin
+* added location filter tree_id
+* fixed prc attachment
+
+
 3.11
 -----
 * fixed locations services (part 2)
