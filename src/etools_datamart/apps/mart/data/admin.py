@@ -206,7 +206,7 @@ class GatewayTypeAdmin(DataModelAdmin):
 class LocationAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'gateway', 'latitude', 'longitude', 'point')
     # readonly_fields = ('parent', 'gateway')
-    list_filter = ('level', TextFieldFilter.factory('parent__name__icontains', "Parent"), 'tree_id')
+    list_filter = ('level', TextFieldFilter.factory('parent__name__icontains', "Parent"))
     search_fields = ('name',)
     autocomplete_fields = ('parent', 'gateway', 'geoname',)
     actions = ['update_centroid', mass_update]
