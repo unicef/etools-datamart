@@ -387,7 +387,8 @@ class ReportIndicatorAdmin(DataModelAdmin):
 @register(models.Attachment)
 class AttachmentAdmin(DataModelAdmin):
     list_display = ('__str__',)
-    list_filter = ()
+    list_filter = ('code', 'content_type')
+    search_fields = ('filename', 'vendor_number', 'agreement_reference_number', 'pd_ssfa_number')
 
 
 @register(models.AuditResult)
