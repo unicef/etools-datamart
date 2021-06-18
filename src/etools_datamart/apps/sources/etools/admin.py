@@ -126,6 +126,8 @@ class LocationsLocationAdmin(TenantModelAdmin):
 @register(models.UnicefAttachmentsAttachment)
 class UnicefAttachmentsAttachmentAdmin(TenantModelAdmin):
     list_display = ('code', 'file')
+    list_filter = ('content_type', 'code')
+    search_fields = ('file', )
 
 
 @register(models.UnicefAttachmentsAttachmentflat)

@@ -15,7 +15,6 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionplannedvisits,
     ReportsAppliedindicator,
     T2FTravelactivity,
-    UnicefAttachmentsAttachment,
 )
 
 from .base import EtoolsDataMartModel
@@ -208,7 +207,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     @cached_property
     def _ct(self):
-        return DjangoContentType.objects.get(app_label='partners', model='intervention')
+        return DjangoContentType.objects.get(app_label='partners', model='intervention').model
 
     # def fr_currencies_ok(self, original: PartnersIntervention):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
@@ -341,8 +340,11 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(ret)
 
     def get_prc_review_document(self, record: PartnersIntervention, values: dict, **kwargs):
-        attachment = UnicefAttachmentsAttachment.objects.select_related('uploaded_by', 'file_type').filter(
-            object_id=record.id, code='partners_intervention_prc_review', content_type=self._ct).order_by('-id').first()
+        from etools_datamart.apps.mart.data.models import Attachment
+        attachment = Attachment.objects.filter(
+            object_id=record.intervention_id,
+            code='partners_intervention_prc_review',
+            content_type=self._ct).order_by('-id').first()
         if attachment:
             return attachment.file
 
