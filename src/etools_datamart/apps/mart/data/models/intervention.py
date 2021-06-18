@@ -2,11 +2,13 @@ import logging
 
 from django.db import models
 from django.db.models import F, JSONField
+from django.utils.functional import cached_property
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.sources.etools.models import (
+    DjangoContentType,
     FundsFundsreservationheader,
     PartnersIntervention,
     PartnersInterventionamendment,
@@ -14,7 +16,6 @@ from etools_datamart.apps.sources.etools.models import (
     ReportsAppliedindicator,
     T2FTravelactivity,
 )
-from etools_datamart.sentry import process_exception
 
 from .base import EtoolsDataMartModel
 from .location import Location
@@ -118,12 +119,13 @@ class InterventionAbstract(models.Model):
     class Options:
         depends = (Office, Location, Partner)
         source = PartnersIntervention
-        queryset = lambda: PartnersIntervention.objects.select_related('agreement',
-                                                                       'partner_authorized_officer_signatory',
-                                                                       'unicef_signatory',
-                                                                       'country_programme',
-                                                                       'partnersintervention_partners_interventionbudget_intervention_id'
-                                                                       )
+        queryset = lambda: PartnersIntervention.objects.select_related(
+            'agreement',
+            'partner_authorized_officer_signatory',
+            'unicef_signatory',
+            'country_programme',
+            'partnersintervention_partners_interventionbudget_intervention_id'
+        )
         key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
                                           intervention_id=record.pk)
         mapping = dict(
@@ -171,7 +173,7 @@ class InterventionAbstract(models.Model):
             partner_type='agreement.partner.type',
             partner_vendor_number='agreement.partner.vendor_number',
             planned_programmatic_visits='-',
-            prc_review_document='=',
+            prc_review_document='-',
             sections='-',
             start_date='start',
             status='=',
@@ -202,6 +204,10 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                                                                               'unicef_focal_points',
                                                                               'partner_focal_points',
                                                                               'result_links')
+
+    @cached_property
+    def _ct(self):
+        return DjangoContentType.objects.get(app_label='partners', model='intervention').model
 
     # def fr_currencies_ok(self, original: PartnersIntervention):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
@@ -260,7 +266,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                              description=section.description,
                              ))
         values['sections_data'] = data
-        return ", ".join([l['name'] for l in data])
+        return ", ".join([sec['name'] for sec in data])
 
     def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
         ta = T2FTravelactivity.objects.filter(partnership__pk=record.pk,
@@ -286,7 +292,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                              name=office.name,
                              ))
         values['offices_data'] = data
-        return ", ".join([l['name'] for l in data])
+        return ", ".join([off['name'] for off in data])
 
     def get_clusters(self, record: PartnersIntervention, values: dict, **kwargs):
 
@@ -333,30 +339,14 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         values['unicef_focal_points_data'] = data
         return ", ".join(ret)
 
-    # def get_reference_number(self, record: PartnersIntervention, values: dict, **kwargs):
-    #     return record.number
-    # if record.document_type != PartnersIntervention.SSFA:
-    #     number = '{agreement}/{type}{year}{id}'.format(
-    #         agreement=record.agreement.base_number,
-    #         type=record.document_type,
-    #         year=record.reference_number_year,
-    #         id=record.id
-    #     )
-    #     ret = number
-    # else:
-    #     ret = record.agreement.base_number
-    # # TODO: remove me
-    # print(111, "intervention.py:344", 1111, record.number, ret)
-    # return ret
-    # def get_disbursement_percent(self, original: PartnersIntervention, values: dict):
-    #     if original.frs__actual_amt_local__sum is None:
-    #         return None
-    #
-    #     if not (self.fr_currencies_ok(original) and original.max_fr_currency == original.planned_budget.currency):
-    #         return "!Error! (currencies do not match)"
-    #     percent = original.frs__actual_amt_local__sum / original.total_unicef_cash * 100 \
-    #         if original.total_unicef_cash and original.total_unicef_cash > 0 else 0
-    #     return "%.1f" % percent
+    def get_prc_review_document(self, record: PartnersIntervention, values: dict, **kwargs):
+        from etools_datamart.apps.mart.data.models import Attachment
+        attachment = Attachment.objects.filter(
+            object_id=record.intervention_id,
+            code='partners_intervention_prc_review',
+            content_type=self._ct).order_by('-id').first()
+        if attachment:
+            return attachment.file
 
 
 class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartModel):

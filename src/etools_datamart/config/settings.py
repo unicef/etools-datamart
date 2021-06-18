@@ -31,7 +31,7 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
                   CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
                   CACHE_URL_TEMPLATE=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
-                  CELERY_ALWAYS_EAGER=(bool, False),
+                  CELERY_TASK_ALWAYS_EAGER=(bool, False),
                   CELERY_BROKER_URL=(str, 'redis://127.0.0.1:6379/2'),
                   CELERY_RESULT_BACKEND=(str, 'redis://127.0.0.1:6379/3'),
                   CSRF_COOKIE_SECURE=(bool, True),
@@ -446,11 +446,11 @@ CELERY_BEAT_SCHEDULER = env.str(
 )
 CELERY_BROKER_POOL_LIMIT = env.int('CELERY_BROKER_POOL_LIMIT', default=0)
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = env.bool('CELERY_ALWAYS_EAGER')
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = env.bool('CELERY_TASK_ALWAYS_EAGER')
 CELERY_REDIS_MAX_CONNECTIONS = env.int('CELERY_REDIS_MAX_CONNECTIONS', 10)
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_RESULT_SERIALIZER = 'etljson'
-CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER')
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER')
 CELERY_TASK_SERIALIZER = 'etljson'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_EMAIL_TASK_CONFIG = {

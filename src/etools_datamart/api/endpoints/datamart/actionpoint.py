@@ -10,19 +10,28 @@ from etools_datamart.apps.mart.data import models
 
 from .. import common
 
-URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
-          'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
-          'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
-          'AuditAudit': "%s/ap/audits/%s/overview/?schema=%s",
-          'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
-          'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s"}
+URLMAP = {
+    'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
+    'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
+    'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
+    'AuditAudit': "%s/ap/audits/%s/overview/?schema=%s",
+    'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
+    'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s",
+    'PseaAssessment': "%s/psea/assessments/%s/details/?schema=%s",
+    'FieldMonitoringPlanningMonitoringactivity': "%s/fm/activities/%s/details/?schema=%s",
+}
 
-MODULEMAP = {'AuditSpotcheck': "fam",
-             'AuditMicroassessment': "fam",
-             'AuditSpecialaudit': "fam",
-             'AuditAudit': "fam",
-             'TpmTpmactivity': "tpm",
-             'T2FTravelactivity': "trips"}
+
+MODULEMAP = {
+    'AuditSpotcheck': "fam",
+    'AuditMicroassessment': "fam",
+    'AuditSpecialaudit': "fam",
+    'AuditAudit': "fam",
+    'TpmTpmactivity': "tpm",
+    'T2FTravelactivity': "trips",
+    'PseaAssessment': "psea",
+    'FieldMonitoringPlanningMonitoringactivity': "fm",
+}
 
 
 class UrlsMixin(DataMartSerializer):

@@ -50,7 +50,7 @@ class Attachment(EtoolsDataMartModel):
             file='attachment.file',
             attachment_source_id='attachment.pk',
             file_type_id='file_type.pk',
-            content_type='content_type.name',
+            content_type='attachment.content_type.model',
             hyperlink='attachment.hyperlink',
             object_id='attachment.object_id',
             code='attachment.code',
