@@ -342,7 +342,8 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_prc_review_document(self, record: PartnersIntervention, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Attachment
         attachment = Attachment.objects.filter(
-            object_id=record.pk,
+            # object_id=record.pk,
+            pd_ssfa_number__in=[record.number, record.number[:-2]],
             code='partners_intervention_prc_review',
             content_type=self._ct).order_by('-id').first()
         if attachment:
