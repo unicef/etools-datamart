@@ -80,7 +80,7 @@ class AttachmentFilterForm(forms.Form):
 class AttachmentViewSet(common.DataMartViewSet):
     serializer_class = AttachmentSerializer
     queryset = models.Attachment.objects.all()
-    filter_fields = ('created', 'date_of_completion', 'due_date')
+    filter_fields = ('created', 'date_of_completion', 'due_date', 'code')
     serializers_fieldsets = {'std': AttachmentSerializer,
                              'full': AttachmentSerializerFull,
                              'etools': AttachmentSerializerEtools,
