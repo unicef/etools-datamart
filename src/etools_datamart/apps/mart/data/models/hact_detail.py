@@ -1,15 +1,11 @@
 import json
 
 from django.db import models
-from django.db.models import JSONField
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import HactHacthistory
 
-# from etools_datamart.libs.json import print
-
-# from HactHistory
 {'Implementing Partner': 'ASIAN DISASTER PREPAREDNESS CENTER',
  'Partner Type': 'Civil Society Organization',
  'Shared': 'No',
@@ -49,11 +45,6 @@ def get_item(d, target, default: object = 'N/A', sep='|'):
 
 
 class HACTDetailLoader(EtoolsLoader):
-    def get_source_partner(self, record, values, field_name):
-        return json.loads(record.partner_values)
-
-    def get_source_history(self, record, values, field_name):
-        return json.loads(record.partner_values)
 
     def get_pv_completed_year(self, record, values, field_name):
         ret = 0
@@ -167,8 +158,6 @@ class HACTHistory(EtoolsDataMartModel):
     audits_completed = models.CharField(max_length=300, blank=True, null=True)
     audits_outstanding_findings = models.CharField(max_length=300, blank=True, null=True)
 
-    source_history = JSONField(blank=True, null=True)
-    source_partner = JSONField(blank=True, null=True)
     loader = HACTDetailLoader()
 
     class Meta:
@@ -195,6 +184,4 @@ class HACTHistory(EtoolsDataMartModel):
                        risk_rating='partner.rating',
                        liqu_1oct_30sep='partner.reported_cy',
                        ct_jan_dec='partner.total_ct_ytd',
-                       source_history='-',
-                       source_partner='-'
                        )

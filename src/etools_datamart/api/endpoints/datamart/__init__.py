@@ -8,7 +8,7 @@ from .audit_result import AuditResultViewSet
 from .audit_special import AuditSpecialViewSet
 from .audit_spotcheck import SpotCheckFindingViewSet
 from .famindicator import FAMIndicatorViewSet
-from .fm_questions import FMOntrackViewSet, FMQuestionViewSet
+from .fm_questions import FMOntrackViewSet, FMOptionsViewSet, FMQuestionViewSet
 from .funds_grant import GrantViewSet
 from .funds_reservation import FundsReservationViewSet
 from .hact_aggregate import HACTAggreagateViewSet

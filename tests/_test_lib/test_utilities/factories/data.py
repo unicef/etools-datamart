@@ -268,6 +268,11 @@ class FMOntrackFactory(DataMartModelFactory):
         model = models.FMOntrack
 
 
+class FMOptionFactory(DataMartModelFactory):
+    class Meta:
+        model = models.FMOptions
+
+
 class FMQuestionFactory(DataMartModelFactory):
 
     class Meta:

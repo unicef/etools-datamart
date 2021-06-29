@@ -7,7 +7,7 @@ from .audit_result import AuditResult  # noqa
 from .audit_special import AuditSpecial  # noqa
 from .audit_spotcheck import SpotCheckFindings  # noqa
 from .fam import FAMIndicator  # noqa
-from .fm_questions import FMOntrack, FMQuestion  # noqa
+from .fm_questions import FMOntrack, FMOptions, FMQuestion  # noqa
 from .fm_settings import Locationsite  # noqa
 from .funds_grant import Grant  # noqa
 from .funds_reservation import FundsReservation  # noqa

@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.hacthistory",
-                "pk": 9,
+                "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:48.557Z",
+                    "last_modify_date": "2021-06-29T23:13:54.833Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -49,17 +49,15 @@
                     "sc_completed_q4": null,
                     "audits_mr": null,
                     "audits_completed": null,
-                    "audits_outstanding_findings": null,
-                    "source_history": null,
-                    "source_partner": null
+                    "audits_outstanding_findings": null
                 }
             },
             {
                 "model": "data.hacthistory",
-                "pk": 10,
+                "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:48.586Z",
+                    "last_modify_date": "2021-06-29T23:13:54.837Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -102,17 +100,15 @@
                     "sc_completed_q4": null,
                     "audits_mr": null,
                     "audits_completed": null,
-                    "audits_outstanding_findings": null,
-                    "source_history": null,
-                    "source_partner": null
+                    "audits_outstanding_findings": null
                 }
             },
             {
                 "model": "data.hacthistory",
-                "pk": 11,
+                "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:48.588Z",
+                    "last_modify_date": "2021-06-29T23:13:54.839Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -155,9 +151,7 @@
                     "sc_completed_q4": null,
                     "audits_mr": null,
                     "audits_completed": null,
-                    "audits_outstanding_findings": null,
-                    "source_history": null,
-                    "source_partner": null
+                    "audits_outstanding_findings": null
                 }
             }
         ],
