@@ -21,3 +21,13 @@ class FMOntrackSerializer(DataMartSerializer):
 class FMOntrackViewSet(DataMartViewSet):
     serializer_class = FMOntrackSerializer
     queryset = models.FMOntrack.objects.all()
+
+
+class FMOptionsSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.FMOptions
+
+
+class FMOptionsViewSet(DataMartViewSet):
+    serializer_class = FMOptionsSerializer
+    queryset = models.FMOptions.objects.all()

@@ -1,3 +1,9 @@
+3.13
+-----
+* add fm option viewset
+* simplified hact detail model
+
+
 3.12
 -----
 * fixed attachments for interventions

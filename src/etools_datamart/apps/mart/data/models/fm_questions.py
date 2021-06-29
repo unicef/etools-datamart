@@ -362,3 +362,29 @@ class FMOntrack(EtoolsDataMartModel):
             person_responsible_email="monitoring_activity.person_responsible.email",
             team_members='-',
         )
+
+
+class FMOptions(EtoolsDataMartModel):
+    label = models.CharField(max_length=50, null=True, blank=True)
+    option_value = models.TextField(blank=True, null=True)
+    question = models.TextField(blank=True, null=True)
+    question_id = models.IntegerField(null=True, blank=True)
+    category = models.CharField(max_length=100)
+    is_custom = models.BooleanField(default=True, blank=True)
+    is_active = models.BooleanField(default=True, blank=True)
+
+    loader = EtoolsLoader()
+
+    class Meta:
+        ordering = ("id",)
+
+    class Options:
+        source = FieldMonitoringSettingsOption
+        mapping = dict(
+            question="question.text",
+            question_id="question.id",
+            category="question.category.name",
+            is_custom="question.is_custom",
+            is_active="question.is_active",
+            option_value='value'
+        )

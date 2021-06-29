@@ -1,0 +1,24 @@
+{
+    "record": {
+        "master": {
+            "model": "data.fmoptions",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2021-06-29T23:14:07.719Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "label": null,
+                "option_value": null,
+                "question": null,
+                "question_id": null,
+                "category": "",
+                "is_custom": true,
+                "is_active": true
+            }
+        },
+        "deps": []
+    }
+}
