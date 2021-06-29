@@ -1,0 +1,124 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"15b07a06577dc706b18bf9149b9a468f\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.fm_questions.FMOptionsViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.fm_questions.FMOptionsViewSet"
+        ],
+        "cache-version": [
+            "cache-version",
+            "1"
+        ],
+        "system-filters": [
+            "system-filters",
+            ""
+        ],
+        "cache-key": [
+            "cache-key",
+            "15b07a06577dc706b18bf9149b9a468f"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "789"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 1,
+                "source_id": null,
+                "last_modify_date": "29 Jun 2021 23:13:53",
+                "seen": null,
+                "country_name": "bolivia",
+                "area_code": "",
+                "label": null,
+                "option_value": null,
+                "question": null,
+                "question_id": null,
+                "category": "",
+                "is_custom": true,
+                "is_active": true
+            },
+            {
+                "id": 2,
+                "source_id": null,
+                "last_modify_date": "29 Jun 2021 23:13:53",
+                "seen": null,
+                "country_name": "chad",
+                "area_code": "",
+                "label": null,
+                "option_value": null,
+                "question": null,
+                "question_id": null,
+                "category": "",
+                "is_custom": true,
+                "is_active": true
+            },
+            {
+                "id": 3,
+                "source_id": null,
+                "last_modify_date": "29 Jun 2021 23:13:53",
+                "seen": null,
+                "country_name": "lebanon",
+                "area_code": "",
+                "label": null,
+                "option_value": null,
+                "question": null,
+                "question_id": null,
+                "category": "",
+                "is_custom": true,
+                "is_active": true
+            }
+        ]
+    },
+    "content_type": "application/json"
+}

@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.hacthistory",
-            "pk": 12,
+            "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-04-29T13:28:52.454Z",
+                "last_modify_date": "2021-06-29T23:14:08.172Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -48,9 +48,7 @@
                 "sc_completed_q4": null,
                 "audits_mr": null,
                 "audits_completed": null,
-                "audits_outstanding_findings": null,
-                "source_history": null,
-                "source_partner": null
+                "audits_outstanding_findings": null
             }
         },
         "deps": []
