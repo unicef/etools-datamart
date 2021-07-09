@@ -46,34 +46,20 @@ class FMQuestionLoader(EtoolsLoader):
         for rec in self.get_queryset():
             filters = self.config.key(self, rec)
             values = self.get_values(rec)
-            activity = rec.activity_question.monitoring_activity
-            partner_qs = FieldMonitoringPlanningMonitoringactivityPartners.objects.filter(
-                monitoringactivity=activity,
-            )
-            intervention_qs = FieldMonitoringPlanningMonitoringactivityInterventions.objects.filter(
-                monitoringactivity=activity,
-            )
-            cp_output_qs = FieldMonitoringPlanningMonitoringactivityCpOutputs.objects.filter(
-                monitoringactivity=activity,
-            )
-            for rec in partner_qs.all():
-                partner = rec.partnerorganization
-                values["entity_type"] = "Partner"
-                values["entity_instance"] = partner.name
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
-            for rec in intervention_qs.all():
-                pd = rec.intervention
-                values["entity_type"] = "PD/SSFA"
-                values["entity_instance"] = pd.reference_number
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
-            for rec in cp_output_qs.all():
-                cp_output = rec.result
+            if rec.activity_question.cp_output:
+                cp_output = rec.activity_question.cp_output
                 values["entity_type"] = "CP Output"
                 values["entity_instance"] = cp_output.name
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
+            elif rec.activity_question.intervention:
+                pd = rec.activity_question.intervention
+                values["entity_type"] = "PD/SSFA"
+                values["entity_instance"] = pd.reference_number
+            elif rec.activity_question.partner:
+                partner = rec.activity_question.partner
+                values["entity_type"] = "Partner"
+                values["entity_instance"] = partner.name
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
 
 
 class FMQuestion(EtoolsDataMartModel):
@@ -214,32 +200,23 @@ class FMOntrackLoader(EtoolsLoader):
         for rec in self.get_queryset():
             filters = self.config.key(self, rec)
             values = self.get_values(rec)
-            activity = rec.monitoring_activity
-            partner_qs = FieldMonitoringPlanningMonitoringactivityPartners.objects.filter(
-                monitoringactivity=activity,
-            )
-            intervention_qs = FieldMonitoringPlanningMonitoringactivityInterventions.objects.filter(
-                monitoringactivity=activity,
-            )
-            cp_output_qs = FieldMonitoringPlanningMonitoringactivityCpOutputs.objects.filter(
-                monitoringactivity=activity,
-            )
-            for rec in partner_qs.all():
-                values["entity"] = rec.partnerorganization.name
-                values["outcome"] = None
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
-            for rec in intervention_qs.all():
+            if rec.cp_output:
+                values["entity"] = rec.cp_output.name
+                values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
+                values["output"] = rec.cp_output.wbs
+                values["entity_type"] = "CP Output"
+            elif rec.intervention:
                 values["entity"] = rec.intervention.reference_number
                 values["outcome"] = None
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
-            for rec in cp_output_qs.all():
-                cp_output = rec.result
-                values["entity"] = cp_output.name
-                values["outcome"] = cp_output.parent.wbs if cp_output.parent else None
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
+                values["output"] = None
+                values["entity_type"] = "PD/SSFA"
+            elif rec.partner:
+                values["entity"] = rec.partner.name
+                values["outcome"] = None
+                values["output"] = None
+                values["entity_type"] = "Partner"
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
 
     def get_sections(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         data = []
@@ -289,6 +266,12 @@ class FMOntrack(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    entity_type = models.CharField(
+        verbose_name=_("Entity Type"),
+        max_length=100,
+        null=True,
+        blank=True,
+    )
     narrative_finding = models.TextField(
         verbose_name=_("Overall Finding Narrative"),
         null=True,
@@ -324,9 +307,16 @@ class FMOntrack(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    status = models.CharField(max_length=20, null=True, blank=True)
     outcome = models.CharField(
         verbose_name=_("Outcome WBS"),
         max_length=30,
+        null=True,
+        blank=True,
+    )
+    output = models.CharField(
+        verbose_name=_("Output WBS"),
+        max_length=50,
         null=True,
         blank=True,
     )
@@ -347,6 +337,7 @@ class FMOntrack(EtoolsDataMartModel):
         source = FieldMonitoringDataCollectionActivityoverallfinding
         mapping = dict(
             entity="i",
+            entity_type="i",
             narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
@@ -354,12 +345,14 @@ class FMOntrack(EtoolsDataMartModel):
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="monitoring_activity.location.name",
             site="monitoring_activity.locationsite.name",
+            status='monitoring_activity.status',
             outcome="i",
+            output="i",
             vendor_number="partner.vendor_number",
             reference_number='intervention.reference_number',
             field_office='monitoring_activity.field_office.name',
             sections="-",
-            person_responsible_email="monitoring_activity.person_responsible.email",
+            person_responsible_email="monitoring_activity.visit_lead.email",
             team_members='-',
         )
 

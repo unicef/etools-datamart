@@ -228,12 +228,18 @@ class LocationsiteAdmin(DataModelAdmin):
 
 @register(models.FMOntrack)
 class FMOntrackAdmin(DataModelAdmin):
-    list_display = ('entity', 'narrative_finding', 'overall_finding_rating')
+    list_display = ('entity', 'entity_type', 'narrative_finding', 'overall_finding_rating', 'status')
+
+
+@register(models.FMOptions)
+class FMOptionsAdmin(DataModelAdmin):
+    list_display = ('label', 'question', 'category', 'is_custom', 'is_active')
+    list_filter = ('category', 'is_custom', 'is_active')
 
 
 @register(models.FMQuestion)
 class FMQuestionAdmin(DataModelAdmin):
-    list_display = ('title', 'answer_type', 'collection_method', 'answer')
+    list_display = ('title', 'entity_instance', 'entity_type', 'answer_type', 'collection_method', 'answer')
 
 
 @register(models.FundsReservation)

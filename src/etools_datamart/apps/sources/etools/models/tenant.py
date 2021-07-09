@@ -469,7 +469,7 @@ class FieldMonitoringPlanningMonitoringactivity(models.TenantModel):
     status = models.CharField(max_length=20)
     location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_location', blank=True, null=True)
     location_site = models.ForeignKey('FieldMonitoringSettingsLocationsite', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_location_site', blank=True, null=True)
-    person_responsible = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_person_responsible', blank=True, null=True)
+    visit_lead = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_person_responsible', blank=True, null=True)
     tpm_partner = models.ForeignKey('TpmpartnersTpmpartner', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_tpm_partner', blank=True, null=True)
     cancel_reason = models.TextField()
     reject_reason = models.TextField()
