@@ -15,6 +15,6 @@ ENV PYTHONPATH /code
 # See https://github.com/unicef/etools/pull/2716
 # RUN apk del .build-deps
 
-RUN python manage.py init-setup --all
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
