@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"44f69651dd5476c8e8a4331f1edbe322\""
+            "\"2b98d3b481b6b724f24af2655013a2f9\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -39,7 +39,7 @@
         ],
         "cache-key": [
             "cache-key",
-            "44f69651dd5476c8e8a4331f1edbe322"
+            "2b98d3b481b6b724f24af2655013a2f9"
         ],
         "cache-hit": [
             "cache-hit",
@@ -59,7 +59,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "1508"
+            "1649"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -81,6 +81,7 @@
                 "country_name": "bolivia",
                 "area_code": "",
                 "entity": null,
+                "entity_type": null,
                 "narrative_finding": null,
                 "overall_finding_rating": null,
                 "monitoring_activity": null,
@@ -88,7 +89,9 @@
                 "monitoring_activity_end_date": null,
                 "location": {},
                 "site": null,
+                "status": null,
                 "outcome": null,
+                "output": null,
                 "vendor_number": null,
                 "reference_number": null,
                 "field_office": null,
@@ -105,6 +108,7 @@
                 "country_name": "chad",
                 "area_code": "",
                 "entity": null,
+                "entity_type": null,
                 "narrative_finding": null,
                 "overall_finding_rating": null,
                 "monitoring_activity": null,
@@ -112,7 +116,9 @@
                 "monitoring_activity_end_date": null,
                 "location": {},
                 "site": null,
+                "status": null,
                 "outcome": null,
+                "output": null,
                 "vendor_number": null,
                 "reference_number": null,
                 "field_office": null,
@@ -129,6 +135,7 @@
                 "country_name": "lebanon",
                 "area_code": "",
                 "entity": null,
+                "entity_type": null,
                 "narrative_finding": null,
                 "overall_finding_rating": null,
                 "monitoring_activity": null,
@@ -136,7 +143,9 @@
                 "monitoring_activity_end_date": null,
                 "location": {},
                 "site": null,
+                "status": null,
                 "outcome": null,
+                "output": null,
                 "vendor_number": null,
                 "reference_number": null,
                 "field_office": null,

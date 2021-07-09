@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"9bc02dedb267aceb8cd8d71145a24358\""
+            "\"7588d65cf4e2c334ab45526d355418f6\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -47,7 +47,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "475"
+            "522"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -62,6 +62,7 @@
         "country_name": "bolivia",
         "area_code": "",
         "entity": null,
+        "entity_type": null,
         "narrative_finding": null,
         "overall_finding_rating": null,
         "monitoring_activity": null,
@@ -69,7 +70,9 @@
         "monitoring_activity_end_date": null,
         "location": {},
         "site": null,
+        "status": null,
         "outcome": null,
+        "output": null,
         "vendor_number": null,
         "reference_number": null,
         "field_office": null,

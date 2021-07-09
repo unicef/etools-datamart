@@ -40,6 +40,7 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
         SizeFilter, 'enabled', 'refresh', 'format',
     )
     actions = [queue, check]
+    raw_id_fields = ('as_user', )
 
     def format(self, obj):
         return obj.stem
