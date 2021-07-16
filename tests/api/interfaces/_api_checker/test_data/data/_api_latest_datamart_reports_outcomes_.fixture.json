@@ -1,0 +1,103 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.result",
+                "pk": 28,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-07-16T17:16:13.633Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "name": null,
+                    "code": null,
+                    "result_type": "Outcome",
+                    "section": null,
+                    "gic_code": null,
+                    "gic_name": null,
+                    "humanitarian_tag": null,
+                    "sic_code": null,
+                    "sic_name": null,
+                    "wbs": null,
+                    "activity_focus_code": null,
+                    "activity_focus_name": null,
+                    "from_date": null,
+                    "to_date": null,
+                    "ram": null,
+                    "country_programme": null,
+                    "humanitarian_marker_code": null,
+                    "humanitarian_marker_name": null,
+                    "programme_area_code": null,
+                    "programme_area_name": null
+                }
+            },
+            {
+                "model": "data.result",
+                "pk": 29,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-07-16T17:16:13.636Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "name": null,
+                    "code": null,
+                    "result_type": "Outcome",
+                    "section": null,
+                    "gic_code": null,
+                    "gic_name": null,
+                    "humanitarian_tag": null,
+                    "sic_code": null,
+                    "sic_name": null,
+                    "wbs": null,
+                    "activity_focus_code": null,
+                    "activity_focus_name": null,
+                    "from_date": null,
+                    "to_date": null,
+                    "ram": null,
+                    "country_programme": null,
+                    "humanitarian_marker_code": null,
+                    "humanitarian_marker_name": null,
+                    "programme_area_code": null,
+                    "programme_area_name": null
+                }
+            },
+            {
+                "model": "data.result",
+                "pk": 30,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-07-16T17:16:13.639Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "name": null,
+                    "code": null,
+                    "result_type": "Outcome",
+                    "section": null,
+                    "gic_code": null,
+                    "gic_name": null,
+                    "humanitarian_tag": null,
+                    "sic_code": null,
+                    "sic_name": null,
+                    "wbs": null,
+                    "activity_focus_code": null,
+                    "activity_focus_name": null,
+                    "from_date": null,
+                    "to_date": null,
+                    "ram": null,
+                    "country_programme": null,
+                    "humanitarian_marker_code": null,
+                    "humanitarian_marker_name": null,
+                    "programme_area_code": null,
+                    "programme_area_name": null
+                }
+            }
+        ],
+        "deps": []
+    }
+}

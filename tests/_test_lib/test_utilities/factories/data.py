@@ -352,3 +352,8 @@ class AuditSpecialFactory(DataMartModelFactory):
 class PartnerStaffMemberFactory(DataMartModelFactory):
     class Meta:
         model = models.PartnerStaffMember
+
+
+class ResultFactory(DataMartModelFactory):
+    class Meta:
+        model = models.Result

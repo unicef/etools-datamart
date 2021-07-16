@@ -1639,6 +1639,8 @@ class ReportsResult(models.TenantModel):
     modified = models.DateTimeField()
     humanitarian_marker_code = models.CharField(max_length=255, blank=True, null=True)
     humanitarian_marker_name = models.CharField(max_length=255, blank=True, null=True)
+    # programme_area_code = models.CharField(max_length=16, null=True, blank=True)
+    # programme_area_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         managed = False

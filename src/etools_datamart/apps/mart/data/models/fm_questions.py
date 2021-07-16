@@ -204,16 +204,21 @@ class FMOntrackLoader(EtoolsLoader):
                 values["entity"] = rec.cp_output.name
                 values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
                 values["output"] = rec.cp_output.wbs
+                values["programme_areas"] = None
+                # values["programme_areas"] = ', '.join([
+                #     f'{output.programme_area_code} {output.programme_area_name}' for output in rec.cp_output])
                 values["entity_type"] = "CP Output"
             elif rec.intervention:
                 values["entity"] = rec.intervention.reference_number
                 values["outcome"] = None
                 values["output"] = None
+                values["programme_areas"] = None
                 values["entity_type"] = "PD/SSFA"
             elif rec.partner:
                 values["entity"] = rec.partner.name
                 values["outcome"] = None
                 values["output"] = None
+                values["programme_areas"] = None
                 values["entity_type"] = "Partner"
             op = self.process_record(filters, values)
             self.increment_counter(op)
@@ -320,6 +325,11 @@ class FMOntrack(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    programme_areas = models.TextField(
+        verbose_name=_("Programme Areas"),
+        null=True,
+        blank=True,
+    )
     vendor_number = models.CharField(max_length=30, blank=True, null=True)
     reference_number = models.CharField(max_length=100, null=True)
     field_office = models.CharField(max_length=254, blank=True, null=True)
@@ -348,6 +358,7 @@ class FMOntrack(EtoolsDataMartModel):
             status='monitoring_activity.status',
             outcome="i",
             output="i",
+            programme_areas="i",
             vendor_number="partner.vendor_number",
             reference_number='intervention.reference_number',
             field_office='monitoring_activity.field_office.name',
