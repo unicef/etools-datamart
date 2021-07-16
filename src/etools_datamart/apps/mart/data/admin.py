@@ -426,3 +426,9 @@ class AuditAdmin(DataModelAdmin):
 class AuditSpecialAdmin(DataModelAdmin):
     list_display = ('__str__',)
     list_filter = ()
+
+
+@register(models.Result)
+class ResultAdmin(DataModelAdmin):
+    list_display = ('result_type', 'name', 'code', 'country_programme', 'wbs')
+    list_filter = ('result_type', 'country_programme')

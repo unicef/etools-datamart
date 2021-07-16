@@ -22,6 +22,7 @@ from .partners_staffmember import PartnerStaffMember  # noqa
 from .pd_indicator import PDIndicator  # noqa
 from .pmp import PMPIndicators  # noqa
 from .report_sector import Section  # noqa
+from .reports import Result  # noqa
 from .reports_indicator import ReportIndicator  # noqa
 from .reports_office import Office  # noqa
 from .tpm_tmpactivity import TPMActivity  # noqa
