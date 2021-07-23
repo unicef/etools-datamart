@@ -114,7 +114,7 @@ def django_db_setup(request,
     # this patch is logically wrong, but we do not use constance permissions
     # otherwise test fails with
     #
-    # .venv/lib/python3.7/site-packages/django/db/backends/utils.py:84: in _execute
+    # .venv/lib/python3.9/site-packages/django/db/backends/utils.py:84: in _execute
     #     return self.cursor.execute(sql, params)
     # E   django.db.utils.ProgrammingError: relation "django_content_type" does not exist
     # E   LINE 1: ..."."app_label", "django_content_type"."model" FROM "django_co...
