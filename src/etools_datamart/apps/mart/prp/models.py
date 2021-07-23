@@ -207,12 +207,14 @@ class IndicatorByLocation(PrpDataMartModel):
         app_label = 'prp'
 
     class Options:
-        queryset = IndicatorIndicatorlocationdata.objects.select_related('location',
-                                                                         # 'indicator_report__project__partner',
-                                                                         # 'indicator_report__progress_report__programme_document',
-                                                                         # 'indicator_report__reportable'
-                                                                         ).all
-        source = IndicatorIndicatorlocationdata
+        queryset = IndicatorIndicatorlocationdata.objects.select_related(
+            'location',
+            'indicator_report__project',
+            'indicator_report__project__partner',
+            'indicator_report__progress_report',
+            'indicator_report__progress_report__programme_document',
+            'indicator_report__reportable'
+        )
         key = lambda loader, record: {'source_id': record.id}
         mapping = {
             'location_source_id': 'location.id',
@@ -234,11 +236,14 @@ class DataReportLoader(PrpBaseLoader):
 
     def get_queryset(self):
         # all_progress_reports = UnicefProgressreport.objects.all()
-        qs = IndicatorIndicatorlocationdata.objects.all()
-        qs = qs.exclude(Q(indicator_report__progress_report__isnull=True) |
-                        Q(indicator_report__progress_report__status__in=["Due",
-                                                                         "Ove",
-                                                                         "Sen"]))
+        qs = IndicatorIndicatorlocationdata.objects.select_related(
+            'location',
+            'indicator_report',
+            'indicator_report__progress_report',
+            'indicator_report__reportable',
+            'indicator_report__reportable__blueprint',
+        ).exclude(Q(indicator_report__progress_report__isnull=True) |
+                  Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"]))
         return qs.all()
 
     def get_value(self, field_name, value_or_func, original_record, current_mapping):
