@@ -1,3 +1,8 @@
+3.16
+-----
+* moved to python 3.9
+
+
 3.15
 -----
 * added outcomes, outputs, activities apis

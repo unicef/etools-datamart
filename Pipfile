@@ -45,7 +45,7 @@ djangorestframework-xml = "*"
 djangorestframework-yaml = "*"
 drf-dynamic-serializer = "*"
 drf-extensions = "*"
-drf-jwt = "<2.0"
+drf-jwt = "*"
 drf-renderer-xlsx = "*"
 drf-yasg = "*"
 gunicorn = "*"
@@ -56,12 +56,11 @@ python-social-auth = "*"
 psycopg2-binary = "*"
 rapidpro-python = "*"
 requests = "*"
-social-auth-core = "<4.0.2"  # pyjwt compatibility
+social-auth-core = "*"
 sentry-sdk = "*"
 swagger-spec-validator = "*"
 unicef-security = "*"
 xhtml2pdf = "*"
-PyJWT = "<2.0"
 
 
 [dev-packages]
