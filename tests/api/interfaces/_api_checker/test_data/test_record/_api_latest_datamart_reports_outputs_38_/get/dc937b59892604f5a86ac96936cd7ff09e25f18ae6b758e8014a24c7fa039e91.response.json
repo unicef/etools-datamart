@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "headers": {
+        "content-type": [
+            "Content-Type",
+            "application/json"
+        ],
+        "vary": [
+            "Vary",
+            "Accept, Origin, Cookie"
+        ],
+        "allow": [
+            "Allow",
+            "GET, HEAD, OPTIONS"
+        ],
+        "etag": [
+            "ETag",
+            "\"4ddc0f67bcb2dac2104f0c809cd4953a\""
+        ],
+        "x-frame-options": [
+            "X-Frame-Options",
+            "DENY"
+        ],
+        "view": [
+            "view",
+            "etools_datamart.api.endpoints.datamart.reports.OutputViewSet"
+        ],
+        "service": [
+            "service",
+            "etools_datamart.api.endpoints.datamart.reports.OutputViewSet"
+        ],
+        "qs_filter": [
+            "qs_filter",
+            "{}"
+        ],
+        "qs_exclude": [
+            "qs_exclude",
+            "{}"
+        ],
+        "cache-hit": [
+            "cache-hit",
+            "False"
+        ],
+        "cache-ttl": [
+            "cache-ttl",
+            "1y"
+        ],
+        "content-length": [
+            "Content-Length",
+            "120"
+        ],
+        "referrer-policy": [
+            "Referrer-Policy",
+            "same-origin"
+        ]
+    },
+    "data": {
+        "wbs": null,
+        "name": null,
+        "from_date": null,
+        "to_date": null,
+        "humanitarian_marker_code": null,
+        "humanitarian_marker_name": null
+    },
+    "content_type": "application/json"
+}

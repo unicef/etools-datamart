@@ -50,6 +50,7 @@ class FMQuestionLoader(EtoolsLoader):
                 cp_output = rec.activity_question.cp_output
                 values["entity_type"] = "CP Output"
                 values["entity_instance"] = cp_output.name
+                values["output"] = cp_output.wbs
             elif rec.activity_question.intervention:
                 pd = rec.activity_question.intervention
                 values["entity_type"] = "PD/SSFA"
@@ -88,6 +89,14 @@ class FMQuestion(EtoolsDataMartModel):
     entity_instance = models.CharField(
         verbose_name=_("Entity Instance"),
         max_length=255,
+        null=True,
+        blank=True,
+    )
+    vendor_number = models.CharField(max_length=30, blank=True, null=True)
+    reference_number = models.CharField(max_length=100, null=True)
+    output = models.CharField(
+        verbose_name=_("Output WBS"),
+        max_length=50,
         null=True,
         blank=True,
     )
@@ -169,6 +178,8 @@ class FMQuestion(EtoolsDataMartModel):
             answer_options="-",
             entity_type="i",
             entity_instance="i",
+            vendor_number="activity_question.partner.vendor_number",
+            reference_number='activity_question.intervention.reference_number',
             question_collection_methods="-",
             collection_method="started_checklist.method.name",
             answer="value",
