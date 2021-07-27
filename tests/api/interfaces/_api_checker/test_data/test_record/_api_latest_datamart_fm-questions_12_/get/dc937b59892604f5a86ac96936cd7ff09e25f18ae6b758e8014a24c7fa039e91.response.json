@@ -15,7 +15,7 @@
         ],
         "etag": [
             "ETag",
-            "\"34810d47ae3e0fa2269a8ef7a409b178\""
+            "\"c1411b82732121a4804656aec8ebc948\""
         ],
         "x-frame-options": [
             "X-Frame-Options",
@@ -47,7 +47,7 @@
         ],
         "content-length": [
             "Content-Length",
-            "537"
+            "596"
         ],
         "referrer-policy": [
             "Referrer-Policy",
@@ -66,6 +66,9 @@
         "answer_options": null,
         "entity_type": null,
         "entity_instance": null,
+        "vendor_number": null,
+        "reference_number": null,
+        "output": null,
         "question_collection_methods": null,
         "collection_method": null,
         "answer": null,
