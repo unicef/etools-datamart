@@ -1,6 +1,8 @@
 3.18
 -----
 * added support to django 3.2
+* added location site endpoint
+* added psea assessment and answer endpoints
 
 
 3.17
