@@ -14,7 +14,7 @@ from .funds_reservation import FundsReservationViewSet
 from .hact_aggregate import HACTAggreagateViewSet
 from .hact_history import HACTHistoryViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
-from .location import GatewayTypeViewSet, LocationViewSet
+from .location import GatewayTypeViewSet, LocationSiteViewSet, LocationViewSet
 from .office import OfficeViewSet
 from .partners_agreement import PartnerAgreementViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet

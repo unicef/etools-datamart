@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"8929a7a022435880ee470df044a6e09a\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.reports.OutcomeViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.reports.OutcomeViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "68",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "code": null,
+        "wbs": null,
+        "name": null,
+        "from_date": null,
+        "to_date": null
+    },
+    "content_type": "application/json"
+}

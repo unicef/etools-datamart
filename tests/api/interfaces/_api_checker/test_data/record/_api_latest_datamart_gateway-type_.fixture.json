@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.gatewaytype",
-            "pk": 1806,
+            "pk": 8,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-04-29T13:28:52.106Z",
+                "last_modify_date": "2021-08-04T21:02:21.025Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",

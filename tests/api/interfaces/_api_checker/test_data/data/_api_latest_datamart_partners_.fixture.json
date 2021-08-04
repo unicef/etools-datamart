@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.partner",
-                "pk": 702,
+                "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:50.933Z",
+                    "last_modify_date": "2021-08-04T21:02:15.961Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -19,7 +19,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2021-04-29T13:28:38.543Z",
+                    "created": "2021-08-04T20:42:03.452Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -54,15 +54,16 @@
                     "last_pv_date": null,
                     "sea_risk_rating_name": null,
                     "highest_risk_rating_name": null,
-                    "highest_risk_rating_type": null
+                    "highest_risk_rating_type": null,
+                    "psea_assessment_date": null
                 }
             },
             {
                 "model": "data.partner",
-                "pk": 703,
+                "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:50.935Z",
+                    "last_modify_date": "2021-08-04T21:02:16.012Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -75,7 +76,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2021-04-29T13:28:38.543Z",
+                    "created": "2021-08-04T20:42:03.452Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -110,15 +111,16 @@
                     "last_pv_date": null,
                     "sea_risk_rating_name": null,
                     "highest_risk_rating_name": null,
-                    "highest_risk_rating_type": null
+                    "highest_risk_rating_type": null,
+                    "psea_assessment_date": null
                 }
             },
             {
                 "model": "data.partner",
-                "pk": 704,
+                "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:50.936Z",
+                    "last_modify_date": "2021-08-04T21:02:16.016Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -131,7 +133,7 @@
                     "city": null,
                     "core_values_assessment_date": null,
                     "country": null,
-                    "created": "2021-04-29T13:28:38.543Z",
+                    "created": "2021-08-04T20:42:03.452Z",
                     "cso_type": null,
                     "deleted_flag": false,
                     "description": "",
@@ -166,7 +168,8 @@
                     "last_pv_date": null,
                     "sea_risk_rating_name": null,
                     "highest_risk_rating_name": null,
-                    "highest_risk_rating_type": null
+                    "highest_risk_rating_type": null,
+                    "psea_assessment_date": null
                 }
             }
         ],

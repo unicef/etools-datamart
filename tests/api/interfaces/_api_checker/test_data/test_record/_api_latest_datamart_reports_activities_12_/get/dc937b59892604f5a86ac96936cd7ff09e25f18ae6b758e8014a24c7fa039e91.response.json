@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"901273937e8be25fec5301f89be8b85b\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.reports.ActivityViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.reports.ActivityViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "198",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "wbs": null,
+        "name": null,
+        "from_date": null,
+        "to_date": null,
+        "sic_code": null,
+        "sic_name": null,
+        "gic_code": null,
+        "gic_name": null,
+        "activity_focus_code": null,
+        "activity_focus_name": null,
+        "humanitarian_tag": null
+    },
+    "content_type": "application/json"
+}

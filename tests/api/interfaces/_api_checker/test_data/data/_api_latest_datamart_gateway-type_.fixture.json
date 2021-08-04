@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.gatewaytype",
-                "pk": 1802,
+                "pk": 4,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:47.737Z",
+                    "last_modify_date": "2021-08-04T21:01:57.504Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -17,10 +17,10 @@
             },
             {
                 "model": "data.gatewaytype",
-                "pk": 1803,
+                "pk": 5,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:47.739Z",
+                    "last_modify_date": "2021-08-04T21:01:57.521Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -31,10 +31,10 @@
             },
             {
                 "model": "data.gatewaytype",
-                "pk": 1804,
+                "pk": 6,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-04-29T13:28:47.741Z",
+                    "last_modify_date": "2021-08-04T21:01:57.533Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",

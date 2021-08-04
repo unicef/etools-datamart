@@ -1,70 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"b1a8c609a4947693c133d5d56708af43\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.trips.TripViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.trips.TripViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "b1a8c609a4947693c133d5d56708af43"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "2280"
-        ],
-        "referrer-policy": [
-            "Referrer-Policy",
-            "same-origin"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"a2f92314d579647ee1b1ee033b95fe10\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.trips.TripViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.trips.TripViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "a2f92314d579647ee1b1ee033b95fe10",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "2280",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -76,7 +28,7 @@
             {
                 "trip_url": "https://etools.unicef.org/None?schema=bolivia",
                 "seen": null,
-                "last_modify_date": "29 Apr 2021 13:28:50",
+                "last_modify_date": "04 Aug 2021 21:02:14",
                 "country_name": "bolivia",
                 "additional_note": null,
                 "created": null,
@@ -109,7 +61,7 @@
             {
                 "trip_url": "https://etools.unicef.org/None?schema=chad",
                 "seen": null,
-                "last_modify_date": "29 Apr 2021 13:28:50",
+                "last_modify_date": "04 Aug 2021 21:02:14",
                 "country_name": "chad",
                 "additional_note": null,
                 "created": null,
@@ -142,7 +94,7 @@
             {
                 "trip_url": "https://etools.unicef.org/None?schema=lebanon",
                 "seen": null,
-                "last_modify_date": "29 Apr 2021 13:28:50",
+                "last_modify_date": "04 Aug 2021 21:02:14",
                 "country_name": "lebanon",
                 "additional_note": null,
                 "created": null,

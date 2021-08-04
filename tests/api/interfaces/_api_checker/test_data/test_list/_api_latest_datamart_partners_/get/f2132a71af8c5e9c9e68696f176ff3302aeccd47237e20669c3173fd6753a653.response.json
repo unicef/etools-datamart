@@ -1,70 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"62f3c0032f0e9a07fde970c75339dd42\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "62f3c0032f0e9a07fde970c75339dd42"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "3516"
-        ],
-        "referrer-policy": [
-            "Referrer-Policy",
-            "same-origin"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"f65d017314445ebc12982156f3fc21fa\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "f65d017314445ebc12982156f3fc21fa",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "3510",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -74,9 +26,9 @@
         "previous": null,
         "results": [
             {
-                "id": 702,
+                "id": 1,
                 "source_id": null,
-                "last_modify_date": "29 Apr 2021 13:28:50",
+                "last_modify_date": "04 Aug 2021 21:02:15",
                 "seen": null,
                 "country_name": "bolivia",
                 "area_code": "",
@@ -88,7 +40,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "29 Apr 2021 13:28:38",
+                "created": "04 Aug 2021 20:42:03",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -127,9 +79,9 @@
                 "psea_assessment_date": null
             },
             {
-                "id": 703,
+                "id": 2,
                 "source_id": null,
-                "last_modify_date": "29 Apr 2021 13:28:50",
+                "last_modify_date": "04 Aug 2021 21:02:16",
                 "seen": null,
                 "country_name": "chad",
                 "area_code": "",
@@ -141,7 +93,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "29 Apr 2021 13:28:38",
+                "created": "04 Aug 2021 20:42:03",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -180,9 +132,9 @@
                 "psea_assessment_date": null
             },
             {
-                "id": 704,
+                "id": 3,
                 "source_id": null,
-                "last_modify_date": "29 Apr 2021 13:28:50",
+                "last_modify_date": "04 Aug 2021 21:02:16",
                 "seen": null,
                 "country_name": "lebanon",
                 "area_code": "",
@@ -194,7 +146,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "29 Apr 2021 13:28:38",
+                "created": "04 Aug 2021 20:42:03",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",

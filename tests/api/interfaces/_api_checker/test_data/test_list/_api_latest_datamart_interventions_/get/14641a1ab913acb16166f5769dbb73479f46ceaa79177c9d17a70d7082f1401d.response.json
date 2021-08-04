@@ -1,70 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"81b1fb9ca15325d0debbfdfb10110cf7\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "81b1fb9ca15325d0debbfdfb10110cf7"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "3750"
-        ],
-        "referrer-policy": [
-            "Referrer-Policy",
-            "same-origin"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"2bd869613ed20d869563da41cac0e17d\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "2bd869613ed20d869563da41cac0e17d",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "3750",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -117,7 +69,7 @@
                 "attachment_types": null,
                 "created": null,
                 "updated": null,
-                "pd_ssfa_last_modify_date": "29 Apr 2021 13:28:48",
+                "pd_ssfa_last_modify_date": "04 Aug 2021 21:02:05",
                 "pd_ssfa_url": "https://etools.unicef.org/pmp/interventions/None/details/?schema=bolivia"
             },
             {
@@ -164,7 +116,7 @@
                 "attachment_types": null,
                 "created": null,
                 "updated": null,
-                "pd_ssfa_last_modify_date": "29 Apr 2021 13:28:48",
+                "pd_ssfa_last_modify_date": "04 Aug 2021 21:02:05",
                 "pd_ssfa_url": "https://etools.unicef.org/pmp/interventions/None/details/?schema=chad"
             },
             {
@@ -211,7 +163,7 @@
                 "attachment_types": null,
                 "created": null,
                 "updated": null,
-                "pd_ssfa_last_modify_date": "29 Apr 2021 13:28:48",
+                "pd_ssfa_last_modify_date": "04 Aug 2021 21:02:05",
                 "pd_ssfa_url": "https://etools.unicef.org/pmp/interventions/None/details/?schema=lebanon"
             }
         ]

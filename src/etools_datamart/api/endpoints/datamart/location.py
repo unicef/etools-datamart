@@ -93,3 +93,13 @@ class GatewayTypeViewSet(DataMartViewSet):
 
     def get_querystringfilter_form(self, request, filter):
         return forms.Form(request.GET, filter.form_prefix)
+
+
+class LocationSiteSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.Locationsite
+
+
+class LocationSiteViewSet(DataMartViewSet):
+    serializer_class = LocationSiteSerializer
+    queryset = models.Locationsite.objects.all()
