@@ -1,0 +1,58 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.locationsite",
+                "pk": 1,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-04T21:01:56.809Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "name": "name000",
+                    "p_code": "",
+                    "point": null,
+                    "is_active": true,
+                    "parent": {}
+                }
+            },
+            {
+                "model": "data.locationsite",
+                "pk": 2,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-04T21:01:56.848Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "name": "name001",
+                    "p_code": "",
+                    "point": null,
+                    "is_active": true,
+                    "parent": {}
+                }
+            },
+            {
+                "model": "data.locationsite",
+                "pk": 3,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-04T21:01:56.874Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "name": "name002",
+                    "p_code": "",
+                    "point": null,
+                    "is_active": true,
+                    "parent": {}
+                }
+            }
+        ],
+        "deps": []
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "record": {
+        "master": {
+            "model": "data.locationsite",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2021-08-04T21:02:20.683Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "name": "name003",
+                "p_code": "",
+                "point": null,
+                "is_active": true,
+                "parent": {}
+            }
+        },
+        "deps": []
+    }
+}

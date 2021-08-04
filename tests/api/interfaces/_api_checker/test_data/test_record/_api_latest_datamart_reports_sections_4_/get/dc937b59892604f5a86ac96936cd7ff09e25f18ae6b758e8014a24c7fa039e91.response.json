@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"f7058b69142228c4630253a69ce15647\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.report_section.SectionViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.report_section.SectionViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "253",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "id": 4,
+        "source_id": null,
+        "last_modify_date": "04 Aug 2021 21:02:24",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "name": null,
+        "description": null,
+        "alternate_id": null,
+        "alternate_name": null,
+        "dashboard": null,
+        "color": null,
+        "created": null,
+        "modified": null
+    },
+    "content_type": "application/json"
+}

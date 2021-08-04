@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"3b6d3577cf5c24746a2eaff8ee12bae8\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.location.LocationSiteViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.location.LocationSiteViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "3b6d3577cf5c24746a2eaff8ee12bae8",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "654",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 1,
+                "source_id": null,
+                "last_modify_date": "04 Aug 2021 21:01:56",
+                "seen": null,
+                "country_name": "bolivia",
+                "area_code": "",
+                "name": "name000",
+                "p_code": "",
+                "point": null,
+                "is_active": true,
+                "parent": {}
+            },
+            {
+                "id": 2,
+                "source_id": null,
+                "last_modify_date": "04 Aug 2021 21:01:56",
+                "seen": null,
+                "country_name": "chad",
+                "area_code": "",
+                "name": "name001",
+                "p_code": "",
+                "point": null,
+                "is_active": true,
+                "parent": {}
+            },
+            {
+                "id": 3,
+                "source_id": null,
+                "last_modify_date": "04 Aug 2021 21:01:56",
+                "seen": null,
+                "country_name": "lebanon",
+                "area_code": "",
+                "name": "name002",
+                "p_code": "",
+                "point": null,
+                "is_active": true,
+                "parent": {}
+            }
+        ]
+    },
+    "content_type": "application/json"
+}

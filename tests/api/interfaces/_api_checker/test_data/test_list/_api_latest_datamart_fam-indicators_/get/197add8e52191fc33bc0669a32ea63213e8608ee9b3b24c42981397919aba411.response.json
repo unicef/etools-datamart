@@ -1,70 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"f8635fc2425914b98f175dc04545c77b\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "f8635fc2425914b98f175dc04545c77b"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "1881"
-        ],
-        "referrer-policy": [
-            "Referrer-Policy",
-            "same-origin"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"9eb8e50d69b8d183ea97c2e882cf3049\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.famindicator.FAMIndicatorViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "9eb8e50d69b8d183ea97c2e882cf3049",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "1872",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -74,13 +26,13 @@
         "previous": null,
         "results": [
             {
-                "id": 1419,
+                "id": 1,
                 "source_id": null,
-                "last_modify_date": "29 Apr 2021 13:28:47",
+                "last_modify_date": "04 Aug 2021 21:01:59",
                 "seen": null,
                 "country_name": "bolivia",
                 "area_code": "",
-                "month": "2021-04-01",
+                "month": "2021-08-01",
                 "spotcheck_ip_contacted": 0,
                 "spotcheck_report_submitted": 0,
                 "spotcheck_final_report": 0,
@@ -99,13 +51,13 @@
                 "microassessment_cancelled": 0
             },
             {
-                "id": 1420,
+                "id": 2,
                 "source_id": null,
-                "last_modify_date": "29 Apr 2021 13:28:47",
+                "last_modify_date": "04 Aug 2021 21:01:59",
                 "seen": null,
                 "country_name": "chad",
                 "area_code": "",
-                "month": "2021-04-01",
+                "month": "2021-08-01",
                 "spotcheck_ip_contacted": 0,
                 "spotcheck_report_submitted": 0,
                 "spotcheck_final_report": 0,
@@ -124,13 +76,13 @@
                 "microassessment_cancelled": 0
             },
             {
-                "id": 1421,
+                "id": 3,
                 "source_id": null,
-                "last_modify_date": "29 Apr 2021 13:28:47",
+                "last_modify_date": "04 Aug 2021 21:01:59",
                 "seen": null,
                 "country_name": "lebanon",
                 "area_code": "",
-                "month": "2021-04-01",
+                "month": "2021-08-01",
                 "spotcheck_ip_contacted": 0,
                 "spotcheck_report_submitted": 0,
                 "spotcheck_final_report": 0,

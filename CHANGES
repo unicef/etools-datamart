@@ -1,3 +1,8 @@
+3.18
+-----
+* added support to django 3.2
+
+
 3.17
 -----
 * tweaks to fmquestions
