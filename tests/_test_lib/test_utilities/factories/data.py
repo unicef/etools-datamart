@@ -135,7 +135,6 @@ class PseaAssessmentFactory(DataMartModelFactory):
 
     class Meta:
         model = models.PseaAssessment
-        django_get_or_create = ('reference_number',)
 
 
 class FuzzyMonth(BaseFuzzyAttribute):

@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"4293f827fd870853386d205ce61b1749\"",
+        "ETag": "\"8deabd7131d3ee8ed9a12dbd8d98d61c\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.psea.PseaAssessmentViewSet",
         "service": "etools_datamart.api.endpoints.datamart.psea.PseaAssessmentViewSet",
@@ -12,13 +12,13 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "279",
+        "Content-Length": "275",
         "Referrer-Policy": "same-origin"
     },
     "data": {
         "id": 4,
         "source_id": null,
-        "last_modify_date": "04 Aug 2021 21:39:26",
+        "last_modify_date": "05 Aug 2021 01:51:42",
         "seen": null,
         "country_name": "bolivia",
         "area_code": "",
@@ -28,8 +28,8 @@
         "overall_rating": null,
         "assessment_date": null,
         "status": null,
-        "assessor": null,
-        "focal_points": null
+        "assessor": {},
+        "focal_points": {}
     },
     "content_type": "application/json"
 }

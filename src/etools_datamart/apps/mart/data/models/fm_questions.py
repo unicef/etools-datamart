@@ -62,6 +62,28 @@ class FMQuestionLoader(EtoolsLoader):
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
+    def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
+        from etools_datamart.apps.mart.data.models import Location
+        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'gateway_name', 'latitude', 'longitude']
+
+        try:
+            instance = Location.objects.get(
+                schema_name=self.context['country'].schema_name,
+                source_id=record.activity_question.monitoring_activity.pk
+            )
+            return {
+                'id': instance.pk,
+                'name': instance.name,
+                'p_code': instance.p_code,
+                'level': instance.level,
+                'source_id': instance.source_id,
+                'gateway_name': instance.gateway.name,
+                'latitude': instance.latitue,
+                'longitude': instance.longitude,
+            }
+        except Location.DoesNotExist:
+            return {key: 'N/A' for key in loc_fields}
+
 
 class FMQuestion(EtoolsDataMartModel):
     title = models.TextField(
@@ -149,12 +171,7 @@ class FMQuestion(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
-    location = models.CharField(
-        verbose_name=_("Location"),
-        max_length=254,
-        null=True,
-        blank=True,
-    )
+    location = JSONField(blank=True, null=True, default=dict)
     site = models.CharField(
         verbose_name=_("Location"),
         max_length=254,
@@ -189,7 +206,7 @@ class FMQuestion(EtoolsDataMartModel):
             specific_details="i",
             date_of_capture="",
             monitoring_activity_end_date="activity_question.monitoring_activity.end_date",
-            location="activity_question.monitoring_activity.location.name",
+            location="-",
             site="activity_question.monitoring_activity.locationsite.name",
             category='activity_question.question.category.name',
             information_source='activity_question.monitoring_activity.information_source',
@@ -251,7 +268,7 @@ class FMOntrackLoader(EtoolsLoader):
 
     def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
-        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'gateway_name']
+        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'gateway_name', 'latitude', 'longitude']
 
         try:
             instance = Location.objects.get(
@@ -264,7 +281,9 @@ class FMOntrackLoader(EtoolsLoader):
                 'p_code': instance.p_code,
                 'level': instance.level,
                 'source_id': instance.source_id,
-                'gateway_name': instance.gateway.name
+                'gateway_name': instance.gateway.name,
+                'latitude': instance.latitue,
+                'longitude': instance.longitude,
             }
         except Location.DoesNotExist:
             return {key: 'N/A' for key in loc_fields}
@@ -364,7 +383,7 @@ class FMOntrack(EtoolsDataMartModel):
             monitoring_activity="monitoring_activity.number",
             monitoring_activity_id="monitoring_activity.pk",
             monitoring_activity_end_date="monitoring_activity.end_date",
-            location="monitoring_activity.location.name",
+            location="-",
             site="monitoring_activity.locationsite.name",
             status='monitoring_activity.status',
             outcome="i",
