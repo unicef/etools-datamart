@@ -22,6 +22,7 @@ from .partners_partner import PartnerViewSet
 from .partners_staffmember import PartnerStaffMemberViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
+from .psea import PseaAnswerViewSet, PseaAssessmentViewSet
 from .report_section import SectionViewSet
 from .reports import ActivityViewSet, OutcomeViewSet, OutputViewSet
 from .reports_indicastor import IndicatorViewSet

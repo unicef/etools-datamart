@@ -432,3 +432,18 @@ class AuditSpecialAdmin(DataModelAdmin):
 class ResultAdmin(DataModelAdmin):
     list_display = ('result_type', 'name', 'code', 'country_programme', 'wbs')
     list_filter = ('result_type', 'country_programme')
+
+
+@register(models.PseaAnswer)
+class PseaAnswerAdmin(DataModelAdmin):
+    list_display = ('assessment_partner_name', 'assessment_vendor_number', 'assessment_reference_number',
+                    'assessment_status', 'assessment_date')
+    list_filter = ('assessment_status',)
+    search_fields = ('assessment_partner_name', 'assessment_vendor_number', 'assessment_reference_number')
+
+
+@register(models.PseaAssessment)
+class PseaAssessmentAdmin(DataModelAdmin):
+    list_display = ('partner_name', 'vendor_number', 'reference_number', 'overall_rating', 'status')
+    list_filter = ('overall_rating', 'status')
+    search_fields = ('partner_name', 'vendor_number', 'reference_number')
