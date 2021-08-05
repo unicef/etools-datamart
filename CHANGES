@@ -1,3 +1,8 @@
+3.18.1
+-----
+* fixed latitude
+
+
 3.18
 -----
 * added support to django 3.2

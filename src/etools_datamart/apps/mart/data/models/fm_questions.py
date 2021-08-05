@@ -78,7 +78,7 @@ class FMQuestionLoader(EtoolsLoader):
                 'level': instance.level,
                 'source_id': instance.source_id,
                 'gateway_name': instance.gateway.name,
-                'latitude': instance.latitue,
+                'latitude': instance.latitude,
                 'longitude': instance.longitude,
             }
         except Location.DoesNotExist:
@@ -282,7 +282,7 @@ class FMOntrackLoader(EtoolsLoader):
                 'level': instance.level,
                 'source_id': instance.source_id,
                 'gateway_name': instance.gateway.name,
-                'latitude': instance.latitue,
+                'latitude': instance.latitude,
                 'longitude': instance.longitude,
             }
         except Location.DoesNotExist:
