@@ -1,0 +1,67 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.pseaassessment",
+                "pk": 1,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-05T01:48:37.400Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "partner_name": null,
+                    "vendor_number": null,
+                    "reference_number": null,
+                    "overall_rating": null,
+                    "assessment_date": null,
+                    "status": null,
+                    "assessor": {},
+                    "focal_points": {}
+                }
+            },
+            {
+                "model": "data.pseaassessment",
+                "pk": 2,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-05T01:48:37.402Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "partner_name": null,
+                    "vendor_number": null,
+                    "reference_number": null,
+                    "overall_rating": null,
+                    "assessment_date": null,
+                    "status": null,
+                    "assessor": {},
+                    "focal_points": {}
+                }
+            },
+            {
+                "model": "data.pseaassessment",
+                "pk": 3,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-05T01:48:37.403Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "partner_name": null,
+                    "vendor_number": null,
+                    "reference_number": null,
+                    "overall_rating": null,
+                    "assessment_date": null,
+                    "status": null,
+                    "assessor": {},
+                    "focal_points": {}
+                }
+            }
+        ],
+        "deps": []
+    }
+}

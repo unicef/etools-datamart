@@ -1,70 +1,22 @@
 {
     "status_code": 200,
     "headers": {
-        "content-type": [
-            "Content-Type",
-            "application/json"
-        ],
-        "vary": [
-            "Vary",
-            "Accept, Origin, Cookie"
-        ],
-        "allow": [
-            "Allow",
-            "GET, HEAD, OPTIONS"
-        ],
-        "etag": [
-            "ETag",
-            "\"2598fc857111c8cf9c10587b2ab7f289\""
-        ],
-        "x-frame-options": [
-            "X-Frame-Options",
-            "DENY"
-        ],
-        "view": [
-            "view",
-            "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet"
-        ],
-        "service": [
-            "service",
-            "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet"
-        ],
-        "cache-version": [
-            "cache-version",
-            "1"
-        ],
-        "system-filters": [
-            "system-filters",
-            ""
-        ],
-        "cache-key": [
-            "cache-key",
-            "2598fc857111c8cf9c10587b2ab7f289"
-        ],
-        "cache-hit": [
-            "cache-hit",
-            "False"
-        ],
-        "qs_filter": [
-            "qs_filter",
-            "{}"
-        ],
-        "qs_exclude": [
-            "qs_exclude",
-            "{}"
-        ],
-        "cache-ttl": [
-            "cache-ttl",
-            "1y"
-        ],
-        "content-length": [
-            "Content-Length",
-            "1662"
-        ],
-        "referrer-policy": [
-            "Referrer-Policy",
-            "same-origin"
-        ]
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"ecc542a6f47828ec7ff0feadfd21bcca\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "ecc542a6f47828ec7ff0feadfd21bcca",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "1662",
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -94,7 +46,7 @@
                 "numerator_label": null,
                 "baseline_numerator": null,
                 "target_numerator": null,
-                "last_modify_date": "29 Apr 2021 13:28:50"
+                "last_modify_date": "04 Aug 2021 21:02:13"
             },
             {
                 "pd_sffa_reference_number": null,
@@ -117,7 +69,7 @@
                 "numerator_label": null,
                 "baseline_numerator": null,
                 "target_numerator": null,
-                "last_modify_date": "29 Apr 2021 13:28:50"
+                "last_modify_date": "04 Aug 2021 21:02:13"
             },
             {
                 "pd_sffa_reference_number": null,
@@ -140,7 +92,7 @@
                 "numerator_label": null,
                 "baseline_numerator": null,
                 "target_numerator": null,
-                "last_modify_date": "29 Apr 2021 13:28:50"
+                "last_modify_date": "04 Aug 2021 21:02:13"
             }
         ]
     },

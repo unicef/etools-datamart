@@ -33,6 +33,7 @@ router.register(r'datamart/audit/special-audit', endpoints.AuditSpecialViewSet)
 router.register(r'datamart/audit/spot-check-findings', endpoints.SpotCheckFindingViewSet)
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
+router.register(r'datamart/location-sites', endpoints.LocationSiteViewSet)
 router.register(r'datamart/gateway-type', endpoints.GatewayTypeViewSet)
 router.register(r'datamart/office', endpoints.OfficeViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
@@ -51,6 +52,9 @@ router.register(r'datamart/user-stats', endpoints.UserStatsViewSet)
 
 router.register(r'datamart/partners/contacts', endpoints.PartnerStaffMemberViewSet)
 router.register(r'datamart/partners/agreements', endpoints.PartnerAgreementViewSet)
+
+router.register(r'datamart/psea/assessments', endpoints.PseaAssessmentViewSet)
+router.register(r'datamart/psea/answers', endpoints.PseaAnswerViewSet)
 
 router.register(r'datamart/reports/sections', endpoints.SectionViewSet)
 router.register(r'datamart/reports/indicators', endpoints.IndicatorViewSet)

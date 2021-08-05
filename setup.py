@@ -40,9 +40,10 @@ setup(name=name,
       zip_safe=False,
       keywords='',
       classifiers=[
-          'Development Status :: 3 - Alpha',
+          'Development Status :: 5 - Production/Stable',
           'Framework :: Django',
           'License :: OSI Approved :: MIT',
           'Natural Language :: English',
-          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.9',
       ])

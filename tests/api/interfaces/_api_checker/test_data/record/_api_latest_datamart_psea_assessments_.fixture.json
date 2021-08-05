@@ -1,0 +1,25 @@
+{
+    "record": {
+        "master": {
+            "model": "data.pseaassessment",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2021-08-05T01:51:42.329Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "partner_name": null,
+                "vendor_number": null,
+                "reference_number": null,
+                "overall_rating": null,
+                "assessment_date": null,
+                "status": null,
+                "assessor": {},
+                "focal_points": {}
+            }
+        },
+        "deps": []
+    }
+}

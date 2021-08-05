@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"0302faf3bdabfc40958036a16fd456e5\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.reports.OutcomeViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.reports.OutcomeViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "0302faf3bdabfc40958036a16fd456e5",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "291",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "code": null,
+                "wbs": null,
+                "name": null,
+                "from_date": null,
+                "to_date": null
+            },
+            {
+                "code": null,
+                "wbs": null,
+                "name": null,
+                "from_date": null,
+                "to_date": null
+            },
+            {
+                "code": null,
+                "wbs": null,
+                "name": null,
+                "from_date": null,
+                "to_date": null
+            }
+        ]
+    },
+    "content_type": "application/json"
+}

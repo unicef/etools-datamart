@@ -1,0 +1,79 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.pseaanswer",
+                "pk": 1,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-04T22:07:40.191Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "assessment_partner_name": null,
+                    "assessment_vendor_number": null,
+                    "assessment_reference_number": null,
+                    "assessment_status": null,
+                    "assessment_date": null,
+                    "indicator_subject": null,
+                    "indicator_content": null,
+                    "indicator_active": null,
+                    "indicator_rating_instructions": null,
+                    "rating_label": null,
+                    "rating_active": null,
+                    "comments": null
+                }
+            },
+            {
+                "model": "data.pseaanswer",
+                "pk": 2,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-04T22:07:40.194Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "assessment_partner_name": null,
+                    "assessment_vendor_number": null,
+                    "assessment_reference_number": null,
+                    "assessment_status": null,
+                    "assessment_date": null,
+                    "indicator_subject": null,
+                    "indicator_content": null,
+                    "indicator_active": null,
+                    "indicator_rating_instructions": null,
+                    "rating_label": null,
+                    "rating_active": null,
+                    "comments": null
+                }
+            },
+            {
+                "model": "data.pseaanswer",
+                "pk": 3,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-08-04T22:07:40.195Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "assessment_partner_name": null,
+                    "assessment_vendor_number": null,
+                    "assessment_reference_number": null,
+                    "assessment_status": null,
+                    "assessment_date": null,
+                    "indicator_subject": null,
+                    "indicator_content": null,
+                    "indicator_active": null,
+                    "indicator_rating_instructions": null,
+                    "rating_label": null,
+                    "rating_active": null,
+                    "comments": null
+                }
+            }
+        ],
+        "deps": []
+    }
+}

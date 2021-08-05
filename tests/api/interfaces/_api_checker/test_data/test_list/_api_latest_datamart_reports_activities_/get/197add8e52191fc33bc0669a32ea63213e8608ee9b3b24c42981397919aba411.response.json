@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"060f5cf43c93f026346c993f84c83635\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.reports.ActivityViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.reports.ActivityViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "060f5cf43c93f026346c993f84c83635",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "681",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "wbs": null,
+                "name": null,
+                "from_date": null,
+                "to_date": null,
+                "sic_code": null,
+                "sic_name": null,
+                "gic_code": null,
+                "gic_name": null,
+                "activity_focus_code": null,
+                "activity_focus_name": null,
+                "humanitarian_tag": null
+            },
+            {
+                "wbs": null,
+                "name": null,
+                "from_date": null,
+                "to_date": null,
+                "sic_code": null,
+                "sic_name": null,
+                "gic_code": null,
+                "gic_name": null,
+                "activity_focus_code": null,
+                "activity_focus_name": null,
+                "humanitarian_tag": null
+            },
+            {
+                "wbs": null,
+                "name": null,
+                "from_date": null,
+                "to_date": null,
+                "sic_code": null,
+                "sic_name": null,
+                "gic_code": null,
+                "gic_name": null,
+                "activity_focus_code": null,
+                "activity_focus_name": null,
+                "humanitarian_tag": null
+            }
+        ]
+    },
+    "content_type": "application/json"
+}

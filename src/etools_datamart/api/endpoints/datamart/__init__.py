@@ -14,7 +14,7 @@ from .funds_reservation import FundsReservationViewSet
 from .hact_aggregate import HACTAggreagateViewSet
 from .hact_history import HACTHistoryViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
-from .location import GatewayTypeViewSet, LocationViewSet
+from .location import GatewayTypeViewSet, LocationSiteViewSet, LocationViewSet
 from .office import OfficeViewSet
 from .partners_agreement import PartnerAgreementViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
@@ -22,6 +22,7 @@ from .partners_partner import PartnerViewSet
 from .partners_staffmember import PartnerStaffMemberViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
+from .psea import PseaAnswerViewSet, PseaAssessmentViewSet
 from .report_section import SectionViewSet
 from .reports import ActivityViewSet, OutcomeViewSet, OutputViewSet
 from .reports_indicastor import IndicatorViewSet

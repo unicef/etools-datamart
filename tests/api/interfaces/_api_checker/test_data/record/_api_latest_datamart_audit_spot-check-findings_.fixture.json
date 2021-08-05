@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.spotcheckfindings",
-            "pk": 12,
+            "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-04-29T13:28:51.704Z",
+                "last_modify_date": "2021-08-04T21:02:19.066Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",

@@ -125,6 +125,18 @@ class LocationsiteFactory(DataMartModelFactory):
         django_get_or_create = ('name',)
 
 
+class PseaAnswerFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.PseaAnswer
+
+
+class PseaAssessmentFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.PseaAssessment
+
+
 class FuzzyMonth(BaseFuzzyAttribute):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
