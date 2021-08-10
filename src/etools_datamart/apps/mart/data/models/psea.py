@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models import JSONField
-from django.utils.translation import gettext as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models import Partner
@@ -26,6 +24,7 @@ class PseaAssessmentLoader(EtoolsLoader):
 
 class PseaAssessment(EtoolsDataMartModel):
     partner_name = models.CharField(blank=True, null=True, max_length=255)
+    cso_type = models.CharField(max_length=50, blank=True, null=True)
     vendor_number = models.CharField(max_length=30, blank=True, null=True)
     reference_number = models.CharField(max_length=100, blank=True, null=True)
     overall_rating = models.IntegerField(blank=True, null=True)
@@ -45,17 +44,15 @@ class PseaAssessment(EtoolsDataMartModel):
         mapping = dict(
             partner_name="partner.name",
             vendor_number="partner.vendor_number",
+            cso_type="partner.cso_type",
             assessor='-',
             focal_points='-'
         )
 
 
-class PseaAnswerLoader(EtoolsLoader):
-    pass
-
-
 class PseaAnswer(EtoolsDataMartModel):
     assessment_partner_name = models.CharField(blank=True, null=True, max_length=255)
+    assessment_cso_type = models.CharField(max_length=50, blank=True, null=True)
     assessment_vendor_number = models.CharField(max_length=30, blank=True, null=True)
     assessment_reference_number = models.CharField(max_length=100, blank=True, null=True)
     assessment_status = models.CharField(max_length=30, blank=True, null=True)
@@ -71,7 +68,7 @@ class PseaAnswer(EtoolsDataMartModel):
 
     comments = models.TextField(blank=True, null=True)
 
-    loader = PseaAnswerLoader()
+    loader = EtoolsLoader()
 
     class Meta:
         ordering = ("id",)
@@ -81,17 +78,15 @@ class PseaAnswer(EtoolsDataMartModel):
         depends = (Partner, PseaAssessment)
         mapping = dict(
             assessment_partner_name="assessment.partner.name",
+            assessment_cso_type="assessment.partner.cso_type",
             assessment_vendor_number="assessment.partner.vendor_number",
             assessment_reference_number="assessment.reference_number",
             assessment_status="assessment.status",
             assessment_date="assessment.assessment_date",
             indicator_subject="indicator.subject",
             indicator_content="indicator.content",
-            indicator_active = "indicator.active",
+            indicator_active="indicator.active",
             indicator_rating_instructions="indicator.rating_instructions",
             rating_label="rating.label",
             rating_active="rating.active"
-
         )
-
-

@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"66ff780f8f68c485fd39d20348fbfe04\"",
+        "ETag": "\"4e4ed7e34866b1578e16171ac3b4b8f1\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.psea.PseaAnswerViewSet",
         "service": "etools_datamart.api.endpoints.datamart.psea.PseaAnswerViewSet",
@@ -12,7 +12,7 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "433",
+        "Content-Length": "460",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -23,6 +23,7 @@
         "country_name": "bolivia",
         "area_code": "",
         "assessment_partner_name": null,
+        "assessment_cso_type": null,
         "assessment_vendor_number": null,
         "assessment_reference_number": null,
         "assessment_status": null,

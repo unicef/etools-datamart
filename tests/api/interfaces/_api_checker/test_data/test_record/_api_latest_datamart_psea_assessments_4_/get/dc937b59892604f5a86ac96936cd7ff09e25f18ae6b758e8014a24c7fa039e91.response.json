@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"8deabd7131d3ee8ed9a12dbd8d98d61c\"",
+        "ETag": "\"43df8e2adc3ce0f69ec3b0a738e1efbf\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.psea.PseaAssessmentViewSet",
         "service": "etools_datamart.api.endpoints.datamart.psea.PseaAssessmentViewSet",
@@ -12,7 +12,7 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "275",
+        "Content-Length": "291",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -23,6 +23,7 @@
         "country_name": "bolivia",
         "area_code": "",
         "partner_name": null,
+        "cso_type": null,
         "vendor_number": null,
         "reference_number": null,
         "overall_rating": null,
