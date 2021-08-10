@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models import JSONField
-from django.utils.translation import gettext as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models import Partner
@@ -87,11 +85,8 @@ class PseaAnswer(EtoolsDataMartModel):
             assessment_date="assessment.assessment_date",
             indicator_subject="indicator.subject",
             indicator_content="indicator.content",
-            indicator_active = "indicator.active",
+            indicator_active="indicator.active",
             indicator_rating_instructions="indicator.rating_instructions",
             rating_label="rating.label",
             rating_active="rating.active"
-
         )
-
-
