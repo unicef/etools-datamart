@@ -167,7 +167,7 @@ class IndicatorIndicatorreportAdmin(DatamartSourceModelAdmin, ModelAdmin):
 
 @register(models.IndicatorReportable)
 class IndicatorReportableAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
+    list_filter = ['content_type']
 
 
 @register(models.IndicatorReportableDisaggregations)
