@@ -385,6 +385,9 @@ class DjangoContentType(ReadOnlyModel):
     app_label = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
 
+    def __str__(self):
+        return f'{self.app_label}:{self.model}'
+
     class Meta:
         managed = False
         db_table = 'django_content_type'

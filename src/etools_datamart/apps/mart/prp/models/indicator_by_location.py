@@ -1,25 +1,31 @@
 from django.db import models
-from django.db.models import JSONField, Q
+from django.db.models import F, Q
 
 from etools_datamart.apps.mart.prp.base import PrpDataMartModel
 from etools_datamart.apps.mart.prp.models.base import PrpBaseLoader
-from etools_datamart.apps.sources.source_prp.models import CoreCountry, CoreGatewaytype, IndicatorIndicatorlocationdata
+from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorlocationdata
 
 
 class IndicatorByLocationLoader(PrpBaseLoader):
-    # def get_location_levelname(self, record, values, field_name):
-    #     pass
-
-    # def get_country(self, record, values, field_name):
-    #     breakpoint()
-    #     try:
-    #         gw = CoreGatewaytype.objects.get(id=record.location.gateway_id)
-    #         values['location_levelname'] = gw.name
-    #         return CoreCountry.objects.get(id=gw.country_id).name
-    #     except Exception:
-    #         return None
-
-    pass
+    def get_queryset(self):
+        qs = IndicatorIndicatorlocationdata.objects.exclude(
+            Q(indicator_report__progress_report__isnull=True) |
+            Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"])
+        ).annotate(
+            country=F('indicator_report__progress_report__programme_document__workspace__title'),
+            location_source_id=F('location__id'),
+            location_name=F('location__title'),
+            location_pcode=F('location__p_code'),
+            location_level=F('location__level'),
+            location_levelname=F('location__gateway__name'),
+            title_of_indicator=F('indicator_report__title'),
+            reference_number=F('indicator_report__progress_report__programme_document__reference_number'),
+            project=F('indicator_report__project__title'),
+            partner=F('indicator_report__project__partner__title'),
+            indicator_baseline=F('indicator_report__reportable__baseline'),
+            indicator_target=F('indicator_report__reportable__target'),
+        )
+        return qs
 
 
 class IndicatorByLocation(PrpDataMartModel):
@@ -43,26 +49,4 @@ class IndicatorByLocation(PrpDataMartModel):
         app_label = 'prp'
 
     class Options:
-        queryset = IndicatorIndicatorlocationdata.objects.select_related(
-            'location',
-            'location__gateway',
-            # 'indicator_report__project',
-            'indicator_report__project__partner',
-            # 'indicator_report__progress_report',
-            'indicator_report__progress_report__programme_document__workspace',
-            'indicator_report__reportable'
-        )
-        mapping = {
-            'location_source_id': 'location.id',
-            'location_name': 'location.title',
-            'location_pcode': 'location.p_code',
-            'location_level': 'location.level',
-            'location_levelname': 'location.gateway.name',
-            'country': 'indicator_report.progress_report.programme_document.workspace.title',
-            'project': 'indicator_report.project.title',
-            'partner': 'indicator_report.project.partner.title',
-            'reference_number': 'indicator_report.progress_report.programme_document.reference_number',
-            'indicator_baseline': 'indicator_report.reportable.baseline',
-            'indicator_target': 'indicator_report.reportable.target',
-            'title_of_indicator': 'indicator_report.title'
-        }
+        mapping = {}
