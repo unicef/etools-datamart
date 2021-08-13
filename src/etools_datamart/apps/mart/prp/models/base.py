@@ -84,7 +84,6 @@ class PrpBaseLoader(BaseLoader):
         self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
-        self.unlock()
         lock = self.lock()
         truncate = self.config.truncate
         try:
