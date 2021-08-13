@@ -1,106 +1,83 @@
-import json
-from ast import literal_eval
-
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import Q
-
-from strategy_field.utils import get_attr
+from django.db.models import F, Q
 
 from etools_datamart.apps.mart.prp.base import PrpDataMartModel
 from etools_datamart.apps.mart.prp.models.base import PrpBaseLoader
-from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorlocationdata
+from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorlocationdata, UnicefLowerleveloutput
 
 
 class DataReportLoader(PrpBaseLoader):
 
     def get_queryset(self):
-        qs = IndicatorIndicatorlocationdata.objects.select_related(
-            'location',
-            # 'indicator_report',
-            'indicator_report__progress_report',
-            'indicator_report__reportable',
-            'indicator_report__reportable__blueprint',
-        ).exclude(Q(indicator_report__progress_report__isnull=True) |
-                  Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"]))
+        qs = IndicatorIndicatorlocationdata.objects.exclude(
+            Q(indicator_report__progress_report__isnull=True) |
+            Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"])
+        ).annotate(
+            report_type=F('indicator_report__progress_report__report_type'),
+            country_name=F('indicator_report__progress_report__programme_document__workspace__title'),
+            business_area=F('indicator_report__progress_report__programme_document__workspace__business_area_code'),
+            partner_name=F('indicator_report__progress_report__programme_document__partner__title'),
+            partner_vendor_number=F('indicator_report__progress_report__programme_document__partner__vendor_number'),
+            etools_intervention_id=F('indicator_report__progress_report__programme_document__external_id'),
+            prp_intervention_id=F('indicator_report__progress_report__programme_document__id'),
+            intervention_reference_number=F('indicator_report__progress_report__programme_document__reference_number'),
+            submitted_by=F('indicator_report__progress_report__submitted_by__username'),
+
+            performance_indicator=F('indicator_report__reportable__blueprint__title'),
+
+            cluster_indicator=F('indicator_report__reportable__is_cluster_indicator'),
+            indicator_type=F('indicator_report__reportable__blueprint__display_type'),
+            high_frequency=F('indicator_report__reportable__is_unicef_hf_indicator'),
+            means_of_verification=F('indicator_report__reportable__means_of_verification'),
+            achievement_in_reporting_period=F('indicator_report__total'),
+
+            report_number=F('indicator_report__progress_report__report_number'),
+            due_date=F('indicator_report__progress_report__due_date'),
+            reporting_period_start_date=F('indicator_report__progress_report__start_date'),
+            reporting_period_end_date=F('indicator_report__progress_report__end_date'),
+            reporting_period_due_date=F('indicator_report__progress_report__due_date'),
+            report_submission_date=F('indicator_report__progress_report__submission_date'),
+
+            narrative=F('indicator_report__progress_report__narrative'),
+            pd_output_progress_status=F('indicator_report__overall_status'),
+            pd_output_narrative_assessment=F('indicator_report__narrative_assessment'),
+            calculation_method_across_location=F('indicator_report__reportable__blueprint__calculation_formula_across_locations'),
+            calculation_method_across_reporting_periods=F('indicator_report__reportable__blueprint__calculation_formula_across_periods'),
+            current_location=F('location__title'),
+            p_code=F('location__p_code'),
+            admin_level=F('location__gateway__admin_level'),
+
+        )
         return qs
 
+    def get_values(self, record: IndicatorIndicatorlocationdata):
+        values = super().get_values(record)
+        ct = record.indicator_report.reportable.content_type
+        if ct.model == 'lowerleveloutput':
+            ll = UnicefLowerleveloutput.objects.get(id=record.indicator_report.reportable.object_id)
+            values['cp_output'] = ll.cp_output.title
+            values['etools_cp_output_id'] = ll.cp_output.external_cp_output_id
+            values['programme_document'] = ll.cp_output.programme_document.reference_number
+            pd2sections = ll.cp_output.programme_document.UnicefProgrammedocumentSections_programmedocument.all()
+            values['section'] = ', '.join([pd2section.section.name for pd2section in pd2sections])
 
-    # def get_values(self, record: IndicatorIndicatorlocationdata):
-    #     record._indicator: IndicatorIndicatorreport = record.indicator_report
-    #     record._reportable: IndicatorReportable = record.indicator_report.reportable
-    #     return super().get_values(record)
+        return values
 
-    # def get_cp_output_indicators(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     return 'N/A'
-    #
-    # def get_cp_output_indicators(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     return 'N/A'
-    #
-    # def get_etools_cp_output_indicators_id(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     return 'N/A'
-    #
-    # def get_locations(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     # PartnersInterventionFlatLocations
-    #     locs = []
-    #     # intervention: PartnersIntervention = original.activity.intervention
-    #     # for location in original.activity.locations.select_related('gateway').order_by('id'):
-    #     qs = (IndicatorReportablelocationgoal.objects
-    #           .select_related('location')
-    #           .filter(reportable=record.indicator_report.reportable))
-    #     for entry in qs.all():
-    #         location = entry.location
-    #         locs.append(dict(
-    #             source_id=location.id,
-    #             name=location.title,
-    #             pcode=location.p_code,
-    #             level=location.level,
-    #             levelname=location.gateway.name
-    #         ))
-    #     values['locations_data'] = locs
-    #     return ", ".join([loc['name'] for loc in locs])
-    #
-    # def get_submitted_by(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     user = get_attr(record, 'indicator_report.progress_report.submitted_by')
-    #     if user:
-    #         return "%s %s (%s)" % (user.first_name, user.last_name, user.email)
-    #
-    # def get_programme_document(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     # UnicefLowerleveloutput.
-    #     # r: IndicatorReportable = record.indicator_report.reportable
-    #     ct = ContentType.objects.get_for_model(record.indicator_report)
-    #     if ct.model == 'lowerleveloutput':
-    #         ll: UnicefLowerleveloutput = UnicefLowerleveloutput.objects.get(id=record.indicator_report.object_id)
-    #         cp_output: UnicefPdresultlink = ll.cp_output
-    #         values['cp_output'] = cp_output.title
-    #         values['etools_cp_output_id'] = cp_output.external_cp_output_id
-    #
-    #         record._programme_document = cp_output.programme_document
-    #         record.indicator_report.reportable.lower_level_output = ll
-    #         section_qs = UnicefProgrammedocumentSections.objects.filter(
-    #             programmedocument=cp_output.programme_document.pk,
-    #         )
-    #         values["section"] = ", ".join([s.section.name for s in section_qs.all()])
-    #         return cp_output.programme_document.title
-    #     return None
-    #
-    # def get_achievement_in_reporting_period(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     indicator = json.loads(record.indicator_report.total)
-    #     return indicator["c"]
-    #
-    # def get_total_cumulative_progress(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     reportable = json.loads(record.indicator_report.total)
-    #     return reportable["c"]
-    #
-    # def get_progress_report(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
-    #     ir: IndicatorIndicatorreport = record.indicator_report
-    #     pr: UnicefProgressreport = ir.progress_report
-    #     if pr:
-    #         pd: UnicefProgrammedocument = pr.programme_document
-    #         return "Progress Report <pk:{}>: {} {} to {}".format(
-    #             pr.id, pd.title, pr.start_date, pr.end_date
-    #         )
-    #
+    def get_locations(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
+        locs = []
+        qs = record.indicator_report.reportable.IndicatorReportablelocationgoal_reportable.select_related(
+            'location__gateway')
+        for goal in qs:
+            locs.append(dict(
+                source_id=goal.location.id,
+                name=goal.location.title,
+                pcode=goal.location.p_code,
+                level=goal.location.level,
+                levelname=goal.location.gateway.name
+            ))
+        values['locations_data'] = locs
+        return ", ".join([loc['name'] for loc in locs])
+
     # def get_disaggregation(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
     #     # get disaggregation data and replace keys with disaggration value
     #     disaggKeyValues = {}
@@ -204,7 +181,7 @@ class DataReport(PrpDataMartModel):
     report_submission_date = models.DateField(blank=True, null=True)
     # | submitted_by | progres_report.submitted_by.first_name + progres_report.submitted_by.last_name + progres_report.submitted_by.email |
     submitted_by = models.CharField(max_length=2048, blank=True, null=True)
-    # | face_attachment | "nope" |
+    # | face_attachment | "nope" |x
     # | attachment_1 | "nope" |
     # | attachment_2 | "nope" |
     # | narrative | progres_report.narrative |
@@ -239,50 +216,10 @@ class DataReport(PrpDataMartModel):
         return f'{self.country_name} | {self.partner_name} | {self.cp_output} | {self.intervention_reference_number} | {self.pd_result}'
 
     class Options:
-        mapping = {'indicator_report': 'indicator_report.title',
-                   # 'progress_report': 'indicator_report.progress_report',
-                   'report_type': 'indicator_report.progress_report.report_type',
-                   'programme_document': 'indicator_report.reportable.lower_level_output.cp_output.programme_document',
-                   # 'programme_document': '-',
-                   'country_name': 'indicator_report.progress_report.programme_document.workspace.title',
-                   'business_area': 'indicator_report.progress_report.programme_document.workspace.business_area_code',
-                   'partner_name': 'indicator_report.progress_report.programme_document.partner.title',
-                   'partner_vendor_number': 'indicator_report.progress_report.programme_document.partner.vendor_number',
-                   'etools_intervention_id': 'indicator_report.progress_report.programme_document.external_id',
-                   'prp_intervention_id': 'indicator_report.progress_report.programme_document.id',
-                   'intervention_reference_number': 'indicator_report.progress_report.programme_document.reference_number',
-                   # 'cp_output': 'i',
-                   # 'etools_cp_output_id': 'i',
-                   'pd_result': 'indicator_report.reportable.lower_level_output.title',
-                   'etools_pd_result_id': 'indicator_report.reportable.lower_level_output.external_id',
-                   'performance_indicator': 'indicator_report.reportable.blueprint.title',
-                   # 'section': 'i',
-                   'cluster_indicator': 'indicator_report.reportable.is_cluster_indicator',
-                   'indicator_type': 'indicator_report.reportable.blueprint.display_type',
-                   'baseline': 'indicator_report.reportable.calculated_baseline',
-                   'target': 'indicator_report.reportable.calculated_target',
-                   'high_frequency': 'indicator_report.reportable.is_unicef_hf_indicator',
-                   'report_status': 'indicator_report.reportable.report_status',
-                   'means_of_verification': 'indicator_report.reportable.means_of_verification',
-                   # 'locations': '-',
-                   'report_number': 'indicator_report.progress_report.report_number',
-                   'due_date': 'indicator_report.progress_report.due_date',
-                   'reporting_period_start_date': 'indicator_report.progress_report.start_date',
-                   'reporting_period_end_date': 'indicator_report.progress_report.end_date',
-                   'reporting_period_due_date': 'indicator_report.progress_report.due_date',
-                   'report_submission_date': 'indicator_report.progress_report.submission_date',
-                   # 'submitted_by': '-',
-                   'narrative': 'indicator_report.progress_report.narrative',
-                   'pd_output_progress_status': 'indicator_report.overall_status',
-                   'pd_output_narrative_assessment': 'indicator_report.narrative_assessment',
-                   'calculation_method_across_location': 'indicator_report.reportable.blueprint.calculation_formula_across_locations',
-                   'calculation_method_across_reporting_periods': 'indicator_report.reportable.blueprint.calculation_formula_across_periods',
-                   'current_location': 'location.title',
-                   'p_code': 'location.p_code',
-                   'admin_level': 'location.type.admin_level',
-                   # 'previous_location_progress': 'previous_location_data.title',
-                   # 'total_cumulative_progress_in_location': 'N/A',
-                   # 'total_cumulative_progress': '-',
-                   # 'achievement_in_reporting_period': '-',
-                   # 'disaggregation': '-',
-                   }
+        mapping = {
+            'indicator_report': 'indicator_report_title',
+            'programme_document': 'i',
+            'etools_cp_output_id': 'i',
+            'locations': '-',
+            'section': 'i',
+        }
