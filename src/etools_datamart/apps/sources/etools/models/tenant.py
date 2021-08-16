@@ -10,6 +10,7 @@ from etools_datamart.apps.multitenant import models
 
 
 class ActionPointsActionpoint(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     status = models.CharField(max_length=10)
@@ -40,6 +41,7 @@ class ActionPointsActionpoint(models.TenantModel):
 
 
 class ActivitiesActivity(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     date = models.DateField(blank=True, null=True)
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='ActivitiesActivity_cp_output', blank=True, null=True)
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='ActivitiesActivity_intervention', blank=True, null=True)
@@ -51,6 +53,7 @@ class ActivitiesActivity(models.TenantModel):
 
 
 class ActivitiesActivityLocations(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     activity = models.ForeignKey(ActivitiesActivity, models.DO_NOTHING, related_name='ActivitiesActivityLocations_activity')
     location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='ActivitiesActivityLocations_location')
 
@@ -61,6 +64,7 @@ class ActivitiesActivityLocations(models.TenantModel):
 
 
 class ActstreamAction(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     actor_object_id = models.CharField(max_length=255)
     verb = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -79,6 +83,7 @@ class ActstreamAction(models.TenantModel):
 
 
 class ActstreamFollow(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     object_id = models.CharField(max_length=255)
     actor_only = models.BooleanField()
     started = models.DateTimeField()
@@ -92,6 +97,7 @@ class ActstreamFollow(models.TenantModel):
 
 
 class AttachmentsAttachmentflat(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     partner = models.CharField(max_length=255)
     partner_type = models.CharField(max_length=150)
     vendor_number = models.CharField(max_length=50)
@@ -126,6 +132,7 @@ class AuditAudit(models.TenantModel):
 
 
 class AuditDetailedfindinginfo(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     finding = models.TextField()
     recommendation = models.TextField()
     micro_assesment = models.ForeignKey('AuditMicroassessment', models.DO_NOTHING, related_name='AuditDetailedfindinginfo_micro_assesment')
@@ -136,6 +143,7 @@ class AuditDetailedfindinginfo(models.TenantModel):
 
 
 class AuditEngagement(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     status = models.CharField(max_length=30)
@@ -172,6 +180,7 @@ class AuditEngagement(models.TenantModel):
 
 
 class AuditEngagementActivePd(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementActivePd_engagement')
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='AuditEngagementActivePd_intervention')
 
@@ -182,6 +191,7 @@ class AuditEngagementActivePd(models.TenantModel):
 
 
 class AuditEngagementAuthorizedOfficers(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementAuthorizedOfficers_engagement')
     partnerstaffmember = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='AuditEngagementAuthorizedOfficers_partnerstaffmember')
 
@@ -192,6 +202,7 @@ class AuditEngagementAuthorizedOfficers(models.TenantModel):
 
 
 class AuditEngagementOffices(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementOffices_engagement')
     office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='AuditEngagementOffices_office')
 
@@ -202,6 +213,7 @@ class AuditEngagementOffices(models.TenantModel):
 
 
 class AuditEngagementSections(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementSections_engagement')
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='AuditEngagementSections_section')
 
@@ -212,6 +224,7 @@ class AuditEngagementSections(models.TenantModel):
 
 
 class AuditEngagementStaffMembers(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementStaffMembers_engagement')
     auditorstaffmember = models.ForeignKey('PurchaseOrderAuditorstaffmember', models.DO_NOTHING, related_name='AuditEngagementStaffMembers_auditorstaffmember')
 
@@ -222,6 +235,7 @@ class AuditEngagementStaffMembers(models.TenantModel):
 
 
 class AuditEngagementUsersNotified(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementUsersNotified_engagement')
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='AuditEngagementUsersNotified_user')
 
@@ -232,6 +246,7 @@ class AuditEngagementUsersNotified(models.TenantModel):
 
 
 class AuditFinancialfinding(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=255)
     local_amount = models.DecimalField(max_digits=20, decimal_places=2)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
@@ -246,6 +261,7 @@ class AuditFinancialfinding(models.TenantModel):
 
 
 class AuditFinding(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     priority = models.CharField(max_length=4)
     category_of_observation = models.CharField(max_length=100)
     recommendation = models.TextField()
@@ -259,6 +275,7 @@ class AuditFinding(models.TenantModel):
 
 
 class AuditKeyinternalcontrol(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     recommendation = models.TextField()
     audit_observation = models.TextField()
     ip_response = models.TextField()
@@ -278,16 +295,9 @@ class AuditMicroassessment(models.TenantModel):
 
 
 class AuditRisk(models.TenantModel):
-    VALUES = {
-        0: 'N/A',
-        1: 'Low',
-        2: 'Medium',
-        3: 'Significant',
-        4: 'High',
-    }
-
+    id = models.IntegerField(primary_key=True)
     value = models.SmallIntegerField(blank=True, null=True)
-    extra = models.TextField(blank=True, null=True)  # This field type is a guess.
+    extra = models.JSONField(blank=True, null=True)
     blueprint = models.ForeignKey('AuditRiskblueprint', models.DO_NOTHING, related_name='AuditRisk_blueprint')
     engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditRisk_engagement')
 
@@ -297,6 +307,7 @@ class AuditRisk(models.TenantModel):
 
 
 class AuditRiskblueprint(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     order = models.IntegerField()
     weight = models.SmallIntegerField()
     is_key = models.BooleanField()
@@ -310,6 +321,7 @@ class AuditRiskblueprint(models.TenantModel):
 
 
 class AuditRiskcategory(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     order = models.IntegerField()
     header = models.CharField(max_length=255)
     category_type = models.CharField(max_length=20)
@@ -330,6 +342,7 @@ class AuditSpecialaudit(models.TenantModel):
 
 
 class AuditSpecialauditrecommendation(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     description = models.TextField()
     audit = models.ForeignKey(AuditSpecialaudit, models.DO_NOTHING, related_name='AuditSpecialauditrecommendation_audit')
 
@@ -339,6 +352,7 @@ class AuditSpecialauditrecommendation(models.TenantModel):
 
 
 class AuditSpecificprocedure(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     description = models.TextField()
     finding = models.TextField()
     audit = models.ForeignKey(AuditSpecialaudit, models.DO_NOTHING, related_name='AuditSpecificprocedure_audit')
@@ -360,6 +374,7 @@ class AuditSpotcheck(models.TenantModel):
 
 
 class DjangoCommentFlags(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     flag = models.CharField(max_length=30)
     flag_date = models.DateTimeField()
     comment = models.ForeignKey('DjangoComments', models.DO_NOTHING, related_name='DjangoCommentFlags_comment')
@@ -372,7 +387,8 @@ class DjangoCommentFlags(models.TenantModel):
 
 
 class DjangoComments(models.TenantModel):
-    object_pk = models.TextField()
+    id = models.IntegerField(primary_key=True)
+    object_pk = models.CharField(max_length=64)
     user_name = models.CharField(max_length=50)
     user_email = models.CharField(max_length=254)
     user_url = models.CharField(max_length=200)
@@ -391,8 +407,9 @@ class DjangoComments(models.TenantModel):
 
 
 class FieldMonitoringDataCollectionActivityoverallfinding(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     narrative_finding = models.TextField()
-    on_track = models.BooleanField(null=True)
+    on_track = models.BooleanField(blank=True, null=True)
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_cp_output', blank=True, null=True)
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_intervention', blank=True, null=True)
     monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_monitoring_activity')
@@ -404,6 +421,7 @@ class FieldMonitoringDataCollectionActivityoverallfinding(models.TenantModel):
 
 
 class FieldMonitoringDataCollectionActivityquestion(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     specific_details = models.TextField()
     is_enabled = models.BooleanField()
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_cp_output', blank=True, null=True)
@@ -418,7 +436,8 @@ class FieldMonitoringDataCollectionActivityquestion(models.TenantModel):
 
 
 class FieldMonitoringDataCollectionActivityquestionoverallfinding(models.TenantModel):
-    value = models.TextField(blank=True, null=True)  # This field type is a guess.
+    id = models.IntegerField(primary_key=True)
+    value = models.JSONField(blank=True, null=True)
     activity_question = models.OneToOneField(FieldMonitoringDataCollectionActivityquestion, models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question')
 
     class Meta:
@@ -427,6 +446,7 @@ class FieldMonitoringDataCollectionActivityquestionoverallfinding(models.TenantM
 
 
 class FieldMonitoringDataCollectionChecklistoverallfinding(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     narrative_finding = models.TextField()
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionChecklistoverallfinding_cp_output', blank=True, null=True)
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionChecklistoverallfinding_intervention', blank=True, null=True)
@@ -439,7 +459,8 @@ class FieldMonitoringDataCollectionChecklistoverallfinding(models.TenantModel):
 
 
 class FieldMonitoringDataCollectionFinding(models.TenantModel):
-    value = models.TextField(blank=True, null=True)  # This field type is a guess.
+    id = models.IntegerField(primary_key=True)
+    value = models.JSONField(blank=True, null=True)
     activity_question = models.ForeignKey(FieldMonitoringDataCollectionActivityquestion, models.DO_NOTHING, related_name='FieldMonitoringDataCollectionFinding_activity_question')
     started_checklist = models.ForeignKey('FieldMonitoringDataCollectionStartedchecklist', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionFinding_started_checklist')
 
@@ -449,6 +470,7 @@ class FieldMonitoringDataCollectionFinding(models.TenantModel):
 
 
 class FieldMonitoringDataCollectionStartedchecklist(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     information_source = models.CharField(max_length=100)
     author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionStartedchecklist_author')
     method = models.ForeignKey('FieldMonitoringSettingsMethod', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionStartedchecklist_method')
@@ -460,6 +482,7 @@ class FieldMonitoringDataCollectionStartedchecklist(models.TenantModel):
 
 
 class FieldMonitoringPlanningMonitoringactivity(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     deleted_at = models.DateTimeField()
@@ -469,7 +492,7 @@ class FieldMonitoringPlanningMonitoringactivity(models.TenantModel):
     status = models.CharField(max_length=20)
     location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_location', blank=True, null=True)
     location_site = models.ForeignKey('FieldMonitoringSettingsLocationsite', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_location_site', blank=True, null=True)
-    visit_lead = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_person_responsible', blank=True, null=True)
+    visit_lead = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_visit_lead', blank=True, null=True)
     tpm_partner = models.ForeignKey('TpmpartnersTpmpartner', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_tpm_partner', blank=True, null=True)
     cancel_reason = models.TextField()
     reject_reason = models.TextField()
@@ -483,6 +506,7 @@ class FieldMonitoringPlanningMonitoringactivity(models.TenantModel):
 
 
 class FieldMonitoringPlanningMonitoringactivityCpOutputs(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityCpOutputs_monitoringactivity')
     result = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityCpOutputs_result')
 
@@ -493,6 +517,7 @@ class FieldMonitoringPlanningMonitoringactivityCpOutputs(models.TenantModel):
 
 
 class FieldMonitoringPlanningMonitoringactivityInterventions(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityInterventions_monitoringactivity')
     intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityInterventions_intervention')
 
@@ -502,7 +527,19 @@ class FieldMonitoringPlanningMonitoringactivityInterventions(models.TenantModel)
         unique_together = (('intervention', 'monitoringactivity'),)
 
 
+class FieldMonitoringPlanningMonitoringactivityOffices(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityOffices_monitoringactivity')
+    office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityOffices_office')
+
+    class Meta:
+        managed = False
+        db_table = 'field_monitoring_planning_monitoringactivity_offices'
+        unique_together = (('monitoringactivity', 'office'),)
+
+
 class FieldMonitoringPlanningMonitoringactivityPartners(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityPartners_monitoringactivity')
     partnerorganization = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityPartners_partnerorganization')
 
@@ -513,6 +550,7 @@ class FieldMonitoringPlanningMonitoringactivityPartners(models.TenantModel):
 
 
 class FieldMonitoringPlanningMonitoringactivitySections(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitySections_monitoringactivity')
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitySections_section')
 
@@ -523,6 +561,7 @@ class FieldMonitoringPlanningMonitoringactivitySections(models.TenantModel):
 
 
 class FieldMonitoringPlanningMonitoringactivityTeamMembers(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityTeamMembers_monitoringactivity')
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityTeamMembers_user')
 
@@ -532,7 +571,28 @@ class FieldMonitoringPlanningMonitoringactivityTeamMembers(models.TenantModel):
         unique_together = (('monitoringactivity', 'user'),)
 
 
+class FieldMonitoringPlanningMonitoringactivitygroup(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroup_partner')
+
+    class Meta:
+        managed = False
+        db_table = 'field_monitoring_planning_monitoringactivitygroup'
+
+
+class FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    monitoringactivitygroup = models.ForeignKey(FieldMonitoringPlanningMonitoringactivitygroup, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup')
+    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivity')
+
+    class Meta:
+        managed = False
+        db_table = 'field_monitoring_planning_monitoringactivitygroup_monitorin69fc'
+        unique_together = (('monitoringactivity', 'monitoringactivitygroup'),)
+
+
 class FieldMonitoringPlanningQuestiontemplate(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     is_active = models.BooleanField()
     specific_details = models.TextField()
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringPlanningQuestiontemplate_cp_output', blank=True, null=True)
@@ -562,6 +622,7 @@ class FieldMonitoringPlanningYearplan(models.TenantModel):
 
 
 class FieldMonitoringSettingsCategory(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     order = models.IntegerField()
     name = models.CharField(max_length=100)
 
@@ -571,6 +632,7 @@ class FieldMonitoringSettingsCategory(models.TenantModel):
 
 
 class FieldMonitoringSettingsGlobalconfig(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
 
     class Meta:
         managed = False
@@ -578,6 +640,7 @@ class FieldMonitoringSettingsGlobalconfig(models.TenantModel):
 
 
 class FieldMonitoringSettingsLocationsite(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     name = models.CharField(max_length=254)
@@ -592,6 +655,7 @@ class FieldMonitoringSettingsLocationsite(models.TenantModel):
 
 
 class FieldMonitoringSettingsLogissue(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     issue = models.TextField()
@@ -608,6 +672,7 @@ class FieldMonitoringSettingsLogissue(models.TenantModel):
 
 
 class FieldMonitoringSettingsMethod(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
     use_information_source = models.BooleanField()
     short_name = models.CharField(max_length=10)
@@ -618,8 +683,9 @@ class FieldMonitoringSettingsMethod(models.TenantModel):
 
 
 class FieldMonitoringSettingsOption(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     label = models.CharField(max_length=50)
-    value = models.TextField(blank=True, null=True)  # This field type is a guess.
+    value = models.JSONField(blank=True, null=True)
     question = models.ForeignKey('FieldMonitoringSettingsQuestion', models.DO_NOTHING, related_name='FieldMonitoringSettingsOption_question')
 
     class Meta:
@@ -629,6 +695,7 @@ class FieldMonitoringSettingsOption(models.TenantModel):
 
 
 class FieldMonitoringSettingsQuestion(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     answer_type = models.CharField(max_length=15)
     choices_size = models.SmallIntegerField(blank=True, null=True)
     level = models.CharField(max_length=15)
@@ -644,6 +711,7 @@ class FieldMonitoringSettingsQuestion(models.TenantModel):
 
 
 class FieldMonitoringSettingsQuestionMethods(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     question = models.ForeignKey(FieldMonitoringSettingsQuestion, models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionMethods_question')
     method = models.ForeignKey(FieldMonitoringSettingsMethod, models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionMethods_method')
 
@@ -654,6 +722,7 @@ class FieldMonitoringSettingsQuestionMethods(models.TenantModel):
 
 
 class FieldMonitoringSettingsQuestionSections(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     question = models.ForeignKey(FieldMonitoringSettingsQuestion, models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionSections_question')
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionSections_section')
 
@@ -664,6 +733,7 @@ class FieldMonitoringSettingsQuestionSections(models.TenantModel):
 
 
 class FundsDonor(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=45)
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -674,6 +744,7 @@ class FundsDonor(models.TenantModel):
 
 
 class FundsFundscommitmentheader(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     vendor_code = models.CharField(max_length=20)
     fc_number = models.CharField(unique=True, max_length=20)
     document_date = models.DateField(blank=True, null=True)
@@ -691,6 +762,7 @@ class FundsFundscommitmentheader(models.TenantModel):
 
 
 class FundsFundscommitmentitem(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     fc_ref_number = models.CharField(max_length=30)
     line_item = models.CharField(max_length=5)
     wbs = models.CharField(max_length=30)
@@ -714,6 +786,7 @@ class FundsFundscommitmentitem(models.TenantModel):
 
 
 class FundsFundsreservationheader(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     vendor_code = models.CharField(max_length=20)
     fr_number = models.CharField(unique=True, max_length=20)
     document_date = models.DateField(blank=True, null=True)
@@ -743,6 +816,7 @@ class FundsFundsreservationheader(models.TenantModel):
 
 
 class FundsFundsreservationitem(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     fr_ref_number = models.CharField(max_length=30)
     line_item = models.SmallIntegerField()
     wbs = models.CharField(max_length=30)
@@ -751,7 +825,7 @@ class FundsFundsreservationitem(models.TenantModel):
     overall_amount = models.DecimalField(max_digits=20, decimal_places=2)
     overall_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     due_date = models.DateField(blank=True, null=True)
-    line_item_text = models.CharField(max_length=255)
+    line_item_text = models.CharField(max_length=255, blank=True, null=True)
     fund_reservation = models.ForeignKey(FundsFundsreservationheader, models.DO_NOTHING, related_name='FundsFundsreservationitem_fund_reservation')
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -765,6 +839,7 @@ class FundsFundsreservationitem(models.TenantModel):
 
 
 class FundsGrant(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=128)
     donor = models.ForeignKey(FundsDonor, models.DO_NOTHING, related_name='FundsGrant_donor')
     expiry = models.DateField(blank=True, null=True)
@@ -778,10 +853,11 @@ class FundsGrant(models.TenantModel):
 
 
 class HactAggregatehact(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     year = models.IntegerField(unique=True)
-    partner_values = models.JSONField(blank=True, null=True)  # This field type is a guess.
+    partner_values = models.JSONField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -789,10 +865,11 @@ class HactAggregatehact(models.TenantModel):
 
 
 class HactHacthistory(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     year = models.IntegerField()
-    partner_values = models.JSONField(blank=True, null=True)  # This field type is a guess.
+    partner_values = models.JSONField(blank=True, null=True)
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='HactHacthistory_partner')
 
     class Meta:
@@ -802,6 +879,7 @@ class HactHacthistory(models.TenantModel):
 
 
 class LocationsCartodbtable(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     domain = models.CharField(max_length=254)
     api_key = models.CharField(max_length=254)
     table_name = models.CharField(max_length=254)
@@ -826,6 +904,7 @@ class LocationsCartodbtable(models.TenantModel):
 
 
 class LocationsGatewaytype(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=64)
     admin_level = models.SmallIntegerField(unique=True, blank=True, null=True)
     created = models.DateTimeField()
@@ -837,6 +916,7 @@ class LocationsGatewaytype(models.TenantModel):
 
 
 class LocationsLocation(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=254)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -860,6 +940,7 @@ class LocationsLocation(models.TenantModel):
 
 
 class LocationsLocationremaphistory(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     comments = models.TextField(blank=True, null=True)
     created = models.DateTimeField()
     new_location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='LocationsLocationremaphistory_new_location')
@@ -872,6 +953,7 @@ class LocationsLocationremaphistory(models.TenantModel):
 
 
 class ManagementSectionhistory(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     history_type = models.CharField(max_length=10)
@@ -882,6 +964,7 @@ class ManagementSectionhistory(models.TenantModel):
 
 
 class ManagementSectionhistoryFromSections(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     sectionhistory = models.ForeignKey(ManagementSectionhistory, models.DO_NOTHING, related_name='ManagementSectionhistoryFromSections_sectionhistory')
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ManagementSectionhistoryFromSections_section')
 
@@ -892,6 +975,7 @@ class ManagementSectionhistoryFromSections(models.TenantModel):
 
 
 class ManagementSectionhistoryToSections(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     sectionhistory = models.ForeignKey(ManagementSectionhistory, models.DO_NOTHING, related_name='ManagementSectionhistoryToSections_sectionhistory')
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ManagementSectionhistoryToSections_section')
 
@@ -902,6 +986,7 @@ class ManagementSectionhistoryToSections(models.TenantModel):
 
 
 class PartnersAgreement(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     start = models.DateField(blank=True, null=True)
@@ -925,6 +1010,7 @@ class PartnersAgreement(models.TenantModel):
 
 
 class PartnersAgreementAuthorizedOfficers(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name='PartnersAgreementAuthorizedOfficers_agreement')
     partnerstaffmember = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersAgreementAuthorizedOfficers_partnerstaffmember')
 
@@ -935,6 +1021,7 @@ class PartnersAgreementAuthorizedOfficers(models.TenantModel):
 
 
 class PartnersAgreementamendment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     number = models.CharField(max_length=5)
@@ -949,6 +1036,7 @@ class PartnersAgreementamendment(models.TenantModel):
 
 
 class PartnersAssessment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     type = models.CharField(max_length=50)
     names_of_other_agencies = models.CharField(max_length=255, blank=True, null=True)
     expected_budget = models.IntegerField(blank=True, null=True)
@@ -972,6 +1060,7 @@ class PartnersAssessment(models.TenantModel):
 
 
 class PartnersCorevaluesassessment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     date = models.DateField(blank=True, null=True)
@@ -985,6 +1074,7 @@ class PartnersCorevaluesassessment(models.TenantModel):
 
 
 class PartnersDirectcashtransfer(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     fc_ref = models.CharField(max_length=50)
     amount_usd = models.DecimalField(max_digits=20, decimal_places=2)
     liquidation_usd = models.DecimalField(max_digits=20, decimal_places=2)
@@ -1000,6 +1090,7 @@ class PartnersDirectcashtransfer(models.TenantModel):
 
 
 class PartnersFiletype(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=64)
 
     class Meta:
@@ -1008,6 +1099,7 @@ class PartnersFiletype(models.TenantModel):
 
 
 class PartnersIntervention(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     document_type = models.CharField(max_length=255)
@@ -1029,7 +1121,7 @@ class PartnersIntervention(models.TenantModel):
     signed_pd_document = models.CharField(max_length=1024, blank=True, null=True)
     country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='PartnersIntervention_country_programme', blank=True, null=True)
     contingency_pd = models.BooleanField()
-    metadata = models.TextField(blank=True, null=True)  # This field type is a guess.
+    metadata = models.JSONField(blank=True, null=True)
     in_amendment = models.BooleanField()
     reference_number_year = models.IntegerField(blank=True, null=True)
     activation_letter = models.CharField(max_length=1024, blank=True, null=True)
@@ -1042,6 +1134,7 @@ class PartnersIntervention(models.TenantModel):
 
 
 class PartnersInterventionFlatLocations(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionFlatLocations_intervention')
     location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='PartnersInterventionFlatLocations_location')
 
@@ -1052,6 +1145,7 @@ class PartnersInterventionFlatLocations(models.TenantModel):
 
 
 class PartnersInterventionOffices(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionOffices_intervention')
     office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='PartnersInterventionOffices_office')
 
@@ -1062,6 +1156,7 @@ class PartnersInterventionOffices(models.TenantModel):
 
 
 class PartnersInterventionPartnerFocalPoints(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionPartnerFocalPoints_intervention')
     partnerstaffmember = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersInterventionPartnerFocalPoints_partnerstaffmember')
 
@@ -1072,6 +1167,7 @@ class PartnersInterventionPartnerFocalPoints(models.TenantModel):
 
 
 class PartnersInterventionSections(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionSections_intervention')
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='PartnersInterventionSections_section')
 
@@ -1082,6 +1178,7 @@ class PartnersInterventionSections(models.TenantModel):
 
 
 class PartnersInterventionUnicefFocalPoints(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionUnicefFocalPoints_intervention')
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionUnicefFocalPoints_user')
 
@@ -1092,6 +1189,7 @@ class PartnersInterventionUnicefFocalPoints(models.TenantModel):
 
 
 class PartnersInterventionamendment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     signed_date = models.DateField(blank=True, null=True)
@@ -1107,6 +1205,7 @@ class PartnersInterventionamendment(models.TenantModel):
 
 
 class PartnersInterventionattachment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     attachment = models.CharField(max_length=1024)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionattachment_intervention')
     type = models.ForeignKey(PartnersFiletype, models.DO_NOTHING, related_name='PartnersInterventionattachment_type')
@@ -1120,6 +1219,7 @@ class PartnersInterventionattachment(models.TenantModel):
 
 
 class PartnersInterventionbudget(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     partner_contribution = models.DecimalField(max_digits=20, decimal_places=2)
@@ -1139,6 +1239,7 @@ class PartnersInterventionbudget(models.TenantModel):
 
 
 class PartnersInterventionplannedvisits(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     year = models.IntegerField()
     programmatic_q4 = models.IntegerField()
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionplannedvisits_intervention')
@@ -1155,6 +1256,7 @@ class PartnersInterventionplannedvisits(models.TenantModel):
 
 
 class PartnersInterventionreportingperiod(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     start_date = models.DateField()
@@ -1168,6 +1270,7 @@ class PartnersInterventionreportingperiod(models.TenantModel):
 
 
 class PartnersInterventionresultlink(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='PartnersInterventionresultlink_cp_output')
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionresultlink_intervention')
     created = models.DateTimeField()
@@ -1179,6 +1282,7 @@ class PartnersInterventionresultlink(models.TenantModel):
 
 
 class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     interventionresultlink = models.ForeignKey(PartnersInterventionresultlink, models.DO_NOTHING, related_name='PartnersInterventionresultlinkRamIndicators_interventionresultlink')
     indicator = models.ForeignKey('ReportsIndicator', models.DO_NOTHING, related_name='PartnersInterventionresultlinkRamIndicators_indicator')
 
@@ -1189,6 +1293,7 @@ class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
 
 
 class PartnersPartnerorganization(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     partner_type = models.CharField(max_length=50)
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=50)
@@ -1215,7 +1320,7 @@ class PartnersPartnerorganization(models.TenantModel):
     postal_code = models.CharField(max_length=32, blank=True, null=True)
     shared_with = models.TextField(blank=True, null=True)  # This field type is a guess.
     street_address = models.CharField(max_length=500, blank=True, null=True)
-    hact_values = models.TextField(blank=True, null=True)  # This field type is a guess.
+    hact_values = models.JSONField(blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     net_ct_cy = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
@@ -1229,6 +1334,8 @@ class PartnersPartnerorganization(models.TenantModel):
     highest_risk_rating_type = models.CharField(max_length=150)
     psea_assessment_date = models.DateTimeField(blank=True, null=True)
     sea_risk_rating_name = models.CharField(max_length=150)
+    lead_office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='PartnersPartnerorganization_lead_office', blank=True, null=True)
+    lead_section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='PartnersPartnerorganization_lead_section', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1237,6 +1344,7 @@ class PartnersPartnerorganization(models.TenantModel):
 
 
 class PartnersPartnerplannedvisits(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     year = models.IntegerField()
@@ -1253,6 +1361,7 @@ class PartnersPartnerplannedvisits(models.TenantModel):
 
 
 class PartnersPartnerstaffmember(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
@@ -1270,6 +1379,7 @@ class PartnersPartnerstaffmember(models.TenantModel):
 
 
 class PartnersPlannedengagement(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     spot_check_planned_q1 = models.IntegerField()
@@ -1287,6 +1397,7 @@ class PartnersPlannedengagement(models.TenantModel):
 
 
 class PartnersWorkspacefiletype(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=64)
 
     class Meta:
@@ -1295,6 +1406,7 @@ class PartnersWorkspacefiletype(models.TenantModel):
 
 
 class PseaAnswer(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     comments = models.TextField(blank=True, null=True)
@@ -1309,6 +1421,7 @@ class PseaAnswer(models.TenantModel):
 
 
 class PseaAnswerevidence(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     description = models.TextField(blank=True, null=True)
@@ -1321,6 +1434,7 @@ class PseaAnswerevidence(models.TenantModel):
 
 
 class PseaAssessment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     reference_number = models.CharField(unique=True, max_length=100)
@@ -1328,6 +1442,8 @@ class PseaAssessment(models.TenantModel):
     assessment_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=30)
     partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='PseaAssessment_partner')
+    assessment_ingo_reason = models.CharField(max_length=32, blank=True, null=True)
+    assessment_type = models.CharField(max_length=16)
 
     class Meta:
         managed = False
@@ -1335,6 +1451,7 @@ class PseaAssessment(models.TenantModel):
 
 
 class PseaAssessmentFocalPoints(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     assessment = models.ForeignKey(PseaAssessment, models.DO_NOTHING, related_name='PseaAssessmentFocalPoints_assessment')
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PseaAssessmentFocalPoints_user')
 
@@ -1345,6 +1462,7 @@ class PseaAssessmentFocalPoints(models.TenantModel):
 
 
 class PseaAssessmentstatushistory(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     status = models.CharField(max_length=30)
@@ -1357,6 +1475,7 @@ class PseaAssessmentstatushistory(models.TenantModel):
 
 
 class PseaAssessor(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     assessor_type = models.CharField(max_length=30)
@@ -1371,6 +1490,7 @@ class PseaAssessor(models.TenantModel):
 
 
 class PseaAssessorAuditorFirmStaff(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     assessor = models.ForeignKey(PseaAssessor, models.DO_NOTHING, related_name='PseaAssessorAuditorFirmStaff_assessor')
     auditorstaffmember = models.ForeignKey('PurchaseOrderAuditorstaffmember', models.DO_NOTHING, related_name='PseaAssessorAuditorFirmStaff_auditorstaffmember')
 
@@ -1381,6 +1501,7 @@ class PseaAssessorAuditorFirmStaff(models.TenantModel):
 
 
 class PseaEvidence(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     label = models.TextField()
@@ -1393,6 +1514,7 @@ class PseaEvidence(models.TenantModel):
 
 
 class PseaIndicator(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     subject = models.TextField()
@@ -1407,6 +1529,7 @@ class PseaIndicator(models.TenantModel):
 
 
 class PseaIndicatorEvidences(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     indicator = models.ForeignKey(PseaIndicator, models.DO_NOTHING, related_name='PseaIndicatorEvidences_indicator')
     evidence = models.ForeignKey(PseaEvidence, models.DO_NOTHING, related_name='PseaIndicatorEvidences_evidence')
 
@@ -1417,6 +1540,7 @@ class PseaIndicatorEvidences(models.TenantModel):
 
 
 class PseaIndicatorRatings(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     indicator = models.ForeignKey(PseaIndicator, models.DO_NOTHING, related_name='PseaIndicatorRatings_indicator')
     rating = models.ForeignKey('PseaRating', models.DO_NOTHING, related_name='PseaIndicatorRatings_rating')
 
@@ -1427,6 +1551,7 @@ class PseaIndicatorRatings(models.TenantModel):
 
 
 class PseaRating(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     label = models.CharField(max_length=50)
@@ -1439,6 +1564,7 @@ class PseaRating(models.TenantModel):
 
 
 class ReportsAppliedindicator(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     context_code = models.CharField(max_length=50, blank=True, null=True)
     assumptions = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
@@ -1454,12 +1580,12 @@ class ReportsAppliedindicator(models.TenantModel):
     section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ReportsAppliedindicator_section', blank=True, null=True)
     is_active = models.BooleanField()
     is_high_frequency = models.BooleanField()
-    baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
+    baseline = models.JSONField(blank=True, null=True)
     denominator_label = models.CharField(max_length=256, blank=True, null=True)
     label = models.TextField(blank=True, null=True)
     measurement_specifications = models.TextField(blank=True, null=True)
     numerator_label = models.CharField(max_length=256, blank=True, null=True)
-    target = models.TextField()  # This field type is a guess.
+    target = models.JSONField()
 
     class Meta:
         managed = False
@@ -1468,6 +1594,7 @@ class ReportsAppliedindicator(models.TenantModel):
 
 
 class ReportsAppliedindicatorDisaggregation(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     appliedindicator = models.ForeignKey(ReportsAppliedindicator, models.DO_NOTHING, related_name='ReportsAppliedindicatorDisaggregation_appliedindicator')
     disaggregation = models.ForeignKey('ReportsDisaggregation', models.DO_NOTHING, related_name='ReportsAppliedindicatorDisaggregation_disaggregation')
 
@@ -1478,6 +1605,7 @@ class ReportsAppliedindicatorDisaggregation(models.TenantModel):
 
 
 class ReportsAppliedindicatorLocations(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     appliedindicator = models.ForeignKey(ReportsAppliedindicator, models.DO_NOTHING, related_name='ReportsAppliedindicatorLocations_appliedindicator')
     location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='ReportsAppliedindicatorLocations_location')
 
@@ -1488,6 +1616,7 @@ class ReportsAppliedindicatorLocations(models.TenantModel):
 
 
 class ReportsCountryprogramme(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
     wbs = models.CharField(unique=True, max_length=30)
     from_date = models.DateField()
@@ -1500,6 +1629,7 @@ class ReportsCountryprogramme(models.TenantModel):
 
 
 class ReportsDisaggregation(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     name = models.CharField(unique=True, max_length=255)
@@ -1511,9 +1641,10 @@ class ReportsDisaggregation(models.TenantModel):
 
 
 class ReportsDisaggregationvalue(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    value = models.CharField(max_length=15)
+    value = models.CharField(max_length=20)
     active = models.BooleanField()
     disaggregation = models.ForeignKey(ReportsDisaggregation, models.DO_NOTHING, related_name='ReportsDisaggregationvalue_disaggregation')
 
@@ -1523,6 +1654,7 @@ class ReportsDisaggregationvalue(models.TenantModel):
 
 
 class ReportsIndicator(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=1024)
     code = models.CharField(max_length=50, blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
@@ -1548,6 +1680,7 @@ class ReportsIndicator(models.TenantModel):
 
 
 class ReportsIndicatorblueprint(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=1024)
     description = models.CharField(max_length=3072, blank=True, null=True)
     code = models.CharField(unique=True, max_length=50, blank=True, null=True)
@@ -1566,6 +1699,7 @@ class ReportsIndicatorblueprint(models.TenantModel):
 
 
 class ReportsLowerresult(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=500)
     code = models.CharField(max_length=50)
     result_link = models.ForeignKey(PartnersInterventionresultlink, models.DO_NOTHING, related_name='ReportsLowerresult_result_link')
@@ -1579,6 +1713,7 @@ class ReportsLowerresult(models.TenantModel):
 
 
 class ReportsOffice(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=254)
 
     class Meta:
@@ -1587,6 +1722,7 @@ class ReportsOffice(models.TenantModel):
 
 
 class ReportsQuarter(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=64)
     year = models.CharField(max_length=4)
     start_date = models.DateTimeField()
@@ -1598,6 +1734,7 @@ class ReportsQuarter(models.TenantModel):
 
 
 class ReportsReportingrequirement(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     start_date = models.DateField(blank=True, null=True)
@@ -1612,6 +1749,7 @@ class ReportsReportingrequirement(models.TenantModel):
 
 
 class ReportsResult(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.TextField()
     code = models.CharField(max_length=50, blank=True, null=True)
     result_type = models.ForeignKey('ReportsResulttype', models.DO_NOTHING, related_name='ReportsResult_result_type')
@@ -1639,8 +1777,8 @@ class ReportsResult(models.TenantModel):
     modified = models.DateTimeField()
     humanitarian_marker_code = models.CharField(max_length=255, blank=True, null=True)
     humanitarian_marker_name = models.CharField(max_length=255, blank=True, null=True)
-    # programme_area_code = models.CharField(max_length=16, null=True, blank=True)
-    # programme_area_name = models.CharField(max_length=255, null=True, blank=True)
+    programme_area_code = models.CharField(max_length=16, blank=True, null=True)
+    programme_area_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1649,6 +1787,7 @@ class ReportsResult(models.TenantModel):
 
 
 class ReportsResulttype(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=150)
 
     class Meta:
@@ -1657,6 +1796,7 @@ class ReportsResulttype(models.TenantModel):
 
 
 class ReportsSector(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=128)
     description = models.CharField(max_length=256, blank=True, null=True)
     alternate_id = models.IntegerField(blank=True, null=True)
@@ -1673,6 +1813,7 @@ class ReportsSector(models.TenantModel):
 
 
 class ReportsSpecialreportingrequirement(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     description = models.CharField(max_length=256)
@@ -1685,6 +1826,7 @@ class ReportsSpecialreportingrequirement(models.TenantModel):
 
 
 class ReportsUnit(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     type = models.CharField(unique=True, max_length=45)
 
     class Meta:
@@ -1693,6 +1835,7 @@ class ReportsUnit(models.TenantModel):
 
 
 class ReportsUsertenantprofile(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name='ReportsUsertenantprofile_office', blank=True, null=True)
     profile = models.OneToOneField('UsersUserprofile', models.DO_NOTHING, related_name='ReportsUsertenantprofile_profile')
 
@@ -1702,12 +1845,13 @@ class ReportsUsertenantprofile(models.TenantModel):
 
 
 class SnapshotActivity(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     target_object_id = models.CharField(max_length=255)
     action = models.CharField(max_length=50)
-    data = models.TextField()  # This field type is a guess.
-    change = models.TextField()  # This field type is a guess.
+    data = models.JSONField()
+    change = models.JSONField()
     by_user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='SnapshotActivity_by_user')
     target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='SnapshotActivity_target_content_type')
 
@@ -1717,6 +1861,7 @@ class SnapshotActivity(models.TenantModel):
 
 
 class T2FItineraryitem(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     origin = models.CharField(max_length=255)
     destination = models.CharField(max_length=255)
     departure_date = models.DateField()
@@ -1733,6 +1878,7 @@ class T2FItineraryitem(models.TenantModel):
 
 
 class T2FItineraryitemAirlines(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     itineraryitem = models.ForeignKey(T2FItineraryitem, models.DO_NOTHING, related_name='T2FItineraryitemAirlines_itineraryitem')
     airlinecompany = models.ForeignKey('PublicsAirlinecompany', models.DO_NOTHING, related_name='T2FItineraryitemAirlines_airlinecompany')
 
@@ -1743,6 +1889,7 @@ class T2FItineraryitemAirlines(models.TenantModel):
 
 
 class T2FTravel(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     completed_at = models.DateTimeField(blank=True, null=True)
     canceled_at = models.DateTimeField(blank=True, null=True)
@@ -1759,8 +1906,8 @@ class T2FTravel(models.TenantModel):
     end_date = models.DateField(blank=True, null=True)
     purpose = models.CharField(max_length=500)
     additional_note = models.TextField()
-    international_travel = models.BooleanField(null=True)
-    ta_required = models.BooleanField(null=True)
+    international_travel = models.BooleanField(blank=True, null=True)
+    ta_required = models.BooleanField(blank=True, null=True)
     reference_number = models.CharField(unique=True, max_length=12)
     hidden = models.BooleanField()
     mode_of_travel = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -1783,6 +1930,7 @@ class T2FTravel(models.TenantModel):
 
 
 class T2FTravelactivity(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     travel_type = models.CharField(max_length=64)
     date = models.DateField(blank=True, null=True)
     partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='T2FTravelactivity_partner', blank=True, null=True)
@@ -1796,6 +1944,7 @@ class T2FTravelactivity(models.TenantModel):
 
 
 class T2FTravelactivityLocations(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     travelactivity = models.ForeignKey(T2FTravelactivity, models.DO_NOTHING, related_name='T2FTravelactivityLocations_travelactivity')
     location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='T2FTravelactivityLocations_location')
 
@@ -1806,6 +1955,7 @@ class T2FTravelactivityLocations(models.TenantModel):
 
 
 class T2FTravelactivityTravels(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     travelactivity = models.ForeignKey(T2FTravelactivity, models.DO_NOTHING, related_name='T2FTravelactivityTravels_travelactivity')
     travel = models.ForeignKey(T2FTravel, models.DO_NOTHING, related_name='T2FTravelactivityTravels_travel')
 
@@ -1816,6 +1966,7 @@ class T2FTravelactivityTravels(models.TenantModel):
 
 
 class T2FTravelattachment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     type = models.CharField(max_length=64)
     name = models.CharField(max_length=255)
     file = models.CharField(max_length=255, blank=True, null=True)
@@ -1839,6 +1990,7 @@ class TpmTpmactivity(models.TenantModel):
 
 
 class TpmTpmactivityOffices(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     tpmactivity = models.ForeignKey(TpmTpmactivity, models.DO_NOTHING, related_name='TpmTpmactivityOffices_tpmactivity')
     office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name='TpmTpmactivityOffices_office')
 
@@ -1849,6 +2001,7 @@ class TpmTpmactivityOffices(models.TenantModel):
 
 
 class TpmTpmactivityUnicefFocalPoints(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     tpmactivity = models.ForeignKey(TpmTpmactivity, models.DO_NOTHING, related_name='TpmTpmactivityUnicefFocalPoints_tpmactivity')
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TpmTpmactivityUnicefFocalPoints_user')
 
@@ -1859,6 +2012,7 @@ class TpmTpmactivityUnicefFocalPoints(models.TenantModel):
 
 
 class TpmTpmvisit(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     deleted_at = models.DateTimeField()
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -1883,6 +2037,7 @@ class TpmTpmvisit(models.TenantModel):
 
 
 class TpmTpmvisitTpmPartnerFocalPoints(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     tpmvisit = models.ForeignKey(TpmTpmvisit, models.DO_NOTHING, related_name='TpmTpmvisitTpmPartnerFocalPoints_tpmvisit')
     tpmpartnerstaffmember = models.ForeignKey('TpmpartnersTpmpartnerstaffmember', models.DO_NOTHING, related_name='TpmTpmvisitTpmPartnerFocalPoints_tpmpartnerstaffmember')
 
@@ -1893,6 +2048,7 @@ class TpmTpmvisitTpmPartnerFocalPoints(models.TenantModel):
 
 
 class TpmTpmvisitreportrejectcomment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     rejected_at = models.DateTimeField()
     reject_reason = models.TextField()
     tpm_visit = models.ForeignKey(TpmTpmvisit, models.DO_NOTHING, related_name='TpmTpmvisitreportrejectcomment_tpm_visit')
@@ -1903,6 +2059,7 @@ class TpmTpmvisitreportrejectcomment(models.TenantModel):
 
 
 class UnicefAttachmentsAttachment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     file = models.CharField(max_length=1024, blank=True, null=True)
@@ -1919,6 +2076,7 @@ class UnicefAttachmentsAttachment(models.TenantModel):
 
 
 class UnicefAttachmentsAttachmentflat(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     object_link = models.CharField(max_length=200)
     file_type = models.CharField(max_length=100)
     file_link = models.CharField(max_length=1024)
@@ -1933,6 +2091,7 @@ class UnicefAttachmentsAttachmentflat(models.TenantModel):
 
 
 class UnicefAttachmentsAttachmentlink(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     object_id = models.IntegerField(blank=True, null=True)
     attachment = models.ForeignKey(UnicefAttachmentsAttachment, models.DO_NOTHING, related_name='UnicefAttachmentsAttachmentlink_attachment')
     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='UnicefAttachmentsAttachmentlink_content_type', blank=True, null=True)
@@ -1943,6 +2102,7 @@ class UnicefAttachmentsAttachmentlink(models.TenantModel):
 
 
 class UnicefAttachmentsFiletype(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     order = models.IntegerField()
     name = models.CharField(max_length=64)
     label = models.CharField(max_length=64)
@@ -1956,12 +2116,13 @@ class UnicefAttachmentsFiletype(models.TenantModel):
 
 
 class UnicefSnapshotActivity(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     target_object_id = models.CharField(max_length=255)
     action = models.CharField(max_length=50)
-    data = models.TextField()  # This field type is a guess.
-    change = models.TextField()  # This field type is a guess.
+    data = models.JSONField()
+    change = models.JSONField()
     by_user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='UnicefSnapshotActivity_by_user')
     target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='UnicefSnapshotActivity_target_content_type')
 

@@ -4,8 +4,6 @@
 
  - [pipenv](https://github.com/pypa/pipenv)
  - [docker](https://www.docker.com/get-docker)
- - [pipsi](https://github.com/mitsuhiko/pipsi/)
-
 
 
 setup local en0 alias
@@ -24,7 +22,10 @@ setup local en0 alias
 
 ### How to run tests
 
-Each time Etools data models changes, it's needed to rebuild the datamart models and the sql
+Each time eTools data models changes, it's needed to rebuild the datamart models and the sql
 needed to run the tests
 
-run `db/update_etools_schema.sh` and follow provided steps
+ 
+    cd db
+    db/update_etools_schema.sh
+    

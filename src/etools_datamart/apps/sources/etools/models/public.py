@@ -10,6 +10,7 @@ from django.db import models
 
 
 class AccountEmailaddress(models.Model):
+    id = models.IntegerField(primary_key=True)
     email = models.CharField(unique=True, max_length=254)
     verified = models.BooleanField()
     primary = models.BooleanField()
@@ -21,6 +22,7 @@ class AccountEmailaddress(models.Model):
 
 
 class AccountEmailconfirmation(models.Model):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     sent = models.DateTimeField(blank=True, null=True)
     key = models.CharField(unique=True, max_length=64)
@@ -32,6 +34,7 @@ class AccountEmailconfirmation(models.Model):
 
 
 class AuthGroup(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=150)
 
     class Meta:
@@ -40,6 +43,7 @@ class AuthGroup(models.Model):
 
 
 class AuthGroupPermissions(models.Model):
+    id = models.IntegerField(primary_key=True)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='AuthGroupPermissions_group')
     permission = models.ForeignKey('AuthPermission', models.DO_NOTHING, related_name='AuthGroupPermissions_permission')
 
@@ -50,6 +54,7 @@ class AuthGroupPermissions(models.Model):
 
 
 class AuthPermission(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='AuthPermission_content_type')
     codename = models.CharField(max_length=100)
@@ -61,6 +66,7 @@ class AuthPermission(models.Model):
 
 
 class AuthUser(models.Model):
+    id = models.IntegerField(primary_key=True)
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.BooleanField()
@@ -81,6 +87,7 @@ class AuthUser(models.Model):
 
 
 class AuthUserGroups(models.Model):
+    id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField()
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='AuthUserGroups_group')
 
@@ -91,6 +98,7 @@ class AuthUserGroups(models.Model):
 
 
 class AuthUserUserPermissions(models.Model):
+    id = models.IntegerField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='AuthUserUserPermissions_user')
     permission = models.ForeignKey(AuthPermission, models.DO_NOTHING, related_name='AuthUserUserPermissions_permission')
 
@@ -111,6 +119,7 @@ class AuthtokenToken(models.Model):
 
 
 class CategoriesCategory(models.Model):
+    id = models.IntegerField(primary_key=True)
     order = models.IntegerField()
     module = models.CharField(max_length=10)
     description = models.TextField()
@@ -124,6 +133,7 @@ class CategoriesCategory(models.Model):
 
 
 class CoreDomain(models.Model):
+    id = models.IntegerField(primary_key=True)
     domain = models.CharField(unique=True, max_length=253)
     is_primary = models.BooleanField()
     tenant = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='CoreDomain_tenant')
@@ -134,6 +144,7 @@ class CoreDomain(models.Model):
 
 
 class CorsheadersCorsmodel(models.Model):
+    id = models.IntegerField(primary_key=True)
     cors = models.CharField(max_length=255)
 
     class Meta:
@@ -142,6 +153,7 @@ class CorsheadersCorsmodel(models.Model):
 
 
 class DjangoAdminLog(models.Model):
+    id = models.IntegerField(primary_key=True)
     action_time = models.DateTimeField()
     object_id = models.TextField(blank=True, null=True)
     object_repr = models.CharField(max_length=200)
@@ -156,8 +168,8 @@ class DjangoAdminLog(models.Model):
 
 
 class DjangoCeleryBeatClockedschedule(models.Model):
+    id = models.IntegerField(primary_key=True)
     clocked_time = models.DateTimeField()
-    enabled = models.BooleanField()
 
     class Meta:
         managed = False
@@ -165,6 +177,7 @@ class DjangoCeleryBeatClockedschedule(models.Model):
 
 
 class DjangoCeleryBeatCrontabschedule(models.Model):
+    id = models.IntegerField(primary_key=True)
     minute = models.CharField(max_length=240)
     hour = models.CharField(max_length=96)
     day_of_week = models.CharField(max_length=64)
@@ -178,6 +191,7 @@ class DjangoCeleryBeatCrontabschedule(models.Model):
 
 
 class DjangoCeleryBeatIntervalschedule(models.Model):
+    id = models.IntegerField(primary_key=True)
     every = models.IntegerField()
     period = models.CharField(max_length=24)
 
@@ -187,6 +201,7 @@ class DjangoCeleryBeatIntervalschedule(models.Model):
 
 
 class DjangoCeleryBeatPeriodictask(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=200)
     task = models.CharField(max_length=200)
     args = models.TextField()
@@ -208,6 +223,7 @@ class DjangoCeleryBeatPeriodictask(models.Model):
     priority = models.IntegerField(blank=True, null=True)
     headers = models.TextField()
     clocked = models.ForeignKey(DjangoCeleryBeatClockedschedule, models.DO_NOTHING, related_name='DjangoCeleryBeatPeriodictask_clocked', blank=True, null=True)
+    expire_seconds = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -224,6 +240,7 @@ class DjangoCeleryBeatPeriodictasks(models.Model):
 
 
 class DjangoCeleryBeatSolarschedule(models.Model):
+    id = models.IntegerField(primary_key=True)
     event = models.CharField(max_length=24)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
@@ -234,7 +251,33 @@ class DjangoCeleryBeatSolarschedule(models.Model):
         unique_together = (('event', 'latitude', 'longitude'),)
 
 
+class DjangoCeleryResultsChordcounter(models.Model):
+    id = models.IntegerField(primary_key=True)
+    group_id = models.CharField(unique=True, max_length=255)
+    sub_tasks = models.TextField()
+    count = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_results_chordcounter'
+
+
+class DjangoCeleryResultsGroupresult(models.Model):
+    id = models.IntegerField(primary_key=True)
+    group_id = models.CharField(unique=True, max_length=255)
+    date_created = models.DateTimeField()
+    date_done = models.DateTimeField()
+    content_type = models.CharField(max_length=128)
+    content_encoding = models.CharField(max_length=64)
+    result = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'django_celery_results_groupresult'
+
+
 class DjangoCeleryResultsTaskresult(models.Model):
+    id = models.IntegerField(primary_key=True)
     task_id = models.CharField(unique=True, max_length=255)
     status = models.CharField(max_length=50)
     content_type = models.CharField(max_length=128)
@@ -242,11 +285,12 @@ class DjangoCeleryResultsTaskresult(models.Model):
     result = models.TextField(blank=True, null=True)
     date_done = models.DateTimeField()
     traceback = models.TextField(blank=True, null=True)
-    hidden = models.BooleanField()
     meta = models.TextField(blank=True, null=True)
     task_args = models.TextField(blank=True, null=True)
     task_kwargs = models.TextField(blank=True, null=True)
     task_name = models.CharField(max_length=255, blank=True, null=True)
+    worker = models.CharField(max_length=100, blank=True, null=True)
+    date_created = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -254,6 +298,7 @@ class DjangoCeleryResultsTaskresult(models.Model):
 
 
 class DjangoContentType(models.Model):
+    id = models.IntegerField(primary_key=True)
     app_label = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
 
@@ -274,6 +319,7 @@ class DjangoSession(models.Model):
 
 
 class DjangoSite(models.Model):
+    id = models.IntegerField(primary_key=True)
     domain = models.CharField(unique=True, max_length=100)
     name = models.CharField(max_length=50)
 
@@ -298,6 +344,7 @@ class DrfpasswordlessCallbacktoken(models.Model):
 
 
 class EasyThumbnailsSource(models.Model):
+    id = models.IntegerField(primary_key=True)
     storage_hash = models.CharField(max_length=40)
     name = models.CharField(max_length=255)
     modified = models.DateTimeField()
@@ -309,6 +356,7 @@ class EasyThumbnailsSource(models.Model):
 
 
 class EasyThumbnailsThumbnail(models.Model):
+    id = models.IntegerField(primary_key=True)
     storage_hash = models.CharField(max_length=40)
     name = models.CharField(max_length=255)
     modified = models.DateTimeField()
@@ -321,6 +369,7 @@ class EasyThumbnailsThumbnail(models.Model):
 
 
 class EasyThumbnailsThumbnaildimensions(models.Model):
+    id = models.IntegerField(primary_key=True)
     thumbnail = models.OneToOneField(EasyThumbnailsThumbnail, models.DO_NOTHING, related_name='EasyThumbnailsThumbnaildimensions_thumbnail')
     width = models.IntegerField(blank=True, null=True)
     height = models.IntegerField(blank=True, null=True)
@@ -331,9 +380,10 @@ class EasyThumbnailsThumbnaildimensions(models.Model):
 
 
 class EnvironmentTenantflag(models.Model):
+    id = models.IntegerField(primary_key=True)
     authenticated = models.BooleanField()
     created = models.DateTimeField()
-    everyone = models.BooleanField(null=True)
+    everyone = models.BooleanField(blank=True, null=True)
     languages = models.TextField()
     modified = models.DateTimeField()
     name = models.CharField(unique=True, max_length=100)
@@ -350,6 +400,7 @@ class EnvironmentTenantflag(models.Model):
 
 
 class EnvironmentTenantflagCountries(models.Model):
+    id = models.IntegerField(primary_key=True)
     tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='EnvironmentTenantflagCountries_tenantflag')
     country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='EnvironmentTenantflagCountries_country')
 
@@ -360,6 +411,7 @@ class EnvironmentTenantflagCountries(models.Model):
 
 
 class EnvironmentTenantflagGroups(models.Model):
+    id = models.IntegerField(primary_key=True)
     tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='EnvironmentTenantflagGroups_tenantflag')
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='EnvironmentTenantflagGroups_group')
 
@@ -370,6 +422,7 @@ class EnvironmentTenantflagGroups(models.Model):
 
 
 class EnvironmentTenantflagUsers(models.Model):
+    id = models.IntegerField(primary_key=True)
     tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='EnvironmentTenantflagUsers_tenantflag')
     user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='EnvironmentTenantflagUsers_user')
 
@@ -380,6 +433,7 @@ class EnvironmentTenantflagUsers(models.Model):
 
 
 class EnvironmentTenantswitch(models.Model):
+    id = models.IntegerField(primary_key=True)
     active = models.BooleanField()
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -392,6 +446,7 @@ class EnvironmentTenantswitch(models.Model):
 
 
 class EnvironmentTenantswitchCountries(models.Model):
+    id = models.IntegerField(primary_key=True)
     tenantswitch = models.ForeignKey(EnvironmentTenantswitch, models.DO_NOTHING, related_name='EnvironmentTenantswitchCountries_tenantswitch')
     country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='EnvironmentTenantswitchCountries_country')
 
@@ -402,6 +457,7 @@ class EnvironmentTenantswitchCountries(models.Model):
 
 
 class GenericLinksGenericlink(models.Model):
+    id = models.IntegerField(primary_key=True)
     content_type_id = models.IntegerField()
     object_id = models.IntegerField()
     url = models.CharField(max_length=200)
@@ -417,12 +473,13 @@ class GenericLinksGenericlink(models.Model):
 
 
 class NotificationNotification(models.Model):
+    id = models.IntegerField(primary_key=True)
     type = models.CharField(max_length=255)
     object_id = models.IntegerField(blank=True, null=True)
     recipients = models.TextField()  # This field type is a guess.
     sent_recipients = models.TextField()  # This field type is a guess.
     template_name = models.CharField(max_length=255)
-    template_data = models.TextField(blank=True, null=True)  # This field type is a guess.
+    template_data = models.JSONField(blank=True, null=True)
     content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING, related_name='NotificationNotification_content_type', blank=True, null=True)
     cc = models.TextField()  # This field type is a guess.
     from_address = models.CharField(max_length=255, blank=True, null=True)
@@ -437,6 +494,7 @@ class NotificationNotification(models.Model):
 
 
 class Permissions2Permission(models.Model):
+    id = models.IntegerField(primary_key=True)
     permission = models.CharField(max_length=10)
     permission_type = models.CharField(max_length=10)
     target = models.CharField(max_length=100)
@@ -448,6 +506,7 @@ class Permissions2Permission(models.Model):
 
 
 class PostOfficeAttachment(models.Model):
+    id = models.IntegerField(primary_key=True)
     file = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     mimetype = models.CharField(max_length=255)
@@ -459,6 +518,7 @@ class PostOfficeAttachment(models.Model):
 
 
 class PostOfficeAttachmentEmails(models.Model):
+    id = models.IntegerField(primary_key=True)
     attachment = models.ForeignKey(PostOfficeAttachment, models.DO_NOTHING, related_name='PostOfficeAttachmentEmails_attachment')
     email = models.ForeignKey('PostOfficeEmail', models.DO_NOTHING, related_name='PostOfficeAttachmentEmails_email')
 
@@ -469,6 +529,7 @@ class PostOfficeAttachmentEmails(models.Model):
 
 
 class PostOfficeEmail(models.Model):
+    id = models.IntegerField(primary_key=True)
     from_email = models.CharField(max_length=254)
     to = models.TextField()
     cc = models.TextField()
@@ -485,6 +546,9 @@ class PostOfficeEmail(models.Model):
     context = models.TextField(blank=True, null=True)
     template = models.ForeignKey('PostOfficeEmailtemplate', models.DO_NOTHING, related_name='PostOfficeEmail_template', blank=True, null=True)
     backend_alias = models.CharField(max_length=64)
+    number_of_retries = models.IntegerField(blank=True, null=True)
+    expires_at = models.DateTimeField(blank=True, null=True)
+    message_id = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -492,6 +556,7 @@ class PostOfficeEmail(models.Model):
 
 
 class PostOfficeEmailtemplate(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
     subject = models.CharField(max_length=255)
@@ -509,6 +574,7 @@ class PostOfficeEmailtemplate(models.Model):
 
 
 class PostOfficeLog(models.Model):
+    id = models.IntegerField(primary_key=True)
     date = models.DateTimeField()
     status = models.SmallIntegerField()
     exception_type = models.CharField(max_length=255)
@@ -521,6 +587,7 @@ class PostOfficeLog(models.Model):
 
 
 class PublicsAirlinecompany(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     code = models.IntegerField()
     iata = models.CharField(max_length=3)
@@ -534,6 +601,7 @@ class PublicsAirlinecompany(models.Model):
 
 
 class PublicsBusinessarea(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=32)
     region = models.ForeignKey('PublicsBusinessregion', models.DO_NOTHING, related_name='PublicsBusinessarea_region')
@@ -546,6 +614,7 @@ class PublicsBusinessarea(models.Model):
 
 
 class PublicsBusinessregion(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=16)
     code = models.CharField(max_length=2)
     deleted_at = models.DateTimeField()
@@ -556,6 +625,7 @@ class PublicsBusinessregion(models.Model):
 
 
 class PublicsCountry(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=64)
     long_name = models.CharField(max_length=128)
     vision_code = models.CharField(unique=True, max_length=3, blank=True, null=True)
@@ -574,6 +644,7 @@ class PublicsCountry(models.Model):
 
 
 class PublicsCurrency(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=5)
     decimal_places = models.IntegerField()
@@ -585,6 +656,7 @@ class PublicsCurrency(models.Model):
 
 
 class PublicsDsarate(models.Model):
+    id = models.IntegerField(primary_key=True)
     effective_to_date = models.DateField()
     dsa_amount_usd = models.DecimalField(max_digits=20, decimal_places=4)
     dsa_amount_60plus_usd = models.DecimalField(max_digits=20, decimal_places=4)
@@ -602,6 +674,7 @@ class PublicsDsarate(models.Model):
 
 
 class PublicsDsaregion(models.Model):
+    id = models.IntegerField(primary_key=True)
     area_name = models.CharField(max_length=120)
     area_code = models.CharField(max_length=3)
     country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name='PublicsDsaregion_country')
@@ -614,6 +687,7 @@ class PublicsDsaregion(models.Model):
 
 
 class PublicsExchangerate(models.Model):
+    id = models.IntegerField(primary_key=True)
     valid_from = models.DateField()
     valid_to = models.DateField()
     x_rate = models.DecimalField(max_digits=10, decimal_places=5)
@@ -626,6 +700,7 @@ class PublicsExchangerate(models.Model):
 
 
 class PublicsTravelagent(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=128)
     city = models.CharField(max_length=128)
@@ -639,6 +714,7 @@ class PublicsTravelagent(models.Model):
 
 
 class PublicsTravelexpensetype(models.Model):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=128)
     vendor_number = models.CharField(max_length=128)
     rank = models.IntegerField()
@@ -650,6 +726,7 @@ class PublicsTravelexpensetype(models.Model):
 
 
 class PurchaseOrderAuditorfirm(models.Model):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     vendor_number = models.CharField(unique=True, max_length=30)
@@ -672,9 +749,13 @@ class PurchaseOrderAuditorfirm(models.Model):
 
 
 class PurchaseOrderAuditorstaffmember(models.Model):
+    id = models.IntegerField(primary_key=True)
     auditor_firm = models.ForeignKey(PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name='PurchaseOrderAuditorstaffmember_auditor_firm')
     user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='PurchaseOrderAuditorstaffmember_user')
     hidden = models.BooleanField()
+    created = models.DateTimeField()
+    history = models.TextField()  # This field type is a guess.
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -682,6 +763,7 @@ class PurchaseOrderAuditorstaffmember(models.Model):
 
 
 class PurchaseOrderPurchaseorder(models.Model):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     order_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
@@ -695,6 +777,7 @@ class PurchaseOrderPurchaseorder(models.Model):
 
 
 class PurchaseOrderPurchaseorderitem(models.Model):
+    id = models.IntegerField(primary_key=True)
     number = models.IntegerField()
     purchase_order = models.ForeignKey(PurchaseOrderPurchaseorder, models.DO_NOTHING, related_name='PurchaseOrderPurchaseorderitem_purchase_order')
 
@@ -705,6 +788,7 @@ class PurchaseOrderPurchaseorderitem(models.Model):
 
 
 class RegistrationRegistrationprofile(models.Model):
+    id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField(unique=True)
     activation_key = models.CharField(max_length=40)
 
@@ -714,6 +798,7 @@ class RegistrationRegistrationprofile(models.Model):
 
 
 class SocialAuthAssociation(models.Model):
+    id = models.IntegerField(primary_key=True)
     server_url = models.CharField(max_length=255)
     handle = models.CharField(max_length=255)
     secret = models.CharField(max_length=255)
@@ -728,6 +813,7 @@ class SocialAuthAssociation(models.Model):
 
 
 class SocialAuthCode(models.Model):
+    id = models.IntegerField(primary_key=True)
     email = models.CharField(max_length=254)
     code = models.CharField(max_length=32)
     verified = models.BooleanField()
@@ -740,6 +826,7 @@ class SocialAuthCode(models.Model):
 
 
 class SocialAuthNonce(models.Model):
+    id = models.IntegerField(primary_key=True)
     server_url = models.CharField(max_length=255)
     timestamp = models.IntegerField()
     salt = models.CharField(max_length=65)
@@ -751,10 +838,11 @@ class SocialAuthNonce(models.Model):
 
 
 class SocialAuthPartial(models.Model):
+    id = models.IntegerField(primary_key=True)
     token = models.CharField(max_length=32)
     next_step = models.SmallIntegerField()
     backend = models.CharField(max_length=32)
-    data = models.TextField()  # This field type is a guess.
+    data = models.JSONField()
     timestamp = models.DateTimeField()
 
     class Meta:
@@ -763,10 +851,13 @@ class SocialAuthPartial(models.Model):
 
 
 class SocialAuthUsersocialauth(models.Model):
+    id = models.IntegerField(primary_key=True)
     provider = models.CharField(max_length=32)
     uid = models.CharField(max_length=255)
-    extra_data = models.TextField()  # This field type is a guess.
+    extra_data = models.JSONField()
     user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='SocialAuthUsersocialauth_user')
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -775,6 +866,7 @@ class SocialAuthUsersocialauth(models.Model):
 
 
 class SocialaccountSocialaccount(models.Model):
+    id = models.IntegerField(primary_key=True)
     provider = models.CharField(max_length=30)
     uid = models.CharField(max_length=191)
     last_login = models.DateTimeField()
@@ -789,6 +881,7 @@ class SocialaccountSocialaccount(models.Model):
 
 
 class SocialaccountSocialapp(models.Model):
+    id = models.IntegerField(primary_key=True)
     provider = models.CharField(max_length=30)
     name = models.CharField(max_length=40)
     client_id = models.CharField(max_length=191)
@@ -801,6 +894,7 @@ class SocialaccountSocialapp(models.Model):
 
 
 class SocialaccountSocialappSites(models.Model):
+    id = models.IntegerField(primary_key=True)
     socialapp = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name='SocialaccountSocialappSites_socialapp')
     site = models.ForeignKey(DjangoSite, models.DO_NOTHING, related_name='SocialaccountSocialappSites_site')
 
@@ -811,6 +905,7 @@ class SocialaccountSocialappSites(models.Model):
 
 
 class SocialaccountSocialtoken(models.Model):
+    id = models.IntegerField(primary_key=True)
     token = models.TextField()
     token_secret = models.TextField()
     expires_at = models.DateTimeField(blank=True, null=True)
@@ -836,6 +931,7 @@ class SpatialRefSys(models.Model):
 
 
 class TpmpartnersTpmpartner(models.Model):
+    id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     vendor_number = models.CharField(unique=True, max_length=30)
@@ -857,6 +953,7 @@ class TpmpartnersTpmpartner(models.Model):
 
 
 class TpmpartnersTpmpartnerCountries(models.Model):
+    id = models.IntegerField(primary_key=True)
     tpmpartner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='TpmpartnersTpmpartnerCountries_tpmpartner')
     country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='TpmpartnersTpmpartnerCountries_country')
 
@@ -867,9 +964,13 @@ class TpmpartnersTpmpartnerCountries(models.Model):
 
 
 class TpmpartnersTpmpartnerstaffmember(models.Model):
+    id = models.IntegerField(primary_key=True)
     receive_tpm_notifications = models.BooleanField()
     tpm_partner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='TpmpartnersTpmpartnerstaffmember_tpm_partner')
     user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='TpmpartnersTpmpartnerstaffmember_user')
+    created = models.DateTimeField()
+    history = models.TextField()  # This field type is a guess.
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -877,6 +978,7 @@ class TpmpartnersTpmpartnerstaffmember(models.Model):
 
 
 class UnicefNotificationNotification(models.Model):
+    id = models.IntegerField(primary_key=True)
     method_type = models.CharField(max_length=255)
     object_id = models.IntegerField(blank=True, null=True)
     from_address = models.CharField(max_length=255, blank=True, null=True)
@@ -884,7 +986,7 @@ class UnicefNotificationNotification(models.Model):
     cc = models.TextField()  # This field type is a guess.
     sent_recipients = models.TextField()  # This field type is a guess.
     template_name = models.CharField(max_length=255)
-    template_data = models.TextField(blank=True, null=True)  # This field type is a guess.
+    template_data = models.JSONField(blank=True, null=True)
     subject = models.TextField()
     text_message = models.TextField()
     html_message = models.TextField()
@@ -897,6 +999,7 @@ class UnicefNotificationNotification(models.Model):
 
 
 class UsersCountry(models.Model):
+    id = models.IntegerField(primary_key=True)
     schema_name = models.CharField(unique=True, max_length=63)
     name = models.CharField(max_length=100)
     business_area_code = models.CharField(max_length=10)
@@ -909,6 +1012,7 @@ class UsersCountry(models.Model):
     local_currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='UsersCountry_local_currency', blank=True, null=True)
     long_name = models.CharField(max_length=255)
     iso3_code = models.CharField(max_length=10)
+    custom_dashboards = models.JSONField()
 
     class Meta:
         managed = False
@@ -916,6 +1020,7 @@ class UsersCountry(models.Model):
 
 
 class UsersCountryOffices(models.Model):
+    id = models.IntegerField(primary_key=True)
     country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersCountryOffices_country')
     office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='UsersCountryOffices_office')
 
@@ -926,6 +1031,7 @@ class UsersCountryOffices(models.Model):
 
 
 class UsersOffice(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=254)
     zonal_chief = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='UsersOffice_zonal_chief', blank=True, null=True)
 
@@ -935,6 +1041,7 @@ class UsersOffice(models.Model):
 
 
 class UsersUserprofile(models.Model):
+    id = models.IntegerField(primary_key=True)
     job_title = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
     country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersUserprofile_country', blank=True, null=True)
@@ -958,6 +1065,7 @@ class UsersUserprofile(models.Model):
 
 
 class UsersUserprofileCountriesAvailable(models.Model):
+    id = models.IntegerField(primary_key=True)
     userprofile = models.ForeignKey(UsersUserprofile, models.DO_NOTHING, related_name='UsersUserprofileCountriesAvailable_userprofile')
     country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersUserprofileCountriesAvailable_country')
 
@@ -968,6 +1076,7 @@ class UsersUserprofileCountriesAvailable(models.Model):
 
 
 class UsersWorkspacecounter(models.Model):
+    id = models.IntegerField(primary_key=True)
     travel_reference_number_counter = models.IntegerField()
     travel_invoice_reference_number_counter = models.IntegerField()
     workspace = models.OneToOneField(UsersCountry, models.DO_NOTHING, related_name='UsersWorkspacecounter_workspace')
@@ -978,6 +1087,7 @@ class UsersWorkspacecounter(models.Model):
 
 
 class VisionVisionsynclog(models.Model):
+    id = models.IntegerField(primary_key=True)
     handler_name = models.CharField(max_length=50)
     total_records = models.IntegerField()
     total_processed = models.IntegerField()
