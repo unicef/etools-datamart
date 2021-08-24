@@ -1012,7 +1012,7 @@ class UsersCountry(models.Model):
     local_currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='UsersCountry_local_currency', blank=True, null=True)
     long_name = models.CharField(max_length=255)
     iso3_code = models.CharField(max_length=10)
-    custom_dashboards = models.JSONField()
+    # custom_dashboards = models.JSONField()
 
     class Meta:
         managed = False

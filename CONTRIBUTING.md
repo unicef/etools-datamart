@@ -27,5 +27,12 @@ needed to run the tests
 
  
     cd db
-    db/update_etools_schema.sh
+    sh update_etools_schema.sh
     
+    
+Looks like there's a record failing import Intervention CHD/SSFA201853
+while replacing chad with lebanon, 256 constraint raises
+needed to replace it manually in dump 3
+
+also atm we need django 3.1 to read data
+

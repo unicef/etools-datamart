@@ -1,5 +1,3 @@
-import json
-
 from django.db import models
 from django.db.models import JSONField
 
@@ -18,20 +16,20 @@ class ReportIndicatorLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = 'locations'
 
     def get_baseline_denominator(self, record, values, field_name):
-        value = SafeDecimal(json.loads(record.baseline).get('d'))
+        value = SafeDecimal(record.baseline.get('d'))
         if value:
             value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_baseline_numerator(self, record, values, field_name):
-        value = SafeDecimal(json.loads(record.baseline).get('v'))
+        value = SafeDecimal(record.baseline.get('v'))
         if value:
             value._validate_for_field(ReportIndicator._meta.get_field(field_name))
         return value
 
     def get_target_value(self, record, values, field_name):
-        values['target_denominator'] = SafeDecimal(json.loads(record.target).get('d'))
-        values['target_numerator'] = SafeDecimal(json.loads(record.target).get('v'))
+        values['target_denominator'] = record.target.get('d')
+        values['target_numerator'] = record.target.get('v')
 
     def get_disaggregations(self, record, values, field_name):
         ret = []

@@ -34,8 +34,7 @@ class PMPIndicatorLoader(EtoolsLoader):
                           'partner_name': partner.name,
                           'partner_type': partner.cso_type,
                           'vendor_number': partner.vendor_number,
-
-                          'pd_ssfa_ref': intervention.number.replace(',', '-'),
+                          'pd_ssfa_ref': intervention.number.replace(',', '-') if intervention.number else '-',
                           'pd_ssfa_status': intervention.status.lower(),
                           'pd_ssfa_start_date': intervention.start,
                           'pd_ssfa_creation_date': intervention.created,
