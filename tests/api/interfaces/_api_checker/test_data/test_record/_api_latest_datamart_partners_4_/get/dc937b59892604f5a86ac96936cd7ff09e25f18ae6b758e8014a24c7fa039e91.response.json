@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"4462b54778fee65c8ca942f1d2e23892\"",
+        "ETag": "\"1f6beee92a94a7c89c52cc502ed8e3ef\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
         "service": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
@@ -12,13 +12,13 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "1122",
+        "Content-Length": "1161",
         "Referrer-Policy": "same-origin"
     },
     "data": {
         "id": 4,
         "source_id": null,
-        "last_modify_date": "04 Aug 2021 21:02:27",
+        "last_modify_date": "16 Aug 2021 23:43:41",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
@@ -31,7 +31,7 @@
         "city": null,
         "core_values_assessment_date": null,
         "country": null,
-        "created": "04 Aug 2021 20:42:03",
+        "created": "16 Aug 2021 23:33:33",
         "cso_type": null,
         "deleted_flag": false,
         "description": "",
@@ -65,7 +65,9 @@
         "sea_risk_rating_name": null,
         "highest_risk_rating_name": null,
         "highest_risk_rating_type": null,
-        "psea_assessment_date": null
+        "psea_assessment_date": null,
+        "lead_office": null,
+        "lead_section": null
     },
     "content_type": "application/json"
 }

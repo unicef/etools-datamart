@@ -14,15 +14,15 @@ PROJECT_DIR="`cd "${CURDIR}/..";pwd`"
 DUMP_DIRECTORY="$PROJECT_DIR/src/etools_datamart/apps/multitenant/postgresql"
 MODEL_DIR="$PROJECT_DIR/src/etools_datamart/apps/sources/etools/models/"
 
-export DEBUG=True
-export PGHOST=db-etools
-export PGPORT=5432
-export DATABASE_NAME=etools
-export DATABASE_USER=postgres
-export DATABASE_PASS=
+export DEBUG=${DEBUG:=True}
+export PGHOST=${PGHOST:=db-etools}
+export PGPORT=${PGPORT:=5432}
+export DATABASE_NAME=${DATABASE_NAME:=etools}
+export DATABASE_USER=${DATABASE_USER:=postgres}
+export DATABASE_PASS=${DATABASE_PASS:=pass}
 
 export BACKUPFILE=${ETOOLS_BACKUP:=2019-04-08-1600.bz2}
-#export BACKUPFILE=${BACKUPFILE:=2019-04-08-1600.bz2}
+
 
 help (){
     echo "$0"
@@ -196,10 +196,6 @@ else
     exit 1
 fi
 
-function color.reset () { # Reset the color in an echo call
-  echo -ne '\e[0m'
-}
-
 
 function drop(){
     MSG="1.1 Dropping and recreating database ${DATABASE_NAME}"
@@ -224,7 +220,7 @@ function drop(){
     pg_restore -h ${PGHOST} -p ${PGPORT} \
             --no-owner --role=${DATABASE_USER} \
             --username=${DATABASE_USER} \
-            --format=tar --dbname=${DATABASE_NAME} etools.dump || exit 1
+            -F c --dbname=${DATABASE_NAME} etools.dump || exit 1
 
 }
 
@@ -520,6 +516,3 @@ duration=$(( end - start ))
 
 echo "Done!!!"
 echo "Total of $duration seconds elapsed for process"
-
-
-

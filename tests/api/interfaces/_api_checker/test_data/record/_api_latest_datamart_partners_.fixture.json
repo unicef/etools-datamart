@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-08-04T21:02:27.704Z",
+                "last_modify_date": "2021-08-16T23:43:41.117Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2021-08-04T20:42:03.452Z",
+                "created": "2021-08-16T23:33:33.680Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -54,7 +54,9 @@
                 "sea_risk_rating_name": null,
                 "highest_risk_rating_name": null,
                 "highest_risk_rating_type": null,
-                "psea_assessment_date": null
+                "psea_assessment_date": null,
+                "lead_office": null,
+                "lead_section": null
             }
         },
         "deps": []

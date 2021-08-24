@@ -131,8 +131,8 @@ SET default_tablespace = '';
             sys.exit(2)
         try:
             cur.execute(raw_sql(header.format(schema='public')))
-        except Exception as e:
-            raise Exception(f"Error creating schema 'public'") from e
+        except BaseException as e:
+            raise BaseException(f"Error creating schema 'public'") from e
 
         for i, schema in enumerate(settings.TEST_SCHEMAS, 1):
             tenant_dump = Path(settings.ETOOLS_DUMP_LOCATION) / ("tenant%s.sql" % i)
@@ -145,8 +145,8 @@ SET default_tablespace = '';
                 sql = sql.replace("[[schema]]", schema).replace("SET default_tablespace = '';",
                                                                 header.format(schema=schema))
                 cur.execute(raw_sql(sql))
-            except Exception as e:
-                raise Exception(f"Error creating schema {schema}") from e
+            except BaseException as e:
+                raise BaseException(f"Error creating schema {schema}") from e
 
         self.connection.close()
         self.connection.ensure_connection()
