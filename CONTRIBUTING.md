@@ -4,8 +4,6 @@
 
  - [pipenv](https://github.com/pypa/pipenv)
  - [docker](https://www.docker.com/get-docker)
- - [pipsi](https://github.com/mitsuhiko/pipsi/)
-
 
 
 setup local en0 alias
@@ -24,7 +22,17 @@ setup local en0 alias
 
 ### How to run tests
 
-Each time Etools data models changes, it's needed to rebuild the datamart models and the sql
+Each time eTools data models changes, it's needed to rebuild the datamart models and the sql
 needed to run the tests
 
-run `db/update_etools_schema.sh` and follow provided steps
+ 
+    cd db
+    sh update_etools_schema.sh
+    
+    
+Looks like there's a record failing import Intervention CHD/SSFA201853
+while replacing chad with lebanon, 256 constraint raises
+needed to replace it manually in dump 3
+
+also atm we need django 3.1 to read data
+

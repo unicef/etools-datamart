@@ -9,8 +9,6 @@ from django.urls import reverse
 import pytest
 from test_utilities.factories import EmailTemplateFactory, HACTFactory, SubscriptionFactory
 
-from unicef_rest_framework.test_utils import user_allow_service
-
 from etools_datamart.apps.etl.models import EtlTask
 from etools_datamart.apps.mart.data.models import HACT
 from etools_datamart.apps.subscriptions.models import Subscription
@@ -91,24 +89,6 @@ def test_subscribe_error(rf, etltask):
     request.user = AnonymousUser()
     res = subscribe(request, etltask.pk)
     assert res.status_code == 500
-
-
-@pytest.mark.django_db
-def test_notification_email(subscription: Subscription, email_templates):
-    with user_allow_service(subscription.user, subscription.viewset):
-        emails = Subscription.objects.notify(subscription.content_type.model_class())
-    assert len(emails) == 1
-    assert emails[0].to == [subscription.user.email]
-    assert emails[0].attachments.count() == 0
-
-
-@pytest.mark.django_db
-def test_notification_email_attachment(subscription_attachment: Subscription, email_templates):
-    with user_allow_service(subscription_attachment.user, subscription_attachment.viewset):
-        emails = Subscription.objects.notify(subscription_attachment.content_type.model_class())
-    assert len(emails) == 1
-    assert emails[0].to == [subscription_attachment.user.email]
-    assert emails[0].attachments.count() == 1
 
 
 def test_http_basic_auth_401(rf):

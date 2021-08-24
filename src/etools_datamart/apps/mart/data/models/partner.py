@@ -41,6 +41,14 @@ class PartnerLoader(EtoolsLoader):
             data = {}
         return data
 
+    def get_lead_office(self, record, values, **kwargs):
+        office = getattr(record, 'lead_office', None)
+        return office.name if office else None
+
+    def get_lead_section(self, record, values, **kwargs):
+        section = getattr(record, 'lead_section', None)
+        return section.name if section else None
+
 
 class Partner(EtoolsDataMartModel):
     address = models.TextField(blank=True, null=True)
@@ -110,6 +118,8 @@ class Partner(EtoolsDataMartModel):
     highest_risk_rating_name = models.CharField(max_length=150, blank=True, null=True)
     highest_risk_rating_type = models.CharField(max_length=150, blank=True, null=True)
     psea_assessment_date = models.DateTimeField(null=True, blank=True)
+    lead_office = models.CharField(max_length=254, null=True, blank=True)
+    lead_section = models.CharField(max_length=128, null=True, blank=True)
 
     class Meta:
         ordering = ("name",)
@@ -120,5 +130,9 @@ class Partner(EtoolsDataMartModel):
 
     class Options:
         source = PartnersPartnerorganization
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.id)
+        key = lambda loader, record: dict(
+            schema_name=loader.context['country'].schema_name,
+            source_id=record.id,
+            # lead_office=record.lead_office.name,
+            # lead_section=record.lead_section.name,
+        )

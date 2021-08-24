@@ -1,5 +1,4 @@
 import os
-import uuid
 import warnings
 
 from django.apps import apps
