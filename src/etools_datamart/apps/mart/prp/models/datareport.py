@@ -189,7 +189,7 @@ class DataReport(PrpDataMartModel):
     # | pd_output_progress_status | indicator_report.overall_status |
     pd_output_progress_status = models.CharField(max_length=2048, blank=True, null=True)
     # | pd_output_narrative_assessment | indicator_report.narrative_assessment |
-    pd_output_narrative_assessment = models.CharField(max_length=2048, blank=True, null=True)
+    pd_output_narrative_assessment = models.TextField(blank=True, null=True)
     # | calculation_method_across_location | r.blueprint.calculation_formula_across_locations |
     calculation_method_across_location = models.CharField(max_length=2048, blank=True, null=True)
     # | calculation_method_across_reporting_periods | r.blueprint.calculation_formula_across_periods |

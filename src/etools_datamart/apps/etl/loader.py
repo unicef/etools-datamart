@@ -292,7 +292,7 @@ class BaseLoader:
                 else:
                     op = UNCHANGED
             return op
-        except Exception as e:  # pragma: no cover
+        except BaseException as e:  # pragma: no cover
             raise LoaderException(f"Error in {self}: {e}") from e
 
     def get_mart_values(self, record=None):
