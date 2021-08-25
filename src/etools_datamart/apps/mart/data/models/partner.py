@@ -1,3 +1,6 @@
+import decimal
+from datetime import date
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import F, JSONField
@@ -49,8 +52,31 @@ class PartnerLoader(EtoolsLoader):
         section = getattr(record, 'lead_section', None)
         return section.name if section else None
 
+    def get_expiring_assessment_flag(self, record, **kwargs):
+        if record.last_assessment_date:
+            last_assessment_age = date.today().year - record.last_assessment_date.year
+            return last_assessment_age >= Partner.EXPIRING_ASSESSMENT_LIMIT_YEAR
+        return False
+
+    def get_expiring_psea_assessment_flag(self, record, **kwargs):
+        if record.psea_assessment_date:
+            last_assessment_age = date.today().year - record.psea_assessment_date.year
+            return last_assessment_age >= Partner.EXPIRING_ASSESSMENT_LIMIT_YEAR
+        return False
+
+    def get_approaching_threshold_flag(self, record, **kwargs):
+        total_ct_ytd = record.total_ct_ytd or 0
+        not_required = record.highest_risk_rating_name == Partner.RATING_NOT_REQUIRED
+        ct_year_overflow = total_ct_ytd > Partner.CT_CP_AUDIT_TRIGGER_LEVEL
+        return not_required and ct_year_overflow
+
 
 class Partner(EtoolsDataMartModel):
+
+    EXPIRING_ASSESSMENT_LIMIT_YEAR = 4
+    CT_CP_AUDIT_TRIGGER_LEVEL = decimal.Decimal('50000.00')
+    RATING_NOT_REQUIRED = 'Not Required'
+
     address = models.TextField(blank=True, null=True)
     alternate_id = models.IntegerField(blank=True, null=True)
     alternate_name = models.CharField(max_length=255, blank=True, null=True)
@@ -121,6 +147,10 @@ class Partner(EtoolsDataMartModel):
     lead_office = models.CharField(max_length=254, null=True, blank=True)
     lead_section = models.CharField(max_length=128, null=True, blank=True)
 
+    expiring_assessment_flag = models.BooleanField(blank=True, null=True)
+    expiring_psea_assessment_flag = models.BooleanField(blank=True, null=True)
+    approaching_threshold_flag = models.BooleanField(blank=True, null=True)
+
     class Meta:
         ordering = ("name",)
         unique_together = (('schema_name', 'name', 'vendor_number'),
@@ -133,6 +163,4 @@ class Partner(EtoolsDataMartModel):
         key = lambda loader, record: dict(
             schema_name=loader.context['country'].schema_name,
             source_id=record.id,
-            # lead_office=record.lead_office.name,
-            # lead_section=record.lead_section.name,
         )

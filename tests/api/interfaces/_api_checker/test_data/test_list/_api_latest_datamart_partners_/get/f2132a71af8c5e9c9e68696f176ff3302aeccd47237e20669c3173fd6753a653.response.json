@@ -4,18 +4,18 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"883e06f30c376ba36fb508391fb2fd66\"",
+        "ETag": "\"bde25feadd647a1fe230c4764bf91226\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
         "service": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "883e06f30c376ba36fb508391fb2fd66",
+        "cache-key": "bde25feadd647a1fe230c4764bf91226",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "3627",
+        "Content-Length": "3936",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -78,7 +78,10 @@
                 "highest_risk_rating_type": null,
                 "psea_assessment_date": null,
                 "lead_office": null,
-                "lead_section": null
+                "lead_section": null,
+                "expiring_assessment_flag": null,
+                "expiring_psea_assessment_flag": null,
+                "approaching_threshold_flag": null
             },
             {
                 "id": 2,
@@ -133,7 +136,10 @@
                 "highest_risk_rating_type": null,
                 "psea_assessment_date": null,
                 "lead_office": null,
-                "lead_section": null
+                "lead_section": null,
+                "expiring_assessment_flag": null,
+                "expiring_psea_assessment_flag": null,
+                "approaching_threshold_flag": null
             },
             {
                 "id": 3,
@@ -188,7 +194,10 @@
                 "highest_risk_rating_type": null,
                 "psea_assessment_date": null,
                 "lead_office": null,
-                "lead_section": null
+                "lead_section": null,
+                "expiring_assessment_flag": null,
+                "expiring_psea_assessment_flag": null,
+                "approaching_threshold_flag": null
             }
         ]
     },
