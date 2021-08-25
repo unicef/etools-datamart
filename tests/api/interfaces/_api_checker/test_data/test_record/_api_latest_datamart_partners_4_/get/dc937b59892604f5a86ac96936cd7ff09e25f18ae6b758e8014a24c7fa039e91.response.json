@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"1f6beee92a94a7c89c52cc502ed8e3ef\"",
+        "ETag": "\"67e7efe76c0c5ca378ce9e96b21737ea\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
         "service": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerViewSet",
@@ -12,7 +12,7 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "1161",
+        "Content-Length": "1264",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -67,7 +67,10 @@
         "highest_risk_rating_type": null,
         "psea_assessment_date": null,
         "lead_office": null,
-        "lead_section": null
+        "lead_section": null,
+        "expiring_assessment_flag": null,
+        "expiring_psea_assessment_flag": null,
+        "approaching_threshold_flag": null
     },
     "content_type": "application/json"
 }
