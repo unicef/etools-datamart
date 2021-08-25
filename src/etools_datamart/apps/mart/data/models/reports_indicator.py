@@ -28,8 +28,8 @@ class ReportIndicatorLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return value
 
     def get_target_value(self, record, values, field_name):
-        values['target_denominator'] = record.target.get('d')
-        values['target_numerator'] = record.target.get('v')
+        values['target_denominator'] = SafeDecimal(record.target.get('d'))
+        values['target_numerator'] = SafeDecimal(record.target.get('v'))
 
     def get_disaggregations(self, record, values, field_name):
         ret = []
