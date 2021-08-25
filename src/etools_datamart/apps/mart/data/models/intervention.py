@@ -343,7 +343,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         from etools_datamart.apps.mart.data.models import Attachment
         attachment = Attachment.objects.filter(
             # object_id=record.pk,
-            pd_ssfa_number__in=[record.number, record.number[:-2]],
+            pd_ssfa_number__in=[record.number, record.number[:-2] if record.number else ''],
             code='partners_intervention_prc_review',
             content_type=self._ct).order_by('-id').first()
         if attachment:

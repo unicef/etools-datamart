@@ -161,7 +161,7 @@ class LoaderTask(celery.Task):
             self.loader.etl_task.save()
             raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
                              countdown=config.ETL_RETRY_COUNTDOWN)
-        except Exception as e:  # pragma: no cover
+        except BaseException as e:  # pragma: no cover
             logger.exception(e)
             # self.loader.etl_task.status = 'ERROR'
             # self.loader.etl_task.save()
@@ -292,7 +292,7 @@ class BaseLoader:
                 else:
                     op = UNCHANGED
             return op
-        except Exception as e:  # pragma: no cover
+        except BaseException as e:  # pragma: no cover
             raise LoaderException(f"Error in {self}: {e}") from e
 
     def get_mart_values(self, record=None):

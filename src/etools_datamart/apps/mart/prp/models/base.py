@@ -129,7 +129,7 @@ class PrpBaseLoader(BaseLoader):
                     # self.results.deleted = deleted
                 except MaxRecordsException:
                     pass
-                except Exception:
+                except BaseException:
                     transaction.savepoint_rollback(sid)
                     raise
             else:
