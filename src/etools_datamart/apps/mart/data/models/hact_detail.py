@@ -71,8 +71,8 @@ class HACTDetailLoader(EtoolsLoader):
         return ret
 
     def get_values(self, record):
-        self.data1 = dict(
-            json.loads(record.partner_values) if isinstance(record.partner_values, str) else record.partner_values)
+        self.data1 = dict(json.loads(record.partner_values) if isinstance(record.partner_values, str) \
+                              else record.partner_values)
         hact_values = dict(
             approach_threshold=get_item(self.data1, 'Approach Threshold', None),
             audits_completed=get_item(self.data1, 'Audit Completed'),

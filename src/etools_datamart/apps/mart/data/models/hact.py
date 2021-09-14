@@ -19,7 +19,6 @@ class HACTLoader(EtoolsLoader):
             self.context['year'] = year
             try:
                 aggregate = self.get_queryset().get()
-
                 data = json.loads(aggregate.partner_values) if isinstance(aggregate.partner_values, str) \
                     else aggregate.partner_values
 
