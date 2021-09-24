@@ -67,6 +67,7 @@ class SpotCheckFindings(EtoolsDataMartModel):
 
     # Overview Section
     auditor = models.CharField(max_length=255, blank=True, null=True)
+    auditor_number = models.CharField(max_length=30, blank=True, null=True)
     partner = JSONField(blank=True, null=True, default=dict)
     date_of_final_report = models.DateField(null=True, blank=True)
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
@@ -103,6 +104,7 @@ class SpotCheckFindings(EtoolsDataMartModel):
         depends = (Partner,)
         mapping = dict(
             auditor="agreement.auditor_firm.name",
+            auditor_number="agreement.auditor_firm.vendor_number",
             spotcheck_total_amount_tested="_impl.total_amount_tested",
             spotcheck_total_amount_of_ineligible_expenditure="_impl.total_amount_of_ineligible_expenditure",
             partner="-",

@@ -93,8 +93,10 @@ class MicroAssessment(EtoolsDataMartModel):
     # Engagement Overview
     partner = JSONField(blank=True, null=True, default=dict)
     agreement = models.CharField(max_length=300, blank=True, null=True)
+    auditor = models.CharField(max_length=255, blank=True, null=True)
+    auditor_number = models.CharField(max_length=30, blank=True, null=True)
     shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
-        blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
+                                blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
 
     # Report Section
     # sections = models.TextField(blank=True, null=True)
@@ -139,6 +141,8 @@ class MicroAssessment(EtoolsDataMartModel):
         depends = (Partner,)
         mapping = dict(
             agreement="agreement.order_number",  # PurchaseOrder
+            auditor="agreement.auditor_firm.name",
+            auditor_number="agreement.auditor_firm.vendor_number",
             partner="-",
             rating="-",
             rating_extra="i",

@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"acb440a51e3befe1aa4eed449430b4b9\"",
+        "ETag": "\"7592b4447d099790549446d2d31e0d7d\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.audit_micro_assessment.MicroAssessmentViewSet",
         "service": "etools_datamart.api.endpoints.datamart.audit_micro_assessment.MicroAssessmentViewSet",
@@ -12,7 +12,7 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "1006",
+        "Content-Length": "1043",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -33,6 +33,8 @@
             "vendor_number": "123"
         },
         "agreement": null,
+        "auditor": null,
+        "auditor_number": null,
         "shared_ip_with": [],
         "date_of_field_visit": null,
         "date_of_final_report": null,

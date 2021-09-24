@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"ca9e74cf0ff2c1908133391895624a50\"",
+        "ETag": "\"13432623647115653936e49afb8b47ff\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.audit_audit.AuditViewSet",
         "service": "etools_datamart.api.endpoints.datamart.audit_audit.AuditViewSet",
@@ -12,7 +12,7 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "1045",
+        "Content-Length": "1067",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -28,6 +28,7 @@
         "status": null,
         "agreement": null,
         "auditor": null,
+        "auditor_number": null,
         "partner": {
             "id": 100,
             "name": "Partner1",

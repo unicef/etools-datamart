@@ -4,18 +4,18 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"af1b18d11984eafbbd20734f4f000eec\"",
+        "ETag": "\"7bcdf2b8e5136ecdbe0ff584dc8ee232\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
         "service": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "af1b18d11984eafbbd20734f4f000eec",
+        "cache-key": "7bcdf2b8e5136ecdbe0ff584dc8ee232",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "2493",
+        "Content-Length": "2559",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -37,6 +37,7 @@
                 "created": null,
                 "status": null,
                 "auditor": null,
+                "auditor_number": null,
                 "partner": {
                     "id": 100,
                     "name": "Partner1",
@@ -71,6 +72,7 @@
                 "created": null,
                 "status": null,
                 "auditor": null,
+                "auditor_number": null,
                 "partner": {
                     "id": 100,
                     "name": "Partner1",
@@ -105,6 +107,7 @@
                 "created": null,
                 "status": null,
                 "auditor": null,
+                "auditor_number": null,
                 "partner": {
                     "id": 100,
                     "name": "Partner1",
