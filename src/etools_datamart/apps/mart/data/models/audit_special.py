@@ -51,12 +51,8 @@ class AuditSpecial(EtoolsDataMartModel):
 
     # Engagement Overview Section
     agreement = models.CharField(max_length=300, blank=True, null=True)
-    auditor = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-    )
-
+    auditor = models.CharField(max_length=255, blank=True, null=True)
+    auditor_number = models.CharField(max_length=30, blank=True, null=True)
     # Engagement Overview Section
     partner = JSONField(blank=True, null=True, default=dict)
     date_of_final_report = models.DateField(null=True, blank=True)
@@ -91,6 +87,7 @@ class AuditSpecial(EtoolsDataMartModel):
         depends = (Partner,)
         mapping = dict(
             auditor="agreement.auditor_firm.name",
+            auditor_number="agreement.auditor_firm.vendor_number",
             agreement="agreement.order_number",  # PurchaseOrder
             partner="-",
             sections='-',

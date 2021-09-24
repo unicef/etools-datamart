@@ -66,6 +66,7 @@ class Audit(EtoolsDataMartModel):
     # Engagement Overview Card
     agreement = models.CharField(max_length=300, blank=True, null=True)
     auditor = models.CharField(max_length=255, blank=True, null=True)
+    auditor_number = models.CharField(max_length=30, blank=True, null=True)
     partner = JSONField(blank=True, null=True, default=dict)
     shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
                                 blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
@@ -115,6 +116,7 @@ class Audit(EtoolsDataMartModel):
         depends = (Partner, )
         mapping = dict(
             auditor="agreement.auditor_firm.name",
+            auditor_number="agreement.auditor_firm.vendor_number",
             agreement="agreement.order_number",  # PurchaseOrder
             financial_findings='_impl.financial_findings',
             audit_opinion='_impl.audit_opinion',

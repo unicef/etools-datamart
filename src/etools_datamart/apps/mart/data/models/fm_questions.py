@@ -232,9 +232,8 @@ class FMOntrackLoader(EtoolsLoader):
                 values["entity"] = rec.cp_output.name
                 values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
                 values["output"] = rec.cp_output.wbs
-                values["programme_areas"] = None
-                # values["programme_areas"] = ', '.join([
-                #     f'{output.programme_area_code} {output.programme_area_name}' for output in rec.cp_output])
+                values["programme_areas"] = ', '.join([
+                    f'{output.programme_area_code} {output.programme_area_name}' for output in rec.cp_output])
                 values["entity_type"] = "CP Output"
             elif rec.intervention:
                 values["entity"] = rec.intervention.reference_number

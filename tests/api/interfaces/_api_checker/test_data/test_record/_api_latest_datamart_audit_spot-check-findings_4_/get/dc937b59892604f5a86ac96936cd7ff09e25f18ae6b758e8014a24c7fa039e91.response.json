@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"bf0380bb16889e5e6fcef207c4ccbcf0\"",
+        "ETag": "\"efdc1fbb72e4bf8f7c386352c8630dab\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
         "service": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
@@ -12,7 +12,7 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "804",
+        "Content-Length": "826",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -27,6 +27,7 @@
         "created": null,
         "status": null,
         "auditor": null,
+        "auditor_number": null,
         "partner": {
             "id": 100,
             "name": "Partner1",
