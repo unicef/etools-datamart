@@ -301,6 +301,7 @@ class Engagement(EtoolsDataMartModel):
                                                                        max_digits=20)
     agreement = models.CharField(max_length=300, blank=True, null=True)
     auditor = models.CharField(max_length=255, blank=True, null=True)
+    auditor_number = models.CharField(max_length=30, blank=True, null=True)
     amount_refunded = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     authorized_officers = models.TextField(blank=True, null=True)
     authorized_officers_data = JSONField(blank=True, null=True)
@@ -400,6 +401,7 @@ class Engagement(EtoolsDataMartModel):
             active_pd_data="i",
             agreement="agreement.order_number",  # PurchaseOrder
             auditor="agreement.auditor_firm.name",
+            auditor_number="agreement.auditor_firm.vendor_number",
             authorized_officers="-",
             reference_number="-",
             engagement_attachments='-',
