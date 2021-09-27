@@ -65,6 +65,7 @@ jobs:
           key: source-{{ .Branch }}--{{ checksum "Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
       - run:
           name: run tests
+          no_output_timeout: 30m
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
