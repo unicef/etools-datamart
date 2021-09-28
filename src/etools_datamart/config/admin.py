@@ -31,6 +31,7 @@ DEFAULT_INDEX_SECTIONS = {
     'Logs': ['tracking', ],
     'System': ['django_celery_beat', 'post_office',
                'unicef_rest_framework.PeriodicTask'],
+
     'Other': [],
     '_hidden_': ['sites', 'unicef_rest_framework.Application',
                  'oauth2_provider', 'social_django',
