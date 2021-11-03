@@ -163,7 +163,7 @@ class AuditEngagement(models.TenantModel):
     amount_refunded = models.DecimalField(max_digits=20, decimal_places=2)
     additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2)
     justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2)
-    write_off_required = models.DecimalField(max_digits=20, decimal_places=2)
+    write_off_required = models.DecimalField(max_digits=20, decimal_places=2)  # impairment
     cancel_comment = models.TextField()
     explanation_for_additional_information = models.TextField()
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='AuditEngagement_partner')
