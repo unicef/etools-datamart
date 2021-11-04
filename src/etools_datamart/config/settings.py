@@ -15,6 +15,7 @@ DEVELOPMENT_DIR = PACKAGE_DIR.parent.parent
 env = environ.Env(API_PREFIX=(str, '/api/'),
                   ABSOLUTE_BASE_URL=(str, 'http://localhost:8000'),
                   ANALYTICS_CODE=(str, ""),
+                  ADMIN_EMAILS=(list, []),
                   AUTOCOMMIT_EXTERNAL=(bool, True),
                   AZURE_CLIENT_ID=(str, ''),
                   AZURE_CLIENT_SECRET=(str, ''),
@@ -83,6 +84,8 @@ env = environ.Env(API_PREFIX=(str, '/api/'),
                   REQUEST_TIMEOUT=(int, 300),
                   )
 
+
+ADMIN_EMAILS = env.list('ADMIN_EMAILS')#.split(',')
 DEBUG = env.bool('DEBUG')
 if DEBUG:  # pragma: no cover
     env_file = env.path('ENV_FILE_PATH', default=DEVELOPMENT_DIR / '.env')
