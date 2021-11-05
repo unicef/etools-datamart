@@ -4,7 +4,10 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.core.mail import send_mail
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.functional import cached_property
 
 from strategy_field.utils import import_by_name
@@ -89,6 +92,18 @@ class Export(AbstractPreload):
         url = "{}{}".format(settings.ABSOLUTE_BASE_URL, self.url)
         response = super().run(target=url, params=params, pre_save=save_file)
         return response
+
+
+@receiver(post_save, sender=Export)
+def update_stock(sender, instance, created, **kwargs):
+    if created and settings.ADMIN_EMAILS:
+        send_mail(
+            'New Export {} {}'.format(instance.name, instance.format),
+            'New export has been added {}.'.format(instance.url),
+            'datamart@unicef.org',
+            settings.ADMIN_EMAILS,
+            fail_silently=False,
+        )
 
 
 def get_storage():

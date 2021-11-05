@@ -1,6 +1,10 @@
+from django.db.models import F
+
 from unicef_rest_framework.views import URFReadOnlyModelViewSet
 
 from etools_datamart.api.endpoints.etools import serializers
+from etools_datamart.api.endpoints.etools.serializers import EToolsSerializer
+from etools_datamart.api.endpoints.etools.serializers.base import CountrySerializerMixin
 from etools_datamart.apps.sources.source_prp import models
 
 
@@ -445,14 +449,41 @@ class UnicefProgrammedocumentUnicefOfficersViewSet(URFReadOnlyModelViewSet):
 
 
 class UnicefProgressreportSerializer(serializers.ModelSerializer):
+    programme_document = serializers.ReadOnlyField(source='programme_document.reference_number')
+    workspace = serializers.ReadOnlyField(source='programme_document.workspace.title')
+
     class Meta:
         model = models.UnicefProgressreport
-        exclude = ()
+        fields = (
+            'created',
+            'modified',
+            'partner_contribution_to_date',
+            'challenges_in_the_reporting_period',
+            'proposed_way_forward',
+            'status',
+            'start_date',
+            'end_date',
+            'due_date',
+            'submission_date',
+            'review_date',
+            'review_overall_status',
+            'sent_back_feedback',
+            'report_number',
+            'report_type',
+            'is_final',
+            'narrative',
+            'programme_document',
+            'workspace'
+        )
 
 
 class UnicefProgressreportViewSet(URFReadOnlyModelViewSet):
     serializer_class = UnicefProgressreportSerializer
-    queryset = models.UnicefProgressreport.objects.all()
+    queryset = models.UnicefProgressreport.objects.annotate(workspace=F('programme_document__workspace__title'))
+
+    filter_fields = (
+        'workspace',
+    )
 
 
 class UnicefProgressreportattachmentSerializer(serializers.ModelSerializer):
