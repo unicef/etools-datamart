@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"4d081dad0fae64dab5c68e59241eaa58\"",
+        "ETag": "\"958ede2a1ed6086487386c8d3120975c\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet",
         "service": "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet",
@@ -36,7 +36,7 @@
         "numerator_label": null,
         "baseline_numerator": null,
         "target_numerator": null,
-        "last_modify_date": "04 Aug 2021 21:02:24"
+        "last_modify_date": "20 Nov 2021 14:24:21"
     },
     "content_type": "application/json"
 }

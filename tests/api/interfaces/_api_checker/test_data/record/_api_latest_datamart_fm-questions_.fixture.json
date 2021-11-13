@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-08-04T21:02:21.613Z",
+                "last_modify_date": "2021-11-20T14:16:50.708Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -27,7 +27,7 @@
                 "specific_details": null,
                 "date_of_capture": null,
                 "monitoring_activity_end_date": null,
-                "location": null,
+                "location": {},
                 "site": null,
                 "category": null,
                 "information_source": null,
