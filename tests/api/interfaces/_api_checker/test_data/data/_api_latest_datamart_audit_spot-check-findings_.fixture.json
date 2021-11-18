@@ -6,7 +6,7 @@
                 "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:01:50.152Z",
+                    "last_modify_date": "2021-11-18T22:36:13.935Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -15,6 +15,7 @@
                     "created": null,
                     "status": null,
                     "auditor": null,
+                    "auditor_number": null,
                     "partner": {
                         "id": 100,
                         "name": "Partner1",
@@ -34,6 +35,7 @@
                     "sections_data": {},
                     "high_priority_findings": {},
                     "low_priority_findings": {},
+                    "date_of_draft_report_to_ip": null,
                     "action_points": {},
                     "action_points_data": {}
                 }
@@ -43,7 +45,7 @@
                 "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:01:50.175Z",
+                    "last_modify_date": "2021-11-18T22:36:13.938Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -52,6 +54,7 @@
                     "created": null,
                     "status": null,
                     "auditor": null,
+                    "auditor_number": null,
                     "partner": {
                         "id": 100,
                         "name": "Partner1",
@@ -71,6 +74,7 @@
                     "sections_data": {},
                     "high_priority_findings": {},
                     "low_priority_findings": {},
+                    "date_of_draft_report_to_ip": null,
                     "action_points": {},
                     "action_points_data": {}
                 }
@@ -80,7 +84,7 @@
                 "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:01:50.182Z",
+                    "last_modify_date": "2021-11-18T22:36:13.939Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -89,6 +93,7 @@
                     "created": null,
                     "status": null,
                     "auditor": null,
+                    "auditor_number": null,
                     "partner": {
                         "id": 100,
                         "name": "Partner1",
@@ -108,6 +113,7 @@
                     "sections_data": {},
                     "high_priority_findings": {},
                     "low_priority_findings": {},
+                    "date_of_draft_report_to_ip": null,
                     "action_points": {},
                     "action_points_data": {}
                 }

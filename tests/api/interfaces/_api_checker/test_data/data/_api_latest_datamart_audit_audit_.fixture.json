@@ -6,7 +6,7 @@
                 "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:01:46.095Z",
+                    "last_modify_date": "2021-11-18T22:36:13.303Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -16,6 +16,7 @@
                     "status": null,
                     "agreement": null,
                     "auditor": null,
+                    "auditor_number": null,
                     "partner": {
                         "id": 100,
                         "name": "Partner1",
@@ -45,6 +46,7 @@
                     "financial_findings_amount": null,
                     "key_internal_control_by_category": {},
                     "key_internal_control_count": null,
+                    "date_of_draft_report_to_ip": null,
                     "action_points": {},
                     "action_points_data": {}
                 }
@@ -54,7 +56,7 @@
                 "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:01:46.110Z",
+                    "last_modify_date": "2021-11-18T22:36:13.305Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -64,6 +66,7 @@
                     "status": null,
                     "agreement": null,
                     "auditor": null,
+                    "auditor_number": null,
                     "partner": {
                         "id": 100,
                         "name": "Partner1",
@@ -93,6 +96,7 @@
                     "financial_findings_amount": null,
                     "key_internal_control_by_category": {},
                     "key_internal_control_count": null,
+                    "date_of_draft_report_to_ip": null,
                     "action_points": {},
                     "action_points_data": {}
                 }
@@ -102,7 +106,7 @@
                 "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:01:46.125Z",
+                    "last_modify_date": "2021-11-18T22:36:13.308Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -112,6 +116,7 @@
                     "status": null,
                     "agreement": null,
                     "auditor": null,
+                    "auditor_number": null,
                     "partner": {
                         "id": 100,
                         "name": "Partner1",
@@ -141,6 +146,7 @@
                     "financial_findings_amount": null,
                     "key_internal_control_by_category": {},
                     "key_internal_control_count": null,
+                    "date_of_draft_report_to_ip": null,
                     "action_points": {},
                     "action_points_data": {}
                 }
