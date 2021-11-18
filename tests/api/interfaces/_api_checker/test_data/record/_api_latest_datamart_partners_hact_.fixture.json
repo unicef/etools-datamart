@@ -1,0 +1,28 @@
+{
+    "record": {
+        "master": {
+            "model": "data.partnerhact",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2021-11-20T03:05:38.305Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "name": "name003",
+                "vendor_number": null,
+                "short_name": null,
+                "type_of_assessment": null,
+                "partner_type": null,
+                "cso_type": null,
+                "rating": null,
+                "hact_values": null,
+                "hact_min_requirements": {},
+                "programmatic_visits": {},
+                "spot_checks": {}
+            }
+        },
+        "deps": []
+    }
+}

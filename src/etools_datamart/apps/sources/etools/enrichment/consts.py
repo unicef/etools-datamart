@@ -171,6 +171,8 @@ class AuditEngagementConsts:
              (TYPE_SPECIAL_AUDIT, _('Special Audit')),
              )
 
+    CANCELLED = 'cancelled'
+
     DISPLAY_STATUSES = Choices(
         ('partner_contacted', _('IP Contacted')),
         ('field_visit', _('Field Visit')),
@@ -180,7 +182,7 @@ class AuditEngagementConsts:
         ('comments_received_by_unicef', _('Comments Received from UNICEF')),
         ('report_submitted', _('Report Submitted')),
         ('final', _('Final Report')),
-        ('cancelled', _('Cancelled')),
+        (CANCELLED, _('Cancelled')),
     )
 
 
@@ -302,3 +304,6 @@ class RiskConst:
         (3, 'significant', 'Significant'),
         (4, 'high', 'High'),
     )
+
+class FieldMonitoringPlanningMonitoringactivityConst:
+    STATUS_COMPLETED = 'completed'

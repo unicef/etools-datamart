@@ -271,6 +271,13 @@ class PartnerAdmin(DataModelAdmin):
     search_fields = ('vendor_number', 'name',)
 
 
+@register(models.PartnerHact)
+class PartnerHactAdmin(DataModelAdmin):
+    list_display = ('name', 'partner_type', 'vendor_number', 'cso_type', 'rating')
+    list_filter = ('partner_type', 'cso_type', 'rating')
+    search_fields = ('vendor_number', 'name',)
+
+
 @register(models.PartnerStaffMember)
 class PartnerStaffMemberAdmin(DataModelAdmin):
     list_display = (
