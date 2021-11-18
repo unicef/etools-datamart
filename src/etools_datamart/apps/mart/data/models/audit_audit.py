@@ -100,6 +100,7 @@ class Audit(EtoolsDataMartModel):
     key_internal_control_by_category = JSONField(blank=True, null=True, default=dict)
     key_internal_control_count = models.IntegerField(blank=True, null=True)
 
+    date_of_draft_report_to_ip = models.DateField(blank=True, null=True)
 
     # Action Points
     action_points = JSONField(blank=True, null=True, default=dict)
