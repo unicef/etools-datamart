@@ -25,17 +25,24 @@ setup local en0 alias
 Each time eTools data models changes, it's needed to rebuild the datamart models and the sql
 needed to run the tests
 
+also atm we need django 3.1 to read data [collation error]
+
     pip install django==3.1.13
+
+update schema & check clean step
+
     cd db
     sh update_etools_schema.sh (gives error)
     sh update_etools_schema.sh -nd
-    open /Users/ddinicola/workspace/etools-datamart/src/etools_datamart/apps/multitenant/postgresql/tenant3.sql
-    
-     
-    
+
 Looks like there's a record failing import Intervention CHD/SSFA201853
 while replacing chad with lebanon, 256 constraint raises
 needed to replace it manually in dump 3
 (Accord de financement pour la mise en oeuvre des activites de soins de sante et de nutrition d’urgence aux refugies, deplaces internes, retournes et populations hotes affectes par la crise nigeriane dans la region du Lac )
 
-also atm we need django 3.1 to read data
+    open /Users/ddinicola/workspace/etools-datamart/src/etools_datamart/apps/multitenant/postgresql/tenant3.sql
+    
+fix tests & update update COUNT_PARTNERS_PARTNERORGANIZATION
+    
+    pytest tests/api/interfaces/
+    pytest tests/multitenant/
