@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-08-04T21:02:17.736Z",
+                "last_modify_date": "2021-11-18T22:36:18.121Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -15,6 +15,7 @@
                 "status": null,
                 "agreement": null,
                 "auditor": null,
+                "auditor_number": null,
                 "partner": {
                     "id": 100,
                     "name": "Partner1",
@@ -44,6 +45,7 @@
                 "financial_findings_amount": null,
                 "key_internal_control_by_category": {},
                 "key_internal_control_count": null,
+                "date_of_draft_report_to_ip": null,
                 "action_points": {},
                 "action_points_data": {}
             }

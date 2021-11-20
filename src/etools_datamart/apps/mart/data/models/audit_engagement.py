@@ -71,7 +71,7 @@ class EngagementMixin:
             )
             extra = risk.extra
             value = risk.value
-            text = AuditRisk.VALUES[value]
+            text = RiskConst.VALUES[value]
         except AuditRisk.DoesNotExist:
             extra, value, text = "", "", ""
         return value, extra, text

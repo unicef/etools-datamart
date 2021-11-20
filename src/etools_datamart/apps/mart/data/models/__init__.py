@@ -16,6 +16,7 @@ from .hact_detail import HACTHistory  # noqa
 from .intervention import Intervention, InterventionByLocation  # noqa
 from .location import GatewayType, GeoName, Location  # noqa
 from .partner import Partner  # noqa
+from .partner_hact import PartnerHact  # noqa
 from .partners_agreement import Agreement  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
 from .partners_staffmember import PartnerStaffMember  # noqa

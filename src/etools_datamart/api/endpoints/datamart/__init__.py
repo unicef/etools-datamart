@@ -17,6 +17,7 @@ from .intervention import InterventionByLocationViewSet, InterventionViewSet
 from .location import GatewayTypeViewSet, LocationSiteViewSet, LocationViewSet
 from .office import OfficeViewSet
 from .partners_agreement import PartnerAgreementViewSet
+from .partners_hact import PartnerHactViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
 from .partners_partner import PartnerViewSet
 from .partners_staffmember import PartnerStaffMemberViewSet

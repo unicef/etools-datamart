@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"efdc1fbb72e4bf8f7c386352c8630dab\"",
+        "ETag": "\"6a23c220e4c5b8a9c4aab195eca5f04d\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
         "service": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
@@ -12,14 +12,14 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "826",
+        "Content-Length": "860",
         "Referrer-Policy": "same-origin"
     },
     "data": {
         "id": 4,
         "partner_name": "Partner1",
         "url": "https://etools.unicef.org/ap/spot-checks/None/overview",
-        "last_modify_date": "04 Aug 2021 21:02:19",
+        "last_modify_date": "18 Nov 2021 22:36:18",
         "country_name": "bolivia",
         "schema_name": "bolivia",
         "area_code": "",
@@ -47,6 +47,7 @@
         "sections_data": {},
         "high_priority_findings": {},
         "low_priority_findings": {},
+        "date_of_draft_report_to_ip": null,
         "action_points": {},
         "action_points_data": {}
     },

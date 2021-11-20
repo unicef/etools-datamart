@@ -1,0 +1,76 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.partnerhact",
+                "pk": 1,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-11-20T03:05:26.274Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "name": "name000",
+                    "vendor_number": null,
+                    "short_name": null,
+                    "type_of_assessment": null,
+                    "partner_type": null,
+                    "cso_type": null,
+                    "rating": null,
+                    "hact_values": null,
+                    "hact_min_requirements": {},
+                    "programmatic_visits": {},
+                    "spot_checks": {}
+                }
+            },
+            {
+                "model": "data.partnerhact",
+                "pk": 2,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-11-20T03:05:26.280Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "name": "name001",
+                    "vendor_number": null,
+                    "short_name": null,
+                    "type_of_assessment": null,
+                    "partner_type": null,
+                    "cso_type": null,
+                    "rating": null,
+                    "hact_values": null,
+                    "hact_min_requirements": {},
+                    "programmatic_visits": {},
+                    "spot_checks": {}
+                }
+            },
+            {
+                "model": "data.partnerhact",
+                "pk": 3,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2021-11-20T03:05:26.285Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "name": "name002",
+                    "vendor_number": null,
+                    "short_name": null,
+                    "type_of_assessment": null,
+                    "partner_type": null,
+                    "cso_type": null,
+                    "rating": null,
+                    "hact_values": null,
+                    "hact_min_requirements": {},
+                    "programmatic_visits": {},
+                    "spot_checks": {}
+                }
+            }
+        ],
+        "deps": []
+    }
+}
