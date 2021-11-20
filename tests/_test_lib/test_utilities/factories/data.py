@@ -205,6 +205,13 @@ class PartnerFactory(DataMartModelFactory):
         model = models.Partner
 
 
+class PartnerHACTFactory(DataMartModelFactory):
+    name = factory.Sequence(lambda n: "name%03d" % n)
+
+    class Meta:
+        model = models.PartnerHact
+
+
 class TravelActivityFactory(DataMartModelFactory):
     travel_reference_number = factory.Sequence(lambda n: "name%03d" % n)
 

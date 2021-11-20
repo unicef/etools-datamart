@@ -295,14 +295,6 @@ class AuditMicroassessment(models.TenantModel):
 
 
 class AuditRisk(models.TenantModel):
-    VALUES = {
-        0: 'N/A',
-        1: 'Low',
-        2: 'Medium',
-        3: 'Significant',
-        4: 'High',
-    }
-
     id = models.IntegerField(primary_key=True)
     value = models.SmallIntegerField(blank=True, null=True)
     extra = models.JSONField(blank=True, null=True)
@@ -437,6 +429,8 @@ class FieldMonitoringDataCollectionActivityquestion(models.TenantModel):
     monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_monitoring_activity')
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_partner', blank=True, null=True)
     question = models.ForeignKey('FieldMonitoringSettingsQuestion', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_question')
+    is_hact = models.BooleanField()
+    text = models.TextField()
 
     class Meta:
         managed = False
@@ -579,24 +573,24 @@ class FieldMonitoringPlanningMonitoringactivityTeamMembers(models.TenantModel):
         unique_together = (('monitoringactivity', 'user'),)
 
 
-# class FieldMonitoringPlanningMonitoringactivitygroup(models.TenantModel):
-#     id = models.IntegerField(primary_key=True)
-#     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroup_partner')
-#
-#     class Meta:
-#         managed = False
-#         db_table = 'field_monitoring_planning_monitoringactivitygroup'
+class FieldMonitoringPlanningMonitoringactivitygroup(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroup_partner')
+
+    class Meta:
+        managed = False
+        db_table = 'field_monitoring_planning_monitoringactivitygroup'
 
 
-# class FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc(models.TenantModel):
-#     id = models.IntegerField(primary_key=True)
-#     monitoringactivitygroup = models.ForeignKey(FieldMonitoringPlanningMonitoringactivitygroup, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup')
-#     monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivity')
-#
-#     class Meta:
-#         managed = False
-#         db_table = 'field_monitoring_planning_monitoringactivitygroup_monitorin69fc'
-#         unique_together = (('monitoringactivity', 'monitoringactivitygroup'),)
+class FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    monitoringactivitygroup = models.ForeignKey(FieldMonitoringPlanningMonitoringactivitygroup, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup')
+    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivity')
+
+    class Meta:
+        managed = False
+        db_table = 'field_monitoring_planning_monitoringactivitygroup_monitorin69fc'
+        unique_together = (('monitoringactivity', 'monitoringactivitygroup'),)
 
 
 class FieldMonitoringPlanningQuestiontemplate(models.TenantModel):
@@ -782,7 +776,7 @@ class FundsFundscommitmentitem(models.TenantModel):
     commitment_amount = models.DecimalField(max_digits=20, decimal_places=2)
     commitment_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     amount_changed = models.DecimalField(max_digits=20, decimal_places=2)
-    line_item_text = models.CharField(max_length=255, blank=True, null=True)
+    line_item_text = models.CharField(max_length=255)
     fund_commitment = models.ForeignKey(FundsFundscommitmentheader, models.DO_NOTHING, related_name='FundsFundscommitmentitem_fund_commitment')
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -1785,8 +1779,8 @@ class ReportsResult(models.TenantModel):
     modified = models.DateTimeField()
     humanitarian_marker_code = models.CharField(max_length=255, blank=True, null=True)
     humanitarian_marker_name = models.CharField(max_length=255, blank=True, null=True)
-    # programme_area_code = models.CharField(max_length=16, blank=True, null=True)
-    # programme_area_name = models.CharField(max_length=255, blank=True, null=True)
+    programme_area_code = models.CharField(max_length=16, blank=True, null=True)
+    programme_area_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
