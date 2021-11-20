@@ -42,6 +42,7 @@ setup(name=name,
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Framework :: Django',
+          'Framework :: Django :: 3.2',
           'License :: OSI Approved :: MIT',
           'Natural Language :: English',
           'Programming Language :: Python :: 3',
