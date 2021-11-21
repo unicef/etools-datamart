@@ -89,7 +89,7 @@ class PartnerHactLoader(EtoolsLoader):
         for visit in tpm_visits:
             visits.append({
                 'module': 'tpm',
-                'end_date': str(visit.date),
+                'end_date': str(visit.activity_ptr.date),
                 'reference_number': visit.tpm_visit.reference_number
             })
 
