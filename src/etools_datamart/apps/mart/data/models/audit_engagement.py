@@ -58,10 +58,13 @@ class EngagementMixin:
                 'id': p.pk,
                 'source_id': p.source_id,
                 'type': p.partner_type,
-                'cso_type': p.cso_type
+                'cso_type': p.cso_type,
+                'reported_cy': str(p.reported_cy),
+                'total_ct_cy': str(p.total_ct_cy),
             }
         except Partner.DoesNotExist:
-            return {key: 'N/A' for key in ['name', 'vendor_number', 'id', 'source_id', 'type', 'cso_type']}
+            return {key: 'N/A' for key in ['name', 'vendor_number', 'id', 'source_id', 'type', 'cso_type',
+                                           'reported_cy', 'total_ct_cy']}
 
     def _get_risk(self, record: AuditEngagement, **kwargs):
         try:
