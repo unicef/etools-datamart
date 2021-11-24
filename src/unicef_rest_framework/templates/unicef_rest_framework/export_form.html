@@ -20,7 +20,7 @@
     <div class="container">
         <div class="col-lg-12">
             <div class="col-lg-8">
-                {% if not request.user.is_superuser %}
+                {% if not object.pk or object.as_user == request.user  or request.user.is_superuser %}
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
