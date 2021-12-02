@@ -200,7 +200,7 @@ class FMQuestion(EtoolsDataMartModel):
             question_collection_methods="-",
             collection_method="started_checklist.method.name",
             answer="value",
-            summary_answer="activity_question.overall_finding.value",
+            summary_answer="value",
             monitoring_activity_id="activity_question.monitoring_activity.pk",
             monitoring_activity="activity_question.monitoring_activity.number",
             specific_details="i",
@@ -209,7 +209,7 @@ class FMQuestion(EtoolsDataMartModel):
             location="-",
             site="activity_question.monitoring_activity.locationsite.name",
             category='activity_question.question.category.name',
-            information_source='activity_question.monitoring_activity.information_source',
+            information_source='started_checklist.information_source',
             is_hact='activity_question.question.is_hact',
         )
 
