@@ -376,7 +376,6 @@ class FMOntrack(EtoolsDataMartModel):
         mapping = dict(
             entity="i",
             entity_type="i",
-            narrative_finding="i",
             overall_finding_rating="-",
             monitoring_activity="monitoring_activity.number",
             monitoring_activity_id="monitoring_activity.pk",
