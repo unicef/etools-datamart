@@ -367,7 +367,7 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M',  # '10/25/06 14:30'
     '%m/%d/%y',  # '10/25/06'
 ]
-EMAIL_BACKEND = 'post_office.backends.EmailBackend'
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_HOST = env('EMAIL_HOST')
@@ -460,10 +460,8 @@ CELERY_EMAIL_TASK_CONFIG = {
     'queue' : 'mail',
 }
 
-CELERY_EMAIL_BACKEND = env.str(
-    'CELERY_EMAIL_BACKEND',
-    default='post_office.backends.EmailBackend',
-)
+CELERY_EMAIL_BACKEND = env.str('EMAIL_BACKEND', default='post_office.backends.EmailBackend')
+
 CELERY_EMAIL_CHUNK_SIZE = 10
 EXPORT_NOTIFICATIONS_ENABLED = env.bool(
     'EXPORT_NOTIFICATIONS_ENABLED',
