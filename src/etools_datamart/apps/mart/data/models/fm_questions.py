@@ -6,10 +6,8 @@ from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringDataCollectionActivityoverallfinding,
+    FieldMonitoringDataCollectionChecklistoverallfinding,
     FieldMonitoringDataCollectionFinding,
-    FieldMonitoringPlanningMonitoringactivityCpOutputs,
-    FieldMonitoringPlanningMonitoringactivityInterventions,
-    FieldMonitoringPlanningMonitoringactivityPartners,
     FieldMonitoringSettingsOption,
     FieldMonitoringSettingsQuestionMethods,
     ReportsSector,
@@ -41,6 +39,33 @@ class FMQuestionLoader(EtoolsLoader):
         return ", ".join(
             [m.method.name for m in methods_qs.all()]
         )
+
+    # def get_summary_answer(
+    #         self,
+    #         record: FieldMonitoringDataCollectionFinding,
+    #         values: dict,
+    #         **kwargs,
+    # ):
+    #     overall_finding = FieldMonitoringDataCollectionActivityoverallfinding.objects.filter(
+    #         partner=record.activity_question.partner,
+    #         intervention=record.activity_question.intervention,
+    #         cp_output=record.activity_question.cp_output,
+    #         monitoring_activity=record.activity_question.monitoring_activity
+    #     ).first()
+    #     return getattr(overall_finding, 'narrative_finding', None)
+
+    def get_overall_finding(
+            self,
+            record: FieldMonitoringDataCollectionFinding,
+            values: dict,
+            **kwargs,
+    ):
+        checklist_finding = FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
+            partner=record.activity_question.partner,
+            intervention=record.activity_question.intervention,
+            cp_output=record.activity_question.cp_output,
+            started_checklist=record.started_checklist).first()
+        return getattr(checklist_finding, 'narrative_finding', None)
 
     def process_country(self):
         for rec in self.get_queryset():
@@ -143,6 +168,11 @@ class FMQuestion(EtoolsDataMartModel):
         null=True,
         blank=True,
     )
+    overall_finding = JSONField(
+        verbose_name=_("Overall Finding"),
+        null=True,
+        blank=True,
+    )
     monitoring_activity_id = models.IntegerField(
         verbose_name=_("Monitoring Activity ID"),
         null=True,
@@ -200,7 +230,8 @@ class FMQuestion(EtoolsDataMartModel):
             question_collection_methods="-",
             collection_method="started_checklist.method.name",
             answer="value",
-            summary_answer="value",
+            summary_answer="activity_question.FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question.value",
+            overall_finding="-",
             monitoring_activity_id="activity_question.monitoring_activity.pk",
             monitoring_activity="activity_question.monitoring_activity.number",
             specific_details="i",

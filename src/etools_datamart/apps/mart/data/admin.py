@@ -228,7 +228,8 @@ class LocationsiteAdmin(DataModelAdmin):
 
 @register(models.FMOntrack)
 class FMOntrackAdmin(DataModelAdmin):
-    list_display = ('entity', 'entity_type', 'narrative_finding', 'overall_finding_rating', 'status')
+    list_display = ('monitoring_activity', 'entity', 'entity_type', 'narrative_finding', 'overall_finding_rating',
+                    'status')
 
 
 @register(models.FMOptions)
@@ -239,7 +240,8 @@ class FMOptionsAdmin(DataModelAdmin):
 
 @register(models.FMQuestion)
 class FMQuestionAdmin(DataModelAdmin):
-    list_display = ('title', 'entity_instance', 'entity_type', 'answer_type', 'collection_method', 'answer')
+    list_display = ('monitoring_activity', 'title', 'entity_instance', 'entity_type', 'answer_type',
+                    'collection_method', 'answer', 'summary_answer', 'overall_finding')
 
 
 @register(models.FundsReservation)

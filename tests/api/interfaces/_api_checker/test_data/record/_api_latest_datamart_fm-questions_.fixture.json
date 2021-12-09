@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-11-20T14:16:50.708Z",
+                "last_modify_date": "2021-12-09T17:05:49.615Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -22,6 +22,7 @@
                 "collection_method": null,
                 "answer": null,
                 "summary_answer": null,
+                "overall_finding": null,
                 "monitoring_activity_id": null,
                 "monitoring_activity": null,
                 "specific_details": null,
