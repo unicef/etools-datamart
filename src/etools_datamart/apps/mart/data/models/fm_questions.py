@@ -6,14 +6,12 @@ from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringDataCollectionActivityoverallfinding,
+    FieldMonitoringDataCollectionChecklistoverallfinding,
     FieldMonitoringDataCollectionFinding,
-    FieldMonitoringPlanningMonitoringactivityCpOutputs,
-    FieldMonitoringPlanningMonitoringactivityInterventions,
-    FieldMonitoringPlanningMonitoringactivityPartners,
     FieldMonitoringSettingsOption,
     FieldMonitoringSettingsQuestionMethods,
     ReportsSector,
-    FieldMonitoringDataCollectionChecklistoverallfinding)
+)
 
 
 class FMQuestionLoader(EtoolsLoader):
