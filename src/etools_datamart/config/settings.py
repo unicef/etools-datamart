@@ -522,7 +522,7 @@ EXPLORER_FROM_EMAIL = 'datamart@unicef.io'
 # WARNINGS: UNICEF pipeline does not work if other provider
 # are added to UNICEF AD. Dio not change below settings
 #
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = False
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['username']
 SOCIAL_AUTH_SANITIZE_REDIRECTS = False
