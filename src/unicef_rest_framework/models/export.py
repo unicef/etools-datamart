@@ -8,7 +8,9 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.html import strip_tags
 
 from strategy_field.utils import import_by_name
 
@@ -97,13 +99,13 @@ class Export(AbstractPreload):
 @receiver(post_save, sender=Export)
 def update_stock(sender, instance, created, **kwargs):
     if created and settings.ADMIN_EMAILS:
-        send_mail(
-            'New Export {} {}'.format(instance.name, instance.format),
-            'New export has been added {}.'.format(instance.url),
-            'datamart@unicef.org',
-            settings.ADMIN_EMAILS,
-            fail_silently=False,
-        )
+        admin_link = reverse('admin:%s_%s_change' % (instance._meta.app_label, instance._meta.model_name),
+                             args=[instance.pk, ])
+        subject = 'New Export {} {}'.format(instance.name, instance.format)
+        html_message = 'New export has been added <a href=https://datamart.unicef.io{}>link</a>.'.format(admin_link)
+        plain_message = strip_tags(html_message)
+        from_email = 'datamart@unicef.org'
+        send_mail(subject, plain_message, from_email, settings.ADMIN_EMAILS, html_message=html_message)
 
 
 def get_storage():
