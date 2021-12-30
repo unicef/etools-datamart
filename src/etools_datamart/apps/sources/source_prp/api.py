@@ -451,12 +451,17 @@ class UnicefProgrammedocumentUnicefOfficersViewSet(URFReadOnlyModelViewSet):
 class UnicefProgressreportSerializer(serializers.ModelSerializer):
     programme_document = serializers.ReadOnlyField(source='programme_document.reference_number')
     workspace = serializers.ReadOnlyField(source='programme_document.workspace.title')
+    business_area_code = serializers.ReadOnlyField(source='programme_document.workspace.business_area_code')
+    partner = serializers.ReadOnlyField(source='programme_document.partner.title')
+    partner_type = serializers.ReadOnlyField(source='programme_document.partner.partner_type')
 
     class Meta:
         model = models.UnicefProgressreport
         fields = (
             'created',
             'modified',
+            'partner',
+            'partner_type',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -473,7 +478,8 @@ class UnicefProgressreportSerializer(serializers.ModelSerializer):
             'is_final',
             'narrative',
             'programme_document',
-            'workspace'
+            'workspace',
+            'business_area_code',
         )
 
 
