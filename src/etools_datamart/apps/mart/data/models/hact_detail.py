@@ -48,25 +48,25 @@ class HACTDetailLoader(EtoolsLoader):
 
     def get_pv_completed_year(self, record, values, field_name):
         ret = 0
-        for i in range(1, 4):
+        for i in range(1, 5):
             ret += get_item(self.data1, 'Programmatic Visits Completed Q%s' % i, 0)
         return ret
 
     def get_pv_planned_year(self, record, values, field_name):
         ret = 0
-        for i in range(1, 4):
+        for i in range(1, 5):
             ret += get_item(self.data1, 'Programmatic Visits Planned Q%s' % i, 0)
         return ret
 
     def get_sc_completed_year(self, record, values, field_name):
         ret = 0
-        for i in range(1, 4):
+        for i in range(1, 5):
             ret += get_item(self.data1, 'Spot Checks Completed Q%s' % i, 0)
         return ret
 
     def get_sc_planned_year(self, record, values, field_name):
         ret = 0
-        for i in range(1, 4):
+        for i in range(1, 5):
             ret += get_item(self.data1, 'Spot Checks Planned Q%s' % i, 0) or 0
         return ret
 
