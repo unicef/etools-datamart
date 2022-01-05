@@ -104,6 +104,9 @@ class HACTDetailLoader(EtoolsLoader):
             sc_planned_q4=get_item(self.data1, 'Spot Checks Planned Q4'),
             # sc_planned_year=get_item(self.data1, ''),
             shared_ip=get_item(self.data1, 'Shared IP'),
+
+            liqu_1oct_30sep=get_item(self.data1, 'Liquidations 1 OCT - 30 SEP'),
+            ct_jan_dec=get_item(self.data1, 'Cash Transfers Jan - Dec'),
         )
         self.mapping.update(hact_values)
         ret = super().get_values(record)
@@ -172,17 +175,11 @@ class HACTHistory(EtoolsDataMartModel):
         queryset = HactHacthistory.objects.select_related('partner').all
         sync_deleted_records = lambda loader: False
         truncate = True
-        # key = lambda loader, record: dict(country_name=loader.context['country'].name,
-        #                                   schema_name=loader.context['country'].schema_name,
-        #                                   year=loader.context['today'].year)
         mapping = dict(partner_name='partner.name',
                        partner_type='partner.partner_type',
                        vendor_number='partner.vendor_number',
                        partner_source_id='partner.id',
-                       shared_ip='N/A',
                        assessment_type='partner.type_of_assessment',
                        year='year',
                        risk_rating='partner.rating',
-                       liqu_1oct_30sep='partner.reported_cy',
-                       ct_jan_dec='partner.total_ct_ytd',
                        )

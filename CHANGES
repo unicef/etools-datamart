@@ -1,6 +1,11 @@
+3.29.2
+------
+* fixed hact history service (liquidation & cash transfer)
+
+
 3.29.1
 ------
-* fixed hact history service
+* fixed hact history service (totals by quarter)
 
 
 3.29
