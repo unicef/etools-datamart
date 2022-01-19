@@ -308,6 +308,8 @@ class Engagement(EtoolsDataMartModel):
     amount_refunded = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     authorized_officers = models.TextField(blank=True, null=True)
     authorized_officers_data = JSONField(blank=True, null=True)
+    sections = models.TextField(blank=True, null=True)
+    sections_data = JSONField(blank=True, null=True, default=dict)
     cancel_comment = models.TextField(blank=True, null=True)
     created = models.DateField(blank=True, null=True)
     date_of_cancel = models.DateField(null=True, blank=True)
