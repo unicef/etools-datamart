@@ -12,8 +12,15 @@ class TravelActivityLoader(EtoolsLoader):
         for record in qs.order_by('id', '-date'):
             record.travel = record.travels.order_by('id').first()
             if record.travel:
-                for location in record.locations.order_by('id'):
-                    record.location = location
+                if record.locations.exists():
+                    for location in record.locations.order_by('id'):
+                        record.location = location
+                        filters = self.config.key(self, record)
+                        values = self.get_values(record)
+                        op = self.process_record(filters, values)
+                        self.increment_counter(op)
+                else:
+                    record.location = None
                     filters = self.config.key(self, record)
                     values = self.get_values(record)
                     op = self.process_record(filters, values)
@@ -52,7 +59,7 @@ class TravelActivity(LocationMixin, EtoolsDataMartModel):
         key = lambda loader, record: dict(country_name=loader.context['country'].name,
                                           schema_name=loader.context['country'].schema_name,
                                           source_id=record.id,
-                                          location_source_id=record.location.id,
+                                          location_source_id=record.location.id if record.location else None,
                                           )
         mapping = add_location_mapping({
             'source_travel_id': 'travel.id',

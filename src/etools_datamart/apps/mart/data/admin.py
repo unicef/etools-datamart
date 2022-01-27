@@ -374,7 +374,7 @@ class TripAdmin(DataModelAdmin):
 
 @register(models.Engagement)
 class EngagementAdmin(DataModelAdmin):
-    list_display = ('agreement', 'engagement_type', 'status', 'start_date',)
+    list_display = ('reference_number', 'agreement', 'engagement_type', 'status', 'start_date', 'sections')
     list_filter = ('engagement_type', 'status', 'start_date')
 
 
