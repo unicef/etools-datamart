@@ -171,7 +171,17 @@ class AuditEngagementConsts:
              (TYPE_SPECIAL_AUDIT, _('Special Audit')),
              )
 
+    PARTNER_CONTACTED = 'partner_contacted'
+    REPORT_SUBMITTED = 'report_submitted'
+    FINAL = 'final'
     CANCELLED = 'cancelled'
+
+    STATUSES = Choices(
+        (PARTNER_CONTACTED, _('IP Contacted')),
+        (REPORT_SUBMITTED, _('Report Submitted')),
+        (FINAL, _('Final Report')),
+        (CANCELLED, _('Cancelled')),
+    )
 
     DISPLAY_STATUSES = Choices(
         ('partner_contacted', _('IP Contacted')),
@@ -182,8 +192,19 @@ class AuditEngagementConsts:
         ('comments_received_by_unicef', _('Comments Received from UNICEF')),
         ('report_submitted', _('Report Submitted')),
         ('final', _('Final Report')),
-        (CANCELLED, _('Cancelled')),
+        ('cancelled', _('Cancelled')),
     )
+    DISPLAY_STATUSES_DATES = {
+        DISPLAY_STATUSES.partner_contacted: 'partner_contacted_at',
+        DISPLAY_STATUSES.field_visit: 'date_of_field_visit',
+        DISPLAY_STATUSES.draft_issued_to_partner: 'date_of_draft_report_to_ip',
+        DISPLAY_STATUSES.comments_received_by_partner: 'date_of_comments_by_ip',
+        DISPLAY_STATUSES.draft_issued_to_unicef: 'date_of_draft_report_to_unicef',
+        DISPLAY_STATUSES.comments_received_by_unicef: 'date_of_comments_by_unicef',
+        DISPLAY_STATUSES.report_submitted: 'date_of_report_submit',
+        DISPLAY_STATUSES.final: 'date_of_final_report',
+        DISPLAY_STATUSES.cancelled: 'date_of_cancel'
+    }
 
 
 class ActionPointConsts:
@@ -304,6 +325,7 @@ class RiskConst:
         (3, 'significant', 'Significant'),
         (4, 'high', 'High'),
     )
+
 
 class FieldMonitoringPlanningMonitoringactivityConst:
     STATUS_COMPLETED = 'completed'
