@@ -376,6 +376,7 @@ class TripAdmin(DataModelAdmin):
 class EngagementAdmin(DataModelAdmin):
     list_display = ('reference_number', 'agreement', 'engagement_type', 'status', 'start_date', 'sections')
     list_filter = ('engagement_type', 'status', 'start_date')
+    search_fields = ('reference_number',)
 
 
 @register(models.Grant)
@@ -415,26 +416,30 @@ class AuditResultAdmin(DataModelAdmin):
 
 @register(models.SpotCheckFindings)
 class SpotCheckAdmin(DataModelAdmin):
-    list_display = ('__str__',)
-    list_filter = ()
+    list_display = ('engagement_type', 'status', 'sections')
+    list_filter = ('engagement_type', 'status')
+    search_fields = ('reference_number',)
 
 
 @register(models.MicroAssessment)
 class MicroAssessmentAdmin(DataModelAdmin):
-    list_display = ('__str__',)
-    list_filter = ()
+    list_display = ('engagement_type', 'status')
+    list_filter = ('engagement_type', 'status')
+    search_fields = ('reference_number',)
 
 
 @register(models.Audit)
 class AuditAdmin(DataModelAdmin):
-    list_display = ('__str__',)
-    list_filter = ()
+    list_display = ('engagement_type', 'status', 'sections')
+    list_filter = ('engagement_type', 'status', )
+    search_fields = ('reference_number',)
 
 
 @register(models.AuditSpecial)
 class AuditSpecialAdmin(DataModelAdmin):
-    list_display = ('__str__',)
-    list_filter = ()
+    list_display = ('engagement_type', 'status', 'sections')
+    list_filter = ('engagement_type', 'status')
+    search_fields = ('reference_number',)
 
 
 @register(models.Result)

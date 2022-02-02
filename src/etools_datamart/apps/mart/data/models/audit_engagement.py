@@ -128,6 +128,22 @@ class EngagementMixin:
         values['action_points_data'] = by_status + by_priority
         return list(qs.order_by(aggr).values(aggr).annotate(count=Count(aggr)))
 
+    def get_status(self, record, values, **kwargs):
+        if record.status != AuditEngagementConsts.STATUSES.partner_contacted:
+            return record.status
+        if record.date_of_comments_by_unicef:
+            return record.DISPLAY_STATUSES.comments_received_by_unicef
+        elif record.date_of_draft_report_to_unicef:
+            return record.DISPLAY_STATUSES.draft_issued_to_unicef
+        elif record.date_of_comments_by_ip:
+            return record.DISPLAY_STATUSES.comments_received_by_partner
+        elif record.date_of_draft_report_to_ip:
+            return record.DISPLAY_STATUSES.draft_issued_to_partner
+        elif record.date_of_field_visit:
+            return record.DISPLAY_STATUSES.field_visit
+
+        return record.status
+
 
 class EngagementlLoader(EngagementMixin, EtoolsLoader):
     def get_queryset(self):
@@ -399,7 +415,7 @@ class Engagement(EtoolsDataMartModel):
 
     class Options:
         source = AuditEngagement
-        sync_deleted_records = lambda a: False
+        sync_deleted_records = lambda a: False  # noqa
         depends = (Partner,)
         mapping = dict(
             active_pd="-",
