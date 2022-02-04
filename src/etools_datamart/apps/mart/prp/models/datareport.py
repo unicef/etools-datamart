@@ -24,6 +24,7 @@ class DataReportLoader(PrpBaseLoader):
             submitted_by=F('indicator_report__progress_report__submitted_by__username'),
 
             performance_indicator=F('indicator_report__reportable__blueprint__title'),
+            target=F('indicator_report__reportable__target'),
 
             cluster_indicator=F('indicator_report__reportable__is_cluster_indicator'),
             indicator_type=F('indicator_report__reportable__blueprint__display_type'),
