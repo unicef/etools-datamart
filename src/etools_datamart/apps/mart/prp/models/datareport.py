@@ -31,6 +31,7 @@ class DataReportLoader(PrpBaseLoader):
             high_frequency=F('indicator_report__reportable__is_unicef_hf_indicator'),
             means_of_verification=F('indicator_report__reportable__means_of_verification'),
             achievement_in_reporting_period=F('indicator_report__total'),
+            total_cumulative_progress=F('indicator_report__reportable__total'),
 
             report_number=F('indicator_report__progress_report__report_number'),
             due_date=F('indicator_report__progress_report__due_date'),
