@@ -3,8 +3,6 @@ from django.db.models import F
 from unicef_rest_framework.views import URFReadOnlyModelViewSet
 
 from etools_datamart.api.endpoints.etools import serializers
-from etools_datamart.api.endpoints.etools.serializers import EToolsSerializer
-from etools_datamart.api.endpoints.etools.serializers.base import CountrySerializerMixin
 from etools_datamart.apps.sources.source_prp import models
 
 
@@ -105,6 +103,17 @@ class CoreLocationSerializer(serializers.ModelSerializer):
 class CoreLocationViewSet(URFReadOnlyModelViewSet):
     serializer_class = CoreLocationSerializer
     queryset = models.CoreLocation.objects.all()
+
+
+class CoreLocationWorkspacesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CoreLocationWorkspaces
+        exclude = ()
+
+
+class CoreLocationWorkspacesViewSet(URFReadOnlyModelViewSet):
+    serializer_class = CoreLocationWorkspacesSerializer
+    queryset = models.CoreLocationWorkspaces.objects.all()
 
 
 class CorePrproleSerializer(serializers.ModelSerializer):
@@ -449,6 +458,7 @@ class UnicefProgrammedocumentUnicefOfficersViewSet(URFReadOnlyModelViewSet):
 
 
 class UnicefProgressreportSerializer(serializers.ModelSerializer):
+    model = models.UnicefProgressreport
     programme_document = serializers.ReadOnlyField(source='programme_document.reference_number')
     workspace = serializers.ReadOnlyField(source='programme_document.workspace.title')
     business_area_code = serializers.ReadOnlyField(source='programme_document.workspace.business_area_code')
@@ -486,7 +496,6 @@ class UnicefProgressreportSerializer(serializers.ModelSerializer):
 class UnicefProgressreportViewSet(URFReadOnlyModelViewSet):
     serializer_class = UnicefProgressreportSerializer
     queryset = models.UnicefProgressreport.objects.annotate(workspace=F('programme_document__workspace__title'))
-
     filter_fields = (
         'workspace',
     )

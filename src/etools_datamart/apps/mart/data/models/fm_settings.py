@@ -10,7 +10,7 @@ class LocationsiteLoader(EtoolsLoader):
 
     def get_parent(self, record: FieldMonitoringSettingsLocationsite, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
-        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'gateway_name']
+        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name']
 
         try:
             instance = Location.objects.get(
@@ -21,9 +21,9 @@ class LocationsiteLoader(EtoolsLoader):
                 'id': instance.pk,
                 'name': instance.name,
                 'p_code': instance.p_code,
-                'level': instance.level,
+                'admin_level': instance.admin_level,
                 'source_id': instance.source_id,
-                'gateway_name': instance.gateway.name
+                'location_type': instance.admin_level_name
             }
         except Location.DoesNotExist:
             return {key: 'N/A' for key in loc_fields}

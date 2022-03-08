@@ -28,8 +28,8 @@ def add_location_mapping(base):
     ret.update(**{'location_source_id': 'location.id',
                   'location_name': 'location.name',
                   'location_pcode': 'location.p_code',
-                  'location_level': 'location.level',
-                  'location_levelname': 'location.gateway.name',
+                  'location_level': 'location.admin_level',
+                  'location_levelname': 'location.admin_level_name',
                   'location': _get_location
                   })
     return ret
@@ -53,13 +53,13 @@ class NestedLocationLoaderMixin:
     def get_locations(self, record, values: dict, **kwargs):
         locs = []
         locations = getattr(record, self.location_m2m_field)
-        for location in locations.select_related('gateway').order_by('id'):
+        for location in locations.order_by('id'):
             location_data = dict(
                 source_id=location.id,
                 name=location.name,
                 pcode=location.p_code,
-                level=location.level,
-                levelname=location.gateway.name,
+                level=location.admin_level,
+                levelname=location.admin_level_name,
                 latitude=None,
                 longitude=None
             )

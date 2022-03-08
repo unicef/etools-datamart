@@ -112,6 +112,7 @@ class AttachmentsAttachmentflat(models.TenantModel):
     source = models.CharField(max_length=150)
     pd_ssfa = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
+    ip_address = models.GenericIPAddressField()
 
     class Meta:
         managed = False
@@ -163,7 +164,7 @@ class AuditEngagement(models.TenantModel):
     amount_refunded = models.DecimalField(max_digits=20, decimal_places=2)
     additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2)
     justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2)
-    write_off_required = models.DecimalField(max_digits=20, decimal_places=2)  # impairment
+    write_off_required = models.DecimalField(max_digits=20, decimal_places=2)
     cancel_comment = models.TextField()
     explanation_for_additional_information = models.TextField()
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='AuditEngagement_partner')
@@ -173,6 +174,7 @@ class AuditEngagement(models.TenantModel):
     shared_ip_with = models.TextField()  # This field type is a guess.
     exchange_rate = models.DecimalField(max_digits=20, decimal_places=2)
     currency_of_report = models.CharField(max_length=5, blank=True, null=True)
+    reference_number = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -295,14 +297,6 @@ class AuditMicroassessment(models.TenantModel):
 
 
 class AuditRisk(models.TenantModel):
-    VALUES = {
-        0: 'N/A',
-        1: 'Low',
-        2: 'Medium',
-        3: 'Significant',
-        4: 'High',
-    }
-
     id = models.IntegerField(primary_key=True)
     value = models.SmallIntegerField(blank=True, null=True)
     extra = models.JSONField(blank=True, null=True)
@@ -437,6 +431,8 @@ class FieldMonitoringDataCollectionActivityquestion(models.TenantModel):
     monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_monitoring_activity')
     partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_partner', blank=True, null=True)
     question = models.ForeignKey('FieldMonitoringSettingsQuestion', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_question')
+    is_hact = models.BooleanField()
+    text = models.TextField()
 
     class Meta:
         managed = False
@@ -782,7 +778,7 @@ class FundsFundscommitmentitem(models.TenantModel):
     commitment_amount = models.DecimalField(max_digits=20, decimal_places=2)
     commitment_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     amount_changed = models.DecimalField(max_digits=20, decimal_places=2)
-    line_item_text = models.CharField(max_length=255, blank=True, null=True)
+    line_item_text = models.CharField(max_length=255)
     fund_commitment = models.ForeignKey(FundsFundscommitmentheader, models.DO_NOTHING, related_name='FundsFundscommitmentitem_fund_commitment')
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -896,7 +892,6 @@ class LocationsCartodbtable(models.TenantModel):
     pcode_col = models.CharField(max_length=254)
     parent_code_col = models.CharField(max_length=254)
     color = models.CharField(max_length=7)
-    location_type = models.ForeignKey('LocationsGatewaytype', models.DO_NOTHING, related_name='LocationsCartodbtable_location_type')
     level = models.IntegerField()
     lft = models.IntegerField()
     parent = models.ForeignKey('self', models.DO_NOTHING, related_name='LocationsCartodbtable_parent', blank=True, null=True)
@@ -905,6 +900,8 @@ class LocationsCartodbtable(models.TenantModel):
     remap_table_name = models.CharField(max_length=254, blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    admin_level = models.SmallIntegerField()
+    admin_level_name = models.CharField(max_length=64)
 
     class Meta:
         managed = False
@@ -930,7 +927,6 @@ class LocationsLocation(models.TenantModel):
     longitude = models.FloatField(blank=True, null=True)
     p_code = models.CharField(max_length=32)
     point = models.TextField(blank=True, null=True)  # This field type is a guess.
-    gateway = models.ForeignKey(LocationsGatewaytype, models.DO_NOTHING, related_name='LocationsLocation_gateway')
     geom = models.TextField(blank=True, null=True)  # This field type is a guess.
     level = models.IntegerField()
     lft = models.IntegerField()
@@ -940,24 +936,13 @@ class LocationsLocation(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     is_active = models.BooleanField()
+    admin_level = models.SmallIntegerField(blank=True, null=True)
+    admin_level_name = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'locations_location'
-        unique_together = (('gateway', 'name', 'p_code'),)
-
-
-class LocationsLocationremaphistory(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    comments = models.TextField(blank=True, null=True)
-    created = models.DateTimeField()
-    new_location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='LocationsLocationremaphistory_new_location')
-    old_location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='LocationsLocationremaphistory_old_location')
-    modified = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'locations_locationremaphistory'
+        unique_together = (('admin_level', 'name', 'p_code'),)
 
 
 class ManagementSectionhistory(models.TenantModel):
@@ -1287,6 +1272,7 @@ class PartnersInterventionresultlink(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_interventionresultlink'
+        unique_together = (('cp_output', 'intervention'),)
 
 
 class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
@@ -1785,8 +1771,8 @@ class ReportsResult(models.TenantModel):
     modified = models.DateTimeField()
     humanitarian_marker_code = models.CharField(max_length=255, blank=True, null=True)
     humanitarian_marker_name = models.CharField(max_length=255, blank=True, null=True)
-    # programme_area_code = models.CharField(max_length=16, blank=True, null=True)
-    # programme_area_name = models.CharField(max_length=255, blank=True, null=True)
+    programme_area_code = models.CharField(max_length=16, blank=True, null=True)
+    programme_area_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -2077,6 +2063,7 @@ class UnicefAttachmentsAttachment(models.TenantModel):
     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='UnicefAttachmentsAttachment_content_type', blank=True, null=True)
     file_type = models.ForeignKey('UnicefAttachmentsFiletype', models.DO_NOTHING, related_name='UnicefAttachmentsAttachment_file_type', blank=True, null=True)
     uploaded_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='UnicefAttachmentsAttachment_uploaded_by', blank=True, null=True)
+    ip_address = models.GenericIPAddressField()
 
     class Meta:
         managed = False
@@ -2092,6 +2079,7 @@ class UnicefAttachmentsAttachmentflat(models.TenantModel):
     uploaded_by = models.CharField(max_length=255)
     created = models.CharField(max_length=50)
     attachment = models.ForeignKey(UnicefAttachmentsAttachment, models.DO_NOTHING, related_name='UnicefAttachmentsAttachmentflat_attachment')
+    ip_address = models.GenericIPAddressField()
 
     class Meta:
         managed = False

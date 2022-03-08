@@ -75,6 +75,11 @@ class CoreLocationAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
+@register(models.CoreLocationWorkspaces)
+class CoreLocationWorkspacesAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
 @register(models.CorePrprole)
 class CorePrproleAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
@@ -293,3 +298,4 @@ class UnicefReportingperioddatesAdmin(DatamartSourceModelAdmin, ModelAdmin):
 @register(models.UnicefSection)
 class UnicefSectionAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
+

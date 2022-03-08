@@ -34,7 +34,6 @@ router.register(r'datamart/audit/spot-check-findings', endpoints.SpotCheckFindin
 router.register(r'datamart/actionpoints', endpoints.ActionPointViewSet)
 router.register(r'datamart/locations', endpoints.LocationViewSet)
 router.register(r'datamart/location-sites', endpoints.LocationSiteViewSet)
-router.register(r'datamart/gateway-type', endpoints.GatewayTypeViewSet)
 router.register(r'datamart/office', endpoints.OfficeViewSet)
 router.register(r'datamart/fam-indicators', endpoints.FAMIndicatorViewSet)
 router.register(r'datamart/fm-questions', endpoints.FMQuestionViewSet)

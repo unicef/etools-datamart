@@ -63,8 +63,8 @@ class InterventionFactory(DataMartModelFactory):
     locations_data = [dict(source_id='1',
                            name="location.name",
                            pcode="location.p_code",
-                           level="location.level",
-                           levelname="location.gateway.name",
+                           level="location.admin_level",
+                           levelname="location.admin_level_name",
                            latitude="location.latitude",
                            longitude="location.longitude",
                            )]
@@ -101,7 +101,7 @@ class GatewayTypeFactory(DataMartModelFactory):
 
 
 class LocationFactory(DataMartModelFactory):
-    gateway = factory.SubFactory(GatewayTypeFactory)
+    # gateway = factory.SubFactory(GatewayTypeFactory)
     name = factory.Sequence(lambda n: "name%03d" % n)
     level = factory.Sequence(lambda n: n)
     lft = 1

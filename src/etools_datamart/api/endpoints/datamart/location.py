@@ -45,7 +45,6 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class LocationRamSerializer(serializers.ModelSerializer):
     geonameid = serializers.SerializerMethodField()
-    admin_level = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Location
@@ -58,16 +57,12 @@ class LocationRamSerializer(serializers.ModelSerializer):
             return obj.geoname.geoname_id
         return None
 
-    def get_admin_level(self, obj):
-        if obj.gateway:
-            return obj.gateway.admin_level
-        return None
-
 
 class LocationViewSet(common.DataMartViewSet):
     serializer_class = LocationSerializer
     queryset = models.Location.objects.all()
-    filter_fields = ('area_code', 'country_name', 'last_modify_date', 'gateway', 'parent', 'tree_id', 'is_active')
+    filter_fields = ('area_code', 'country_name', 'last_modify_date', 'admin_level', 'admin_level_name', 'parent',
+                     'tree_id', 'is_active')
     serializers_fieldsets = {'std': None,
                              'light': ('country_name', 'area_code', 'p_code', 'name'),
                              'gis': LocationSerializerGIS,
