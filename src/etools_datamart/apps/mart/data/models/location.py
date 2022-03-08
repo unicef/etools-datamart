@@ -109,7 +109,6 @@ class Location(EtoolsDataMartModel):
         ordering = ("name",)
 
     class Options:
-        depends = (GatewayType,)
         source = LocationsLocation
         queryset = lambda: LocationsLocation.objects.order_by('-parent')
         last_modify_field = 'modified'
