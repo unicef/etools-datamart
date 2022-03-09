@@ -8,7 +8,7 @@ from . import models
 @register(models.AuthUser)
 class AuthUserAdmin(EToolsModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
 
@@ -16,7 +16,7 @@ class AuthUserAdmin(EToolsModelAdmin):
 @register(models.UsersUserprofile)
 class UsersUserprofileAdmin(EToolsModelAdmin):
     list_display = ('country', 'office')
-    # search_fields = ('user__username', 'user__email')
+    search_fields = ('user__username', 'user__email')
 
 
 # @register(models.ActionPointsActionpoint)

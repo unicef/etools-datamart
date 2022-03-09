@@ -43,7 +43,6 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("params", ret, ids=ids)
 
 
-@pytest.mark.skip(reason="schema_check")
 @pytest.mark.django_db
 def test_etools_user_access_allowed_countries(params):
     # etools user has access same countries as in eTools app
