@@ -7,7 +7,7 @@
     <ul class="breadcrumb">
         <li class="active"><a href="{% url "home" %}">Home</a></li>
         <li class="active"><a href="{% url "profile" %}">Settings</a></li>
-        <li class="active"><a href="{% url 'urf:export-list' %}">Files</a></li>
+        <li class="active"><a href="{% url 'urf:export-list' %}">Exports</a></li>
         <li class="active"><a href="#">{{ form.instance }}</a></li>
     </ul>
 {% endblock %}
@@ -39,9 +39,16 @@
                 {% endif %}
             </div>
             <div class="col-lg-4">
+                <br>
+                {% if object.last_run %}
+                    <h4><b><a href="{% url "urf:export-fetch" object.id %}">Download</a></b></h4>
+                {% endif %}
+                <br><br>
+                <b>Selected Filters:</b>
                 <ul>{% for k,v in form.params.items %}
                     <li><strong>{{ k }}</strong>: {{ v }}</li>
                 {% endfor %}</ul>
+
             </div>
         </div>
     </div>
