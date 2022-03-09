@@ -151,8 +151,7 @@ class DateRangePickerField(forms.MultiValueField):
 class ExportForm(forms.ModelForm):
     class Meta:
         model = Export
-        exclude = ('content', 'as_user', 'status_code', 'response_ms', 'enabled',
-                   'url', 'response_length', 'last_run', 'params', 'etag')
+        fields = ('name', 'format', 'refresh', 'filename', 'save_as', 'enabled')
 
     def __init__(self, instance=None, url=None, params=None, **kwargs):
         if instance is None:
