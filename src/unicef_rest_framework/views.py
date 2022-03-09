@@ -3,7 +3,6 @@ from functools import lru_cache, reduce
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -228,6 +227,11 @@ class ExportObjectMixin(LoginRequiredMixin):
                      })
         return data
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if not self.request.user.is_superuser:
+            form.fields.pop('enabled')
+        return form
 
 class ExportCreate(ExportObjectMixin, CreateView):
 
