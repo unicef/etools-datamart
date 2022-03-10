@@ -29,10 +29,11 @@ def get_allowed_schemas(user):
         else:
             with conn.noschema():
                 aa = flatten(list(SchemaAccessControl.objects.filter(group__user=user).values_list('schemas')))
-                etools_user = UsersUserprofile.objects.filter(user__email=user.email).first()
+                etools_user = UsersUserprofile.objects.filter(user_id=user.pk).first()
                 if etools_user:
-                    etools_allowed = etools_user.countries_available.exclude(**settings.SCHEMA_EXCLUDE)
-                    aa.extend(set(etools_allowed.values_list('schema_name', flat=True)))
+                    etools_allowed = etools_user.UsersUserprofileCountriesAvailable_userprofile.exclude(
+                        **settings.SCHEMA_EXCLUDE)
+                    aa.extend(set(etools_allowed.values_list('country__schema_name', flat=True)))
             values = list(filter(None, aa))
         cache.set(key, list(values))
     return set(values)

@@ -1,31 +1,25 @@
-## Collaborate
+Contributing
+============
 
-### Prerequisites
-
- - [pipenv](https://github.com/pypa/pipenv)
- - [docker](https://www.docker.com/get-docker)
-
-
-setup local en0 alias
-
-    $ sudo ifconfig en0 alias 192.168.66.66
-
-### Initialize app
-
-   Create a `.env` file in the root folder based on the content for `.env.tpl`
-
-    $ pipenv sync
-    $ pipenv shell
-    $ ./manage.py init-setup --all
-    $ ./manage.py runserver
-
-
-### How to run tests
+eTools
+======
 
 Each time eTools data models changes, it's needed to rebuild the datamart models and the sql
 needed to run the tests
 
-also atm we need django 3.1 to read data [collation error]
+create or get a dump
+--------------------
+
+    pg_dump -Fc -Upostgres -a etools > etools_hope.sql
+
+update dump location env var
+----------------------------
+    ETOOLS_BACKUP
+
+update schema & check clean step
+--------------------------------
+
+Important: atm we need django 3.1 to read data [collation error]
 
     pip install django==3.1.13
 
@@ -46,3 +40,18 @@ fix tests & update update COUNT_PARTNERS_PARTNERORGANIZATION
     
     pytest tests/api/interfaces/
     pytest tests/multitenant/
+
+
+PRP
+===    
+    python manage.py inspectprp
+
+Initialize app
+==============
+
+   Create a `.env` file in the root folder based on the content for `.env.tpl`
+
+    $ pipenv sync
+    $ pipenv shell
+    $ ./manage.py init-setup --all
+    $ ./manage.py runserver

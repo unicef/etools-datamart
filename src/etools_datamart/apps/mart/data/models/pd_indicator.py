@@ -148,8 +148,8 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
 
             location_name='location.name',
             location_pcode='location.p_code',
-            location_level='location.level',
-            location_levelname='location.gateway.name',
+            location_level='location.admin_level',
+            location_levelname='location.admin_level_name',
             location=lambda loader, record: Location.objects.filter(source_id=record.id,
                                                                     schema_name=loader.context[
                                                                         'country'].schema_name).first(),

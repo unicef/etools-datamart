@@ -5,7 +5,7 @@
 {% block right %}
     <div class="center" id="login-menu">
         <div>
-            <h2><a href="{% url "social:begin" "azuread-tenant-oauth2" %}">Login with Azure</a></h2>
+            <h2><a href='{% url "social:begin" "azuread-tenant-oauth2" %}{% if request.GET.next %}?next={{request.GET.next}}{% endif %}'>Login with Azure</a></h2>
         </div>
         <div><h4>OR</h4></div>
         <div>

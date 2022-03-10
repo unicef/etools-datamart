@@ -89,7 +89,8 @@ class FMQuestionLoader(EtoolsLoader):
 
     def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
-        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'gateway_name', 'latitude', 'longitude']
+        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name',
+                      'latitude', 'longitude']
 
         try:
             instance = Location.objects.get(
@@ -100,9 +101,9 @@ class FMQuestionLoader(EtoolsLoader):
                 'id': instance.pk,
                 'name': instance.name,
                 'p_code': instance.p_code,
-                'level': instance.level,
+                'admin_level': instance.admin_level,
                 'source_id': instance.source_id,
-                'gateway_name': instance.gateway.name,
+                'location_type': instance.admin_level_name,
                 'latitude': instance.latitude,
                 'longitude': instance.longitude,
             }
@@ -297,7 +298,8 @@ class FMOntrackLoader(EtoolsLoader):
 
     def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
-        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'gateway_name', 'latitude', 'longitude']
+        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name',
+                      'latitude', 'longitude']
 
         try:
             instance = Location.objects.get(
@@ -308,9 +310,9 @@ class FMOntrackLoader(EtoolsLoader):
                 'id': instance.pk,
                 'name': instance.name,
                 'p_code': instance.p_code,
-                'level': instance.level,
+                'admin_level': instance.admin_level,
                 'source_id': instance.source_id,
-                'gateway_name': instance.gateway.name,
+                'location_type': instance.admin_level_name,
                 'latitude': instance.latitude,
                 'longitude': instance.longitude,
             }

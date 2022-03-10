@@ -15,7 +15,7 @@ class AuthUserAdmin(EToolsModelAdmin):
 
 @register(models.UsersUserprofile)
 class UsersUserprofileAdmin(EToolsModelAdmin):
-    list_display = ('user', 'country', 'office')
+    list_display = ('country', 'office')
     search_fields = ('user__username', 'user__email')
 
 

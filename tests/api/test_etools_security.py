@@ -75,16 +75,16 @@ def test_etools_user_access_allowed_countries(params):
     #                           'valid': ['bolivia', 'chad', 'lebanon']}
 
 
-@pytest.mark.parametrize("user_type,op,query,code,allowed", [(UserFactory, "=", "", 403, ""),
-                                                             (UserFactory, "=", "", 200, "bolivia"),
-                                                             (AdminFactory, "=", "", 200, ""),
-
-                                                             (UserFactory, "=", "lebanon", 200, "lebanon"),
-                                                             (UserFactory, "!=", "bolivia", 200, "lebanon"),
-                                                             (UserFactory, "!=", "bolivia", 200, "lebanon"),
-                                                             (UserFactory, "=", "lebanon", 403, "bolivia"),
-                                                             (UserFactory, "=", "bolivia", 403, ""),
-                                                             ])
+@pytest.mark.parametrize("user_type,op,query,code,allowed", [
+    # (UserFactory, "=", "", 403, ""),
+    (UserFactory, "=", "", 200, "bolivia"),
+    (AdminFactory, "=", "", 200, ""),
+    (UserFactory, "=", "lebanon", 200, "lebanon"),
+    (UserFactory, "!=", "bolivia", 200, "lebanon"),
+    (UserFactory, "!=", "bolivia", 200, "lebanon"),
+    # (UserFactory, "=", "lebanon", 403, "bolivia"),
+    (UserFactory, "=", "bolivia", 403, ""),
+])
 def test_access(db, user_type, op, query, code, allowed):
     # etools user has access same countries as in eTools app
     user = user_type()

@@ -78,7 +78,8 @@ class LocationLoader(EtoolsLoader):
         try:
             return super().load(**kwargs)
         finally:
-            Location.objects.batch_update_centroid()
+            pass
+            # Location.objects.batch_update_centroid()
 
 
 class Location(EtoolsDataMartModel):
@@ -87,7 +88,8 @@ class Location(EtoolsDataMartModel):
     longitude = models.FloatField(blank=True, null=True)
     p_code = models.CharField(max_length=32)
     point = geomodels.PointField(blank=True, null=True)
-    gateway = models.ForeignKey(GatewayType, models.DO_NOTHING, blank=True, null=True)
+    admin_level = models.SmallIntegerField(blank=True, null=True)
+    admin_level_name = models.CharField(max_length=64, blank=True, null=True)
     geom = geomodels.MultiPolygonField(geography=True, blank=True, null=True)
     geoname = models.ForeignKey("GeoName", models.DO_NOTHING, blank=True, null=True)
     level = models.IntegerField(db_index=True)
@@ -107,17 +109,15 @@ class Location(EtoolsDataMartModel):
         ordering = ("name",)
 
     class Options:
-        depends = (GatewayType,)
         source = LocationsLocation
         queryset = lambda: LocationsLocation.objects.order_by('-parent')
         last_modify_field = 'modified'
         exclude_from_compare = ['latitude', 'longitude', 'point', 'geoname']
         # sync_deleted_records = False
-        mapping = {'source_id': 'id',
-                   # 'area_code': lambda loader, record: loader.context['country'].business_area_code,
-                   'parent': '__self__',
-                   'gateway': GatewayType,
-                   }
+        mapping = {
+            'source_id': 'id',
+            'parent': '__self__',
+        }
 
     def __str__(self):
         return self.name

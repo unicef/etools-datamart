@@ -218,7 +218,7 @@ function drop(){
     echo "1.3 Restoring database"
 
     pg_restore -h ${PGHOST} -p ${PGPORT} \
-            --no-owner --role=${DATABASE_USER} \
+            --no-owner --disable-triggers --role=${DATABASE_USER} \
             --username=${DATABASE_USER} \
             -F c --dbname=${DATABASE_NAME} etools.dump || exit 1
 
@@ -362,7 +362,7 @@ function inspect(){
     fi
     cd $CURDIR/..
     echo "6.1 Inspect 'public' schema"
-    ./manage.py inspectschema --database etools > $MODEL_DIR/public_new.py
+    ./manage.py inspectschema --database etools --schema public > $MODEL_DIR/public_new.py
 
     echo "6.2 Inspect 'tenant' schema (${BASE_SCHEMA})"
     ./manage.py inspectschema --database etools --schema=${BASE_SCHEMA} > $MODEL_DIR/tenant_new.py

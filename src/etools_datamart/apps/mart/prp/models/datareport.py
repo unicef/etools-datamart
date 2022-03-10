@@ -31,6 +31,7 @@ class DataReportLoader(PrpBaseLoader):
             high_frequency=F('indicator_report__reportable__is_unicef_hf_indicator'),
             means_of_verification=F('indicator_report__reportable__means_of_verification'),
             achievement_in_reporting_period=F('indicator_report__total'),
+            total_cumulative_progress=F('indicator_report__reportable__total'),
 
             report_number=F('indicator_report__progress_report__report_number'),
             due_date=F('indicator_report__progress_report__due_date'),
@@ -44,9 +45,9 @@ class DataReportLoader(PrpBaseLoader):
             pd_output_narrative_assessment=F('indicator_report__narrative_assessment'),
             calculation_method_across_location=F('indicator_report__reportable__blueprint__calculation_formula_across_locations'),
             calculation_method_across_reporting_periods=F('indicator_report__reportable__blueprint__calculation_formula_across_periods'),
-            current_location=F('location__title'),
+            current_location=F('location__name'),
             p_code=F('location__p_code'),
-            admin_level=F('location__gateway__admin_level'),
+            admin_level=F('location__admin_level'),
 
         )
         return qs
@@ -66,15 +67,14 @@ class DataReportLoader(PrpBaseLoader):
 
     def get_locations(self, record: IndicatorIndicatorlocationdata, values, **kwargs):
         locs = []
-        qs = record.indicator_report.reportable.IndicatorReportablelocationgoal_reportable.select_related(
-            'location__gateway')
+        qs = record.indicator_report.reportable.IndicatorReportablelocationgoal_reportable.select_related('location')
         for goal in qs:
             locs.append(dict(
                 source_id=goal.location.id,
-                name=goal.location.title,
+                name=goal.location.name,
                 pcode=goal.location.p_code,
-                level=goal.location.level,
-                levelname=goal.location.gateway.name
+                level=goal.location.admin_level,
+                levelname=goal.location.admin_level_name
             ))
         values['locations_data'] = locs
         return ", ".join([loc['name'] for loc in locs])
