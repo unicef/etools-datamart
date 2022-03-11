@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django import forms
 from django.contrib import messages
 from django.contrib.admin import helpers
@@ -7,7 +9,6 @@ from django.template.defaultfilters import pluralize
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.http import urlquote
 from django.utils.translation import gettext_lazy as _
 
 from admin_extra_urls.decorators import button
@@ -123,7 +124,7 @@ class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
                 )
                 msg_dict = {
                     'name': opts.verbose_name,
-                    'obj': format_html('<a href="{}">{}</a>', urlquote(obj_url), obj),
+                    'obj': format_html('<a href="{}">{}</a>', quote(obj_url), obj),
                 }
                 msg = _('The {name} "{obj}" was added successfully.')
                 self.message_user(request, format_html(msg, **msg_dict), messages.SUCCESS)

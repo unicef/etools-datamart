@@ -3,7 +3,7 @@ from django.utils.functional import cached_property
 
 
 class Command(LabelCommand):
-    requires_system_checks = False
+    requires_system_checks = []
     help = "Trigger celery with selected task"
     args = "[task]"
     label = 'task'

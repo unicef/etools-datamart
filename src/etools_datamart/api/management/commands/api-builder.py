@@ -47,7 +47,7 @@ class BuildException(Exception):
 
 class Command(LabelCommand):
     help = "Process a Django Model and creates related ViewSet/Serializer "
-    requires_system_checks = False
+    requires_system_checks = []
     args = "[modelname]"
     label = 'model name'
 

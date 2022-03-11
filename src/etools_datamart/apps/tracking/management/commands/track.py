@@ -11,7 +11,7 @@ class Command(BaseCommand):
     args = ''
     help = ''
     requires_migrations_checks = False
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
 

@@ -60,7 +60,7 @@ class TripLoader(EtoolsLoader):
                 levelname=location.admin_level_name
             ))
         values['locations_data'] = locs
-        return ", ".join([l['name'] for l in locs])
+        return ", ".join([loc['name'] for loc in locs])
 
     def get_trip_attachments(self, record, values, **kwargs):
         return ",\n".join(list(map(lambda x: ":".join(x),
@@ -122,10 +122,8 @@ class Trip(EtoolsDataMartModel):
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True)
     misc_expenses = models.TextField(blank=True, null=True)
-    mode_of_travel = ArrayField(models.CharField(max_length=5,
-                                                 choices=ModeOfTravel.CHOICES),
-                                null=True, blank=True, db_index=True,
-                                verbose_name=_('Mode of Travel'))
+    mode_of_travel = ArrayField(models.CharField(max_length=5, choices=ModeOfTravel.CHOICES),
+                                null=True, blank=True, db_index=True, default=list, verbose_name=_('Mode of Travel'))
 
     office_name = models.CharField(max_length=300, blank=True, null=True)
     partner_name = models.CharField(max_length=300, blank=True, null=True)
@@ -165,6 +163,8 @@ class Trip(EtoolsDataMartModel):
 
     class Options:
         source = T2FTravelactivity
+        ordering_fields = ('id',)
+        ordering = 'id'
         # last_modify_field = 'modified'
         key = lambda loader, travel: dict(schema_name=loader.context['country'].schema_name,
                                           source_id=travel.id,

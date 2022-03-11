@@ -137,7 +137,7 @@ class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     @button()
     def doc(self, request, pk):
         service = Service.objects.get(pk=pk)
-        return HttpResponseRedirect(service.doc_url)
+        return HttpResponseRedirect(service.doc_url())
 
     @button()
     def api(self, request, pk):

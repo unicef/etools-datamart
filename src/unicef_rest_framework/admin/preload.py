@@ -58,7 +58,7 @@ class PreloadAdmin(ExtraUrlMixin, admin.ModelAdmin):
         preload.apply_async(args=[id])
 
     @button()
-    def check_url(self, request, id):
+    def checkurl(self, request, id):
         target = self.model.objects.get(id=id)
         try:
             target.check_url(True)

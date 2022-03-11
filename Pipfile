@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-azure-storage-blob = "<12.0"
+azure-storage-blob = "*"
 celery = "*"
 cryptography = "<3.4"  # PEP517 dependency
 dj-static = "*"
@@ -61,6 +61,9 @@ sentry-sdk = "*"
 swagger-spec-validator = "*"
 unicef-security = "*"
 xhtml2pdf = "*"
+
+reportlab = "<3.6"
+
 
 
 [dev-packages]
