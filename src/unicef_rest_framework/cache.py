@@ -5,8 +5,8 @@ from django.core.cache import caches
 from django.utils.translation import gettext as _
 
 from constance import config
-from humanize.i18n import ngettext
-from humanize.time import date_and_delta
+from humanize.i18n import _gettext
+from humanize.time import _date_and_delta
 from rest_framework_extensions.cache.decorators import CacheResponse
 from rest_framework_extensions.etag.decorators import ETAGProcessor
 from rest_framework_extensions.key_constructor import bits
@@ -52,7 +52,7 @@ def humanize_ttl(value, months=True):  # noqa
     is True, then a number of months (based on 30.5 days) will be used
     for fuzziness between years."""
     # now = _now()
-    date, delta = date_and_delta(value)
+    date, delta = _date_and_delta(value)
     if date is None:
         return value
 
@@ -70,44 +70,44 @@ def humanize_ttl(value, months=True):  # noqa
         elif seconds == 1:
             return _("1 second")
         elif seconds < 60:
-            return ngettext("%d second", "%d seconds", seconds) % seconds
+            return _gettext("%d second", "%d seconds", seconds) % seconds
         elif 60 <= seconds < 120:
             return _("1 minute")
         elif 120 <= seconds < 3600:
             minutes = seconds // 60
-            return ngettext("%d minute", "%d minutes", minutes) % minutes
+            return _gettext("%d minute", "%d minutes", minutes) % minutes
         elif 3600 <= seconds < 3600 * 2:
             return _("1 hour")
         elif 3600 < seconds:
             hours = seconds // 3600
-            return ngettext("%d hour", "%d hours", hours) % hours
+            return _gettext("%d hour", "%d hours", hours) % hours
     elif years == 0:
         if days == 1:
             return _("1 day")
         if not use_months:
-            return ngettext("%d day", "%d days", days) % days
+            return _gettext("%d day", "%d days", days) % days
         else:
             if not months:
-                return ngettext("%d day", "%d days", days) % days
+                return _gettext("%d day", "%d days", days) % days
             elif months == 1:
                 return _("a month")
             else:
-                return ngettext("%d month", "%d months", months) % months
+                return _gettext("%d month", "%d months", months) % months
     elif years == 1:
         if not months and not days:
             return _("a year")
         elif not months:
-            return ngettext("1 year, %d day", "1 year, %d days", days) % days
+            return _gettext("1 year, %d day", "1 year, %d days", days) % days
         elif use_months:
             if months == 1:
                 return _("1 year, 1 month")
             else:
-                return ngettext("1 year, %d month",
+                return _gettext("1 year, %d month",
                                 "1 year, %d months", months) % months
         else:
-            return ngettext("1 year, %d day", "1 year, %d days", days) % days
+            return _gettext("1 year, %d day", "1 year, %d days", days) % days
     else:
-        return ngettext("%d year", "%d years", years) % years
+        return _gettext("%d year", "%d years", years) % years
 
 
 class CacheVersionKeyBit(KeyBitBase):

@@ -37,7 +37,7 @@ def setup_logging(verbosity):
 class Command(BaseCommand):
     args = ''
     help = ''
-    requires_system_checks = False
+    requires_system_checks = []
     requires_migrations_checks = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
 

@@ -28,7 +28,7 @@ IGNORED_TABLES = RegexList([
 
 class Command(BaseCommand):
     help = "Introspects the database tables in the given database/schema and outputs a Django model module."
-    requires_system_checks = False
+    requires_system_checks = []
     stealth_options = ('table_name_filter',)
     db_module = 'etools_datamart.apps.multitenant'
 
