@@ -31,6 +31,7 @@
         <table class="container table">
 <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Description</th>
                     <th>Filename</th>
                     <th>Refresh</th>
@@ -44,6 +45,7 @@
 </thead>
             {% for export in export_list %}
                 <tr style="padding-bottom: 0;">
+                    <td>{{ export.id }}</td>
                     <td>
                         <a href="{% url "urf:export-update" export.id %}">{{ export.name }}</a>
                     </td>
@@ -59,8 +61,8 @@
                     </td>
                 </tr>
                 <tr style="border-top: 0;padding-top: 0;">
-                <td colspan="8" style="border-top: 0;padding-top: 0;"><small>{{ export.url }}</small>
-                </td>
+                    <td style="border-top: 0;padding-top: 0;"></td>
+                    <td colspan="8" style="border-top: 0;padding-top: 0;"><small>{{ export.url }}</small></td>
                 </tr>
             {% endfor %}
         </table>
