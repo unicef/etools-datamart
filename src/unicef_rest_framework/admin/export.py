@@ -35,7 +35,7 @@ class ExportAdmin(AdminFiltersMixin, ExtraUrlMixin, admin.ModelAdmin):
         'response_ms', 'api', 'download', 'queue_task'
     )
     date_hierarchy = 'last_run'
-    search_fields = ('url', 'name', 'filename')
+    search_fields = ('id', 'url', 'name', 'filename')
     list_filter = (
         ('as_user__username', ValueFilter.factory(title='User', lookup_name='icontains')),
         ('status_code', StatusFilter),
