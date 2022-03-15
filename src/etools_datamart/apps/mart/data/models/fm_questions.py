@@ -87,7 +87,7 @@ class FMQuestionLoader(EtoolsLoader):
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
-    def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
+    def get_location(self, record: FieldMonitoringDataCollectionFinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
         loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name',
                       'latitude', 'longitude']
@@ -95,7 +95,7 @@ class FMQuestionLoader(EtoolsLoader):
         try:
             instance = Location.objects.get(
                 schema_name=self.context['country'].schema_name,
-                source_id=record.monitoring_activity.location.pk
+                source_id=record.activity_question.monitoring_activity.location.pk
             )
             return {
                 'id': instance.pk,
