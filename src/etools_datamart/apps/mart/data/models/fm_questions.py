@@ -95,7 +95,7 @@ class FMQuestionLoader(EtoolsLoader):
         try:
             instance = Location.objects.get(
                 schema_name=self.context['country'].schema_name,
-                source_id=record.activity_question.monitoring_activity.pk
+                source_id=record.activity_question.monitoring_activity.location.pk
             )
             return {
                 'id': instance.pk,
