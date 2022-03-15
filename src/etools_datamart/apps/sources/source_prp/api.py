@@ -4,6 +4,7 @@ from unicef_rest_framework.views import URFReadOnlyModelViewSet
 
 from etools_datamart.api.endpoints.etools import serializers
 from etools_datamart.apps.sources.source_prp import models
+from etools_datamart.apps.sources.source_prp.const import PRP_URL
 
 
 class ClusterClusterSerializer(serializers.ModelSerializer):
@@ -502,9 +503,17 @@ class UnicefProgressreportViewSet(URFReadOnlyModelViewSet):
 
 
 class UnicefProgressreportattachmentSerializer(serializers.ModelSerializer):
+    pd = serializers.ReadOnlyField(source='progress_report.programme_document.reference_number')
+    pd_title = serializers.ReadOnlyField(source='progress_report.programme_document.title')
+    link = serializers.SerializerMethodField()
+
+    def get_link(self, obj):
+        if obj.file:
+            return f'{PRP_URL}{obj.file.url}'
+
     class Meta:
         model = models.UnicefProgressreportattachment
-        exclude = ()
+        fields = '__all__'
 
 
 class UnicefProgressreportattachmentViewSet(URFReadOnlyModelViewSet):
