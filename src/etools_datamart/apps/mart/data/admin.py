@@ -251,6 +251,7 @@ class FMQuestionAdmin(DataModelAdmin):
 
 @register(models.FundsReservation)
 class FundsReservationAdmin(DataModelAdmin):
+    search_fields = ('fr_number', 'wbs')
     list_display = ('country_name', 'schema_name', 'fr_number', 'fr_type', 'wbs')
     date_hierarchy = 'start_date'
 
