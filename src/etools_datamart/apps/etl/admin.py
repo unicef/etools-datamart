@@ -38,7 +38,7 @@ cache = caches['default']
 def queue(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
-        modeladmin.queue(request, pk=obj.pk, message=False)
+        modeladmin.queue(request, pk=obj.pk)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
                             messages.SUCCESS)
@@ -135,12 +135,10 @@ class JSONROWidget(forms.Textarea):
 
 @register(models.EtlTask)
 class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('task', '_last_run', '_status',
-                    '_total', 'time',
-                    '_last_success', '_last_failure',
-                    'unlock_task', 'queue_task', 'data'
-                    )
-
+    list_display = (
+        'task', '_last_run', '_status', '_total', 'time', '_last_success', '_last_failure', 'unlock_task',
+        'queue_task', 'data'
+    )
     date_hierarchy = 'last_run'
     actions = [mass_update, queue, truncate, unlock]
     mass_update_hints = ['status', ]
@@ -275,7 +273,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
     #     return self._changeform_view(request, object_id, form_url, extra_context)
 
     @button()
-    def check_running(self, request, message=True):
+    def checkrunning(self, request, message=True):
         # {'celery@gundam.local': [{'id': '7a570647-89cd-4c47-84e4-c8569ef48f28',
         #                           'name': 'load_data_hact',
         #                           'args': '()',
@@ -304,7 +302,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         models.EtlTask.objects.exclude(task__in=founds).update(task_id=None)
 
     @button()
-    def queue(self, request, pk, message=True):
+    def queue(self, request, pk):
         obj = self.get_object(request, pk)
         try:
             obj.status = 'QUEUED'
@@ -312,8 +310,7 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
             obj.save()
             task = app.tasks.get(obj.task)
             task.delay(run_type=RUN_QUEUED)
-            if message:
-                self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
+            self.message_user(request, f"Task '{obj.task}' queued", messages.SUCCESS)
         except Exception as e:  # pragma: no cover
             process_exception(e)
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)

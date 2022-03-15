@@ -51,7 +51,7 @@ class FundsReservation(EtoolsDataMartModel):
     overall_amount = models.DecimalField(max_digits=20, decimal_places=2)
     overall_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     due_date = models.DateField(blank=True, null=True)
-    line_item_text = models.CharField(max_length=255)
+    line_item_text = models.CharField(max_length=255, null=True, blank=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     donor = models.CharField(max_length=256, blank=True, null=True)
@@ -109,26 +109,10 @@ class FundsReservation(EtoolsDataMartModel):
             multi_curr_flag='fund_reservation.multi_curr_flag',
             completed_flag='fund_reservation.completed_flag',
             intervention_title="fund_reservation.intervention.title",
-            # delegated="fund_reservation.intervention.delegated",
             delegated='i',
             source_id='id',
             source_intervention_id='fund_reservation.id',
-            seen="=",
-            country_name="=",
-            schema_name="=",
-            area_code="=",
-            fr_ref_number="=",
-            line_item="=",
             wbs="wbs",
-            grant_number="=",
             fund="fund",
-            overall_amount="=",
-            overall_amount_dc="=",
-            due_date="=",
-            line_item_text="=",
-            created="=",
-            modified="=",
-            donor="=",
-            donor_code="=",
             pd_reference_number="fund_reservation.intervention.reference_number",
         )

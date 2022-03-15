@@ -52,8 +52,8 @@ jobs:
           CELERY_BROKER_URL: "redis://localhost:6379/0"
           CELERY_RESULT_BACKEND: "redis://localhost:6379/0"
           DEPLOY_BRANCHES: "develop|staging|master"
-      - image: circleci/redis:6-alpine
-      - image: circleci/postgres:12-alpine-postgis
+      - image: cimg/redis:6.2
+      - image: cimg/postgres:12.9-postgis
         environment:
           POSTGRES_USER: postgres
           PGUSER: postgres

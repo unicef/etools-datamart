@@ -5,7 +5,8 @@ from django.utils.safestring import mark_safe
 
 from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
-from adminfilters.filters import TextFieldFilter
+from adminfilters.mixin import AdminFiltersMixin
+from adminfilters.value import ValueFilter
 
 from unicef_rest_framework.utils import humanize_size
 
@@ -28,14 +29,15 @@ def queue(modeladmin, request, queryset):
         preload.apply_async(args=[t.id])
 
 
-class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
-    list_display = ('name', 'filename', 'as_user', 'format',
-                    'enabled', 'refresh', 'last_run',
-                    'status_code', 'size', 'response_ms', 'api', 'download', 'queue_task')
+class ExportAdmin(AdminFiltersMixin, ExtraUrlMixin, admin.ModelAdmin):
+    list_display = (
+        'name', 'filename', 'as_user', 'format', 'enabled', 'refresh', 'last_run', 'status_code', 'size',
+        'response_ms', 'api', 'download', 'queue_task'
+    )
     date_hierarchy = 'last_run'
-    search_fields = ('url', 'name', 'filename')
+    search_fields = ('id', 'url', 'name', 'filename')
     list_filter = (
-        TextFieldFilter.factory('as_user__username__icontains', "User"),
+        ('as_user__username', ValueFilter.factory(title='User', lookup_name='icontains')),
         ('status_code', StatusFilter),
         SizeFilter, 'enabled', 'refresh', 'format',
     )
@@ -91,7 +93,7 @@ class ExportAdmin(ExtraUrlMixin, admin.ModelAdmin):
         from unicef_rest_framework.tasks import export
         export(pk)
 
-    @button(label='download')
+    @button(label='Download')
     def _download(self, request, pk):
         obj = self.model.objects.get(id=pk)
         url = reverse('urf:export-fetch', args=[obj.pk])

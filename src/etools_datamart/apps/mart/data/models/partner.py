@@ -116,7 +116,8 @@ class Partner(EtoolsDataMartModel):
         models.CharField(max_length=20, blank=True, choices=PartnerOrganizationConst.AGENCY_CHOICES),
         verbose_name=_("Shared Partner"),
         blank=True,
-        null=True
+        null=True,
+        default=list
     )
     short_name = models.CharField(max_length=50, blank=True, null=True)
     street_address = models.CharField(max_length=500, blank=True, null=True)

@@ -1,4 +1,4 @@
-from django.utils.http import urlquote
+from urllib.parse import quote
 
 import pytest
 from rest_framework.test import APIClient
@@ -97,7 +97,7 @@ def test_permission_check_serializer_allow(client, allow_many_serializer):
     view = allow_many_serializer.service.viewset
     client.force_authenticate(allow_many_serializer.user)
     with user_allow_country(allow_many_serializer.user, 'bolivia'):
-        res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
+        res = client.get("%s?%s=short" % (url, quote(view.serializer_field_param)))
     assert res.status_code == 200
     # assert res.json()['detail'] == "You do not have permission to perform this action."
 
@@ -107,7 +107,7 @@ def test_permission_check_serializer_deny(client, allow_std_serializer):
     view = allow_std_serializer.service.viewset
     client.force_authenticate(allow_std_serializer.user)
     # with user_allow_country(allow_many_serializer.user, 'bolivia'):
-    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
+    res = client.get("%s?%s=short" % (url, quote(view.serializer_field_param)))
     assert res.status_code == 403, res.content
     assert res.json()['error'] == "Forbidden serializer 'short'"
 
@@ -117,7 +117,7 @@ def test_permission_check_serializer_any(client, allow_any_serializer):
     view = allow_any_serializer.service.viewset
     client.force_authenticate(allow_any_serializer.user)
     with user_allow_country(allow_any_serializer.user, 'bolivia'):
-        res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
+        res = client.get("%s?%s=short" % (url, quote(view.serializer_field_param)))
     assert res.status_code == 200, res.content
 
 
@@ -126,5 +126,5 @@ def test_permission_check_user(client, allow_any_serializer, user2):
     view = allow_any_serializer.service.viewset
     client.force_authenticate(user2)
 
-    res = client.get("%s?%s=short" % (url, urlquote(view.serializer_field_param)))
+    res = client.get("%s?%s=short" % (url, quote(view.serializer_field_param)))
     assert res.status_code == 403

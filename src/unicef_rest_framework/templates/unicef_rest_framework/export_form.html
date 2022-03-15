@@ -20,13 +20,14 @@
     <div class="container">
         <div class="col-lg-12">
             <div class="col-lg-8">
-                {% if not object.pk or object.as_user == request.user  or request.user.is_superuser %}
+                {% if not object.pk or object.as_user == request.user or request.user.is_superuser %}
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
                     <input type="submit" class="btn btn-primary" value="Save">
                 </form>
                 {% else %}
+                    <p><b>ID: </b>{{ object.name }}</p>
                     <h1><b>Name: </b>{{ object.name }}</h1>
                     <p><b>Url: </b>{{ object.url }}</p>
                     <p><b>As User: </b>{{ object.as_user }}</p>
@@ -44,6 +45,10 @@
                     <h4><b><a href="{% url "urf:export-fetch" object.id %}">Download</a></b></h4>
                 {% endif %}
                 <br><br>
+                {% if request.user.is_superuser %}
+                    <h4><b><a href="{% url "admin:unicef_rest_framework_export_change" object.id %}" target="_blank">Admin</a></b></h4>
+                    <br><br>
+                {% endif %}
                 <b>Selected Filters:</b>
                 <ul>{% for k,v in form.params.items %}
                     <li><strong>{{ k }}</strong>: {{ v }}</li>
