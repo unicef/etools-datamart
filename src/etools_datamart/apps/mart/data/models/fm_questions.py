@@ -95,7 +95,7 @@ class FMQuestionLoader(EtoolsLoader):
         try:
             instance = Location.objects.get(
                 schema_name=self.context['country'].schema_name,
-                source_id=record.activity_question.monitoring_activity.pk
+                source_id=record.activity_question.monitoring_activity.location.pk
             )
             return {
                 'id': instance.pk,
@@ -112,6 +112,7 @@ class FMQuestionLoader(EtoolsLoader):
 
 
 class FMQuestion(EtoolsDataMartModel):
+    question_id = models.IntegerField(null=True, blank=True)
     title = models.TextField(
         verbose_name=_("Question Title"),
         null=True,
@@ -221,6 +222,7 @@ class FMQuestion(EtoolsDataMartModel):
     class Options:
         source = FieldMonitoringDataCollectionFinding
         mapping = dict(
+            question_id="id",
             title="activity_question.question.text",
             answer_type="activity_question.question.answer_type",
             answer_options="-",

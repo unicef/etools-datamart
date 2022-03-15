@@ -1,3 +1,19 @@
+3.34
+------
+* PRP attachments improvements
+* FM On-track: fixed locations
+* FM Question: fixed locations
+* fr tweaks
+
+
+3.33
+------
+* export tweaks
+* update requirements
+* fix fund reservation
+* amend FM question service
+
+
 3.32.1
 ------
 * fix permission issues
@@ -5,6 +21,7 @@
 
 3.32
 ------
+* export tweaks
 * updates to eTools 9.11
 
 

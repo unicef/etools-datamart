@@ -931,7 +931,7 @@ class UnicefProgressreport(ReadOnlyModel):
 class UnicefProgressreportattachment(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    file = models.CharField(max_length=500)
+    file = models.FileField(max_length=500)
     type = models.CharField(max_length=5)
     progress_report = models.ForeignKey(UnicefProgressreport, models.PROTECT, related_name='UnicefProgressreportattachment_progress_report')
 
