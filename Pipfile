@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 azure-storage-blob = "*"
-celery = "*"
+celery = "<5.2"  # error class based task
 cryptography = "<3.4"  # PEP517 dependency
 dj-static = "*"
 Django = "*"
