@@ -1,3 +1,9 @@
+3.36
+------
+* fixed office
+* amend email notification export
+
+
 3.35
 ------
 * reset migrations

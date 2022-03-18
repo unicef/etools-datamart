@@ -298,6 +298,11 @@ class FMOntrackLoader(EtoolsLoader):
         values['sections_data'] = data
         return ", ".join([sec['name'] for sec in data])
 
+    def get_field_offices(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
+        activity = record.monitoring_activity
+        return list(activity.FieldMonitoringPlanningMonitoringactivityOffices_monitoringactivity.values_list(
+            'office__name', flat=True))
+
     def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
         loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name',
@@ -395,7 +400,7 @@ class FMOntrack(EtoolsDataMartModel):
     )
     vendor_number = models.CharField(max_length=30, blank=True, null=True)
     reference_number = models.CharField(max_length=100, null=True)
-    field_office = models.CharField(max_length=254, blank=True, null=True)
+    field_offices = JSONField(blank=True, null=True, default=dict)
     sections = models.TextField(blank=True, null=True)
     sections_data = JSONField(blank=True, null=True, default=dict)
     person_responsible_email = models.CharField(max_length=254, null=True, blank=True)
@@ -423,7 +428,6 @@ class FMOntrack(EtoolsDataMartModel):
             programme_areas="i",
             vendor_number="partner.vendor_number",
             reference_number='intervention.reference_number',
-            field_office='monitoring_activity.field_office.name',
             sections="-",
             person_responsible_email="monitoring_activity.visit_lead.email",
             team_members='-',
