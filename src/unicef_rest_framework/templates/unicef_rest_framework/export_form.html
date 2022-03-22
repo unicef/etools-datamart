@@ -45,7 +45,7 @@
                     <h4><b><a href="{% url "urf:export-fetch" object.id %}">Download</a></b></h4>
                 {% endif %}
                 <br><br>
-                {% if request.user.is_superuser %}
+                {% if request.user.is_superuser and object.id %}
                     <h4><b><a href="{% url "admin:unicef_rest_framework_export_change" object.id %}" target="_blank">Admin</a></b></h4>
                     <br><br>
                 {% endif %}
