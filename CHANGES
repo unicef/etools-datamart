@@ -1,3 +1,9 @@
+3.38
+------
+* fix request export for superusers
+* amend fund reservation light serializer
+
+
 3.37
 ------
 * fund reservation light serializer

@@ -32,7 +32,9 @@ class FundsReservationFilterForm(forms.Form):
 class FundsReservationLightSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.FundsReservation
-        fields = ["country_name", "vendor_code", "fr_number", "actual_amt_local", "total_amt_local"]
+        fields = [
+            "country_name", "pd_reference_number", "vendor_code", "fr_number", "actual_amt_local", "total_amt_local"
+        ]
         exclude = None
 
 
