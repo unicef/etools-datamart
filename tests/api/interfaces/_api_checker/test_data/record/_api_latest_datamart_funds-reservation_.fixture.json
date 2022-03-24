@@ -2,9 +2,9 @@
     "record": {
         "master": {
             "model": "data.fundsreservation",
-            "pk": 4,
+            "pk": 12,
             "fields": {
-                "last_modify_date": "2021-08-04T21:02:21.840Z",
+                "last_modify_date": "2022-03-24T23:15:28.378Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -35,9 +35,9 @@
                 "overall_amount": "107.00",
                 "overall_amount_dc": "108.00",
                 "due_date": null,
-                "line_item_text": "",
-                "created": "2021-08-04T20:42:03.452Z",
-                "modified": "2021-08-04T20:42:03.452Z",
+                "line_item_text": null,
+                "created": "2022-03-24T23:15:14.255Z",
+                "modified": "2022-03-24T23:15:14.255Z",
                 "donor": null,
                 "donor_code": null,
                 "intervention_title": null,
@@ -45,19 +45,19 @@
                 "pd_ssfa_number": null,
                 "source_id": 1,
                 "source_intervention_id": 1,
-                "intervention": 7
+                "intervention": 12
             }
         },
         "deps": [
             {
                 "model": "data.intervention",
-                "pk": 7,
+                "pk": 12,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:02:21.830Z",
+                    "last_modify_date": "2022-03-24T23:15:28.376Z",
                     "seen": null,
-                    "country_name": "Chad",
-                    "schema_name": "Chad",
+                    "country_name": "Bolivia",
+                    "schema_name": "Bolivia",
                     "area_code": "",
                     "agreement_reference_number": null,
                     "amendment_types": null,
@@ -80,10 +80,10 @@
                     "fr_number": null,
                     "in_kind_amount": "10.00",
                     "in_kind_amount_local": "10.00",
-                    "intervention_id": 6,
+                    "intervention_id": 3,
                     "last_amendment_date": null,
                     "metadata": {},
-                    "number": "#006",
+                    "number": "#003",
                     "number_of_attachments": null,
                     "number_of_amendments": null,
                     "offices": null,
@@ -119,7 +119,7 @@
                     "status": null,
                     "submission_date": null,
                     "submission_date_prc": null,
-                    "title": "title006",
+                    "title": "title003",
                     "total": "10.00",
                     "total_local": "10.00",
                     "unicef_cash": "10.00",
@@ -133,10 +133,10 @@
                     "locations_data": [
                         {
                             "name": "location.name",
-                            "level": "location.level",
+                            "level": "location.admin_level",
                             "pcode": "location.p_code",
                             "latitude": "location.latitude",
-                            "levelname": "location.gateway.name",
+                            "levelname": "location.admin_level_name",
                             "longitude": "location.longitude",
                             "source_id": "1"
                         }
