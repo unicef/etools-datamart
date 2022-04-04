@@ -323,7 +323,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                          .values_list('fr_number', flat=True))
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
-        values['cp_outputs_data'] = list(record.result_links.values("name", "code"))
+        values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
         return ", ".join([rl.name for rl in record.result_links.all()])
 
     def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
