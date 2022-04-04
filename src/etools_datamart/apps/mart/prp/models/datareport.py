@@ -41,6 +41,8 @@ class DataReportLoader(PrpBaseLoader):
             report_submission_date=F('indicator_report__progress_report__submission_date'),
 
             narrative=F('indicator_report__progress_report__narrative'),
+            report_status=F('indicator_report__report_status'),
+
             pd_output_progress_status=F('indicator_report__overall_status'),
             pd_output_narrative_assessment=F('indicator_report__narrative_assessment'),
             calculation_method_across_location=F('indicator_report__reportable__blueprint__calculation_formula_across_locations'),

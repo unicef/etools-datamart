@@ -1,3 +1,9 @@
+3.38.2
+------
+* Datareport: fixed report_status
+* Intervention: fixed cp_outputs_data
+
+
 3.38.1
 ------
 * amend fund reservation light serializer
