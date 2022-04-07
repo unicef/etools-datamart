@@ -52,6 +52,7 @@ class SpotCheckFindings(EtoolsDataMartModel):
     TYPES = Choices(
         (TYPE_SPOT_CHECK, _('Spot Check')),
     )
+    reference_number = models.CharField(max_length=100, blank=True, null=True)
 
     engagement_type = models.CharField(
         max_length=300,

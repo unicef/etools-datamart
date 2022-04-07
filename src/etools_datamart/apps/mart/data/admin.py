@@ -418,36 +418,36 @@ class AttachmentAdmin(DataModelAdmin):
 @register(models.AuditResult)
 class AuditResultAdmin(DataModelAdmin):
     # list_display = ('vendor', 'partner_type', 'risk_rating')
-    list_display = ('__str__',)
-    list_filter = ()
+    list_display = ('reference_number', 'schema_name',)
+    list_filter = ('reference_number', 'source_id')
 
 
 @register(models.SpotCheckFindings)
 class SpotCheckAdmin(DataModelAdmin):
-    list_display = ('engagement_type', 'status', 'sections')
+    list_display = ('reference_number', 'schema_name', 'status', 'sections', 'date_of_final_report')
     list_filter = ('engagement_type', 'status')
-    search_fields = ('reference_number',)
+    search_fields = ('reference_number', 'source_id')
 
 
 @register(models.MicroAssessment)
 class MicroAssessmentAdmin(DataModelAdmin):
-    list_display = ('engagement_type', 'status')
+    list_display = ('reference_number', 'engagement_type', 'status')
     list_filter = ('engagement_type', 'status')
-    search_fields = ('reference_number',)
+    search_fields = ('reference_number', 'source_id')
 
 
 @register(models.Audit)
 class AuditAdmin(DataModelAdmin):
-    list_display = ('engagement_type', 'status', 'sections')
+    list_display = ('reference_number', 'engagement_type', 'status', 'sections')
     list_filter = ('engagement_type', 'status', )
-    search_fields = ('reference_number',)
+    search_fields = ('reference_number', 'source_id')
 
 
 @register(models.AuditSpecial)
 class AuditSpecialAdmin(DataModelAdmin):
-    list_display = ('engagement_type', 'status', 'sections')
+    list_display = ('reference_number', 'engagement_type', 'status', 'sections')
     list_filter = ('engagement_type', 'status')
-    search_fields = ('reference_number',)
+    search_fields = ('reference_number', 'source_id')
 
 
 @register(models.Result)
