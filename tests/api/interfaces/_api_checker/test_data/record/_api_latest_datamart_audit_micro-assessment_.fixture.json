@@ -1,0 +1,50 @@
+{
+    "record": {
+        "master": {
+            "model": "data.microassessment",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2022-04-07T22:40:14.792Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "reference_number": null,
+                "engagement_type": null,
+                "status": null,
+                "created": null,
+                "partner": {
+                    "id": 100,
+                    "name": "Partner1",
+                    "source_id": 101,
+                    "vendor_number": "123"
+                },
+                "agreement": null,
+                "auditor": null,
+                "auditor_number": null,
+                "shared_ip_with": "[]",
+                "date_of_field_visit": null,
+                "date_of_final_report": null,
+                "rating": null,
+                "rating_extra": {},
+                "subject_area": null,
+                "subject_area_extra": {},
+                "test_subject_areas": null,
+                "test_subject_areas_count": null,
+                "findings_count": null,
+                "overall_risk_rating": null,
+                "implementing_partner_risk_rating": null,
+                "programme_management_risk_rating": null,
+                "organizational_structure_and_staffing_risk_rating": null,
+                "accounting_policies_and_procedures_risk_rating": null,
+                "fixed_assets_and_inventory_risk_rating": null,
+                "financial_reporting_and_monitoring_risk_rating": null,
+                "procurement_and_contract_administration_risk_rating": null,
+                "action_points": {},
+                "action_points_data": {}
+            }
+        },
+        "deps": []
+    }
+}

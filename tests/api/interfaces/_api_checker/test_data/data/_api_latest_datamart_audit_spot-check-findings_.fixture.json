@@ -1,0 +1,127 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.spotcheckfindings",
+                "pk": 1,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2022-04-07T22:40:09.429Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "reference_number": null,
+                    "engagement_type": null,
+                    "created": null,
+                    "status": null,
+                    "auditor": null,
+                    "auditor_number": null,
+                    "partner": {
+                        "id": 100,
+                        "name": "Partner1",
+                        "source_id": 101,
+                        "vendor_number": "123"
+                    },
+                    "date_of_final_report": null,
+                    "total_value": "0.00",
+                    "amount_refunded": "0.00",
+                    "write_off_required": "0.00",
+                    "pending_unsupported_amount": null,
+                    "spotcheck_total_amount_tested": null,
+                    "spotcheck_total_amount_of_ineligible_expenditure": null,
+                    "additional_supporting_documentation_provided": null,
+                    "justification_provided_and_accepted": null,
+                    "sections": null,
+                    "sections_data": {},
+                    "high_priority_findings": {},
+                    "low_priority_findings": {},
+                    "date_of_draft_report_to_ip": null,
+                    "action_points": {},
+                    "action_points_data": {}
+                }
+            },
+            {
+                "model": "data.spotcheckfindings",
+                "pk": 2,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2022-04-07T22:40:09.431Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "reference_number": null,
+                    "engagement_type": null,
+                    "created": null,
+                    "status": null,
+                    "auditor": null,
+                    "auditor_number": null,
+                    "partner": {
+                        "id": 100,
+                        "name": "Partner1",
+                        "source_id": 101,
+                        "vendor_number": "123"
+                    },
+                    "date_of_final_report": null,
+                    "total_value": "0.00",
+                    "amount_refunded": "0.00",
+                    "write_off_required": "0.00",
+                    "pending_unsupported_amount": null,
+                    "spotcheck_total_amount_tested": null,
+                    "spotcheck_total_amount_of_ineligible_expenditure": null,
+                    "additional_supporting_documentation_provided": null,
+                    "justification_provided_and_accepted": null,
+                    "sections": null,
+                    "sections_data": {},
+                    "high_priority_findings": {},
+                    "low_priority_findings": {},
+                    "date_of_draft_report_to_ip": null,
+                    "action_points": {},
+                    "action_points_data": {}
+                }
+            },
+            {
+                "model": "data.spotcheckfindings",
+                "pk": 3,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2022-04-07T22:40:09.433Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "reference_number": null,
+                    "engagement_type": null,
+                    "created": null,
+                    "status": null,
+                    "auditor": null,
+                    "auditor_number": null,
+                    "partner": {
+                        "id": 100,
+                        "name": "Partner1",
+                        "source_id": 101,
+                        "vendor_number": "123"
+                    },
+                    "date_of_final_report": null,
+                    "total_value": "0.00",
+                    "amount_refunded": "0.00",
+                    "write_off_required": "0.00",
+                    "pending_unsupported_amount": null,
+                    "spotcheck_total_amount_tested": null,
+                    "spotcheck_total_amount_of_ineligible_expenditure": null,
+                    "additional_supporting_documentation_provided": null,
+                    "justification_provided_and_accepted": null,
+                    "sections": null,
+                    "sections_data": {},
+                    "high_priority_findings": {},
+                    "low_priority_findings": {},
+                    "date_of_draft_report_to_ip": null,
+                    "action_points": {},
+                    "action_points_data": {}
+                }
+            }
+        ],
+        "deps": []
+    }
+}

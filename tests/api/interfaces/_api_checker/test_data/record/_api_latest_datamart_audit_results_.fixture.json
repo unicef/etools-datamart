@@ -1,0 +1,35 @@
+{
+    "record": {
+        "master": {
+            "model": "data.auditresult",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2022-04-07T22:40:15.290Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "vendor": null,
+                "vendor_number": null,
+                "reference_number": null,
+                "partner_type": null,
+                "risk_rating": null,
+                "audited_expenditure": "1.00",
+                "financial_findings": "2.00",
+                "date_of_draft_report_to_ip": null,
+                "amount_refunded": null,
+                "additional_supporting_documentation_provided": null,
+                "justification_provided_and_accepted": null,
+                "write_off_required": null,
+                "pending_unsupported_amount": null,
+                "audit_opinion": "--",
+                "count_high_risk_findings": null,
+                "count_financial_findings": null,
+                "count_key_control_weaknesses": null,
+                "status": null
+            }
+        },
+        "deps": []
+    }
+}
