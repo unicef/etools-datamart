@@ -58,6 +58,7 @@ class Audit(EtoolsDataMartModel):
         (TYPE_AUDIT, _('Audit')),
     )
 
+    reference_number = models.CharField(max_length=100, blank=True, null=True)
     engagement_type = models.CharField(max_length=300, blank=True, null=True, choices=TYPES, db_index=True)
     status = models.CharField(max_length=30, blank=True, null=True,
                               choices=AuditEngagementConsts.DISPLAY_STATUSES,

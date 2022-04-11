@@ -36,7 +36,7 @@ class AuditSpecial(EtoolsDataMartModel):
     TYPES = Choices(
         (TYPE_SPECIAL_AUDIT, _('Special Audit')),
     )
-
+    reference_number = models.CharField(max_length=100, blank=True, null=True)
     engagement_type = models.CharField(
         max_length=300,
         blank=True,

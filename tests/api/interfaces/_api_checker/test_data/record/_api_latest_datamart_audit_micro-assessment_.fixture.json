@@ -5,11 +5,12 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-08-04T21:02:18.633Z",
+                "last_modify_date": "2022-04-07T22:40:14.792Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
+                "reference_number": null,
                 "engagement_type": null,
                 "status": null,
                 "created": null,
@@ -20,6 +21,8 @@
                     "vendor_number": "123"
                 },
                 "agreement": null,
+                "auditor": null,
+                "auditor_number": null,
                 "shared_ip_with": "[]",
                 "date_of_field_visit": null,
                 "date_of_final_report": null,

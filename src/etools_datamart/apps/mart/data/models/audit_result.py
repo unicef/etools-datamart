@@ -38,6 +38,7 @@ class AuditResult(EtoolsDataMartModel):
     # AuditAudit.engagement_ptr.agreement.auditor_firm.name - -
     vendor = models.CharField(max_length=300, blank=True, null=True)
     vendor_number = models.CharField(max_length=300, blank=True, null=True)
+    reference_number = models.CharField(max_length=100, blank=True, null=True)
 
     # AuditAudit.engagement_ptr.partner.partner_type - -
     partner_type = models.CharField(max_length=300, blank=True, null=True)

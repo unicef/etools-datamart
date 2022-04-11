@@ -77,7 +77,7 @@ class MicroAssessment(EtoolsDataMartModel):
     TYPES = Choices(
         (TYPE_MICRO_ASSESSMENT, _('Micro Assessment')),
     )
-
+    reference_number = models.CharField(max_length=100, blank=True, null=True)
     engagement_type = models.CharField(
         max_length=300,
         blank=True,
