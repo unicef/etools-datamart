@@ -56,11 +56,36 @@ class DataReportFilterForm(forms.Form):
             pass
 
 
+class IndicatorReportSerializer(DataMartSerializer):
+    class Meta(DataMartSerializer.Meta):
+        model = models.IndicatorReport
+        exclude = None
+        fields = '__all__'
+
+
 class DataReportSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.DataReport
         exclude = None
         fields = '__all__'
+
+
+class IndicatorReportViewSet(DataMartViewSet):
+    serializer_class = IndicatorReportSerializer
+    queryset = models.IndicatorReport.objects.all()
+
+    filter_fields = ('business_area', 'pd_output_progress_status', )
+    search_fields = ('intervention_reference_number', )
+
+    serializers_fieldsets = {'std': IndicatorReportSerializer, }
+    filter_backends = [
+        DatamartQueryStringFilterBackend,
+        OrderingFilter,
+        DynamicSerializerFilter,
+    ]
+
+    def get_serializer(self, *args, **kwargs):
+        return super().get_serializer(*args, **kwargs)
 
 
 class DataReportViewSet(DataMartViewSet):

@@ -71,6 +71,7 @@ router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
 router.register(r'datamart/partners_hact', endpoints.PartnerHactViewSet)
 router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
+router.register(r'prp/indicator-report/', endpoints.IndicatorReportViewSet)
 router.register(r'prp/datareport', endpoints.DataReportViewSet)
 
 router.register(r'system/monitor', endpoints.MonitorViewSet)
