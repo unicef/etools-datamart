@@ -6,7 +6,7 @@
                 "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-04-07T22:40:09.429Z",
+                    "last_modify_date": "2022-04-20T18:40:03.069Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -23,7 +23,6 @@
                         "source_id": 101,
                         "vendor_number": "123"
                     },
-                    "date_of_final_report": null,
                     "total_value": "0.00",
                     "amount_refunded": "0.00",
                     "write_off_required": "0.00",
@@ -36,7 +35,14 @@
                     "sections_data": {},
                     "high_priority_findings": {},
                     "low_priority_findings": {},
+                    "partner_contacted_at": null,
                     "date_of_draft_report_to_ip": null,
+                    "date_of_comments_by_ip": null,
+                    "date_of_draft_report_to_unicef": null,
+                    "date_of_comments_by_unicef": null,
+                    "date_of_report_submit": null,
+                    "date_of_final_report": null,
+                    "date_of_cancel": null,
                     "action_points": {},
                     "action_points_data": {}
                 }
@@ -46,7 +52,7 @@
                 "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-04-07T22:40:09.431Z",
+                    "last_modify_date": "2022-04-20T18:40:03.091Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -63,7 +69,6 @@
                         "source_id": 101,
                         "vendor_number": "123"
                     },
-                    "date_of_final_report": null,
                     "total_value": "0.00",
                     "amount_refunded": "0.00",
                     "write_off_required": "0.00",
@@ -76,7 +81,14 @@
                     "sections_data": {},
                     "high_priority_findings": {},
                     "low_priority_findings": {},
+                    "partner_contacted_at": null,
                     "date_of_draft_report_to_ip": null,
+                    "date_of_comments_by_ip": null,
+                    "date_of_draft_report_to_unicef": null,
+                    "date_of_comments_by_unicef": null,
+                    "date_of_report_submit": null,
+                    "date_of_final_report": null,
+                    "date_of_cancel": null,
                     "action_points": {},
                     "action_points_data": {}
                 }
@@ -86,7 +98,7 @@
                 "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-04-07T22:40:09.433Z",
+                    "last_modify_date": "2022-04-20T18:40:03.095Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -103,7 +115,6 @@
                         "source_id": 101,
                         "vendor_number": "123"
                     },
-                    "date_of_final_report": null,
                     "total_value": "0.00",
                     "amount_refunded": "0.00",
                     "write_off_required": "0.00",
@@ -116,7 +127,14 @@
                     "sections_data": {},
                     "high_priority_findings": {},
                     "low_priority_findings": {},
+                    "partner_contacted_at": null,
                     "date_of_draft_report_to_ip": null,
+                    "date_of_comments_by_ip": null,
+                    "date_of_draft_report_to_unicef": null,
+                    "date_of_comments_by_unicef": null,
+                    "date_of_report_submit": null,
+                    "date_of_final_report": null,
+                    "date_of_cancel": null,
                     "action_points": {},
                     "action_points_data": {}
                 }

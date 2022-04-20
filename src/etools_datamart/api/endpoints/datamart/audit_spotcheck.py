@@ -35,6 +35,10 @@ class SpotCheckFindingSerializer(DataMartSerializer):
             return 'N/A'
 
 
+class SpotCheckFindingDataSerializer(SpotCheckFindingSerializer):
+    pass
+
+
 class SpotCheckFindingFilterForm(forms.Form):
     date_of_final_report = DateRangePickerField(
         label='Date of Final Report',
@@ -50,6 +54,10 @@ class SpotCheckFindingViewSet(DataMartViewSet):
     filter_fields = (
         'date_of_final_report',
     )
+    serializers_fieldsets = {
+        'std': SpotCheckFindingSerializer,
+        'dates': SpotCheckFindingDataSerializer
+    }
 
     def get_querystringfilter_form(self, request, filter):
         return SpotCheckFindingFilterForm(request.GET, filter.form_prefix)
