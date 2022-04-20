@@ -70,7 +70,7 @@ class SpotCheckFindings(EtoolsDataMartModel):
     auditor = models.CharField(max_length=255, blank=True, null=True)
     auditor_number = models.CharField(max_length=30, blank=True, null=True)
     partner = JSONField(blank=True, null=True, default=dict)
-    date_of_final_report = models.DateField(null=True, blank=True)
+
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     amount_refunded = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     write_off_required = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
@@ -90,8 +90,15 @@ class SpotCheckFindings(EtoolsDataMartModel):
     high_priority_findings = JSONField(blank=True, null=True, default=dict)
     low_priority_findings = JSONField(blank=True, null=True, default=dict)
 
+    partner_contacted_at = models.DateField(blank=True, null=True)
     date_of_draft_report_to_ip = models.DateField(blank=True, null=True)
-    
+    date_of_comments_by_ip = models.DateField(blank=True, null=True)
+    date_of_draft_report_to_unicef = models.DateField(blank=True, null=True)
+    date_of_comments_by_unicef = models.DateField(blank=True, null=True)
+    date_of_report_submit = models.DateField(blank=True, null=True)
+    date_of_final_report = models.DateField(null=True, blank=True)
+    date_of_cancel = models.DateField(blank=True, null=True)
+
     # Action Points
     action_points = JSONField(blank=True, null=True, default=dict)
     action_points_data = JSONField(blank=True, null=True, default=dict)
