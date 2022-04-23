@@ -90,6 +90,7 @@ class SpotCheckFindings(EtoolsDataMartModel):
     high_priority_findings = JSONField(blank=True, null=True, default=dict)
     low_priority_findings = JSONField(blank=True, null=True, default=dict)
 
+    date_of_field_visit = models.DateField(blank=True, null=True)
     partner_contacted_at = models.DateField(blank=True, null=True)
     date_of_draft_report_to_ip = models.DateField(blank=True, null=True)
     date_of_comments_by_ip = models.DateField(blank=True, null=True)
