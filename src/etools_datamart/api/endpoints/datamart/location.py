@@ -72,24 +72,6 @@ class LocationViewSet(common.DataMartViewSet):
                              }
 
 
-class GatewayTypeSerializer(DataMartSerializer):
-
-    class Meta(DataMartSerializer.Meta):
-        model = models.GatewayType
-        exclude = ('seen', 'source_id',)
-
-
-class GatewayTypeViewSet(DataMartViewSet):
-    querystringfilter_form_base_class = forms.Form
-    filter_fields = ('admin_level', )
-
-    serializer_class = GatewayTypeSerializer
-    queryset = models.GatewayType.objects.all()
-
-    def get_querystringfilter_form(self, request, filter):
-        return forms.Form(request.GET, filter.form_prefix)
-
-
 class LocationSiteSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Locationsite

@@ -198,12 +198,6 @@ class HACTAdmin(DataModelAdmin):
     list_filter = (SchemaFilter, 'year', 'last_modify_date')
 
 
-@register(models.GatewayType)
-class GatewayTypeAdmin(DataModelAdmin):
-    list_display = ('country_name', 'schema_name', 'name', 'admin_level', 'source_id')
-    search_fields = ('name',)
-
-
 @register(models.Location)
 class LocationAdmin(AdminFiltersMixin, DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'name', 'admin_level', 'admin_level_name', 'latitude', 'longitude', 'point')

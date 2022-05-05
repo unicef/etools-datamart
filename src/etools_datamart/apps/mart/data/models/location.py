@@ -1,34 +1,15 @@
 from django.conf import settings
 from django.contrib.gis.db import models as geomodels
 from django.contrib.gis.db.models.functions import Centroid
-from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from django.db import connection, models
 
 import requests
 
 from etools_datamart.apps.core.models import DataMartManager, DataMartQuerySet
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import LocationsGatewaytype, LocationsLocation
+from etools_datamart.apps.sources.etools.models import LocationsLocation
 
 from ..loader import EtoolsLoader
-
-
-class GatewayType(EtoolsDataMartModel):
-    name = models.CharField(db_index=True, max_length=64)
-    admin_level = models.SmallIntegerField(blank=True, null=True)
-
-    class Meta:
-        unique_together = (('schema_name', 'source_id'), )
-
-    class Options:
-        source = LocationsGatewaytype
-        sync_deleted_records = lambda loader: False
-
-        # key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-        #                                   source_id=record.id)
-
-    def __str__(self):
-        return self.name
 
 
 class LocationQuerySet(DataMartQuerySet):

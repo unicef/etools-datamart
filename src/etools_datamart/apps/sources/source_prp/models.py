@@ -1,6 +1,6 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2021-01-01 00:18:01.691561
+# Generated on 2022-05-05 23:24:47.300049
 from django.contrib.gis.db import models
 
 from etools_datamart.apps.core.readonly import ReadOnlyModel
@@ -289,112 +289,6 @@ class CoreWorkspaceCountries(ReadOnlyModel):
         managed = False
         db_table = 'core_workspace_countries'
         unique_together = (('workspace', 'country'),)
-        app_label = 'source_prp'
-
-
-class DjangoCeleryBeatClockedschedule(ReadOnlyModel):
-    clocked_time = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_celery_beat_clockedschedule'
-        app_label = 'source_prp'
-
-
-class DjangoCeleryBeatCrontabschedule(ReadOnlyModel):
-    minute = models.CharField(max_length=240)
-    hour = models.CharField(max_length=96)
-    day_of_week = models.CharField(max_length=64)
-    day_of_month = models.CharField(max_length=124)
-    month_of_year = models.CharField(max_length=64)
-    timezone = models.CharField(max_length=63)
-
-    class Meta:
-        managed = False
-        db_table = 'django_celery_beat_crontabschedule'
-        app_label = 'source_prp'
-
-
-class DjangoCeleryBeatIntervalschedule(ReadOnlyModel):
-    every = models.IntegerField()
-    period = models.CharField(max_length=24)
-
-    class Meta:
-        managed = False
-        db_table = 'django_celery_beat_intervalschedule'
-        app_label = 'source_prp'
-
-
-class DjangoCeleryBeatPeriodictask(ReadOnlyModel):
-    name = models.CharField(unique=True, max_length=200)
-    task = models.CharField(max_length=200)
-    args = models.TextField()
-    kwargs = models.TextField()
-    queue = models.CharField(max_length=200, blank=True, null=True)
-    exchange = models.CharField(max_length=200, blank=True, null=True)
-    routing_key = models.CharField(max_length=200, blank=True, null=True)
-    expires = models.DateTimeField(blank=True, null=True)
-    enabled = models.BooleanField()
-    last_run_at = models.DateTimeField(blank=True, null=True)
-    total_run_count = models.IntegerField()
-    date_changed = models.DateTimeField()
-    description = models.TextField()
-    crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_crontab', blank=True, null=True)
-    interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_interval', blank=True, null=True)
-    solar = models.ForeignKey('source_prp.DjangoCeleryBeatSolarschedule', models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_solar', blank=True, null=True)
-    one_off = models.BooleanField()
-    start_time = models.DateTimeField(blank=True, null=True)
-    priority = models.IntegerField(blank=True, null=True)
-    headers = models.TextField()
-    clocked = models.ForeignKey(DjangoCeleryBeatClockedschedule, models.PROTECT, related_name='DjangoCeleryBeatPeriodictask_clocked', blank=True, null=True)
-    expire_seconds = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'django_celery_beat_periodictask'
-        app_label = 'source_prp'
-
-
-class DjangoCeleryBeatPeriodictasks(ReadOnlyModel):
-    ident = models.SmallIntegerField(primary_key=True)
-    last_update = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_celery_beat_periodictasks'
-        app_label = 'source_prp'
-
-
-class DjangoCeleryBeatSolarschedule(ReadOnlyModel):
-    event = models.CharField(max_length=24)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
-
-    class Meta:
-        managed = False
-        db_table = 'django_celery_beat_solarschedule'
-        unique_together = (('event', 'latitude', 'longitude'),)
-        app_label = 'source_prp'
-
-
-class DjangoCeleryResultsTaskresult(ReadOnlyModel):
-    task_id = models.CharField(unique=True, max_length=255)
-    status = models.CharField(max_length=50)
-    content_type = models.CharField(max_length=128)
-    content_encoding = models.CharField(max_length=64)
-    result = models.TextField(blank=True, null=True)
-    date_done = models.DateTimeField()
-    traceback = models.TextField(blank=True, null=True)
-    meta = models.TextField(blank=True, null=True)
-    task_args = models.TextField(blank=True, null=True)
-    task_kwargs = models.TextField(blank=True, null=True)
-    task_name = models.CharField(max_length=255, blank=True, null=True)
-    worker = models.CharField(max_length=100, blank=True, null=True)
-    date_created = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_celery_results_taskresult'
         app_label = 'source_prp'
 
 
