@@ -21,7 +21,7 @@ def test_query_public(db):
 
 def test_query_single_tenant(number_of_partnerorganization):
     conn.set_schemas(['bolivia'])
-    assert len(PartnersPartnerorganization.objects.all()) == 74
+    assert len(PartnersPartnerorganization.objects.all()) == 77
 
 
 def test_query_multi_tenant(number_of_partnerorganization):
@@ -31,7 +31,7 @@ def test_query_multi_tenant(number_of_partnerorganization):
 
 def test_count_single_tenant(number_of_partnerorganization):
     conn.set_schemas(['bolivia'])
-    assert PartnersPartnerorganization.objects.count() == 74
+    assert PartnersPartnerorganization.objects.count() == 77
 
 
 def test_count_multi_tenant1(number_of_partnerorganization):

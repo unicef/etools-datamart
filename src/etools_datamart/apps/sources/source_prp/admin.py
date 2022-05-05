@@ -100,41 +100,6 @@ class CoreWorkspaceCountriesAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
-@register(models.DjangoCeleryBeatClockedschedule)
-class DjangoCeleryBeatClockedscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.DjangoCeleryBeatCrontabschedule)
-class DjangoCeleryBeatCrontabscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.DjangoCeleryBeatIntervalschedule)
-class DjangoCeleryBeatIntervalscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.DjangoCeleryBeatPeriodictask)
-class DjangoCeleryBeatPeriodictaskAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.DjangoCeleryBeatPeriodictasks)
-class DjangoCeleryBeatPeriodictasksAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.DjangoCeleryBeatSolarschedule)
-class DjangoCeleryBeatSolarscheduleAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.DjangoCeleryResultsTaskresult)
-class DjangoCeleryResultsTaskresultAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
 @register(models.DjangoContentType)
 class DjangoContentTypeAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
