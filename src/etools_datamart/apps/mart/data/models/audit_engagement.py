@@ -248,6 +248,11 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
             ret.append(ActionPointSimpleSerializer(r).data)
         return ret
 
+    def get_key_internal_control_weaknesses(self, record: AuditEngagement, values: dict, **kwargs):
+        qs = AuditRisk.objects.filter(
+            blueprint__category__header='Key Internal Controls Weaknesses', engagement_id=record.id)
+        return [risk.blueprint.header for risk in qs]
+
     def process_country(self):
         for m in [AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck, AuditAudit]:
             for record in m.objects.select_related('engagement_ptr'):
@@ -389,6 +394,7 @@ class Engagement(EtoolsDataMartModel):
 
     # ActionPoints
     action_points = JSONField(blank=True, null=True)
+    key_internal_control_weaknesses = JSONField(blank=True, null=True)
 
     # datamart
     loader = EngagementlLoader()
@@ -423,4 +429,5 @@ class Engagement(EtoolsDataMartModel):
             action_points="-",
             rating="-",
             rating_extra="i",
+            key_internal_control_weaknesses='-',
         )
