@@ -5,7 +5,7 @@
             "pk": 8,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2022-04-07T22:40:14.429Z",
+                "last_modify_date": "2022-05-04T16:59:47.948Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -66,7 +66,8 @@
                 "audited_expenditure": "0.00",
                 "financial_findings": "0.00",
                 "audit_opinion": null,
-                "action_points": null
+                "action_points": null,
+                "key_internal_control_weaknesses": null
             }
         },
         "deps": []
