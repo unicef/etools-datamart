@@ -882,44 +882,6 @@ class HactHacthistory(models.TenantModel):
         unique_together = (('partner', 'year'),)
 
 
-class LocationsCartodbtable(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    domain = models.CharField(max_length=254)
-    api_key = models.CharField(max_length=254)
-    table_name = models.CharField(max_length=254)
-    display_name = models.CharField(max_length=254)
-    name_col = models.CharField(max_length=254)
-    pcode_col = models.CharField(max_length=254)
-    parent_code_col = models.CharField(max_length=254)
-    color = models.CharField(max_length=7)
-    level = models.IntegerField()
-    lft = models.IntegerField()
-    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='LocationsCartodbtable_parent', blank=True, null=True)
-    rght = models.IntegerField()
-    tree_id = models.IntegerField()
-    remap_table_name = models.CharField(max_length=254, blank=True, null=True)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    admin_level = models.SmallIntegerField()
-    admin_level_name = models.CharField(max_length=64)
-
-    class Meta:
-        managed = False
-        db_table = 'locations_cartodbtable'
-
-
-class LocationsGatewaytype(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(unique=True, max_length=64)
-    admin_level = models.SmallIntegerField(unique=True, blank=True, null=True)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'locations_gatewaytype'
-
-
 class LocationsLocation(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=254)
@@ -2052,6 +2014,87 @@ class TpmTpmvisitreportrejectcomment(models.TenantModel):
         db_table = 'tpm_tpmvisitreportrejectcomment'
 
 
+class TravelActivity(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    activity_date = models.DateField()
+    activity_type = models.CharField(max_length=64)
+    location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='TravelActivity_location', blank=True, null=True)
+    monitoring_activity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='TravelActivity_monitoring_activity', blank=True, null=True)
+    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='TravelActivity_partner', blank=True, null=True)
+    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='TravelActivity_section', blank=True, null=True)
+    trip = models.ForeignKey('TravelTrip', models.DO_NOTHING, related_name='TravelActivity_trip')
+
+    class Meta:
+        managed = False
+        db_table = 'travel_activity'
+
+
+class TravelItineraryitem(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    travel_method = models.CharField(max_length=150)
+    destination = models.CharField(max_length=150)
+    trip = models.ForeignKey('TravelTrip', models.DO_NOTHING, related_name='TravelItineraryitem_trip')
+    monitoring_activity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='TravelItineraryitem_monitoring_activity', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'travel_itineraryitem'
+
+
+class TravelReport(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    narrative = models.TextField()
+    trip = models.OneToOneField('TravelTrip', models.DO_NOTHING, related_name='TravelReport_trip')
+
+    class Meta:
+        managed = False
+        db_table = 'travel_report'
+
+
+class TravelTrip(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    reference_number = models.CharField(unique=True, max_length=100)
+    status = models.CharField(max_length=30)
+    title = models.CharField(max_length=120)
+    description = models.TextField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name='TravelTrip_office', blank=True, null=True)
+    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='TravelTrip_section', blank=True, null=True)
+    supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_supervisor', blank=True, null=True)
+    traveller = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_traveller')
+    user_info_text = models.JSONField()
+    additional_notes = models.TextField(blank=True, null=True)
+    not_as_planned = models.BooleanField()
+
+    class Meta:
+        managed = False
+        db_table = 'travel_trip'
+
+
+class TravelTripstatushistory(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    status = models.CharField(max_length=30)
+    comment = models.TextField()
+    trip = models.ForeignKey(TravelTrip, models.DO_NOTHING, related_name='TravelTripstatushistory_trip')
+
+    class Meta:
+        managed = False
+        db_table = 'travel_tripstatushistory'
+
+
 class UnicefAttachmentsAttachment(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
@@ -2109,6 +2152,44 @@ class UnicefAttachmentsFiletype(models.TenantModel):
         managed = False
         db_table = 'unicef_attachments_filetype'
         unique_together = (('code', 'name'),)
+
+
+class UnicefLocationsCartodbtable(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    domain = models.CharField(max_length=254)
+    api_key = models.CharField(max_length=254)
+    table_name = models.CharField(max_length=254)
+    display_name = models.CharField(max_length=254)
+    name_col = models.CharField(max_length=254)
+    pcode_col = models.CharField(max_length=254)
+    parent_code_col = models.CharField(max_length=254)
+    color = models.CharField(max_length=7)
+    level = models.IntegerField()
+    lft = models.IntegerField()
+    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='UnicefLocationsCartodbtable_parent', blank=True, null=True)
+    rght = models.IntegerField()
+    tree_id = models.IntegerField()
+    remap_table_name = models.CharField(max_length=254, blank=True, null=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    admin_level = models.SmallIntegerField()
+    admin_level_name = models.CharField(max_length=64)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_locations_cartodbtable'
+
+
+class UnicefLocationsGatewaytype(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(unique=True, max_length=64)
+    admin_level = models.SmallIntegerField(unique=True, blank=True, null=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_locations_gatewaytype'
 
 
 class UnicefSnapshotActivity(models.TenantModel):
