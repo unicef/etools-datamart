@@ -265,7 +265,7 @@ function dump_public(){
             return
         fi
     fi
-    pg_dump --inserts -O \
+    pg_dump --inserts -O -x \
             -d ${DATABASE_NAME} \
             -U ${DATABASE_USER} \
             -n public \
@@ -314,7 +314,7 @@ function dump_tenant(){
     IFS=,
     for tenant in $BASE_SCHEMAS; do
         echo "4.2.1 Dump $tenant"
-        pg_dump --inserts -O  -d ${DATABASE_NAME} -U ${DATABASE_USER} \
+        pg_dump --inserts -O -x -d ${DATABASE_NAME} -U ${DATABASE_USER} \
                 --exclude-table-data django_migrations \
                 --exclude-table-data django_comments \
                 --exclude-table-data django_comment_flags \

@@ -109,7 +109,7 @@ SET default_tablespace = '';
             print("Restoring %s" % public_dump)
 
         cmds = ["pg_restore",
-                "-U", self.connection.settings_dict['USER'],
+                "-U", 'postgres',  # self.connection.settings_dict['USER'],
                 "-p", str(self.connection.settings_dict['PORT']),
                 "-h", self.connection.settings_dict['HOST'],
                 "-d", self.connection.settings_dict['NAME'],
