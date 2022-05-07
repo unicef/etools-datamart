@@ -92,16 +92,7 @@ class InterventionByLocationFactory(DataMartModelFactory):
         model = models.InterventionByLocation
 
 
-class GatewayTypeFactory(DataMartModelFactory):
-    name = factory.Sequence(lambda n: "name%03d" % n)
-
-    class Meta:
-        model = models.GatewayType
-        django_get_or_create = ('name',)
-
-
 class LocationFactory(DataMartModelFactory):
-    # gateway = factory.SubFactory(GatewayTypeFactory)
     name = factory.Sequence(lambda n: "name%03d" % n)
     level = factory.Sequence(lambda n: n)
     lft = 1

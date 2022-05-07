@@ -32,6 +32,9 @@ class IndicatorReport(PrpDataMartModel):
     baseline = models.CharField(max_length=2048, blank=True, null=True)
     target = models.CharField(max_length=2048, blank=True, null=True)
     total_cumulative_progress = models.CharField(max_length=2048, blank=True, null=True)
+    time_period_start = models.DateField(blank=True, null=True)
+    time_period_end = models.DateField(blank=True, null=True)
+    submission_date = models.DateField(blank=True, null=True)
 
     loader = IndicatorReportLoader()
 
