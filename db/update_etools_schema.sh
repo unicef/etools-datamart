@@ -510,7 +510,6 @@ else
 fi
 
 
-
 end=$SECONDS
 duration=$(( end - start ))
 
