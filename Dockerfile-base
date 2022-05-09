@@ -1,4 +1,4 @@
-# unicef/datamart:base-39
+# unicef/datamart:base-39-v2
 FROM python:3.9.6-alpine3.14
 
 RUN apk update
@@ -24,7 +24,9 @@ RUN apk add --no-cache --virtual .build-deps --update \
     geos-dev \
     gdal-dev \
     gcc \
-    g++
+    g++ \
+    freetype-dev \
+    musl-dev
 
 
 # PYTHON
