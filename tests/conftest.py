@@ -59,6 +59,12 @@ def pytest_unconfigure(config):
 warnings.simplefilter('ignore', RuntimeWarning, lineno=1421)
 
 
+# def pytest_sessionstart(session):
+#     from django.test import TestCase
+#     TestCase.multi_db = True
+#     TestCase.databases = '__all__'
+
+
 @pytest.fixture(scope="session")
 def enable_migration_signals(request):
     return request.config.option.enable_migration_signals
