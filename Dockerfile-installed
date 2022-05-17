@@ -1,6 +1,6 @@
 # TODO change this to etools-base, if etools Dockerfile-base changes accepted
 # See https://github.com/unicef/etools/pull/2716
-FROM unicef/datamart:base-39
+FROM unicef/datamart:base-39-v2
 
 WORKDIR /code/
 ADD Pipfile .
