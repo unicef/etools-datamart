@@ -148,6 +148,28 @@ class T2FTravelConsts:
     )
 
 
+class TravelTripConsts:
+    STATUS_DRAFT = 'draft'
+    STATUS_SUBMISSION_REVIEW = 'submission'
+    STATUS_SUBMITTED = 'submitted'
+    STATUS_REJECTED = 'rejected'
+    STATUS_APPROVED = 'approved'
+    STATUS_REVIEW = 'review'
+    STATUS_COMPLETED = 'completed'
+    STATUS_CANCELLED = 'cancelled'
+
+    CHOICES = (
+        (STATUS_DRAFT, _('Draft')),
+        (STATUS_SUBMISSION_REVIEW, _('Submission Review')),
+        (STATUS_SUBMITTED, _('Submitted')),
+        (STATUS_REJECTED, _('Rejected')),
+        (STATUS_APPROVED, _('Approved')),
+        (STATUS_REVIEW, _('Review')),
+        (STATUS_COMPLETED, _('Completed')),
+        (STATUS_CANCELLED, _('Cancelled')),
+    )
+
+
 class CategoryConsts:
     MODULE_CHOICES = Choices(
         ('apd', _('Action Points')),

@@ -30,6 +30,7 @@ from .reports_office import Office  # noqa
 from .tpm_tmpactivity import TPMActivity  # noqa
 from .tpm_tmpvisit import TPMVisit  # noqa
 from .travel import Travel  # noqa
+from .travel_trip import TravelTrip  # noqa
 from .travel_activity import TravelActivity  # noqa
 from .trip import ModeOfTravel, Trip  # noqa
 from .user import EtoolsUser  # noqa
