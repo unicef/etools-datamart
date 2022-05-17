@@ -376,8 +376,8 @@ class TripAdmin(DataModelAdmin):
 
 @register(models.TravelTrip)
 class TravelTripAdmin(DataModelAdmin):
-    list_display = ('reference_number', 'traveler_name',
-                    'partner_name', 'vendor_number', 'end_date',)
+    list_display = ('reference_number', 'traveler_email',
+                    'supervisor_email', 'end_date',)
     list_filter = ('start_date', 'end_date')
     search_fields = ('reference_number',)
 
