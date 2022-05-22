@@ -59,10 +59,8 @@ requests = "*"
 social-auth-core = "*"
 sentry-sdk = "*"
 swagger-spec-validator = "*"
-unicef-security = "*"
+unicef-security = "<1.0"
 xhtml2pdf = "*"
-
-reportlab = "<3.6"
 
 
 
@@ -77,7 +75,6 @@ isort = "*"
 pytest-cov = "*"
 pytest-django = "<4.3"
 pytest-echo = "*"
-pytest-pythonpath = "*"
 vcrpy = "*"
 
 [requires]
