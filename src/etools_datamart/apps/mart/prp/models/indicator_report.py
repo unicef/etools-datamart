@@ -17,6 +17,7 @@ class IndicatorReportLoader(PrpBaseLoader):
             performance_indicator=F('reportable__blueprint__title'),
             target=F('reportable__target'),
             baseline=F('reportable__baseline'),
+            unit=F('reportable__blueprint__unit'),
             total_cumulative_progress=F('reportable__total'),
             pd_output_progress_status=F('overall_status'),
         )
@@ -31,6 +32,7 @@ class IndicatorReport(PrpDataMartModel):
     performance_indicator = models.CharField(max_length=2048, blank=True, null=True)
     baseline = models.CharField(max_length=2048, blank=True, null=True)
     target = models.CharField(max_length=2048, blank=True, null=True)
+    unit = models.CharField(max_length=10, blank=True, null=True)
     total_cumulative_progress = models.CharField(max_length=2048, blank=True, null=True)
     time_period_start = models.DateField(blank=True, null=True)
     time_period_end = models.DateField(blank=True, null=True)
