@@ -1,0 +1,33 @@
+{
+    "record": {
+        "master": {
+            "model": "data.traveltrip",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2022-05-23T08:54:41.198Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "created": null,
+                "modified": null,
+                "reference_number": null,
+                "status": "",
+                "title": "",
+                "description": null,
+                "start_date": null,
+                "end_date": null,
+                "office_name": null,
+                "section_name": null,
+                "supervisor_email": null,
+                "traveler_email": null,
+                "user_info_text": {},
+                "additional_notes": null,
+                "not_as_planned": null,
+                "attachments": null
+            }
+        },
+        "deps": []
+    }
+}
