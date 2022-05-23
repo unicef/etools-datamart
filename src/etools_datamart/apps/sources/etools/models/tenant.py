@@ -2073,7 +2073,7 @@ class TravelTrip(models.TenantModel):
     section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='TravelTrip_section', blank=True, null=True)
     supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_supervisor', blank=True, null=True)
     traveller = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_traveller')
-    user_info_text = models.JSONField()
+    user_info_text = models.JSONField(default=dict, blank=True)
     additional_notes = models.TextField(blank=True, null=True)
     not_as_planned = models.BooleanField()
 

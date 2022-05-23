@@ -106,7 +106,7 @@ class Command(BaseCommand):
 
         parser.add_argument('-c',
                             '--countries',
-                            help="Run only selected counries",
+                            help="Run only selected countries",
                             )
 
         parser.add_argument('-r',
