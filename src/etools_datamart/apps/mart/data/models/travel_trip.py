@@ -1,34 +1,32 @@
 from django.db import models
-from django.utils.functional import cached_property
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.sources.etools.enrichment.consts import TravelTripConsts
-from etools_datamart.apps.sources.etools.models import DjangoContentType, TravelTrip, UnicefAttachmentsAttachment
+from etools_datamart.apps.sources.etools.models import TravelTrip
 
 from .base import EtoolsDataMartModel
 
-
-class TravelTripLoader(EtoolsLoader):
-    @cached_property
-    def _ct(self):
-        return DjangoContentType.objects.get(app_label='travel',
-                                             model='trip')
-
-    def get_attachments(self, record, values, **kwargs):
-        attachments = (UnicefAttachmentsAttachment.objects
-                       .select_related('file_type')
-                       .filter(object_id=record.id,
-                               code='travel_docs',
-                               content_type=self._ct,
-                               ).order_by('id'))
-        ret = []
-        for a in attachments:
-            ret.append(dict(
-                file=a.file,
-                file_type=a.file_type.name,
-                code=a.code,
-            ))
-        return ", ".join([a.file for a in attachments])
+# class TravelTripLoader(EtoolsLoader):
+#     @cached_property
+#     def _ct(self):
+#         return DjangoContentType.objects.get(app_label='travel',
+#                                              model='trip')
+#
+#     def get_attachments(self, record, values, **kwargs):
+#         attachments = (UnicefAttachmentsAttachment.objects
+#                        .select_related('file_type')
+#                        .filter(object_id=record.id,
+#                                code='travel_docs',
+#                                content_type=self._ct,
+#                                ).order_by('id'))
+#         ret = []
+#         for a in attachments:
+#             ret.append(dict(
+#                 file=a.file,
+#                 file_type=a.file_type.name,
+#                 code=a.code,
+#             ))
+#         return ", ".join([a.file for a in attachments])
 
 
 class TravelTrip(EtoolsDataMartModel):
@@ -51,7 +49,7 @@ class TravelTrip(EtoolsDataMartModel):
 
     attachments = models.TextField(blank=True, null=True)
 
-    loader = TravelTripLoader()
+    loader = EtoolsLoader()
 
     class Meta:
         unique_together = ('schema_name', 'reference_number')
