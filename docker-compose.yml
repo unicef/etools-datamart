@@ -65,7 +65,7 @@ services:
     command: celery -A etools_datamart worker --loglevel=info --workdir=/code/src
 
   db:
-    image: mdillon/postgis:9.6
+    image: postgis/postgis:12-3.2
     container_name: datamart_db
     environment:
       POSTGRES_PASSWORD:
@@ -76,7 +76,7 @@ services:
 
   # Rely on etools and prp database instances running locally
   db-etools:
-    image: mdillon/postgis:9.6
+    image: postgis/postgis:12-3.2
     container_name: datamart_etools
     shm_size: '1gb'
     environment:
@@ -87,7 +87,7 @@ services:
       - "$PWD/build/etools:/var/lib/postgresql/data"
 
   db-prp:
-    image: mdillon/postgis:9.6
+    image: postgis/postgis:12-3.2
     shm_size: '1gb'
     container_name: datamart_prp
     environment:

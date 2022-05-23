@@ -1,4 +1,4 @@
-FROM mdillon/postgis:9.6
+FROM postgis/postgis:12-3.2
 
 #RUN mkdir -p /tmp/psql_data/
 
