@@ -45,7 +45,7 @@ class TravelTrip(EtoolsDataMartModel):
     section_name = models.CharField(max_length=128, blank=True, null=True, db_index=True)
     supervisor_email = models.CharField(max_length=200, blank=True, null=True)
     traveler_email = models.CharField(max_length=200, blank=True, null=True, db_index=True)
-    user_info_text = models.JSONField()
+    user_info_text = models.JSONField(default=dict, blank=True)
     additional_notes = models.TextField(blank=True, null=True)
     not_as_planned = models.BooleanField(blank=True, null=True)
 
