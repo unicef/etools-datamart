@@ -31,11 +31,11 @@ def queue(modeladmin, request, queryset):
 
 class ExportAdmin(AdminFiltersMixin, ExtraUrlMixin, admin.ModelAdmin):
     list_display = (
-        'name', 'filename', 'as_user', 'format', 'enabled', 'refresh', 'last_run', 'status_code', 'size',
+        'name', 'url', 'filename', 'as_user', 'format', 'enabled', 'refresh', 'last_run', 'status_code', 'size',
         'response_ms', 'api', 'download', 'queue_task'
     )
     date_hierarchy = 'last_run'
-    search_fields = ('id', 'url', 'name', 'filename')
+    search_fields = ('id', 'url', 'name', 'filename', 'url')
     list_filter = (
         ('as_user__username', ValueFilter.factory(title='User', lookup_name='icontains')),
         ('status_code', StatusFilter),
