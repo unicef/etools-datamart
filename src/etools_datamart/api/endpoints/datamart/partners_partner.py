@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Q
 
 from rest_framework import serializers
 
@@ -72,8 +73,12 @@ class PartnerViewSet(common.DataMartViewSet):
                              'short': PartnerSerializerShort
                              }
     queryset = models.Partner.objects.all()
-    filter_fields = ('partner_type', 'hidden', 'cso_type', 'rating', 'last_modify_date')
+    filter_fields = ('partner_type', 'hidden', 'cso_type', 'rating', 'last_modify_date', 'reported_cy', 'total_ct_cy')
     ordering_fields = ("id", "name")
 
     def get_querystringfilter_form(self, request, filter):
         return PartnerFilterForm(request.GET, filter.form_prefix)
+
+
+class PartnerHACTActiveViewSet(PartnerViewSet):
+    queryset = models.Partner.objects.filter(Q(reported_cy__gt=0) | Q(total_ct_cy__gt=0))

@@ -72,6 +72,7 @@ router.register(r'datamart/t2f/trips', endpoints.TripViewSet)
 router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
 router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
 router.register(r'datamart/partners_hact', endpoints.PartnerHactViewSet)
+router.register(r'datamart/partners_hact_active', endpoints.PartnerHACTActiveViewSet)
 router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
 router.register(r'prp/indicator-report', endpoints.IndicatorReportViewSet)
