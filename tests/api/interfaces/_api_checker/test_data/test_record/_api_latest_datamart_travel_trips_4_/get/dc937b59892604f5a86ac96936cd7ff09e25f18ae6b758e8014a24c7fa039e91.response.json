@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"a337864aeb0aaee1ccd7aa9e627cc83b\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.travel_trips.TravelTripViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.travel_trips.TravelTripViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "420",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "id": 4,
+        "source_id": null,
+        "last_modify_date": "23 May 2022 08:54:41",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "created": null,
+        "modified": null,
+        "reference_number": null,
+        "status": "",
+        "title": "",
+        "description": null,
+        "start_date": null,
+        "end_date": null,
+        "office_name": null,
+        "section_name": null,
+        "supervisor_email": null,
+        "traveler_email": null,
+        "user_info_text": {},
+        "additional_notes": null,
+        "not_as_planned": null,
+        "attachments": null
+    },
+    "content_type": "application/json"
+}

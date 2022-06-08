@@ -374,6 +374,14 @@ class TripAdmin(DataModelAdmin):
     search_fields = ('reference_number',)
 
 
+@register(models.TravelTrip)
+class TravelTripAdmin(DataModelAdmin):
+    list_display = ('reference_number', 'traveler_email',
+                    'supervisor_email', 'end_date',)
+    list_filter = ('start_date', 'end_date')
+    search_fields = ('reference_number',)
+
+
 @register(models.Engagement)
 class EngagementAdmin(DataModelAdmin):
     list_display = ('reference_number', 'agreement', 'engagement_type', 'status', 'start_date', 'sections')

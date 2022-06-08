@@ -63,12 +63,16 @@ router.register(r'datamart/reports/outputs', endpoints.OutputViewSet, basename='
 router.register(r'datamart/reports/activities', endpoints.ActivityViewSet, basename='activity')
 
 router.register(r'datamart/users', endpoints.EtoolsUserViewSet)
+
+router.register(r'datamart/travel/trips', endpoints.TravelTripViewSet)
+
 router.register(r'datamart/travels', endpoints.TravelViewSet)
 router.register(r'datamart/travel-activities', endpoints.TravelActivityViewSet)
 router.register(r'datamart/t2f/trips', endpoints.TripViewSet)
 router.register(r'datamart/tpm-visits', endpoints.TPMVisitViewSet)
 router.register(r'datamart/tpm-activities', endpoints.TPMActivityViewSet)
 router.register(r'datamart/partners_hact', endpoints.PartnerHactViewSet)
+router.register(r'datamart/partners_hact_active', endpoints.PartnerHACTActiveViewSet)
 router.register(r'datamart/partners', endpoints.PartnerViewSet)
 
 router.register(r'prp/indicator-report', endpoints.IndicatorReportViewSet)

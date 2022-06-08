@@ -112,6 +112,7 @@ class Command(BaseCommand):
                         if c['unique'] and len(c['columns']) == 1
                     ]
                     table_description = connection.introspection.get_table_description(cursor, table_name)
+                    print(11111111)
                 except BaseException as e:
                     yield "# Unable to inspect table '%s'" % table_name
                     yield "# The error was: %s" % e

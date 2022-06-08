@@ -19,7 +19,7 @@ from .office import OfficeViewSet
 from .partners_agreement import PartnerAgreementViewSet
 from .partners_hact import PartnerHactViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
-from .partners_partner import PartnerViewSet
+from .partners_partner import PartnerHACTActiveViewSet, PartnerViewSet
 from .partners_staffmember import PartnerStaffMemberViewSet
 from .pd_indicator import PDIndicatorViewSet
 from .pmpindicators import PMPIndicatorsViewSet
@@ -31,6 +31,7 @@ from .tpm_activity import TPMActivityViewSet
 from .tpm_visit import TPMVisitViewSet
 from .travel import TravelViewSet
 from .travel_activity import TravelActivityViewSet
+from .travel_trips import TravelTripViewSet
 from .trips import TripViewSet
 from .user import EtoolsUserViewSet
 from .userstats import UserStatsViewSet
