@@ -6,7 +6,7 @@
                 "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:02:11.932Z",
+                    "last_modify_date": "2022-06-20T21:19:30.613Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -21,7 +21,8 @@
                     "vendor_number": null,
                     "active": null,
                     "created": null,
-                    "modified": null
+                    "modified": null,
+                    "partner_id": null
                 }
             },
             {
@@ -29,7 +30,7 @@
                 "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:02:11.943Z",
+                    "last_modify_date": "2022-06-20T21:19:30.616Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -44,7 +45,8 @@
                     "vendor_number": null,
                     "active": null,
                     "created": null,
-                    "modified": null
+                    "modified": null,
+                    "partner_id": null
                 }
             },
             {
@@ -52,7 +54,7 @@
                 "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-08-04T21:02:11.968Z",
+                    "last_modify_date": "2022-06-20T21:19:30.616Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -67,7 +69,8 @@
                     "vendor_number": null,
                     "active": null,
                     "created": null,
-                    "modified": null
+                    "modified": null,
+                    "partner_id": null
                 }
             }
         ],

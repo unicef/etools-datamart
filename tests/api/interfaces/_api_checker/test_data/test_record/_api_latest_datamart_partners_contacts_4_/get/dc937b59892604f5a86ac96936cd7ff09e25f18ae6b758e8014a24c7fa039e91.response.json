@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"27abf7719ae97c0c5a7f048d78b2827a\"",
+        "ETag": "\"f618d18d102b1e630b298aab6ca6c3cc\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.partners_staffmember.PartnerStaffMemberViewSet",
         "service": "etools_datamart.api.endpoints.datamart.partners_staffmember.PartnerStaffMemberViewSet",
@@ -13,7 +13,8 @@
         "cache-hit": "False",
         "cache-ttl": "1y",
         "Content-Length": "161",
-        "Referrer-Policy": "same-origin"
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "partner": null,
