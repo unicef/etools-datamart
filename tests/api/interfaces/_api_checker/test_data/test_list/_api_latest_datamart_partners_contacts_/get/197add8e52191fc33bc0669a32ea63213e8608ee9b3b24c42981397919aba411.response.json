@@ -15,7 +15,7 @@
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "570",
+        "Content-Length": "624",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -27,6 +27,7 @@
         "results": [
             {
                 "partner": null,
+                "partner_id": null,
                 "user": null,
                 "vendor_number": null,
                 "position": null,
@@ -38,6 +39,7 @@
             },
             {
                 "partner": null,
+                "partner_id": null,
                 "user": null,
                 "vendor_number": null,
                 "position": null,
@@ -49,6 +51,7 @@
             },
             {
                 "partner": null,
+                "partner_id": null,
                 "user": null,
                 "vendor_number": null,
                 "position": null,

@@ -15,6 +15,7 @@ class PartnerStaffMemberSerializer(DataMartSerializer):
     class Meta:
         model = models.PartnerStaffMember
         fields = ('partner',
+                  'partner_id',
                   'user',
                   'vendor_number',
                   'position',

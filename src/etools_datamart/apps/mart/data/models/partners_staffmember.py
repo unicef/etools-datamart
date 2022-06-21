@@ -19,6 +19,7 @@ class PartnerStaffMember(EtoolsDataMartModel):
     user = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     partner = models.CharField(max_length=255, blank=True, null=True)
+    partner_id = models.PositiveIntegerField(blank=True, null=True)
     vendor_number = models.CharField(max_length=100, blank=True, null=True)
     active = models.BooleanField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
@@ -30,6 +31,7 @@ class PartnerStaffMember(EtoolsDataMartModel):
         source = PartnersPartnerstaffmember
         mapping = {
             'partner': 'partner.name',
+            'partner_id': 'partner.id',
             'vendor_number': 'partner.vendor_number',
             'user': '-',
         }
