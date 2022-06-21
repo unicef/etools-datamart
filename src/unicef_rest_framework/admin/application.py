@@ -4,7 +4,7 @@ import uuid
 from django import forms
 from django.contrib import admin
 
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 
 from unicef_rest_framework.models import Application
 
@@ -24,7 +24,7 @@ class ApplicationForm(forms.ModelForm):
             return self.cleaned_data['password']
 
 
-class ApplicationAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class ApplicationAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     readonly_fields = ('uuid', 'last_modify_user')
     form = ApplicationForm
     exclude = ('all_services',)

@@ -8,7 +8,7 @@ from django.contrib.admin.views.main import ChangeList
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from admin_extra_urls.decorators import button
+from admin_extra_buttons.decorators import button
 from adminactions.actions import export_as_csv, export_as_xls, mass_update
 from adminfilters.filters import AllValuesComboFilter
 from adminfilters.mixin import AdminFiltersMixin

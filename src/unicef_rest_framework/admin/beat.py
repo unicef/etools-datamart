@@ -11,8 +11,8 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminactions.mass_update import mass_update, MassUpdateForm
 from django_celery_beat import admin
 from django_celery_beat.admin import PeriodicTaskForm
@@ -39,7 +39,7 @@ class PeriodicTaskPreloadForm(PeriodicTaskForm):
         widgets = {'kwargs': forms.HiddenInput}
 
 
-class PeriodicTaskAdmin(ExtraUrlMixin, admin.PeriodicTaskAdmin):
+class PeriodicTaskAdmin(ExtraButtonsMixin, admin.PeriodicTaskAdmin):
     list_display = ('name', 'enabled', 'schedule', 'one_off', 'total_run_count')
     list_filter = ('enabled', 'last_run_at', )
     date_hierarchy = 'last_run_at'

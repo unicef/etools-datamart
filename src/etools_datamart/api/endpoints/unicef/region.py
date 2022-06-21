@@ -1,4 +1,4 @@
-from unicef_security import models
+from unicef_realm import models
 
 from .. import common
 from . import serializers

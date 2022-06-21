@@ -2,8 +2,8 @@ import logging
 
 from django.contrib import admin
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import _confirm_action, ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import confirm_action, ExtraButtonsMixin
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +17,14 @@ class ReadOnlyAdminMixin:
         return [f.name for f in self.model._meta.fields]
 
 
-class TruncateTableMixin(ExtraUrlMixin):
+class TruncateTableMixin(ExtraButtonsMixin):
 
     def _truncate(self, request):
         self.model.objects.truncate()
 
     @button(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
     def truncate(self, request):
-        return _confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
+        return confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
                                "Successfully executed", )
 
 

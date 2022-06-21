@@ -7,8 +7,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 import requests
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 
 from ..models.filter import SystemFilter, SystemFilterFieldRule
 
@@ -25,7 +25,7 @@ class SystemFilterRuleInline(TabularInline):
 #     list_display = ('param', 'value')
 
 
-class SystemFilterAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class SystemFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = ('service', 'user', 'group', 'handler')
     readonly_fields = ('handler',)
     list_filter = ('service', 'user')
