@@ -349,8 +349,24 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         if attachment:
             return attachment.file
 
+    def get_final_partnership_review(self, record: PartnersIntervention, values: dict, **kwargs):
+        from etools_datamart.apps.mart.data.models import Attachment
+        partner_intervention_att = record.PartnersInterventionattachment_intervention\
+            .filter(type__name='Final Partnership Review')\
+            .last()
+        if partner_intervention_att:
+            attachment = Attachment.objects\
+                .filter(object_id=partner_intervention_att.id,
+                        code='partners_intervention_attachment',
+                        content_type='interventionattachment')\
+                .last()
+            if attachment:
+                return attachment.file
+
 
 class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartModel):
+    final_partnership_review = models.CharField(max_length=1024, null=True)
+
     locations = models.TextField(blank=True, null=True)
     locations_data = JSONField(blank=True, null=True, default=dict)
 
@@ -365,6 +381,7 @@ class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartMode
         mapping = dict(**InterventionAbstract.Options.mapping,
                        locations_data='i',
                        locations='-',
+                       final_partnership_review='-',
                        )
 
 
