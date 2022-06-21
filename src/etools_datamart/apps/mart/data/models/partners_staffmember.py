@@ -23,12 +23,14 @@ class PartnerStaffMember(EtoolsDataMartModel):
     active = models.BooleanField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     modified = models.DateTimeField(blank=True, null=True)
+    partner_id = models.IntegerField(blank=True, null=True)
 
     loader = PartnerStaffMemberLoader()
 
     class Options:
         source = PartnersPartnerstaffmember
         mapping = {
+            'partner_id': 'partner.id',
             'partner': 'partner.name',
             'vendor_number': 'partner.vendor_number',
             'user': '-',

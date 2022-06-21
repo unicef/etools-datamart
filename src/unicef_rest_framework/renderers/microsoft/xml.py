@@ -1,4 +1,4 @@
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 
 from rest_framework_xml.renderers import XMLRenderer
 
@@ -31,4 +31,4 @@ class MSXmlRenderer(XMLRenderer):
             pass
 
         else:
-            xml.characters(smart_text(data))
+            xml.characters(smart_str(data))
