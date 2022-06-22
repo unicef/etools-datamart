@@ -8,11 +8,10 @@ azure-storage-blob = "*"
 celery = "<5.2"  # error class based task
 cryptography = "<3.4"  # PEP517 dependency
 dj-static = "*"
-Django = "*"
-django-admin-extra-urls = "*"
+Django = "<4.0"
 django-adminactions = "*"
 django-adminfilters = "*"
-django-celery-beat = "*"
+django-celery-beat = "<2.3"
 django-celery-email = "*"
 django-concurrency = "*"
 django-constance = "*"
@@ -60,6 +59,9 @@ social-auth-core = "*"
 sentry-sdk = "*"
 swagger-spec-validator = "*"
 unicef-security = "<1.0"
+django-admin-extra-buttons = "*"
+#unicef-security = "*"
+#unicef-realm = "*"
 xhtml2pdf = "*"
 
 

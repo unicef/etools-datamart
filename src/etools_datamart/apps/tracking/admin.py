@@ -8,7 +8,7 @@ from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import button
+from admin_extra_buttons.decorators import button
 
 from unicef_rest_framework.admin import APIModelAdmin, TruncateTableMixin
 from unicef_rest_framework.utils import humanize_size

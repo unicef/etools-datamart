@@ -315,7 +315,7 @@ INSTALLED_APPS = [
 
     'etools_datamart.api',
     'impersonate',
-    'admin_extra_urls',
+    'admin_extra_buttons',
     'adminactions',
 
     'jsoneditor',

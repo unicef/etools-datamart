@@ -14,8 +14,8 @@ from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import _confirm_action, ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import confirm_action, ExtraButtonsMixin
 from adminactions.mass_update import mass_update
 from django_celery_beat.models import PeriodicTask
 from pygments import highlight
@@ -38,7 +38,7 @@ cache = caches['default']
 def queue(modeladmin, request, queryset):
     count = len(queryset)
     for obj in queryset:
-        modeladmin.queue(request, pk=obj.pk)
+        modeladmin.queue(modeladmin, request, pk=obj.pk)
     modeladmin.message_user(request,
                             "{0} task{1} queued".format(count, pluralize(count)),
                             messages.SUCCESS)
@@ -134,7 +134,7 @@ class JSONROWidget(forms.Textarea):
 
 
 @register(models.EtlTask)
-class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class EtlTaskAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = (
         'task', '_last_run', '_status', '_total', 'time', '_last_success', '_last_failure', 'unlock_task',
         'queue_task', 'data'
@@ -324,8 +324,8 @@ class EtlTaskAdmin(ExtraUrlMixin, admin.ModelAdmin):
         def _action(request):
             obj.loader.unlock()
 
-        return _confirm_action(self, request, _action,
-                               f"""Continuing will unlock selected task. ({obj.task}).
+        return confirm_action(self, request, _action,
+                              f"""Continuing will unlock selected task. ({obj.task}).
 {obj.loader.task.name} - {obj.loader.config.lock_key}
 """,
                                "Successfully executed", )
@@ -360,7 +360,7 @@ class DeltaFilter(RangeFilter):
 
 
 @register(models.EtlTaskHistory)
-class EtlTaskHistoryAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class EtlTaskHistoryAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = ('task', 'timestamp', 'time', 'incr')
     list_filter = ('task', ElapsedFilter, DeltaFilter)
     actions = [mass_update]
