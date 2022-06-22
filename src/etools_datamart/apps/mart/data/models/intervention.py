@@ -351,17 +351,13 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     def get_final_partnership_review(self, record: PartnersIntervention, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Attachment
-        partner_intervention_att = record.PartnersInterventionattachment_intervention\
-            .filter(type__name='Final Partnership Review')\
+        attachment = Attachment.objects\
+            .filter(pd_ssfa_number=record.number,
+                    code='partners_intervention_attachment',
+                    content_type='interventionattachment')\
             .last()
-        if partner_intervention_att:
-            attachment = Attachment.objects\
-                .filter(object_id=partner_intervention_att.id,
-                        code='partners_intervention_attachment',
-                        content_type='interventionattachment')\
-                .last()
-            if attachment:
-                return attachment.file
+        if attachment:
+            return attachment.file
 
 
 class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartModel):
