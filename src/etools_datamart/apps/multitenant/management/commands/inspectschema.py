@@ -112,7 +112,6 @@ class Command(BaseCommand):
                         if c['unique'] and len(c['columns']) == 1
                     ]
                     table_description = connection.introspection.get_table_description(cursor, table_name)
-                    print(11111111)
                 except BaseException as e:
                     yield "# Unable to inspect table '%s'" % table_name
                     yield "# The error was: %s" % e
@@ -179,7 +178,7 @@ class Command(BaseCommand):
                     if att_name == 'id' and extra_params == {'primary_key': True}:
                         if field_type == 'AutoField(':
                             continue
-                        elif field_type == 'IntegerField(' and not connection.features.can_introspect_autofield:
+                        elif field_type == 'IntegerField(' and not connection.features.introspected_field_types:
                             comment_notes.append('AutoField?')
 
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
