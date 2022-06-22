@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.utils import timezone
 
 import factory
+import unicef_realm.models
 import unicef_security.models
 from factory import SubFactory
 from factory.base import FactoryMetaClass
@@ -152,7 +153,7 @@ class RegionFactory(RegisterModelFactory):
     name = factory.Sequence(lambda n: "name%03d" % n)
 
     class Meta:
-        model = unicef_security.models.Region
+        model = unicef_realm.models.Region
         django_get_or_create = ('name',)
 
 
@@ -169,5 +170,5 @@ class BusinessAreaFactory(RegisterModelFactory):
     region = SubFactory(RegionFactory)
 
     class Meta:
-        model = unicef_security.models.BusinessArea
+        model = unicef_realm.models.BusinessArea
         django_get_or_create = ('name',)

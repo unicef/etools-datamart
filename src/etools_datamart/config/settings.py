@@ -665,7 +665,7 @@ SCHEMA_EXCLUDE = {'schema_name__in': env.list('IGNORED_SCHEMAS')}
 
 ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')
 
-BUSINESSAREA_MODEL = 'unicef_security.BusinessArea'
+REALM_TARGET_MODEL = 'unicef_realm.BusinessArea'
 AUTH_USER_MODEL = 'unicef_security.User'
 
 
