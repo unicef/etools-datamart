@@ -3,8 +3,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminfilters.mixin import AdminFiltersMixin
 from adminfilters.value import ValueFilter
 
@@ -29,7 +29,7 @@ def queue(modeladmin, request, queryset):
         preload.apply_async(args=[t.id])
 
 
-class ExportAdmin(AdminFiltersMixin, ExtraUrlMixin, admin.ModelAdmin):
+class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
     list_display = (
         'name', 'url', 'filename', 'as_user', 'format', 'enabled', 'refresh', 'last_run', 'status_code', 'size',
         'response_ms', 'api', 'download', 'queue_task'

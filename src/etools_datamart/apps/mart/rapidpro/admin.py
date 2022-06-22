@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin, register
 
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 
 from etools_datamart.apps.core.admin_mixins import ReadOnlyMixin
 from etools_datamart.apps.mart.data.admin import DataModelAdmin
@@ -20,7 +20,7 @@ class RapidProAdmin(ReadOnlyMixin, DataModelAdmin):
 
 
 @register(models.Source)
-class SourceAdmin(ExtraUrlMixin, ModelAdmin):
+class SourceAdmin(ExtraButtonsMixin, ModelAdmin):
     list_display = ('name', 'server', 'is_active')
     list_filter = ('is_active',)
 
