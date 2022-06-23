@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 azure-storage-blob = "*"
-celery = "<5.2"  # error class based task
+celery = "==5.2.7"
 cryptography = "<3.4"  # PEP517 dependency
 dj-static = "*"
 Django = "<4.0"
@@ -63,8 +63,6 @@ django-admin-extra-buttons = "*"
 #unicef-security = "*"
 #unicef-realm = "*"
 xhtml2pdf = "*"
-
-
 
 [dev-packages]
 drf-api-checker = "*"
