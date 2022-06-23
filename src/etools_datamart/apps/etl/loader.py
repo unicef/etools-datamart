@@ -221,7 +221,7 @@ class BaseLoader:
             self.config = model._etl_config
             del model._etl_config
             self.task = LoaderTask(self)
-            self.config.celery.tasks.register(self.task)
+            self.config.celery.register_task(self.task)
 
         setattr(model, name, self)
 
