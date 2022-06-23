@@ -5,13 +5,13 @@ name = "pypi"
 
 [packages]
 azure-storage-blob = "*"
-celery = "==5.2.7"
+celery = "*"
 cryptography = "<3.4"  # PEP517 dependency
 dj-static = "*"
 Django = "<4.0"
 django-adminactions = "*"
 django-adminfilters = "*"
-django-celery-beat = "<2.3"
+django-celery-beat = "*"
 django-celery-email = "*"
 django-concurrency = "*"
 django-constance = "*"
