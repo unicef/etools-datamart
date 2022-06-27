@@ -340,6 +340,7 @@ INSTALLED_APPS = [
     'djcelery_email',
     'django_celery_beat',
     'django_extensions',
+    'unicef_realm',
 
 ]
 DATE_FORMAT = '%d %b %Y'
