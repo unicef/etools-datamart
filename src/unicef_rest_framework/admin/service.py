@@ -7,8 +7,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminactions.mass_update import mass_update
 from constance import config
 from strategy_field.utils import fqn
@@ -39,7 +39,7 @@ def get_stash_url(obj, label=None, **kwargs):
                                                                        label or qn.split('.')[-1]))
 
 
-class ServiceAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class ServiceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = ('short_name', 'visible', 'access', 'cache_version', 'suffix', 'json', 'admin')
     list_filter = ('hidden', 'access')
 

@@ -7,7 +7,7 @@ from django.db import connections
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 
 from etools_datamart.apps.core.admin_mixins import DisplayAllMixin, ReadOnlyMixin
 
@@ -72,7 +72,7 @@ class SchemaFilter(ListFilter):
         return queryset
 
 
-class EToolsModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
+class EToolsModelAdmin(ExtraButtonsMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         if request.method == 'POST':
@@ -84,7 +84,7 @@ class EToolsModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin
         return self._changeform_view(request, object_id, form_url, extra_context)
 
 
-class TenantModelAdmin(ExtraUrlMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
+class TenantModelAdmin(ExtraButtonsMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
     list_filter = [SchemaFilter, ]
 
     # def get_queryset(self, request):

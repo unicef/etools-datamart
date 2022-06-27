@@ -11,8 +11,8 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 
 from unicef_rest_framework.cache import humanize_ttl, parse_ttl
 from unicef_rest_framework.forms import CacheVersionForm
@@ -25,7 +25,7 @@ class CacheUpdateForm(forms.Form):
     viewset = forms.CharField()
 
 
-class CacheVersionAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class CacheVersionAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = ('name', 'cache_version', 'get_cache_ttl', 'cache_key')
     search_fields = ('name', 'viewset')
     actions = ['incr_version', 'reset_version', 'generate_cache_token']

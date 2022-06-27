@@ -6,6 +6,7 @@ from django.contrib.admin.apps import SimpleAdminConfig
 from django.core.cache import caches
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from django.views.decorators.cache import never_cache
 
@@ -72,7 +73,7 @@ class DatamartAdminSite(AdminSite):
         ] + urls
         return urls
 
-    @never_cache
+    @method_decorator(never_cache)
     def index(self, request, extra_context=None):
         style = request.COOKIES.get('old_index_style', 0)
         if style in [1, "1"]:
@@ -80,7 +81,7 @@ class DatamartAdminSite(AdminSite):
         else:
             return self.index_new(request, {'index_style': 1})
 
-    @never_cache
+    @method_decorator(never_cache)
     def index_new(self, request, extra_context=None):
         key = f'2apps_groups:{request.user.id}:{get_full_version()}:{config.CACHE_VERSION}'
         app_list = self.get_app_list(request)

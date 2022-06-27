@@ -1,6 +1,6 @@
 from django.db import models
 
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 
 
 class ReadOnlyMixin:
@@ -32,9 +32,9 @@ class DisplayAllMixin:
         return self.list_display
 
 
-class DatamartSourceModelAdmin(ReadOnlyMixin, ExtraUrlMixin, DisplayAllMixin):
+class DatamartSourceModelAdmin(ReadOnlyMixin, ExtraButtonsMixin, DisplayAllMixin):
     pass
 
 
-class DatamartModelAdmin(ExtraUrlMixin, DisplayAllMixin):
+class DatamartModelAdmin(ExtraButtonsMixin, DisplayAllMixin):
     pass

@@ -1,15 +1,15 @@
 from collections import namedtuple
 
-from django.db.backends.base.introspection import BaseDatabaseIntrospection, FieldInfo, TableInfo
+from django.db.backends.base.introspection import BaseDatabaseIntrospection, TableInfo
 from django.utils.encoding import force_str
 
 from .utils import raw_sql
 
-fields = FieldInfo._fields
-if 'default' not in fields:
-    fields += ('default',)
-
-FieldInfo = namedtuple('FieldInfo', fields)
+FieldInfo = namedtuple(
+    'FieldInfo',
+    'name type_code display_size internal_size precision scale null_ok '
+    'default'
+)
 
 
 class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):

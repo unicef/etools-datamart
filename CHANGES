@@ -1,3 +1,12 @@
+3.43
+------
+* update to django 4.0
+* update to celery 5.2
+* fix inspectdb django 3.2/4.0
+* tweak partner contact service
+* added realm
+
+
 3.42
 ------
 * admin tweaks

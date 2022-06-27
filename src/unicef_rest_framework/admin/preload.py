@@ -2,8 +2,8 @@ from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 
 from unicef_rest_framework.utils import humanize_size
 
@@ -26,7 +26,7 @@ def queue(modeladmin, request, queryset):
 #         }
 
 
-class PreloadAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class PreloadAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = ('url', 'as_user', 'format',
                     'enabled', 'last_run',
                     'status_code', 'size', 'response_ms', 'preview')

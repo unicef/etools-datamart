@@ -315,7 +315,7 @@ INSTALLED_APPS = [
 
     'etools_datamart.api',
     'impersonate',
-    'admin_extra_urls',
+    'admin_extra_buttons',
     'adminactions',
 
     'jsoneditor',
@@ -340,6 +340,7 @@ INSTALLED_APPS = [
     'djcelery_email',
     'django_celery_beat',
     'django_extensions',
+    'unicef_realm',
 
 ]
 DATE_FORMAT = '%d %b %Y'
@@ -665,7 +666,7 @@ SCHEMA_EXCLUDE = {'schema_name__in': env.list('IGNORED_SCHEMAS')}
 
 ENABLE_LIVE_STATS = env('ENABLE_LIVE_STATS')
 
-BUSINESSAREA_MODEL = 'unicef_security.BusinessArea'
+REALM_TARGET_MODEL = 'unicef_realm.BusinessArea'
 AUTH_USER_MODEL = 'unicef_security.User'
 
 
