@@ -58,10 +58,8 @@ requests = "*"
 social-auth-core = "*"
 sentry-sdk = "*"
 swagger-spec-validator = "*"
-unicef-security = "<1.0"
-django-admin-extra-buttons = "*"
-#unicef-security = "*"
-#unicef-realm = "*"
+unicef-security = "*"
+unicef-realm = "*"
 xhtml2pdf = "*"
 
 [dev-packages]

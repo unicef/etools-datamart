@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from unicef_security import models
+from unicef_realm import models
 
 
 class RegionSerializer(serializers.ModelSerializer):
