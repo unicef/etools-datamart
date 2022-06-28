@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 azure-storage-blob = "*"
 celery = "*"
-cryptography = "<3.4"  # PEP517 dependency
+cryptography = "*"
 dj-static = "*"
 Django = "*"
 django-adminactions = "*"
