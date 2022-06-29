@@ -1,3 +1,7 @@
+3.43.34
+------
+* fixed all social auth login urls
+
 3.43.3
 ------
 * fixed social auth login settings
