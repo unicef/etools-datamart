@@ -71,6 +71,7 @@ class InterventionFactory(DataMartModelFactory):
 
     class Meta:
         model = models.Intervention
+        django_get_or_create = ('intervention_id', 'schema_name')
 
 
 class InterventionByLocationFactory(DataMartModelFactory):
