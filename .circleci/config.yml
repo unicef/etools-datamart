@@ -8,6 +8,7 @@ parameters:
 jobs:
   setup:
     machine: true
+    docker_layer_caching: true
     steps:
       - checkout
       - run:
@@ -59,23 +60,29 @@ jobs:
           PGUSER: postgres
           POSTGRES_DB: etools_datamart
           POSTGRES_PASSWORD: postgres
+    parallelism: 4
     steps:
       - checkout
       - restore_cache:
           key: source-{{ .Branch }}--{{ checksum "Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
       - run:
           name: run tests
+          parallel: true
           no_output_timeout: 30m
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install tox
-            tox
+            TESTFILES=$(circleci tests glob tests/**/test*.py tests/test*.py | circleci tests split --split-by=timings)
+            mkdir -p test-results
+            tox -- --junitxml=test-results/junit.xml $TESTFILES
       - save_cache:
           key: source-{{ .Branch }}--{{ checksum "Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
           paths:
             - ".venv"
             - "~/.cache/pip"
+      - store_test_results:
+          path: test-results
       - store_artifacts:
           path: build/coverage
           destination: coverage
