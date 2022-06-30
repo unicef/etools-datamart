@@ -36,6 +36,7 @@ from django.db.models import signals
 
 import pytest
 from _pytest.fixtures import SubRequest
+from pytest_django.django_compat import is_django_unittest
 
 
 def pytest_configure(config):
@@ -109,11 +110,11 @@ def django_db_setup(request,
     # """Top level fixture to ensure test databases are available"""
     from django.test.utils import setup_databases, teardown_databases
 
-    from pytest_django.fixtures import _disable_native_migrations
+    from pytest_django.fixtures import _disable_migrations
     setup_databases_args = {}
 
     if not django_db_use_migrations:
-        _disable_native_migrations()
+        _disable_migrations()
 
     if django_db_keepdb and not django_db_createdb:
         setup_databases_args["keepdb"] = True
@@ -158,6 +159,43 @@ def django_db_setup(request,
         Site.objects.get_or_create(domain='example.com', name='example.com')
         assert Service.objects.exists()
         assert not APIRequestLog.objects.exists()
+
+
+@pytest.fixture()
+def _django_db_helper(
+        request, django_db_blocker, transactional=False, reset_sequences=False
+):
+    if is_django_unittest(request):
+        return
+
+    if not transactional and "live_server" in request.fixturenames:
+        # Do nothing, we get called with transactional=True, too.
+        return
+
+    django_db_blocker.unblock()
+    request.addfinalizer(django_db_blocker.restore)
+
+    if transactional:
+        from django.test import TransactionTestCase as django_case
+
+        if reset_sequences:
+
+            class ResetSequenceTestCase(django_case):
+                reset_sequences = True
+
+            django_case = ResetSequenceTestCase
+    else:
+        from django.db import transaction
+        from django.test import TestCase as django_case
+        transaction.Atomic._ensure_durability = False
+
+        def reset_durability():
+            transaction.Atomic._ensure_durability = True
+        request.addfinalizer(reset_durability)
+
+    test_case = django_case(methodName="__init__")
+    test_case._pre_setup()
+    request.addfinalizer(test_case._post_teardown)
 
 
 @pytest.fixture
