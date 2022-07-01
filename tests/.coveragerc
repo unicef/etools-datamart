@@ -1,6 +1,7 @@
 [run]
 branch = True
 source = etools_datamart
+parallel = True
 
 omit =
         **/api-builder.py
