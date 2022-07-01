@@ -73,7 +73,7 @@ jobs:
             export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             pip install tox
-            TESTFILES=$(circleci tests glob tests/**/test*.py tests/test*.py | circleci tests split --split-by=timings)
+            TESTFILES=$(circleci tests glob tests/test_*.py tests/**/test_*.py tests/**/**/test_*.py | circleci tests split --split-by=timings)
             mkdir -p test-results
             tox -- --junitxml=test-results/junit.xml $TESTFILES
       - save_cache:
