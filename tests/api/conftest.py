@@ -5,7 +5,7 @@ from functools import partial
 import pytest
 from drf_querystringfilter.filters import RexList
 from rest_framework.test import APIClient
-from test_utilities.factories import AnonUserFactory
+from test_utilities.factories import AnonUserFactory, factories_registry
 
 from unicef_rest_framework.models import Service
 
@@ -68,3 +68,15 @@ def django_assert_no_duplicate_queries(pytestconfig, ignored=None):
 @pytest.fixture()
 def anon_user(db):
     return AnonUserFactory()
+
+
+@pytest.fixture()
+def data(db, request):
+    # TIPS: database access is forbidden in pytest_generate_tests
+    viewset = request.getfixturevalue('viewset')
+    factory = factories_registry[viewset.serializer_class.Meta.model]
+    data = (factory(schema_name='bolivia'),
+            factory(schema_name='chad'),
+            factory(schema_name='lebanon'))
+    yield
+    [r.delete() for r in data]
