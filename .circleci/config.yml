@@ -80,6 +80,7 @@ jobs:
           paths:
             - ".venv"
             - "~/.cache/pip"
+            - ".tox/py39/lib/python3.9/site-packages/"
       - store_test_results:
           path: test-results
       - store_artifacts:
