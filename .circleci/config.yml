@@ -60,14 +60,13 @@ jobs:
           PGUSER: postgres
           POSTGRES_DB: etools_datamart
           POSTGRES_PASSWORD: postgres
-    parallelism: 4
+    parallelism: 6
     steps:
       - checkout
       - restore_cache:
           key: source-{{ .Branch }}--{{ checksum "Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
       - run:
           name: run tests
-          parallel: true
           no_output_timeout: 30m
           command: |
             export PATH=/home/circleci/.local/bin:$PATH
