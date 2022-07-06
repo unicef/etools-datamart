@@ -1,6 +1,7 @@
-from etools_datamart.apps.sources.etools.models import AuditSpotcheck, PartnersPartnerorganization
+from etools_datamart.apps.sources.etools.models import AuditSpotcheck, PartnersPartnerorganization, \
+    PartnersPlannedengagement
 
-from .consts import PartnerOrganizationConst
+from .consts import PartnerOrganizationConst, PartnerType
 from .utils import create_alias
 
 PartnersPartnerorganization.CSO_TYPES = (
@@ -55,8 +56,17 @@ PartnersPartnerorganization.min_req_programme_visits = property(min_req_programm
 def min_req_spot_checks(self):
     # reported_cy can be None
     reported_cy = self.reported_cy or 0
+    if self.partner_type in [PartnerType.BILATERAL_MULTILATERAL, PartnerType.UN_AGENCY]:
+        return 0
     if self.type_of_assessment == 'Low Risk Assumed' or reported_cy <= PartnerOrganizationConst.CT_CP_AUDIT_TRIGGER_LEVEL:
         return 0
+    try:
+        self.planned_engagement
+    except PartnersPlannedengagement.DoesNotExist:
+        pass
+    else:
+        if self.planned_engagement.scheduled_audit:
+            return 0
     return 1
 
 

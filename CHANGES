@@ -1,6 +1,12 @@
-3.43.34
+3.43.5
+------
+* hact fix
+
+
+3.43.4
 ------
 * fixed all social auth login urls
+
 
 3.43.3
 ------
