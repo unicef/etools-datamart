@@ -1,5 +1,8 @@
-from etools_datamart.apps.sources.etools.models import AuditSpotcheck, PartnersPartnerorganization, \
-    PartnersPlannedengagement
+from etools_datamart.apps.sources.etools.models import (
+    AuditSpotcheck,
+    PartnersPartnerorganization,
+    PartnersPlannedengagement,
+)
 
 from .consts import PartnerOrganizationConst, PartnerType
 from .utils import create_alias
