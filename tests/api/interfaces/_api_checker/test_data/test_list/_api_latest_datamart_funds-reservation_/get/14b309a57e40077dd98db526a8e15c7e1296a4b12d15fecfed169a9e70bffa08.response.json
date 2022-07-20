@@ -4,18 +4,18 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"9dd4ce76b5d1ae9474f1a29c87645e98\"",
+        "ETag": "\"c0d4dee11c8fcb9ae8cb7f5d3cb3f58f\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.funds_reservation.FundsReservationViewSet",
         "service": "etools_datamart.api.endpoints.datamart.funds_reservation.FundsReservationViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "9dd4ce76b5d1ae9474f1a29c87645e98",
+        "cache-key": "c0d4dee11c8fcb9ae8cb7f5d3cb3f58f",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "579",
+        "Content-Length": "702",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -30,7 +30,9 @@
                 "pd_reference_number": null,
                 "vendor_code": "",
                 "fr_number": "",
+                "fr_ref_number": "",
                 "overall_amount_dc": "108.00",
+                "actual_amt": "101.00",
                 "actual_amt_local": "105.00",
                 "total_amt_local": null
             },
@@ -39,7 +41,9 @@
                 "pd_reference_number": null,
                 "vendor_code": "",
                 "fr_number": "",
+                "fr_ref_number": "",
                 "overall_amount_dc": "108.00",
+                "actual_amt": "101.00",
                 "actual_amt_local": "105.00",
                 "total_amt_local": null
             },
@@ -48,7 +52,9 @@
                 "pd_reference_number": null,
                 "vendor_code": "",
                 "fr_number": "",
+                "fr_ref_number": "",
                 "overall_amount_dc": "108.00",
+                "actual_amt": "101.00",
                 "actual_amt_local": "105.00",
                 "total_amt_local": null
             }
