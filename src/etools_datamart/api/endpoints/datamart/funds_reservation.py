@@ -33,8 +33,8 @@ class FundsReservationLightSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.FundsReservation
         fields = [
-            "country_name", "pd_reference_number", "vendor_code", "fr_number", "fr_ref_number",
-            "overall_amount_dc", "actual_amt", "actual_amt_local", "total_amt_local",
+            "country_name", "pd_reference_number", "vendor_code", "fr_number", "fr_ref_number", "wbs",
+                "overall_amount_dc", "actual_amt", "actual_amt_local", "total_amt_local",
         ]
         exclude = None
 
