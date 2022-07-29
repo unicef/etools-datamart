@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"49bb5558c567a3a2e336f12b3937ad76\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.reports_indicastor.IndicatorViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "49bb5558c567a3a2e336f12b3937ad76",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "1143",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "partner_name": null,
+                "partner_vendor_number": null,
+                "pd_sffa_reference_number": null,
+                "lower_result_name": null,
+                "pd_output_indicator_title": null,
+                "unit": null,
+                "display_type": null,
+                "baseline_numerator": null,
+                "baseline_denominator": null,
+                "target_numerator": null,
+                "target_denominator": null,
+                "means_of_verification": null
+            },
+            {
+                "country_name": "chad",
+                "schema_name": "chad",
+                "partner_name": null,
+                "partner_vendor_number": null,
+                "pd_sffa_reference_number": null,
+                "lower_result_name": null,
+                "pd_output_indicator_title": null,
+                "unit": null,
+                "display_type": null,
+                "baseline_numerator": null,
+                "baseline_denominator": null,
+                "target_numerator": null,
+                "target_denominator": null,
+                "means_of_verification": null
+            },
+            {
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "partner_name": null,
+                "partner_vendor_number": null,
+                "pd_sffa_reference_number": null,
+                "lower_result_name": null,
+                "pd_output_indicator_title": null,
+                "unit": null,
+                "display_type": null,
+                "baseline_numerator": null,
+                "baseline_denominator": null,
+                "target_numerator": null,
+                "target_denominator": null,
+                "means_of_verification": null
+            }
+        ]
+    },
+    "content_type": "application/json"
+}

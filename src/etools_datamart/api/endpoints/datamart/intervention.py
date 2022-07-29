@@ -121,6 +121,24 @@ class InterventionSerializerPlain(InterventionSerializerV2):
                    )
 
 
+class InterventionSerializerBudget(InterventionSerializerV2):
+    class Meta:
+        model = models.Intervention
+        exclude = None
+        fields = (
+            'country_name',
+            'schema_name',
+            'partner_name',
+            'partner_vendor_number',
+            'agreement_reference_number',
+            'currency',
+            'partner_contribution_local',
+            'unicef_cash_local',
+            'in_kind_amount_local',
+            'cp_outputs_data'
+        )
+
+
 class InterventionSerializerFull(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Intervention
@@ -154,6 +172,7 @@ class InterventionViewSet(common.DataMartViewSet):
                              'full': InterventionSerializerFull,
                              'v2': InterventionSerializerV2,
                              'plain': InterventionSerializerPlain,
+                             'budget': InterventionSerializerBudget,
                              'short': ["title", "number", "country_name", "start_date"]}
 
     def get_querystringfilter_form(self, request, filter):
