@@ -90,6 +90,8 @@ class ReportIndicatorLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
 
 class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):
+    partner_vendor_number = models.CharField(max_length=100, blank=True, null=True)
+    partner_name = models.CharField(max_length=200, null=True)
     assumptions = models.TextField(null=True, blank=True, )
     baseline = JSONField(default=dict, blank=True, null=True)
     baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
@@ -159,6 +161,8 @@ class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):
     class Options:
         source = ReportsAppliedindicator
         mapping = dict(
+            partner_name='lower_result.result_link.intervention.agreement.partner.name',
+            partner_vendor_number='lower_result.result_link.intervention.agreement.partner.vendor_number',
             baseline_denominator='-',
             baseline_numerator='-',
             cluster_indicator_id="=",
