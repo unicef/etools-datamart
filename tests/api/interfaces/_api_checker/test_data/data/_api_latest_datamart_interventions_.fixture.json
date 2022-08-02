@@ -6,7 +6,7 @@
                 "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-11-20T14:16:38.901Z",
+                    "last_modify_date": "2022-08-02T14:03:16.337Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -81,14 +81,15 @@
                     "unicef_signatory_name": null,
                     "updated": null,
                     "last_pv_date": null,
+                    "final_partnership_review": null,
                     "locations": null,
                     "locations_data": [
                         {
                             "name": "location.name",
-                            "level": "location.level",
+                            "level": "location.admin_level",
                             "pcode": "location.p_code",
                             "latitude": "location.latitude",
-                            "levelname": "location.gateway.name",
+                            "levelname": "location.admin_level_name",
                             "longitude": "location.longitude",
                             "source_id": "1"
                         }
@@ -100,7 +101,7 @@
                 "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-11-20T14:16:38.907Z",
+                    "last_modify_date": "2022-08-02T14:03:16.340Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -175,14 +176,15 @@
                     "unicef_signatory_name": null,
                     "updated": null,
                     "last_pv_date": null,
+                    "final_partnership_review": null,
                     "locations": null,
                     "locations_data": [
                         {
                             "name": "location.name",
-                            "level": "location.level",
+                            "level": "location.admin_level",
                             "pcode": "location.p_code",
                             "latitude": "location.latitude",
-                            "levelname": "location.gateway.name",
+                            "levelname": "location.admin_level_name",
                             "longitude": "location.longitude",
                             "source_id": "1"
                         }
@@ -194,7 +196,7 @@
                 "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2021-11-20T14:16:38.910Z",
+                    "last_modify_date": "2022-08-02T14:03:16.342Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -269,14 +271,15 @@
                     "unicef_signatory_name": null,
                     "updated": null,
                     "last_pv_date": null,
+                    "final_partnership_review": null,
                     "locations": null,
                     "locations_data": [
                         {
                             "name": "location.name",
-                            "level": "location.level",
+                            "level": "location.admin_level",
                             "pcode": "location.p_code",
                             "latitude": "location.latitude",
-                            "levelname": "location.gateway.name",
+                            "levelname": "location.admin_level_name",
                             "longitude": "location.longitude",
                             "source_id": "1"
                         }

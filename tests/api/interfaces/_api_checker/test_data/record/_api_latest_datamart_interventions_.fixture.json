@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-11-20T14:16:51.474Z",
+                "last_modify_date": "2022-08-02T14:03:21.067Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -80,14 +80,15 @@
                 "unicef_signatory_name": null,
                 "updated": null,
                 "last_pv_date": null,
+                "final_partnership_review": null,
                 "locations": null,
                 "locations_data": [
                     {
                         "name": "location.name",
-                        "level": "location.level",
+                        "level": "location.admin_level",
                         "pcode": "location.p_code",
                         "latitude": "location.latitude",
-                        "levelname": "location.gateway.name",
+                        "levelname": "location.admin_level_name",
                         "longitude": "location.longitude",
                         "source_id": "1"
                     }

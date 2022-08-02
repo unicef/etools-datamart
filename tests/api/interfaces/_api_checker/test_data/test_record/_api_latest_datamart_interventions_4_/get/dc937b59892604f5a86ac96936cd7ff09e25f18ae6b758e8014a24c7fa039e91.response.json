@@ -12,13 +12,13 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "1876",
+        "Content-Length": "1886",
         "Referrer-Policy": "same-origin"
     },
     "data": {
         "id": 4,
         "source_id": null,
-        "last_modify_date": "20 Nov 2021 14:16:51",
+        "last_modify_date": "02 Aug 2022 14:03:21",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
@@ -87,10 +87,10 @@
         "locations_data": [
             {
                 "name": "location.name",
-                "level": "location.level",
+                "level": "location.admin_level",
                 "pcode": "location.p_code",
                 "latitude": "location.latitude",
-                "levelname": "location.gateway.name",
+                "levelname": "location.admin_level_name",
                 "longitude": "location.longitude",
                 "source_id": "1"
             }

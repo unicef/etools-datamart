@@ -4,18 +4,18 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"90cd0489e80d7162ef0f65ce2047a4cf\"",
+        "ETag": "\"5173929dc7ea138118f424bb68187e7a\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
         "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
-        "cache-version": "2",
+        "cache-version": "1",
         "system-filters": "",
-        "cache-key": "90cd0489e80d7162ef0f65ce2047a4cf",
+        "cache-key": "5173929dc7ea138118f424bb68187e7a",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "5709",
+        "Content-Length": "5739",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -28,7 +28,7 @@
             {
                 "id": 1,
                 "source_id": null,
-                "last_modify_date": "20 Nov 2021 14:16:38",
+                "last_modify_date": "02 Aug 2022 14:03:16",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -97,10 +97,10 @@
                 "locations_data": [
                     {
                         "name": "location.name",
-                        "level": "location.level",
+                        "level": "location.admin_level",
                         "pcode": "location.p_code",
                         "latitude": "location.latitude",
-                        "levelname": "location.gateway.name",
+                        "levelname": "location.admin_level_name",
                         "longitude": "location.longitude",
                         "source_id": "1"
                     }
@@ -109,7 +109,7 @@
             {
                 "id": 2,
                 "source_id": null,
-                "last_modify_date": "20 Nov 2021 14:16:38",
+                "last_modify_date": "02 Aug 2022 14:03:16",
                 "seen": null,
                 "country_name": "chad",
                 "schema_name": "chad",
@@ -178,10 +178,10 @@
                 "locations_data": [
                     {
                         "name": "location.name",
-                        "level": "location.level",
+                        "level": "location.admin_level",
                         "pcode": "location.p_code",
                         "latitude": "location.latitude",
-                        "levelname": "location.gateway.name",
+                        "levelname": "location.admin_level_name",
                         "longitude": "location.longitude",
                         "source_id": "1"
                     }
@@ -190,7 +190,7 @@
             {
                 "id": 3,
                 "source_id": null,
-                "last_modify_date": "20 Nov 2021 14:16:38",
+                "last_modify_date": "02 Aug 2022 14:03:16",
                 "seen": null,
                 "country_name": "lebanon",
                 "schema_name": "lebanon",
@@ -259,10 +259,10 @@
                 "locations_data": [
                     {
                         "name": "location.name",
-                        "level": "location.level",
+                        "level": "location.admin_level",
                         "pcode": "location.p_code",
                         "latitude": "location.latitude",
-                        "levelname": "location.gateway.name",
+                        "levelname": "location.admin_level_name",
                         "longitude": "location.longitude",
                         "source_id": "1"
                     }
