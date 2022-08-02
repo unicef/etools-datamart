@@ -74,6 +74,6 @@ class IndicatorViewSet(common.DataMartViewSet):
     filter_fields = ('year', 'last_modify_date')
     serializers_fieldsets = {
         'std': None,
-        'full': IndicatorLightSerializer,
+        'light': IndicatorLightSerializer,
     }
 

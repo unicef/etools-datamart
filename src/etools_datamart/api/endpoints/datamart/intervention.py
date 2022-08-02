@@ -131,6 +131,7 @@ class InterventionSerializerBudget(InterventionSerializerV2):
             'partner_name',
             'partner_vendor_number',
             'agreement_reference_number',
+            'reference_number',
             'currency',
             'partner_contribution_local',
             'unicef_cash_local',
