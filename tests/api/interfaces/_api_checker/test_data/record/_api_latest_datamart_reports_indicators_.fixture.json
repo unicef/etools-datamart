@@ -2,16 +2,18 @@
     "record": {
         "master": {
             "model": "data.reportindicator",
-            "pk": 8,
+            "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-11-20T14:24:21.015Z",
+                "last_modify_date": "2022-12-20T15:54:17.996Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
                 "locations": null,
                 "locations_data": {},
+                "partner_vendor_number": null,
+                "partner_name": null,
                 "assumptions": null,
                 "baseline": {},
                 "baseline_denominator": null,

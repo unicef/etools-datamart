@@ -6,7 +6,7 @@
                 "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-06-20T21:19:30.613Z",
+                    "last_modify_date": "2022-12-20T15:54:08.258Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -30,7 +30,7 @@
                 "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-06-20T21:19:30.616Z",
+                    "last_modify_date": "2022-12-20T15:54:08.263Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -54,7 +54,7 @@
                 "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-06-20T21:19:30.616Z",
+                    "last_modify_date": "2022-12-20T15:54:08.264Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
