@@ -14,7 +14,10 @@ class IndicatorReportLoader(PrpBaseLoader):
         ).annotate(
             business_area=F('progress_report__programme_document__workspace__business_area_code'),
             intervention_reference_number=F('progress_report__programme_document__reference_number'),
+            partner=F('progress_report__programme_document__partner__title'),
             performance_indicator=F('reportable__blueprint__title'),
+            report_type=F('progress_report__report_type'),
+            report_number=F('progress_report__report_number'),
             target=F('reportable__target'),
             baseline=F('reportable__baseline'),
             unit=F('reportable__blueprint__unit'),
@@ -27,6 +30,9 @@ class IndicatorReportLoader(PrpBaseLoader):
 class IndicatorReport(PrpDataMartModel):
 
     business_area = models.CharField(max_length=2048, blank=True, null=True)
+    partner = models.CharField(max_length=255, blank=True, null=True)
+    report_type = models.CharField(max_length=3, blank=True, null=True)
+    report_number = models.IntegerField(blank=True, null=True)
     intervention_reference_number = models.CharField(max_length=2048, blank=True, null=True)
     pd_output_progress_status = models.CharField(max_length=2048, blank=True, null=True)
     performance_indicator = models.CharField(max_length=2048, blank=True, null=True)
@@ -37,6 +43,7 @@ class IndicatorReport(PrpDataMartModel):
     time_period_start = models.DateField(blank=True, null=True)
     time_period_end = models.DateField(blank=True, null=True)
     submission_date = models.DateField(blank=True, null=True)
+    due_date = models.DateField(blank=True, null=True)
 
     loader = IndicatorReportLoader()
 
