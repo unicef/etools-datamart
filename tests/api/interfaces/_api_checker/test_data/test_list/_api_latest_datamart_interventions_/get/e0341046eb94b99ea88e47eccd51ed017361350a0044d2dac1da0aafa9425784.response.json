@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"c5e66534267ded5307f1ce29f9e9c3db\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "c5e66534267ded5307f1ce29f9e9c3db",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "954",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "partner_name": null,
+                "partner_vendor_number": null,
+                "agreement_reference_number": null,
+                "reference_number": null,
+                "currency": "USD",
+                "partner_contribution_local": "10.00",
+                "unicef_cash_local": "10.00",
+                "in_kind_amount_local": "10.00",
+                "cp_outputs_data": {}
+            },
+            {
+                "country_name": "chad",
+                "schema_name": "chad",
+                "partner_name": null,
+                "partner_vendor_number": null,
+                "agreement_reference_number": null,
+                "reference_number": null,
+                "currency": "USD",
+                "partner_contribution_local": "10.00",
+                "unicef_cash_local": "10.00",
+                "in_kind_amount_local": "10.00",
+                "cp_outputs_data": {}
+            },
+            {
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "partner_name": null,
+                "partner_vendor_number": null,
+                "agreement_reference_number": null,
+                "reference_number": null,
+                "currency": "USD",
+                "partner_contribution_local": "10.00",
+                "unicef_cash_local": "10.00",
+                "in_kind_amount_local": "10.00",
+                "cp_outputs_data": {}
+            }
+        ]
+    },
+    "content_type": "application/json"
+}
