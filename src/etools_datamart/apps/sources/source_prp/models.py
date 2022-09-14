@@ -1,6 +1,6 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2022-05-05 23:24:47.300049
+# Generated on 2022-09-14 14:34:09.785703
 from django.contrib.gis.db import models
 
 from etools_datamart.apps.core.readonly import ReadOnlyModel
@@ -137,32 +137,6 @@ class ClusterClusterobjectiveLocations(ReadOnlyModel):
         app_label = 'source_prp'
 
 
-class CoreCartodbtable(ReadOnlyModel):
-    domain = models.CharField(max_length=254)
-    table_name = models.CharField(max_length=254)
-    lft = models.IntegerField()
-    rght = models.IntegerField()
-    tree_id = models.IntegerField()
-    level = models.IntegerField()
-    parent = models.ForeignKey('self', models.PROTECT, related_name='CoreCartodbtable_parent', blank=True, null=True)
-    display_name = models.CharField(max_length=254)
-    name_col = models.CharField(max_length=254)
-    parent_code_col = models.CharField(max_length=254)
-    pcode_col = models.CharField(max_length=254)
-    admin_level = models.SmallIntegerField()
-    admin_level_name = models.CharField(max_length=64)
-    api_key = models.CharField(max_length=254)
-    color = models.CharField(max_length=7)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    remap_table_name = models.CharField(max_length=254, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'core_cartodbtable'
-        app_label = 'source_prp'
-
-
 class CoreCountry(ReadOnlyModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
@@ -174,20 +148,6 @@ class CoreCountry(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'core_country'
-        app_label = 'source_prp'
-
-
-class CoreGatewaytype(ReadOnlyModel):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    name = models.CharField(unique=True, max_length=64)
-    admin_level = models.SmallIntegerField()
-    country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='CoreGatewaytype_country')
-
-    class Meta:
-        managed = False
-        db_table = 'core_gatewaytype'
-        unique_together = (('country', 'admin_level'),)
         app_label = 'source_prp'
 
 
@@ -207,6 +167,9 @@ class CoreLocation(ReadOnlyModel):
     tree_id = models.IntegerField()
     admin_level = models.SmallIntegerField(blank=True, null=True)
     admin_level_name = models.CharField(max_length=64, blank=True, null=True)
+    created = models.DateTimeField()
+    is_active = models.BooleanField()
+    modified = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -278,17 +241,6 @@ class CoreWorkspace(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'core_workspace'
-        app_label = 'source_prp'
-
-
-class CoreWorkspaceCountries(ReadOnlyModel):
-    workspace = models.ForeignKey(CoreWorkspace, models.PROTECT, related_name='CoreWorkspaceCountries_workspace')
-    country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='CoreWorkspaceCountries_country')
-
-    class Meta:
-        managed = False
-        db_table = 'core_workspace_countries'
-        unique_together = (('workspace', 'country'),)
         app_label = 'source_prp'
 
 
@@ -656,6 +608,46 @@ class PartnerPartnerprojectfunding(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerprojectfunding'
+        app_label = 'source_prp'
+
+
+class UnicefLocationsCartodbtable(ReadOnlyModel):
+    domain = models.CharField(max_length=254)
+    table_name = models.CharField(max_length=254)
+    lft = models.IntegerField()
+    rght = models.IntegerField()
+    tree_id = models.IntegerField()
+    level = models.IntegerField()
+    parent = models.ForeignKey('self', models.PROTECT, related_name='UnicefLocationsCartodbtable_parent', blank=True, null=True)
+    display_name = models.CharField(max_length=254)
+    name_col = models.CharField(max_length=254)
+    parent_code_col = models.CharField(max_length=254)
+    pcode_col = models.CharField(max_length=254)
+    admin_level = models.SmallIntegerField()
+    admin_level_name = models.CharField(max_length=64)
+    api_key = models.CharField(max_length=254)
+    color = models.CharField(max_length=7)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    remap_table_name = models.CharField(max_length=254, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_locations_cartodbtable'
+        app_label = 'source_prp'
+
+
+class UnicefLocationsGatewaytype(ReadOnlyModel):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    name = models.CharField(unique=True, max_length=64)
+    admin_level = models.SmallIntegerField()
+    country = models.ForeignKey(CoreCountry, models.PROTECT, related_name='UnicefLocationsGatewaytype_country')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_locations_gatewaytype'
+        unique_together = (('country', 'admin_level'),)
         app_label = 'source_prp'
 
 
