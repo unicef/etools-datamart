@@ -55,18 +55,8 @@ class ClusterClusterobjectiveLocationsAdmin(DatamartSourceModelAdmin, ModelAdmin
     list_filter = []
 
 
-@register(models.CoreCartodbtable)
-class CoreCartodbtableAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
 @register(models.CoreCountry)
 class CoreCountryAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.CoreGatewaytype)
-class CoreGatewaytypeAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
@@ -92,11 +82,6 @@ class CoreResponseplanAdmin(DatamartSourceModelAdmin, ModelAdmin):
 
 @register(models.CoreWorkspace)
 class CoreWorkspaceAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = []
-
-
-@register(models.CoreWorkspaceCountries)
-class CoreWorkspaceCountriesAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
@@ -202,6 +187,16 @@ class PartnerPartnerprojectLocationsAdmin(DatamartSourceModelAdmin, ModelAdmin):
 
 @register(models.PartnerPartnerprojectfunding)
 class PartnerPartnerprojectfundingAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.UnicefLocationsCartodbtable)
+class UnicefLocationsCartodbtableAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
+@register(models.UnicefLocationsGatewaytype)
+class UnicefLocationsGatewaytypeAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
