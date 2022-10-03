@@ -62,17 +62,6 @@ class ClusterClusterobjectiveLocationsViewSet(URFReadOnlyModelViewSet):
     queryset = models.ClusterClusterobjectiveLocations.objects.all()
 
 
-class CoreCartodbtableSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CoreCartodbtable
-        exclude = ()
-
-
-class CoreCartodbtableViewSet(URFReadOnlyModelViewSet):
-    serializer_class = CoreCartodbtableSerializer
-    queryset = models.CoreCartodbtable.objects.all()
-
-
 class CoreCountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CoreCountry
@@ -82,17 +71,6 @@ class CoreCountrySerializer(serializers.ModelSerializer):
 class CoreCountryViewSet(URFReadOnlyModelViewSet):
     serializer_class = CoreCountrySerializer
     queryset = models.CoreCountry.objects.all()
-
-
-class CoreGatewaytypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CoreGatewaytype
-        exclude = ()
-
-
-class CoreGatewaytypeViewSet(URFReadOnlyModelViewSet):
-    serializer_class = CoreGatewaytypeSerializer
-    queryset = models.CoreGatewaytype.objects.all()
 
 
 class CoreLocationSerializer(serializers.ModelSerializer):
@@ -148,17 +126,6 @@ class CoreWorkspaceSerializer(serializers.ModelSerializer):
 class CoreWorkspaceViewSet(URFReadOnlyModelViewSet):
     serializer_class = CoreWorkspaceSerializer
     queryset = models.CoreWorkspace.objects.all()
-
-
-class CoreWorkspaceCountriesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CoreWorkspaceCountries
-        exclude = ()
-
-
-class CoreWorkspaceCountriesViewSet(URFReadOnlyModelViewSet):
-    serializer_class = CoreWorkspaceCountriesSerializer
-    queryset = models.CoreWorkspaceCountries.objects.all()
 
 
 class IndicatorDisaggregationSerializer(serializers.ModelSerializer):
@@ -368,6 +335,28 @@ class PartnerPartnerprojectfundingSerializer(serializers.ModelSerializer):
 class PartnerPartnerprojectfundingViewSet(URFReadOnlyModelViewSet):
     serializer_class = PartnerPartnerprojectfundingSerializer
     queryset = models.PartnerPartnerprojectfunding.objects.all()
+
+
+class UnicefLocationsCartodbtableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UnicefLocationsCartodbtable
+        exclude = ()
+
+
+class UnicefLocationsCartodbtableViewSet(URFReadOnlyModelViewSet):
+    serializer_class = UnicefLocationsCartodbtableSerializer
+    queryset = models.UnicefLocationsCartodbtable.objects.all()
+
+
+class UnicefLocationsGatewaytypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UnicefLocationsGatewaytype
+        exclude = ()
+
+
+class UnicefLocationsGatewaytypeViewSet(URFReadOnlyModelViewSet):
+    serializer_class = UnicefLocationsGatewaytypeSerializer
+    queryset = models.UnicefLocationsGatewaytype.objects.all()
 
 
 class UnicefLowerleveloutputSerializer(serializers.ModelSerializer):
