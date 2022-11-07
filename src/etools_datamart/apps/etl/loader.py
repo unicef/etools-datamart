@@ -409,7 +409,7 @@ class BaseLoader:
     def on_end(self, error=None, retry=False):
         from django.utils import timezone
 
-        from etools_datamart.apps.subscriptions.models import Subscription
+        # from etools_datamart.apps.subscriptions.models import Subscription
         self.results.total_records = self.model.objects.count()
 
         cost = time.time() - self._start
@@ -435,7 +435,7 @@ class BaseLoader:
                     defs['last_changes'] = timezone.now()
                     for service in self.config.model.linked_services:
                         service.invalidate_cache()
-                        Subscription.objects.notify(self.config.model)
+                        # Subscription.objects.notify(self.config.model)
                 defs['results']['checks'] = self.consistency_check()
         self.etl_task.update(**defs)
         self.etl_task.snapshot()
