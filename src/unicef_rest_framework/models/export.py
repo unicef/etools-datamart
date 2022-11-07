@@ -19,7 +19,7 @@ from .preload import AbstractPreload, Client
 FORMATS = (
     ('text/plain', 'txt'),
     ('text/csv', 'csv'),
-    ('application/xlsx', 'xlsx'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx'),
     ('application/json', 'json'),
 )
 
@@ -30,7 +30,7 @@ def get_filename(instance, filename):
 
 class Export(AbstractPreload):
     name = models.CharField(max_length=100)
-    format = models.CharField(max_length=30, choices=FORMATS)
+    format = models.CharField(max_length=100, choices=FORMATS)
     refresh = models.BooleanField(default=False, help_text='If true data are refreshed every day')
     enabled = models.BooleanField(default=False, blank=True)
     filename = models.CharField(max_length=100,

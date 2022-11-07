@@ -16,7 +16,7 @@ FORMATS = (
     ('pdf', 'application/pdf; charset=utf-8'),
     ('txt', 'text/plain; charset=utf-8'),
     ('xhtml', 'text/html; charset=utf-8'),
-    ('xlsx', 'application/xlsx; charset=utf-8'),
+    ('xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=utf-8'),
     ('xml', 'application/xml; charset=utf-8'),
 )
 
