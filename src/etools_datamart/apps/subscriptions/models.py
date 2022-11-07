@@ -1,70 +1,63 @@
 import logging
-from io import BytesIO
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.functional import cached_property
 
-from post_office import mail
-from rest_framework.test import APIRequestFactory
-
-from unicef_rest_framework.models import Service
-
-from etools_datamart.apps.etl.models import EtlTask
-from etools_datamart.sentry import process_exception
-
 logger = logging.getLogger(__name__)
 
 
 class SubscriptionManager(models.Manager):
     def notify(self, model):
-        ct = ContentType.objects.get_for_model(model)
-        etl = EtlTask.objects.filter(content_type=ct).first()
         ret = []
-        for service in Service.objects.filter(source_model=ct):
-            for subscription in self.filter(content_type=ct).exclude(type=Subscription.NONE):
-                logger.info(f"Process subscription {subscription}")
-                try:
-                    if subscription.type in (Subscription.EXCEL, Subscription.PDF):
-                        format = {Subscription.EXCEL: 'xlsx',
-                                  Subscription.PDF: 'pdf',
-                                  }[subscription.type]
-                        rf = APIRequestFactory()
-                        request = rf.get(f"{service.endpoint}?format={format}")
-                        request.user = subscription.user
-                        request.api_info = {}  # this is set my the middleware, so we must set manually here
-                        response = service.viewset.as_view({'get': 'list'})(request)
-                        response.render()
 
-                        # check headers set in ApiMiddleware in request.api_info
-                        request.api_info.update(dict(response.items()))
-
-                        attachments = {
-                            f'{model._meta.verbose_name}.{format}': BytesIO(response.content),
-                        }
-                        template = 'dataset_changed_attachment'
-                    else:
-                        attachments = None
-                        template = 'dataset_changed'
-
-                    ret.append(mail.send(
-                        subscription.user.email,  # List of email addresses also accepted
-                        'notification@datamart.unicef.io',
-                        template=template,
-                        context={'subscription': subscription,
-                                 'user': subscription.user,
-                                 'base_url': settings.ABSOLUTE_BASE_URL,
-                                 'verbose_name': model._meta.verbose_name,
-                                 'etl': etl,
-                                 'model': ct.model,
-                                 'service': service
-                                 },
-                        attachments=attachments
-                    ))
-                except Exception as e:  # pragma: no cover
-                    logger.exception(e)
-                    process_exception(e)
+        # ct = ContentType.objects.get_for_model(model)
+        # etl = EtlTask.objects.filter(content_type=ct).first()
+        # ret = []
+        # for service in Service.objects.filter(source_model=ct):
+        #     for subscription in self.filter(content_type=ct).exclude(type=Subscription.NONE):
+        #         logger.info(f"Process subscription {subscription}")
+        #         try:
+        #             if subscription.type in (Subscription.EXCEL, Subscription.PDF):
+        #                 format = {Subscription.EXCEL: 'xlsx',
+        #                           Subscription.PDF: 'pdf',
+        #                           }[subscription.type]
+        #                 rf = APIRequestFactory()
+        #                 request = rf.get(f"{service.endpoint}?format={format}")
+        #                 request.user = subscription.user
+        #                 request.api_info = {}  # this is set my the middleware, so we must set manually here
+        #                 response = service.viewset.as_view({'get': 'list'})(request)
+        #                 response.render()
+        #
+        #                 # check headers set in ApiMiddleware in request.api_info
+        #                 request.api_info.update(dict(response.items()))
+        #
+        #                 attachments = {
+        #                     f'{model._meta.verbose_name}.{format}': BytesIO(response.content),
+        #                 }
+        #                 template = 'dataset_changed_attachment'
+        #             else:
+        #                 attachments = None
+        #                 template = 'dataset_changed'
+        #
+        #             ret.append(mail.send(
+        #                 subscription.user.email,  # List of email addresses also accepted
+        #                 'notification@datamart.unicef.io',
+        #                 template=template,
+        #                 context={'subscription': subscription,
+        #                          'user': subscription.user,
+        #                          'base_url': settings.ABSOLUTE_BASE_URL,
+        #                          'verbose_name': model._meta.verbose_name,
+        #                          'etl': etl,
+        #                          'model': ct.model,
+        #                          'service': service
+        #                          },
+        #                 attachments=attachments
+        #             ))
+        #         except Exception as e:  # pragma: no cover
+        #             logger.exception(e)
+        #             process_exception(e)
         return ret
 
 
