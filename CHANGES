@@ -1,6 +1,12 @@
+3.47
+------
+* disabled notifications
+* updated etag functionality
+
+
 3.46.1
 ------
-* fix Safe decimal
+* fixed Safe decimal
 
 
 3.46
