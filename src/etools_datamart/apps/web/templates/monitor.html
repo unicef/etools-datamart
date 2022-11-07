@@ -34,7 +34,7 @@
             <span class="col last_run">Last run</span>
             <span class="col last_changes">Last change</span>
             <span class="col status">Status</span>
-            <span class="col subscription">Subscribe</span>
+<!--            <span class="col subscription">Subscribe</span>-->
         </div>
         {% for t in tasks %}
             <div class="row {% cycle 'odd' 'even' %}">
@@ -42,9 +42,7 @@
                 <span class="col last_run">{{ t.last_run|default_if_none:"" }}</span>
                 <span class="col last_changes">{{ t.last_changes|default_if_none:"" }}</span>
                 <span class="col status {{ t.status }}">{{ t.status }}</span>
-                <span class="col subscription">
-                    {% subscription_select t %}
-                </span>
+<!--                <span class="col subscription">{% subscription_select t %}</span>-->
                 {% if user.is_staff %}
                     <span><a href="{% url "admin:etl_etltask_change" t.pk %}">Admin</a></span>
                 {% endif %}

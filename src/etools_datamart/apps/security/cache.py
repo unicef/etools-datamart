@@ -1,3 +1,5 @@
+import hashlib
+
 from rest_framework_extensions.key_constructor.bits import KeyBitBase
 
 from etools_datamart.api.filtering import CountryFilter
@@ -11,4 +13,5 @@ class SchemaAccessKeyBit(KeyBitBase):
             if CountryFilter.query_param not in request.GET:
                 value = get_allowed_schemas(request.user)
 
-        return {'countries': str(value)}
+        hashed_value = hashlib.md5(str(value).encode()).hexdigest()
+        return {'countries': hashed_value}
