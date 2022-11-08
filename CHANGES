@@ -1,3 +1,10 @@
+3.49
+------
+* fixed Trip intervention field
+* Data Report: added Indicator Title
+* Intervention Budget: fix PartnersInterventionattachment
+
+
 3.48
 ------
 * updated drf 3.14

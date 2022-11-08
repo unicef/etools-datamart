@@ -43,6 +43,7 @@ class DataReportLoader(PrpBaseLoader):
             narrative=F('indicator_report__progress_report__narrative'),
             report_status=F('indicator_report__report_status'),
 
+            pd_output_title=F('indicator_report__title'),
             pd_output_progress_status=F('indicator_report__overall_status'),
             pd_output_narrative_assessment=F('indicator_report__narrative_assessment'),
             calculation_method_across_location=F('indicator_report__reportable__blueprint__calculation_formula_across_locations'),
@@ -189,6 +190,7 @@ class DataReport(PrpDataMartModel):
     # | attachment_2 | "nope" |
     # | narrative | progres_report.narrative |
     narrative = models.CharField(max_length=2048, blank=True, null=True)
+    pd_output_title = models.CharField(max_length=2048, blank=True, null=True)
     # | pd_output_progress_status | indicator_report.overall_status |
     pd_output_progress_status = models.CharField(max_length=2048, blank=True, null=True)
     # | pd_output_narrative_assessment | indicator_report.narrative_assessment |
