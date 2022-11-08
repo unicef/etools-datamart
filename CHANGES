@@ -1,3 +1,9 @@
+3.48
+------
+* updated drf 3.14
+* fixed Trip intervention field
+
+
 3.47
 ------
 * disabled notifications
