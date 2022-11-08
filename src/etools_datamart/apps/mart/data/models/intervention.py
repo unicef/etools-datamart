@@ -14,7 +14,7 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionamendment,
     PartnersInterventionplannedvisits,
     ReportsAppliedindicator,
-    T2FTravelactivity,
+    T2FTravelactivity, PartnersInterventionattachment,
 )
 
 from .base import EtoolsDataMartModel
@@ -234,7 +234,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return record.planned
 
     def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = record.PartnersInterventionattachment_intervention.all()
+        qs = PartnersInterventionattachment.objects.filter(intervention=record)
         values['number_of_attachments'] = qs.count()
         return ", ".join(qs.values_list('type__name', flat=True))
 
