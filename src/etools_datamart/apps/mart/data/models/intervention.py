@@ -12,9 +12,10 @@ from etools_datamart.apps.sources.etools.models import (
     FundsFundsreservationheader,
     PartnersIntervention,
     PartnersInterventionamendment,
+    PartnersInterventionattachment,
     PartnersInterventionplannedvisits,
     ReportsAppliedindicator,
-    T2FTravelactivity, PartnersInterventionattachment,
+    T2FTravelactivity,
 )
 
 from .base import EtoolsDataMartModel
