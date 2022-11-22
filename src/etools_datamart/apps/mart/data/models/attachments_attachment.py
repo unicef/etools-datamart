@@ -32,7 +32,7 @@ class Attachment(EtoolsDataMartModel):
     file = models.CharField(max_length=1024, blank=True, null=True)
     file_type = models.CharField(max_length=100, blank=True, null=True)
     file_type_id = models.IntegerField(blank=True, null=True)
-    hyperlink = models.CharField(max_length=255, blank=True, null=True)
+    hyperlink = models.CharField(max_length=1000, blank=True, null=True)
     code = models.CharField(max_length=64, blank=True, null=True)
     uploaded_by = models.CharField(max_length=100, blank=True, null=True)
     object_id = models.IntegerField(blank=True, null=True)

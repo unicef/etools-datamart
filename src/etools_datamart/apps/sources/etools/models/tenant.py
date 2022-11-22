@@ -2100,7 +2100,7 @@ class UnicefAttachmentsAttachment(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     file = models.CharField(max_length=1024, blank=True, null=True)
-    hyperlink = models.CharField(max_length=255)
+    hyperlink = models.CharField(max_length=1000)
     object_id = models.IntegerField(blank=True, null=True)
     code = models.CharField(max_length=64)
     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='UnicefAttachmentsAttachment_content_type', blank=True, null=True)
