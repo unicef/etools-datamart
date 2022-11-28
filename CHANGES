@@ -1,3 +1,9 @@
+3.50
+------
+* fixed attachment endpoints
+* fixed intervention budget endpoints
+* fixed data report
+
 3.49
 ------
 * fixed Trip intervention field
