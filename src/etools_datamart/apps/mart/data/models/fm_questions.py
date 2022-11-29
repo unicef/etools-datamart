@@ -16,15 +16,26 @@ from etools_datamart.apps.sources.etools.models import (
 
 class FMQuestionLoader(EtoolsLoader):
     """Loader for FM Questions"""
+
+    def get_queryset(self):
+        return self.config.source.objects.select_related(
+            "activity_question", "activity_question__question", "activity_question__question__category",
+            "started_checklist", "started_checklist__method",
+            "activity_question__monitoring_activity__location_site",
+            "activity_question__partner", "activity_question__intervention",
+            "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question"
+        ).prefetch_related(
+            'activity_question__question__FieldMonitoringSettingsQuestionMethods_question',
+            'activity_question__question__FieldMonitoringSettingsOption_question'
+        )
+
     def get_answer_options(
             self,
             record: FieldMonitoringDataCollectionFinding,
             values: dict,
             **kwargs,
     ):
-        option_qs = FieldMonitoringSettingsOption.objects.filter(
-            question=record.activity_question.question,
-        )
+        option_qs = record.activity_question.question.FieldMonitoringSettingsOption_question.all()
         return ", ".join([o.label for o in option_qs.all()])
 
     def get_question_collection_methods(
@@ -33,9 +44,7 @@ class FMQuestionLoader(EtoolsLoader):
             values: dict,
             **kwargs,
     ):
-        methods_qs = FieldMonitoringSettingsQuestionMethods.objects.filter(
-            question=record.activity_question.question,
-        )
+        methods_qs = record.activity_question.question.FieldMonitoringSettingsQuestionMethods_question.all()
         return ", ".join(
             [m.method.name for m in methods_qs.all()]
         )
@@ -241,7 +250,7 @@ class FMQuestion(EtoolsDataMartModel):
             date_of_capture="",
             monitoring_activity_end_date="activity_question.monitoring_activity.end_date",
             location="-",
-            site="activity_question.monitoring_activity.locationsite.name",
+            site="activity_question.monitoring_activity.location_site.name",
             category='activity_question.question.category.name',
             information_source='started_checklist.information_source',
             is_hact='activity_question.question.is_hact',
