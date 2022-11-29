@@ -1,5 +1,10 @@
 3.50
 ------
+* fixed intervention budget endpoints
+* improve performace on FMQuestions
+
+3.50
+------
 * fixed attachment endpoints
 * fixed intervention budget endpoints
 * fixed data report

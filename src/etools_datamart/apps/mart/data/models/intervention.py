@@ -324,7 +324,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                          .values_list('fr_number', flat=True))
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
-        if record.result_links:
+        if hasattr(record, 'result_links', None):
             values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
         else:
             values['cp_outputs_data'] = []
