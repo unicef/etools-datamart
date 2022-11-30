@@ -326,9 +326,9 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
         if hasattr(record, 'result_links'):
             values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
+            return ", ".join([rl.name for rl in record.result_links.all()])
         else:
             values['cp_outputs_data'] = []
-        return ", ".join([rl.name for rl in record.result_links.all()])
 
     def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
