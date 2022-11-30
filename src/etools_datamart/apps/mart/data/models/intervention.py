@@ -248,14 +248,14 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(types)
 
     def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
-        i1 = record.review_date_prc
-        i2 = record.signed_by_partner_date
+        i1 = getattr(record, 'review_date_prc', None)
+        i2 = getattr(record, 'signed_by_partner_date', None)
         if i1 and i2:
             return (i2 - i1).days
 
     def get_days_from_submission_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
-        i1 = record.submission_date
-        i2 = record.signed_by_unicef_date
+        i1 = getattr(record, 'submission_date', None)
+        i2 = getattr(record, 'signed_by_unicef_date', None)
         if i1 and i2:
             return (i2 - i1).days
 
@@ -278,11 +278,11 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ta.date if ta else None
 
     def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
-        if record.unicef_signatory:
+        if getattr(record, 'unicef_signatory', None):
             return "{0.username} ({0.email})".format(record.unicef_signatory)
 
     def get_partner_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
-        if record.partner_authorized_officer_signatory:
+        if getattr(record, 'partner_authorized_officer_signatory', None):
             return "{0.last_name} {0.first_name} ({0.email})".format(record.partner_authorized_officer_signatory)
 
     def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
