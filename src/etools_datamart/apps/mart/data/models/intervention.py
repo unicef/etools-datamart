@@ -12,7 +12,6 @@ from etools_datamart.apps.sources.etools.models import (
     FundsFundsreservationheader,
     PartnersIntervention,
     PartnersInterventionamendment,
-    PartnersInterventionattachment,
     PartnersInterventionplannedvisits,
     ReportsAppliedindicator,
     T2FTravelactivity,
@@ -235,7 +234,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return record.planned
 
     def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionattachment.objects.filter(intervention=record)
+        qs = record.PartnersInterventionattachment_intervention.all()
         values['number_of_attachments'] = qs.count()
         return ", ".join(qs.values_list('type__name', flat=True))
 
@@ -248,14 +247,14 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(types)
 
     def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
-        i1 = getattr(record, 'review_date_prc', None)
-        i2 = getattr(record, 'signed_by_partner_date', None)
+        i1 = record.review_date_prc
+        i2 = record.signed_by_partner_date
         if i1 and i2:
             return (i2 - i1).days
 
     def get_days_from_submission_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
-        i1 = getattr(record, 'submission_date', None)
-        i2 = getattr(record, 'signed_by_unicef_date', None)
+        i1 = record.submission_date
+        i2 = record.signed_by_unicef_date
         if i1 and i2:
             return (i2 - i1).days
 
@@ -278,11 +277,11 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ta.date if ta else None
 
     def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
-        if getattr(record, 'unicef_signatory', None):
+        if record.unicef_signatory:
             return "{0.username} ({0.email})".format(record.unicef_signatory)
 
     def get_partner_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
-        if getattr(record, 'partner_authorized_officer_signatory', None):
+        if record.partner_authorized_officer_signatory:
             return "{0.last_name} {0.first_name} ({0.email})".format(record.partner_authorized_officer_signatory)
 
     def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
@@ -324,11 +323,8 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                          .values_list('fr_number', flat=True))
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
-        if hasattr(record, 'result_links'):
-            values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
-            return ", ".join([rl.name for rl in record.result_links.all()])
-        else:
-            values['cp_outputs_data'] = []
+        values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
+        return ", ".join([rl.name for rl in record.result_links.all()])
 
     def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
