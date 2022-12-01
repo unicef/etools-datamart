@@ -59,7 +59,7 @@ class CacheVersionAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         url = reverse("admin:unicef_rest_framework_service_change", args=[pk])
         return HttpResponseRedirect(url)
 
-    @button(label='Reset cache', css_class="btn btn-danger", icon="fa fa-warning icon-white")
+    @button(label='Reset cache', html_attrs={"class": "btn btn-danger"}, icon="fa fa-warning icon-white")
     def reset_cache(self, request):
         opts = self.model._meta
         context = dict(

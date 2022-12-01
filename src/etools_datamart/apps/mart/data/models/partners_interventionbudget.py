@@ -16,7 +16,7 @@ class InterventionBudgetLoader(InterventionLoader):
         return PartnersInterventionbudget.objects
 
     def process_country(self):
-        for record in self.get_queryset().all():
+        for record in self.get_queryset().exclude(intervention__isnull=True):
             filters = self.config.key(self, record)
             values = self.get_values(record.intervention)
             values['source_id'] = record.id

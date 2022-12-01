@@ -12,7 +12,6 @@ from etools_datamart.apps.sources.etools.models import (
     FundsFundsreservationheader,
     PartnersIntervention,
     PartnersInterventionamendment,
-    PartnersInterventionattachment,
     PartnersInterventionplannedvisits,
     ReportsAppliedindicator,
     T2FTravelactivity,
@@ -235,7 +234,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return record.planned
 
     def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionattachment.objects.filter(intervention=record)
+        qs = record.PartnersInterventionattachment_intervention.all()
         values['number_of_attachments'] = qs.count()
         return ", ".join(qs.values_list('type__name', flat=True))
 
@@ -324,11 +323,8 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                          .values_list('fr_number', flat=True))
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
-        if hasattr(record, 'result_links'):
-            values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
-            return ", ".join([rl.name for rl in record.result_links.all()])
-        else:
-            values['cp_outputs_data'] = []
+        values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
+        return ", ".join([rl.name for rl in record.result_links.all()])
 
     def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []

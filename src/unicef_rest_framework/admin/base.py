@@ -8,6 +8,10 @@ from admin_extra_buttons.mixins import confirm_action, ExtraButtonsMixin
 logger = logging.getLogger(__name__)
 
 
+def is_superuser(request, *args, **kwargs):
+    return request.user.is_superuser
+
+
 class ReadOnlyAdminMixin:
     editing = False
 
@@ -22,7 +26,7 @@ class TruncateTableMixin(ExtraButtonsMixin):
     def _truncate(self, request):
         self.model.objects.truncate()
 
-    @button(label='Truncate', permission=lambda request, obj: request.user.is_superuser)
+    @button(label='Truncate', permissions=is_superuser)
     def truncate(self, request):
         return confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
                                "Successfully executed", )
