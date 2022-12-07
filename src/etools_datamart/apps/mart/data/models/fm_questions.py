@@ -444,7 +444,7 @@ class FMOntrack(EtoolsDataMartModel):
 
 
 class FMOptions(EtoolsDataMartModel):
-    label = models.CharField(max_length=50, null=True, blank=True)
+    label = models.CharField(max_length=100, null=True, blank=True)
     option_value = models.TextField(blank=True, null=True)
     question = models.TextField(blank=True, null=True)
     question_id = models.IntegerField(null=True, blank=True)
