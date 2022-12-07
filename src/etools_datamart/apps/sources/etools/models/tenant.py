@@ -688,7 +688,7 @@ class FieldMonitoringSettingsMethod(models.TenantModel):
 
 class FieldMonitoringSettingsOption(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    label = models.CharField(max_length=50)
+    label = models.CharField(max_length=100)
     value = models.JSONField(blank=True, null=True)
     question = models.ForeignKey('FieldMonitoringSettingsQuestion', models.DO_NOTHING, related_name='FieldMonitoringSettingsOption_question')
 
