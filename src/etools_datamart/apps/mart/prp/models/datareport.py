@@ -60,6 +60,7 @@ class DataReportLoader(PrpBaseLoader):
         ct = record.indicator_report.reportable.content_type
         if ct.model == 'lowerleveloutput':
             ll = UnicefLowerleveloutput.objects.get(id=record.indicator_report.reportable.object_id)
+            values['pd_output_title'] = ll.title
             values['cp_output'] = ll.cp_output.title
             values['etools_cp_output_id'] = ll.cp_output.external_cp_output_id
             values['programme_document'] = ll.cp_output.programme_document.reference_number
