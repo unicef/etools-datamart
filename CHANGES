@@ -1,3 +1,8 @@
+3.51.6
+------
+* fixed PRP data report
+
+
 3.51.5
 ------
 * updated FMOptions label length
@@ -5,7 +10,7 @@
 
 3.51.4
 ------
-* fix truncate permission
+* fixed truncate permission
 * fixed intervention budget endpoints
 
 
