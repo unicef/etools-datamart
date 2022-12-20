@@ -32,6 +32,7 @@ router.register(r'sources/prp/partnerpartnerprojectadditionalpartners', api.Part
 router.register(r'sources/prp/partnerpartnerprojectclusters', api.PartnerPartnerprojectClustersViewSet)
 router.register(r'sources/prp/partnerpartnerprojectlocations', api.PartnerPartnerprojectLocationsViewSet)
 router.register(r'sources/prp/partnerpartnerprojectfunding', api.PartnerPartnerprojectfundingViewSet)
+router.register(r'sources/prp/uniceffinalreview', api.UnicefFinalreviewViewSet)
 router.register(r'sources/prp/uniceflocationscartodbtable', api.UnicefLocationsCartodbtableViewSet)
 router.register(r'sources/prp/uniceflocationsgatewaytype', api.UnicefLocationsGatewaytypeViewSet)
 router.register(r'sources/prp/uniceflowerleveloutput', api.UnicefLowerleveloutputViewSet)
