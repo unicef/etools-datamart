@@ -337,6 +337,17 @@ class PartnerPartnerprojectfundingViewSet(URFReadOnlyModelViewSet):
     queryset = models.PartnerPartnerprojectfunding.objects.all()
 
 
+class UnicefFinalreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UnicefFinalreview
+        exclude = ()
+
+
+class UnicefFinalreviewViewSet(URFReadOnlyModelViewSet):
+    serializer_class = UnicefFinalreviewSerializer
+    queryset = models.UnicefFinalreview.objects.all()
+
+
 class UnicefLocationsCartodbtableSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UnicefLocationsCartodbtable
