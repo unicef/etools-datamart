@@ -80,6 +80,7 @@ class AuthUser(models.Model):
     middle_name = models.CharField(max_length=50)
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    preferences = models.JSONField()
 
     class Meta:
         managed = False
