@@ -62,6 +62,7 @@ URL_MAP = {models.Engagement.TYPE_AUDIT: 'audit',
 
 class EngagementSerializer(DataMartSerializer):
     partner_name = serializers.SerializerMethodField()
+    partner_code = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
     class Meta(DataMartSerializer.Meta):
@@ -79,6 +80,12 @@ class EngagementSerializer(DataMartSerializer):
     def get_partner_name(self, obj):
         try:
             return obj.partner['name']
+        except KeyError:
+            return 'N/A'
+
+    def get_partner_code(self, obj):
+        try:
+            return obj.partner['vendor_number']
         except KeyError:
             return 'N/A'
 
