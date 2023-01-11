@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"55d288b99c69993ca20a10bbcfa211b3\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCountryProgrammeViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCountryProgrammeViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "55d288b99c69993ca20a10bbcfa211b3",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "765",
+        "Referrer-Policy": "same-origin"
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "id": 1,
+                "last_modify_date": "11 Jan 2023 23:58:45",
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "pd_number": null,
+                "pd_title": null,
+                "partner": null,
+                "partner_cso_type": null,
+                "partner_type": null,
+                "partner_number": null
+            },
+            {
+                "id": 2,
+                "last_modify_date": "11 Jan 2023 23:58:45",
+                "country_name": "chad",
+                "schema_name": "chad",
+                "area_code": "",
+                "pd_number": null,
+                "pd_title": null,
+                "partner": null,
+                "partner_cso_type": null,
+                "partner_type": null,
+                "partner_number": null
+            },
+            {
+                "id": 3,
+                "last_modify_date": "11 Jan 2023 23:58:45",
+                "country_name": "lebanon",
+                "schema_name": "lebanon",
+                "area_code": "",
+                "pd_number": null,
+                "pd_title": null,
+                "partner": null,
+                "partner_cso_type": null,
+                "partner_type": null,
+                "partner_number": null
+            }
+        ]
+    },
+    "content_type": "application/json"
+}

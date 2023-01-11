@@ -1,0 +1,23 @@
+{
+    "record": {
+        "master": {
+            "model": "data.interventionreview",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2023-01-11T22:49:43.439Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "pd_number": null,
+                "pd_title": null,
+                "partner": null,
+                "partner_cso_type": null,
+                "partner_type": null,
+                "partner_number": null
+            }
+        },
+        "deps": []
+    }
+}

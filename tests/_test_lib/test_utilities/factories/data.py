@@ -247,6 +247,32 @@ class InterventionBudgetFactory(DataMartModelFactory):
         model = models.InterventionBudget
 
 
+class InterventionActivityFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionActivity
+
+
+class InterventionCountryProgrammeFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionCountryProgramme
+
+
+class InterventionEPDFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionEPD
+
+
+class InterventionManagementBudgetFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionManagementBudget
+
+
+class InterventionReviewFactory(DataMartModelFactory):
+
+    class Meta:
+        model = models.InterventionReview
+
+
 class OfficeFactory(DataMartModelFactory):
     class Meta:
         model = models.Office

@@ -1,0 +1,61 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.interventionmanagementbudget",
+                "pk": 1,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-01-11T23:58:45.851Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "pd_number": null,
+                    "pd_title": null,
+                    "partner": null,
+                    "partner_cso_type": null,
+                    "partner_type": null,
+                    "partner_number": null
+                }
+            },
+            {
+                "model": "data.interventionmanagementbudget",
+                "pk": 2,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-01-11T23:58:45.859Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "pd_number": null,
+                    "pd_title": null,
+                    "partner": null,
+                    "partner_cso_type": null,
+                    "partner_type": null,
+                    "partner_number": null
+                }
+            },
+            {
+                "model": "data.interventionmanagementbudget",
+                "pk": 3,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-01-11T23:58:45.859Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "pd_number": null,
+                    "pd_title": null,
+                    "partner": null,
+                    "partner_cso_type": null,
+                    "partner_type": null,
+                    "partner_number": null
+                }
+            }
+        ],
+        "deps": []
+    }
+}

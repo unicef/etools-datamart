@@ -91,7 +91,7 @@ class ServiceManager(models.Manager):
 
 
 class Service(MasterDataModel):
-    name = models.CharField(max_length=100, help_text='unique service name',
+    name = models.CharField(max_length=200, help_text='unique service name',
                             db_index=True, unique=True)
     description = models.TextField(blank=True, null=True)
     viewset = StrategyClassField(help_text='class FQN',

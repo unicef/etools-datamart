@@ -14,6 +14,11 @@ from .funds_reservation import FundsReservation  # noqa
 from .hact import HACT  # noqa
 from .hact_detail import HACTHistory  # noqa
 from .intervention import Intervention, InterventionByLocation  # noqa
+from .intervention_activity import InterventionActivity  # noqa
+from .intervention_country_programme import InterventionCountryProgramme  # noqa
+from .intervention_epd import InterventionEPD  # noqa
+from .intervention_management_budget import InterventionManagementBudget  # noqa
+from .intervention_review import InterventionReview  # noqa
 from .location import GeoName, Location  # noqa
 from .partner import Partner  # noqa
 from .partner_hact import PartnerHact  # noqa
