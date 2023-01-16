@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2023-01-11T23:22:03.259Z",
+                "last_modify_date": "2023-01-13T16:00:19.927Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -15,7 +15,7 @@
                 "partner": null,
                 "partner_cso_type": null,
                 "partner_type": null,
-                "partner_number": null,
+                "partner_vendor_number": null,
                 "budget_owner": null,
                 "context": null,
                 "date_sent_to_partner": null,

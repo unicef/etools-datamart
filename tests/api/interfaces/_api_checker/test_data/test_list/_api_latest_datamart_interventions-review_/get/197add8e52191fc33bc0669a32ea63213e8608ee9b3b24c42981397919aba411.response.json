@@ -15,7 +15,7 @@
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "765",
+        "Content-Length": "786",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -27,7 +27,7 @@
         "results": [
             {
                 "id": 1,
-                "last_modify_date": "11 Jan 2023 22:49:39",
+                "last_modify_date": "13 Jan 2023 16:00:16",
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
@@ -36,11 +36,11 @@
                 "partner": null,
                 "partner_cso_type": null,
                 "partner_type": null,
-                "partner_number": null
+                "partner_vendor_number": null
             },
             {
                 "id": 2,
-                "last_modify_date": "11 Jan 2023 22:49:39",
+                "last_modify_date": "13 Jan 2023 16:00:16",
                 "country_name": "chad",
                 "schema_name": "chad",
                 "area_code": "",
@@ -49,11 +49,11 @@
                 "partner": null,
                 "partner_cso_type": null,
                 "partner_type": null,
-                "partner_number": null
+                "partner_vendor_number": null
             },
             {
                 "id": 3,
-                "last_modify_date": "11 Jan 2023 22:49:39",
+                "last_modify_date": "13 Jan 2023 16:00:16",
                 "country_name": "lebanon",
                 "schema_name": "lebanon",
                 "area_code": "",
@@ -62,7 +62,7 @@
                 "partner": null,
                 "partner_cso_type": null,
                 "partner_type": null,
-                "partner_number": null
+                "partner_vendor_number": null
             }
         ]
     },

@@ -4,20 +4,20 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"fa080b3edb4dca86e0fa5fd99bdc25f4\"",
+        "ETag": "\"5f3b822915feea6f809ab55eb7de9b0b\"",
         "X-Frame-Options": "DENY",
-        "view": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCountryProgrammeViewSet",
-        "service": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCountryProgrammeViewSet",
+        "view": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCPViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCPViewSet",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "228",
+        "Content-Length": "288",
         "Referrer-Policy": "same-origin"
     },
     "data": {
         "id": 4,
-        "last_modify_date": "11 Jan 2023 23:58:50",
+        "last_modify_date": "13 Jan 2023 16:00:19",
         "country_name": "bolivia",
         "schema_name": "bolivia",
         "area_code": "",
@@ -26,7 +26,9 @@
         "partner": null,
         "partner_cso_type": null,
         "partner_type": null,
-        "partner_number": null
+        "partner_vendor_number": null,
+        "country_programme": null,
+        "country_programme_id": null
     },
     "content_type": "application/json"
 }
