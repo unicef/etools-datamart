@@ -39,7 +39,7 @@ class InterventionManagementBudget(InterventionSimpleAbstract, EtoolsDataMartMod
 
     class Options:
         source = PartnersInterventionmanagementbudgetitem
-        depends = (Intervention, PartnersInterventionmanagementbudget)
+        depends = (Intervention,)
         mapping = dict(
             pd_number='budget.intervention.number',
             pd_title='budget.intervention.title',
