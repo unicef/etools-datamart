@@ -271,6 +271,8 @@ class InterventionManagementBudgetFactory(DataMartModelFactory):
 
 
 class InterventionReviewFactory(DataMartModelFactory):
+    review_created = timezone.now()
+    review_modified = timezone.now()
 
     class Meta:
         model = models.InterventionReview
