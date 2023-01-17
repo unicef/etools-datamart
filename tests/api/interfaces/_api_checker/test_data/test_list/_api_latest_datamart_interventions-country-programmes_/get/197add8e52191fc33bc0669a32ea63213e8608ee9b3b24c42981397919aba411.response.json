@@ -4,18 +4,18 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"a3e223480c00d93859c9360d3180647d\"",
+        "ETag": "\"0478d08d8d52c3e8fcda50c03ef43158\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCPViewSet",
         "service": "etools_datamart.api.endpoints.datamart.intervention_country_programme.InterventionCPViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "a3e223480c00d93859c9360d3180647d",
+        "cache-key": "0478d08d8d52c3e8fcda50c03ef43158",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "945",
+        "Content-Length": "861",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -27,7 +27,7 @@
         "results": [
             {
                 "id": 1,
-                "last_modify_date": "13 Jan 2023 16:00:15",
+                "last_modify_date": "17 Jan 2023 09:58:13",
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
@@ -37,12 +37,11 @@
                 "partner_cso_type": null,
                 "partner_type": null,
                 "partner_vendor_number": null,
-                "country_programme": null,
-                "country_programme_id": null
+                "country_programme": null
             },
             {
                 "id": 2,
-                "last_modify_date": "13 Jan 2023 16:00:15",
+                "last_modify_date": "17 Jan 2023 09:58:13",
                 "country_name": "chad",
                 "schema_name": "chad",
                 "area_code": "",
@@ -52,12 +51,11 @@
                 "partner_cso_type": null,
                 "partner_type": null,
                 "partner_vendor_number": null,
-                "country_programme": null,
-                "country_programme_id": null
+                "country_programme": null
             },
             {
                 "id": 3,
-                "last_modify_date": "13 Jan 2023 16:00:15",
+                "last_modify_date": "17 Jan 2023 09:58:13",
                 "country_name": "lebanon",
                 "schema_name": "lebanon",
                 "area_code": "",
@@ -67,8 +65,7 @@
                 "partner_cso_type": null,
                 "partner_type": null,
                 "partner_vendor_number": null,
-                "country_programme": null,
-                "country_programme_id": null
+                "country_programme": null
             }
         ]
     },

@@ -15,7 +15,6 @@ class InterventionCountryProgrammeLoader(EtoolsLoader):
 
 class InterventionCountryProgramme(InterventionSimpleAbstract, EtoolsDataMartModel):
     country_programme = models.CharField(max_length=300, blank=True, null=True)
-    country_programme_id = models.IntegerField(blank=True, null=True)
 
     loader = InterventionCountryProgrammeLoader()
 
@@ -30,5 +29,4 @@ class InterventionCountryProgramme(InterventionSimpleAbstract, EtoolsDataMartMod
             partner_type='intervention.agreement.partner.partner_type',
             partner_vendor_number='intervention.agreement.partner.vendor_number',
             country_programme='countryprogramme.name',
-            country_programme_id='countryprogramme.pk',
         )
