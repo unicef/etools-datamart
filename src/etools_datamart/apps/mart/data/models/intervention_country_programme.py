@@ -9,8 +9,12 @@ from etools_datamart.apps.sources.etools.models import PartnersInterventionCount
 
 class InterventionCountryProgrammeLoader(EtoolsLoader):
     def get_queryset(self):
-        return PartnersInterventionCountryProgrammes.objects\
-            .select_related('countryprogramme', 'intervention', 'intervention__agreement')
+        return PartnersInterventionCountryProgrammes.objects.select_related(
+            'countryprogramme',
+            'intervention',
+            'intervention__agreement',
+            'intervention__agreement__partner'
+        )
 
 
 class InterventionCountryProgramme(InterventionSimpleAbstract, EtoolsDataMartModel):
