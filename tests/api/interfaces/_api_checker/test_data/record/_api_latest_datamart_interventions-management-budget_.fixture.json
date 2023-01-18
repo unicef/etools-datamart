@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2023-01-11T23:58:50.615Z",
+                "last_modify_date": "2023-01-16T06:51:48.638Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -15,7 +15,22 @@
                 "partner": null,
                 "partner_cso_type": null,
                 "partner_type": null,
-                "partner_number": null
+                "partner_vendor_number": null,
+                "budget_created": "2023-01-16T06:49:17.424Z",
+                "budget_modified": "2023-01-16T06:49:17.424Z",
+                "act1_unicef": null,
+                "act1_partner": null,
+                "act2_unicef": null,
+                "act2_partner": null,
+                "act3_unicef": null,
+                "act3_partner": null,
+                "name": null,
+                "kind": null,
+                "unicef_cash": null,
+                "cso_cash": null,
+                "no_units": null,
+                "unit": null,
+                "unit_price": null
             }
         },
         "deps": []

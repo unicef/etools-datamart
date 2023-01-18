@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2023-01-11T22:38:38.310Z",
+                "last_modify_date": "2023-01-13T16:00:19.869Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -15,7 +15,7 @@
                 "partner": null,
                 "partner_cso_type": null,
                 "partner_type": null,
-                "partner_number": null,
+                "partner_vendor_number": null,
                 "name": null,
                 "unicef_cash": null,
                 "cso_cash": null,

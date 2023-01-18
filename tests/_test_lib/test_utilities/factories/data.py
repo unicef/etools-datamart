@@ -263,11 +263,16 @@ class InterventionEPDFactory(DataMartModelFactory):
 
 
 class InterventionManagementBudgetFactory(DataMartModelFactory):
+    budget_created = timezone.now()
+    budget_modified = timezone.now()
+
     class Meta:
         model = models.InterventionManagementBudget
 
 
 class InterventionReviewFactory(DataMartModelFactory):
+    review_created = timezone.now()
+    review_modified = timezone.now()
 
     class Meta:
         model = models.InterventionReview
