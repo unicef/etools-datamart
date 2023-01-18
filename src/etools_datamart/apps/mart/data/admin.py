@@ -174,6 +174,41 @@ class InterventionByLocationAdmin(DataModelAdmin, TruncateTableMixin):
     autocomplete_fields = ('location',)
 
 
+@register(models.InterventionActivity)
+class InterventionActivityAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'pd_number', 'partner')
+    list_filter = (SchemaFilter, )
+    search_fields = ('pd_number', 'partner')
+
+
+@register(models.InterventionCountryProgramme)
+class InterventionCountryProgrammeAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'pd_number', 'partner')
+    list_filter = (SchemaFilter, )
+    search_fields = ('pd_number', 'partner')
+
+
+@register(models.InterventionEPD)
+class InterventionEPDAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'pd_number', 'partner')
+    list_filter = (SchemaFilter, )
+    search_fields = ('pd_number', 'partner')
+
+
+@register(models.InterventionManagementBudget)
+class InterventionManagementBudgetAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'pd_number', 'partner')
+    list_filter = (SchemaFilter, )
+    search_fields = ('pd_number', 'partner')
+
+
+@register(models.InterventionReview)
+class InterventionReviewAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('country_name', 'pd_number', 'partner')
+    list_filter = (SchemaFilter, )
+    search_fields = ('pd_number', 'partner')
+
+
 @register(models.FAMIndicator)
 class FAMIndicatorAdmin(DataModelAdmin):
     list_display = ('country_name', 'schema_name', 'month',)
