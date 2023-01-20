@@ -63,7 +63,7 @@ def test_tasklog_queue_action(django_app, admin_user, tasklog):
     res = django_app.get(url, user=admin_user)
     res.forms['changelist-form']['action'].value = 'queue'
     res.forms['changelist-form']['_selected_action'] = [tasklog.id]
-    res = res.forms[1].submit().maybe_follow()
+    res = res.forms['changelist-form'].submit().maybe_follow()
     assert res.status_code == 200
     storage = res.context['messages']
     assert storage
