@@ -38,5 +38,5 @@ def test_schemaaccesscontrol_change(django_app, admin_user, schema_access_contro
     url = reverse("admin:security_schemaaccesscontrol_change", args=[schema_access_control.pk])
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
-    res = res.form.submit()
+    res = res.forms['schemaaccesscontrol_form'].submit()
     assert res.status_code == 302
