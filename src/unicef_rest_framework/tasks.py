@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def invalidate_cache(service_id):
     service = Service.objects.get(service_id)
     service.invalidate_cache()
-    return {"cache_versipn": service.cache_version,
+    return {"cache_version": service.cache_version,
             "service": service.name}
 
 
