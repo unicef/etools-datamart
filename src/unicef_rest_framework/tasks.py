@@ -49,3 +49,12 @@ def export(target_id):
                      'download_url': reverse('urf:export-fetch', args=[target.id])}
         )
     return response.status_code
+
+
+@default_app.task()
+def force_refresh():
+    qs = Export.objects.filter(status_code=304, enabled=True, refresh=True)
+    qs.update(status_code=-1, etag=None)
+
+    for exp in qs.values_list('id', flat=True):
+        export.apply_async(args=[exp])
