@@ -97,7 +97,7 @@ class Export(AbstractPreload):
 
 
 @receiver(post_save, sender=Export)
-def update_stock(sender, instance, created, **kwargs):
+def notify_new_export(sender, instance, created, **kwargs):
     if created and settings.ADMIN_EMAILS:
         admin_link = reverse('admin:%s_%s_change' % (instance._meta.app_label, instance._meta.model_name),
                              args=[instance.pk, ])
@@ -105,7 +105,7 @@ def update_stock(sender, instance, created, **kwargs):
         html_message = f'{instance.as_user} requested a new export: ' \
                        f'<a href=https://datamart.unicef.io{admin_link}>{instance.name}</a>.'
         plain_message = strip_tags(html_message)
-        from_email = 'datamart@unicef.org'
+        from_email = getattr(instance.as_user, 'email', 'datamart@unicef.org')
         send_mail(subject, plain_message, from_email, settings.ADMIN_EMAILS, html_message=html_message)
 
 
