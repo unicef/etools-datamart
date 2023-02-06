@@ -247,6 +247,37 @@ class InterventionBudgetFactory(DataMartModelFactory):
         model = models.InterventionBudget
 
 
+class InterventionActivityFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionActivity
+
+
+class InterventionCountryProgrammeFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionCountryProgramme
+
+
+class InterventionEPDFactory(DataMartModelFactory):
+    class Meta:
+        model = models.InterventionEPD
+
+
+class InterventionManagementBudgetFactory(DataMartModelFactory):
+    budget_created = timezone.now()
+    budget_modified = timezone.now()
+
+    class Meta:
+        model = models.InterventionManagementBudget
+
+
+class InterventionReviewFactory(DataMartModelFactory):
+    review_created = timezone.now()
+    review_modified = timezone.now()
+
+    class Meta:
+        model = models.InterventionReview
+
+
 class OfficeFactory(DataMartModelFactory):
     class Meta:
         model = models.Office

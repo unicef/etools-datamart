@@ -1,0 +1,42 @@
+{
+    "record": {
+        "master": {
+            "model": "data.interventionreview",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2023-01-16T12:49:30.986Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "pd_number": null,
+                "pd_title": null,
+                "partner": null,
+                "partner_cso_type": null,
+                "partner_type": null,
+                "partner_vendor_number": null,
+                "review_created": "2023-01-16T12:46:54.381Z",
+                "review_modified": "2023-01-16T12:46:54.381Z",
+                "review_type": null,
+                "overall_approval": null,
+                "actions_list": null,
+                "budget_is_aligned": null,
+                "ges_considered": null,
+                "meeting_date": null,
+                "overall_approver": null,
+                "overall_comment": null,
+                "partner_comparative_advantage": null,
+                "pd_is_guided": null,
+                "pd_is_relevant": null,
+                "relationship_is_represented": null,
+                "relationships_are_positive": null,
+                "supply_issues_considered": null,
+                "submitted_by": null,
+                "review_date": null,
+                "sent_back_comment": null
+            }
+        },
+        "deps": []
+    }
+}

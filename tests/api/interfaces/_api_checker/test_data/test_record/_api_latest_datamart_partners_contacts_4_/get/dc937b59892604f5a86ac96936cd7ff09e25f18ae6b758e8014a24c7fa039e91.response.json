@@ -13,8 +13,7 @@
         "cache-hit": "False",
         "cache-ttl": "1y",
         "Content-Length": "161",
-        "Referrer-Policy": "same-origin",
-        "Cross-Origin-Opener-Policy": "same-origin"
+        "Referrer-Policy": "same-origin"
     },
     "data": {
         "partner": null,

@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-08-16T23:43:41.117Z",
+                "last_modify_date": "2022-12-20T15:54:19.511Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -18,7 +18,7 @@
                 "city": null,
                 "core_values_assessment_date": null,
                 "country": null,
-                "created": "2021-08-16T23:33:33.680Z",
+                "created": "2022-12-20T15:53:53.858Z",
                 "cso_type": null,
                 "deleted_flag": false,
                 "description": "",
@@ -37,7 +37,7 @@
                 "postal_code": null,
                 "rating": null,
                 "reported_cy": null,
-                "shared_with": null,
+                "shared_with": "[]",
                 "short_name": null,
                 "street_address": null,
                 "total_ct_cp": null,
@@ -56,7 +56,10 @@
                 "highest_risk_rating_type": null,
                 "psea_assessment_date": null,
                 "lead_office": null,
-                "lead_section": null
+                "lead_section": null,
+                "expiring_assessment_flag": null,
+                "expiring_psea_assessment_flag": null,
+                "approaching_threshold_flag": null
             }
         },
         "deps": []

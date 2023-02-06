@@ -13,6 +13,8 @@ conn = connections['etools']
 
 pytestmark = pytest.mark.django_db
 
+PARTNER_ORGANIZATION_COUNT = 77
+
 
 def test_query_public(db):
     conn.set_schemas(['bolivia'])
@@ -21,7 +23,7 @@ def test_query_public(db):
 
 def test_query_single_tenant(number_of_partnerorganization):
     conn.set_schemas(['bolivia'])
-    assert len(PartnersPartnerorganization.objects.all()) == 77
+    assert len(PartnersPartnerorganization.objects.all()) == PARTNER_ORGANIZATION_COUNT
 
 
 def test_query_multi_tenant(number_of_partnerorganization):
@@ -31,7 +33,7 @@ def test_query_multi_tenant(number_of_partnerorganization):
 
 def test_count_single_tenant(number_of_partnerorganization):
     conn.set_schemas(['bolivia'])
-    assert PartnersPartnerorganization.objects.count() == 77
+    assert PartnersPartnerorganization.objects.count() == PARTNER_ORGANIZATION_COUNT
 
 
 def test_count_multi_tenant1(number_of_partnerorganization):

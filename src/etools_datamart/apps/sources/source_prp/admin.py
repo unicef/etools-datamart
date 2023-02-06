@@ -190,6 +190,11 @@ class PartnerPartnerprojectfundingAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
 
 
+@register(models.UnicefFinalreview)
+class UnicefFinalreviewAdmin(DatamartSourceModelAdmin, ModelAdmin):
+    list_filter = []
+
+
 @register(models.UnicefLocationsCartodbtable)
 class UnicefLocationsCartodbtableAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []

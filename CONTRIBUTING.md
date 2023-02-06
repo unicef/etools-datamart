@@ -19,10 +19,6 @@ update dump location env var
 update schema & check clean step
 --------------------------------
 
-Important: atm we need django 3.1 to read data [collation error]
-
-    pip install django==3.1.13
-
 update schema & check clean step
 
     cd db
@@ -34,7 +30,7 @@ while replacing chad with lebanon, 256 constraint raises
 needed to replace it manually in dump 3
 (Accord de financement pour la mise en oeuvre des activites de soins de sante et de nutrition d’urgence aux refugies, deplaces internes, retournes et populations hotes affectes par la crise nigeriane dans la region du Lac )
 
-    open /Users/ddinicola/workspace/etools-datamart/src/etools_datamart/apps/multitenant/postgresql/tenant3.sql
+    open /Users/jojo/workspace/datamart/src/etools_datamart/apps/multitenant/postgresql/tenant3.sql
     
 fix tests & update update COUNT_PARTNERS_PARTNERORGANIZATION
     

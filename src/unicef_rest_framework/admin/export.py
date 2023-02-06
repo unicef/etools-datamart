@@ -93,6 +93,15 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
         from unicef_rest_framework.tasks import export
         export(pk)
 
+    @button()
+    def force_run(self, request, pk):
+        from unicef_rest_framework.tasks import export
+        obj = self.model.objects.get(id=pk)
+        obj.status_code = -1
+        obj.etag = None
+        obj.save()
+        export(pk)
+
     @button(label='Download')
     def _download(self, request, pk):
         obj = self.model.objects.get(id=pk)
