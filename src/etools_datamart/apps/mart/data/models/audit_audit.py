@@ -63,7 +63,8 @@ class Audit(EtoolsDataMartModel):
     status = models.CharField(max_length=30, blank=True, null=True,
                               choices=AuditEngagementConsts.DISPLAY_STATUSES,
                               db_index=True)
-
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     # Engagement Overview Card
     agreement = models.CharField(max_length=300, blank=True, null=True)
     auditor = models.CharField(max_length=255, blank=True, null=True)
@@ -120,6 +121,8 @@ class Audit(EtoolsDataMartModel):
             auditor="agreement.auditor_firm.name",
             auditor_number="agreement.auditor_firm.vendor_number",
             agreement="agreement.order_number",  # PurchaseOrder
+            start_date='_impl.start_date',
+            end_date='_impl.end_date',
             financial_findings='_impl.financial_findings',
             audit_opinion='_impl.audit_opinion',
             audited_expenditure='_impl.audited_expenditure',
