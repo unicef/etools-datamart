@@ -4,7 +4,7 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"68679413a8e0cf4ff73fd76358f6372b\"",
+        "ETag": "\"910de9420b478d482662f597c4ceab26\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.audit_audit.AuditViewSet",
         "service": "etools_datamart.api.endpoints.datamart.audit_audit.AuditViewSet",
@@ -12,8 +12,9 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "1125",
-        "Referrer-Policy": "same-origin"
+        "Content-Length": "1159",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "id": 4,
@@ -27,6 +28,8 @@
         "reference_number": null,
         "engagement_type": null,
         "status": null,
+        "start_date": null,
+        "end_date": null,
         "agreement": null,
         "auditor": null,
         "auditor_number": null,
