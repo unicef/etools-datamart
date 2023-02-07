@@ -54,6 +54,8 @@ class Export(AbstractPreload):
     def stem(self):
         if self.format == 'text/plain':
             return 'txt'
+        elif self.format == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            return 'xlsx'
         else:
             return self.format.split('/')[1]
 
