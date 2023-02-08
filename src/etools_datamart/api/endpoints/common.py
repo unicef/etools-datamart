@@ -191,7 +191,11 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
         return ret
 
 
-class DataMartViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
+class DataMartBaseViewSet(APIReadOnlyModelViewSet, UpdatesMixin):
+    pass
+
+
+class DataMartViewSet(DataMartBaseViewSet):
     list_cache_key_func = list_etag_func = CountryAwareKeyConstructor()
 
     # def _get_serializer_from_param(self, name=None):
