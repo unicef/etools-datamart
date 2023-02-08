@@ -1,6 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Count, JSONField, Sum
+from django.db.models import JSONField, Sum
 from django.utils.translation import gettext as _
 
 from _decimal import DivisionByZero, InvalidOperation
@@ -121,8 +121,6 @@ class Audit(EtoolsDataMartModel):
             auditor="agreement.auditor_firm.name",
             auditor_number="agreement.auditor_firm.vendor_number",
             agreement="agreement.order_number",  # PurchaseOrder
-            start_date='_impl.start_date',
-            end_date='_impl.end_date',
             financial_findings='_impl.financial_findings',
             audit_opinion='_impl.audit_opinion',
             audited_expenditure='_impl.audited_expenditure',
