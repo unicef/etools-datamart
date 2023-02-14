@@ -4,7 +4,7 @@ from unicef_rest_framework.ds import DynamicSerializerFilter
 from unicef_rest_framework.forms import Select2MultipleChoiceField
 from unicef_rest_framework.ordering import OrderingFilter
 
-from etools_datamart.api.endpoints.common import DataMartViewSet
+from etools_datamart.api.endpoints.common import DataMartBaseViewSet
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.api.filtering import DatamartQueryStringFilterBackend
 from etools_datamart.apps.mart.prp import models
@@ -70,7 +70,7 @@ class DataReportSerializer(DataMartSerializer):
         fields = '__all__'
 
 
-class IndicatorReportViewSet(DataMartViewSet):
+class IndicatorReportViewSet(DataMartBaseViewSet):
     serializer_class = IndicatorReportSerializer
     queryset = models.IndicatorReport.objects.all()
 
@@ -88,7 +88,7 @@ class IndicatorReportViewSet(DataMartViewSet):
         return super().get_serializer(*args, **kwargs)
 
 
-class DataReportViewSet(DataMartViewSet):
+class DataReportViewSet(DataMartBaseViewSet):
     serializer_class = DataReportSerializer
     queryset = models.DataReport.objects.all()
     filter_fields = ('country_name', 'report_status', 'report_type', 'section')
