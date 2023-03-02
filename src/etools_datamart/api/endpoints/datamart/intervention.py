@@ -136,7 +136,9 @@ class InterventionSerializerBudget(InterventionSerializerV2):
             'partner_contribution_local',
             'unicef_cash_local',
             'in_kind_amount_local',
-            'cp_outputs_data'
+            'cp_outputs_data',
+            'fr_number',
+            'outstanding_amt_local'
         )
 
 
