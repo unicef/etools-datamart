@@ -4,25 +4,31 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"323e5b3d00079dd1ee215267bf1e5d67\"",
+        "ETag": "\"4e8c3e0c3c4acee049037f2c631cc081\"",
         "X-Frame-Options": "DENY",
-        "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
-        "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
+        "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionByLocationViewSet",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "1888",
-        "Referrer-Policy": "same-origin"
+        "Content-Length": "1795",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
-        "id": 814,
+        "id": 4,
         "source_id": null,
-        "last_modify_date": "03 Sep 2022 11:38:01",
+        "last_modify_date": "02 Mar 2023 00:18:30",
         "seen": null,
         "country_name": "bolivia",
         "schema_name": "bolivia",
         "area_code": "",
+        "location_source_id": null,
+        "location_name": null,
+        "location_pcode": null,
+        "location_level": null,
+        "location_levelname": null,
         "agreement_reference_number": null,
         "amendment_types": null,
         "attachment_types": null,
@@ -41,11 +47,13 @@
         "document_type": null,
         "end_date": null,
         "fr_number": null,
+        "outstanding_amt_local": "0.00",
         "intervention_id": 3,
         "last_amendment_date": null,
         "number": "#003",
         "number_of_attachments": null,
         "number_of_amendments": null,
+        "offices": null,
         "offices_data": {},
         "partner_authorized_officer_signatory_id": null,
         "partner_focal_points": null,
@@ -82,19 +90,7 @@
         "unicef_signatory_name": null,
         "updated": null,
         "last_pv_date": null,
-        "final_partnership_review": null,
-        "locations": null,
-        "locations_data": [
-            {
-                "name": "location.name",
-                "level": "location.admin_level",
-                "pcode": "location.p_code",
-                "latitude": "location.latitude",
-                "levelname": "location.admin_level_name",
-                "longitude": "location.longitude",
-                "source_id": "1"
-            }
-        ]
+        "location": null
     },
     "content_type": "application/json"
 }

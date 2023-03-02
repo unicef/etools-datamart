@@ -3,10 +3,10 @@
         "master": [
             {
                 "model": "data.interventionbylocation",
-                "pk": 500,
+                "pk": 1,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-09-03T11:37:57.593Z",
+                    "last_modify_date": "2023-03-02T00:18:24.250Z",
                     "seen": null,
                     "country_name": "bolivia",
                     "schema_name": "bolivia",
@@ -36,6 +36,7 @@
                     "document_type": null,
                     "end_date": null,
                     "fr_number": null,
+                    "outstanding_amt_local": "0.00",
                     "in_kind_amount": "10.00",
                     "in_kind_amount_local": "10.00",
                     "intervention_id": 0,
@@ -91,10 +92,10 @@
             },
             {
                 "model": "data.interventionbylocation",
-                "pk": 501,
+                "pk": 2,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-09-03T11:37:57.601Z",
+                    "last_modify_date": "2023-03-02T00:18:24.258Z",
                     "seen": null,
                     "country_name": "chad",
                     "schema_name": "chad",
@@ -124,6 +125,7 @@
                     "document_type": null,
                     "end_date": null,
                     "fr_number": null,
+                    "outstanding_amt_local": "0.00",
                     "in_kind_amount": "10.00",
                     "in_kind_amount_local": "10.00",
                     "intervention_id": 1,
@@ -179,10 +181,10 @@
             },
             {
                 "model": "data.interventionbylocation",
-                "pk": 502,
+                "pk": 3,
                 "fields": {
                     "source_id": null,
-                    "last_modify_date": "2022-09-03T11:37:57.603Z",
+                    "last_modify_date": "2023-03-02T00:18:24.261Z",
                     "seen": null,
                     "country_name": "lebanon",
                     "schema_name": "lebanon",
@@ -212,6 +214,7 @@
                     "document_type": null,
                     "end_date": null,
                     "fr_number": null,
+                    "outstanding_amt_local": "0.00",
                     "in_kind_amount": "10.00",
                     "in_kind_amount_local": "10.00",
                     "intervention_id": 2,

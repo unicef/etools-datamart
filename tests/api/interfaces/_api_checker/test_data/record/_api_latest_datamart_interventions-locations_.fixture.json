@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.interventionbylocation",
-            "pk": 503,
+            "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2022-09-03T11:38:01.326Z",
+                "last_modify_date": "2023-03-02T00:18:30.580Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -35,6 +35,7 @@
                 "document_type": null,
                 "end_date": null,
                 "fr_number": null,
+                "outstanding_amt_local": "0.00",
                 "in_kind_amount": "10.00",
                 "in_kind_amount_local": "10.00",
                 "intervention_id": 3,
