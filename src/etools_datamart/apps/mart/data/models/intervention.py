@@ -1,7 +1,7 @@
 import logging
 
 from django.db import models
-from django.db.models import F, JSONField
+from django.db.models import F, JSONField, Sum
 from django.utils.functional import cached_property
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
@@ -50,6 +50,7 @@ class InterventionAbstract(models.Model):
                                      choices=PartnersInterventionConst.INTERVENTION_TYPES)
     end_date = models.DateField(null=True)
     fr_number = models.CharField(max_length=300, blank=True, null=True)
+    outstanding_amt_local = models.DecimalField(default=0, max_digits=20, decimal_places=2, blank=True, null=True)
     in_kind_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     in_kind_amount_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     intervention_id = models.IntegerField(blank=True, null=True)
@@ -144,6 +145,7 @@ class InterventionAbstract(models.Model):
             days_from_prc_review_to_signature='-',
             end_date='end',
             fr_number='-',
+            outstanding_amt_local='-',
             in_kind_amount='PartnersInterventionbudget_intervention.in_kind_amount',
             in_kind_amount_local='PartnersInterventionbudget_intervention.in_kind_amount_local',
             intervention_id='id',
@@ -321,6 +323,10 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
         return ", ".join(FundsFundsreservationheader.objects.filter(intervention=record)
                          .values_list('fr_number', flat=True))
+
+    def get_outstanding_amt_local(self, record: PartnersIntervention, values: dict, **kwargs):
+        return FundsFundsreservationheader.objects.filter(intervention=record).aggregate(
+            Sum('outstanding_amt_local'))['outstanding_amt_local__sum']
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
         values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))

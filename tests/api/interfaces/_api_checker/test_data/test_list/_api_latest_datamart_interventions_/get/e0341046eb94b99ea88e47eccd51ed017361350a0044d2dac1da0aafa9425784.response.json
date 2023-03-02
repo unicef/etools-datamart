@@ -4,19 +4,20 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"c5e66534267ded5307f1ce29f9e9c3db\"",
+        "ETag": "\"7c79b76824f6f3176a4f28c77412b1c5\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
         "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "c5e66534267ded5307f1ce29f9e9c3db",
+        "cache-key": "7c79b76824f6f3176a4f28c77412b1c5",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
         "Content-Length": "954",
-        "Referrer-Policy": "same-origin"
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "count": 3,
