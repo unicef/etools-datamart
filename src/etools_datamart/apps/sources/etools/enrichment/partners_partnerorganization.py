@@ -1,6 +1,7 @@
 from etools_datamart.apps.sources.etools.models import (
     AuditSpotcheck,
-    PartnersPartnerorganization, PartnersPartnerplannedvisits,
+    PartnersPartnerorganization,
+    PartnersPartnerplannedvisits,
 )
 
 from .consts import PartnerOrganizationConst, PartnerType
