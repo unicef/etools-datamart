@@ -1,11 +1,31 @@
+import json
 import logging
 from collections.abc import Iterable, MutableMapping
+from typing import Any
 
+from drf_excel import fields
 from drf_excel.renderers import XLSXRenderer as _XLSXRenderer
 
 from unicef_rest_framework.renderers.mixin import ContentDispositionMixin
 
 logger = logging.getLogger(__name__)
+
+
+# patch of XLSXListField.prep_value() to handle None values
+# known issue https://github.com/wharton/drf-excel/issues/61
+def patched_prep_value(self) -> Any:
+    if self.value is None:
+        return None
+    if len(self.value) > 0 and isinstance(self.value[0], Iterable):
+        # array of array; write as json
+        return json.dumps(self.value, ensure_ascii=False)
+    else:
+        # Flatten the array into a comma separated string to fit
+        # in a single spreadsheet column
+        return self.list_sep.join(map(str, self.value))
+
+
+fields.XLSXListField.prep_value = patched_prep_value
 
 
 class XLSXRenderer(ContentDispositionMixin, _XLSXRenderer):
