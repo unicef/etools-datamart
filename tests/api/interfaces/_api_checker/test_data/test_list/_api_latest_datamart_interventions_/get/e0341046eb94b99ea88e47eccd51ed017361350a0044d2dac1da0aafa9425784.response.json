@@ -4,19 +4,20 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"0748eb129c27b6c0ce88d51ca9e159cd\"",
+        "ETag": "\"379926dd6569d0f2c79a62ffd052d95f\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
         "service": "etools_datamart.api.endpoints.datamart.intervention.InterventionViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "0748eb129c27b6c0ce88d51ca9e159cd",
+        "cache-key": "379926dd6569d0f2c79a62ffd052d95f",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "954",
-        "Referrer-Policy": "same-origin"
+        "Content-Length": "1098",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -36,7 +37,9 @@
                 "partner_contribution_local": "10.00",
                 "unicef_cash_local": "10.00",
                 "in_kind_amount_local": "10.00",
-                "cp_outputs_data": {}
+                "cp_outputs_data": {},
+                "fr_number": null,
+                "outstanding_amt_local": "0.00"
             },
             {
                 "country_name": "chad",
@@ -49,7 +52,9 @@
                 "partner_contribution_local": "10.00",
                 "unicef_cash_local": "10.00",
                 "in_kind_amount_local": "10.00",
-                "cp_outputs_data": {}
+                "cp_outputs_data": {},
+                "fr_number": null,
+                "outstanding_amt_local": "0.00"
             },
             {
                 "country_name": "lebanon",
@@ -62,7 +67,9 @@
                 "partner_contribution_local": "10.00",
                 "unicef_cash_local": "10.00",
                 "in_kind_amount_local": "10.00",
-                "cp_outputs_data": {}
+                "cp_outputs_data": {},
+                "fr_number": null,
+                "outstanding_amt_local": "0.00"
             }
         ]
     },

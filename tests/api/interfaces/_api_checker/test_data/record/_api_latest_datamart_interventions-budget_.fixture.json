@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2022-12-20T15:54:16.612Z",
+                "last_modify_date": "2023-03-14T19:41:20.103Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -28,6 +28,7 @@
                 "document_type": null,
                 "end_date": null,
                 "fr_number": null,
+                "outstanding_amt_local": "0.00",
                 "in_kind_amount": null,
                 "in_kind_amount_local": null,
                 "intervention_id": null,

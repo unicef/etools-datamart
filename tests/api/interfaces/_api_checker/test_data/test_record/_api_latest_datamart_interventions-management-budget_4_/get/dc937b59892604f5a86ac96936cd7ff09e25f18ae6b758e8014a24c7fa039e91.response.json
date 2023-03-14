@@ -13,11 +13,12 @@
         "cache-hit": "False",
         "cache-ttl": "1y",
         "Content-Length": "538",
-        "Referrer-Policy": "same-origin"
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "id": 4,
-        "last_modify_date": "16 Jan 2023 06:51:48",
+        "last_modify_date": "14 Mar 2023 19:41:20",
         "country_name": "bolivia",
         "schema_name": "bolivia",
         "area_code": "",
@@ -27,8 +28,8 @@
         "partner_cso_type": null,
         "partner_type": null,
         "partner_vendor_number": null,
-        "budget_created": "16 Jan 2023 06:49:17",
-        "budget_modified": "16 Jan 2023 06:49:17",
+        "budget_created": "14 Mar 2023 19:36:50",
+        "budget_modified": "14 Mar 2023 19:36:50",
         "act1_unicef": null,
         "act1_partner": null,
         "act2_unicef": null,

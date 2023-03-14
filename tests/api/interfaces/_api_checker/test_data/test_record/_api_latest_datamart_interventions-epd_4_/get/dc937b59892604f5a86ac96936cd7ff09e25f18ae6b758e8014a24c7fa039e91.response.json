@@ -13,11 +13,12 @@
         "cache-hit": "False",
         "cache-ttl": "1y",
         "Content-Length": "940",
-        "Referrer-Policy": "same-origin"
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "id": 4,
-        "last_modify_date": "13 Jan 2023 16:00:19",
+        "last_modify_date": "14 Mar 2023 19:41:20",
         "country_name": "bolivia",
         "schema_name": "bolivia",
         "area_code": "",

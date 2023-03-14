@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('data', '0015_audit_end_date_audit_start_date'),
+        ('data', '0016_intervention_outstanding_amt_local_and_more'),
         ('data', '0015_interventionactivity_interventioncountryprogramme_interventionepd_interventionmanagementbudget_inter'),
     ]
 
