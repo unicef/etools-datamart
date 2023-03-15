@@ -34,8 +34,6 @@ class InterventionAbstract(models.Model):
     cfei_number = models.CharField(max_length=150, null=True, blank=True)
     clusters = models.TextField(blank=True, null=True)
     contingency_pd = models.BooleanField(null=True)
-    # cp_output = models.CharField(max_length=300, blank=True, null=True)
-    # cp_output_id = models.IntegerField(blank=True, null=True)
     cp_outputs = models.TextField(blank=True, null=True)
     cp_outputs_data = JSONField(blank=True, null=True, default=dict)
 

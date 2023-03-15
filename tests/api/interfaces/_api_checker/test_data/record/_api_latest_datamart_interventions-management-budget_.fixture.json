@@ -1,0 +1,38 @@
+{
+    "record": {
+        "master": {
+            "model": "data.interventionmanagementbudget",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2023-03-14T19:41:20.588Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "pd_number": null,
+                "pd_title": null,
+                "partner": null,
+                "partner_cso_type": null,
+                "partner_type": null,
+                "partner_vendor_number": null,
+                "budget_created": "2023-03-14T19:36:50.223Z",
+                "budget_modified": "2023-03-14T19:36:50.223Z",
+                "act1_unicef": null,
+                "act1_partner": null,
+                "act2_unicef": null,
+                "act2_partner": null,
+                "act3_unicef": null,
+                "act3_partner": null,
+                "name": null,
+                "kind": null,
+                "unicef_cash": null,
+                "cso_cash": null,
+                "no_units": null,
+                "unit": null,
+                "unit_price": null
+            }
+        },
+        "deps": []
+    }
+}

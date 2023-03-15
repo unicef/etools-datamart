@@ -1,6 +1,6 @@
 # flake8: noqa F405.
 # This is an auto-generated PRP model module.
-# Generated on 2022-09-14 14:34:09.785703
+# Generated on 2022-12-20 16:49:11.773476
 from django.contrib.gis.db import models
 
 from etools_datamart.apps.core.readonly import ReadOnlyModel
@@ -608,6 +608,31 @@ class PartnerPartnerprojectfunding(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'partner_partnerprojectfunding'
+        app_label = 'source_prp'
+
+
+class UnicefFinalreview(ReadOnlyModel):
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    release_cash_in_time_choice = models.BooleanField(blank=True, null=True)
+    release_cash_in_time_comment = models.TextField(blank=True, null=True)
+    release_supplies_in_time_choice = models.BooleanField(blank=True, null=True)
+    release_supplies_in_time_comment = models.TextField(blank=True, null=True)
+    feedback_face_form_in_time_choice = models.BooleanField(blank=True, null=True)
+    feedback_face_form_in_time_comment = models.TextField(blank=True, null=True)
+    respond_requests_in_time_choice = models.BooleanField(blank=True, null=True)
+    respond_requests_in_time_comment = models.TextField(blank=True, null=True)
+    implemented_as_planned_choice = models.BooleanField(blank=True, null=True)
+    implemented_as_planned_comment = models.TextField(blank=True, null=True)
+    action_to_address_choice = models.BooleanField(blank=True, null=True)
+    action_to_address_comment = models.TextField(blank=True, null=True)
+    overall_satisfaction_choice = models.CharField(max_length=20, blank=True, null=True)
+    overall_satisfaction_comment = models.TextField(blank=True, null=True)
+    progress_report = models.OneToOneField('source_prp.UnicefProgressreport', models.PROTECT, related_name='UnicefFinalreview_progress_report')
+
+    class Meta:
+        managed = False
+        db_table = 'unicef_finalreview'
         app_label = 'source_prp'
 
 

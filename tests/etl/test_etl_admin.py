@@ -42,7 +42,7 @@ def test_tasklog_unlock(django_app, admin_user, tasklog):
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
     res = res.click("Unlock")
-    res = res.form.submit().follow()
+    res = res.forms[1].submit().follow()
     storage = res.context['messages']
     assert [m.message for m in storage] == ['Successfully executed']
 
@@ -61,9 +61,9 @@ def test_tasklog_queue_action(django_app, admin_user, tasklog):
     tasklog.loader.task.delay = lambda **kw: True
     url = reverse("admin:etl_etltask_changelist")
     res = django_app.get(url, user=admin_user)
-    res.form['action'].value = 'queue'
-    res.form['_selected_action'] = [tasklog.id]
-    res = res.form.submit().maybe_follow()
+    res.forms['changelist-form']['action'].value = 'queue'
+    res.forms['changelist-form']['_selected_action'] = [tasklog.id]
+    res = res.forms['changelist-form'].submit().maybe_follow()
     assert res.status_code == 200
     storage = res.context['messages']
     assert storage

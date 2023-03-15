@@ -5,7 +5,7 @@
             "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2021-08-04T21:02:27.040Z",
+                "last_modify_date": "2022-12-20T15:54:19.203Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -33,7 +33,7 @@
                 "locations": null,
                 "locations_data": null,
                 "misc_expenses": null,
-                "mode_of_travel": null,
+                "mode_of_travel": "[]",
                 "office_name": null,
                 "partner_name": null,
                 "pd_ssfa_reference_number": null,

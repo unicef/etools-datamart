@@ -11,5 +11,4 @@ def update_geonames():
         try:
             geoname.sync()
         except GeoNameLimitException:
-            # have reached our daily limit, so pointless continuing
-            break
+            break  # have reached our daily limit, so pointless continuing

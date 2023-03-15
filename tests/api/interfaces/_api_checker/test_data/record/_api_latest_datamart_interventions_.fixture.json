@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.intervention",
-            "pk": 8,
+            "pk": 4,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2023-03-02T14:33:18.898Z",
+                "last_modify_date": "2023-03-14T19:41:19.316Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",

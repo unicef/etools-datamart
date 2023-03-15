@@ -122,7 +122,7 @@ class Command(BaseCommand):
                             self.stdout.write("Generating endpoint for %s" % model_name)
                         for line in self.handle_viewset(model_name):
                             api.write("%s\n" % line)
-                        line = "router.register(r'prp/%s', api.%sViewSet)" % (model_name.lower(), model_name)
+                        line = "router.register(r'sources/prp/%s', api.%sViewSet)" % (model_name.lower(), model_name)
                         urls.write("%s\n" % line)
                     else:
                         if verbosity >= 1:

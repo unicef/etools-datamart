@@ -4,52 +4,28 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"22eaecc61a01759ea4d6ad4f10eeb96e\"",
+        "ETag": "\"2a2a08671e4a12038856559882f15876\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.reports.OutputViewSet",
         "service": "etools_datamart.api.endpoints.datamart.reports.OutputViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "22eaecc61a01759ea4d6ad4f10eeb96e",
+        "cache-key": "2a2a08671e4a12038856559882f15876",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "447",
-        "Referrer-Policy": "same-origin"
+        "Content-Length": "85",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
-        "count": 3,
+        "count": 0,
         "next": null,
         "current_page": 1,
         "total_pages": 1,
         "previous": null,
-        "results": [
-            {
-                "wbs": null,
-                "name": null,
-                "from_date": null,
-                "to_date": null,
-                "humanitarian_marker_code": null,
-                "humanitarian_marker_name": null
-            },
-            {
-                "wbs": null,
-                "name": null,
-                "from_date": null,
-                "to_date": null,
-                "humanitarian_marker_code": null,
-                "humanitarian_marker_name": null
-            },
-            {
-                "wbs": null,
-                "name": null,
-                "from_date": null,
-                "to_date": null,
-                "humanitarian_marker_code": null,
-                "humanitarian_marker_name": null
-            }
-        ]
+        "results": []
     },
     "content_type": "application/json"
 }

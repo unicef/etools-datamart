@@ -375,6 +375,35 @@ class AuditSpotcheck(models.TenantModel):
         db_table = 'audit_spotcheck'
 
 
+class CommentsComment(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    state = models.CharField(max_length=10)
+    instance_related_id = models.IntegerField()
+    related_to_description = models.TextField()
+    related_to = models.CharField(max_length=100)
+    text = models.TextField()
+    instance_related_ct = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='CommentsComment_instance_related_ct')
+    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='CommentsComment_parent', blank=True, null=True)
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='CommentsComment_user')
+
+    class Meta:
+        managed = False
+        db_table = 'comments_comment'
+
+
+class CommentsCommentUsersRelated(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    comment = models.ForeignKey(CommentsComment, models.DO_NOTHING, related_name='CommentsCommentUsersRelated_comment')
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='CommentsCommentUsersRelated_user')
+
+    class Meta:
+        managed = False
+        db_table = 'comments_comment_users_related'
+        unique_together = (('comment', 'user'),)
+
+
 class DjangoCommentFlags(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     flag = models.CharField(max_length=30)
@@ -958,6 +987,7 @@ class PartnersAgreement(models.TenantModel):
     country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='PartnersAgreement_country_programme', blank=True, null=True)
     reference_number_year = models.IntegerField()
     special_conditions_pca = models.BooleanField()
+    terms_acknowledged_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersAgreement_terms_acknowledged_by', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1082,10 +1112,52 @@ class PartnersIntervention(models.TenantModel):
     activation_letter = models.CharField(max_length=1024, blank=True, null=True)
     termination_doc = models.CharField(max_length=1024, blank=True, null=True)
     cfei_number = models.CharField(max_length=150, blank=True, null=True)
+    budget_owner = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersIntervention_budget_owner', blank=True, null=True)
+    context = models.TextField(blank=True, null=True)
+    date_sent_to_partner = models.DateField(blank=True, null=True)
+    equity_narrative = models.TextField(blank=True, null=True)
+    equity_rating = models.CharField(max_length=50)
+    gender_narrative = models.TextField(blank=True, null=True)
+    gender_rating = models.CharField(max_length=50)
+    hq_support_cost = models.DecimalField(max_digits=2, decimal_places=1)
+    implementation_strategy = models.TextField(blank=True, null=True)
+    ip_program_contribution = models.TextField(blank=True, null=True)
+    partner_accepted = models.BooleanField()
+    sustainability_narrative = models.TextField(blank=True, null=True)
+    sustainability_rating = models.CharField(max_length=50)
+    unicef_accepted = models.BooleanField()
+    unicef_court = models.BooleanField()
+    unicef_review_type = models.CharField(max_length=50)
+    humanitarian_flag = models.BooleanField()
+    capacity_development = models.TextField(blank=True, null=True)
+    other_info = models.TextField(blank=True, null=True)
+    other_partners_involved = models.TextField(blank=True, null=True)
+    technical_guidance = models.TextField(blank=True, null=True)
+    cash_transfer_modalities = models.TextField()  # This field type is a guess.
+    cancel_justification = models.TextField(blank=True, null=True)
+    date_partnership_review_performed = models.DateField(blank=True, null=True)
+    accepted_on_behalf_of_partner = models.BooleanField()
+    activation_protocol = models.TextField(blank=True, null=True)
+    confidential = models.BooleanField()
+    has_activities_involving_children = models.BooleanField()
+    has_data_processing_agreement = models.BooleanField()
+    has_special_conditions_for_construction = models.BooleanField()
+    final_review_approved = models.BooleanField()
 
     class Meta:
         managed = False
         db_table = 'partners_intervention'
+
+
+class PartnersInterventionCountryProgrammes(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionCountryProgrammes_intervention')
+    countryprogramme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='PartnersInterventionCountryProgrammes_countryprogramme')
+
+    class Meta:
+        managed = False
+        db_table = 'partners_intervention_country_programmes'
+        unique_together = (('countryprogramme', 'intervention'),)
 
 
 class PartnersInterventionFlatLocations(models.TenantModel):
@@ -1132,6 +1204,17 @@ class PartnersInterventionSections(models.TenantModel):
         unique_together = (('intervention', 'section'),)
 
 
+class PartnersInterventionSites(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionSites_intervention')
+    locationsite = models.ForeignKey(FieldMonitoringSettingsLocationsite, models.DO_NOTHING, related_name='PartnersInterventionSites_locationsite')
+
+    class Meta:
+        managed = False
+        db_table = 'partners_intervention_sites'
+        unique_together = (('intervention', 'locationsite'),)
+
+
 class PartnersInterventionUnicefFocalPoints(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionUnicefFocalPoints_intervention')
@@ -1148,11 +1231,20 @@ class PartnersInterventionamendment(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     signed_date = models.DateField(blank=True, null=True)
-    amendment_number = models.IntegerField()
+    amendment_number = models.CharField(max_length=15)
     signed_amendment = models.CharField(max_length=1024)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionamendment_intervention')
     types = models.TextField()  # This field type is a guess.
     other_description = models.CharField(max_length=512, blank=True, null=True)
+    amended_intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionamendment_amended_intervention', blank=True, null=True)
+    difference = models.JSONField()
+    is_active = models.BooleanField()
+    kind = models.CharField(max_length=20)
+    partner_authorized_officer_signatory = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersInterventionamendment_partner_authorized_officer_signatory', blank=True, null=True)
+    related_objects_map = models.JSONField()
+    signed_by_partner_date = models.DateField(blank=True, null=True)
+    signed_by_unicef_date = models.DateField(blank=True, null=True)
+    unicef_signatory = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionamendment_unicef_signatory', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1187,10 +1279,48 @@ class PartnersInterventionbudget(models.TenantModel):
     intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionbudget_intervention', blank=True, null=True)
     total_local = models.DecimalField(max_digits=20, decimal_places=2)
     currency = models.CharField(max_length=5)
+    programme_effectiveness = models.DecimalField(max_digits=20, decimal_places=2)
+    total_hq_cash_local = models.DecimalField(max_digits=20, decimal_places=2)
+    total_unicef_cash_local_wo_hq = models.DecimalField(max_digits=20, decimal_places=2)
+    partner_supply_local = models.DecimalField(max_digits=20, decimal_places=2)
+    total_partner_contribution_local = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
         db_table = 'partners_interventionbudget'
+
+
+class PartnersInterventionmanagementbudget(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    act1_unicef = models.DecimalField(max_digits=20, decimal_places=2)
+    act1_partner = models.DecimalField(max_digits=20, decimal_places=2)
+    act2_unicef = models.DecimalField(max_digits=20, decimal_places=2)
+    act2_partner = models.DecimalField(max_digits=20, decimal_places=2)
+    act3_unicef = models.DecimalField(max_digits=20, decimal_places=2)
+    act3_partner = models.DecimalField(max_digits=20, decimal_places=2)
+    intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionmanagementbudget_intervention')
+
+    class Meta:
+        managed = False
+        db_table = 'partners_interventionmanagementbudget'
+
+
+class PartnersInterventionmanagementbudgetitem(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    kind = models.CharField(max_length=15)
+    unicef_cash = models.DecimalField(max_digits=20, decimal_places=2)
+    cso_cash = models.DecimalField(max_digits=20, decimal_places=2)
+    budget = models.ForeignKey(PartnersInterventionmanagementbudget, models.DO_NOTHING, related_name='PartnersInterventionmanagementbudgetitem_budget')
+    no_units = models.DecimalField(max_digits=20, decimal_places=2)
+    unit = models.CharField(max_length=150)
+    unit_price = models.DecimalField(max_digits=20, decimal_places=2)
+
+    class Meta:
+        managed = False
+        db_table = 'partners_interventionmanagementbudgetitem'
 
 
 class PartnersInterventionplannedvisits(models.TenantModel):
@@ -1226,10 +1356,11 @@ class PartnersInterventionreportingperiod(models.TenantModel):
 
 class PartnersInterventionresultlink(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='PartnersInterventionresultlink_cp_output')
+    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='PartnersInterventionresultlink_cp_output', blank=True, null=True)
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionresultlink_intervention')
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    code = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1246,6 +1377,90 @@ class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
         managed = False
         db_table = 'partners_interventionresultlink_ram_indicators'
         unique_together = (('indicator', 'interventionresultlink'),)
+
+
+class PartnersInterventionreview(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    review_type = models.CharField(max_length=50)
+    overall_approval = models.BooleanField(blank=True, null=True)
+    amendment = models.ForeignKey(PartnersInterventionamendment, models.DO_NOTHING, related_name='PartnersInterventionreview_amendment', blank=True, null=True)
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionreview_intervention')
+    actions_list = models.TextField()
+    budget_is_aligned = models.CharField(max_length=100)
+    ges_considered = models.CharField(max_length=100)
+    meeting_date = models.DateField(blank=True, null=True)
+    overall_approver = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreview_overall_approver', blank=True, null=True)
+    overall_comment = models.TextField()
+    partner_comparative_advantage = models.CharField(max_length=100)
+    pd_is_guided = models.CharField(max_length=100)
+    pd_is_relevant = models.CharField(max_length=100)
+    relationship_is_represented = models.CharField(max_length=10)
+    relationships_are_positive = models.CharField(max_length=100)
+    supply_issues_considered = models.CharField(max_length=100)
+    submitted_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreview_submitted_by', blank=True, null=True)
+    review_date = models.DateField(blank=True, null=True)
+    sent_back_comment = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'partners_interventionreview'
+
+
+class PartnersInterventionreviewPrcOfficers(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    interventionreview = models.ForeignKey(PartnersInterventionreview, models.DO_NOTHING, related_name='PartnersInterventionreviewPrcOfficers_interventionreview')
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreviewPrcOfficers_user')
+
+    class Meta:
+        managed = False
+        db_table = 'partners_interventionreview_prc_officers'
+        unique_together = (('interventionreview', 'user'),)
+
+
+class PartnersInterventionreviewnotification(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    review = models.ForeignKey(PartnersInterventionreview, models.DO_NOTHING, related_name='PartnersInterventionreviewnotification_review')
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreviewnotification_user')
+
+    class Meta:
+        managed = False
+        db_table = 'partners_interventionreviewnotification'
+
+
+class PartnersInterventionrisk(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    risk_type = models.CharField(max_length=50)
+    mitigation_measures = models.TextField()
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionrisk_intervention')
+
+    class Meta:
+        managed = False
+        db_table = 'partners_interventionrisk'
+
+
+class PartnersInterventionsupplyitem(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    title = models.CharField(max_length=150)
+    unit_number = models.DecimalField(max_digits=20, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=20, decimal_places=2)
+    total_price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    other_mentions = models.TextField()
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionsupplyitem_intervention')
+    result = models.ForeignKey(PartnersInterventionresultlink, models.DO_NOTHING, related_name='PartnersInterventionsupplyitem_result', blank=True, null=True)
+    unicef_product_number = models.CharField(max_length=150)
+    provided_by = models.CharField(max_length=10)
+
+    class Meta:
+        managed = False
+        db_table = 'partners_interventionsupplyitem'
 
 
 class PartnersPartnerorganization(models.TenantModel):
@@ -1350,6 +1565,29 @@ class PartnersPlannedengagement(models.TenantModel):
     class Meta:
         managed = False
         db_table = 'partners_plannedengagement'
+
+
+class PartnersPrcofficerinterventionreview(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    relationship_is_represented = models.CharField(max_length=10)
+    partner_comparative_advantage = models.CharField(max_length=100)
+    relationships_are_positive = models.CharField(max_length=100)
+    pd_is_relevant = models.CharField(max_length=100)
+    pd_is_guided = models.CharField(max_length=100)
+    ges_considered = models.CharField(max_length=100)
+    budget_is_aligned = models.CharField(max_length=100)
+    supply_issues_considered = models.CharField(max_length=100)
+    overall_comment = models.TextField()
+    overall_approval = models.BooleanField(blank=True, null=True)
+    overall_review = models.ForeignKey(PartnersInterventionreview, models.DO_NOTHING, related_name='PartnersPrcofficerinterventionreview_overall_review')
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersPrcofficerinterventionreview_user')
+    review_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'partners_prcofficerinterventionreview'
 
 
 class PartnersWorkspacefiletype(models.TenantModel):
@@ -1654,13 +1892,74 @@ class ReportsIndicatorblueprint(models.TenantModel):
         db_table = 'reports_indicatorblueprint'
 
 
+class ReportsInterventionactivity(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    name = models.CharField(max_length=150)
+    context_details = models.TextField(blank=True, null=True)
+    unicef_cash = models.DecimalField(max_digits=20, decimal_places=2)
+    cso_cash = models.DecimalField(max_digits=20, decimal_places=2)
+    result = models.ForeignKey('ReportsLowerresult', models.DO_NOTHING, related_name='ReportsInterventionactivity_result')
+    code = models.CharField(max_length=50, blank=True, null=True)
+    is_active = models.BooleanField()
+
+    class Meta:
+        managed = False
+        db_table = 'reports_interventionactivity'
+
+
+class ReportsInterventionactivityTimeFrames(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    interventionactivity = models.ForeignKey(ReportsInterventionactivity, models.DO_NOTHING, related_name='ReportsInterventionactivityTimeFrames_interventionactivity')
+    interventiontimeframe = models.ForeignKey('ReportsInterventiontimeframe', models.DO_NOTHING, related_name='ReportsInterventionactivityTimeFrames_interventiontimeframe')
+
+    class Meta:
+        managed = False
+        db_table = 'reports_interventionactivity_time_frames'
+        unique_together = (('interventionactivity', 'interventiontimeframe'),)
+
+
+class ReportsInterventionactivityitem(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    name = models.CharField(max_length=150)
+    unicef_cash = models.DecimalField(max_digits=20, decimal_places=2)
+    cso_cash = models.DecimalField(max_digits=20, decimal_places=2)
+    activity = models.ForeignKey(ReportsInterventionactivity, models.DO_NOTHING, related_name='ReportsInterventionactivityitem_activity')
+    no_units = models.DecimalField(max_digits=20, decimal_places=2)
+    unit = models.CharField(max_length=150)
+    unit_price = models.DecimalField(max_digits=20, decimal_places=2)
+    code = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'reports_interventionactivityitem'
+
+
+class ReportsInterventiontimeframe(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='ReportsInterventiontimeframe_intervention')
+    quarter = models.SmallIntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'reports_interventiontimeframe'
+
+
 class ReportsLowerresult(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=500)
-    code = models.CharField(max_length=50)
+    code = models.CharField(max_length=50, blank=True, null=True)
     result_link = models.ForeignKey(PartnersInterventionresultlink, models.DO_NOTHING, related_name='ReportsLowerresult_result_link')
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    is_active = models.BooleanField()
 
     class Meta:
         managed = False
@@ -2073,7 +2372,7 @@ class TravelTrip(models.TenantModel):
     section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='TravelTrip_section', blank=True, null=True)
     supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_supervisor', blank=True, null=True)
     traveller = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_traveller')
-    user_info_text = models.JSONField(default=dict, blank=True)
+    user_info_text = models.JSONField()
     additional_notes = models.TextField(blank=True, null=True)
     not_as_planned = models.BooleanField()
 

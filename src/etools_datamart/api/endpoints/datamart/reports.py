@@ -20,8 +20,8 @@ class OutcomeViewSet(common.DataMartViewSet):
 class OutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Result
-        fields = ('wbs', 'name', 'from_date', 'to_date', 'humanitarian_marker_code', 'humanitarian_marker_name')
-        # 'programme_area_code', 'programme_area_name')
+        fields = ('wbs', 'name', 'from_date', 'to_date', 'humanitarian_marker_code', 'humanitarian_marker_name',
+                  'programme_area_code', 'programme_area_name')
 
 
 class OutputViewSet(common.DataMartViewSet):
