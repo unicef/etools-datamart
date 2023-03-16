@@ -79,7 +79,7 @@ class ActionPointLoader(EtoolsLoader):
         elif module == 'TpmTpmactivity':
             return record.tpm_activity.tpm_visit_id
         elif module == 'T2FTravelactivity':
-            return record.travel_activity.pk
+            return getattr(record.travel_activity.travels.filter(traveler=record.assigned_to).last(), "pk", None)
         elif module == 'PseaAssessment':
             return record.psea_assessment.pk
         elif module == 'FieldMonitoringPlanningMonitoringactivity':
