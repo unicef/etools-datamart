@@ -443,7 +443,7 @@ CONSTANCE_CONFIG = {
 
 }
 
-CELERY_ACCEPT_CONTENT = ['etljson']
+CELERY_ACCEPT_CONTENT = ['etljson', 'application/json']
 CELERY_BEAT_SCHEDULER = env.str(
     'CELERY_BEAT_SCHEDULER',
     default='unicef_rest_framework.schedulers:DatabaseScheduler',
