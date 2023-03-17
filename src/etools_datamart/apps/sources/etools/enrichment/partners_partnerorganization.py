@@ -1,7 +1,7 @@
 from etools_datamart.apps.sources.etools.models import (
     AuditSpotcheck,
     PartnersPartnerorganization,
-    PartnersPartnerplannedvisits,
+    PartnersPlannedengagement,
 )
 
 from .consts import PartnerOrganizationConst, PartnerType
@@ -65,8 +65,8 @@ def min_req_spot_checks(self):
         return 0
 
     try:
-        self.PartnersPartnerplannedvisits_partner
-    except PartnersPartnerplannedvisits.DoesNotExist:
+        self.PartnersPlannedengagement_partner
+    except PartnersPlannedengagement.DoesNotExist:
         pass
     else:
         if self.planned_engagement.scheduled_audit:
