@@ -38,7 +38,15 @@ class InterventionActivity(InterventionSimpleAbstract, EtoolsDataMartModel):
     class Options:
         source = ReportsInterventionactivityitem
         depends = (Intervention,)
-        mapping = dict()
+        mapping = dict(
+            activity='activity.name',
+            activity_details='activity.context_details',
+            activity_unicef_cash='activity.unicef_cash',
+            activity_cso_cash='activity.cso_cash',
+            activity_code='activity.code',
+            ll_name='activity.result.name',
+            ll_code='activity.result.code'
+        )
         queryset = lambda: ReportsInterventionactivityitem.objects.select_related(
             'activity__result__result_link__intervention__agreement__partner'
         )
