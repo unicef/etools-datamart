@@ -1,0 +1,28 @@
+{
+    "record": {
+        "master": {
+            "model": "data.interventionplannedvisits",
+            "pk": 4,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2023-03-20T16:55:13.378Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "created": null,
+                "modified": null,
+                "partner_vendor_number": null,
+                "partner_name": null,
+                "pd_status": null,
+                "pd_reference_number": null,
+                "year": 2023,
+                "programmatic_q1": 0,
+                "programmatic_q2": 0,
+                "programmatic_q3": 0,
+                "programmatic_q4": 0
+            }
+        },
+        "deps": []
+    }
+}

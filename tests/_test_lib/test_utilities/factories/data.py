@@ -270,6 +270,13 @@ class InterventionManagementBudgetFactory(DataMartModelFactory):
         model = models.InterventionManagementBudget
 
 
+class InterventionPlannedVisitsFactory(DataMartModelFactory):
+    year = datetime.now().year
+
+    class Meta:
+        model = models.InterventionPlannedVisits
+
+
 class InterventionReviewFactory(DataMartModelFactory):
     review_created = timezone.now()
     review_modified = timezone.now()
