@@ -18,6 +18,7 @@ from .intervention_activity import InterventionActivityViewSet
 from .intervention_country_programme import InterventionCPViewSet
 from .intervention_epd import InterventionEPDViewSet
 from .intervention_management_budget import InterventionBudgetMgmtViewSet
+from .intervention_planned_visits import InterventionPlannedVisitsViewSet
 from .intervention_review import InterventionReviewViewSet
 from .location import LocationSiteViewSet, LocationViewSet
 from .office import OfficeViewSet

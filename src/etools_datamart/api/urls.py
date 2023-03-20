@@ -49,6 +49,7 @@ router.register(r'datamart/interventions-activities', endpoints.InterventionActi
 router.register(r'datamart/interventions-country-programmes', endpoints.InterventionCPViewSet)
 router.register(r'datamart/interventions-epd', endpoints.InterventionEPDViewSet)
 router.register(r'datamart/interventions-management-budget', endpoints.InterventionBudgetMgmtViewSet)
+router.register(r'datamart/interventions-planned-visits', endpoints.InterventionPlannedVisitsViewSet)
 router.register(r'datamart/interventions-review', endpoints.InterventionReviewViewSet)
 
 router.register(r'datamart/pd-indicators', endpoints.PDIndicatorViewSet)

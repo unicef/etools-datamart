@@ -1326,13 +1326,13 @@ class PartnersInterventionmanagementbudgetitem(models.TenantModel):
 class PartnersInterventionplannedvisits(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     year = models.IntegerField()
-    programmatic_q4 = models.IntegerField()
     intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionplannedvisits_intervention')
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    programmatic_q1 = models.IntegerField()
-    programmatic_q2 = models.IntegerField()
-    programmatic_q3 = models.IntegerField()
+    programmatic_q1 = models.IntegerField(default=0)
+    programmatic_q2 = models.IntegerField(default=0)
+    programmatic_q3 = models.IntegerField(default=0)
+    programmatic_q4 = models.IntegerField(default=0)
 
     class Meta:
         managed = False
