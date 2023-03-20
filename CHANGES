@@ -1,6 +1,11 @@
+3.53.1
+------
+* fixed MR PV
+* fixed travel action point
+* fixed intervention-activity
+
 3.53
 ------
-* fixed travel action point
 * fixed celery accept content type
 
 3.52
