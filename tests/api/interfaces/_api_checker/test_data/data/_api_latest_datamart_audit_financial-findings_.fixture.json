@@ -1,0 +1,76 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.auditfinancialfinding",
+                "pk": 100,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-03-21T17:05:03.867Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "created": null,
+                    "partner_vendor_number": null,
+                    "partner_name": null,
+                    "audit_reference_number": null,
+                    "audit_status": null,
+                    "title": "cut-off-error",
+                    "local_amount": "100.00",
+                    "amount": "200.00",
+                    "description": "--",
+                    "recommendation": "",
+                    "ip_comments": ""
+                }
+            },
+            {
+                "model": "data.auditfinancialfinding",
+                "pk": 101,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-03-21T17:05:03.869Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "created": null,
+                    "partner_vendor_number": null,
+                    "partner_name": null,
+                    "audit_reference_number": null,
+                    "audit_status": null,
+                    "title": "cut-off-error",
+                    "local_amount": "100.00",
+                    "amount": "200.00",
+                    "description": "--",
+                    "recommendation": "",
+                    "ip_comments": ""
+                }
+            },
+            {
+                "model": "data.auditfinancialfinding",
+                "pk": 102,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-03-21T17:05:03.870Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "created": null,
+                    "partner_vendor_number": null,
+                    "partner_name": null,
+                    "audit_reference_number": null,
+                    "audit_status": null,
+                    "title": "cut-off-error",
+                    "local_amount": "100.00",
+                    "amount": "200.00",
+                    "description": "--",
+                    "recommendation": "",
+                    "ip_comments": ""
+                }
+            }
+        ],
+        "deps": []
+    }
+}

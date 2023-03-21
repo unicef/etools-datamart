@@ -4,38 +4,6 @@ from etools_datamart.apps.mart.data.models.intervention import Intervention
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst
 from etools_datamart.apps.sources.etools.models import models, PartnersInterventionplannedvisits
 
-#
-# class InterventionPlannedVisitsLoader(InterventionLoader):
-#     def get_queryset(self):
-#         return PartnersInterventionbudget.objects
-#
-#     def process_country(self):
-#         for record in self.get_queryset().exclude(intervention__isnull=True):
-#             filters = self.config.key(self, record)
-#             values = self.get_values(record.intervention)
-#             values['source_id'] = record.id
-#             values['budget_cso_contribution'] = record.partner_contribution_local
-#             values['budget_unicef_cash'] = record.unicef_cash_local
-#             values['budget_total'] = record.total_local
-#             values['budget_currency'] = record.currency
-#             values['budget_unicef_supply'] = record.in_kind_amount_local
-#             op = self.process_record(filters, values)
-#             self.increment_counter(op)
-#
-#     def get_fr_numbers(self, record: PartnersIntervention, values: dict, **kwargs):
-#         data = []
-#         ret = []
-#         for fr in FundsFundsreservationheader.objects.filter(intervention=record):
-#             ret.append(fr.fr_number)
-#             data.append(dict(fr_number=fr.fr_number,
-#                              vendor_code=fr.vendor_code,
-#                              fr_type=fr.fr_type,
-#                              currency=fr.currency,
-#                              ))
-#
-#         values['fr_numbers_data'] = data
-#         return ", ".join(ret)
-
 
 class InterventionPlannedVisits(EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)

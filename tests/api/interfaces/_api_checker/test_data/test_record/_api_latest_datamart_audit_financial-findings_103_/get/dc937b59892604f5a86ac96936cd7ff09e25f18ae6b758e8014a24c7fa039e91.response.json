@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"002a9b2ffb8bbd076aa7d564e1cd9917\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.audit_financial_finding.AuditFinancialFindingViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.audit_financial_finding.AuditFinancialFindingViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "357",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
+    },
+    "data": {
+        "id": 103,
+        "source_id": null,
+        "last_modify_date": "21 Mar 2023 17:05:07",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "created": null,
+        "partner_vendor_number": null,
+        "partner_name": null,
+        "audit_reference_number": null,
+        "audit_status": null,
+        "title": "cut-off-error",
+        "local_amount": "100.00",
+        "amount": "200.00",
+        "description": "--",
+        "recommendation": "",
+        "ip_comments": ""
+    },
+    "content_type": "application/json"
+}
