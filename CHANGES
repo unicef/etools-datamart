@@ -1,3 +1,8 @@
+3.54
+
+added audit/financial-findings/ endpoint
+added interventions-planned-visits endpoint
+
 3.53.1
 ------
 * fixed MR PV

@@ -202,6 +202,13 @@ class InterventionManagementBudgetAdmin(DataModelAdmin, TruncateTableMixin):
     search_fields = ('pd_number', 'partner')
 
 
+@register(models.InterventionPlannedVisits)
+class InterventionPlannedVisitsAdmin(DataModelAdmin, TruncateTableMixin):
+    list_display = ('partner_vendor_number', 'partner_name', 'pd_status', 'pd_reference_number')
+    list_filter = (SchemaFilter, )
+    search_fields = ('partner_vendor_number', 'partner_name', 'pd_reference_number')
+
+
 @register(models.InterventionReview)
 class InterventionReviewAdmin(DataModelAdmin, TruncateTableMixin):
     list_display = ('country_name', 'pd_number', 'partner')
@@ -478,6 +485,13 @@ class AuditAdmin(DataModelAdmin):
     list_display = ('reference_number', 'engagement_type', 'status', 'sections')
     list_filter = ('engagement_type', 'status', )
     search_fields = ('reference_number', 'source_id')
+
+
+@register(models.AuditFinancialFinding)
+class AuditFinancialFindingAdmin(DataModelAdmin):
+    list_display = ('audit_reference_number', 'audit_status', 'partner_name')
+    list_filter = ('partner_name', 'audit_status', )
+    search_fields = ('partner_name', 'audit_reference_number', 'source_id')
 
 
 @register(models.AuditSpecial)

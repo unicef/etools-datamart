@@ -2,6 +2,7 @@ from .actionpoint import ActionPoint  # noqa
 from .attachments_attachment import Attachment  # noqa
 from .audit_audit import Audit  # noqa
 from .audit_engagement import Engagement  # noqa
+from .audit_financial_finding import AuditFinancialFinding  # noqa
 from .audit_micro_assessment import MicroAssessment
 from .audit_result import AuditResult  # noqa
 from .audit_special import AuditSpecial  # noqa
@@ -18,6 +19,7 @@ from .intervention_activity import InterventionActivity  # noqa
 from .intervention_country_programme import InterventionCountryProgramme  # noqa
 from .intervention_epd import InterventionEPD  # noqa
 from .intervention_management_budget import InterventionManagementBudget  # noqa
+from .intervention_planned_visits import InterventionPlannedVisits
 from .intervention_review import InterventionReview  # noqa
 from .location import GeoName, Location  # noqa
 from .partner import Partner  # noqa

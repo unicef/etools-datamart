@@ -3,6 +3,7 @@ from .actionpoint import ActionPointViewSet
 from .attachment import AttachmentViewSet
 from .audit_audit import AuditViewSet
 from .audit_engagement import EngagementDetailViewSet, EngagementViewSet
+from .audit_financial_finding import AuditFinancialFindingViewSet
 from .audit_micro_assessment import MicroAssessmentViewSet
 from .audit_result import AuditResultViewSet
 from .audit_special import AuditSpecialViewSet
@@ -18,6 +19,7 @@ from .intervention_activity import InterventionActivityViewSet
 from .intervention_country_programme import InterventionCPViewSet
 from .intervention_epd import InterventionEPDViewSet
 from .intervention_management_budget import InterventionBudgetMgmtViewSet
+from .intervention_planned_visits import InterventionPlannedVisitsViewSet
 from .intervention_review import InterventionReviewViewSet
 from .location import LocationSiteViewSet, LocationViewSet
 from .office import OfficeViewSet

@@ -270,6 +270,13 @@ class InterventionManagementBudgetFactory(DataMartModelFactory):
         model = models.InterventionManagementBudget
 
 
+class InterventionPlannedVisitsFactory(DataMartModelFactory):
+    year = datetime.now().year
+
+    class Meta:
+        model = models.InterventionPlannedVisits
+
+
 class InterventionReviewFactory(DataMartModelFactory):
     review_created = timezone.now()
     review_modified = timezone.now()
@@ -354,7 +361,6 @@ class AuditResultFactory(DataMartModelFactory):
         model = models.AuditResult
 
 
-
 class SpotCheckFindingsFactory(DataMartModelFactory):
     partner = {'name': 'Partner1',
                'vendor_number': '123',
@@ -383,6 +389,15 @@ class AuditFactory(DataMartModelFactory):
 
     class Meta:
         model = models.Audit
+
+
+class AuditFinancialFindingFactory(DataMartModelFactory):
+    created = timezone.now()
+    local_amount = 100.0
+    amount = 200.0
+
+    class Meta:
+        model = models.AuditFinancialFinding
 
 
 class AuditSpecialFactory(DataMartModelFactory):
