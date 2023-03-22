@@ -229,6 +229,27 @@ class AuditEngagementConsts:
     }
 
 
+class AuditFinancialFindingsConsts:
+    TITLE_CHOICES = Choices(
+        ('no-supporting-documentation', _('No supporting documentation')),
+        ('insufficient-supporting-documentation', _('Insufficient supporting documentation')),
+        ('cut-off-error', _('Cut-off error')),
+        ('expenditure-not-for-project-purposes', _('Expenditure not for project purposes')),
+        ('no-proof-of-payment', _('No proof of payment')),
+        ('no-proof-of-goods-services-received', _('No proof of goods / services received')),
+        ('vat-incorrectly-claimed', _('VAT incorrectly claimed')),
+        ('dsa-rates-exceeded', _('DSA rates exceeded')),
+        ('unreasonable-price', _('Unreasonable price')),
+        ('bank-interest-not-reported', _('Bank interest not reported')),
+        ('support-costs-incorrectly-calculated', _('Support costs incorrectly calculated')),
+        ('expenditure-claimed-but-activities-not-undertaken', _('Expenditure claimed but activities not undertaken')),
+        ('advance-claimed-as-expenditure', _('Advance claimed as expenditure')),
+        ('commitments-treated-as-expenditure', _('Commitments treated as expenditure')),
+        ('ineligible-salary-costs', _('Ineligible salary costs')),
+        ('ineligible-costs-other', _('Ineligible costs (other)')),
+    )
+
+
 class ActionPointConsts:
     MODULE_CHOICES = CategoryConsts.MODULE_CHOICES
 

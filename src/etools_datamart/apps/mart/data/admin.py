@@ -487,6 +487,13 @@ class AuditAdmin(DataModelAdmin):
     search_fields = ('reference_number', 'source_id')
 
 
+@register(models.AuditFinancialFinding)
+class AuditFinancialFindingAdmin(DataModelAdmin):
+    list_display = ('audit_reference_number', 'audit_status', 'partner_name')
+    list_filter = ('partner_name', 'audit_status', )
+    search_fields = ('partner_name', 'audit_reference_number', 'source_id')
+
+
 @register(models.AuditSpecial)
 class AuditSpecialAdmin(DataModelAdmin):
     list_display = ('reference_number', 'engagement_type', 'status', 'sections')
