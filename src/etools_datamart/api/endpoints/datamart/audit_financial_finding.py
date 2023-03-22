@@ -32,12 +32,3 @@ class AuditFinancialFindingViewSet(common.DataMartViewSet):
     filter_fields = ('status',)
     serializers_fieldsets = {'std': AuditFinancialFindingSerializer}
     querystringfilter_form_base_class = AuditFinancialFindingFilterForm
-
-    def get_serializer(self, *args, **kwargs):
-        return super().get_serializer(*args, **kwargs)
-
-    def filter_queryset(self, queryset):
-        return super().filter_queryset(queryset)
-
-    def get_queryset(self):
-        return super().get_queryset()

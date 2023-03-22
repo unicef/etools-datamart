@@ -393,10 +393,8 @@ class AuditFactory(DataMartModelFactory):
 
 class AuditFinancialFindingFactory(DataMartModelFactory):
     created = timezone.now()
-    title = 'cut-off-error'
     local_amount = 100.0
     amount = 200.0
-    description = "--"
 
     class Meta:
         model = models.AuditFinancialFinding

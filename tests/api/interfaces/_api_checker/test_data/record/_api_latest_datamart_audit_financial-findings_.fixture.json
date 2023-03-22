@@ -2,23 +2,23 @@
     "record": {
         "master": {
             "model": "data.auditfinancialfinding",
-            "pk": 103,
+            "pk": 143,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2023-03-21T17:05:07.605Z",
+                "last_modify_date": "2023-03-22T14:39:32.165Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
                 "area_code": "",
-                "created": null,
+                "created": "2023-03-22",
                 "partner_vendor_number": null,
                 "partner_name": null,
                 "audit_reference_number": null,
                 "audit_status": null,
-                "title": "cut-off-error",
+                "title": "",
                 "local_amount": "100.00",
                 "amount": "200.00",
-                "description": "--",
+                "description": "",
                 "recommendation": "",
                 "ip_comments": ""
             }
