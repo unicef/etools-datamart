@@ -1,7 +1,12 @@
-3.54
+3.54.1
+------
+* added newrelic
 
-added audit/financial-findings/ endpoint
-added interventions-planned-visits endpoint
+3.54
+------
+* added audit/financial-findings/ endpoint
+* added interventions-planned-visits endpoint
+
 
 3.53.1
 ------
@@ -9,9 +14,11 @@ added interventions-planned-visits endpoint
 * fixed travel action point
 * fixed intervention-activity
 
+
 3.53
 ------
 * fixed celery accept content type
+
 
 3.52
 ------
