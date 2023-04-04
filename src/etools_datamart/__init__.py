@@ -1,3 +1,3 @@
 NAME = 'etools-datamart'
-VERSION = __version__ = '3.54'
+VERSION = __version__ = '3.54.1'
 __author__ = ''
