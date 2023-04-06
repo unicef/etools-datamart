@@ -19,6 +19,7 @@ CACHES['locmem'] = {  # noqa
     'LOCATION': 'unique-snowflake',
 }
 
+print(env.cache('CACHE_URL'))
 CACHES['redis'] = env.cache('CACHE_URL')  # noqa
 # we must have redis here to check for pickling errors
 assert CACHES['redis']['BACKEND'] == 'django_redis.cache.RedisCache'  # noqa

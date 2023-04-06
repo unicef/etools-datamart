@@ -333,7 +333,8 @@ INSTALLED_APPS = [
     'django_filters',
     'month_field',
     'drf_querystringfilter',
-    'crispy_forms',
+    "crispy_forms",
+    "crispy_bootstrap4",
     'drf_yasg',
     'adminfilters',
     'post_office',
@@ -385,7 +386,8 @@ POST_OFFICE = {
 # crispy-forms
 CRISPY_FAIL_SILENTLY = not DEBUG
 CRISPY_CLASS_CONVERTERS = {'textinput': "textinput inputtext"}
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # django-secure
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE')
