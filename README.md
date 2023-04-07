@@ -26,3 +26,21 @@ UNICEF eTools API and Datamart
 
 [microbadger-badge]: https://images.microbadger.com/badges/image/unicef/datamart.svg
 [microbadger-link]: https://microbadger.com/images/unicef/datamart "Docker image infos"
+
+
+### restore environment
+
+#### Non replicable tables
+
+* unicef_security_user_groups
+* unicef_security_users
+* unicef_rest_framework_export
+
+#### Partner refresh every 4 hours
+
+scheduler 0 0,4,8,12,16,20 * * *
+
+#### Tasks
+
+- Preload: 1.00 am
+- Force Refresh: * 1 * * 0 (304 cached)
