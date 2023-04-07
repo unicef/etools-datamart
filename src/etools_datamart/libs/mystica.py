@@ -26,6 +26,7 @@ def mystica_auth(username, password):
 #         return mystica_auth(username, password)
 #
 
+
 class MysticaBasicAuthentication(BasicAuthentication):
     def authenticate_credentials(self, userid, password, request=None):
         return mystica_auth(userid, password)

@@ -12,6 +12,7 @@ from etools_datamart.libs.admin_filters import SizeFilter, StatusFilter
 
 def queue(modeladmin, request, queryset):
     from unicef_rest_framework.tasks import preload
+
     for t in queryset:
         preload.apply_async(args=[t.id])
 
@@ -27,21 +28,21 @@ def queue(modeladmin, request, queryset):
 
 
 class PreloadAdmin(ExtraButtonsMixin, admin.ModelAdmin):
-    list_display = ('url', 'as_user', 'format',
-                    'enabled', 'last_run',
-                    'status_code', 'size', 'response_ms', 'preview')
-    date_hierarchy = 'last_run'
-    search_fields = ('url',)
-    list_filter = (('status_code', StatusFilter), 'enabled', SizeFilter)
-    actions = [queue, ]
+    list_display = ("url", "as_user", "format", "enabled", "last_run", "status_code", "size", "response_ms", "preview")
+    date_hierarchy = "last_run"
+    search_fields = ("url",)
+    list_filter = (("status_code", StatusFilter), "enabled", SizeFilter)
+    actions = [
+        queue,
+    ]
 
     def format(self, obj):
-        return obj.params.get('format', '')
+        return obj.params.get("format", "")
 
     def preview(self, obj):
         return mark_safe("<a href='{0}' title='{0}' target='_new'>preview</a>".format(obj.get_full_url()))
 
-    @button(label='Goto API')
+    @button(label="Goto API")
     def goto(self, request, pk):
         obj = self.model.objects.get(id=pk)
         return HttpResponseRedirect(obj.get_full_url())
@@ -50,11 +51,12 @@ class PreloadAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         if obj.response_length:
             return mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
 
-    size.admin_order_field = 'response_length'
+    size.admin_order_field = "response_length"
 
     @button()
     def queue(self, request, id):
         from unicef_rest_framework.tasks import preload
+
         preload.apply_async(args=[id])
 
     @button()

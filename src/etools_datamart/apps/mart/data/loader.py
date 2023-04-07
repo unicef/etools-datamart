@@ -19,8 +19,7 @@ logger = get_task_logger(__name__)
 
 
 class EToolsLoaderOptions(BaseLoaderOptions):
-    DEFAULT_KEY = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                              source_id=record.pk)
+    DEFAULT_KEY = lambda loader, record: dict(schema_name=loader.context["country"].schema_name, source_id=record.pk)
 
 
 #     def __init__(self, base=None):
@@ -31,18 +30,19 @@ class EToolsLoaderOptions(BaseLoaderOptions):
 
 class EtoolsLoader(BaseLoader):
     def get_mart_values(self, record=None):
-        country = self.context['country']
-        ret = {'area_code': country.business_area_code,
-               'schema_name': country.schema_name,
-               'country_name': country.name,
-               'seen': self.context['today']
-               }
+        country = self.context["country"]
+        ret = {
+            "area_code": country.business_area_code,
+            "schema_name": country.schema_name,
+            "country_name": country.name,
+            "seen": self.context["today"],
+        }
         if record:
-            ret['source_id'] = record.id
+            ret["source_id"] = record.id
         return ret
 
     def xxget_values(self, record):
-        country = self.context['country']
+        country = self.context["country"]
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
@@ -50,24 +50,23 @@ class EtoolsLoader(BaseLoader):
                 continue
             if v is None:
                 ret[k] = None
-            elif v == 'N/A':
-                ret[k] = 'N/A'
-            elif v == 'i':
+            elif v == "N/A":
+                ret[k] = "N/A"
+            elif v == "i":
                 continue
             elif isinstance(v, str) and hasattr(self, v) and callable(getattr(self, v)):
                 getter = getattr(self, v)
                 _value = getter(record, ret, field_name=k)
                 if _value != self.noop:
                     ret[k] = _value
-            elif v == '-' or hasattr(self, 'get_%s' % k):
-                getter = getattr(self, 'get_%s' % k)
+            elif v == "-" or hasattr(self, "get_%s" % k):
+                getter = getattr(self, "get_%s" % k)
                 _value = getter(record, ret, field_name=k)
                 if _value != self.noop:
                     ret[k] = _value
-            elif v == '__self__':
+            elif v == "__self__":
                 try:
-                    ret[k] = self.model.objects.get(schema_name=country.schema_name,
-                                                    source_id=getattr(record, k).id)
+                    ret[k] = self.model.objects.get(schema_name=country.schema_name, source_id=getattr(record, k).id)
                 except AttributeError:
                     ret[k] = None
                 except self.model.DoesNotExist:
@@ -76,15 +75,14 @@ class EtoolsLoader(BaseLoader):
 
             elif isclass(v) and issubclass(v, models.Model):
                 try:
-                    ret[k] = v.objects.get(schema_name=country.schema_name,
-                                           source_id=getattr(record, k).id)
+                    ret[k] = v.objects.get(schema_name=country.schema_name, source_id=getattr(record, k).id)
                 except ObjectDoesNotExist:  # pragma: no cover
                     ret[k] = None
                 except AttributeError:  # pragma: no cover
                     pass
             elif callable(v):
                 ret[k] = v(self, record)
-            elif v == '=' and has_attr(record, k):
+            elif v == "=" and has_attr(record, k):
                 ret[k] = get_attr(record, k)
             # elif has_attr(record, k):
             #     ret[k] = get_attr(record, k)
@@ -105,21 +103,23 @@ class EtoolsLoader(BaseLoader):
         return ret
 
     def get_value(self, field_name, value_or_func, original_record, current_mapping):
-        if value_or_func == '__self__':
-            country = self.context['country']
+        if value_or_func == "__self__":
+            country = self.context["country"]
             try:
-                return self.model.objects.get(schema_name=country.schema_name,
-                                              source_id=getattr(original_record, field_name).id)
+                return self.model.objects.get(
+                    schema_name=country.schema_name, source_id=getattr(original_record, field_name).id
+                )
             except AttributeError:
                 return None
             except self.model.DoesNotExist:
                 self.tree_parents.append((original_record.id, getattr(original_record, field_name).id))
                 return None
         if isclass(value_or_func) and issubclass(value_or_func, models.Model):
-            country = self.context['country']
+            country = self.context["country"]
             try:
-                return value_or_func.objects.get(schema_name=country.schema_name,
-                                                 source_id=getattr(original_record, field_name).id)
+                return value_or_func.objects.get(
+                    schema_name=country.schema_name, source_id=getattr(original_record, field_name).id
+                )
             except ObjectDoesNotExist:  # pragma: no cover
                 return None
             except AttributeError:  # pragma: no cover
@@ -128,7 +128,7 @@ class EtoolsLoader(BaseLoader):
             return super().get_value(field_name, value_or_func, original_record, current_mapping)
 
     def filter_queryset(self, qs):
-        use_delta = self.context['only_delta'] and not self.context['is_empty']
+        use_delta = self.context["only_delta"] and not self.context["is_empty"]
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
         if use_delta and (self.config.last_modify_field and self.last_run):
@@ -145,25 +145,22 @@ class EtoolsLoader(BaseLoader):
             self.increment_counter(op)
 
     def remove_deleted(self):
-        country = self.context['country']
-        existing = list(self.get_queryset().only('id').values_list('id', flat=True))
+        country = self.context["country"]
+        existing = list(self.get_queryset().only("id").values_list("id", flat=True))
         to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
         self.results.deleted += to_delete.count()
         to_delete.delete()
 
     def post_process_country(self):
-        country = self.context['country']
+        country = self.context["country"]
         for mart, etools in self.tree_parents:
-            kk = self.model.objects.get(schema_name=country.schema_name,
-                                        source_id=mart)
-            kk.parent = self.model.objects.get(schema_name=country.schema_name,
-                                               source_id=etools)
+            kk = self.model.objects.get(schema_name=country.schema_name, source_id=mart)
+            kk.parent = self.model.objects.get(schema_name=country.schema_name, source_id=etools)
             kk.save()
         self.tree_parents = []
         # mark seen records
 
     def get_queryset(self):
-
         if self.config.queryset:
             ret = self.config.queryset()
         elif self.config.source:
@@ -173,8 +170,17 @@ class EtoolsLoader(BaseLoader):
 
         return ret
 
-    def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
-             only_delta=True, run_type=RUN_UNKNOWN, **kwargs):
+    def load(
+        self,
+        *,
+        verbosity=0,
+        stdout=None,
+        ignore_dependencies=False,
+        max_records=None,
+        only_delta=True,
+        run_type=RUN_UNKNOWN,
+        **kwargs,
+    ):
         logger.debug(f"Running loader {self}")
         lock = self.lock()
         truncate = self.config.truncate
@@ -187,9 +193,9 @@ class EtoolsLoader(BaseLoader):
                             raise RequiredIsRunning(requirement)
                         if requirement.loader.need_refresh(self):
                             raise RequiredIsMissing(requirement)
-                connection = connections['etools']
-                if kwargs.get('countries'):
-                    countries = kwargs['countries']
+                connection = connections["etools"]
+                if kwargs.get("countries"):
+                    countries = kwargs["countries"]
                     truncate = False
                 else:
                     countries = connection.get_tenants()
@@ -205,14 +211,16 @@ class EtoolsLoader(BaseLoader):
                 #         self.mapping[field.name] = field.name
                 # if self.config.mapping:  # pragma: no branch
                 #     self.mapping.update(self.config.mapping)
-                self.update_context(today=timezone.now(),
-                                    countries=countries,
-                                    max_records=max_records,
-                                    verbosity=verbosity,
-                                    records=0,
-                                    only_delta=only_delta,
-                                    is_empty=not self.model.objects.exists(),
-                                    stdout=stdout)
+                self.update_context(
+                    today=timezone.now(),
+                    countries=countries,
+                    max_records=max_records,
+                    verbosity=verbosity,
+                    records=0,
+                    only_delta=only_delta,
+                    is_empty=not self.model.objects.exists(),
+                    stdout=stdout,
+                )
                 sid = transaction.savepoint()
                 total_countries = len(countries)
                 try:
@@ -223,11 +231,11 @@ class EtoolsLoader(BaseLoader):
                         self.model.objects.truncate()
                     for i, country in enumerate(countries, 1):
                         cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
-                        self.context['country'] = country
+                        self.context["country"] = country
                         if stdout and verbosity > 0:
-                            stdout.write(f"{i:>3}/{total_countries} "
-                                         f"{country.name:<25} "
-                                         f"{country.schema_name:<25}")
+                            stdout.write(
+                                f"{i:>3}/{total_countries} " f"{country.name:<25} " f"{country.schema_name:<25}"
+                            )
                             stdout.flush()
 
                         connection.set_schemas([country.schema_name])
@@ -281,16 +289,16 @@ class CommonSchemaLoaderOptions(BaseLoaderOptions):
 
 class CommonSchemaLoader(EtoolsLoader):
     def get_mart_values(self, record=None):
-        ret = {'seen': self.context['today']}
+        ret = {"seen": self.context["today"]}
         if record:
-            ret['source_id'] = record.id
+            ret["source_id"] = record.id
         return ret
 
     def ssget_values(self, record):
         ret = self.get_mart_values(record)
 
         for k, v in self.mapping.items():
-            if v == '__self__':
+            if v == "__self__":
                 try:
                     ret[k] = self.model.objects.get(source_id=getattr(record, k).id)
                 except AttributeError:
@@ -306,8 +314,8 @@ class CommonSchemaLoader(EtoolsLoader):
                     pass
             elif callable(v):
                 ret[k] = v(self, record)
-            elif hasattr(self, 'get_%s' % v):
-                getter = getattr(self, 'get_%s' % v)
+            elif hasattr(self, "get_%s" % v):
+                getter = getattr(self, "get_%s" % v)
                 ret[k] = getter(record, ret)
             else:
                 ret[k] = get_attr(record, v)
@@ -328,12 +336,19 @@ class CommonSchemaLoader(EtoolsLoader):
             except AttributeError:  # pragma: no cover
                 pass
         else:
-            return super().get_value(field_name, value_or_func, original_record,
-                                                             current_mapping)
+            return super().get_value(field_name, value_or_func, original_record, current_mapping)
 
-    def load(self, *, verbosity=0, stdout=None,
-             ignore_dependencies=False, max_records=None,
-             only_delta=True, run_type=RUN_UNKNOWN, **kwargs):
+    def load(
+        self,
+        *,
+        verbosity=0,
+        stdout=None,
+        ignore_dependencies=False,
+        max_records=None,
+        only_delta=True,
+        run_type=RUN_UNKNOWN,
+        **kwargs,
+    ):
         self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
@@ -364,18 +379,26 @@ class CommonSchemaLoader(EtoolsLoader):
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
-                    if field.name not in ['country_name', 'schema_name', 'area_code', 'source_id',
-                                          'id', 'last_modify_date']:
+                    if field.name not in [
+                        "country_name",
+                        "schema_name",
+                        "area_code",
+                        "source_id",
+                        "id",
+                        "last_modify_date",
+                    ]:
                         self.mapping[field.name] = field.name
                 if self.config.mapping:  # pragma: no branch
                     self.mapping.update(self.config.mapping)
-                self.update_context(today=timezone.now(),
-                                    max_records=max_records,
-                                    verbosity=verbosity,
-                                    records=0,
-                                    only_delta=only_delta,
-                                    is_empty=not self.model.objects.exists(),
-                                    stdout=stdout)
+                self.update_context(
+                    today=timezone.now(),
+                    max_records=max_records,
+                    verbosity=verbosity,
+                    records=0,
+                    only_delta=only_delta,
+                    is_empty=not self.model.objects.exists(),
+                    stdout=stdout,
+                )
                 sid = transaction.savepoint()
                 try:
                     self.results.context = self.context

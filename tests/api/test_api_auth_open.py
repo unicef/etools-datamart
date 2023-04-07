@@ -1,4 +1,3 @@
-
 import pytest
 from concurrency.api import disable_concurrency
 from rest_framework.test import APIClient
@@ -27,4 +26,4 @@ def test_loacl_user_access(anon_user, service):
 
     res = client.get(f"{url}?country_name=lebanon,chad")
     assert res.status_code == 403, res
-    assert res.json() == {'error': "You are not allowed to access schema: 'chad,lebanon'"}
+    assert res.json() == {"error": "You are not allowed to access schema: 'chad,lebanon'"}

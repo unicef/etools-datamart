@@ -14,14 +14,14 @@ class GroupSerializer(DataMartSerializer):
 
 
 class GroupFilterForm(forms.Form):
-    organization = DateRangePickerField(label='Created between', required=False)
+    organization = DateRangePickerField(label="Created between", required=False)
 
 
 class GroupViewSet(RapidProViewSet):
     serializer_class = GroupSerializer
     queryset = models.Group.objects.all()
-    filter_fields = ('organization', )
-    serializers_fieldsets = {'std': GroupSerializer}
+    filter_fields = ("organization",)
+    serializers_fieldsets = {"std": GroupSerializer}
     querystringfilter_form_base_class = GroupFilterForm
 
     def get_serializer(self, *args, **kwargs):

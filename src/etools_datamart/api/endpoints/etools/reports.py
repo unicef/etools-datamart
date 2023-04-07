@@ -5,12 +5,12 @@ from etools_datamart.apps.sources.etools import models
 
 class ReportsResultViewSet(common.APIMultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.ReportsResultSerializer
-    queryset = models.ReportsResult.objects.select_related('result_type')
+    queryset = models.ReportsResult.objects.select_related("result_type")
 
 
 class ReportsResultTypeViewSet(common.APIMultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.ReportsResultSerializer
-    queryset = models.ReportsResult.objects.select_related('result_type')
+    queryset = models.ReportsResult.objects.select_related("result_type")
 
 
 class AppliedindicatorViewSet(common.APIMultiTenantReadOnlyModelViewSet):

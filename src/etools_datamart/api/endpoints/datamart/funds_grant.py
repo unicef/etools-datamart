@@ -11,12 +11,14 @@ from .. import common
 class GrantSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.Grant
-        exclude = ('seen', 'source_id',)
+        exclude = (
+            "seen",
+            "source_id",
+        )
 
 
 class GrantFilterForm(forms.Form):
-    expiry = DateRangePickerField(label='Date between',
-                                  required=False)
+    expiry = DateRangePickerField(label="Date between", required=False)
 
 
 class GrantViewSet(common.DataMartViewSet):
@@ -24,8 +26,11 @@ class GrantViewSet(common.DataMartViewSet):
 
     serializer_class = GrantSerializer
     queryset = models.Grant.objects.all()
-    filter_fields = ('expiry',)
-    ordering_fields = ("id", "name",)
+    filter_fields = ("expiry",)
+    ordering_fields = (
+        "id",
+        "name",
+    )
 
     def get_querystringfilter_form(self, request, filter):
         return GrantFilterForm(request.GET, filter.form_prefix)

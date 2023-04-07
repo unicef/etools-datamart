@@ -16,10 +16,8 @@ from django.dispatch import receiver
 def create_system_user(app_config, **kwargs):
     from rest_framework.authtoken.models import Token
 
-    uname = os.environ.get('SYSTEM_USER', 'system')
+    uname = os.environ.get("SYSTEM_USER", "system")
     ModelUser = get_user_model()
-    user, __ = ModelUser.objects.get_or_create(username=uname,
-                                               defaults={"is_superuser": True,
-                                                         "is_staff": False})
+    user, __ = ModelUser.objects.get_or_create(username=uname, defaults={"is_superuser": True, "is_staff": False})
 
     Token.objects.get_or_create(user=user)

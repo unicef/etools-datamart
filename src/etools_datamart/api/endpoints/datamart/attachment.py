@@ -16,9 +16,7 @@ class AttachmentSerializerFull(DataMartSerializer):
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
-        return "%s%s?schema=%s" % (config.ETOOLS_ADDRESS,
-                                   obj.file_link,
-                                   obj.schema_name)
+        return "%s%s?schema=%s" % (config.ETOOLS_ADDRESS, obj.file_link, obj.schema_name)
 
     class Meta(DataMartSerializer.Meta):
         model = models.Attachment
@@ -27,65 +25,69 @@ class AttachmentSerializerFull(DataMartSerializer):
 class AttachmentSerializer(AttachmentSerializerFull):
     class Meta(DataMartSerializer.Meta):
         model = models.Attachment
-        exclude = ('schema_name', 'file_type_id')
+        exclude = ("schema_name", "file_type_id")
 
 
 class AttachmentSerializerMinimalEtools(AttachmentSerializerFull):
-
     class Meta(DataMartSerializer.Meta):
         model = models.Attachment
         exclude = None
-        fields = ("schema_name",
-                  "vendor_number",
-                  "pd_ssfa_number",
-                  "file_link",
-                  "filename",
-                  "source",
-                  "uploaded_by",
-                  "created",
-                  "code")
+        fields = (
+            "schema_name",
+            "vendor_number",
+            "pd_ssfa_number",
+            "file_link",
+            "filename",
+            "source",
+            "uploaded_by",
+            "created",
+            "code",
+        )
 
 
 class AttachmentSerializerEtools(CountrySerializerMixin, AttachmentSerializerFull):
-    attachment = serializers.IntegerField(source='attachment_source_id')
+    attachment = serializers.IntegerField(source="attachment_source_id")
 
     class Meta(DataMartSerializer.Meta):
         model = models.Attachment
         exclude = None
 
-        fields = ("country",
-                  "schema_name",
-                  "file_type_id",
-                  "partner",
-                  "partner_type",
-                  "vendor_number",
-                  "pd_ssfa",
-                  "pd_ssfa_number",
-                  "agreement_reference_number",
-                  "object_link",
-                  "file_type",
-                  "file_link",
-                  "filename",
-                  "source",
-                  "uploaded_by",
-                  "created",
-                  "attachment",
-                  "code")
+        fields = (
+            "country",
+            "schema_name",
+            "file_type_id",
+            "partner",
+            "partner_type",
+            "vendor_number",
+            "pd_ssfa",
+            "pd_ssfa_number",
+            "agreement_reference_number",
+            "object_link",
+            "file_type",
+            "file_link",
+            "filename",
+            "source",
+            "uploaded_by",
+            "created",
+            "attachment",
+            "code",
+        )
 
 
 class AttachmentFilterForm(forms.Form):
-    created = DateRangePickerField(label='Created between', required=False)
+    created = DateRangePickerField(label="Created between", required=False)
 
 
 class AttachmentViewSet(common.DataMartViewSet):
     serializer_class = AttachmentSerializer
     queryset = models.Attachment.objects.all()
-    filter_fields = ('created', 'date_of_completion', 'due_date', 'code')
-    serializers_fieldsets = {'std': AttachmentSerializer,
-                             'full': AttachmentSerializerFull,
-                             'etools': AttachmentSerializerEtools,
-                             'etools-min': AttachmentSerializerMinimalEtools
-                             }
+    filter_fields = ("created", "date_of_completion", "due_date", "code")
+    serializers_fieldsets = {
+        "std": AttachmentSerializer,
+        "full": AttachmentSerializerFull,
+        "etools": AttachmentSerializerEtools,
+        "etools-min": AttachmentSerializerMinimalEtools,
+    }
     querystringfilter_form_base_class = AttachmentFilterForm
 
     def get_serializer(self, *args, **kwargs):

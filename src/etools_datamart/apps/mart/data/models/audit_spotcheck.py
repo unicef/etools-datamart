@@ -14,9 +14,8 @@ from .partner import Partner
 
 
 class SpotCheckLoader(EngagementMixin, EtoolsLoader):
-
     def process_country(self):
-        for record in AuditSpotcheck.objects.select_related('engagement_ptr'):
+        for record in AuditSpotcheck.objects.select_related("engagement_ptr"):
             record.id = record.engagement_ptr_id
             record.sub_type = AuditSpotcheck
             record.engagement_ptr._impl = record
@@ -26,12 +25,17 @@ class SpotCheckLoader(EngagementMixin, EtoolsLoader):
             self.increment_counter(op)
 
     def _get_priority_findings(self, record: AuditEngagement, priority: str):
-        return list(AuditFinding.objects.filter(
-            spot_check=record._impl,
-            priority=priority,
-        ).order_by("category_of_observation").values("category_of_observation").annotate(
-            count=Count("category_of_observation"),
-        ))
+        return list(
+            AuditFinding.objects.filter(
+                spot_check=record._impl,
+                priority=priority,
+            )
+            .order_by("category_of_observation")
+            .values("category_of_observation")
+            .annotate(
+                count=Count("category_of_observation"),
+            )
+        )
 
     def get_high_priority_findings(self, record: AuditSpotcheck, values: dict, **kwargs):
         return self._get_priority_findings(record, "high")
@@ -40,17 +44,19 @@ class SpotCheckLoader(EngagementMixin, EtoolsLoader):
         return self._get_priority_findings(record, "low")
 
     def get_pending_unsupported_amount(self, record, values, field_name):
-        return record._impl.total_amount_of_ineligible_expenditure - \
-               record.additional_supporting_documentation_provided - \
-               record.justification_provided_and_accepted - \
-               record.write_off_required
+        return (
+            record._impl.total_amount_of_ineligible_expenditure
+            - record.additional_supporting_documentation_provided
+            - record.justification_provided_and_accepted
+            - record.write_off_required
+        )
 
 
 class SpotCheckFindings(EtoolsDataMartModel):
-    TYPE_SPOT_CHECK = 'sc'
+    TYPE_SPOT_CHECK = "sc"
 
     TYPES = Choices(
-        (TYPE_SPOT_CHECK, _('Spot Check')),
+        (TYPE_SPOT_CHECK, _("Spot Check")),
     )
     reference_number = models.CharField(max_length=100, blank=True, null=True)
 
@@ -62,9 +68,9 @@ class SpotCheckFindings(EtoolsDataMartModel):
         db_index=True,
     )
     created = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=30, blank=True, null=True,
-                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
-                              db_index=True)
+    status = models.CharField(
+        max_length=30, blank=True, null=True, choices=AuditEngagementConsts.DISPLAY_STATUSES, db_index=True
+    )
 
     # Overview Section
     auditor = models.CharField(max_length=255, blank=True, null=True)
@@ -79,9 +85,11 @@ class SpotCheckFindings(EtoolsDataMartModel):
     # Overview Card
     spotcheck_total_amount_tested = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
     spotcheck_total_amount_of_ineligible_expenditure = models.DecimalField(
-        null=True, blank=True, decimal_places=2, max_digits=20)
-    additional_supporting_documentation_provided = models.DecimalField(blank=True, null=True, decimal_places=2,
-                                                                       max_digits=20)
+        null=True, blank=True, decimal_places=2, max_digits=20
+    )
+    additional_supporting_documentation_provided = models.DecimalField(
+        blank=True, null=True, decimal_places=2, max_digits=20
+    )
     justification_provided_and_accepted = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
     sections = models.TextField(blank=True, null=True)
     sections_data = JSONField(blank=True, null=True, default=dict)
@@ -120,9 +128,9 @@ class SpotCheckFindings(EtoolsDataMartModel):
             spotcheck_total_amount_of_ineligible_expenditure="_impl.total_amount_of_ineligible_expenditure",
             partner="-",
             sections="-",
-            pending_unsupported_amount='-',
+            pending_unsupported_amount="-",
             high_priority_findings="-",
             low_priority_findings="-",
-            action_points='-',
-            action_points_data='i',
+            action_points="-",
+            action_points_data="i",
         )

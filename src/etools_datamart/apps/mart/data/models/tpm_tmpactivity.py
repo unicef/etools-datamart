@@ -12,8 +12,7 @@ from etools_datamart.apps.sources.etools.models import DjangoContentType, TpmTpm
 class TPMActivityLoader(EtoolsLoader):
     @cached_property
     def _ct(self):
-        return DjangoContentType.objects.get(app_label='tpm',
-                                             model='tpmactivity')
+        return DjangoContentType.objects.get(app_label="tpm", model="tpmactivity")
 
     # def get_pd_ssfa_reference_number(self, original: TpmTpmactivity, values: dict):
     #     return reference_number(original.activity.intervention)
@@ -22,7 +21,7 @@ class TPMActivityLoader(EtoolsLoader):
         return "Task #{}.{}".format(record.tpm_visit.id, record.id)
 
     def get_visit_url(self, record: TpmTpmactivity, values: dict, **kwargs):
-        return 'tpm/visits/%s/details' % record.tpm_visit_id
+        return "tpm/visits/%s/details" % record.tpm_visit_id
 
     def get_report_attachments(self, record: TpmTpmactivity, values: dict, **kwargs):
         # attachments = AttachmentsAttachment.objects.filter(object_id=original.tpm_visit.id,
@@ -31,52 +30,54 @@ class TPMActivityLoader(EtoolsLoader):
         #                                                    ).order_by('id').values_list('file', flat=True)
         #
         # values['report_attachments_data'] = attachments
-        attachments = (UnicefAttachmentsAttachment.objects
-                       .select_related('uploaded_by', 'file_type')
-                       .filter(object_id=record.tpm_visit.id,
-                               code='activity_report',
-                               content_type=self._ct,
-                               ).order_by('id'))
+        attachments = (
+            UnicefAttachmentsAttachment.objects.select_related("uploaded_by", "file_type")
+            .filter(
+                object_id=record.tpm_visit.id,
+                code="activity_report",
+                content_type=self._ct,
+            )
+            .order_by("id")
+        )
         ret = []
         for a in attachments:
-            ret.append(dict(
-                file=a.file,
-                file_type=a.file_type.name,
-                code=a.code,
-                uploaded_by=get_attr(a, 'uploaded_by.email')
-            ))
+            ret.append(
+                dict(file=a.file, file_type=a.file_type.name, code=a.code, uploaded_by=get_attr(a, "uploaded_by.email"))
+            )
 
-        values['report_attachments_data'] = ret
+        values["report_attachments_data"] = ret
         return ", ".join([a.file for a in attachments])
 
     def get_attachments(self, record: TpmTpmactivity, values: dict, **kwargs):
-        attachments = (UnicefAttachmentsAttachment.objects
-                       .select_related('uploaded_by', 'file_type')
-                       .filter(object_id=record.tpm_visit.id,
-                               code='activity_attachments',
-                               content_type=self._ct,
-                               ).order_by('id'))
+        attachments = (
+            UnicefAttachmentsAttachment.objects.select_related("uploaded_by", "file_type")
+            .filter(
+                object_id=record.tpm_visit.id,
+                code="activity_attachments",
+                content_type=self._ct,
+            )
+            .order_by("id")
+        )
         ret = []
         for a in attachments:
-            ret.append(dict(
-                file=a.file,
-                file_type=a.file_type.name,
-                code=a.code,
-                uploaded_by=get_attr(a, 'uploaded_by.email')
-            ))
+            ret.append(
+                dict(file=a.file, file_type=a.file_type.name, code=a.code, uploaded_by=get_attr(a, "uploaded_by.email"))
+            )
 
-        values['attachments_data'] = ret
+        values["attachments_data"] = ret
         return ", ".join([a.file for a in attachments])
 
     def get_offices(self, record: TpmTpmactivity, values: dict, **kwargs):
         locs = []
-        for office in record.offices.order_by('id'):
-            locs.append(dict(
-                source_id=office.id,
-                name=office.name,
-            ))
-        values['offices_data'] = locs
-        return ", ".join([l['name'] for l in locs])
+        for office in record.offices.order_by("id"):
+            locs.append(
+                dict(
+                    source_id=office.id,
+                    name=office.name,
+                )
+            )
+        values["offices_data"] = locs
+        return ", ".join([l["name"] for l in locs])
 
     def get_unicef_focal_points(self, record: TpmTpmactivity, values: dict, **kwargs):
         # TpmTpmactivityUnicefFocalPoints
@@ -91,31 +92,37 @@ class TPMActivityLoader(EtoolsLoader):
         # staffmembers = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=original.tpm_visit)
         ret = []
         for member in record.visit.tpm_partner_focal_points.all():
-            ret.append(dict(email=member.user.email,
-                            first_name=member.user.first_name,
-                            last_name=member.user.last_name, ))
+            ret.append(
+                dict(
+                    email=member.user.email,
+                    first_name=member.user.first_name,
+                    last_name=member.user.last_name,
+                )
+            )
 
-        values['tpm_focal_points_data'] = ret
-        return ",".join([m['email'] for m in ret])
+        values["tpm_focal_points_data"] = ret
+        return ",".join([m["email"] for m in ret])
 
     def get_locations(self, record: TpmTpmactivity, values: dict, **kwargs):
         # PartnersInterventionFlatLocations
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention
         # for location in original.activity.locations.order_by('id'):
-        for location in record.activity.locations.order_by('id'):
-            locs.append(dict(
-                source_id=location.id,
-                name=location.name,
-                pcode=location.p_code,
-                level=location.admin_level,
-                levelname=location.admin_level_name
-            ))
-        values['locations_data'] = locs
-        return ", ".join([l['name'] for l in locs])
+        for location in record.activity.locations.order_by("id"):
+            locs.append(
+                dict(
+                    source_id=location.id,
+                    name=location.name,
+                    pcode=location.p_code,
+                    level=location.admin_level,
+                    levelname=location.admin_level_name,
+                )
+            )
+        values["locations_data"] = locs
+        return ", ".join([l["name"] for l in locs])
 
     def get_queryset(self):
-        return TpmTpmactivity.objects.select_related('activity_ptr')
+        return TpmTpmactivity.objects.select_related("activity_ptr")
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
@@ -201,60 +208,61 @@ class TPMActivity(EtoolsDataMartModel):
         #                                   source_id=record.id)
 
         source = TpmTpmactivity
-        mapping = dict(additional_information='additional_information',
-                       approval_comment="tpm_visit.approval_comment",
-                       # attachments="=",
-                       author_name="tpm_visit.author.name",
-                       cancel_comment="tpm_visit.cancel_comment",
-                       # country_name="=",
-                       cp_output="activity.cp_output.name",
-                       cp_output_id="activity.cp_output.vision_id",
-                       # created="=",
-                       date="activity.date",
-                       date_of_assigned="tpm_visit.date_of_assigned",
-                       date_of_cancelled="tpm_visit.date_of_cancelled",
-                       date_of_tpm_accepted="tpm_visit.date_of_tpm_accepted",
-                       date_of_tpm_rejected="tpm_visit.date_of_tpm_rejected",
-                       date_of_tpm_report_rejected="tpm_visit.date_of_tpm_report_rejected",
-                       date_of_tpm_reported="tpm_visit.date_of_tpm_reported",
-                       date_of_unicef_approved="tpm_visit.date_of_unicef_approved",
-                       deleted_at="tpm_visit.deleted_at",
-                       # end_date="tpm_visit.end_date",
-                       is_pv="is_pv",
-                       locations="-",
-                       locations_data="i",
-                       # location_level="=",
-                       # location_levelname="=",
-                       # location_name="=",
-                       # location_pcode="=",
-                       offices="-",
-                       offices_data="i",
-                       partner_name="activity.partner.name",
-                       partner_vendor_number="activity.partner.vendor_number",
-                       pd_ssfa_reference_number="activity.intervention.reference_number",
-                       pd_ssfa_title="activity.intervention.title",
-                       reject_comment="activity.reject_comment",
-                       report_attachments="=",
-                       # schema_name="=",
-                       section="section.name",
-                       # source_partner_id="=",
-                       # start_date="tpm_visit.start_date",
-                       status="tpm_visit.status",
-                       task_reference_number="-",
-                       # tpm_focal_point_email="=",
-                       # tpm_focal_point_name="=",
-                       tpm_focal_points="-",
-                       tpm_focal_points_data="i",
-                       tpm_name="tpm_visit.tpm_partner.name",
-                       # unicef_focal_point_email="=",
-                       # unicef_focal_point_name="=",
-                       unicef_focal_points="=",
-                       # vendor_number="=",
-                       visit_created="tpm_visit.created",
-                       visit_end_date="tpm_visit.end_date",
-                       visit_information="tpm_visit.visit_information",
-                       visit_reference_number="tpm_visit.reference_number",
-                       visit_start_date="tpm_visit.start_date",
-                       visit_status="tpm_visit.status",
-                       visit_url="=",
-                       )
+        mapping = dict(
+            additional_information="additional_information",
+            approval_comment="tpm_visit.approval_comment",
+            # attachments="=",
+            author_name="tpm_visit.author.name",
+            cancel_comment="tpm_visit.cancel_comment",
+            # country_name="=",
+            cp_output="activity.cp_output.name",
+            cp_output_id="activity.cp_output.vision_id",
+            # created="=",
+            date="activity.date",
+            date_of_assigned="tpm_visit.date_of_assigned",
+            date_of_cancelled="tpm_visit.date_of_cancelled",
+            date_of_tpm_accepted="tpm_visit.date_of_tpm_accepted",
+            date_of_tpm_rejected="tpm_visit.date_of_tpm_rejected",
+            date_of_tpm_report_rejected="tpm_visit.date_of_tpm_report_rejected",
+            date_of_tpm_reported="tpm_visit.date_of_tpm_reported",
+            date_of_unicef_approved="tpm_visit.date_of_unicef_approved",
+            deleted_at="tpm_visit.deleted_at",
+            # end_date="tpm_visit.end_date",
+            is_pv="is_pv",
+            locations="-",
+            locations_data="i",
+            # location_level="=",
+            # location_levelname="=",
+            # location_name="=",
+            # location_pcode="=",
+            offices="-",
+            offices_data="i",
+            partner_name="activity.partner.name",
+            partner_vendor_number="activity.partner.vendor_number",
+            pd_ssfa_reference_number="activity.intervention.reference_number",
+            pd_ssfa_title="activity.intervention.title",
+            reject_comment="activity.reject_comment",
+            report_attachments="=",
+            # schema_name="=",
+            section="section.name",
+            # source_partner_id="=",
+            # start_date="tpm_visit.start_date",
+            status="tpm_visit.status",
+            task_reference_number="-",
+            # tpm_focal_point_email="=",
+            # tpm_focal_point_name="=",
+            tpm_focal_points="-",
+            tpm_focal_points_data="i",
+            tpm_name="tpm_visit.tpm_partner.name",
+            # unicef_focal_point_email="=",
+            # unicef_focal_point_name="=",
+            unicef_focal_points="=",
+            # vendor_number="=",
+            visit_created="tpm_visit.created",
+            visit_end_date="tpm_visit.end_date",
+            visit_information="tpm_visit.visit_information",
+            visit_reference_number="tpm_visit.reference_number",
+            visit_start_date="tpm_visit.start_date",
+            visit_status="tpm_visit.status",
+            visit_url="=",
+        )

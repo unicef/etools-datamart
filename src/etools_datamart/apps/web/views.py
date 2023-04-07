@@ -14,37 +14,40 @@ from etools_datamart.config.settings import env
 
 
 def index(request):
-    context = {'page': 'index', 'title': 'eTools Datamart'}
-    return TemplateResponse(request, 'index.html', context)
+    context = {"page": "index", "title": "eTools Datamart"}
+    return TemplateResponse(request, "index.html", context)
 
 
 @login_required
 def monitor(request):
-    context = {'tasks': EtlTask.objects.order_by('task'),
-               'subscriptions': request.user.subscriptions,
-               'page': 'monitor'}
-    return TemplateResponse(request, 'monitor.html', context)
+    context = {
+        "tasks": EtlTask.objects.order_by("task"),
+        "subscriptions": request.user.subscriptions,
+        "page": "monitor",
+    }
+    return TemplateResponse(request, "monitor.html", context)
 
 
 def whoami(request):
     if request.user.is_authenticated:
         return HttpResponse(request.user.email)
-    return HttpResponse('')
+    return HttpResponse("")
 
 
 class DisconnectView(LogoutView):
     def get_next_page(self):  # pragma: no cover
-        return env('DISCONNECT_URL')
+        return env("DISCONNECT_URL")
 
 
 class EmailField2(forms.EmailField):
-    default_validators = [validators.validate_email,
-                          RegexValidator(re.compile('@unicef.org$'),
-                                         message='email must be @unicef.org')]
+    default_validators = [
+        validators.validate_email,
+        RegexValidator(re.compile("@unicef.org$"), message="email must be @unicef.org"),
+    ]
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
-        attrs['class'] = 'input100'
+        attrs["class"] = "input100"
         return attrs
 
 
@@ -119,9 +122,8 @@ class EmailField2(forms.EmailField):
 
 
 class DatamartLoginView(LoginView):
-
     def get_context_data(self, **kwargs):
-        kwargs['settings'] = settings
+        kwargs["settings"] = settings
         return super().get_context_data(**kwargs)
 
 

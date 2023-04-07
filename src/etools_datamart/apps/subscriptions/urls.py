@@ -12,6 +12,7 @@ def http_basic_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
         from django.contrib.auth import authenticate, login
+
         if "HTTP_AUTHORIZATION" in request.META:
             authmeth, auth = request.META["HTTP_AUTHORIZATION"].split(" ", 1)
             if authmeth.lower() == "basic":
@@ -19,7 +20,7 @@ def http_basic_auth(func):
                 username, password = auth.split(":", 1)
                 user = authenticate(username=username, password=password)
                 if user:
-                    login(request, user, backend='django.contrib.auth.backends.RemoteUserBackend')
+                    login(request, user, backend="django.contrib.auth.backends.RemoteUserBackend")
                 else:
                     return HttpResponse(status=403)
 
@@ -36,5 +37,5 @@ def http_basic_login(func):
 
 
 urlpatterns = [
-    path(r'subscribe/<etl_id>/', http_basic_login(subscribe), name='subscribe'),
+    path(r"subscribe/<etl_id>/", http_basic_login(subscribe), name="subscribe"),
 ]

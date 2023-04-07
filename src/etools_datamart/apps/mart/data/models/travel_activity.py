@@ -9,11 +9,11 @@ from etools_datamart.apps.sources.etools.models import T2FTravelactivity
 class TravelActivityLoader(EtoolsLoader):
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
-        for record in qs.order_by('id', '-date'):
-            record.travel = record.travels.order_by('id').first()
+        for record in qs.order_by("id", "-date"):
+            record.travel = record.travels.order_by("id").first()
             if record.travel:
                 if record.locations.exists():
-                    for location in record.locations.order_by('id'):
+                    for location in record.locations.order_by("id"):
                         record.location = location
                         filters = self.config.key(self, record)
                         values = self.get_values(record)
@@ -47,36 +47,34 @@ class TravelActivity(LocationMixin, EtoolsDataMartModel):
     loader = TravelActivityLoader()
 
     class Meta:
-        unique_together = ('schema_name',
-                           'source_id',
-                           'travel_reference_number',
-                           'location_source_id')
+        unique_together = ("schema_name", "source_id", "travel_reference_number", "location_source_id")
 
     class Options:
         # depends = (Travel, Location)
         source = T2FTravelactivity
         last_modify_field = None
-        key = lambda loader, record: dict(country_name=loader.context['country'].name,
-                                          schema_name=loader.context['country'].schema_name,
-                                          source_id=record.id,
-                                          location_source_id=record.location.id if record.location else None,
-                                          )
-        mapping = add_location_mapping({
-            'source_travel_id': 'travel.id',
-            'source_partner_id': 'partner.id',
-            'source_partnership_id': 'partnership.id',
-            # 'location_source_id': 'location.id',
-            # 'location_name': 'location.name',
-            # 'location_pcode': 'location.p_code',
-            # 'location_level': 'location.admin_level',
-            # 'location_levelname': 'location.admin_level_name',
-            'travel_reference_number': 'travel.reference_number',
-            'primary_traveler': 'primary_traveler.email',
-            'partner_name': 'partner.name',
-            'partnership_number': 'partnership.number',
-
-            'result_name': 'result.name',
-            'result_code': 'result.code',
-            'result_type': 'result.result_type.name',
-
-        })
+        key = lambda loader, record: dict(
+            country_name=loader.context["country"].name,
+            schema_name=loader.context["country"].schema_name,
+            source_id=record.id,
+            location_source_id=record.location.id if record.location else None,
+        )
+        mapping = add_location_mapping(
+            {
+                "source_travel_id": "travel.id",
+                "source_partner_id": "partner.id",
+                "source_partnership_id": "partnership.id",
+                # 'location_source_id': 'location.id',
+                # 'location_name': 'location.name',
+                # 'location_pcode': 'location.p_code',
+                # 'location_level': 'location.admin_level',
+                # 'location_levelname': 'location.admin_level_name',
+                "travel_reference_number": "travel.reference_number",
+                "primary_traveler": "primary_traveler.email",
+                "partner_name": "partner.name",
+                "partnership_number": "partnership.number",
+                "result_name": "result.name",
+                "result_code": "result.code",
+                "result_type": "result.result_type.name",
+            }
+        )

@@ -15,10 +15,9 @@ T2FTravel.CERTIFICATION_REJECTED = T2FTravelConsts.CERTIFICATION_REJECTED
 T2FTravel.CERTIFIED = T2FTravelConsts.CERTIFIED
 T2FTravel.COMPLETED = T2FTravelConsts.COMPLETED
 
-T2FTravel._meta.get_field('status').choices = T2FTravelConsts.CHOICES
+T2FTravel._meta.get_field("status").choices = T2FTravelConsts.CHOICES
 
-aliases = (['t2ftravel_t2f_travelattachment_travel_id', 'attachments'],
-           )
+aliases = (["t2ftravel_t2f_travelattachment_travel_id", "attachments"],)
 create_alias(T2FTravel, aliases)
 
 
@@ -31,4 +30,4 @@ T2FTravel.get_reference_number = get_reference_number
 
 @property
 def task_number(self):
-    return list(self.travel.activities.values_list('id', flat=True)).index(self.id) + 1
+    return list(self.travel.activities.values_list("id", flat=True)).index(self.id) + 1

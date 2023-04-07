@@ -14,13 +14,13 @@ from etools_datamart.apps.mart.data import models
 
 
 class DataMartModelFactory(RegisterModelFactory):
-    schema_name = factory.Iterator(connections['etools'].get_tenants())
-    country_name = factory.SelfAttribute('schema_name')
+    schema_name = factory.Iterator(connections["etools"].get_tenants())
+    country_name = factory.SelfAttribute("schema_name")
 
 
 class HACTFactory(DataMartModelFactory):
     year = today.year
-    country_name = factory.SelfAttribute('schema_name')
+    country_name = factory.SelfAttribute("schema_name")
 
     class Meta:
         model = models.HACT
@@ -30,7 +30,7 @@ class PMPIndicatorFactory(DataMartModelFactory):
     # schema_name = factory.Iterator(connections['etools'].get_tenants())
     class Meta:
         model = models.PMPIndicators
-        django_get_or_create = ('country_name',)
+        django_get_or_create = ("country_name",)
 
 
 class FAMIndicatorFactory(DataMartModelFactory):
@@ -58,16 +58,19 @@ class InterventionFactory(DataMartModelFactory):
     in_kind_amount_local = 10
     total = 10
     total_local = 10
-    currency = 'USD'
+    currency = "USD"
     intervention_id = factory.Sequence(lambda n: n)
-    locations_data = [dict(source_id='1',
-                           name="location.name",
-                           pcode="location.p_code",
-                           level="location.admin_level",
-                           levelname="location.admin_level_name",
-                           latitude="location.latitude",
-                           longitude="location.longitude",
-                           )]
+    locations_data = [
+        dict(
+            source_id="1",
+            name="location.name",
+            pcode="location.p_code",
+            level="location.admin_level",
+            levelname="location.admin_level_name",
+            latitude="location.latitude",
+            longitude="location.longitude",
+        )
+    ]
 
     class Meta:
         model = models.Intervention
@@ -85,7 +88,7 @@ class InterventionByLocationFactory(DataMartModelFactory):
     in_kind_amount_local = 10
     total = 10
     total_local = 10
-    currency = 'USD'
+    currency = "USD"
     intervention_id = factory.Sequence(lambda n: n)
 
     class Meta:
@@ -104,7 +107,7 @@ class LocationFactory(DataMartModelFactory):
 
     class Meta:
         model = models.Location
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)
 
 
 class LocationsiteFactory(DataMartModelFactory):
@@ -113,17 +116,15 @@ class LocationsiteFactory(DataMartModelFactory):
 
     class Meta:
         model = models.Locationsite
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)
 
 
 class PseaAnswerFactory(DataMartModelFactory):
-
     class Meta:
         model = models.PseaAnswer
 
 
 class PseaAssessmentFactory(DataMartModelFactory):
-
     class Meta:
         model = models.PseaAssessment
 
@@ -141,7 +142,7 @@ class UserStatsFactory(DataMartModelFactory):
 
     class Meta:
         model = models.UserStats
-        django_get_or_create = ('month', 'country_name')
+        django_get_or_create = ("month", "country_name")
 
 
 class FundsReservationFactory(DataMartModelFactory):
@@ -306,17 +307,13 @@ class TravelTripFactory(DataMartModelFactory):
 
 
 class EngagementFactory(DataMartModelFactory):
-    partner = {'name': 'Partner1',
-               'vendor_number': '123',
-               'id': 100,
-               'source_id': 101}
+    partner = {"name": "Partner1", "vendor_number": "123", "id": 100, "source_id": 101}
 
     class Meta:
         model = models.Engagement
 
 
 class FMOntrackFactory(DataMartModelFactory):
-
     class Meta:
         model = models.FMOntrack
 
@@ -327,7 +324,6 @@ class FMOptionFactory(DataMartModelFactory):
 
 
 class FMQuestionFactory(DataMartModelFactory):
-
     class Meta:
         model = models.FMQuestion
 
@@ -362,30 +358,21 @@ class AuditResultFactory(DataMartModelFactory):
 
 
 class SpotCheckFindingsFactory(DataMartModelFactory):
-    partner = {'name': 'Partner1',
-               'vendor_number': '123',
-               'id': 100,
-               'source_id': 101}
+    partner = {"name": "Partner1", "vendor_number": "123", "id": 100, "source_id": 101}
 
     class Meta:
         model = models.SpotCheckFindings
 
 
 class MicroAssessmentFactory(DataMartModelFactory):
-    partner = {'name': 'Partner1',
-               'vendor_number': '123',
-               'id': 100,
-               'source_id': 101}
+    partner = {"name": "Partner1", "vendor_number": "123", "id": 100, "source_id": 101}
 
     class Meta:
         model = models.MicroAssessment
 
 
 class AuditFactory(DataMartModelFactory):
-    partner = {'name': 'Partner1',
-               'vendor_number': '123',
-               'id': 100,
-               'source_id': 101}
+    partner = {"name": "Partner1", "vendor_number": "123", "id": 100, "source_id": 101}
 
     class Meta:
         model = models.Audit
@@ -401,10 +388,7 @@ class AuditFinancialFindingFactory(DataMartModelFactory):
 
 
 class AuditSpecialFactory(DataMartModelFactory):
-    partner = {'name': 'Partner1',
-               'vendor_number': '123',
-               'id': 100,
-               'source_id': 101}
+    partner = {"name": "Partner1", "vendor_number": "123", "id": 100, "source_id": 101}
 
     class Meta:
         model = models.AuditSpecial

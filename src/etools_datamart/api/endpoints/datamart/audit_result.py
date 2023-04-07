@@ -15,28 +15,33 @@ class AuditResultSerializer(DataMartSerializer):
 
 
 class AuditResultFilterForm(forms.Form):
-    status__in = CleareableSelect2MultipleChoiceField(required=False,
-                                                      choices=AuditEngagementConsts.DISPLAY_STATUSES,
-                                                      )
+    status__in = CleareableSelect2MultipleChoiceField(
+        required=False,
+        choices=AuditEngagementConsts.DISPLAY_STATUSES,
+    )
 
-    risk_rating = CleareableSelect2MultipleChoiceField(required=False,
-                                                       choices=(('High', 'High'),
-                                                                ('Significant', 'Significant'),
-                                                                ('Medium', 'Medium'),
-                                                                ('Low', 'Low'),))
+    risk_rating = CleareableSelect2MultipleChoiceField(
+        required=False,
+        choices=(
+            ("High", "High"),
+            ("Significant", "Significant"),
+            ("Medium", "Medium"),
+            ("Low", "Low"),
+        ),
+    )
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, *args, **kwargs):
+    def __init__(self, data=None, files=None, auto_id="id_%s", prefix=None, initial=None, *args, **kwargs):
         filters = data.copy()
-        if 'status__in' in filters:
-            filters.setlist('status__in', data['status__in'].split(','))
+        if "status__in" in filters:
+            filters.setlist("status__in", data["status__in"].split(","))
         super().__init__(filters, files, auto_id, prefix, initial, *args, **kwargs)
 
 
 class AuditResultViewSet(common.DataMartViewSet):
     serializer_class = AuditResultSerializer
     queryset = models.AuditResult.objects.all()
-    filter_fields = ('risk_rating', 'status')
-    serializers_fieldsets = {'std': AuditResultSerializer}
+    filter_fields = ("risk_rating", "status")
+    serializers_fieldsets = {"std": AuditResultSerializer}
     querystringfilter_form_base_class = AuditResultFilterForm
 
     def get_serializer(self, *args, **kwargs):

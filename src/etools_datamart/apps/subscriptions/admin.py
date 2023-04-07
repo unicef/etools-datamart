@@ -8,5 +8,5 @@ from . import models
 
 @register(models.Subscription)
 class SubscriptionAdmin(ExtraButtonsMixin, admin.ModelAdmin):
-    list_display = ('user', 'content_type', 'type')
-    list_filter = ('user', 'content_type', 'type')
+    list_display = ("user", "content_type", "type")
+    list_filter = ("user", "content_type", "type")

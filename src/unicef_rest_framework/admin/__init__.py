@@ -17,14 +17,16 @@ from .cache import CacheVersionAdmin
 from .filter import SystemFilterAdmin
 from .service import ServiceAdmin
 
-__all__ = ['ApplicationAdmin',
-           'GroupAccessControlAdmin',
-           'ServiceAdmin',
-           'UserAccessControlAdmin',
-           'ListDisplayAllMixin',
-           'ReadOnlyAdminMixin',
-           'PeriodicTaskAdmin',
-           'CrontabScheduleAdmin']
+__all__ = [
+    "ApplicationAdmin",
+    "GroupAccessControlAdmin",
+    "ServiceAdmin",
+    "UserAccessControlAdmin",
+    "ListDisplayAllMixin",
+    "ReadOnlyAdminMixin",
+    "PeriodicTaskAdmin",
+    "CrontabScheduleAdmin",
+]
 
 # admin.site.unregister(PeriodicTask)
 admin.site.unregister(CrontabSchedule)

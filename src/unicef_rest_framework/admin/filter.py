@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class SystemFilterRuleInline(TabularInline):
     model = SystemFilterFieldRule
-    list_display = ('field', 'value', 'override_field')
+    list_display = ("field", "value", "override_field")
 
 
 # class SystemFilterParamInline(TabularInline):
@@ -26,10 +26,10 @@ class SystemFilterRuleInline(TabularInline):
 
 
 class SystemFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
-    list_display = ('service', 'user', 'group', 'handler')
-    readonly_fields = ('handler',)
-    list_filter = ('service', 'user')
-    search_fields = ('service__name',)
+    list_display = ("service", "user", "group", "handler")
+    readonly_fields = ("handler",)
+    list_filter = ("service", "user")
+    search_fields = ("service__name",)
     inlines = [SystemFilterRuleInline]
 
     @button()
@@ -44,8 +44,7 @@ class SystemFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             self.message_user(request, str(e), messages.ERROR)
 
         info = self.model._meta.app_label, self.model._meta.model_name
-        return HttpResponseRedirect(reverse('admin:%s_%s_change' % info,
-                                            args=[pk]))
+        return HttpResponseRedirect(reverse("admin:%s_%s_change" % info, args=[pk]))
 
     @button()
     def view(self, request, pk):
@@ -54,9 +53,7 @@ class SystemFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         rule = SystemFilter.objects.get(pk=pk)
         try:
             filter = rule.get_querystring()
-            url = "{}{}?{}".format(settings.DATAMART_SERVER,
-                                   rule.service.endpoint,
-                                   filter)
+            url = "{}{}?{}".format(settings.DATAMART_SERVER, rule.service.endpoint, filter)
             res = requests.get(url)
             if res.status_code == 200:
                 return HttpResponseRedirect(url)
@@ -64,5 +61,4 @@ class SystemFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             self.message_user(request, str(e), messages.ERROR)
 
         info = self.model._meta.app_label, self.model._meta.model_name
-        return HttpResponseRedirect(reverse('admin:%s_%s_change' % info,
-                                            args=[pk]))
+        return HttpResponseRedirect(reverse("admin:%s_%s_change" % info, args=[pk]))

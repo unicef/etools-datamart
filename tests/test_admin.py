@@ -2,7 +2,7 @@ from django.core.cache import caches
 from django.db import connections
 from django.urls import reverse
 
-conn = connections['etools']
+conn = connections["etools"]
 
 
 def test_constance(django_app, admin_user):
@@ -13,7 +13,7 @@ def test_constance(django_app, admin_user):
 
 def test_index_default(django_app, admin_user, monkeypatch):
     url = reverse("admin:index")
-    monkeypatch.setattr('etools_datamart.config.admin.cache', caches['redis'])
+    monkeypatch.setattr("etools_datamart.config.admin.cache", caches["redis"])
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
     # repeat to test caching
@@ -38,5 +38,5 @@ def test_schemaaccesscontrol_change(django_app, admin_user, schema_access_contro
     url = reverse("admin:security_schemaaccesscontrol_change", args=[schema_access_control.pk])
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
-    res = res.forms['schemaaccesscontrol_form'].submit()
+    res = res.forms["schemaaccesscontrol_form"].submit()
     assert res.status_code == 302

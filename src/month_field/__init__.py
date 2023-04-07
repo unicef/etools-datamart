@@ -28,11 +28,11 @@ class Month:
         return cls(y, m)
 
     def __add__(self, x):
-        '''x is an integer'''
+        """x is an integer"""
         return Month.from_int(int(self) + x)
 
     def __sub__(self, x):
-        '''x is integer or Month instance'''
+        """x is integer or Month instance"""
         if isinstance(x, Month):
             return int(self) - int(x)
         else:
@@ -91,7 +91,7 @@ class Month:
         return not self >= x
 
     def __str__(self):
-        return '%s-%02d' % (self.year, self.month)
+        return "%s-%02d" % (self.year, self.month)
 
     def __unicode__(self):
         return self.__str__()
@@ -111,7 +111,7 @@ class Month:
     isoformat = datestring
 
     def range(self, x):
-        '''x must be an instance of Month that is larger than self.
-        returns a list of Month objects that make up the timespan from self to x (inclusive)'''
+        """x must be an instance of Month that is larger than self.
+        returns a list of Month objects that make up the timespan from self to x (inclusive)"""
         months_as_ints = range(int(self), int(x) + 1)
         return [Month.from_int(i) for i in months_as_ints]

@@ -10,21 +10,21 @@ from strategy_field.utils import get_attr
 
 class ApiException(APIException):
     def __init__(self, *args, **kwargs):
-        self._data = kwargs.pop('data', None)
-        self._cause = kwargs.pop('cause', None)
-        self._tb = kwargs.pop('tb', None)
+        self._data = kwargs.pop("data", None)
+        self._cause = kwargs.pop("cause", None)
+        self._tb = kwargs.pop("tb", None)
 
         super().__init__(*args, **kwargs)
 
 
 class TokenExpired(Exception):
     status_code = status.HTTP_401_UNAUTHORIZED
-    default_detail = _('Token expired')
+    default_detail = _("Token expired")
 
 
 class TokenDecodeError(Exception):
     status_code = status.HTTP_401_UNAUTHORIZED
-    default_detail = _('Token tampered with')
+    default_detail = _("Token tampered with")
 
 
 class InvalidQueryArgumentError(ApiException):
@@ -65,24 +65,24 @@ def handler(exc, context):
 
     if isinstance(exc, AuthenticationFailed):
         response = Response({}, status=401)
-        response.data['detail'] = str(exc)
-        response.data['error'] = str(exc)
+        response.data["detail"] = str(exc)
+        response.data["error"] = str(exc)
     elif isinstance(exc, ApiException):
-        if get_attr(exc, 'reason.messages'):
+        if get_attr(exc, "reason.messages"):
             err = ",".join(map(str, (exc.reason.messages)))
         else:
             err = str(exc)
-        response = Response({'error': err}, status=400)
+        response = Response({"error": err}, status=400)
     elif isinstance(exc, ValidationError):
         if response is None:
             response = Response({}, status=400)
-        if 'error_dics' in exc and 'non_field_errors' in exc.error_dict:
-            response.data['error'] = ",".join(map(str, exc.error_dict['non_field_errors']))
+        if "error_dics" in exc and "non_field_errors" in exc.error_dict:
+            response.data["error"] = ",".join(map(str, exc.error_dict["non_field_errors"]))
         else:
-            response.data['error'] = str(exc)
+            response.data["error"] = str(exc)
 
     # Now add the HTTP status code to the response.
     if response is not None:
-        response.data['status_code'] = response.status_code
+        response.data["status_code"] = response.status_code
 
     return response

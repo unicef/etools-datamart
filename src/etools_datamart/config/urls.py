@@ -10,20 +10,17 @@ import etools_datamart.api.urls
 from etools_datamart.apps.multitenant.views import SelectSchema
 
 urlpatterns = [
-    path(r'me/', include('etools_datamart.apps.me.urls')),
-    path(r's/', include('etools_datamart.apps.subscriptions.urls')),
-    path(r'', include('etools_datamart.apps.web.urls')),
-    path(r'', include('social_django.urls', namespace='social')),
-
-    re_path(r'^authorize/?$', AuthorizationView.as_view(), name="authorize"),
-    path(r'api/', include(etools_datamart.api.urls)),
-    path(r'urf/', include(unicef_rest_framework.urls, namespace='urf')),
-
-    path(r'admin/schemas/', SelectSchema.as_view(), name='select-schema'),
-    path(r'admin/', site.urls),
-    path(r'impersonate/', include('impersonate.urls')),
-    path(r'explorer/', include('explorer.urls')),
-
+    path(r"me/", include("etools_datamart.apps.me.urls")),
+    path(r"s/", include("etools_datamart.apps.subscriptions.urls")),
+    path(r"", include("etools_datamart.apps.web.urls")),
+    path(r"", include("social_django.urls", namespace="social")),
+    re_path(r"^authorize/?$", AuthorizationView.as_view(), name="authorize"),
+    path(r"api/", include(etools_datamart.api.urls)),
+    path(r"urf/", include(unicef_rest_framework.urls, namespace="urf")),
+    path(r"admin/schemas/", SelectSchema.as_view(), name="select-schema"),
+    path(r"admin/", site.urls),
+    path(r"impersonate/", include("impersonate.urls")),
+    path(r"explorer/", include("explorer.urls")),
 ]
 
 
@@ -32,7 +29,7 @@ def trigger_error(request):
 
 
 urlpatterns += [
-    path('sentry-debug/', trigger_error),
+    path("sentry-debug/", trigger_error),
 ]
 
 urlpatterns = [

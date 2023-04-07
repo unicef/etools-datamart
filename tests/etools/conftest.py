@@ -2,7 +2,7 @@ from django.db import connections
 
 import pytest
 
-conn = connections['etools']
+conn = connections["etools"]
 
 
 @pytest.fixture(autouse=True)

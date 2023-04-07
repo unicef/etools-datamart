@@ -19,12 +19,12 @@ class InterventionBudgetLoader(InterventionLoader):
         for record in self.get_queryset().exclude(intervention__isnull=True):
             filters = self.config.key(self, record)
             values = self.get_values(record.intervention)
-            values['source_id'] = record.id
-            values['budget_cso_contribution'] = record.partner_contribution_local
-            values['budget_unicef_cash'] = record.unicef_cash_local
-            values['budget_total'] = record.total_local
-            values['budget_currency'] = record.currency
-            values['budget_unicef_supply'] = record.in_kind_amount_local
+            values["source_id"] = record.id
+            values["budget_cso_contribution"] = record.partner_contribution_local
+            values["budget_unicef_cash"] = record.unicef_cash_local
+            values["budget_total"] = record.total_local
+            values["budget_currency"] = record.currency
+            values["budget_unicef_supply"] = record.in_kind_amount_local
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
@@ -33,13 +33,16 @@ class InterventionBudgetLoader(InterventionLoader):
         ret = []
         for fr in FundsFundsreservationheader.objects.filter(intervention=record):
             ret.append(fr.fr_number)
-            data.append(dict(fr_number=fr.fr_number,
-                             vendor_code=fr.vendor_code,
-                             fr_type=fr.fr_type,
-                             currency=fr.currency,
-                             ))
+            data.append(
+                dict(
+                    fr_number=fr.fr_number,
+                    vendor_code=fr.vendor_code,
+                    fr_type=fr.fr_type,
+                    currency=fr.currency,
+                )
+            )
 
-        values['fr_numbers_data'] = data
+        values["fr_numbers_data"] = data
         return ", ".join(ret)
 
 
@@ -65,5 +68,4 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
     class Options(InterventionAbstract.Options):
         model = PartnersInterventionbudget
         depends = (Location,)
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.pk)
+        key = lambda loader, record: dict(schema_name=loader.context["country"].schema_name, source_id=record.pk)

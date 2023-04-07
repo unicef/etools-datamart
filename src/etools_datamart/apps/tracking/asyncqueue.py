@@ -17,7 +17,7 @@ class AsyncQueue(object):
         self._thread = None
         self._thread_for_pid = None
         self.options = {
-            'shutdown_timeout': shutdown_timeout,
+            "shutdown_timeout": shutdown_timeout,
         }
         self.start()
 
@@ -65,7 +65,7 @@ class AsyncQueue(object):
             # wake the processing thread up
             self._queue.put_nowait(self._terminator)
 
-            timeout = self.options['shutdown_timeout']
+            timeout = self.options["shutdown_timeout"]
 
             # wait briefly, initially
             # initial_timeout = 0.1
@@ -102,7 +102,7 @@ class AsyncQueue(object):
                 try:
                     self._process(record)
                 except Exception:  # pragma: no cover
-                    logger.error('Failed processing job', exc_info=True)
+                    logger.error("Failed processing job", exc_info=True)
             finally:
                 self._queue.task_done()
 

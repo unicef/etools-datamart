@@ -50,14 +50,11 @@ logger = logging.getLogger(__name__)
 
 
 class SchemasForm(forms.Form):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        schemas = connections['etools'].get_tenants()
+        schemas = connections["etools"].get_tenants()
         for schema in schemas:
-            self.fields[schema.schema_name] = forms.BooleanField(
-                label=schema.name,
-                required=False)
+            self.fields[schema.schema_name] = forms.BooleanField(label=schema.name, required=False)
 
     def clean(self):
         selected = [(k, v) for (k, v) in self.cleaned_data.items() if v]
@@ -67,9 +64,9 @@ class SchemasForm(forms.Form):
 
     @property
     def media(self):
-        extra = '' if settings.DEBUG else '.min'
+        extra = "" if settings.DEBUG else ".min"
         js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
+            "vendor/jquery/jquery%s.js" % extra,
+            "jquery.init.js",
         ]
-        return forms.Media(js=['admin/js/%s' % url for url in js])
+        return forms.Media(js=["admin/js/%s" % url for url in js])

@@ -16,48 +16,49 @@ from etools_datamart.sentry import process_exception
 class TPMVisitLoader(EtoolsLoader):
     def get_activities(self, record: TpmTpmvisit, values: dict, **kwargs):
         ret = []
-        for activity in record.activities.order_by('activity_ptr_id'):
-            ret.append(dict(
-                source_id=activity.activity_ptr_id,
-                date=str(activity.activity_ptr.date),
-                is_pv=activity.is_pv,
-                section=activity.section.name
-            ))
-        values['activities_data'] = ret
-        return ", ".join([l['date'] for l in ret])
+        for activity in record.activities.order_by("activity_ptr_id"):
+            ret.append(
+                dict(
+                    source_id=activity.activity_ptr_id,
+                    date=str(activity.activity_ptr.date),
+                    is_pv=activity.is_pv,
+                    section=activity.section.name,
+                )
+            )
+        values["activities_data"] = ret
+        return ", ".join([l["date"] for l in ret])
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
-        content_type = DjangoContentType.objects.get(app_label='tpm',
-                                                     model='tpmvisit')
+        content_type = DjangoContentType.objects.get(app_label="tpm", model="tpmvisit")
         for visit in qs.all():
             tpm_activities = visit.activities
             unicef_focal_points = []
-            for a in tpm_activities.only('activity_ptr_id'):
+            for a in tpm_activities.only("activity_ptr_id"):
                 qs = TpmTpmactivityUnicefFocalPoints.objects.filter(tpmactivity_id=a.activity_ptr_id)
-                unicef_focal_points.extend(qs.values_list('user__email', flat=True))
+                unicef_focal_points.extend(qs.values_list("user__email", flat=True))
 
             visit.unicef_focal_points = ",".join(unicef_focal_points)
 
             tpm_focal_points = []
             qs = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=visit)
-            tpm_focal_points.extend(qs.values_list('tpmpartnerstaffmember__user__email', flat=True))
+            tpm_focal_points.extend(qs.values_list("tpmpartnerstaffmember__user__email", flat=True))
 
             visit.tpm_focal_points = ",".join(tpm_focal_points)
             try:
-                visit.report_attachments = ",".join(UnicefAttachmentsAttachment.objects.filter(
-                    object_id=visit.id,
-                    code='activity_report',
-                    content_type=content_type
-                ).values_list('file', flat=True)).strip()
+                visit.report_attachments = ",".join(
+                    UnicefAttachmentsAttachment.objects.filter(
+                        object_id=visit.id, code="activity_report", content_type=content_type
+                    ).values_list("file", flat=True)
+                ).strip()
             except Exception as e:
                 process_exception(e)
             try:
-                visit.attachments = ",".join(UnicefAttachmentsAttachment.objects.filter(
-                    object_id=visit.id,
-                    code='activity_attachments',
-                    content_type=content_type
-                ).values_list('file', flat=True)).strip()
+                visit.attachments = ",".join(
+                    UnicefAttachmentsAttachment.objects.filter(
+                        object_id=visit.id, code="activity_attachments", content_type=content_type
+                    ).values_list("file", flat=True)
+                ).strip()
             except Exception as e:
                 process_exception(e)
             filters = self.config.key(self, visit)
@@ -142,7 +143,7 @@ class TPMVisit(EtoolsDataMartModel):
     loader = TPMVisitLoader()
 
     class Meta:
-        ordering = ('id',)
+        ordering = ("id",)
 
     class Options:
         # depends = (Intervention,)
@@ -151,17 +152,17 @@ class TPMVisit(EtoolsDataMartModel):
 
         source = TpmTpmvisit
         mapping = dict(
-            author_name='author.name',
-            partner_name='tpm_partner.name',
-            source_partner_id='tpm_partner.id',
-            task_reference_number='N/A',
-            tpm_name='N/A',
+            author_name="author.name",
+            partner_name="tpm_partner.name",
+            source_partner_id="tpm_partner.id",
+            task_reference_number="N/A",
+            tpm_name="N/A",
             # cp_output='N/A',
             # pd_ssfa_title='N/A',
             # pd_ssfa_reference_number='N/A',
-            vendor_number='tpm_partner.vendor_number',
-            visit_reference_number='reference_number',
-            visit_status='status',
-            visit_start_date='start_date',
-            visit_end_date='end_date',
+            vendor_number="tpm_partner.vendor_number",
+            visit_reference_number="reference_number",
+            visit_status="status",
+            visit_start_date="start_date",
+            visit_end_date="end_date",
         )

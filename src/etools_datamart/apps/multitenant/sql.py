@@ -8,12 +8,7 @@ from django_regex.utils import RegexList
 from sqlparse.sql import Function, Identifier, IdentifierList, Where
 from sqlparse.tokens import Keyword, Whitespace
 
-SHARED_TABLES = RegexList(['"auth_.*',
-                           '"publics_.*',
-                           '"users_.*',
-                           '"categories_.*',
-                           '"django_content_type.*'
-                           ])
+SHARED_TABLES = RegexList(['"auth_.*', '"publics_.*', '"users_.*', '"categories_.*', '"django_content_type.*'])
 
 cache = {}
 
@@ -69,20 +64,20 @@ class Parser:
         return ret
 
     def __getattr__(self, item):
-        if item in ['raw_tables', 'raw_order', 'raw_fields', 'raw_joins', 'raw_where', 'unknown']:
+        if item in ["raw_tables", "raw_order", "raw_fields", "raw_joins", "raw_where", "unknown"]:
             if not self._parsed:
                 self.parse()
-            return getattr(self, f'_{item}')
+            return getattr(self, f"_{item}")
         raise AttributeError(item)  # pragma: no cover
 
     def split(self, stm):
         # TODO: improve regex
-        _select = r'(?P<query>(?P<select>SELECT( DISTINCT)? )(?P<fields>.*))'
-        _from = r'(?P<from> FROM (?P<tables>.*))'
-        _where = r'(?P<where> WHERE .*)'
-        _group = r'(?P<group> GROUP BY .*)'
-        _order = r'(?P<order> ORDER BY .*)'
-        _limit = r'(?P<limit> LIMIT .*)'
+        _select = r"(?P<query>(?P<select>SELECT( DISTINCT)? )(?P<fields>.*))"
+        _from = r"(?P<from> FROM (?P<tables>.*))"
+        _where = r"(?P<where> WHERE .*)"
+        _group = r"(?P<group> GROUP BY .*)"
+        _order = r"(?P<order> ORDER BY .*)"
+        _limit = r"(?P<limit> LIMIT .*)"
 
         rexx = [
             f"{_select}{_from}{_where}{_order}{_group}{_limit}",
@@ -91,8 +86,6 @@ class Parser:
             f"{_select}{_from}{_group}",
             f"{_select}{_from}{_group}{_limit}",
             f"{_select}{_from}{_order}{_group}",
-
-
             f"{_select}{_from}{_where}{_order}{_limit}",
             f"{_select}{_from}{_where}{_order}",
             f"{_select}{_from}{_order}{_limit}",
@@ -111,7 +104,7 @@ class Parser:
 
     def join(self, parts):
         ret = ""
-        for part in ['query', 'from', 'where', 'order']:
+        for part in ["query", "from", "where", "order"]:
             ret += (parts.get(part, "") or "").rstrip()
         return ret
 
@@ -124,13 +117,15 @@ class Parser:
         self.tokens = parsed[0].tokens
         for token in self.tokens:
             value = token.value.upper()
-            if token.value in ["SELECT", ]:
+            if token.value in [
+                "SELECT",
+            ]:
                 self.clause = token.value
                 continue
             if token.ttype in [Whitespace]:
                 continue
             elif token.ttype is Keyword:
-                if value in ['FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'LEFT OUTER JOIN', 'RIGHT OUTER JOIN']:
+                if value in ["FROM", "INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "LEFT OUTER JOIN", "RIGHT OUTER JOIN"]:
                     target = self._raw_tables
                 # elif value in ['SELECT', 'DISTINCT']:
                 #     target = self._raw_fields
@@ -149,12 +144,12 @@ class Parser:
                     for identifier in token.get_identifiers():
                         target.append(str(identifier))
                 elif isinstance(token, Identifier):
-                    self.is_count = self.is_count or 'COUNT(' in str(token)
+                    self.is_count = self.is_count or "COUNT(" in str(token)
                     target.append(str(token))
                 # elif isinstance(token, Comparison):
                 #     target.append(str(token))
                 elif isinstance(token, Function):
-                    self.is_count = self.is_count or 'COUNT(' in str(token)
+                    self.is_count = self.is_count or "COUNT(" in str(token)
                     target.append(str(token))
                 elif isinstance(token, Where):
                     # target.append(str(token))
@@ -183,16 +178,16 @@ class Parser:
             else:
                 _from = _from.replace(t, f'"{schema}".{t}')
 
-        ret = parts['select']
+        ret = parts["select"]
         self.mapping = OrderedDict()
-        fields = parts['fields'].split(',')
+        fields = parts["fields"].split(",")
         for field in fields:
-            if '__schema' in field:
-                self.mapping['schema'] = f"'{schema}' AS __schema"
+            if "__schema" in field:
+                self.mapping["schema"] = f"'{schema}' AS __schema"
             else:
                 self.mapping[field] = re.sub(r'("(.[^"]*)"\."(.[^"]*)")', r'"\2"."\3" AS \2__\3', field)
 
-        self.mapping['schema'] = f"'{schema}' AS __schema"
+        self.mapping["schema"] = f"'{schema}' AS __schema"
 
         ret += ", ".join(self.mapping.values())
         ret += f" {_from}"
@@ -212,7 +207,7 @@ class Parser:
 
         if self.is_count:
             ret = "SELECT COUNT(*) FROM ("
-            ret += " UNION ALL ".join([self.set_schema(s, fields='id') for s in schemas])
+            ret += " UNION ALL ".join([self.set_schema(s, fields="id") for s in schemas])
             ret += ") as __count"
             return ret
 
@@ -220,10 +215,10 @@ class Parser:
         ret = f"SELECT * FROM ("
         ret += " UNION ALL ".join([self.set_schema(s) for s in schemas])
         ret += ") as __query"
-        if self.parts.get('order'):
-            parts = self.parts.get('order').split(',')
-            parts = map(lambda p: p.replace('"', '').replace(".", "__"), parts)
+        if self.parts.get("order"):
+            parts = self.parts.get("order").split(",")
+            parts = map(lambda p: p.replace('"', "").replace(".", "__"), parts)
             ret += ",".join(parts)
-        if self.parts.get('limit'):
+        if self.parts.get("limit"):
             ret += f" {self.parts['limit']}"
         return ret

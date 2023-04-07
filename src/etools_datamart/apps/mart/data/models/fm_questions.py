@@ -19,35 +19,37 @@ class FMQuestionLoader(EtoolsLoader):
 
     def get_queryset(self):
         return self.config.source.objects.select_related(
-            "activity_question", "activity_question__question", "activity_question__question__category",
-            "started_checklist", "started_checklist__method",
+            "activity_question",
+            "activity_question__question",
+            "activity_question__question__category",
+            "started_checklist",
+            "started_checklist__method",
             "activity_question__monitoring_activity__location_site",
-            "activity_question__partner", "activity_question__intervention",
-            "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question"
+            "activity_question__partner",
+            "activity_question__intervention",
+            "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
         ).prefetch_related(
-            'activity_question__question__FieldMonitoringSettingsQuestionMethods_question',
-            'activity_question__question__FieldMonitoringSettingsOption_question'
+            "activity_question__question__FieldMonitoringSettingsQuestionMethods_question",
+            "activity_question__question__FieldMonitoringSettingsOption_question",
         )
 
     def get_answer_options(
-            self,
-            record: FieldMonitoringDataCollectionFinding,
-            values: dict,
-            **kwargs,
+        self,
+        record: FieldMonitoringDataCollectionFinding,
+        values: dict,
+        **kwargs,
     ):
         option_qs = record.activity_question.question.FieldMonitoringSettingsOption_question.all()
         return ", ".join([o.label for o in option_qs.all()])
 
     def get_question_collection_methods(
-            self,
-            record: FieldMonitoringDataCollectionFinding,
-            values: dict,
-            **kwargs,
+        self,
+        record: FieldMonitoringDataCollectionFinding,
+        values: dict,
+        **kwargs,
     ):
         methods_qs = record.activity_question.question.FieldMonitoringSettingsQuestionMethods_question.all()
-        return ", ".join(
-            [m.method.name for m in methods_qs.all()]
-        )
+        return ", ".join([m.method.name for m in methods_qs.all()])
 
     # def get_summary_answer(
     #         self,
@@ -64,17 +66,18 @@ class FMQuestionLoader(EtoolsLoader):
     #     return getattr(overall_finding, 'narrative_finding', None)
 
     def get_overall_finding(
-            self,
-            record: FieldMonitoringDataCollectionFinding,
-            values: dict,
-            **kwargs,
+        self,
+        record: FieldMonitoringDataCollectionFinding,
+        values: dict,
+        **kwargs,
     ):
         checklist_finding = FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
             partner=record.activity_question.partner,
             intervention=record.activity_question.intervention,
             cp_output=record.activity_question.cp_output,
-            started_checklist=record.started_checklist).first()
-        return getattr(checklist_finding, 'narrative_finding', None)
+            started_checklist=record.started_checklist,
+        ).first()
+        return getattr(checklist_finding, "narrative_finding", None)
 
     def process_country(self):
         for rec in self.get_queryset():
@@ -98,26 +101,36 @@ class FMQuestionLoader(EtoolsLoader):
 
     def get_location(self, record: FieldMonitoringDataCollectionFinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
-        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name',
-                      'latitude', 'longitude']
+
+        loc_fields = [
+            "id",
+            "name",
+            "p_code",
+            "level",
+            "source_id",
+            "admin_level",
+            "admin_level_name",
+            "latitude",
+            "longitude",
+        ]
 
         try:
             instance = Location.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.activity_question.monitoring_activity.location.pk
+                schema_name=self.context["country"].schema_name,
+                source_id=record.activity_question.monitoring_activity.location.pk,
             )
             return {
-                'id': instance.pk,
-                'name': instance.name,
-                'p_code': instance.p_code,
-                'admin_level': instance.admin_level,
-                'source_id': instance.source_id,
-                'location_type': instance.admin_level_name,
-                'latitude': instance.latitude,
-                'longitude': instance.longitude,
+                "id": instance.pk,
+                "name": instance.name,
+                "p_code": instance.p_code,
+                "admin_level": instance.admin_level,
+                "source_id": instance.source_id,
+                "location_type": instance.admin_level_name,
+                "latitude": instance.latitude,
+                "longitude": instance.longitude,
             }
         except Location.DoesNotExist:
-            return {key: 'N/A' for key in loc_fields}
+            return {key: "N/A" for key in loc_fields}
 
 
 class FMQuestion(EtoolsDataMartModel):
@@ -238,7 +251,7 @@ class FMQuestion(EtoolsDataMartModel):
             entity_type="i",
             entity_instance="i",
             vendor_number="activity_question.partner.vendor_number",
-            reference_number='activity_question.intervention.reference_number',
+            reference_number="activity_question.intervention.reference_number",
             question_collection_methods="-",
             collection_method="started_checklist.method.name",
             answer="value",
@@ -251,19 +264,20 @@ class FMQuestion(EtoolsDataMartModel):
             monitoring_activity_end_date="activity_question.monitoring_activity.end_date",
             location="-",
             site="activity_question.monitoring_activity.location_site.name",
-            category='activity_question.question.category.name',
-            information_source='started_checklist.information_source',
-            is_hact='activity_question.question.is_hact',
+            category="activity_question.question.category.name",
+            information_source="started_checklist.information_source",
+            is_hact="activity_question.question.is_hact",
         )
 
 
 class FMOntrackLoader(EtoolsLoader):
     """Loader for FM Ontrack"""
+
     def get_overall_finding_rating(
-            self,
-            record: FieldMonitoringDataCollectionActivityoverallfinding,
-            values: dict,
-            **kwargs,
+        self,
+        record: FieldMonitoringDataCollectionActivityoverallfinding,
+        values: dict,
+        **kwargs,
     ):
         return "On track" if record.on_track else "Off track"
 
@@ -275,7 +289,7 @@ class FMOntrackLoader(EtoolsLoader):
                 values["entity"] = rec.cp_output.name
                 values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
                 values["output"] = rec.cp_output.wbs
-                values["programme_areas"] = f'{rec.cp_output.programme_area_code} {rec.cp_output.programme_area_name}'
+                values["programme_areas"] = f"{rec.cp_output.programme_area_code} {rec.cp_output.programme_area_name}"
                 values["entity_type"] = "CP Output"
             elif rec.intervention:
                 values["entity"] = rec.intervention.reference_number
@@ -295,7 +309,8 @@ class FMOntrackLoader(EtoolsLoader):
     def get_sections(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         data = []
         qs = ReportsSector.objects.filter(
-            FieldMonitoringPlanningMonitoringactivitySections_section__monitoringactivity=record.monitoring_activity)
+            FieldMonitoringPlanningMonitoringactivitySections_section__monitoringactivity=record.monitoring_activity
+        )
         for rec in qs:
             data.append(
                 dict(
@@ -304,41 +319,55 @@ class FMOntrackLoader(EtoolsLoader):
                     description=rec.description,
                 ),
             )
-        values['sections_data'] = data
-        return ", ".join([sec['name'] for sec in data])
+        values["sections_data"] = data
+        return ", ".join([sec["name"] for sec in data])
 
     def get_field_offices(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         activity = record.monitoring_activity
-        return list(activity.FieldMonitoringPlanningMonitoringactivityOffices_monitoringactivity.values_list(
-            'office__name', flat=True))
+        return list(
+            activity.FieldMonitoringPlanningMonitoringactivityOffices_monitoringactivity.values_list(
+                "office__name", flat=True
+            )
+        )
 
     def get_location(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
-        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name',
-                      'latitude', 'longitude']
+
+        loc_fields = [
+            "id",
+            "name",
+            "p_code",
+            "level",
+            "source_id",
+            "admin_level",
+            "admin_level_name",
+            "latitude",
+            "longitude",
+        ]
 
         try:
             instance = Location.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.monitoring_activity.location.pk
+                schema_name=self.context["country"].schema_name, source_id=record.monitoring_activity.location.pk
             )
             return {
-                'id': instance.pk,
-                'name': instance.name,
-                'p_code': instance.p_code,
-                'admin_level': instance.admin_level,
-                'source_id': instance.source_id,
-                'location_type': instance.admin_level_name,
-                'latitude': instance.latitude,
-                'longitude': instance.longitude,
+                "id": instance.pk,
+                "name": instance.name,
+                "p_code": instance.p_code,
+                "admin_level": instance.admin_level,
+                "source_id": instance.source_id,
+                "location_type": instance.admin_level_name,
+                "latitude": instance.latitude,
+                "longitude": instance.longitude,
             }
         except Location.DoesNotExist:
-            return {key: 'N/A' for key in loc_fields}
+            return {key: "N/A" for key in loc_fields}
 
     def get_team_members(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
-        return ', '.join(record.monitoring_activity.
-                         FieldMonitoringPlanningMonitoringactivityTeamMembers_monitoringactivity.values_list(
-            'user__email', flat=True))
+        return ", ".join(
+            record.monitoring_activity.FieldMonitoringPlanningMonitoringactivityTeamMembers_monitoringactivity.values_list(
+                "user__email", flat=True
+            )
+        )
 
 
 class FMOntrack(EtoolsDataMartModel):
@@ -431,15 +460,15 @@ class FMOntrack(EtoolsDataMartModel):
             monitoring_activity_end_date="monitoring_activity.end_date",
             location="-",
             site="monitoring_activity.locationsite.name",
-            status='monitoring_activity.status',
+            status="monitoring_activity.status",
             outcome="i",
             output="i",
             programme_areas="i",
             vendor_number="partner.vendor_number",
-            reference_number='intervention.reference_number',
+            reference_number="intervention.reference_number",
             sections="-",
             person_responsible_email="monitoring_activity.visit_lead.email",
-            team_members='-',
+            team_members="-",
         )
 
 
@@ -465,5 +494,5 @@ class FMOptions(EtoolsDataMartModel):
             category="question.category.name",
             is_custom="question.is_custom",
             is_active="question.is_active",
-            option_value='value'
+            option_value="value",
         )

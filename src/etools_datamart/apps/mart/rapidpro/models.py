@@ -25,7 +25,7 @@ class Source(models.Model):
     is_active = models.BooleanField(default=False)
 
     class Meta:
-        app_label = 'rapidpro'
+        app_label = "rapidpro"
 
     def __str__(self):
         return self.name
@@ -41,10 +41,9 @@ class Organization(models.Model):
         "timezone": "Africa/Kigali",
         "date_style": "day_first",
         "credits": {"used": 121433, "remaining": 3452},
-        "anon": False
+        "anon": False,
     }
-    source = models.OneToOneField(Source, on_delete=models.CASCADE,
-                                  blank=True, null=True)
+    source = models.OneToOneField(Source, on_delete=models.CASCADE, blank=True, null=True)
     # uuid = models.UUIDField(null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
@@ -59,10 +58,10 @@ class Organization(models.Model):
 
     # loader = TembaLoader()
     class Meta:
-        app_label = 'rapidpro'
+        app_label = "rapidpro"
 
     class Options:
-        source = 'https://app.rapidpro.io/api/v2/org'
+        source = "https://app.rapidpro.io/api/v2/org"
 
     def __str__(self):
         return self.name
@@ -83,11 +82,13 @@ class RapidProDataMartModel(models.Model, metaclass=RapidProModelBase):
     @class_property
     def service(self):
         from unicef_rest_framework.models import Service
+
         return Service.objects.get(source_model=ContentType.objects.get_for_model(self))
 
     @class_property
     def linked_services(self):
         from unicef_rest_framework.models import Service
+
         return [s for s in Service.objects.all() if s.managed_model == self]
 
 
@@ -98,14 +99,13 @@ class Group(RapidProDataMartModel):
     count = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.organization)
+        return "{} ({})".format(self.name, self.organization)
 
     class Options:
-        source = 'groups'
+        source = "groups"
 
 
 class ContactLoader(TembaLoader):
-
     def get_groups(self, record, ret, field_name):
         return [oo.serialize() for oo in record.groups]
 
@@ -114,11 +114,7 @@ class Contact(RapidProDataMartModel):
     uuid = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
     name = models.TextField(null=True, blank=True)
     language = models.CharField(max_length=100, null=True, blank=True)
-    urns = ArrayField(
-        models.CharField(max_length=100),
-        default=list,
-        null=True, blank=True
-    )
+    urns = ArrayField(models.CharField(max_length=100), default=list, null=True, blank=True)
     # groups = models.ManyToManyField(Group)
     groups = JSONField(default=dict, null=True, blank=True)
     fields = JSONField(default=dict, null=True, blank=True)
@@ -129,11 +125,13 @@ class Contact(RapidProDataMartModel):
     loader = ContactLoader()
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.organization)
+        return "{} ({})".format(self.name, self.organization)
 
     class Options:
-        source = 'contacts'
-        exclude_from_compare = ['groups', ]
+        source = "contacts"
+        exclude_from_compare = [
+            "groups",
+        ]
         fields_to_compare = None
 
 
@@ -151,10 +149,10 @@ class Campaign(RapidProDataMartModel):
     loader = CampaignLoader()
 
     class Options:
-        source = 'campaigns'
+        source = "campaigns"
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.organization)
+        return "{} ({})".format(self.name, self.organization)
 
 
 class Label(RapidProDataMartModel):
@@ -163,10 +161,10 @@ class Label(RapidProDataMartModel):
     count = models.IntegerField(null=True, blank=True)
 
     class Options:
-        source = 'labels'
+        source = "labels"
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.organization)
+        return "{} ({})".format(self.name, self.organization)
 
 
 class Runs(RapidProDataMartModel):
@@ -176,12 +174,11 @@ class Runs(RapidProDataMartModel):
     interrupted = models.IntegerField(default=0)
 
     class Options:
-        source = 'runs'
-        key = lambda loader, record: dict(source_id=record.source_id,
-                                          organization=loader.context['organization'])
+        source = "runs"
+        key = lambda loader, record: dict(source_id=record.source_id, organization=loader.context["organization"])
 
     def __str__(self):
-        return f'{self.active} {self.completed} {self.expired} {self.interrupted}'
+        return f"{self.active} {self.completed} {self.expired} {self.interrupted}"
 
 
 class FlowLoader(TembaLoader):
@@ -189,11 +186,10 @@ class FlowLoader(TembaLoader):
         return record.runs.serialize()
 
     def process_record(self, filters, values):
-        runs = values.pop('runs')
+        runs = values.pop("runs")
         op = super().process_record(filters, values)
-        runs['organization'] = self.record.organization
-        rr, __ = Runs.objects.update_or_create(id=self.record.id,
-                                               defaults=runs)
+        runs["organization"] = self.record.organization
+        rr, __ = Runs.objects.update_or_create(id=self.record.id, defaults=runs)
         self.record.runs = rr
         self.record.save()
         for label in self.source_record.labels:
@@ -218,16 +214,16 @@ class Flow(RapidProDataMartModel):
     loader = FlowLoader()
 
     class Options:
-        source = 'flows'
+        source = "flows"
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.organization)
+        return "{} ({})".format(self.name, self.organization)
 
 
 class FlowStartLoader(TembaLoader):
     def process_record(self, filters, values):
         op = super().process_record(filters, values)
-        for m2m_name in ('groups', 'contacts'):
+        for m2m_name in ("groups", "contacts"):
             m2m = getattr(self.source_record, m2m_name)
             m2m_local = getattr(self.record, m2m_name)
             m2m_local_model = m2m_local.model
@@ -255,5 +251,5 @@ class FlowStart(RapidProDataMartModel):
     loader = FlowStartLoader()
 
     class Options:
-        source = 'flow_starts'
+        source = "flow_starts"
         depends = (Flow, Group, Contact)

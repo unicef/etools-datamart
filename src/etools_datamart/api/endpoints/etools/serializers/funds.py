@@ -11,15 +11,14 @@ class EToolsGrantSerializer(serializers.ModelSerializer):
 
 
 class EToolsFundsreservationitemSerializer(serializers.ModelSerializer):
-
     country_name = serializers.SerializerMethodField()
 
     def get_country_name(self, obj):
-        return getattr(UsersCountry.objects.filter(schema_name=obj.schema).first(), 'name', None)
+        return getattr(UsersCountry.objects.filter(schema_name=obj.schema).first(), "name", None)
 
     class Meta:
         model = models.FundsFundsreservationitem
-        fields = '__all__'
+        fields = "__all__"
 
 
 class EToolsFundsReservationHeaderSerializer(serializers.ModelSerializer):

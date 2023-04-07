@@ -26,8 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class InterventionAbstract(models.Model):
-    agreement_reference_number = models.CharField(max_length=300,
-                                                  blank=True, null=True)
+    agreement_reference_number = models.CharField(max_length=300, blank=True, null=True)
     amendment_types = models.TextField(blank=True, null=True)
     attachment_types = models.TextField(blank=True, null=True)
     agreement_id = models.IntegerField(blank=True, null=True)
@@ -44,8 +43,7 @@ class InterventionAbstract(models.Model):
     currency = models.CharField(max_length=5, blank=True, null=True)
     days_from_prc_review_to_signature = models.IntegerField(blank=True, null=True)
     days_from_submission_to_signature = models.IntegerField(blank=True, null=True)
-    document_type = models.CharField(max_length=255, null=True,
-                                     choices=PartnersInterventionConst.INTERVENTION_TYPES)
+    document_type = models.CharField(max_length=255, null=True, choices=PartnersInterventionConst.INTERVENTION_TYPES)
     end_date = models.DateField(null=True)
     fr_number = models.CharField(max_length=300, blank=True, null=True)
     outstanding_amt_local = models.DecimalField(default=0, max_digits=20, decimal_places=2, blank=True, null=True)
@@ -92,8 +90,7 @@ class InterventionAbstract(models.Model):
     signed_by_unicef_date = models.DateField(null=True)
     signed_pd_document = models.CharField(max_length=1024, null=True)
     start_date = models.DateField(null=True)
-    status = models.CharField(max_length=32, null=True, db_index=True,
-                              choices=PartnersInterventionConst.STATUSES)
+    status = models.CharField(max_length=32, null=True, db_index=True, choices=PartnersInterventionConst.STATUSES)
     submission_date = models.DateField(null=True)
     submission_date_prc = models.DateField(null=True)
     title = models.CharField(max_length=256, null=True, db_index=True)
@@ -119,95 +116,92 @@ class InterventionAbstract(models.Model):
         depends = (Office, Location, Partner)
         source = PartnersIntervention
         queryset = lambda: PartnersIntervention.objects.select_related(
-            'agreement',
-            'partner_authorized_officer_signatory',
-            'unicef_signatory',
-            'country_programme',
-            'partnersintervention_partners_interventionbudget_intervention_id'
+            "agreement",
+            "partner_authorized_officer_signatory",
+            "unicef_signatory",
+            "country_programme",
+            "partnersintervention_partners_interventionbudget_intervention_id",
         )
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          intervention_id=record.pk)
+        key = lambda loader, record: dict(schema_name=loader.context["country"].schema_name, intervention_id=record.pk)
         mapping = dict(
-            agreement_reference_number='agreement.reference_number',
-            amendment_types='-',
-            attachment_types='-',
-            clusters='-',
-            contingency_pd='=',
-            country_programme='country_programme.name',
-            country_programme_id='country_programme.pk',
-            cp_outputs='-',
-            created='=',
-            cso_type='agreement.partner.cso_type',
-            currency='PartnersInterventionbudget_intervention.currency',
-            days_from_submission_to_signature='-',
-            days_from_prc_review_to_signature='-',
-            end_date='end',
-            fr_number='-',
-            outstanding_amt_local='-',
-            in_kind_amount='PartnersInterventionbudget_intervention.in_kind_amount',
-            in_kind_amount_local='PartnersInterventionbudget_intervention.in_kind_amount_local',
-            intervention_id='id',
-            last_amendment_date='i',
-            last_pv_date='-',
-            location='i',
+            agreement_reference_number="agreement.reference_number",
+            amendment_types="-",
+            attachment_types="-",
+            clusters="-",
+            contingency_pd="=",
+            country_programme="country_programme.name",
+            country_programme_id="country_programme.pk",
+            cp_outputs="-",
+            created="=",
+            cso_type="agreement.partner.cso_type",
+            currency="PartnersInterventionbudget_intervention.currency",
+            days_from_submission_to_signature="-",
+            days_from_prc_review_to_signature="-",
+            end_date="end",
+            fr_number="-",
+            outstanding_amt_local="-",
+            in_kind_amount="PartnersInterventionbudget_intervention.in_kind_amount",
+            in_kind_amount_local="PartnersInterventionbudget_intervention.in_kind_amount_local",
+            intervention_id="id",
+            last_amendment_date="i",
+            last_pv_date="-",
+            location="i",
             # locations_data='i',
             # locations='-',
-            number_of_amendments='i',
-            number_of_attachments='i',
-            offices='-',
-            offices_data='i',
-            partner_authorized_officer_signatory_id='partner_authorized_officer_signatory.pk',
-            partner_contribution='PartnersInterventionbudget_intervention.partner_contribution',
-            partner_contribution_local='PartnersInterventionbudget_intervention.partner_contribution_local',
-            partner_focal_points='-',
-            partner_focal_points_data='i',
-            partner_id='-',
-            partner_name='agreement.partner.name',
-            partner_sea_risk_rating='i',
-            partner_signatory_email='partner_authorized_officer_signatory.email',
-            partner_signatory_first_name='partner_authorized_officer_signatory.first_name',
-            partner_signatory_last_name='partner_authorized_officer_signatory.last_name',
-            partner_signatory_phone='partner_authorized_officer_signatory.phone',
-            partner_signatory_title='partner_authorized_officer_signatory.title',
-            partner_source_id='agreement.partner.id',
-            partner_type='agreement.partner.type',
-            partner_vendor_number='agreement.partner.vendor_number',
-            planned_programmatic_visits='-',
-            prc_review_document='-',
-            sections='-',
-            start_date='start',
-            status='=',
-            total='PartnersInterventionbudget_intervention.total',
-            total_local='PartnersInterventionbudget_intervention.total_local',
-            unicef_cash='PartnersInterventionbudget_intervention.unicef_cash',
-            unicef_cash_local='PartnersInterventionbudget_intervention.unicef_cash_local',
-            unicef_focal_points='-',
-            unicef_focal_points_data='i',
+            number_of_amendments="i",
+            number_of_attachments="i",
+            offices="-",
+            offices_data="i",
+            partner_authorized_officer_signatory_id="partner_authorized_officer_signatory.pk",
+            partner_contribution="PartnersInterventionbudget_intervention.partner_contribution",
+            partner_contribution_local="PartnersInterventionbudget_intervention.partner_contribution_local",
+            partner_focal_points="-",
+            partner_focal_points_data="i",
+            partner_id="-",
+            partner_name="agreement.partner.name",
+            partner_sea_risk_rating="i",
+            partner_signatory_email="partner_authorized_officer_signatory.email",
+            partner_signatory_first_name="partner_authorized_officer_signatory.first_name",
+            partner_signatory_last_name="partner_authorized_officer_signatory.last_name",
+            partner_signatory_phone="partner_authorized_officer_signatory.phone",
+            partner_signatory_title="partner_authorized_officer_signatory.title",
+            partner_source_id="agreement.partner.id",
+            partner_type="agreement.partner.type",
+            partner_vendor_number="agreement.partner.vendor_number",
+            planned_programmatic_visits="-",
+            prc_review_document="-",
+            sections="-",
+            start_date="start",
+            status="=",
+            total="PartnersInterventionbudget_intervention.total",
+            total_local="PartnersInterventionbudget_intervention.total_local",
+            unicef_cash="PartnersInterventionbudget_intervention.unicef_cash",
+            unicef_cash_local="PartnersInterventionbudget_intervention.unicef_cash_local",
+            unicef_focal_points="-",
+            unicef_focal_points_data="i",
             # unicef_signatory_email='unicef_signatory.email',
             # unicef_signatory_first_name='unicef_signatory.first_name',
             # unicef_signatory_id='unicef_signatory.pk',
             # unicef_signatory_last_name='unicef_signatory.last_name',
-            updated='modified',
-            cfei_number='=',
+            updated="modified",
+            cfei_number="=",
         )
 
 
 class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
-    location_m2m_field = 'flat_locations'
+    location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return PartnersIntervention.objects.select_related('agreement',
-                                                           'agreement__partner',
-                                                           ).prefetch_related('sections',
-                                                                              'flat_locations',
-                                                                              'offices',
-                                                                              'unicef_focal_points',
-                                                                              'partner_focal_points',
-                                                                              'result_links')
+        return PartnersIntervention.objects.select_related(
+            "agreement",
+            "agreement__partner",
+        ).prefetch_related(
+            "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
+        )
 
     @cached_property
     def _ct(self):
-        return DjangoContentType.objects.get(app_label='partners', model='intervention').model
+        return DjangoContentType.objects.get(app_label="partners", model="intervention").model
 
     # def fr_currencies_ok(self, original: PartnersIntervention):
     #     return original.frs__currency__count == 1 if original.frs__currency__count else None
@@ -215,35 +209,36 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_partner_id(self, record: PartnersIntervention, values: dict, **kwargs):
         try:
             data = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
+                schema_name=self.context["country"].schema_name,
                 source_id=record.agreement.partner.id,
             )
-            values['partner_sea_risk_rating'] = data.sea_risk_rating_name
+            values["partner_sea_risk_rating"] = data.sea_risk_rating_name
             return data.pk
         except Partner.DoesNotExist:
-            values['partner_sea_risk_rating'] = None
+            values["partner_sea_risk_rating"] = None
             return None
 
     def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
         qs = PartnersInterventionplannedvisits.objects.filter(intervention=record)
-        qs = qs.filter(year=self.context['today'].year)
+        qs = qs.filter(year=self.context["today"].year)
         qs = qs.annotate(
-            planned=F('programmatic_q1') + F('programmatic_q2') + F('programmatic_q3') + F('programmatic_q4'))
+            planned=F("programmatic_q1") + F("programmatic_q2") + F("programmatic_q3") + F("programmatic_q4")
+        )
         record = qs.first()
         if record:
             return record.planned
 
     def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
         qs = record.PartnersInterventionattachment_intervention.all()
-        values['number_of_attachments'] = qs.count()
-        return ", ".join(qs.values_list('type__name', flat=True))
+        values["number_of_attachments"] = qs.count()
+        return ", ".join(qs.values_list("type__name", flat=True))
 
     def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionamendment.objects.filter(intervention=record).order_by('signed_date')
-        values['number_of_amendments'] = qs.count()
+        qs = PartnersInterventionamendment.objects.filter(intervention=record).order_by("signed_date")
+        values["number_of_amendments"] = qs.count()
         if qs:
-            values['last_amendment_date'] = qs.latest('signed_date').signed_date
-        types = [str(t) for t in qs.values_list('types', flat=True)]
+            values["last_amendment_date"] = qs.latest("signed_date").signed_date
+        types = [str(t) for t in qs.values_list("types", flat=True)]
         return ", ".join(types)
 
     def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
@@ -261,19 +256,27 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_sections(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         for section in record.sections.all():
-            data.append(dict(source_id=section.id,
-                             name=section.name,
-                             description=section.description,
-                             ))
-        values['sections_data'] = data
-        return ", ".join([sec['name'] for sec in data])
+            data.append(
+                dict(
+                    source_id=section.id,
+                    name=section.name,
+                    description=section.description,
+                )
+            )
+        values["sections_data"] = data
+        return ", ".join([sec["name"] for sec in data])
 
     def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
-        ta = T2FTravelactivity.objects.filter(partnership__pk=record.pk,
-                                              travel_type=TravelType.PROGRAMME_MONITORING,
-                                              travels__status='completed',
-                                              date__isnull=False,
-                                              ).order_by('date').last()
+        ta = (
+            T2FTravelactivity.objects.filter(
+                partnership__pk=record.pk,
+                travel_type=TravelType.PROGRAMME_MONITORING,
+                travels__status="completed",
+                date__isnull=False,
+            )
+            .order_by("date")
+            .last()
+        )
         return ta.date if ta else None
 
     def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
@@ -287,15 +290,17 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionOffices
         data = []
-        for office in record.offices.order_by('id'):
-            data.append(dict(source_id=office.id,
-                             name=office.name,
-                             ))
-        values['offices_data'] = data
-        return ", ".join([off['name'] for off in data])
+        for office in record.offices.order_by("id"):
+            data.append(
+                dict(
+                    source_id=office.id,
+                    name=office.name,
+                )
+            )
+        values["offices_data"] = data
+        return ", ".join([off["name"] for off in data])
 
     def get_clusters(self, record: PartnersIntervention, values: dict, **kwargs):
-
         qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=record)
         clusters = set()
         for applied_indicator in qs.all():
@@ -309,25 +314,30 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         for member in record.partner_focal_points.all():
             # member is PartnersPartnerstaffmember
             ret.append("{0.last_name} {0.first_name} ({0.email}) {0.phone}".format(member))
-            data.append(dict(last_name=member.last_name,
-                             first_name=member.first_name,
-                             email=member.email,
-                             phone=member.phone,
-                             ))
+            data.append(
+                dict(
+                    last_name=member.last_name,
+                    first_name=member.first_name,
+                    email=member.email,
+                    phone=member.phone,
+                )
+            )
 
-        values['partner_focal_points_data'] = data
+        values["partner_focal_points_data"] = data
         return ", ".join(ret)
 
     def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
-        return ", ".join(FundsFundsreservationheader.objects.filter(intervention=record)
-                         .values_list('fr_number', flat=True))
+        return ", ".join(
+            FundsFundsreservationheader.objects.filter(intervention=record).values_list("fr_number", flat=True)
+        )
 
     def get_outstanding_amt_local(self, record: PartnersIntervention, values: dict, **kwargs):
-        return FundsFundsreservationheader.objects.filter(intervention=record).aggregate(
-            Sum('outstanding_amt_local'))['outstanding_amt_local__sum']
+        return FundsFundsreservationheader.objects.filter(intervention=record).aggregate(Sum("outstanding_amt_local"))[
+            "outstanding_amt_local__sum"
+        ]
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
-        values['cp_outputs_data'] = list(record.result_links.values("name", "wbs"))
+        values["cp_outputs_data"] = list(record.result_links.values("name", "wbs"))
         return ", ".join([rl.name for rl in record.result_links.all()])
 
     def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
@@ -335,31 +345,39 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         ret = []
         for member in record.unicef_focal_points.all():
             ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
-            data.append(dict(last_name=member.last_name,
-                             first_name=member.first_name,
-                             email=member.email,
-                             ))
+            data.append(
+                dict(
+                    last_name=member.last_name,
+                    first_name=member.first_name,
+                    email=member.email,
+                )
+            )
 
-        values['unicef_focal_points_data'] = data
+        values["unicef_focal_points_data"] = data
         return ", ".join(ret)
 
     def get_prc_review_document(self, record: PartnersIntervention, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Attachment
-        attachment = Attachment.objects.filter(
-            # object_id=record.pk,
-            pd_ssfa_number__in=[record.number, record.number[:-2] if record.number else ''],
-            code='partners_intervention_prc_review',
-            content_type=self._ct).order_by('-id').first()
+
+        attachment = (
+            Attachment.objects.filter(
+                # object_id=record.pk,
+                pd_ssfa_number__in=[record.number, record.number[:-2] if record.number else ""],
+                code="partners_intervention_prc_review",
+                content_type=self._ct,
+            )
+            .order_by("-id")
+            .first()
+        )
         if attachment:
             return attachment.file
 
     def get_final_partnership_review(self, record: PartnersIntervention, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Attachment
-        attachment = Attachment.objects\
-            .filter(pd_ssfa_number=record.number,
-                    code='partners_intervention_attachment',
-                    content_type='interventionattachment')\
-            .last()
+
+        attachment = Attachment.objects.filter(
+            pd_ssfa_number=record.number, code="partners_intervention_attachment", content_type="interventionattachment"
+        ).last()
         if attachment:
             return attachment.file
 
@@ -373,31 +391,31 @@ class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartMode
     loader = InterventionLoader()
 
     class Meta:
-        ordering = ('country_name', 'title', 'id')
+        ordering = ("country_name", "title", "id")
         verbose_name = "Intervention"
-        unique_together = ('schema_name', 'intervention_id')
+        unique_together = ("schema_name", "intervention_id")
 
     class Options(InterventionAbstract.Options):
-        mapping = dict(**InterventionAbstract.Options.mapping,
-                       locations_data='i',
-                       locations='-',
-                       final_partnership_review='-',
-                       )
+        mapping = dict(
+            **InterventionAbstract.Options.mapping,
+            locations_data="i",
+            locations="-",
+            final_partnership_review="-",
+        )
 
 
 class InterventionByLocationLoader(InterventionLoader):
-
     def get_values(self, record):
         values = super().get_values(record)
-        values['location'] = Location.objects.filter(
-            schema_name=self.context['country'].schema_name,
-            source_id=record.location.id).first()
+        values["location"] = Location.objects.filter(
+            schema_name=self.context["country"].schema_name, source_id=record.location.id
+        ).first()
         return values
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for intervention in qs.all():
-            for location in intervention.flat_locations.all().order_by('id'):
+            for location in intervention.flat_locations.all().order_by("id"):
                 intervention.location = location
                 filters = self.config.key(self, intervention)
                 values = self.get_values(intervention)
@@ -409,12 +427,14 @@ class InterventionByLocation(LocationMixin, InterventionAbstract, EtoolsDataMart
     loader = InterventionByLocationLoader()
 
     class Meta:
-        ordering = ('country_name', 'title')
+        ordering = ("country_name", "title")
         verbose_name = "Intervention By Location"
-        unique_together = ('schema_name', 'intervention_id', 'location_source_id')
+        unique_together = ("schema_name", "intervention_id", "location_source_id")
 
     class Options(InterventionAbstract.Options):
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          intervention_id=record.pk,
-                                          location_source_id=record.location.pk)
+        key = lambda loader, record: dict(
+            schema_name=loader.context["country"].schema_name,
+            intervention_id=record.pk,
+            location_source_id=record.location.pk,
+        )
         mapping = add_location_mapping(InterventionAbstract.Options.mapping)

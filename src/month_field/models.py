@@ -12,7 +12,7 @@ class MonthField(models.DateField):
     widget = widgets.MonthSelectorWidget
 
     default_error_messages = {
-        'invalid_year': _("Year informed invalid. Enter at least 4 digits."),
+        "invalid_year": _("Year informed invalid. Enter at least 4 digits."),
     }
 
     def to_python(self, value):
@@ -22,9 +22,9 @@ class MonthField(models.DateField):
             month = Month.from_date(value)
             if len(str(month.year)) < 4:
                 raise exceptions.ValidationError(
-                    self.error_messages['invalid_year'],
-                    code='invalid_year',
-                    params={'value': value},
+                    self.error_messages["invalid_year"],
+                    code="invalid_year",
+                    params={"value": value},
                 )
         elif isinstance(value, str):
             month = Month.from_string(value)
@@ -46,9 +46,7 @@ class MonthField(models.DateField):
 
     def formfield(self, **kwargs):
         # The widget is allready being specified somewhere by models.DateField...
-        kwargs['widget'] = self.widget
-        defaults = {
-            'form_class': forms.MonthField
-        }
+        kwargs["widget"] = self.widget
+        defaults = {"form_class": forms.MonthField}
         defaults.update(kwargs)
         return super().formfield(**defaults)

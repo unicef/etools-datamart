@@ -14,9 +14,8 @@ from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthor
 
 
 def pytest_generate_tests(metafunc):
-    if 'url' in metafunc.fixturenames:
-        urls = [reverse("api:%s" % url.name, args=['v1']) for url in router.urls
-                if url.name.endswith('-list')]
+    if "url" in metafunc.fixturenames:
+        urls = [reverse("api:%s" % url.name, args=["v1"]) for url in router.urls if url.name.endswith("-list")]
         metafunc.parametrize("url", urls, ids=urls)
 
 
@@ -26,15 +25,19 @@ def test_options(client, url):
     assert res.json()
 
 
-@pytest.mark.parametrize("exc, code", [(QueryFilterException, 400),
-                                       (NotAuthenticated, 401),
-                                       (Http404, 404),
-                                       (NotAuthorizedSchema, 403),
-                                       (PermissionDenied, 403),
-                                       (InvalidSchema, 400),
-                                       (AuthenticationFailed, 403),
-                                       (InvalidSerializerError, 400),
-                                       ])
+@pytest.mark.parametrize(
+    "exc, code",
+    [
+        (QueryFilterException, 400),
+        (NotAuthenticated, 401),
+        (Http404, 404),
+        (NotAuthorizedSchema, 403),
+        (PermissionDenied, 403),
+        (InvalidSchema, 400),
+        (AuthenticationFailed, 403),
+        (InvalidSerializerError, 400),
+    ],
+)
 def test_handle_exception(client, exc, code):
     view = APIReadOnlyModelViewSet()
     view.request = Mock()

@@ -12,10 +12,9 @@ from etools_datamart.apps.sources.etools.models import (
 
 
 class AuditResultLoader(EtoolsLoader):
-
     def get_mart_values(self, record: AuditAudit = None):
         ret = super().get_mart_values(None)
-        ret['source_id'] = record.engagement_ptr_id
+        ret["source_id"] = record.engagement_ptr_id
         return ret
 
     def get_queryset(self):
@@ -54,11 +53,12 @@ class AuditResult(EtoolsDataMartModel):
 
     date_of_draft_report_to_ip = models.DateField(blank=True, null=True)
     amount_refunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    additional_supporting_documentation_provided = models.DecimalField(max_digits=20, decimal_places=2,
-                                                                       blank=True, null=True)
+    additional_supporting_documentation_provided = models.DecimalField(
+        max_digits=20, decimal_places=2, blank=True, null=True
+    )
     justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
-    write_off_required = models.DecimalField('Impairment', max_digits=20, decimal_places=2, blank=True, null=True)
+    write_off_required = models.DecimalField("Impairment", max_digits=20, decimal_places=2, blank=True, null=True)
     pending_unsupported_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
     # AuditAudit.audit_opinion - -
@@ -73,9 +73,9 @@ class AuditResult(EtoolsDataMartModel):
     # model count(Audit.KeyInternalControl) per engagement
     count_key_control_weaknesses = models.IntegerField(blank=True, null=True)
 
-    status = models.CharField(max_length=30, blank=True, null=True,
-                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
-                              db_index=True)
+    status = models.CharField(
+        max_length=30, blank=True, null=True, choices=AuditEngagementConsts.DISPLAY_STATUSES, db_index=True
+    )
 
     loader = AuditResultLoader()
 
@@ -85,23 +85,23 @@ class AuditResult(EtoolsDataMartModel):
     class Options:
         source = AuditAudit
         sync_deleted_records = lambda loader: False
-        mapping = {'source_id': 'engagement_ptr.id',
-                   'vendor': 'engagement_ptr.partner.name',
-                   'status': 'engagement_ptr.status',
-                   'vendor_number': 'engagement_ptr.partner.vendor_number',
-                   'partner_type': 'engagement_ptr.partner.partner_type',
-                   'risk_rating': 'engagement_ptr.partner.rating',
-                   'date_of_draft_report_to_ip': 'engagement_ptr.date_of_draft_report_to_ip',
-                   'amount_refunded': 'engagement_ptr.amount_refunded',
-                   'additional_supporting_documentation_provided': 'engagement_ptr.additional_supporting_documentation_provided',
-                   'justification_provided_and_accepted': 'engagement_ptr.justification_provided_and_accepted',
-                   'write_off_required': 'engagement_ptr.write_off_required',
-                   'pending_unsupported_amount': 'engagement_ptr.pending_unsupported_amount',
-                   'audited_expenditure': '=',
-                   'financial_findings': '=',
-                   'audit_opinion': '=',
-                   'count_high_risk_findings': '-',
-                   'count_financial_findings': '-',
-                   'count_key_control_weaknesses': '-',
-
-                   }
+        mapping = {
+            "source_id": "engagement_ptr.id",
+            "vendor": "engagement_ptr.partner.name",
+            "status": "engagement_ptr.status",
+            "vendor_number": "engagement_ptr.partner.vendor_number",
+            "partner_type": "engagement_ptr.partner.partner_type",
+            "risk_rating": "engagement_ptr.partner.rating",
+            "date_of_draft_report_to_ip": "engagement_ptr.date_of_draft_report_to_ip",
+            "amount_refunded": "engagement_ptr.amount_refunded",
+            "additional_supporting_documentation_provided": "engagement_ptr.additional_supporting_documentation_provided",
+            "justification_provided_and_accepted": "engagement_ptr.justification_provided_and_accepted",
+            "write_off_required": "engagement_ptr.write_off_required",
+            "pending_unsupported_amount": "engagement_ptr.pending_unsupported_amount",
+            "audited_expenditure": "=",
+            "financial_findings": "=",
+            "audit_opinion": "=",
+            "count_high_risk_findings": "-",
+            "count_financial_findings": "-",
+            "count_key_control_weaknesses": "-",
+        }

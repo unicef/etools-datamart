@@ -48,7 +48,6 @@ class TPMVisitSerializerV2(DataMartSerializer):
             "attachments",
             # "report_attachments",
             # "visit_url",
-
         )
 
 
@@ -60,8 +59,9 @@ class TPMVisitSerializer(DataMartSerializer):
 class TPMVisitViewSet(common.DataMartViewSet):
     serializer_class = TPMVisitSerializer
     queryset = models.TPMVisit.objects.all()
-    filter_fields = ('status', 'date_of_assigned', 'date_of_tpm_accepted',
-                     'date_of_tpm_rejected')
-    ordering_fields = ("id", "created",)
-    serializers_fieldsets = {'std': TPMVisitSerializer,
-                             'v2': TPMVisitSerializerV2}
+    filter_fields = ("status", "date_of_assigned", "date_of_tpm_accepted", "date_of_tpm_rejected")
+    ordering_fields = (
+        "id",
+        "created",
+    )
+    serializers_fieldsets = {"std": TPMVisitSerializer, "v2": TPMVisitSerializerV2}

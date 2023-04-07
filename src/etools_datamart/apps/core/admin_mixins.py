@@ -18,17 +18,25 @@ class ReadOnlyMixin:
 
 class DisplayAllMixin:
     def get_list_display(self, request):  # pragma: no cover
-        if self.list_display == ('__str__',):
-            return [field.name for field in self.model._meta.fields
-                    if not (isinstance(field, models.ForeignKey) or
-                            field.name in ['seen',
-                                           'created',
-                                           'uuid',
-                                           'country_name',
-                                           'area_code',
-                                           'source_id',
-                                           'modified',
-                                           'last_modify_date'])]
+        if self.list_display == ("__str__",):
+            return [
+                field.name
+                for field in self.model._meta.fields
+                if not (
+                    isinstance(field, models.ForeignKey)
+                    or field.name
+                    in [
+                        "seen",
+                        "created",
+                        "uuid",
+                        "country_name",
+                        "area_code",
+                        "source_id",
+                        "modified",
+                        "last_modify_date",
+                    ]
+                )
+            ]
         return self.list_display
 
 

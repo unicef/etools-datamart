@@ -27,11 +27,13 @@ def check_loader(app_configs, **kwargs):
             try:
                 opts.get_field(cfg.last_modify_field)
             except Exception:
-                errors.append(Error(
-                    f"LoaderOptions last_modify_field: '{cfg.last_modify_field}' does not exists in {opts}",
-                    hint='',
-                    obj=model.loader,
-                    id='L001',
-                ))
+                errors.append(
+                    Error(
+                        f"LoaderOptions last_modify_field: '{cfg.last_modify_field}' does not exists in {opts}",
+                        hint="",
+                        obj=model.loader,
+                        id="L001",
+                    )
+                )
 
     return errors

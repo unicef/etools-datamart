@@ -17,10 +17,9 @@ class ServicePermission(BasePermission):
     def get_acl(self, request, service: Service):
         # PERF: this can be can be cached if we need to handle
         # consecutive OPTIONS/GET requests
-        return (list(UserAccessControl.objects.filter(service=service,
-                                                      user=request.user).order_by('-policy')) +
-                list(GroupAccessControl.objects.filter(service=service,
-                                                       group__user=request.user).order_by('-policy')))
+        return list(UserAccessControl.objects.filter(service=service, user=request.user).order_by("-policy")) + list(
+            GroupAccessControl.objects.filter(service=service, group__user=request.user).order_by("-policy")
+        )
 
     def has_permission(self, request, view):
         if request.user.is_superuser:
@@ -39,7 +38,6 @@ class ServicePermission(BasePermission):
             requested_serializer = request.GET.get(view.serializer_field_param, "std")
 
             for acl in acls:
-
                 if acl.policy == AbstractAccessControl.POLICY_DENY:
                     logger.error(f"Access denied for user '{request.user}' to '{fqn(view)}'")
                     raise PermissionDenied
@@ -52,6 +50,6 @@ class ServicePermission(BasePermission):
                 #     raise PermissionDenied(f"Forbidden serializer '{requested_serializer}'")
             raise PermissionDenied(f"Forbidden serializer '{requested_serializer}'")
             # return False
-        except (GroupAccessControl.DoesNotExist):
+        except GroupAccessControl.DoesNotExist:
             logger.error(f"User '{request.user}' does not have grants for '{fqn(view)}'")
             return False

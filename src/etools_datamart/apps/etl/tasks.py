@@ -7,13 +7,14 @@ from etools_datamart.celery import app
 
 logger = logging.getLogger(__name__)
 
-HEALTHCHECK_KEY = 'healthcheck'
-HEALTHCHECK_FORMAT = '%Y-%m-%d %H:%M:%S'
+HEALTHCHECK_KEY = "healthcheck"
+HEALTHCHECK_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 @app.task
 def healthcheck():
-    cache.set('healthcheck', timezone.now().strftime(HEALTHCHECK_FORMAT))
+    cache.set("healthcheck", timezone.now().strftime(HEALTHCHECK_FORMAT))
+
 
 #
 # @app.on_after_configure.connect

@@ -22,25 +22,27 @@ class ReadOnlyAdminMixin:
 
 
 class TruncateTableMixin(ExtraButtonsMixin):
-
     def _truncate(self, request):
         self.model.objects.truncate()
 
-    @button(label='Truncate', permissions=is_superuser)
+    @button(label="Truncate", permissions=is_superuser)
     def truncate(self, request):
-        return confirm_action(self, request, self._truncate, "Continuing will erase the entire content of the table.",
-                               "Successfully executed", )
+        return confirm_action(
+            self,
+            request,
+            self._truncate,
+            "Continuing will erase the entire content of the table.",
+            "Successfully executed",
+        )
 
 
 class ListDisplayAllMixin:
     list_display = ()
-    list_display_exclude = ('id', 'uuid', 'version',
-                            'last_modified_user', 'last_modified_date')
+    list_display_exclude = ("id", "uuid", "version", "last_modified_user", "last_modified_date")
 
     def get_list_display(self, request):
         if not self.list_display:
-            return [f.name for f in self.model._meta.fields
-                    if f.name not in self.list_display_exclude]
+            return [f.name for f in self.model._meta.fields if f.name not in self.list_display_exclude]
         return self.list_display
 
 

@@ -58,7 +58,6 @@ from etools_datamart.sentry import process_exception
 
 
 class PrpBaseLoader(BaseLoader):
-
     def get_queryset(self):
         if self.config.queryset:
             ret = self.config.queryset
@@ -70,7 +69,7 @@ class PrpBaseLoader(BaseLoader):
         return ret
 
     def filter_queryset(self, qs):
-        use_delta = self.context['only_delta'] and not self.context['is_empty']
+        use_delta = self.context["only_delta"] and not self.context["is_empty"]
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
         if use_delta and (self.config.last_modify_field and self.last_run):
@@ -78,9 +77,17 @@ class PrpBaseLoader(BaseLoader):
             qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.last_run})
         return qs
 
-    def load(self, *, verbosity=0, stdout=None,
-             ignore_dependencies=False, max_records=None,
-             only_delta=True, run_type=RUN_UNKNOWN, **kwargs):
+    def load(
+        self,
+        *,
+        verbosity=0,
+        stdout=None,
+        ignore_dependencies=False,
+        max_records=None,
+        only_delta=True,
+        run_type=RUN_UNKNOWN,
+        **kwargs,
+    ):
         self.on_start(run_type)
         self.results = EtlResult()
         logger.debug(f"Running loader {self}")
@@ -99,17 +106,19 @@ class PrpBaseLoader(BaseLoader):
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
-                    if field.name not in ['source_id', 'id', 'last_modify_date']:
+                    if field.name not in ["source_id", "id", "last_modify_date"]:
                         self.mapping[field.name] = field.name
                 if self.config.mapping:  # pragma: no branch
                     self.mapping.update(self.config.mapping)
-                self.update_context(today=timezone.now(),
-                                    max_records=max_records,
-                                    verbosity=verbosity,
-                                    records=0,
-                                    only_delta=only_delta,
-                                    is_empty=not self.model.objects.exists(),
-                                    stdout=stdout)
+                self.update_context(
+                    today=timezone.now(),
+                    max_records=max_records,
+                    verbosity=verbosity,
+                    records=0,
+                    only_delta=only_delta,
+                    is_empty=not self.model.objects.exists(),
+                    stdout=stdout,
+                )
                 sid = transaction.savepoint()
                 try:
                     self.results.context = self.context

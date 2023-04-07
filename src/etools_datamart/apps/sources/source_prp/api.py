@@ -460,60 +460,58 @@ class UnicefProgrammedocumentUnicefOfficersViewSet(URFReadOnlyModelViewSet):
 
 class UnicefProgressreportSerializer(serializers.ModelSerializer):
     model = models.UnicefProgressreport
-    programme_document = serializers.ReadOnlyField(source='programme_document.reference_number')
-    workspace = serializers.ReadOnlyField(source='programme_document.workspace.title')
-    business_area_code = serializers.ReadOnlyField(source='programme_document.workspace.business_area_code')
-    partner = serializers.ReadOnlyField(source='programme_document.partner.title')
-    partner_type = serializers.ReadOnlyField(source='programme_document.partner.partner_type')
+    programme_document = serializers.ReadOnlyField(source="programme_document.reference_number")
+    workspace = serializers.ReadOnlyField(source="programme_document.workspace.title")
+    business_area_code = serializers.ReadOnlyField(source="programme_document.workspace.business_area_code")
+    partner = serializers.ReadOnlyField(source="programme_document.partner.title")
+    partner_type = serializers.ReadOnlyField(source="programme_document.partner.partner_type")
 
     class Meta:
         model = models.UnicefProgressreport
         fields = (
-            'created',
-            'modified',
-            'partner',
-            'partner_type',
-            'partner_contribution_to_date',
-            'challenges_in_the_reporting_period',
-            'proposed_way_forward',
-            'status',
-            'start_date',
-            'end_date',
-            'due_date',
-            'submission_date',
-            'review_date',
-            'review_overall_status',
-            'sent_back_feedback',
-            'report_number',
-            'report_type',
-            'is_final',
-            'narrative',
-            'programme_document',
-            'workspace',
-            'business_area_code',
+            "created",
+            "modified",
+            "partner",
+            "partner_type",
+            "partner_contribution_to_date",
+            "challenges_in_the_reporting_period",
+            "proposed_way_forward",
+            "status",
+            "start_date",
+            "end_date",
+            "due_date",
+            "submission_date",
+            "review_date",
+            "review_overall_status",
+            "sent_back_feedback",
+            "report_number",
+            "report_type",
+            "is_final",
+            "narrative",
+            "programme_document",
+            "workspace",
+            "business_area_code",
         )
 
 
 class UnicefProgressreportViewSet(URFReadOnlyModelViewSet):
     serializer_class = UnicefProgressreportSerializer
-    queryset = models.UnicefProgressreport.objects.annotate(workspace=F('programme_document__workspace__title'))
-    filter_fields = (
-        'workspace',
-    )
+    queryset = models.UnicefProgressreport.objects.annotate(workspace=F("programme_document__workspace__title"))
+    filter_fields = ("workspace",)
 
 
 class UnicefProgressreportattachmentSerializer(serializers.ModelSerializer):
-    pd = serializers.ReadOnlyField(source='progress_report.programme_document.reference_number')
-    pd_title = serializers.ReadOnlyField(source='progress_report.programme_document.title')
+    pd = serializers.ReadOnlyField(source="progress_report.programme_document.reference_number")
+    pd_title = serializers.ReadOnlyField(source="progress_report.programme_document.title")
     link = serializers.SerializerMethodField()
 
     def get_link(self, obj):
         if obj.file:
-            return f'{PRP_URL}{obj.file.url}'
+            return f"{PRP_URL}{obj.file.url}"
 
     class Meta:
         model = models.UnicefProgressreportattachment
-        fields = '__all__'
+        fields = "__all__"
 
 
 class UnicefProgressreportattachmentViewSet(URFReadOnlyModelViewSet):

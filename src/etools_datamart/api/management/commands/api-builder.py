@@ -49,29 +49,37 @@ class Command(LabelCommand):
     help = "Process a Django Model and creates related ViewSet/Serializer "
     requires_system_checks = []
     args = "[modelname]"
-    label = 'model name'
+    label = "model name"
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
-            '--serializers', action='store', dest='serializers',
-            default='etools_datamart.api.serializers',
-            help='',
+            "--serializers",
+            action="store",
+            dest="serializers",
+            default="etools_datamart.api.serializers",
+            help="",
         )
         parser.add_argument(
-            '--views', action='store', dest='views',
-            default='etools_datamart.api.endpoints',
-            help='',
+            "--views",
+            action="store",
+            dest="views",
+            default="etools_datamart.api.endpoints",
+            help="",
         )
         parser.add_argument(
-            '--urls', action='store', dest='urls',
-            default='etools_datamart.api.urls',
-            help='',
+            "--urls",
+            action="store",
+            dest="urls",
+            default="etools_datamart.api.urls",
+            help="",
         )
         parser.add_argument(
-            '--admin', action='store', dest='admin',
-            default='etools_datamart.apps.etools.admin',
-            help='',
+            "--admin",
+            action="store",
+            dest="admin",
+            default="etools_datamart.apps.etools.admin",
+            help="",
         )
 
     def handle_label(self, modelname, **options):  # noqa
@@ -81,19 +89,19 @@ class Command(LabelCommand):
             except ImportError:
                 raise BuildException(f"Cannot find model {modelname} into 'etools_datamart.apps.etools.models' package")
 
-            app, *name = re.findall('[A-Z][^A-Z]*', model.__name__)
+            app, *name = re.findall("[A-Z][^A-Z]*", model.__name__)
             app_label = app.lower()
             realname = "".join(name)
 
             try:
                 serializer_package = import_module(f"{options['serializers']}")
-                serializer_module_path = Path(serializer_package.__file__).parent / f'{app_label}.py'.lower()
+                serializer_module_path = Path(serializer_package.__file__).parent / f"{app_label}.py".lower()
             except ImportError:
                 raise BuildException(f"Cannot import {options['serializers']}")
 
             try:
                 view_package = import_module(f"{options['views']}")
-                view_module_path = Path(view_package.__file__).parent / f'{app_label}.py'.lower()
+                view_module_path = Path(view_package.__file__).parent / f"{app_label}.py".lower()
             except ImportError:
                 raise BuildException(f"Cannot import {options['views']}")
 
@@ -123,7 +131,7 @@ class Command(LabelCommand):
         try:
             import_string(f"{options['serializers']}.{app_label}.{realname}Serializer")
         except ImportError:
-            with open(str(serializer_module_path), 'a') as f:
+            with open(str(serializer_module_path), "a") as f:
                 f.write(serializer_code)
 
         with open(serializer_package.__file__, "r") as f:
@@ -143,7 +151,7 @@ class Command(LabelCommand):
         try:
             import_string(f"{options['views']}.{app_label}.{realname}ViewSet")
         except ImportError:
-            with open(str(view_module_path), 'a') as f:
+            with open(str(view_module_path), "a") as f:
                 f.write(viewset_code)
 
         with open(view_package.__file__, "r") as f:

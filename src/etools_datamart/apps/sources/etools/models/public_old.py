@@ -14,11 +14,11 @@ class AccountEmailaddress(models.Model):
     email = models.CharField(unique=True, max_length=254)
     verified = models.BooleanField()
     primary = models.BooleanField()
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='AccountEmailaddress_user')
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="AccountEmailaddress_user")
 
     class Meta:
         managed = False
-        db_table = 'account_emailaddress'
+        db_table = "account_emailaddress"
 
 
 class AccountEmailconfirmation(models.Model):
@@ -26,11 +26,13 @@ class AccountEmailconfirmation(models.Model):
     created = models.DateTimeField()
     sent = models.DateTimeField(blank=True, null=True)
     key = models.CharField(unique=True, max_length=64)
-    email_address = models.ForeignKey(AccountEmailaddress, models.DO_NOTHING, related_name='AccountEmailconfirmation_email_address')
+    email_address = models.ForeignKey(
+        AccountEmailaddress, models.DO_NOTHING, related_name="AccountEmailconfirmation_email_address"
+    )
 
     class Meta:
         managed = False
-        db_table = 'account_emailconfirmation'
+        db_table = "account_emailconfirmation"
 
 
 class AuthGroup(models.Model):
@@ -39,30 +41,30 @@ class AuthGroup(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'auth_group'
+        db_table = "auth_group"
 
 
 class AuthGroupPermissions(models.Model):
     id = models.IntegerField(primary_key=True)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='AuthGroupPermissions_group')
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING, related_name='AuthGroupPermissions_permission')
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name="AuthGroupPermissions_group")
+    permission = models.ForeignKey("AuthPermission", models.DO_NOTHING, related_name="AuthGroupPermissions_permission")
 
     class Meta:
         managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
+        db_table = "auth_group_permissions"
+        unique_together = (("group", "permission"),)
 
 
 class AuthPermission(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='AuthPermission_content_type')
+    content_type = models.ForeignKey("DjangoContentType", models.DO_NOTHING, related_name="AuthPermission_content_type")
     codename = models.CharField(max_length=100)
 
     class Meta:
         managed = False
-        db_table = 'auth_permission'
-        unique_together = (('codename', 'content_type'),)
+        db_table = "auth_permission"
+        unique_together = (("codename", "content_type"),)
 
 
 class AuthUser(models.Model):
@@ -84,29 +86,29 @@ class AuthUser(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'auth_user'
+        db_table = "auth_user"
 
 
 class AuthUserGroups(models.Model):
     id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField()
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='AuthUserGroups_group')
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name="AuthUserGroups_group")
 
     class Meta:
         managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('group', 'user_id'),)
+        db_table = "auth_user_groups"
+        unique_together = (("group", "user_id"),)
 
 
 class AuthUserUserPermissions(models.Model):
     id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='AuthUserUserPermissions_user')
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING, related_name='AuthUserUserPermissions_permission')
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="AuthUserUserPermissions_user")
+    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING, related_name="AuthUserUserPermissions_permission")
 
     class Meta:
         managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('permission', 'user'),)
+        db_table = "auth_user_user_permissions"
+        unique_together = (("permission", "user"),)
 
 
 class AuthtokenToken(models.Model):
@@ -116,7 +118,7 @@ class AuthtokenToken(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'authtoken_token'
+        db_table = "authtoken_token"
 
 
 class CategoriesCategory(models.Model):
@@ -129,19 +131,19 @@ class CategoriesCategory(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'categories_category'
-        unique_together = (('description', 'module'),)
+        db_table = "categories_category"
+        unique_together = (("description", "module"),)
 
 
 class CoreDomain(models.Model):
     id = models.IntegerField(primary_key=True)
     domain = models.CharField(unique=True, max_length=253)
     is_primary = models.BooleanField()
-    tenant = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='CoreDomain_tenant')
+    tenant = models.ForeignKey("UsersCountry", models.DO_NOTHING, related_name="CoreDomain_tenant")
 
     class Meta:
         managed = False
-        db_table = 'core_domain'
+        db_table = "core_domain"
 
 
 class CorsheadersCorsmodel(models.Model):
@@ -150,7 +152,7 @@ class CorsheadersCorsmodel(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'corsheaders_corsmodel'
+        db_table = "corsheaders_corsmodel"
 
 
 class DjangoAdminLog(models.Model):
@@ -160,12 +162,14 @@ class DjangoAdminLog(models.Model):
     object_repr = models.CharField(max_length=200)
     action_flag = models.SmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='DjangoAdminLog_content_type', blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='DjangoAdminLog_user')
+    content_type = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, related_name="DjangoAdminLog_content_type", blank=True, null=True
+    )
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="DjangoAdminLog_user")
 
     class Meta:
         managed = False
-        db_table = 'django_admin_log'
+        db_table = "django_admin_log"
 
 
 class DjangoCeleryBeatClockedschedule(models.Model):
@@ -174,7 +178,7 @@ class DjangoCeleryBeatClockedschedule(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_beat_clockedschedule'
+        db_table = "django_celery_beat_clockedschedule"
 
 
 class DjangoCeleryBeatCrontabschedule(models.Model):
@@ -188,7 +192,7 @@ class DjangoCeleryBeatCrontabschedule(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_beat_crontabschedule'
+        db_table = "django_celery_beat_crontabschedule"
 
 
 class DjangoCeleryBeatIntervalschedule(models.Model):
@@ -198,7 +202,7 @@ class DjangoCeleryBeatIntervalschedule(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_beat_intervalschedule'
+        db_table = "django_celery_beat_intervalschedule"
 
 
 class DjangoCeleryBeatPeriodictask(models.Model):
@@ -216,19 +220,43 @@ class DjangoCeleryBeatPeriodictask(models.Model):
     total_run_count = models.IntegerField()
     date_changed = models.DateTimeField()
     description = models.TextField()
-    crontab = models.ForeignKey(DjangoCeleryBeatCrontabschedule, models.DO_NOTHING, related_name='DjangoCeleryBeatPeriodictask_crontab', blank=True, null=True)
-    interval = models.ForeignKey(DjangoCeleryBeatIntervalschedule, models.DO_NOTHING, related_name='DjangoCeleryBeatPeriodictask_interval', blank=True, null=True)
-    solar = models.ForeignKey('DjangoCeleryBeatSolarschedule', models.DO_NOTHING, related_name='DjangoCeleryBeatPeriodictask_solar', blank=True, null=True)
+    crontab = models.ForeignKey(
+        DjangoCeleryBeatCrontabschedule,
+        models.DO_NOTHING,
+        related_name="DjangoCeleryBeatPeriodictask_crontab",
+        blank=True,
+        null=True,
+    )
+    interval = models.ForeignKey(
+        DjangoCeleryBeatIntervalschedule,
+        models.DO_NOTHING,
+        related_name="DjangoCeleryBeatPeriodictask_interval",
+        blank=True,
+        null=True,
+    )
+    solar = models.ForeignKey(
+        "DjangoCeleryBeatSolarschedule",
+        models.DO_NOTHING,
+        related_name="DjangoCeleryBeatPeriodictask_solar",
+        blank=True,
+        null=True,
+    )
     one_off = models.BooleanField()
     start_time = models.DateTimeField(blank=True, null=True)
     priority = models.IntegerField(blank=True, null=True)
     headers = models.TextField()
-    clocked = models.ForeignKey(DjangoCeleryBeatClockedschedule, models.DO_NOTHING, related_name='DjangoCeleryBeatPeriodictask_clocked', blank=True, null=True)
+    clocked = models.ForeignKey(
+        DjangoCeleryBeatClockedschedule,
+        models.DO_NOTHING,
+        related_name="DjangoCeleryBeatPeriodictask_clocked",
+        blank=True,
+        null=True,
+    )
     expire_seconds = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'django_celery_beat_periodictask'
+        db_table = "django_celery_beat_periodictask"
 
 
 class DjangoCeleryBeatPeriodictasks(models.Model):
@@ -237,7 +265,7 @@ class DjangoCeleryBeatPeriodictasks(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_beat_periodictasks'
+        db_table = "django_celery_beat_periodictasks"
 
 
 class DjangoCeleryBeatSolarschedule(models.Model):
@@ -248,8 +276,8 @@ class DjangoCeleryBeatSolarschedule(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_beat_solarschedule'
-        unique_together = (('event', 'latitude', 'longitude'),)
+        db_table = "django_celery_beat_solarschedule"
+        unique_together = (("event", "latitude", "longitude"),)
 
 
 class DjangoCeleryResultsChordcounter(models.Model):
@@ -260,7 +288,7 @@ class DjangoCeleryResultsChordcounter(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_results_chordcounter'
+        db_table = "django_celery_results_chordcounter"
 
 
 class DjangoCeleryResultsGroupresult(models.Model):
@@ -274,7 +302,7 @@ class DjangoCeleryResultsGroupresult(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_results_groupresult'
+        db_table = "django_celery_results_groupresult"
 
 
 class DjangoCeleryResultsTaskresult(models.Model):
@@ -295,7 +323,7 @@ class DjangoCeleryResultsTaskresult(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_celery_results_taskresult'
+        db_table = "django_celery_results_taskresult"
 
 
 class DjangoContentType(models.Model):
@@ -305,8 +333,8 @@ class DjangoContentType(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
+        db_table = "django_content_type"
+        unique_together = (("app_label", "model"),)
 
 
 class DjangoSession(models.Model):
@@ -316,7 +344,7 @@ class DjangoSession(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_session'
+        db_table = "django_session"
 
 
 class DjangoSite(models.Model):
@@ -326,7 +354,7 @@ class DjangoSite(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_site'
+        db_table = "django_site"
 
 
 class DrfpasswordlessCallbacktoken(models.Model):
@@ -336,12 +364,12 @@ class DrfpasswordlessCallbacktoken(models.Model):
     to_alias = models.CharField(max_length=40)
     to_alias_type = models.CharField(max_length=20)
     key = models.CharField(unique=True, max_length=6)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='DrfpasswordlessCallbacktoken_user')
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="DrfpasswordlessCallbacktoken_user")
 
     class Meta:
         managed = False
-        db_table = 'drfpasswordless_callbacktoken'
-        unique_together = (('is_active', 'key'),)
+        db_table = "drfpasswordless_callbacktoken"
+        unique_together = (("is_active", "key"),)
 
 
 class EasyThumbnailsSource(models.Model):
@@ -352,8 +380,8 @@ class EasyThumbnailsSource(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'easy_thumbnails_source'
-        unique_together = (('name', 'storage_hash'),)
+        db_table = "easy_thumbnails_source"
+        unique_together = (("name", "storage_hash"),)
 
 
 class EasyThumbnailsThumbnail(models.Model):
@@ -361,23 +389,25 @@ class EasyThumbnailsThumbnail(models.Model):
     storage_hash = models.CharField(max_length=40)
     name = models.CharField(max_length=255)
     modified = models.DateTimeField()
-    source = models.ForeignKey(EasyThumbnailsSource, models.DO_NOTHING, related_name='EasyThumbnailsThumbnail_source')
+    source = models.ForeignKey(EasyThumbnailsSource, models.DO_NOTHING, related_name="EasyThumbnailsThumbnail_source")
 
     class Meta:
         managed = False
-        db_table = 'easy_thumbnails_thumbnail'
-        unique_together = (('name', 'source', 'storage_hash'),)
+        db_table = "easy_thumbnails_thumbnail"
+        unique_together = (("name", "source", "storage_hash"),)
 
 
 class EasyThumbnailsThumbnaildimensions(models.Model):
     id = models.IntegerField(primary_key=True)
-    thumbnail = models.OneToOneField(EasyThumbnailsThumbnail, models.DO_NOTHING, related_name='EasyThumbnailsThumbnaildimensions_thumbnail')
+    thumbnail = models.OneToOneField(
+        EasyThumbnailsThumbnail, models.DO_NOTHING, related_name="EasyThumbnailsThumbnaildimensions_thumbnail"
+    )
     width = models.IntegerField(blank=True, null=True)
     height = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'easy_thumbnails_thumbnaildimensions'
+        db_table = "easy_thumbnails_thumbnaildimensions"
 
 
 class EnvironmentTenantflag(models.Model):
@@ -397,40 +427,48 @@ class EnvironmentTenantflag(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'environment_tenantflag'
+        db_table = "environment_tenantflag"
 
 
 class EnvironmentTenantflagCountries(models.Model):
     id = models.IntegerField(primary_key=True)
-    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='EnvironmentTenantflagCountries_tenantflag')
-    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='EnvironmentTenantflagCountries_country')
+    tenantflag = models.ForeignKey(
+        EnvironmentTenantflag, models.DO_NOTHING, related_name="EnvironmentTenantflagCountries_tenantflag"
+    )
+    country = models.ForeignKey(
+        "UsersCountry", models.DO_NOTHING, related_name="EnvironmentTenantflagCountries_country"
+    )
 
     class Meta:
         managed = False
-        db_table = 'environment_tenantflag_countries'
-        unique_together = (('country', 'tenantflag'),)
+        db_table = "environment_tenantflag_countries"
+        unique_together = (("country", "tenantflag"),)
 
 
 class EnvironmentTenantflagGroups(models.Model):
     id = models.IntegerField(primary_key=True)
-    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='EnvironmentTenantflagGroups_tenantflag')
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name='EnvironmentTenantflagGroups_group')
+    tenantflag = models.ForeignKey(
+        EnvironmentTenantflag, models.DO_NOTHING, related_name="EnvironmentTenantflagGroups_tenantflag"
+    )
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name="EnvironmentTenantflagGroups_group")
 
     class Meta:
         managed = False
-        db_table = 'environment_tenantflag_groups'
-        unique_together = (('group', 'tenantflag'),)
+        db_table = "environment_tenantflag_groups"
+        unique_together = (("group", "tenantflag"),)
 
 
 class EnvironmentTenantflagUsers(models.Model):
     id = models.IntegerField(primary_key=True)
-    tenantflag = models.ForeignKey(EnvironmentTenantflag, models.DO_NOTHING, related_name='EnvironmentTenantflagUsers_tenantflag')
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='EnvironmentTenantflagUsers_user')
+    tenantflag = models.ForeignKey(
+        EnvironmentTenantflag, models.DO_NOTHING, related_name="EnvironmentTenantflagUsers_tenantflag"
+    )
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="EnvironmentTenantflagUsers_user")
 
     class Meta:
         managed = False
-        db_table = 'environment_tenantflag_users'
-        unique_together = (('tenantflag', 'user'),)
+        db_table = "environment_tenantflag_users"
+        unique_together = (("tenantflag", "user"),)
 
 
 class EnvironmentTenantswitch(models.Model):
@@ -443,18 +481,22 @@ class EnvironmentTenantswitch(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'environment_tenantswitch'
+        db_table = "environment_tenantswitch"
 
 
 class EnvironmentTenantswitchCountries(models.Model):
     id = models.IntegerField(primary_key=True)
-    tenantswitch = models.ForeignKey(EnvironmentTenantswitch, models.DO_NOTHING, related_name='EnvironmentTenantswitchCountries_tenantswitch')
-    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='EnvironmentTenantswitchCountries_country')
+    tenantswitch = models.ForeignKey(
+        EnvironmentTenantswitch, models.DO_NOTHING, related_name="EnvironmentTenantswitchCountries_tenantswitch"
+    )
+    country = models.ForeignKey(
+        "UsersCountry", models.DO_NOTHING, related_name="EnvironmentTenantswitchCountries_country"
+    )
 
     class Meta:
         managed = False
-        db_table = 'environment_tenantswitch_countries'
-        unique_together = (('country', 'tenantswitch'),)
+        db_table = "environment_tenantswitch_countries"
+        unique_together = (("country", "tenantswitch"),)
 
 
 class GenericLinksGenericlink(models.Model):
@@ -470,7 +512,7 @@ class GenericLinksGenericlink(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'generic_links_genericlink'
+        db_table = "generic_links_genericlink"
 
 
 class NotificationNotification(models.Model):
@@ -481,17 +523,25 @@ class NotificationNotification(models.Model):
     sent_recipients = models.TextField()  # This field type is a guess.
     template_name = models.CharField(max_length=255)
     template_data = models.JSONField(blank=True, null=True)
-    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING, related_name='NotificationNotification_content_type', blank=True, null=True)
+    content_type = models.ForeignKey(
+        DjangoContentType,
+        models.DO_NOTHING,
+        related_name="NotificationNotification_content_type",
+        blank=True,
+        null=True,
+    )
     cc = models.TextField()  # This field type is a guess.
     from_address = models.CharField(max_length=255, blank=True, null=True)
     html_message = models.TextField()
-    sent_email = models.ForeignKey('PostOfficeEmail', models.DO_NOTHING, related_name='NotificationNotification_sent_email', blank=True, null=True)
+    sent_email = models.ForeignKey(
+        "PostOfficeEmail", models.DO_NOTHING, related_name="NotificationNotification_sent_email", blank=True, null=True
+    )
     subject = models.TextField()
     text_message = models.TextField()
 
     class Meta:
         managed = False
-        db_table = 'notification_notification'
+        db_table = "notification_notification"
 
 
 class Permissions2Permission(models.Model):
@@ -503,7 +553,7 @@ class Permissions2Permission(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'permissions2_permission'
+        db_table = "permissions2_permission"
 
 
 class PostOfficeAttachment(models.Model):
@@ -515,18 +565,20 @@ class PostOfficeAttachment(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'post_office_attachment'
+        db_table = "post_office_attachment"
 
 
 class PostOfficeAttachmentEmails(models.Model):
     id = models.IntegerField(primary_key=True)
-    attachment = models.ForeignKey(PostOfficeAttachment, models.DO_NOTHING, related_name='PostOfficeAttachmentEmails_attachment')
-    email = models.ForeignKey('PostOfficeEmail', models.DO_NOTHING, related_name='PostOfficeAttachmentEmails_email')
+    attachment = models.ForeignKey(
+        PostOfficeAttachment, models.DO_NOTHING, related_name="PostOfficeAttachmentEmails_attachment"
+    )
+    email = models.ForeignKey("PostOfficeEmail", models.DO_NOTHING, related_name="PostOfficeAttachmentEmails_email")
 
     class Meta:
         managed = False
-        db_table = 'post_office_attachment_emails'
-        unique_together = (('attachment', 'email'),)
+        db_table = "post_office_attachment_emails"
+        unique_together = (("attachment", "email"),)
 
 
 class PostOfficeEmail(models.Model):
@@ -545,7 +597,9 @@ class PostOfficeEmail(models.Model):
     scheduled_time = models.DateTimeField(blank=True, null=True)
     headers = models.TextField(blank=True, null=True)
     context = models.TextField(blank=True, null=True)
-    template = models.ForeignKey('PostOfficeEmailtemplate', models.DO_NOTHING, related_name='PostOfficeEmail_template', blank=True, null=True)
+    template = models.ForeignKey(
+        "PostOfficeEmailtemplate", models.DO_NOTHING, related_name="PostOfficeEmail_template", blank=True, null=True
+    )
     backend_alias = models.CharField(max_length=64)
     number_of_retries = models.IntegerField(blank=True, null=True)
     expires_at = models.DateTimeField(blank=True, null=True)
@@ -553,7 +607,7 @@ class PostOfficeEmail(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'post_office_email'
+        db_table = "post_office_email"
 
 
 class PostOfficeEmailtemplate(models.Model):
@@ -565,13 +619,15 @@ class PostOfficeEmailtemplate(models.Model):
     html_content = models.TextField()
     created = models.DateTimeField()
     last_updated = models.DateTimeField()
-    default_template = models.ForeignKey('self', models.DO_NOTHING, related_name='PostOfficeEmailtemplate_default_template', blank=True, null=True)
+    default_template = models.ForeignKey(
+        "self", models.DO_NOTHING, related_name="PostOfficeEmailtemplate_default_template", blank=True, null=True
+    )
     language = models.CharField(max_length=12)
 
     class Meta:
         managed = False
-        db_table = 'post_office_emailtemplate'
-        unique_together = (('default_template', 'language', 'name'),)
+        db_table = "post_office_emailtemplate"
+        unique_together = (("default_template", "language", "name"),)
 
 
 class PostOfficeLog(models.Model):
@@ -580,11 +636,11 @@ class PostOfficeLog(models.Model):
     status = models.SmallIntegerField()
     exception_type = models.CharField(max_length=255)
     message = models.TextField()
-    email = models.ForeignKey(PostOfficeEmail, models.DO_NOTHING, related_name='PostOfficeLog_email')
+    email = models.ForeignKey(PostOfficeEmail, models.DO_NOTHING, related_name="PostOfficeLog_email")
 
     class Meta:
         managed = False
-        db_table = 'post_office_log'
+        db_table = "post_office_log"
 
 
 class PublicsAirlinecompany(models.Model):
@@ -598,20 +654,22 @@ class PublicsAirlinecompany(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'publics_airlinecompany'
+        db_table = "publics_airlinecompany"
 
 
 class PublicsBusinessarea(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=32)
-    region = models.ForeignKey('PublicsBusinessregion', models.DO_NOTHING, related_name='PublicsBusinessarea_region')
-    default_currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='PublicsBusinessarea_default_currency', blank=True, null=True)
+    region = models.ForeignKey("PublicsBusinessregion", models.DO_NOTHING, related_name="PublicsBusinessarea_region")
+    default_currency = models.ForeignKey(
+        "PublicsCurrency", models.DO_NOTHING, related_name="PublicsBusinessarea_default_currency", blank=True, null=True
+    )
     deleted_at = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'publics_businessarea'
+        db_table = "publics_businessarea"
 
 
 class PublicsBusinessregion(models.Model):
@@ -622,7 +680,7 @@ class PublicsBusinessregion(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'publics_businessregion'
+        db_table = "publics_businessregion"
 
 
 class PublicsCountry(models.Model):
@@ -634,14 +692,18 @@ class PublicsCountry(models.Model):
     iso_3 = models.CharField(max_length=3)
     valid_from = models.DateField(blank=True, null=True)
     valid_to = models.DateField(blank=True, null=True)
-    business_area = models.ForeignKey(PublicsBusinessarea, models.DO_NOTHING, related_name='PublicsCountry_business_area', blank=True, null=True)
-    currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='PublicsCountry_currency', blank=True, null=True)
+    business_area = models.ForeignKey(
+        PublicsBusinessarea, models.DO_NOTHING, related_name="PublicsCountry_business_area", blank=True, null=True
+    )
+    currency = models.ForeignKey(
+        "PublicsCurrency", models.DO_NOTHING, related_name="PublicsCountry_currency", blank=True, null=True
+    )
     deleted_at = models.DateTimeField()
     dsa_code = models.CharField(max_length=3)
 
     class Meta:
         managed = False
-        db_table = 'publics_country'
+        db_table = "publics_country"
 
 
 class PublicsCurrency(models.Model):
@@ -653,7 +715,7 @@ class PublicsCurrency(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'publics_currency'
+        db_table = "publics_currency"
 
 
 class PublicsDsarate(models.Model):
@@ -666,25 +728,25 @@ class PublicsDsarate(models.Model):
     room_rate = models.DecimalField(max_digits=20, decimal_places=4)
     finalization_date = models.DateField()
     effective_from_date = models.DateField()
-    region = models.ForeignKey('PublicsDsaregion', models.DO_NOTHING, related_name='PublicsDsarate_region')
+    region = models.ForeignKey("PublicsDsaregion", models.DO_NOTHING, related_name="PublicsDsarate_region")
 
     class Meta:
         managed = False
-        db_table = 'publics_dsarate'
-        unique_together = (('effective_to_date', 'region'),)
+        db_table = "publics_dsarate"
+        unique_together = (("effective_to_date", "region"),)
 
 
 class PublicsDsaregion(models.Model):
     id = models.IntegerField(primary_key=True)
     area_name = models.CharField(max_length=120)
     area_code = models.CharField(max_length=3)
-    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name='PublicsDsaregion_country')
+    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name="PublicsDsaregion_country")
     deleted_at = models.DateTimeField()
     user_defined = models.BooleanField()
 
     class Meta:
         managed = False
-        db_table = 'publics_dsaregion'
+        db_table = "publics_dsaregion"
 
 
 class PublicsExchangerate(models.Model):
@@ -692,12 +754,12 @@ class PublicsExchangerate(models.Model):
     valid_from = models.DateField()
     valid_to = models.DateField()
     x_rate = models.DecimalField(max_digits=10, decimal_places=5)
-    currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='PublicsExchangerate_currency')
+    currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name="PublicsExchangerate_currency")
     deleted_at = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'publics_exchangerate'
+        db_table = "publics_exchangerate"
 
 
 class PublicsTravelagent(models.Model):
@@ -705,13 +767,15 @@ class PublicsTravelagent(models.Model):
     name = models.CharField(max_length=128)
     code = models.CharField(max_length=128)
     city = models.CharField(max_length=128)
-    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name='PublicsTravelagent_country')
-    expense_type = models.OneToOneField('PublicsTravelexpensetype', models.DO_NOTHING, related_name='PublicsTravelagent_expense_type')
+    country = models.ForeignKey(PublicsCountry, models.DO_NOTHING, related_name="PublicsTravelagent_country")
+    expense_type = models.OneToOneField(
+        "PublicsTravelexpensetype", models.DO_NOTHING, related_name="PublicsTravelagent_expense_type"
+    )
     deleted_at = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'publics_travelagent'
+        db_table = "publics_travelagent"
 
 
 class PublicsTravelexpensetype(models.Model):
@@ -723,7 +787,7 @@ class PublicsTravelexpensetype(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'publics_travelexpensetype'
+        db_table = "publics_travelexpensetype"
 
 
 class PurchaseOrderAuditorfirm(models.Model):
@@ -746,13 +810,15 @@ class PurchaseOrderAuditorfirm(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'purchase_order_auditorfirm'
+        db_table = "purchase_order_auditorfirm"
 
 
 class PurchaseOrderAuditorstaffmember(models.Model):
     id = models.IntegerField(primary_key=True)
-    auditor_firm = models.ForeignKey(PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name='PurchaseOrderAuditorstaffmember_auditor_firm')
-    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='PurchaseOrderAuditorstaffmember_user')
+    auditor_firm = models.ForeignKey(
+        PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name="PurchaseOrderAuditorstaffmember_auditor_firm"
+    )
+    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name="PurchaseOrderAuditorstaffmember_user")
     hidden = models.BooleanField()
     created = models.DateTimeField()
     history = models.TextField()  # This field type is a guess.
@@ -760,7 +826,7 @@ class PurchaseOrderAuditorstaffmember(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'purchase_order_auditorstaffmember'
+        db_table = "purchase_order_auditorstaffmember"
 
 
 class PurchaseOrderPurchaseorder(models.Model):
@@ -770,22 +836,26 @@ class PurchaseOrderPurchaseorder(models.Model):
     order_number = models.CharField(unique=True, max_length=30, blank=True, null=True)
     contract_start_date = models.DateField(blank=True, null=True)
     contract_end_date = models.DateField(blank=True, null=True)
-    auditor_firm = models.ForeignKey(PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name='PurchaseOrderPurchaseorder_auditor_firm')
+    auditor_firm = models.ForeignKey(
+        PurchaseOrderAuditorfirm, models.DO_NOTHING, related_name="PurchaseOrderPurchaseorder_auditor_firm"
+    )
 
     class Meta:
         managed = False
-        db_table = 'purchase_order_purchaseorder'
+        db_table = "purchase_order_purchaseorder"
 
 
 class PurchaseOrderPurchaseorderitem(models.Model):
     id = models.IntegerField(primary_key=True)
     number = models.IntegerField()
-    purchase_order = models.ForeignKey(PurchaseOrderPurchaseorder, models.DO_NOTHING, related_name='PurchaseOrderPurchaseorderitem_purchase_order')
+    purchase_order = models.ForeignKey(
+        PurchaseOrderPurchaseorder, models.DO_NOTHING, related_name="PurchaseOrderPurchaseorderitem_purchase_order"
+    )
 
     class Meta:
         managed = False
-        db_table = 'purchase_order_purchaseorderitem'
-        unique_together = (('number', 'purchase_order'),)
+        db_table = "purchase_order_purchaseorderitem"
+        unique_together = (("number", "purchase_order"),)
 
 
 class RegistrationRegistrationprofile(models.Model):
@@ -795,7 +865,7 @@ class RegistrationRegistrationprofile(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'registration_registrationprofile'
+        db_table = "registration_registrationprofile"
 
 
 class SocialAuthAssociation(models.Model):
@@ -809,8 +879,8 @@ class SocialAuthAssociation(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'social_auth_association'
-        unique_together = (('handle', 'server_url'),)
+        db_table = "social_auth_association"
+        unique_together = (("handle", "server_url"),)
 
 
 class SocialAuthCode(models.Model):
@@ -822,8 +892,8 @@ class SocialAuthCode(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'social_auth_code'
-        unique_together = (('code', 'email'),)
+        db_table = "social_auth_code"
+        unique_together = (("code", "email"),)
 
 
 class SocialAuthNonce(models.Model):
@@ -834,8 +904,8 @@ class SocialAuthNonce(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'social_auth_nonce'
-        unique_together = (('salt', 'server_url', 'timestamp'),)
+        db_table = "social_auth_nonce"
+        unique_together = (("salt", "server_url", "timestamp"),)
 
 
 class SocialAuthPartial(models.Model):
@@ -848,7 +918,7 @@ class SocialAuthPartial(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'social_auth_partial'
+        db_table = "social_auth_partial"
 
 
 class SocialAuthUsersocialauth(models.Model):
@@ -856,14 +926,14 @@ class SocialAuthUsersocialauth(models.Model):
     provider = models.CharField(max_length=32)
     uid = models.CharField(max_length=255)
     extra_data = models.JSONField()
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='SocialAuthUsersocialauth_user')
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="SocialAuthUsersocialauth_user")
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'social_auth_usersocialauth'
-        unique_together = (('provider', 'uid'),)
+        db_table = "social_auth_usersocialauth"
+        unique_together = (("provider", "uid"),)
 
 
 class SocialaccountSocialaccount(models.Model):
@@ -877,8 +947,8 @@ class SocialaccountSocialaccount(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialaccount'
-        unique_together = (('provider', 'uid'),)
+        db_table = "socialaccount_socialaccount"
+        unique_together = (("provider", "uid"),)
 
 
 class SocialaccountSocialapp(models.Model):
@@ -891,18 +961,20 @@ class SocialaccountSocialapp(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialapp'
+        db_table = "socialaccount_socialapp"
 
 
 class SocialaccountSocialappSites(models.Model):
     id = models.IntegerField(primary_key=True)
-    socialapp = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name='SocialaccountSocialappSites_socialapp')
-    site = models.ForeignKey(DjangoSite, models.DO_NOTHING, related_name='SocialaccountSocialappSites_site')
+    socialapp = models.ForeignKey(
+        SocialaccountSocialapp, models.DO_NOTHING, related_name="SocialaccountSocialappSites_socialapp"
+    )
+    site = models.ForeignKey(DjangoSite, models.DO_NOTHING, related_name="SocialaccountSocialappSites_site")
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialapp_sites'
-        unique_together = (('site', 'socialapp'),)
+        db_table = "socialaccount_socialapp_sites"
+        unique_together = (("site", "socialapp"),)
 
 
 class SocialaccountSocialtoken(models.Model):
@@ -910,13 +982,15 @@ class SocialaccountSocialtoken(models.Model):
     token = models.TextField()
     token_secret = models.TextField()
     expires_at = models.DateTimeField(blank=True, null=True)
-    account = models.ForeignKey(SocialaccountSocialaccount, models.DO_NOTHING, related_name='SocialaccountSocialtoken_account')
-    app = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name='SocialaccountSocialtoken_app')
+    account = models.ForeignKey(
+        SocialaccountSocialaccount, models.DO_NOTHING, related_name="SocialaccountSocialtoken_account"
+    )
+    app = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, related_name="SocialaccountSocialtoken_app")
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialtoken'
-        unique_together = (('account', 'app'),)
+        db_table = "socialaccount_socialtoken"
+        unique_together = (("account", "app"),)
 
 
 class SpatialRefSys(models.Model):
@@ -928,7 +1002,7 @@ class SpatialRefSys(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'spatial_ref_sys'
+        db_table = "spatial_ref_sys"
 
 
 class TpmpartnersTpmpartner(models.Model):
@@ -950,32 +1024,38 @@ class TpmpartnersTpmpartner(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'tpmpartners_tpmpartner'
+        db_table = "tpmpartners_tpmpartner"
 
 
 class TpmpartnersTpmpartnerCountries(models.Model):
     id = models.IntegerField(primary_key=True)
-    tpmpartner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='TpmpartnersTpmpartnerCountries_tpmpartner')
-    country = models.ForeignKey('UsersCountry', models.DO_NOTHING, related_name='TpmpartnersTpmpartnerCountries_country')
+    tpmpartner = models.ForeignKey(
+        TpmpartnersTpmpartner, models.DO_NOTHING, related_name="TpmpartnersTpmpartnerCountries_tpmpartner"
+    )
+    country = models.ForeignKey(
+        "UsersCountry", models.DO_NOTHING, related_name="TpmpartnersTpmpartnerCountries_country"
+    )
 
     class Meta:
         managed = False
-        db_table = 'tpmpartners_tpmpartner_countries'
-        unique_together = (('country', 'tpmpartner'),)
+        db_table = "tpmpartners_tpmpartner_countries"
+        unique_together = (("country", "tpmpartner"),)
 
 
 class TpmpartnersTpmpartnerstaffmember(models.Model):
     id = models.IntegerField(primary_key=True)
     receive_tpm_notifications = models.BooleanField()
-    tpm_partner = models.ForeignKey(TpmpartnersTpmpartner, models.DO_NOTHING, related_name='TpmpartnersTpmpartnerstaffmember_tpm_partner')
-    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name='TpmpartnersTpmpartnerstaffmember_user')
+    tpm_partner = models.ForeignKey(
+        TpmpartnersTpmpartner, models.DO_NOTHING, related_name="TpmpartnersTpmpartnerstaffmember_tpm_partner"
+    )
+    user = models.OneToOneField(AuthUser, models.DO_NOTHING, related_name="TpmpartnersTpmpartnerstaffmember_user")
     created = models.DateTimeField()
     history = models.TextField()  # This field type is a guess.
     modified = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'tpmpartners_tpmpartnerstaffmember'
+        db_table = "tpmpartners_tpmpartnerstaffmember"
 
 
 class UnicefNotificationNotification(models.Model):
@@ -991,12 +1071,24 @@ class UnicefNotificationNotification(models.Model):
     subject = models.TextField()
     text_message = models.TextField()
     html_message = models.TextField()
-    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING, related_name='UnicefNotificationNotification_content_type', blank=True, null=True)
-    sent_email = models.ForeignKey(PostOfficeEmail, models.DO_NOTHING, related_name='UnicefNotificationNotification_sent_email', blank=True, null=True)
+    content_type = models.ForeignKey(
+        DjangoContentType,
+        models.DO_NOTHING,
+        related_name="UnicefNotificationNotification_content_type",
+        blank=True,
+        null=True,
+    )
+    sent_email = models.ForeignKey(
+        PostOfficeEmail,
+        models.DO_NOTHING,
+        related_name="UnicefNotificationNotification_sent_email",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'unicef_notification_notification'
+        db_table = "unicef_notification_notification"
 
 
 class UsersCountry(models.Model):
@@ -1010,46 +1102,58 @@ class UsersCountry(models.Model):
     country_short_code = models.CharField(max_length=10)
     vision_sync_enabled = models.BooleanField()
     vision_last_synced = models.DateTimeField(blank=True, null=True)
-    local_currency = models.ForeignKey(PublicsCurrency, models.DO_NOTHING, related_name='UsersCountry_local_currency', blank=True, null=True)
+    local_currency = models.ForeignKey(
+        PublicsCurrency, models.DO_NOTHING, related_name="UsersCountry_local_currency", blank=True, null=True
+    )
     long_name = models.CharField(max_length=255)
     iso3_code = models.CharField(max_length=10)
     custom_dashboards = models.JSONField()
 
     class Meta:
         managed = False
-        db_table = 'users_country'
+        db_table = "users_country"
 
 
 class UsersCountryOffices(models.Model):
     id = models.IntegerField(primary_key=True)
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersCountryOffices_country')
-    office = models.ForeignKey('UsersOffice', models.DO_NOTHING, related_name='UsersCountryOffices_office')
+    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name="UsersCountryOffices_country")
+    office = models.ForeignKey("UsersOffice", models.DO_NOTHING, related_name="UsersCountryOffices_office")
 
     class Meta:
         managed = False
-        db_table = 'users_country_offices'
-        unique_together = (('country', 'office'),)
+        db_table = "users_country_offices"
+        unique_together = (("country", "office"),)
 
 
 class UsersOffice(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=254)
-    zonal_chief = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='UsersOffice_zonal_chief', blank=True, null=True)
+    zonal_chief = models.ForeignKey(
+        AuthUser, models.DO_NOTHING, related_name="UsersOffice_zonal_chief", blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 'users_office'
+        db_table = "users_office"
 
 
 class UsersUserprofile(models.Model):
     id = models.IntegerField(primary_key=True)
     job_title = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersUserprofile_country', blank=True, null=True)
-    office = models.ForeignKey(UsersOffice, models.DO_NOTHING, related_name='UsersUserprofile_office', blank=True, null=True)
+    country = models.ForeignKey(
+        UsersCountry, models.DO_NOTHING, related_name="UsersUserprofile_country", blank=True, null=True
+    )
+    office = models.ForeignKey(
+        UsersOffice, models.DO_NOTHING, related_name="UsersUserprofile_office", blank=True, null=True
+    )
     user_id = models.IntegerField(unique=True)
-    country_override = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersUserprofile_country_override', blank=True, null=True)
-    field_partner_staff_member = models.IntegerField(db_column='_partner_staff_member', blank=True, null=True)  # Field renamed because it started with '_'.
+    country_override = models.ForeignKey(
+        UsersCountry, models.DO_NOTHING, related_name="UsersUserprofile_country_override", blank=True, null=True
+    )
+    field_partner_staff_member = models.IntegerField(
+        db_column="_partner_staff_member", blank=True, null=True
+    )  # Field renamed because it started with '_'.
     guid = models.CharField(unique=True, max_length=40, blank=True, null=True)
     org_unit_code = models.CharField(max_length=32, blank=True, null=True)
     org_unit_name = models.CharField(max_length=64, blank=True, null=True)
@@ -1057,34 +1161,40 @@ class UsersUserprofile(models.Model):
     post_title = models.CharField(max_length=64, blank=True, null=True)
     staff_id = models.CharField(max_length=32, blank=True, null=True)
     vendor_number = models.CharField(unique=True, max_length=32, blank=True, null=True)
-    oic = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='UsersUserprofile_oic', blank=True, null=True)
-    supervisor = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='UsersUserprofile_supervisor', blank=True, null=True)
+    oic = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="UsersUserprofile_oic", blank=True, null=True)
+    supervisor = models.ForeignKey(
+        AuthUser, models.DO_NOTHING, related_name="UsersUserprofile_supervisor", blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 'users_userprofile'
+        db_table = "users_userprofile"
 
 
 class UsersUserprofileCountriesAvailable(models.Model):
     id = models.IntegerField(primary_key=True)
-    userprofile = models.ForeignKey(UsersUserprofile, models.DO_NOTHING, related_name='UsersUserprofileCountriesAvailable_userprofile')
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='UsersUserprofileCountriesAvailable_country')
+    userprofile = models.ForeignKey(
+        UsersUserprofile, models.DO_NOTHING, related_name="UsersUserprofileCountriesAvailable_userprofile"
+    )
+    country = models.ForeignKey(
+        UsersCountry, models.DO_NOTHING, related_name="UsersUserprofileCountriesAvailable_country"
+    )
 
     class Meta:
         managed = False
-        db_table = 'users_userprofile_countries_available'
-        unique_together = (('country', 'userprofile'),)
+        db_table = "users_userprofile_countries_available"
+        unique_together = (("country", "userprofile"),)
 
 
 class UsersWorkspacecounter(models.Model):
     id = models.IntegerField(primary_key=True)
     travel_reference_number_counter = models.IntegerField()
     travel_invoice_reference_number_counter = models.IntegerField()
-    workspace = models.OneToOneField(UsersCountry, models.DO_NOTHING, related_name='UsersWorkspacecounter_workspace')
+    workspace = models.OneToOneField(UsersCountry, models.DO_NOTHING, related_name="UsersWorkspacecounter_workspace")
 
     class Meta:
         managed = False
-        db_table = 'users_workspacecounter'
+        db_table = "users_workspacecounter"
 
 
 class VisionVisionsynclog(models.Model):
@@ -1095,10 +1205,10 @@ class VisionVisionsynclog(models.Model):
     successful = models.BooleanField()
     exception_message = models.TextField()
     date_processed = models.DateTimeField()
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='VisionVisionsynclog_country')
+    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name="VisionVisionsynclog_country")
     details = models.CharField(max_length=2048)
     business_area_code = models.CharField(max_length=10, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'vision_visionsynclog'
+        db_table = "vision_visionsynclog"

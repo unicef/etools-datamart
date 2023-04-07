@@ -22,18 +22,17 @@ from .creation import DatabaseCreation
 from .introspection import DatabaseSchemaIntrospection
 from .utils import raw_sql, RawSql
 
-EXTRA_SEARCH_PATHS = getattr(settings, 'PG_EXTRA_SEARCH_PATHS', [])
+EXTRA_SEARCH_PATHS = getattr(settings, "PG_EXTRA_SEARCH_PATHS", [])
 
 # from the postgresql doc
-SQL_IDENTIFIER_RE = re.compile(r'^[_a-zA-Z][_a-zA-Z0-9]{,62}$')
-SQL_SCHEMA_NAME_RESERVED_RE = re.compile(r'^pg_', re.IGNORECASE)
+SQL_IDENTIFIER_RE = re.compile(r"^[_a-zA-Z][_a-zA-Z0-9]{,62}$")
+SQL_SCHEMA_NAME_RESERVED_RE = re.compile(r"^pg_", re.IGNORECASE)
 
-dj_logger = logging.getLogger('django.db.backends')
+dj_logger = logging.getLogger("django.db.backends")
 logger = logging.getLogger(__name__)
 
 
 class TenantCursor(CursorWrapper):
-
     def execute(self, sql, params=None):
         if isinstance(sql, RawSql):
             return super().execute(sql, params)
@@ -86,13 +85,14 @@ class TenantDebugCursor(TenantCursor):  # pragma: no cover
             stop = time()
             duration = stop - start
             sql = self.db.ops.last_executed_query(self.cursor, sql, params)
-            self.db.queries_log.append({
-                'sql': sql,
-                'time': "%.3f" % duration,
-            })
+            self.db.queries_log.append(
+                {
+                    "sql": sql,
+                    "time": "%.3f" % duration,
+                }
+            )
             dj_logger.debug(
-                '(%.3f) %s; args=%s', duration, sql, params,
-                extra={'duration': duration, 'sql': sql, 'params': params}
+                "(%.3f) %s; args=%s", duration, sql, params, extra={"duration": duration, "sql": sql, "params": params}
             )
 
     # def executemany(self, sql, param_list):
@@ -120,6 +120,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     """
     Adds the capability to manipulate the search_path using set_tenant and set_schema_name
     """
+
     include_public_schema = True
     creation_class = DatabaseCreation
     introspection_class = DatabaseSchemaIntrospection
@@ -153,7 +154,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
     def get_tenants(self) -> List[UsersCountry]:
         # should be etools.UsersCountry
         model = apps.get_model(settings.TENANT_MODEL)
-        return model.objects.filter(**settings.SCHEMA_FILTER).exclude(**settings.SCHEMA_EXCLUDE).order_by('name')
+        return model.objects.filter(**settings.SCHEMA_FILTER).exclude(**settings.SCHEMA_EXCLUDE).order_by("name")
 
     @cached_property
     def all_schemas(self):
@@ -168,6 +169,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
         Main API method to current database schema,
         but it does not actually modify the db connection.
         """
+
         def _validate(n):
             name = n.lower()
             if name not in self.all_schemas:
@@ -276,7 +278,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
             try:
                 # self.set_search_paths(cursor_for_search_path, *search_paths)
                 logger.debug(f"SET search_path: {search_paths}")
-                cursor.execute(raw_sql('SET search_path = {0}'.format(','.join(search_paths))))
+                cursor.execute(raw_sql("SET search_path = {0}".format(",".join(search_paths))))
             except (django.db.utils.DatabaseError, psycopg2.InternalError):  # pragma: no cover
                 self.search_path_set = False
             else:

@@ -4,12 +4,12 @@ from rest_framework_xml.renderers import XMLRenderer
 
 
 class MSXmlRenderer(XMLRenderer):
-    media_type = 'application/xml'
-    format = 'ms-xml'
+    media_type = "application/xml"
+    format = "ms-xml"
     root_tag_name = "DocumentElement"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        view = renderer_context['view']
+        view = renderer_context["view"]
         self.item_tag_name = view.get_queryset().model._meta.model_name
         return super().render(data, accepted_media_type, renderer_context)
 

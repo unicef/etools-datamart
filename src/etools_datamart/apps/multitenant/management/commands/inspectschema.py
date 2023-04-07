@@ -10,39 +10,50 @@ from django_regex.utils import RegexList
 
 # from etools_datamart import state
 
-IGNORED_TABLES = RegexList([
-    # Both
-    'django_migra.*',
-    'reversion_.*',
-    # Public
-    'filer_.*',
-    'users_equitrackregistration.*',
-    'registration_emailregistrationprofile.*',
-    'waffle_.*',
-    'djcelery_.*',
-    'celery_.*',
-    'snapshotactivity'
-    # Tenant
-])
+IGNORED_TABLES = RegexList(
+    [
+        # Both
+        "django_migra.*",
+        "reversion_.*",
+        # Public
+        "filer_.*",
+        "users_equitrackregistration.*",
+        "registration_emailregistrationprofile.*",
+        "waffle_.*",
+        "djcelery_.*",
+        "celery_.*",
+        "snapshotactivity"
+        # Tenant
+    ]
+)
 
 
 class Command(BaseCommand):
     help = "Introspects the database tables in the given database/schema and outputs a Django model module."
     requires_system_checks = []
-    stealth_options = ('table_name_filter',)
-    db_module = 'etools_datamart.apps.multitenant'
+    stealth_options = ("table_name_filter",)
+    db_module = "etools_datamart.apps.multitenant"
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'table', action='store', nargs='*', type=str,
-            help='Selects what tables or views should be introspected.',
+            "table",
+            action="store",
+            nargs="*",
+            type=str,
+            help="Selects what tables or views should be introspected.",
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            "--database",
+            action="store",
+            dest="database",
+            default=DEFAULT_DB_ALIAS,
             help='Nominates a database to introspect. Defaults to using the "default" database.',
         )
         parser.add_argument(
-            '--schema', action='store', dest='schema', default='public',
+            "--schema",
+            action="store",
+            dest="schema",
+            default="public",
             help='Nominates a schema to introspect. Defaults to using the "public" schema.',
         )
 
@@ -54,12 +65,12 @@ class Command(BaseCommand):
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
     def handle_inspection(self, options):  # noqa
-        connection = connections[options['database']]
-        schema = options['schema']
-        table_name_filter = options.get('table_name_filter')
+        connection = connections[options["database"]]
+        schema = options["schema"]
+        table_name_filter = options.get("table_name_filter")
 
         def table2model(table_name):
-            return re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
+            return re.sub(r"[^a-zA-Z0-9]", "", table_name.title())
 
         def strip_prefix(s):
             return s[1:] if s.startswith("u'") else s
@@ -82,13 +93,13 @@ class Command(BaseCommand):
             )
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
             if schema == "public":
-                basemodel = 'models.Model'
-                yield 'from django.db import models'
+                basemodel = "models.Model"
+                yield "from django.db import models"
             else:
-                basemodel = 'models.TenantModel'
-                yield 'from %s import models' % self.db_module
+                basemodel = "models.TenantModel"
+                yield "from %s import models" % self.db_module
             known_models = []
-            tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
+            tables_to_introspect = options["table"] or connection.introspection.table_names(cursor)
 
             for table_name in tables_to_introspect:
                 if table_name in IGNORED_TABLES:
@@ -108,8 +119,7 @@ class Command(BaseCommand):
                         constraints = {}
                     primary_key_column = connection.introspection.get_primary_key_column(cursor, table_name)
                     unique_columns = [
-                        c['columns'][0] for c in constraints.values()
-                        if c['unique'] and len(c['columns']) == 1
+                        c["columns"][0] for c in constraints.values() if c["unique"] and len(c["columns"]) == 1
                     ]
                     table_description = connection.introspection.get_table_description(cursor, table_name)
                 except BaseException as e:
@@ -117,9 +127,9 @@ class Command(BaseCommand):
                     yield "# The error was: %s" % e
                     continue
 
-                yield ''
-                yield ''
-                yield 'class %s(%s):' % (model_name, basemodel)
+                yield ""
+                yield ""
+                yield "class %s(%s):" % (model_name, basemodel)
 
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
@@ -130,8 +140,7 @@ class Command(BaseCommand):
                     column_name = row[0]
                     is_relation = column_name in relations
 
-                    att_name, params, notes = self.normalize_col_name(
-                        column_name, used_column_names, is_relation)
+                    att_name, params, notes = self.normalize_col_name(column_name, used_column_names, is_relation)
                     extra_params.update(params)
                     comment_notes.extend(notes)
 
@@ -140,24 +149,25 @@ class Command(BaseCommand):
 
                     # Add primary_key and unique, if necessary.
                     if column_name == primary_key_column:
-                        extra_params['primary_key'] = True
+                        extra_params["primary_key"] = True
                     elif column_name in unique_columns:
-                        extra_params['unique'] = True
+                        extra_params["unique"] = True
 
                     if is_relation:
                         rel_to = (
-                            "self" if relations[column_name][1] == table_name
+                            "self"
+                            if relations[column_name][1] == table_name
                             else table2model(relations[column_name][1])
                         )
 
-                        if 'unique' in extra_params:
-                            extra_params.pop('unique')
-                            ftype = 'OneToOneField'
-                        elif 'primary_key' in extra_params:
-                            extra_params.pop('primary_key')
-                            ftype = 'OneToOneField'
+                        if "unique" in extra_params:
+                            extra_params.pop("unique")
+                            ftype = "OneToOneField"
+                        elif "primary_key" in extra_params:
+                            extra_params.pop("primary_key")
+                            ftype = "OneToOneField"
                         else:
-                            ftype = 'ForeignKey'
+                            ftype = "ForeignKey"
 
                         if rel_to in known_models:
                             field_type = f"{ftype}({rel_to}"
@@ -171,15 +181,15 @@ class Command(BaseCommand):
                         extra_params.update(field_params)
                         comment_notes.extend(field_notes)
 
-                        field_type += '('
+                        field_type += "("
 
                     # Don't output 'id = meta.AutoField(primary_key=True)', because
                     # that's assumed if it doesn't exist.
-                    if att_name == 'id' and extra_params == {'primary_key': True}:
-                        if field_type == 'AutoField(':
+                    if att_name == "id" and extra_params == {"primary_key": True}:
+                        if field_type == "AutoField(":
                             continue
-                        elif field_type == 'IntegerField(' and not connection.features.introspected_field_types:
-                            comment_notes.append('AutoField?')
+                        elif field_type == "IntegerField(" and not connection.features.introspected_field_types:
+                            comment_notes.append("AutoField?")
 
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                     # table description.
@@ -187,36 +197,34 @@ class Command(BaseCommand):
                         # if field_type == 'BooleanField(':
                         #     field_type = 'NullBooleanField('
                         # else:
-                        extra_params['blank'] = True
-                        extra_params['null'] = True
+                        extra_params["blank"] = True
+                        extra_params["null"] = True
 
-                    field_desc = '%s = %s%s' % (
+                    field_desc = "%s = %s%s" % (
                         att_name,
                         # Custom fields will have a dotted path
-                        '' if '.' in field_type else 'models.',
+                        "" if "." in field_type else "models.",
                         field_type,
                     )
-                    if field_type.startswith('ForeignKey(') or field_type.startswith('OneToOneField('):
+                    if field_type.startswith("ForeignKey(") or field_type.startswith("OneToOneField("):
                         # _related_name = f'{table2model(relations[column_name][1]).lower()}_{table_name}_{column_name}'
-                        _related_name = f'{model_name}.{att_name}'
+                        _related_name = f"{model_name}.{att_name}"
 
                         # if _related_name in names:
                         #     _related_name = names[_related_name]
                         # else:
-                        _related_name = _related_name.replace('.', '_')
-                        field_desc += ', models.DO_NOTHING'
+                        _related_name = _related_name.replace(".", "_")
+                        field_desc += ", models.DO_NOTHING"
                         field_desc += f", related_name='{_related_name}'"
 
                     if extra_params:
-                        if not field_desc.endswith('('):
-                            field_desc += ', '
-                        field_desc += ', '.join(
-                            '%s=%s' % (k, strip_prefix(repr(v)))
-                            for k, v in extra_params.items())
-                    field_desc += ')'
+                        if not field_desc.endswith("("):
+                            field_desc += ", "
+                        field_desc += ", ".join("%s=%s" % (k, strip_prefix(repr(v))) for k, v in extra_params.items())
+                    field_desc += ")"
                     if comment_notes:
-                        field_desc += '  # ' + ' '.join(comment_notes)
-                    yield '    %s' % field_desc
+                        field_desc += "  # " + " ".join(comment_notes)
+                    yield "    %s" % field_desc
                 for meta_line in self.get_meta(table_name, constraints, column_to_field_name):
                     yield meta_line
 
@@ -229,50 +237,50 @@ class Command(BaseCommand):
 
         new_name = col_name.lower()
         if new_name != col_name:
-            field_notes.append('Field name made lowercase.')
+            field_notes.append("Field name made lowercase.")
 
         if is_relation:
-            if new_name.endswith('_id'):
+            if new_name.endswith("_id"):
                 new_name = new_name[:-3]
             else:
-                field_params['db_column'] = col_name
+                field_params["db_column"] = col_name
 
-        new_name, num_repl = re.subn(r'\W', '_', new_name)
+        new_name, num_repl = re.subn(r"\W", "_", new_name)
         if num_repl > 0:
-            field_notes.append('Field renamed to remove unsuitable characters.')
+            field_notes.append("Field renamed to remove unsuitable characters.")
 
         if new_name.find(LOOKUP_SEP) >= 0:
             while new_name.find(LOOKUP_SEP) >= 0:
-                new_name = new_name.replace(LOOKUP_SEP, '_')
+                new_name = new_name.replace(LOOKUP_SEP, "_")
             if col_name.lower().find(LOOKUP_SEP) >= 0:
                 # Only add the comment if the double underscore was in the original name
                 field_notes.append("Field renamed because it contained more than one '_' in a row.")
 
-        if new_name.startswith('_'):
-            new_name = 'field%s' % new_name
+        if new_name.startswith("_"):
+            new_name = "field%s" % new_name
             field_notes.append("Field renamed because it started with '_'.")
 
-        if new_name.endswith('_'):
-            new_name = '%sfield' % new_name
+        if new_name.endswith("_"):
+            new_name = "%sfield" % new_name
             field_notes.append("Field renamed because it ended with '_'.")
 
         if keyword.iskeyword(new_name):
-            new_name += '_field'
-            field_notes.append('Field renamed because it was a Python reserved word.')
+            new_name += "_field"
+            field_notes.append("Field renamed because it was a Python reserved word.")
 
         if new_name[0].isdigit():
-            new_name = 'number_%s' % new_name
+            new_name = "number_%s" % new_name
             field_notes.append("Field renamed because it wasn't a valid Python identifier.")
 
         if new_name in used_column_names:
             num = 0
-            while '%s_%d' % (new_name, num) in used_column_names:
+            while "%s_%d" % (new_name, num) in used_column_names:
                 num += 1
-            new_name = '%s_%d' % (new_name, num)
-            field_notes.append('Field renamed because of name conflict.')
+            new_name = "%s_%d" % (new_name, num)
+            field_notes.append("Field renamed because of name conflict.")
 
         if col_name != new_name and field_notes:
-            field_params['db_column'] = col_name
+            field_params["db_column"] = col_name
 
         return new_name, field_params, field_notes
 
@@ -288,8 +296,8 @@ class Command(BaseCommand):
         try:
             field_type = connection.introspection.get_field_type(row[1], row)
         except KeyError:
-            field_type = 'TextField'
-            field_notes.append('This field type is a guess.')
+            field_type = "TextField"
+            field_notes.append("This field type is a guess.")
 
         # This is a hook for data_types_reverse to return a tuple of
         # (field_type, field_params_dict).
@@ -298,19 +306,20 @@ class Command(BaseCommand):
             field_params.update(new_params)
 
         # Add max_length for all CharFields.
-        if field_type == 'CharField' and row[3]:
-            field_params['max_length'] = int(row[3])
+        if field_type == "CharField" and row[3]:
+            field_params["max_length"] = int(row[3])
 
-        if field_type == 'DecimalField':
+        if field_type == "DecimalField":
             if row[4] is None or row[5] is None:
                 field_notes.append(
-                    'max_digits and decimal_places have been guessed, as this '
-                    'database handles decimal fields as float')
-                field_params['max_digits'] = row[4] if row[4] is not None else 10
-                field_params['decimal_places'] = row[5] if row[5] is not None else 5
+                    "max_digits and decimal_places have been guessed, as this "
+                    "database handles decimal fields as float"
+                )
+                field_params["max_digits"] = row[4] if row[4] is not None else 10
+                field_params["decimal_places"] = row[5] if row[5] is not None else 5
             else:
-                field_params['max_digits'] = row[4]
-                field_params['decimal_places'] = row[5]
+                field_params["max_digits"] = row[4]
+                field_params["decimal_places"] = row[5]
 
         return field_type, field_params, field_notes
 
@@ -322,23 +331,23 @@ class Command(BaseCommand):
         """
         unique_together = set()
         for index, params in constraints.items():
-            if params['unique']:
-                columns = params['columns']
+            if params["unique"]:
+                columns = params["columns"]
                 if len(columns) > 1:
                     cols = set(columns)
                     # we do not want to include the u"" or u'' prefix
                     # so we build the string rather than interpolate the tuple
                     fields = [column_to_field_name[c] for c in cols if len(cols) > 1]
                     if fields:
-                        tup = '(' + ', '.join(
-                            sorted(["'%s'" % column_to_field_name[c] for c in cols if len(cols) > 1])) + ')'
+                        tup = (
+                            "("
+                            + ", ".join(sorted(["'%s'" % column_to_field_name[c] for c in cols if len(cols) > 1]))
+                            + ")"
+                        )
                         unique_together.add(tup)
-        meta = ["",
-                "    class Meta:",
-                "        managed = False",
-                "        db_table = '%s'" % table_name]
+        meta = ["", "    class Meta:", "        managed = False", "        db_table = '%s'" % table_name]
 
         if unique_together:
-            tup = '(' + ', '.join(sorted(unique_together)) + ',)'
+            tup = "(" + ", ".join(sorted(unique_together)) + ",)"
             meta += ["        unique_together = %s" % tup]
         return meta

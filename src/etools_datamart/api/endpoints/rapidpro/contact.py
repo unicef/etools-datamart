@@ -14,14 +14,14 @@ class ContactSerializer(DataMartSerializer):
 
 
 class ContactFilterForm(forms.Form):
-    organization = DateRangePickerField(label='Created between', required=False)
+    organization = DateRangePickerField(label="Created between", required=False)
 
 
 class ContactViewSet(RapidProViewSet):
     serializer_class = ContactSerializer
     queryset = models.Contact.objects.all()
-    filter_fields = ('organization', )
-    serializers_fieldsets = {'std': ContactSerializer}
+    filter_fields = ("organization",)
+    serializers_fieldsets = {"std": ContactSerializer}
     querystringfilter_form_base_class = ContactFilterForm
 
     def get_serializer(self, *args, **kwargs):

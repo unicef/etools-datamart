@@ -5,7 +5,7 @@ import pytest
 
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema
 
-conn = connections['etools']
+conn = connections["etools"]
 
 
 @pytest.fixture()
@@ -30,28 +30,30 @@ def test_query_param(django_app, admin_user, url):
     url = f"{url}?country_name=bolivia,lebanon"
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200
-    assert conn.schemas == ['bolivia', 'lebanon']
+    assert conn.schemas == ["bolivia", "lebanon"]
 
 
 def test_select_schema_tenant(django_app, admin_user):
     _from = reverse("admin:etools_partnerspartnerorganization_changelist")
     url = f"{reverse('select-schema')}?from={_from}"
     res = django_app.get(url, user=admin_user)
-    res.form['bolivia'] = True
+    res.form["bolivia"] = True
     res = res.form.submit().follow()
     assert res.status_code == 200
-    qs = res.context['cl'].queryset
+    qs = res.context["cl"].queryset
     assert {e.schema for e in qs.all()} == {"bolivia"}
-    assert conn.schemas == ['bolivia', ]
+    assert conn.schemas == [
+        "bolivia",
+    ]
 
 
 def test_select_schema_all_tenant(django_app, admin_user):
     _from = reverse("admin:etools_partnerspartnerorganization_changelist")
     url = f"{reverse('select-schema')}?from={_from}"
     res = django_app.get(url, user=admin_user)
-    res.form['bolivia'] = True
-    res.form['lebanon'] = True
-    res.form['chad'] = True
+    res.form["bolivia"] = True
+    res.form["lebanon"] = True
+    res.form["chad"] = True
     res = res.form.submit()
     assert res["Location"] == _from
     res = res.follow()
@@ -62,7 +64,7 @@ def test_select_schema_data(django_app, admin_user):
     _from = reverse("admin:data_intervention_changelist")
     url = f"{reverse('select-schema')}?from={_from}"
     res = django_app.get(url, user=admin_user)
-    res.form['bolivia'] = True
+    res.form["bolivia"] = True
     res = res.form.submit().follow()
     assert res.status_code == 200
 

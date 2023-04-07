@@ -18,8 +18,7 @@ class user_allow_country(ContextDecorator):  # noqa
     def __enter__(self):
         self.group = GroupFactory()
         self.group.user_set.add(self.user)
-        self.rule = SchemaAccessControl.objects.get_or_create(group=self.group,
-                                                              schemas=self.areas)[0]
+        self.rule = SchemaAccessControl.objects.get_or_create(group=self.group, schemas=self.areas)[0]
 
     def __exit__(self, e_typ, e_val, trcbak):
         self.group.delete()
@@ -47,10 +46,9 @@ class user_allow_service(ContextDecorator):  # noqa
 
     def __enter__(self):
         for service in self.services:
-            rule = UserAccessControl.objects.get_or_create(user=self.user,
-                                                           service=service,
-                                                           policy=UserAccessControl.POLICY_ALLOW
-                                                           )[0]
+            rule = UserAccessControl.objects.get_or_create(
+                user=self.user, service=service, policy=UserAccessControl.POLICY_ALLOW
+            )[0]
             self.rules.append(rule.pk)
 
     def __exit__(self, e_typ, e_val, trcbak):

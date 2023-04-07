@@ -52,14 +52,17 @@ class TravelTrip(EtoolsDataMartModel):
     loader = EtoolsLoader()
 
     class Meta:
-        unique_together = ('schema_name', 'reference_number')
+        unique_together = ("schema_name", "reference_number")
 
     class Options:
         source = TravelTrip
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          reference_number=record.reference_number)
+        key = lambda loader, record: dict(
+            schema_name=loader.context["country"].schema_name, reference_number=record.reference_number
+        )
 
-        mapping = dict(office_name='office.name',
-                       section_name='section.name',
-                       supervisor_email='supervisor.email',
-                       traveler_email='traveler.email')
+        mapping = dict(
+            office_name="office.name",
+            section_name="section.name",
+            supervisor_email="supervisor.email",
+            traveler_email="traveler.email",
+        )

@@ -29,8 +29,7 @@ fields.XLSXListField.prep_value = patched_prep_value
 
 
 class XLSXRenderer(ContentDispositionMixin, _XLSXRenderer):
-
-    def _flatten(self, data, parent_key='', key_sep='.', list_sep=', '):
+    def _flatten(self, data, parent_key="", key_sep=".", list_sep=", "):
         items = []
         for k, v in data.items():
             new_key = f"{parent_key}{key_sep}{k}" if parent_key else k
@@ -44,7 +43,7 @@ class XLSXRenderer(ContentDispositionMixin, _XLSXRenderer):
                     if isinstance(item, dict):
                         vv.append("\n".join([f"{ki}: {vi}" for ki, vi in item.items() if vi]))
                     elif isinstance(item, list):
-                        vv.append(': '.join(item))
+                        vv.append(": ".join(item))
                     else:
                         vv.append(item)
                 items.append((new_key, list_sep.join(vv)))
@@ -53,7 +52,7 @@ class XLSXRenderer(ContentDispositionMixin, _XLSXRenderer):
         return dict(items)
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        response = renderer_context['response']
+        response = renderer_context["response"]
         self.process_response(renderer_context)
         if response.status_code == 200 and data:
             try:
@@ -61,6 +60,6 @@ class XLSXRenderer(ContentDispositionMixin, _XLSXRenderer):
 
             except Exception as e:
                 logger.exception(e)
-                raise Exception(f'Error processing request {e}') from e
+                raise Exception(f"Error processing request {e}") from e
         else:
-            return ''
+            return ""

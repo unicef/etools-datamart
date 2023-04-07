@@ -7,25 +7,24 @@ import six
 
 logger = logging.getLogger(__name__)
 
-OBFUSCATE = ['password', 'pwd', 'token']
-PREFIX = 'md5$'
-GLOBAL_CREDENTIALS = os.environ.get('GLOBAL_CREDENTIALS',
-                                    os.path.expanduser('~/.credentials.json'))
+OBFUSCATE = ["password", "pwd", "token"]
+PREFIX = "md5$"
+GLOBAL_CREDENTIALS = os.environ.get("GLOBAL_CREDENTIALS", os.path.expanduser("~/.credentials.json"))
 
-RESERVED = ['global', ]
+RESERVED = [
+    "global",
+]
 
 
 def encrypt(plain):
-    return '{}{}'.format(PREFIX, base64.b64encode(six.b(plain)).decode('ascii'))
+    return "{}{}".format(PREFIX, base64.b64encode(six.b(plain)).decode("ascii"))
 
 
 def decrypt(encoded):
-    return base64.b64decode(encoded[len(PREFIX):]).decode('utf-8')
+    return base64.b64decode(encoded[len(PREFIX) :]).decode("utf-8")
 
 
-CRYPTO = {
-    'md5': (encrypt, decrypt)
-}
+CRYPTO = {"md5": (encrypt, decrypt)}
 
 
 def is_encrypted(value):
@@ -33,19 +32,16 @@ def is_encrypted(value):
 
 
 class DictWrapper(dict):
-
     def __init__(self, *args, **kwargs) -> None:
-        self.__dict__['_silent'] = kwargs.pop('__silent')
-        self.__dict__['_decrypter'] = kwargs.pop('__decrypter')
+        self.__dict__["_silent"] = kwargs.pop("__silent")
+        self.__dict__["_decrypter"] = kwargs.pop("__decrypter")
         super().__init__(*args, **kwargs)
 
     def __getattr__(self, item):
         try:
             v = self[item]
             if isinstance(v, dict):
-                return DictWrapper(v,
-                                   __decrypter=self._decrypter,
-                                   __silent=self._silent)
+                return DictWrapper(v, __decrypter=self._decrypter, __silent=self._silent)
             elif isinstance(v, six.string_types) and is_encrypted(v):
                 return self._decrypter(v)
             else:
@@ -57,28 +53,22 @@ class DictWrapper(dict):
 
 
 class Wallet(object):
-    def __init__(self, filename, silent=False, obfuscate=True, crypter='md5'):
+    def __init__(self, filename, silent=False, obfuscate=True, crypter="md5"):
         self._filename = os.path.abspath(filename)
         self._silent = silent
         self._obfuscate = obfuscate
         self._crypter, self._decrypter = CRYPTO[crypter]
-        self.__credentials = DictWrapper({},
-                                         __decrypter=self._decrypter,
-                                         __silent=self._silent)
+        self.__credentials = DictWrapper({}, __decrypter=self._decrypter, __silent=self._silent)
 
         if os.path.exists(GLOBAL_CREDENTIALS):
             self._load(GLOBAL_CREDENTIALS)
         self._load(self._filename)
 
     def _load(self, filename):
-        over = DictWrapper(json.load(open(str(filename))),
-                           __decrypter=self._decrypter,
-                           __silent=self._silent)
+        over = DictWrapper(json.load(open(str(filename))), __decrypter=self._decrypter, __silent=self._silent)
         data = self.__credentials.copy()
         data.update(over)
-        self.__credentials = DictWrapper(data,
-                                         __decrypter=self._decrypter,
-                                         __silent=self._silent)
+        self.__credentials = DictWrapper(data, __decrypter=self._decrypter, __silent=self._silent)
 
         if self._obfuscate:
             self._process(self._crypter, is_encrypted)
@@ -92,7 +82,7 @@ class Wallet(object):
                     d[key] = func(value)
 
         recurse(self.__credentials)
-        json.dump(self.__credentials, open(self._filename, 'w'), indent=2)
+        json.dump(self.__credentials, open(self._filename, "w"), indent=2)
 
     # def encrypt(self):
     #     self._process(encrypt, is_encrypted)
@@ -101,10 +91,10 @@ class Wallet(object):
         try:
             return getattr(self.__credentials, item)
         except (AttributeError, KeyError):
-            raise AttributeError(f'Wallet does not have an entry for {item}')
+            raise AttributeError(f"Wallet does not have an entry for {item}")
 
     def __getitem__(self, item):
         try:
             return self.__credentials[item]
         except (AttributeError, KeyError):
-            raise AttributeError(f'Wallet does not have an entry for {item}')
+            raise AttributeError(f"Wallet does not have an entry for {item}")

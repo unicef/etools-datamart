@@ -10,7 +10,6 @@ class PartnerSerializerFull(DataMartSerializer):
 
 
 class PartnerHactViewSet(common.DataMartViewSet):
-
     serializer_class = PartnerSerializerFull
     queryset = models.PartnerHact.objects.all()
     ordering_fields = ("id", "name")
