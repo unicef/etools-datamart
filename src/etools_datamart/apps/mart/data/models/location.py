@@ -14,20 +14,26 @@ from ..loader import EtoolsLoader
 
 class LocationQuerySet(DataMartQuerySet):
     def batch_update_centroid(self):
-        sql = '''UPDATE "{0}" SET point = ST_Centroid(geom::geometry),
+        sql = """UPDATE "{0}" SET point = ST_Centroid(geom::geometry),
 latitude = ST_Y(ST_Centroid(geom::geometry)),
 longitude = ST_X(ST_Centroid(geom::geometry))
 WHERE point IS NULL AND geom IS NOT NULL;
 UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
-'''.format(self.model._meta.db_table)
+""".format(
+            self.model._meta.db_table
+        )
         with connection.cursor() as cursor:
             cursor.execute(sql)
 
         # need to update geoname
-        for record in super().filter(
+        for record in (
+            super()
+            .filter(
                 latitude__isnull=False,
                 longitude__isnull=False,
-        ).all():
+            )
+            .all()
+        ):
             geoname, __ = GeoName.objects.get_or_create(
                 lat=record.latitude,
                 lng=record.longitude,
@@ -38,7 +44,7 @@ UPDATE "{0}" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
 
     def update_centroid(self):
         clone = self._chain()
-        for each in clone.annotate(cent=Centroid('geom')):
+        for each in clone.annotate(cent=Centroid("geom")):
             each.point = each.cent
             each.latitude = each.point.y
             each.longitude = each.point.x
@@ -54,7 +60,6 @@ class LocationManager(DataMartManager.from_queryset(LocationQuerySet)):
 
 
 class LocationLoader(EtoolsLoader):
-
     def load(self, **kwargs):
         try:
             return super().load(**kwargs)
@@ -75,7 +80,7 @@ class Location(EtoolsDataMartModel):
     geoname = models.ForeignKey("GeoName", models.DO_NOTHING, blank=True, null=True)
     level = models.IntegerField(db_index=True)
     lft = models.IntegerField()
-    parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
+    parent = models.ForeignKey("self", models.DO_NOTHING, blank=True, null=True)
     rght = models.IntegerField()
     tree_id = models.IntegerField()
     created = models.DateTimeField()
@@ -86,18 +91,18 @@ class Location(EtoolsDataMartModel):
     loader = LocationLoader()
 
     class Meta:
-        unique_together = ('schema_name', 'source_id')
+        unique_together = ("schema_name", "source_id")
         ordering = ("name",)
 
     class Options:
         source = LocationsLocation
-        queryset = lambda: LocationsLocation.objects.order_by('-parent')
-        last_modify_field = 'modified'
-        exclude_from_compare = ['latitude', 'longitude', 'point', 'geoname']
+        queryset = lambda: LocationsLocation.objects.order_by("-parent")
+        last_modify_field = "modified"
+        exclude_from_compare = ["latitude", "longitude", "point", "geoname"]
         # sync_deleted_records = False
         mapping = {
-            'source_id': 'id',
-            'parent': '__self__',
+            "source_id": "id",
+            "parent": "__self__",
         }
 
     def __str__(self):
@@ -122,7 +127,7 @@ class GeoName(models.Model):
     distance = models.FloatField(null=True)
 
     class Meta:
-        unique_together = ('lat', 'lng')
+        unique_together = ("lat", "lng")
 
     def __str__(self):
         return f"{self.name} ({self.lat}, {self.lng})"

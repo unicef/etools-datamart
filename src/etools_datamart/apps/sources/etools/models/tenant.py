@@ -17,50 +17,108 @@ class ActionPointsActionpoint(models.TenantModel):
     description = models.TextField()
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateTimeField(blank=True, null=True)
-    assigned_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='ActionPointsActionpoint_assigned_by')
-    assigned_to = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='ActionPointsActionpoint_assigned_to')
-    author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='ActionPointsActionpoint_author')
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='ActionPointsActionpoint_cp_output', blank=True, null=True)
-    engagement = models.ForeignKey('AuditEngagement', models.DO_NOTHING, related_name='ActionPointsActionpoint_engagement', blank=True, null=True)
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='ActionPointsActionpoint_intervention', blank=True, null=True)
-    location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='ActionPointsActionpoint_location', blank=True, null=True)
-    office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='ActionPointsActionpoint_office', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='ActionPointsActionpoint_partner', blank=True, null=True)
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ActionPointsActionpoint_section', blank=True, null=True)
-    tpm_activity = models.ForeignKey('TpmTpmactivity', models.DO_NOTHING, related_name='ActionPointsActionpoint_tpm_activity', blank=True, null=True)
+    assigned_by = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="ActionPointsActionpoint_assigned_by")
+    assigned_to = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="ActionPointsActionpoint_assigned_to")
+    author = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="ActionPointsActionpoint_author")
+    cp_output = models.ForeignKey(
+        "ReportsResult", models.DO_NOTHING, related_name="ActionPointsActionpoint_cp_output", blank=True, null=True
+    )
+    engagement = models.ForeignKey(
+        "AuditEngagement", models.DO_NOTHING, related_name="ActionPointsActionpoint_engagement", blank=True, null=True
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention",
+        models.DO_NOTHING,
+        related_name="ActionPointsActionpoint_intervention",
+        blank=True,
+        null=True,
+    )
+    location = models.ForeignKey(
+        "LocationsLocation", models.DO_NOTHING, related_name="ActionPointsActionpoint_location", blank=True, null=True
+    )
+    office = models.ForeignKey(
+        "ReportsOffice", models.DO_NOTHING, related_name="ActionPointsActionpoint_office", blank=True, null=True
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="ActionPointsActionpoint_partner",
+        blank=True,
+        null=True,
+    )
+    section = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="ActionPointsActionpoint_section", blank=True, null=True
+    )
+    tpm_activity = models.ForeignKey(
+        "TpmTpmactivity", models.DO_NOTHING, related_name="ActionPointsActionpoint_tpm_activity", blank=True, null=True
+    )
     high_priority = models.BooleanField()
-    travel_activity = models.ForeignKey('T2FTravelactivity', models.DO_NOTHING, related_name='ActionPointsActionpoint_travel_activity', blank=True, null=True)
-    category = models.ForeignKey('CategoriesCategory', models.DO_NOTHING, related_name='ActionPointsActionpoint_category', blank=True, null=True)
-    psea_assessment = models.ForeignKey('PseaAssessment', models.DO_NOTHING, related_name='ActionPointsActionpoint_psea_assessment', blank=True, null=True)
+    travel_activity = models.ForeignKey(
+        "T2FTravelactivity",
+        models.DO_NOTHING,
+        related_name="ActionPointsActionpoint_travel_activity",
+        blank=True,
+        null=True,
+    )
+    category = models.ForeignKey(
+        "CategoriesCategory", models.DO_NOTHING, related_name="ActionPointsActionpoint_category", blank=True, null=True
+    )
+    psea_assessment = models.ForeignKey(
+        "PseaAssessment",
+        models.DO_NOTHING,
+        related_name="ActionPointsActionpoint_psea_assessment",
+        blank=True,
+        null=True,
+    )
     reference_number = models.CharField(max_length=100, blank=True, null=True)
-    monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='ActionPointsActionpoint_monitoring_activity', blank=True, null=True)
+    monitoring_activity = models.ForeignKey(
+        "FieldMonitoringPlanningMonitoringactivity",
+        models.DO_NOTHING,
+        related_name="ActionPointsActionpoint_monitoring_activity",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'action_points_actionpoint'
+        db_table = "action_points_actionpoint"
 
 
 class ActivitiesActivity(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     date = models.DateField(blank=True, null=True)
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='ActivitiesActivity_cp_output', blank=True, null=True)
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='ActivitiesActivity_intervention', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='ActivitiesActivity_partner', blank=True, null=True)
+    cp_output = models.ForeignKey(
+        "ReportsResult", models.DO_NOTHING, related_name="ActivitiesActivity_cp_output", blank=True, null=True
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention", models.DO_NOTHING, related_name="ActivitiesActivity_intervention", blank=True, null=True
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="ActivitiesActivity_partner",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'activities_activity'
+        db_table = "activities_activity"
 
 
 class ActivitiesActivityLocations(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    activity = models.ForeignKey(ActivitiesActivity, models.DO_NOTHING, related_name='ActivitiesActivityLocations_activity')
-    location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='ActivitiesActivityLocations_location')
+    activity = models.ForeignKey(
+        ActivitiesActivity, models.DO_NOTHING, related_name="ActivitiesActivityLocations_activity"
+    )
+    location = models.ForeignKey(
+        "LocationsLocation", models.DO_NOTHING, related_name="ActivitiesActivityLocations_location"
+    )
 
     class Meta:
         managed = False
-        db_table = 'activities_activity_locations'
-        unique_together = (('activity', 'location'),)
+        db_table = "activities_activity_locations"
+        unique_together = (("activity", "location"),)
 
 
 class ActstreamAction(models.TenantModel):
@@ -73,13 +131,27 @@ class ActstreamAction(models.TenantModel):
     timestamp = models.DateTimeField()
     public = models.BooleanField()
     data = models.TextField(blank=True, null=True)
-    action_object_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='ActstreamAction_action_object_content_type', blank=True, null=True)
-    actor_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='ActstreamAction_actor_content_type')
-    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='ActstreamAction_target_content_type', blank=True, null=True)
+    action_object_content_type = models.ForeignKey(
+        "DjangoContentType",
+        models.DO_NOTHING,
+        related_name="ActstreamAction_action_object_content_type",
+        blank=True,
+        null=True,
+    )
+    actor_content_type = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, related_name="ActstreamAction_actor_content_type"
+    )
+    target_content_type = models.ForeignKey(
+        "DjangoContentType",
+        models.DO_NOTHING,
+        related_name="ActstreamAction_target_content_type",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'actstream_action'
+        db_table = "actstream_action"
 
 
 class ActstreamFollow(models.TenantModel):
@@ -87,13 +159,15 @@ class ActstreamFollow(models.TenantModel):
     object_id = models.CharField(max_length=255)
     actor_only = models.BooleanField()
     started = models.DateTimeField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='ActstreamFollow_content_type')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='ActstreamFollow_user')
+    content_type = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, related_name="ActstreamFollow_content_type"
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="ActstreamFollow_user")
 
     class Meta:
         managed = False
-        db_table = 'actstream_follow'
-        unique_together = (('content_type', 'object_id', 'user'),)
+        db_table = "actstream_follow"
+        unique_together = (("content_type", "object_id", "user"),)
 
 
 class AttachmentsAttachmentflat(models.TenantModel):
@@ -105,7 +179,9 @@ class AttachmentsAttachmentflat(models.TenantModel):
     file_type = models.CharField(max_length=100)
     file_link = models.CharField(max_length=1024)
     uploaded_by = models.CharField(max_length=255)
-    attachment = models.ForeignKey('UnicefAttachmentsAttachment', models.DO_NOTHING, related_name='AttachmentsAttachmentflat_attachment')
+    attachment = models.ForeignKey(
+        "UnicefAttachmentsAttachment", models.DO_NOTHING, related_name="AttachmentsAttachmentflat_attachment"
+    )
     filename = models.CharField(max_length=1024)
     agreement_reference_number = models.CharField(max_length=100)
     object_link = models.CharField(max_length=200)
@@ -116,11 +192,13 @@ class AttachmentsAttachmentflat(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'attachments_attachmentflat'
+        db_table = "attachments_attachmentflat"
 
 
 class AuditAudit(models.TenantModel):
-    engagement_ptr = models.OneToOneField('AuditEngagement', models.DO_NOTHING, related_name='AuditAudit_engagement_ptr')
+    engagement_ptr = models.OneToOneField(
+        "AuditEngagement", models.DO_NOTHING, related_name="AuditAudit_engagement_ptr"
+    )
     audited_expenditure = models.DecimalField(max_digits=20, decimal_places=2)
     financial_findings = models.DecimalField(max_digits=20, decimal_places=2)
     audit_opinion = models.CharField(max_length=20)
@@ -129,18 +207,20 @@ class AuditAudit(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'audit_audit'
+        db_table = "audit_audit"
 
 
 class AuditDetailedfindinginfo(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     finding = models.TextField()
     recommendation = models.TextField()
-    micro_assesment = models.ForeignKey('AuditMicroassessment', models.DO_NOTHING, related_name='AuditDetailedfindinginfo_micro_assesment')
+    micro_assesment = models.ForeignKey(
+        "AuditMicroassessment", models.DO_NOTHING, related_name="AuditDetailedfindinginfo_micro_assesment"
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_detailedfindinginfo'
+        db_table = "audit_detailedfindinginfo"
 
 
 class AuditEngagement(models.TenantModel):
@@ -167,10 +247,20 @@ class AuditEngagement(models.TenantModel):
     write_off_required = models.DecimalField(max_digits=20, decimal_places=2)
     cancel_comment = models.TextField()
     explanation_for_additional_information = models.TextField()
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='AuditEngagement_partner')
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization", models.DO_NOTHING, related_name="AuditEngagement_partner"
+    )
     joint_audit = models.BooleanField()
-    agreement = models.ForeignKey('PurchaseOrderPurchaseorder', models.DO_NOTHING, related_name='AuditEngagement_agreement')
-    po_item = models.ForeignKey('PurchaseOrderPurchaseorderitem', models.DO_NOTHING, related_name='AuditEngagement_po_item', blank=True, null=True)
+    agreement = models.ForeignKey(
+        "PurchaseOrderPurchaseorder", models.DO_NOTHING, related_name="AuditEngagement_agreement"
+    )
+    po_item = models.ForeignKey(
+        "PurchaseOrderPurchaseorderitem",
+        models.DO_NOTHING,
+        related_name="AuditEngagement_po_item",
+        blank=True,
+        null=True,
+    )
     shared_ip_with = models.TextField()  # This field type is a guess.
     exchange_rate = models.DecimalField(max_digits=20, decimal_places=2)
     currency_of_report = models.CharField(max_length=5, blank=True, null=True)
@@ -178,73 +268,93 @@ class AuditEngagement(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'audit_engagement'
+        db_table = "audit_engagement"
 
 
 class AuditEngagementActivePd(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementActivePd_engagement')
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='AuditEngagementActivePd_intervention')
+    engagement = models.ForeignKey(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditEngagementActivePd_engagement"
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention", models.DO_NOTHING, related_name="AuditEngagementActivePd_intervention"
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_engagement_active_pd'
-        unique_together = (('engagement', 'intervention'),)
+        db_table = "audit_engagement_active_pd"
+        unique_together = (("engagement", "intervention"),)
 
 
 class AuditEngagementAuthorizedOfficers(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementAuthorizedOfficers_engagement')
-    partnerstaffmember = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='AuditEngagementAuthorizedOfficers_partnerstaffmember')
+    engagement = models.ForeignKey(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditEngagementAuthorizedOfficers_engagement"
+    )
+    partnerstaffmember = models.ForeignKey(
+        "PartnersPartnerstaffmember",
+        models.DO_NOTHING,
+        related_name="AuditEngagementAuthorizedOfficers_partnerstaffmember",
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_engagement_authorized_officers'
-        unique_together = (('engagement', 'partnerstaffmember'),)
+        db_table = "audit_engagement_authorized_officers"
+        unique_together = (("engagement", "partnerstaffmember"),)
 
 
 class AuditEngagementOffices(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementOffices_engagement')
-    office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='AuditEngagementOffices_office')
+    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name="AuditEngagementOffices_engagement")
+    office = models.ForeignKey("ReportsOffice", models.DO_NOTHING, related_name="AuditEngagementOffices_office")
 
     class Meta:
         managed = False
-        db_table = 'audit_engagement_offices'
-        unique_together = (('engagement', 'office'),)
+        db_table = "audit_engagement_offices"
+        unique_together = (("engagement", "office"),)
 
 
 class AuditEngagementSections(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementSections_engagement')
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='AuditEngagementSections_section')
+    engagement = models.ForeignKey(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditEngagementSections_engagement"
+    )
+    section = models.ForeignKey("ReportsSector", models.DO_NOTHING, related_name="AuditEngagementSections_section")
 
     class Meta:
         managed = False
-        db_table = 'audit_engagement_sections'
-        unique_together = (('engagement', 'section'),)
+        db_table = "audit_engagement_sections"
+        unique_together = (("engagement", "section"),)
 
 
 class AuditEngagementStaffMembers(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementStaffMembers_engagement')
-    auditorstaffmember = models.ForeignKey('PurchaseOrderAuditorstaffmember', models.DO_NOTHING, related_name='AuditEngagementStaffMembers_auditorstaffmember')
+    engagement = models.ForeignKey(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditEngagementStaffMembers_engagement"
+    )
+    auditorstaffmember = models.ForeignKey(
+        "PurchaseOrderAuditorstaffmember",
+        models.DO_NOTHING,
+        related_name="AuditEngagementStaffMembers_auditorstaffmember",
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_engagement_staff_members'
-        unique_together = (('auditorstaffmember', 'engagement'),)
+        db_table = "audit_engagement_staff_members"
+        unique_together = (("auditorstaffmember", "engagement"),)
 
 
 class AuditEngagementUsersNotified(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditEngagementUsersNotified_engagement')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='AuditEngagementUsersNotified_user')
+    engagement = models.ForeignKey(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditEngagementUsersNotified_engagement"
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="AuditEngagementUsersNotified_user")
 
     class Meta:
         managed = False
-        db_table = 'audit_engagement_users_notified'
-        unique_together = (('engagement', 'user'),)
+        db_table = "audit_engagement_users_notified"
+        unique_together = (("engagement", "user"),)
 
 
 class AuditFinancialfinding(models.TenantModel):
@@ -255,11 +365,11 @@ class AuditFinancialfinding(models.TenantModel):
     description = models.TextField()
     recommendation = models.TextField()
     ip_comments = models.TextField()
-    audit = models.ForeignKey(AuditAudit, models.DO_NOTHING, related_name='AuditFinancialfinding_audit')
+    audit = models.ForeignKey(AuditAudit, models.DO_NOTHING, related_name="AuditFinancialfinding_audit")
 
     class Meta:
         managed = False
-        db_table = 'audit_financialfinding'
+        db_table = "audit_financialfinding"
 
 
 class AuditFinding(models.TenantModel):
@@ -269,11 +379,11 @@ class AuditFinding(models.TenantModel):
     recommendation = models.TextField()
     agreed_action_by_ip = models.TextField()
     deadline_of_action = models.DateField(blank=True, null=True)
-    spot_check = models.ForeignKey('AuditSpotcheck', models.DO_NOTHING, related_name='AuditFinding_spot_check')
+    spot_check = models.ForeignKey("AuditSpotcheck", models.DO_NOTHING, related_name="AuditFinding_spot_check")
 
     class Meta:
         managed = False
-        db_table = 'audit_finding'
+        db_table = "audit_finding"
 
 
 class AuditKeyinternalcontrol(models.TenantModel):
@@ -281,31 +391,33 @@ class AuditKeyinternalcontrol(models.TenantModel):
     recommendation = models.TextField()
     audit_observation = models.TextField()
     ip_response = models.TextField()
-    audit = models.ForeignKey(AuditAudit, models.DO_NOTHING, related_name='AuditKeyinternalcontrol_audit')
+    audit = models.ForeignKey(AuditAudit, models.DO_NOTHING, related_name="AuditKeyinternalcontrol_audit")
 
     class Meta:
         managed = False
-        db_table = 'audit_keyinternalcontrol'
+        db_table = "audit_keyinternalcontrol"
 
 
 class AuditMicroassessment(models.TenantModel):
-    engagement_ptr = models.OneToOneField(AuditEngagement, models.DO_NOTHING, related_name='AuditMicroassessment_engagement_ptr')
+    engagement_ptr = models.OneToOneField(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditMicroassessment_engagement_ptr"
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_microassessment'
+        db_table = "audit_microassessment"
 
 
 class AuditRisk(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     value = models.SmallIntegerField(blank=True, null=True)
     extra = models.JSONField(blank=True, null=True)
-    blueprint = models.ForeignKey('AuditRiskblueprint', models.DO_NOTHING, related_name='AuditRisk_blueprint')
-    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name='AuditRisk_engagement')
+    blueprint = models.ForeignKey("AuditRiskblueprint", models.DO_NOTHING, related_name="AuditRisk_blueprint")
+    engagement = models.ForeignKey(AuditEngagement, models.DO_NOTHING, related_name="AuditRisk_engagement")
 
     class Meta:
         managed = False
-        db_table = 'audit_risk'
+        db_table = "audit_risk"
 
 
 class AuditRiskblueprint(models.TenantModel):
@@ -315,11 +427,11 @@ class AuditRiskblueprint(models.TenantModel):
     is_key = models.BooleanField()
     header = models.TextField()
     description = models.TextField()
-    category = models.ForeignKey('AuditRiskcategory', models.DO_NOTHING, related_name='AuditRiskblueprint_category')
+    category = models.ForeignKey("AuditRiskcategory", models.DO_NOTHING, related_name="AuditRiskblueprint_category")
 
     class Meta:
         managed = False
-        db_table = 'audit_riskblueprint'
+        db_table = "audit_riskblueprint"
 
 
 class AuditRiskcategory(models.TenantModel):
@@ -328,51 +440,59 @@ class AuditRiskcategory(models.TenantModel):
     header = models.CharField(max_length=255)
     category_type = models.CharField(max_length=20)
     code = models.CharField(max_length=20)
-    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='AuditRiskcategory_parent', blank=True, null=True)
+    parent = models.ForeignKey(
+        "self", models.DO_NOTHING, related_name="AuditRiskcategory_parent", blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_riskcategory'
+        db_table = "audit_riskcategory"
 
 
 class AuditSpecialaudit(models.TenantModel):
-    engagement_ptr = models.OneToOneField(AuditEngagement, models.DO_NOTHING, related_name='AuditSpecialaudit_engagement_ptr')
+    engagement_ptr = models.OneToOneField(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditSpecialaudit_engagement_ptr"
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_specialaudit'
+        db_table = "audit_specialaudit"
 
 
 class AuditSpecialauditrecommendation(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     description = models.TextField()
-    audit = models.ForeignKey(AuditSpecialaudit, models.DO_NOTHING, related_name='AuditSpecialauditrecommendation_audit')
+    audit = models.ForeignKey(
+        AuditSpecialaudit, models.DO_NOTHING, related_name="AuditSpecialauditrecommendation_audit"
+    )
 
     class Meta:
         managed = False
-        db_table = 'audit_specialauditrecommendation'
+        db_table = "audit_specialauditrecommendation"
 
 
 class AuditSpecificprocedure(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     description = models.TextField()
     finding = models.TextField()
-    audit = models.ForeignKey(AuditSpecialaudit, models.DO_NOTHING, related_name='AuditSpecificprocedure_audit')
+    audit = models.ForeignKey(AuditSpecialaudit, models.DO_NOTHING, related_name="AuditSpecificprocedure_audit")
 
     class Meta:
         managed = False
-        db_table = 'audit_specificprocedure'
+        db_table = "audit_specificprocedure"
 
 
 class AuditSpotcheck(models.TenantModel):
-    engagement_ptr = models.OneToOneField(AuditEngagement, models.DO_NOTHING, related_name='AuditSpotcheck_engagement_ptr')
+    engagement_ptr = models.OneToOneField(
+        AuditEngagement, models.DO_NOTHING, related_name="AuditSpotcheck_engagement_ptr"
+    )
     total_amount_tested = models.DecimalField(max_digits=20, decimal_places=2)
     total_amount_of_ineligible_expenditure = models.DecimalField(max_digits=20, decimal_places=2)
     internal_controls = models.TextField()
 
     class Meta:
         managed = False
-        db_table = 'audit_spotcheck'
+        db_table = "audit_spotcheck"
 
 
 class CommentsComment(models.TenantModel):
@@ -384,37 +504,39 @@ class CommentsComment(models.TenantModel):
     related_to_description = models.TextField()
     related_to = models.CharField(max_length=100)
     text = models.TextField()
-    instance_related_ct = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='CommentsComment_instance_related_ct')
-    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='CommentsComment_parent', blank=True, null=True)
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='CommentsComment_user')
+    instance_related_ct = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, related_name="CommentsComment_instance_related_ct"
+    )
+    parent = models.ForeignKey("self", models.DO_NOTHING, related_name="CommentsComment_parent", blank=True, null=True)
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="CommentsComment_user")
 
     class Meta:
         managed = False
-        db_table = 'comments_comment'
+        db_table = "comments_comment"
 
 
 class CommentsCommentUsersRelated(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    comment = models.ForeignKey(CommentsComment, models.DO_NOTHING, related_name='CommentsCommentUsersRelated_comment')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='CommentsCommentUsersRelated_user')
+    comment = models.ForeignKey(CommentsComment, models.DO_NOTHING, related_name="CommentsCommentUsersRelated_comment")
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="CommentsCommentUsersRelated_user")
 
     class Meta:
         managed = False
-        db_table = 'comments_comment_users_related'
-        unique_together = (('comment', 'user'),)
+        db_table = "comments_comment_users_related"
+        unique_together = (("comment", "user"),)
 
 
 class DjangoCommentFlags(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     flag = models.CharField(max_length=30)
     flag_date = models.DateTimeField()
-    comment = models.ForeignKey('DjangoComments', models.DO_NOTHING, related_name='DjangoCommentFlags_comment')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='DjangoCommentFlags_user')
+    comment = models.ForeignKey("DjangoComments", models.DO_NOTHING, related_name="DjangoCommentFlags_comment")
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="DjangoCommentFlags_user")
 
     class Meta:
         managed = False
-        db_table = 'django_comment_flags'
-        unique_together = (('comment', 'flag', 'user'),)
+        db_table = "django_comment_flags"
+        unique_together = (("comment", "flag", "user"),)
 
 
 class DjangoComments(models.TenantModel):
@@ -428,90 +550,182 @@ class DjangoComments(models.TenantModel):
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     is_public = models.BooleanField()
     is_removed = models.BooleanField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='DjangoComments_content_type')
-    site = models.ForeignKey('DjangoSite', models.DO_NOTHING, related_name='DjangoComments_site')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='DjangoComments_user', blank=True, null=True)
+    content_type = models.ForeignKey("DjangoContentType", models.DO_NOTHING, related_name="DjangoComments_content_type")
+    site = models.ForeignKey("DjangoSite", models.DO_NOTHING, related_name="DjangoComments_site")
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="DjangoComments_user", blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'django_comments'
+        db_table = "django_comments"
 
 
 class FieldMonitoringDataCollectionActivityoverallfinding(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     narrative_finding = models.TextField()
     on_track = models.BooleanField(blank=True, null=True)
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_cp_output', blank=True, null=True)
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_intervention', blank=True, null=True)
-    monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_monitoring_activity')
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityoverallfinding_partner', blank=True, null=True)
+    cp_output = models.ForeignKey(
+        "ReportsResult",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityoverallfinding_cp_output",
+        blank=True,
+        null=True,
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityoverallfinding_intervention",
+        blank=True,
+        null=True,
+    )
+    monitoring_activity = models.ForeignKey(
+        "FieldMonitoringPlanningMonitoringactivity",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityoverallfinding_monitoring_activity",
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityoverallfinding_partner",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_data_collection_activityoverallfinding'
+        db_table = "field_monitoring_data_collection_activityoverallfinding"
 
 
 class FieldMonitoringDataCollectionActivityquestion(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     specific_details = models.TextField()
     is_enabled = models.BooleanField()
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_cp_output', blank=True, null=True)
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_intervention', blank=True, null=True)
-    monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_monitoring_activity')
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_partner', blank=True, null=True)
-    question = models.ForeignKey('FieldMonitoringSettingsQuestion', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestion_question')
+    cp_output = models.ForeignKey(
+        "ReportsResult",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityquestion_cp_output",
+        blank=True,
+        null=True,
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityquestion_intervention",
+        blank=True,
+        null=True,
+    )
+    monitoring_activity = models.ForeignKey(
+        "FieldMonitoringPlanningMonitoringactivity",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityquestion_monitoring_activity",
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityquestion_partner",
+        blank=True,
+        null=True,
+    )
+    question = models.ForeignKey(
+        "FieldMonitoringSettingsQuestion",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityquestion_question",
+    )
     is_hact = models.BooleanField()
     text = models.TextField()
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_data_collection_activityquestion'
+        db_table = "field_monitoring_data_collection_activityquestion"
 
 
 class FieldMonitoringDataCollectionActivityquestionoverallfinding(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     value = models.JSONField(blank=True, null=True)
-    activity_question = models.OneToOneField(FieldMonitoringDataCollectionActivityquestion, models.DO_NOTHING, related_name='FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question')
+    activity_question = models.OneToOneField(
+        FieldMonitoringDataCollectionActivityquestion,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_data_collection_activityquestionoverallfinding'
+        db_table = "field_monitoring_data_collection_activityquestionoverallfinding"
 
 
 class FieldMonitoringDataCollectionChecklistoverallfinding(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     narrative_finding = models.TextField()
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionChecklistoverallfinding_cp_output', blank=True, null=True)
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionChecklistoverallfinding_intervention', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionChecklistoverallfinding_partner', blank=True, null=True)
-    started_checklist = models.ForeignKey('FieldMonitoringDataCollectionStartedchecklist', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionChecklistoverallfinding_started_checklist')
+    cp_output = models.ForeignKey(
+        "ReportsResult",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionChecklistoverallfinding_cp_output",
+        blank=True,
+        null=True,
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionChecklistoverallfinding_intervention",
+        blank=True,
+        null=True,
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionChecklistoverallfinding_partner",
+        blank=True,
+        null=True,
+    )
+    started_checklist = models.ForeignKey(
+        "FieldMonitoringDataCollectionStartedchecklist",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionChecklistoverallfinding_started_checklist",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_data_collection_checklistoverallfinding'
+        db_table = "field_monitoring_data_collection_checklistoverallfinding"
 
 
 class FieldMonitoringDataCollectionFinding(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     value = models.JSONField(blank=True, null=True)
-    activity_question = models.ForeignKey(FieldMonitoringDataCollectionActivityquestion, models.DO_NOTHING, related_name='FieldMonitoringDataCollectionFinding_activity_question')
-    started_checklist = models.ForeignKey('FieldMonitoringDataCollectionStartedchecklist', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionFinding_started_checklist')
+    activity_question = models.ForeignKey(
+        FieldMonitoringDataCollectionActivityquestion,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionFinding_activity_question",
+    )
+    started_checklist = models.ForeignKey(
+        "FieldMonitoringDataCollectionStartedchecklist",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionFinding_started_checklist",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_data_collection_finding'
+        db_table = "field_monitoring_data_collection_finding"
 
 
 class FieldMonitoringDataCollectionStartedchecklist(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     information_source = models.CharField(max_length=100)
-    author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionStartedchecklist_author')
-    method = models.ForeignKey('FieldMonitoringSettingsMethod', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionStartedchecklist_method')
-    monitoring_activity = models.ForeignKey('FieldMonitoringPlanningMonitoringactivity', models.DO_NOTHING, related_name='FieldMonitoringDataCollectionStartedchecklist_monitoring_activity')
+    author = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="FieldMonitoringDataCollectionStartedchecklist_author"
+    )
+    method = models.ForeignKey(
+        "FieldMonitoringSettingsMethod",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionStartedchecklist_method",
+    )
+    monitoring_activity = models.ForeignKey(
+        "FieldMonitoringPlanningMonitoringactivity",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringDataCollectionStartedchecklist_monitoring_activity",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_data_collection_startedchecklist'
+        db_table = "field_monitoring_data_collection_startedchecklist"
 
 
 class FieldMonitoringPlanningMonitoringactivity(models.TenantModel):
@@ -523,119 +737,223 @@ class FieldMonitoringPlanningMonitoringactivity(models.TenantModel):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=20)
-    location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_location', blank=True, null=True)
-    location_site = models.ForeignKey('FieldMonitoringSettingsLocationsite', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_location_site', blank=True, null=True)
-    visit_lead = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_visit_lead', blank=True, null=True)
-    tpm_partner = models.ForeignKey('TpmpartnersTpmpartner', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_tpm_partner', blank=True, null=True)
+    location = models.ForeignKey(
+        "LocationsLocation",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivity_location",
+        blank=True,
+        null=True,
+    )
+    location_site = models.ForeignKey(
+        "FieldMonitoringSettingsLocationsite",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivity_location_site",
+        blank=True,
+        null=True,
+    )
+    visit_lead = models.ForeignKey(
+        "AuthUser",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivity_visit_lead",
+        blank=True,
+        null=True,
+    )
+    tpm_partner = models.ForeignKey(
+        "TpmpartnersTpmpartner",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivity_tpm_partner",
+        blank=True,
+        null=True,
+    )
     cancel_reason = models.TextField()
     reject_reason = models.TextField()
-    field_office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivity_field_office', blank=True, null=True)
+    field_office = models.ForeignKey(
+        "ReportsOffice",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivity_field_office",
+        blank=True,
+        null=True,
+    )
     report_reject_reason = models.TextField()
     number = models.CharField(unique=True, max_length=64, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivity'
+        db_table = "field_monitoring_planning_monitoringactivity"
 
 
 class FieldMonitoringPlanningMonitoringactivityCpOutputs(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityCpOutputs_monitoringactivity')
-    result = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityCpOutputs_result')
+    monitoringactivity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivityCpOutputs_monitoringactivity",
+    )
+    result = models.ForeignKey(
+        "ReportsResult", models.DO_NOTHING, related_name="FieldMonitoringPlanningMonitoringactivityCpOutputs_result"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivity_cp_outputs'
-        unique_together = (('monitoringactivity', 'result'),)
+        db_table = "field_monitoring_planning_monitoringactivity_cp_outputs"
+        unique_together = (("monitoringactivity", "result"),)
 
 
 class FieldMonitoringPlanningMonitoringactivityInterventions(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityInterventions_monitoringactivity')
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityInterventions_intervention')
+    monitoringactivity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivityInterventions_monitoringactivity",
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivityInterventions_intervention",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivity_interventions'
-        unique_together = (('intervention', 'monitoringactivity'),)
+        db_table = "field_monitoring_planning_monitoringactivity_interventions"
+        unique_together = (("intervention", "monitoringactivity"),)
 
 
 class FieldMonitoringPlanningMonitoringactivityOffices(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityOffices_monitoringactivity')
-    office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityOffices_office')
+    monitoringactivity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivityOffices_monitoringactivity",
+    )
+    office = models.ForeignKey(
+        "ReportsOffice", models.DO_NOTHING, related_name="FieldMonitoringPlanningMonitoringactivityOffices_office"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivity_offices'
-        unique_together = (('monitoringactivity', 'office'),)
+        db_table = "field_monitoring_planning_monitoringactivity_offices"
+        unique_together = (("monitoringactivity", "office"),)
 
 
 class FieldMonitoringPlanningMonitoringactivityPartners(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityPartners_monitoringactivity')
-    partnerorganization = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityPartners_partnerorganization')
+    monitoringactivity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivityPartners_monitoringactivity",
+    )
+    partnerorganization = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivityPartners_partnerorganization",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivity_partners'
-        unique_together = (('monitoringactivity', 'partnerorganization'),)
+        db_table = "field_monitoring_planning_monitoringactivity_partners"
+        unique_together = (("monitoringactivity", "partnerorganization"),)
 
 
 class FieldMonitoringPlanningMonitoringactivitySections(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitySections_monitoringactivity')
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitySections_section')
+    monitoringactivity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivitySections_monitoringactivity",
+    )
+    section = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="FieldMonitoringPlanningMonitoringactivitySections_section"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivity_sections'
-        unique_together = (('monitoringactivity', 'section'),)
+        db_table = "field_monitoring_planning_monitoringactivity_sections"
+        unique_together = (("monitoringactivity", "section"),)
 
 
 class FieldMonitoringPlanningMonitoringactivityTeamMembers(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityTeamMembers_monitoringactivity')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivityTeamMembers_user')
+    monitoringactivity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivityTeamMembers_monitoringactivity",
+    )
+    user = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="FieldMonitoringPlanningMonitoringactivityTeamMembers_user"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivity_team_members'
-        unique_together = (('monitoringactivity', 'user'),)
+        db_table = "field_monitoring_planning_monitoringactivity_team_members"
+        unique_together = (("monitoringactivity", "user"),)
 
 
 class FieldMonitoringPlanningMonitoringactivitygroup(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroup_partner')
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivitygroup_partner",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivitygroup'
+        db_table = "field_monitoring_planning_monitoringactivitygroup"
 
 
 class FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    monitoringactivitygroup = models.ForeignKey(FieldMonitoringPlanningMonitoringactivitygroup, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup')
-    monitoringactivity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivity')
+    monitoringactivitygroup = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivitygroup,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup",
+    )
+    monitoringactivity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivity",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_monitoringactivitygroup_monitorin69fc'
-        unique_together = (('monitoringactivity', 'monitoringactivitygroup'),)
+        db_table = "field_monitoring_planning_monitoringactivitygroup_monitorin69fc"
+        unique_together = (("monitoringactivity", "monitoringactivitygroup"),)
 
 
 class FieldMonitoringPlanningQuestiontemplate(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     is_active = models.BooleanField()
     specific_details = models.TextField()
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringPlanningQuestiontemplate_cp_output', blank=True, null=True)
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FieldMonitoringPlanningQuestiontemplate_intervention', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringPlanningQuestiontemplate_partner', blank=True, null=True)
-    question = models.ForeignKey('FieldMonitoringSettingsQuestion', models.DO_NOTHING, related_name='FieldMonitoringPlanningQuestiontemplate_question')
+    cp_output = models.ForeignKey(
+        "ReportsResult",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningQuestiontemplate_cp_output",
+        blank=True,
+        null=True,
+    )
+    intervention = models.ForeignKey(
+        "PartnersIntervention",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningQuestiontemplate_intervention",
+        blank=True,
+        null=True,
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningQuestiontemplate_partner",
+        blank=True,
+        null=True,
+    )
+    question = models.ForeignKey(
+        "FieldMonitoringSettingsQuestion",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringPlanningQuestiontemplate_question",
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_questiontemplate'
+        db_table = "field_monitoring_planning_questiontemplate"
 
 
 class FieldMonitoringPlanningYearplan(models.TenantModel):
@@ -651,7 +969,7 @@ class FieldMonitoringPlanningYearplan(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_planning_yearplan'
+        db_table = "field_monitoring_planning_yearplan"
 
 
 class FieldMonitoringSettingsCategory(models.TenantModel):
@@ -661,7 +979,7 @@ class FieldMonitoringSettingsCategory(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_category'
+        db_table = "field_monitoring_settings_category"
 
 
 class FieldMonitoringSettingsGlobalconfig(models.TenantModel):
@@ -669,7 +987,7 @@ class FieldMonitoringSettingsGlobalconfig(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_globalconfig'
+        db_table = "field_monitoring_settings_globalconfig"
 
 
 class FieldMonitoringSettingsLocationsite(models.TenantModel):
@@ -680,11 +998,13 @@ class FieldMonitoringSettingsLocationsite(models.TenantModel):
     p_code = models.CharField(max_length=32)
     point = models.TextField(blank=True, null=True)  # This field type is a guess.
     is_active = models.BooleanField()
-    parent = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='FieldMonitoringSettingsLocationsite_parent')
+    parent = models.ForeignKey(
+        "LocationsLocation", models.DO_NOTHING, related_name="FieldMonitoringSettingsLocationsite_parent"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_locationsite'
+        db_table = "field_monitoring_settings_locationsite"
 
 
 class FieldMonitoringSettingsLogissue(models.TenantModel):
@@ -693,15 +1013,39 @@ class FieldMonitoringSettingsLogissue(models.TenantModel):
     modified = models.DateTimeField()
     issue = models.TextField()
     status = models.CharField(max_length=10)
-    author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='FieldMonitoringSettingsLogissue_author')
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='FieldMonitoringSettingsLogissue_cp_output', blank=True, null=True)
-    location = models.ForeignKey('LocationsLocation', models.DO_NOTHING, related_name='FieldMonitoringSettingsLogissue_location', blank=True, null=True)
-    location_site = models.ForeignKey(FieldMonitoringSettingsLocationsite, models.DO_NOTHING, related_name='FieldMonitoringSettingsLogissue_location_site', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='FieldMonitoringSettingsLogissue_partner', blank=True, null=True)
+    author = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="FieldMonitoringSettingsLogissue_author")
+    cp_output = models.ForeignKey(
+        "ReportsResult",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringSettingsLogissue_cp_output",
+        blank=True,
+        null=True,
+    )
+    location = models.ForeignKey(
+        "LocationsLocation",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringSettingsLogissue_location",
+        blank=True,
+        null=True,
+    )
+    location_site = models.ForeignKey(
+        FieldMonitoringSettingsLocationsite,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringSettingsLogissue_location_site",
+        blank=True,
+        null=True,
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization",
+        models.DO_NOTHING,
+        related_name="FieldMonitoringSettingsLogissue_partner",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_logissue'
+        db_table = "field_monitoring_settings_logissue"
 
 
 class FieldMonitoringSettingsMethod(models.TenantModel):
@@ -712,19 +1056,21 @@ class FieldMonitoringSettingsMethod(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_method'
+        db_table = "field_monitoring_settings_method"
 
 
 class FieldMonitoringSettingsOption(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     label = models.CharField(max_length=100)
     value = models.JSONField(blank=True, null=True)
-    question = models.ForeignKey('FieldMonitoringSettingsQuestion', models.DO_NOTHING, related_name='FieldMonitoringSettingsOption_question')
+    question = models.ForeignKey(
+        "FieldMonitoringSettingsQuestion", models.DO_NOTHING, related_name="FieldMonitoringSettingsOption_question"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_option'
-        unique_together = (('question', 'value'),)
+        db_table = "field_monitoring_settings_option"
+        unique_together = (("question", "value"),)
 
 
 class FieldMonitoringSettingsQuestion(models.TenantModel):
@@ -736,33 +1082,47 @@ class FieldMonitoringSettingsQuestion(models.TenantModel):
     is_hact = models.BooleanField()
     is_custom = models.BooleanField()
     is_active = models.BooleanField()
-    category = models.ForeignKey(FieldMonitoringSettingsCategory, models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestion_category')
+    category = models.ForeignKey(
+        FieldMonitoringSettingsCategory, models.DO_NOTHING, related_name="FieldMonitoringSettingsQuestion_category"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_question'
+        db_table = "field_monitoring_settings_question"
 
 
 class FieldMonitoringSettingsQuestionMethods(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    question = models.ForeignKey(FieldMonitoringSettingsQuestion, models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionMethods_question')
-    method = models.ForeignKey(FieldMonitoringSettingsMethod, models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionMethods_method')
+    question = models.ForeignKey(
+        FieldMonitoringSettingsQuestion,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringSettingsQuestionMethods_question",
+    )
+    method = models.ForeignKey(
+        FieldMonitoringSettingsMethod, models.DO_NOTHING, related_name="FieldMonitoringSettingsQuestionMethods_method"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_question_methods'
-        unique_together = (('method', 'question'),)
+        db_table = "field_monitoring_settings_question_methods"
+        unique_together = (("method", "question"),)
 
 
 class FieldMonitoringSettingsQuestionSections(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    question = models.ForeignKey(FieldMonitoringSettingsQuestion, models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionSections_question')
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='FieldMonitoringSettingsQuestionSections_section')
+    question = models.ForeignKey(
+        FieldMonitoringSettingsQuestion,
+        models.DO_NOTHING,
+        related_name="FieldMonitoringSettingsQuestionSections_question",
+    )
+    section = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="FieldMonitoringSettingsQuestionSections_section"
+    )
 
     class Meta:
         managed = False
-        db_table = 'field_monitoring_settings_question_sections'
-        unique_together = (('question', 'section'),)
+        db_table = "field_monitoring_settings_question_sections"
+        unique_together = (("question", "section"),)
 
 
 class FundsDonor(models.TenantModel):
@@ -773,7 +1133,7 @@ class FundsDonor(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'funds_donor'
+        db_table = "funds_donor"
 
 
 class FundsFundscommitmentheader(models.TenantModel):
@@ -791,7 +1151,7 @@ class FundsFundscommitmentheader(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'funds_fundscommitmentheader'
+        db_table = "funds_fundscommitmentheader"
 
 
 class FundsFundscommitmentitem(models.TenantModel):
@@ -808,14 +1168,16 @@ class FundsFundscommitmentitem(models.TenantModel):
     commitment_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     amount_changed = models.DecimalField(max_digits=20, decimal_places=2)
     line_item_text = models.CharField(max_length=255)
-    fund_commitment = models.ForeignKey(FundsFundscommitmentheader, models.DO_NOTHING, related_name='FundsFundscommitmentitem_fund_commitment')
+    fund_commitment = models.ForeignKey(
+        FundsFundscommitmentheader, models.DO_NOTHING, related_name="FundsFundscommitmentitem_fund_commitment"
+    )
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'funds_fundscommitmentitem'
-        unique_together = (('fund_commitment', 'line_item'),)
+        db_table = "funds_fundscommitmentitem"
+        unique_together = (("fund_commitment", "line_item"),)
 
 
 class FundsFundsreservationheader(models.TenantModel):
@@ -829,7 +1191,13 @@ class FundsFundsreservationheader(models.TenantModel):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     actual_amt = models.DecimalField(max_digits=20, decimal_places=2)
-    intervention = models.ForeignKey('PartnersIntervention', models.DO_NOTHING, related_name='FundsFundsreservationheader_intervention', blank=True, null=True)
+    intervention = models.ForeignKey(
+        "PartnersIntervention",
+        models.DO_NOTHING,
+        related_name="FundsFundsreservationheader_intervention",
+        blank=True,
+        null=True,
+    )
     intervention_amt = models.DecimalField(max_digits=20, decimal_places=2)
     outstanding_amt = models.DecimalField(max_digits=20, decimal_places=2)
     total_amt = models.DecimalField(max_digits=20, decimal_places=2)
@@ -844,8 +1212,8 @@ class FundsFundsreservationheader(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'funds_fundsreservationheader'
-        unique_together = (('fr_number', 'vendor_code'),)
+        db_table = "funds_fundsreservationheader"
+        unique_together = (("fr_number", "vendor_code"),)
 
 
 class FundsFundsreservationitem(models.TenantModel):
@@ -859,7 +1227,9 @@ class FundsFundsreservationitem(models.TenantModel):
     overall_amount_dc = models.DecimalField(max_digits=20, decimal_places=2)
     due_date = models.DateField(blank=True, null=True)
     line_item_text = models.CharField(max_length=255, blank=True, null=True)
-    fund_reservation = models.ForeignKey(FundsFundsreservationheader, models.DO_NOTHING, related_name='FundsFundsreservationitem_fund_reservation')
+    fund_reservation = models.ForeignKey(
+        FundsFundsreservationheader, models.DO_NOTHING, related_name="FundsFundsreservationitem_fund_reservation"
+    )
     created = models.DateTimeField()
     modified = models.DateTimeField()
     donor = models.CharField(max_length=256, blank=True, null=True)
@@ -867,14 +1237,14 @@ class FundsFundsreservationitem(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'funds_fundsreservationitem'
-        unique_together = (('fund_reservation', 'line_item'),)
+        db_table = "funds_fundsreservationitem"
+        unique_together = (("fund_reservation", "line_item"),)
 
 
 class FundsGrant(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=128)
-    donor = models.ForeignKey(FundsDonor, models.DO_NOTHING, related_name='FundsGrant_donor')
+    donor = models.ForeignKey(FundsDonor, models.DO_NOTHING, related_name="FundsGrant_donor")
     expiry = models.DateField(blank=True, null=True)
     description = models.CharField(max_length=255)
     created = models.DateTimeField()
@@ -882,7 +1252,7 @@ class FundsGrant(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'funds_grant'
+        db_table = "funds_grant"
 
 
 class HactAggregatehact(models.TenantModel):
@@ -894,7 +1264,7 @@ class HactAggregatehact(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'hact_aggregatehact'
+        db_table = "hact_aggregatehact"
 
 
 class HactHacthistory(models.TenantModel):
@@ -903,12 +1273,14 @@ class HactHacthistory(models.TenantModel):
     modified = models.DateTimeField()
     year = models.IntegerField()
     partner_values = models.JSONField(blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='HactHacthistory_partner')
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization", models.DO_NOTHING, related_name="HactHacthistory_partner"
+    )
 
     class Meta:
         managed = False
-        db_table = 'hact_hacthistory'
-        unique_together = (('partner', 'year'),)
+        db_table = "hact_hacthistory"
+        unique_together = (("partner", "year"),)
 
 
 class LocationsLocation(models.TenantModel):
@@ -921,7 +1293,9 @@ class LocationsLocation(models.TenantModel):
     geom = models.TextField(blank=True, null=True)  # This field type is a guess.
     level = models.IntegerField()
     lft = models.IntegerField()
-    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='LocationsLocation_parent', blank=True, null=True)
+    parent = models.ForeignKey(
+        "self", models.DO_NOTHING, related_name="LocationsLocation_parent", blank=True, null=True
+    )
     rght = models.IntegerField()
     tree_id = models.IntegerField()
     created = models.DateTimeField()
@@ -932,8 +1306,8 @@ class LocationsLocation(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'locations_location'
-        unique_together = (('admin_level', 'name', 'p_code'),)
+        db_table = "locations_location"
+        unique_together = (("admin_level", "name", "p_code"),)
 
 
 class ManagementSectionhistory(models.TenantModel):
@@ -944,29 +1318,37 @@ class ManagementSectionhistory(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'management_sectionhistory'
+        db_table = "management_sectionhistory"
 
 
 class ManagementSectionhistoryFromSections(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    sectionhistory = models.ForeignKey(ManagementSectionhistory, models.DO_NOTHING, related_name='ManagementSectionhistoryFromSections_sectionhistory')
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ManagementSectionhistoryFromSections_section')
+    sectionhistory = models.ForeignKey(
+        ManagementSectionhistory, models.DO_NOTHING, related_name="ManagementSectionhistoryFromSections_sectionhistory"
+    )
+    section = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="ManagementSectionhistoryFromSections_section"
+    )
 
     class Meta:
         managed = False
-        db_table = 'management_sectionhistory_from_sections'
-        unique_together = (('section', 'sectionhistory'),)
+        db_table = "management_sectionhistory_from_sections"
+        unique_together = (("section", "sectionhistory"),)
 
 
 class ManagementSectionhistoryToSections(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    sectionhistory = models.ForeignKey(ManagementSectionhistory, models.DO_NOTHING, related_name='ManagementSectionhistoryToSections_sectionhistory')
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ManagementSectionhistoryToSections_section')
+    sectionhistory = models.ForeignKey(
+        ManagementSectionhistory, models.DO_NOTHING, related_name="ManagementSectionhistoryToSections_sectionhistory"
+    )
+    section = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="ManagementSectionhistoryToSections_section"
+    )
 
     class Meta:
         managed = False
-        db_table = 'management_sectionhistory_to_sections'
-        unique_together = (('section', 'sectionhistory'),)
+        db_table = "management_sectionhistory_to_sections"
+        unique_together = (("section", "sectionhistory"),)
 
 
 class PartnersAgreement(models.TenantModel):
@@ -980,29 +1362,53 @@ class PartnersAgreement(models.TenantModel):
     attached_agreement = models.CharField(max_length=1024)
     signed_by_unicef_date = models.DateField(blank=True, null=True)
     signed_by_partner_date = models.DateField(blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='PartnersAgreement_partner')
-    partner_manager = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersAgreement_partner_manager', blank=True, null=True)
-    signed_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersAgreement_signed_by', blank=True, null=True)
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization", models.DO_NOTHING, related_name="PartnersAgreement_partner"
+    )
+    partner_manager = models.ForeignKey(
+        "PartnersPartnerstaffmember",
+        models.DO_NOTHING,
+        related_name="PartnersAgreement_partner_manager",
+        blank=True,
+        null=True,
+    )
+    signed_by = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersAgreement_signed_by", blank=True, null=True
+    )
     status = models.CharField(max_length=32)
-    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='PartnersAgreement_country_programme', blank=True, null=True)
+    country_programme = models.ForeignKey(
+        "ReportsCountryprogramme",
+        models.DO_NOTHING,
+        related_name="PartnersAgreement_country_programme",
+        blank=True,
+        null=True,
+    )
     reference_number_year = models.IntegerField()
     special_conditions_pca = models.BooleanField()
-    terms_acknowledged_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersAgreement_terms_acknowledged_by', blank=True, null=True)
+    terms_acknowledged_by = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersAgreement_terms_acknowledged_by", blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_agreement'
+        db_table = "partners_agreement"
 
 
 class PartnersAgreementAuthorizedOfficers(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name='PartnersAgreementAuthorizedOfficers_agreement')
-    partnerstaffmember = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersAgreementAuthorizedOfficers_partnerstaffmember')
+    agreement = models.ForeignKey(
+        PartnersAgreement, models.DO_NOTHING, related_name="PartnersAgreementAuthorizedOfficers_agreement"
+    )
+    partnerstaffmember = models.ForeignKey(
+        "PartnersPartnerstaffmember",
+        models.DO_NOTHING,
+        related_name="PartnersAgreementAuthorizedOfficers_partnerstaffmember",
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_agreement_authorized_officers'
-        unique_together = (('agreement', 'partnerstaffmember'),)
+        db_table = "partners_agreement_authorized_officers"
+        unique_together = (("agreement", "partnerstaffmember"),)
 
 
 class PartnersAgreementamendment(models.TenantModel):
@@ -1012,12 +1418,14 @@ class PartnersAgreementamendment(models.TenantModel):
     number = models.CharField(max_length=5)
     signed_amendment = models.CharField(max_length=1024, blank=True, null=True)
     signed_date = models.DateField(blank=True, null=True)
-    agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name='PartnersAgreementamendment_agreement')
+    agreement = models.ForeignKey(
+        PartnersAgreement, models.DO_NOTHING, related_name="PartnersAgreementamendment_agreement"
+    )
     types = models.TextField()  # This field type is a guess.
 
     class Meta:
         managed = False
-        db_table = 'partners_agreementamendment'
+        db_table = "partners_agreementamendment"
 
 
 class PartnersAssessment(models.TenantModel):
@@ -1032,16 +1440,22 @@ class PartnersAssessment(models.TenantModel):
     rating = models.CharField(max_length=50)
     report = models.CharField(max_length=1024, blank=True, null=True)
     current = models.BooleanField()
-    approving_officer = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersAssessment_approving_officer', blank=True, null=True)
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='PartnersAssessment_partner')
-    requesting_officer = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersAssessment_requesting_officer', blank=True, null=True)
+    approving_officer = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersAssessment_approving_officer", blank=True, null=True
+    )
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization", models.DO_NOTHING, related_name="PartnersAssessment_partner"
+    )
+    requesting_officer = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersAssessment_requesting_officer", blank=True, null=True
+    )
     created = models.DateTimeField()
     modified = models.DateTimeField()
     active = models.BooleanField()
 
     class Meta:
         managed = False
-        db_table = 'partners_assessment'
+        db_table = "partners_assessment"
 
 
 class PartnersCorevaluesassessment(models.TenantModel):
@@ -1051,11 +1465,13 @@ class PartnersCorevaluesassessment(models.TenantModel):
     date = models.DateField(blank=True, null=True)
     assessment = models.CharField(max_length=1024, blank=True, null=True)
     archived = models.BooleanField()
-    partner = models.ForeignKey('PartnersPartnerorganization', models.DO_NOTHING, related_name='PartnersCorevaluesassessment_partner')
+    partner = models.ForeignKey(
+        "PartnersPartnerorganization", models.DO_NOTHING, related_name="PartnersCorevaluesassessment_partner"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_corevaluesassessment'
+        db_table = "partners_corevaluesassessment"
 
 
 class PartnersDirectcashtransfer(models.TenantModel):
@@ -1064,14 +1480,18 @@ class PartnersDirectcashtransfer(models.TenantModel):
     amount_usd = models.DecimalField(max_digits=20, decimal_places=2)
     liquidation_usd = models.DecimalField(max_digits=20, decimal_places=2)
     outstanding_balance_usd = models.DecimalField(max_digits=20, decimal_places=2)
-    amount_less_than_3_months_usd = models.DecimalField(db_column='amount_less_than_3_Months_usd', max_digits=20, decimal_places=2)  # Field name made lowercase.
+    amount_less_than_3_months_usd = models.DecimalField(
+        db_column="amount_less_than_3_Months_usd", max_digits=20, decimal_places=2
+    )  # Field name made lowercase.
     amount_3_to_6_months_usd = models.DecimalField(max_digits=20, decimal_places=2)
     amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2)
-    amount_more_than_9_months_usd = models.DecimalField(db_column='amount_more_than_9_Months_usd', max_digits=20, decimal_places=2)  # Field name made lowercase.
+    amount_more_than_9_months_usd = models.DecimalField(
+        db_column="amount_more_than_9_Months_usd", max_digits=20, decimal_places=2
+    )  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'partners_directcashtransfer'
+        db_table = "partners_directcashtransfer"
 
 
 class PartnersFiletype(models.TenantModel):
@@ -1080,7 +1500,7 @@ class PartnersFiletype(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'partners_filetype'
+        db_table = "partners_filetype"
 
 
 class PartnersIntervention(models.TenantModel):
@@ -1100,11 +1520,25 @@ class PartnersIntervention(models.TenantModel):
     signed_by_unicef_date = models.DateField(blank=True, null=True)
     signed_by_partner_date = models.DateField(blank=True, null=True)
     population_focus = models.CharField(max_length=130, blank=True, null=True)
-    agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name='PartnersIntervention_agreement')
-    partner_authorized_officer_signatory = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersIntervention_partner_authorized_officer_signatory', blank=True, null=True)
-    unicef_signatory = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersIntervention_unicef_signatory', blank=True, null=True)
+    agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name="PartnersIntervention_agreement")
+    partner_authorized_officer_signatory = models.ForeignKey(
+        "PartnersPartnerstaffmember",
+        models.DO_NOTHING,
+        related_name="PartnersIntervention_partner_authorized_officer_signatory",
+        blank=True,
+        null=True,
+    )
+    unicef_signatory = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersIntervention_unicef_signatory", blank=True, null=True
+    )
     signed_pd_document = models.CharField(max_length=1024, blank=True, null=True)
-    country_programme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='PartnersIntervention_country_programme', blank=True, null=True)
+    country_programme = models.ForeignKey(
+        "ReportsCountryprogramme",
+        models.DO_NOTHING,
+        related_name="PartnersIntervention_country_programme",
+        blank=True,
+        null=True,
+    )
     contingency_pd = models.BooleanField()
     metadata = models.JSONField(blank=True, null=True)
     in_amendment = models.BooleanField()
@@ -1112,7 +1546,9 @@ class PartnersIntervention(models.TenantModel):
     activation_letter = models.CharField(max_length=1024, blank=True, null=True)
     termination_doc = models.CharField(max_length=1024, blank=True, null=True)
     cfei_number = models.CharField(max_length=150, blank=True, null=True)
-    budget_owner = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersIntervention_budget_owner', blank=True, null=True)
+    budget_owner = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersIntervention_budget_owner", blank=True, null=True
+    )
     context = models.TextField(blank=True, null=True)
     date_sent_to_partner = models.DateField(blank=True, null=True)
     equity_narrative = models.TextField(blank=True, null=True)
@@ -1146,84 +1582,110 @@ class PartnersIntervention(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention'
+        db_table = "partners_intervention"
 
 
 class PartnersInterventionCountryProgrammes(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionCountryProgrammes_intervention')
-    countryprogramme = models.ForeignKey('ReportsCountryprogramme', models.DO_NOTHING, related_name='PartnersInterventionCountryProgrammes_countryprogramme')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionCountryProgrammes_intervention"
+    )
+    countryprogramme = models.ForeignKey(
+        "ReportsCountryprogramme",
+        models.DO_NOTHING,
+        related_name="PartnersInterventionCountryProgrammes_countryprogramme",
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention_country_programmes'
-        unique_together = (('countryprogramme', 'intervention'),)
+        db_table = "partners_intervention_country_programmes"
+        unique_together = (("countryprogramme", "intervention"),)
 
 
 class PartnersInterventionFlatLocations(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionFlatLocations_intervention')
-    location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='PartnersInterventionFlatLocations_location')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionFlatLocations_intervention"
+    )
+    location = models.ForeignKey(
+        LocationsLocation, models.DO_NOTHING, related_name="PartnersInterventionFlatLocations_location"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention_flat_locations'
-        unique_together = (('intervention', 'location'),)
+        db_table = "partners_intervention_flat_locations"
+        unique_together = (("intervention", "location"),)
 
 
 class PartnersInterventionOffices(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionOffices_intervention')
-    office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='PartnersInterventionOffices_office')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionOffices_intervention"
+    )
+    office = models.ForeignKey("ReportsOffice", models.DO_NOTHING, related_name="PartnersInterventionOffices_office")
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention_offices'
-        unique_together = (('intervention', 'office'),)
+        db_table = "partners_intervention_offices"
+        unique_together = (("intervention", "office"),)
 
 
 class PartnersInterventionPartnerFocalPoints(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionPartnerFocalPoints_intervention')
-    partnerstaffmember = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersInterventionPartnerFocalPoints_partnerstaffmember')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionPartnerFocalPoints_intervention"
+    )
+    partnerstaffmember = models.ForeignKey(
+        "PartnersPartnerstaffmember",
+        models.DO_NOTHING,
+        related_name="PartnersInterventionPartnerFocalPoints_partnerstaffmember",
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention_partner_focal_points'
-        unique_together = (('intervention', 'partnerstaffmember'),)
+        db_table = "partners_intervention_partner_focal_points"
+        unique_together = (("intervention", "partnerstaffmember"),)
 
 
 class PartnersInterventionSections(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionSections_intervention')
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='PartnersInterventionSections_section')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionSections_intervention"
+    )
+    section = models.ForeignKey("ReportsSector", models.DO_NOTHING, related_name="PartnersInterventionSections_section")
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention_sections'
-        unique_together = (('intervention', 'section'),)
+        db_table = "partners_intervention_sections"
+        unique_together = (("intervention", "section"),)
 
 
 class PartnersInterventionSites(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionSites_intervention')
-    locationsite = models.ForeignKey(FieldMonitoringSettingsLocationsite, models.DO_NOTHING, related_name='PartnersInterventionSites_locationsite')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionSites_intervention"
+    )
+    locationsite = models.ForeignKey(
+        FieldMonitoringSettingsLocationsite, models.DO_NOTHING, related_name="PartnersInterventionSites_locationsite"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention_sites'
-        unique_together = (('intervention', 'locationsite'),)
+        db_table = "partners_intervention_sites"
+        unique_together = (("intervention", "locationsite"),)
 
 
 class PartnersInterventionUnicefFocalPoints(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionUnicefFocalPoints_intervention')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionUnicefFocalPoints_user')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionUnicefFocalPoints_intervention"
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="PartnersInterventionUnicefFocalPoints_user")
 
     class Meta:
         managed = False
-        db_table = 'partners_intervention_unicef_focal_points'
-        unique_together = (('intervention', 'user'),)
+        db_table = "partners_intervention_unicef_focal_points"
+        unique_together = (("intervention", "user"),)
 
 
 class PartnersInterventionamendment(models.TenantModel):
@@ -1233,36 +1695,58 @@ class PartnersInterventionamendment(models.TenantModel):
     signed_date = models.DateField(blank=True, null=True)
     amendment_number = models.CharField(max_length=15)
     signed_amendment = models.CharField(max_length=1024)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionamendment_intervention')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionamendment_intervention"
+    )
     types = models.TextField()  # This field type is a guess.
     other_description = models.CharField(max_length=512, blank=True, null=True)
-    amended_intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionamendment_amended_intervention', blank=True, null=True)
+    amended_intervention = models.OneToOneField(
+        PartnersIntervention,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionamendment_amended_intervention",
+        blank=True,
+        null=True,
+    )
     difference = models.JSONField()
     is_active = models.BooleanField()
     kind = models.CharField(max_length=20)
-    partner_authorized_officer_signatory = models.ForeignKey('PartnersPartnerstaffmember', models.DO_NOTHING, related_name='PartnersInterventionamendment_partner_authorized_officer_signatory', blank=True, null=True)
+    partner_authorized_officer_signatory = models.ForeignKey(
+        "PartnersPartnerstaffmember",
+        models.DO_NOTHING,
+        related_name="PartnersInterventionamendment_partner_authorized_officer_signatory",
+        blank=True,
+        null=True,
+    )
     related_objects_map = models.JSONField()
     signed_by_partner_date = models.DateField(blank=True, null=True)
     signed_by_unicef_date = models.DateField(blank=True, null=True)
-    unicef_signatory = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionamendment_unicef_signatory', blank=True, null=True)
+    unicef_signatory = models.ForeignKey(
+        "AuthUser",
+        models.DO_NOTHING,
+        related_name="PartnersInterventionamendment_unicef_signatory",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionamendment'
+        db_table = "partners_interventionamendment"
 
 
 class PartnersInterventionattachment(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     attachment = models.CharField(max_length=1024)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionattachment_intervention')
-    type = models.ForeignKey(PartnersFiletype, models.DO_NOTHING, related_name='PartnersInterventionattachment_type')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionattachment_intervention"
+    )
+    type = models.ForeignKey(PartnersFiletype, models.DO_NOTHING, related_name="PartnersInterventionattachment_type")
     created = models.DateTimeField()
     modified = models.DateTimeField()
     active = models.BooleanField()
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionattachment'
+        db_table = "partners_interventionattachment"
 
 
 class PartnersInterventionbudget(models.TenantModel):
@@ -1276,7 +1760,13 @@ class PartnersInterventionbudget(models.TenantModel):
     unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2)
     in_kind_amount_local = models.DecimalField(max_digits=20, decimal_places=2)
     total = models.DecimalField(max_digits=20, decimal_places=2)
-    intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionbudget_intervention', blank=True, null=True)
+    intervention = models.OneToOneField(
+        PartnersIntervention,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionbudget_intervention",
+        blank=True,
+        null=True,
+    )
     total_local = models.DecimalField(max_digits=20, decimal_places=2)
     currency = models.CharField(max_length=5)
     programme_effectiveness = models.DecimalField(max_digits=20, decimal_places=2)
@@ -1287,7 +1777,7 @@ class PartnersInterventionbudget(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionbudget'
+        db_table = "partners_interventionbudget"
 
 
 class PartnersInterventionmanagementbudget(models.TenantModel):
@@ -1300,11 +1790,13 @@ class PartnersInterventionmanagementbudget(models.TenantModel):
     act2_partner = models.DecimalField(max_digits=20, decimal_places=2)
     act3_unicef = models.DecimalField(max_digits=20, decimal_places=2)
     act3_partner = models.DecimalField(max_digits=20, decimal_places=2)
-    intervention = models.OneToOneField(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionmanagementbudget_intervention')
+    intervention = models.OneToOneField(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionmanagementbudget_intervention"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionmanagementbudget'
+        db_table = "partners_interventionmanagementbudget"
 
 
 class PartnersInterventionmanagementbudgetitem(models.TenantModel):
@@ -1313,20 +1805,26 @@ class PartnersInterventionmanagementbudgetitem(models.TenantModel):
     kind = models.CharField(max_length=15)
     unicef_cash = models.DecimalField(max_digits=20, decimal_places=2)
     cso_cash = models.DecimalField(max_digits=20, decimal_places=2)
-    budget = models.ForeignKey(PartnersInterventionmanagementbudget, models.DO_NOTHING, related_name='PartnersInterventionmanagementbudgetitem_budget')
+    budget = models.ForeignKey(
+        PartnersInterventionmanagementbudget,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionmanagementbudgetitem_budget",
+    )
     no_units = models.DecimalField(max_digits=20, decimal_places=2)
     unit = models.CharField(max_length=150)
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionmanagementbudgetitem'
+        db_table = "partners_interventionmanagementbudgetitem"
 
 
 class PartnersInterventionplannedvisits(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     year = models.IntegerField()
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionplannedvisits_intervention')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionplannedvisits_intervention"
+    )
     created = models.DateTimeField()
     modified = models.DateTimeField()
     programmatic_q1 = models.IntegerField(default=0)
@@ -1336,8 +1834,8 @@ class PartnersInterventionplannedvisits(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionplannedvisits'
-        unique_together = (('intervention', 'year'),)
+        db_table = "partners_interventionplannedvisits"
+        unique_together = (("intervention", "year"),)
 
 
 class PartnersInterventionreportingperiod(models.TenantModel):
@@ -1347,36 +1845,52 @@ class PartnersInterventionreportingperiod(models.TenantModel):
     start_date = models.DateField()
     end_date = models.DateField()
     due_date = models.DateField()
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionreportingperiod_intervention')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionreportingperiod_intervention"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionreportingperiod'
+        db_table = "partners_interventionreportingperiod"
 
 
 class PartnersInterventionresultlink(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    cp_output = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='PartnersInterventionresultlink_cp_output', blank=True, null=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionresultlink_intervention')
+    cp_output = models.ForeignKey(
+        "ReportsResult",
+        models.DO_NOTHING,
+        related_name="PartnersInterventionresultlink_cp_output",
+        blank=True,
+        null=True,
+    )
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionresultlink_intervention"
+    )
     created = models.DateTimeField()
     modified = models.DateTimeField()
     code = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionresultlink'
-        unique_together = (('cp_output', 'intervention'),)
+        db_table = "partners_interventionresultlink"
+        unique_together = (("cp_output", "intervention"),)
 
 
 class PartnersInterventionresultlinkRamIndicators(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    interventionresultlink = models.ForeignKey(PartnersInterventionresultlink, models.DO_NOTHING, related_name='PartnersInterventionresultlinkRamIndicators_interventionresultlink')
-    indicator = models.ForeignKey('ReportsIndicator', models.DO_NOTHING, related_name='PartnersInterventionresultlinkRamIndicators_indicator')
+    interventionresultlink = models.ForeignKey(
+        PartnersInterventionresultlink,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionresultlinkRamIndicators_interventionresultlink",
+    )
+    indicator = models.ForeignKey(
+        "ReportsIndicator", models.DO_NOTHING, related_name="PartnersInterventionresultlinkRamIndicators_indicator"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionresultlink_ram_indicators'
-        unique_together = (('indicator', 'interventionresultlink'),)
+        db_table = "partners_interventionresultlink_ram_indicators"
+        unique_together = (("indicator", "interventionresultlink"),)
 
 
 class PartnersInterventionreview(models.TenantModel):
@@ -1385,13 +1899,23 @@ class PartnersInterventionreview(models.TenantModel):
     modified = models.DateTimeField()
     review_type = models.CharField(max_length=50)
     overall_approval = models.BooleanField(blank=True, null=True)
-    amendment = models.ForeignKey(PartnersInterventionamendment, models.DO_NOTHING, related_name='PartnersInterventionreview_amendment', blank=True, null=True)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionreview_intervention')
+    amendment = models.ForeignKey(
+        PartnersInterventionamendment,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionreview_amendment",
+        blank=True,
+        null=True,
+    )
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionreview_intervention"
+    )
     actions_list = models.TextField()
     budget_is_aligned = models.CharField(max_length=100)
     ges_considered = models.CharField(max_length=100)
     meeting_date = models.DateField(blank=True, null=True)
-    overall_approver = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreview_overall_approver', blank=True, null=True)
+    overall_approver = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersInterventionreview_overall_approver", blank=True, null=True
+    )
     overall_comment = models.TextField()
     partner_comparative_advantage = models.CharField(max_length=100)
     pd_is_guided = models.CharField(max_length=100)
@@ -1399,36 +1923,44 @@ class PartnersInterventionreview(models.TenantModel):
     relationship_is_represented = models.CharField(max_length=10)
     relationships_are_positive = models.CharField(max_length=100)
     supply_issues_considered = models.CharField(max_length=100)
-    submitted_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreview_submitted_by', blank=True, null=True)
+    submitted_by = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersInterventionreview_submitted_by", blank=True, null=True
+    )
     review_date = models.DateField(blank=True, null=True)
     sent_back_comment = models.TextField()
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionreview'
+        db_table = "partners_interventionreview"
 
 
 class PartnersInterventionreviewPrcOfficers(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    interventionreview = models.ForeignKey(PartnersInterventionreview, models.DO_NOTHING, related_name='PartnersInterventionreviewPrcOfficers_interventionreview')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreviewPrcOfficers_user')
+    interventionreview = models.ForeignKey(
+        PartnersInterventionreview,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionreviewPrcOfficers_interventionreview",
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="PartnersInterventionreviewPrcOfficers_user")
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionreview_prc_officers'
-        unique_together = (('interventionreview', 'user'),)
+        db_table = "partners_interventionreview_prc_officers"
+        unique_together = (("interventionreview", "user"),)
 
 
 class PartnersInterventionreviewnotification(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    review = models.ForeignKey(PartnersInterventionreview, models.DO_NOTHING, related_name='PartnersInterventionreviewnotification_review')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersInterventionreviewnotification_user')
+    review = models.ForeignKey(
+        PartnersInterventionreview, models.DO_NOTHING, related_name="PartnersInterventionreviewnotification_review"
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="PartnersInterventionreviewnotification_user")
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionreviewnotification'
+        db_table = "partners_interventionreviewnotification"
 
 
 class PartnersInterventionrisk(models.TenantModel):
@@ -1437,11 +1969,13 @@ class PartnersInterventionrisk(models.TenantModel):
     modified = models.DateTimeField()
     risk_type = models.CharField(max_length=50)
     mitigation_measures = models.TextField()
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionrisk_intervention')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionrisk_intervention"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionrisk'
+        db_table = "partners_interventionrisk"
 
 
 class PartnersInterventionsupplyitem(models.TenantModel):
@@ -1453,14 +1987,22 @@ class PartnersInterventionsupplyitem(models.TenantModel):
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
     total_price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     other_mentions = models.TextField()
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='PartnersInterventionsupplyitem_intervention')
-    result = models.ForeignKey(PartnersInterventionresultlink, models.DO_NOTHING, related_name='PartnersInterventionsupplyitem_result', blank=True, null=True)
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionsupplyitem_intervention"
+    )
+    result = models.ForeignKey(
+        PartnersInterventionresultlink,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionsupplyitem_result",
+        blank=True,
+        null=True,
+    )
     unicef_product_number = models.CharField(max_length=150)
     provided_by = models.CharField(max_length=10)
 
     class Meta:
         managed = False
-        db_table = 'partners_interventionsupplyitem'
+        db_table = "partners_interventionsupplyitem"
 
 
 class PartnersPartnerorganization(models.TenantModel):
@@ -1499,19 +2041,35 @@ class PartnersPartnerorganization(models.TenantModel):
     total_ct_ytd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     basis_for_risk_rating = models.CharField(max_length=50)
     manually_blocked = models.BooleanField()
-    outstanding_dct_amount_6_to_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    outstanding_dct_amount_more_than_9_months_usd = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    outstanding_dct_amount_6_to_9_months_usd = models.DecimalField(
+        max_digits=20, decimal_places=2, blank=True, null=True
+    )
+    outstanding_dct_amount_more_than_9_months_usd = models.DecimalField(
+        max_digits=20, decimal_places=2, blank=True, null=True
+    )
     highest_risk_rating_name = models.CharField(max_length=150)
     highest_risk_rating_type = models.CharField(max_length=150)
     psea_assessment_date = models.DateTimeField(blank=True, null=True)
     sea_risk_rating_name = models.CharField(max_length=150)
-    lead_office = models.ForeignKey('ReportsOffice', models.DO_NOTHING, related_name='PartnersPartnerorganization_lead_office', blank=True, null=True)
-    lead_section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='PartnersPartnerorganization_lead_section', blank=True, null=True)
+    lead_office = models.ForeignKey(
+        "ReportsOffice",
+        models.DO_NOTHING,
+        related_name="PartnersPartnerorganization_lead_office",
+        blank=True,
+        null=True,
+    )
+    lead_section = models.ForeignKey(
+        "ReportsSector",
+        models.DO_NOTHING,
+        related_name="PartnersPartnerorganization_lead_section",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_partnerorganization'
-        unique_together = (('name', 'vendor_number'),)
+        db_table = "partners_partnerorganization"
+        unique_together = (("name", "vendor_number"),)
 
 
 class PartnersPartnerplannedvisits(models.TenantModel):
@@ -1523,12 +2081,14 @@ class PartnersPartnerplannedvisits(models.TenantModel):
     programmatic_q2 = models.IntegerField()
     programmatic_q3 = models.IntegerField()
     programmatic_q4 = models.IntegerField()
-    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='PartnersPartnerplannedvisits_partner')
+    partner = models.ForeignKey(
+        PartnersPartnerorganization, models.DO_NOTHING, related_name="PartnersPartnerplannedvisits_partner"
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_partnerplannedvisits'
-        unique_together = (('partner', 'year'),)
+        db_table = "partners_partnerplannedvisits"
+        unique_together = (("partner", "year"),)
 
 
 class PartnersPartnerstaffmember(models.TenantModel):
@@ -1538,15 +2098,19 @@ class PartnersPartnerstaffmember(models.TenantModel):
     last_name = models.CharField(max_length=64)
     email = models.CharField(unique=True, max_length=128)
     phone = models.CharField(max_length=64, blank=True, null=True)
-    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='PartnersPartnerstaffmember_partner')
+    partner = models.ForeignKey(
+        PartnersPartnerorganization, models.DO_NOTHING, related_name="PartnersPartnerstaffmember_partner"
+    )
     active = models.BooleanField()
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    user = models.OneToOneField('AuthUser', models.DO_NOTHING, related_name='PartnersPartnerstaffmember_user', blank=True, null=True)
+    user = models.OneToOneField(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersPartnerstaffmember_user", blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 'partners_partnerstaffmember'
+        db_table = "partners_partnerstaffmember"
 
 
 class PartnersPlannedengagement(models.TenantModel):
@@ -1559,12 +2123,14 @@ class PartnersPlannedengagement(models.TenantModel):
     spot_check_planned_q4 = models.IntegerField()
     scheduled_audit = models.BooleanField()
     special_audit = models.BooleanField()
-    partner = models.OneToOneField(PartnersPartnerorganization, models.DO_NOTHING, related_name='PartnersPlannedengagement_partner')
+    partner = models.OneToOneField(
+        PartnersPartnerorganization, models.DO_NOTHING, related_name="PartnersPlannedengagement_partner"
+    )
     spot_check_follow_up = models.IntegerField()
 
     class Meta:
         managed = False
-        db_table = 'partners_plannedengagement'
+        db_table = "partners_plannedengagement"
 
 
 class PartnersPrcofficerinterventionreview(models.TenantModel):
@@ -1581,13 +2147,17 @@ class PartnersPrcofficerinterventionreview(models.TenantModel):
     supply_issues_considered = models.CharField(max_length=100)
     overall_comment = models.TextField()
     overall_approval = models.BooleanField(blank=True, null=True)
-    overall_review = models.ForeignKey(PartnersInterventionreview, models.DO_NOTHING, related_name='PartnersPrcofficerinterventionreview_overall_review')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PartnersPrcofficerinterventionreview_user')
+    overall_review = models.ForeignKey(
+        PartnersInterventionreview,
+        models.DO_NOTHING,
+        related_name="PartnersPrcofficerinterventionreview_overall_review",
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="PartnersPrcofficerinterventionreview_user")
     review_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'partners_prcofficerinterventionreview'
+        db_table = "partners_prcofficerinterventionreview"
 
 
 class PartnersWorkspacefiletype(models.TenantModel):
@@ -1596,7 +2166,7 @@ class PartnersWorkspacefiletype(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'partners_workspacefiletype'
+        db_table = "partners_workspacefiletype"
 
 
 class PseaAnswer(models.TenantModel):
@@ -1604,14 +2174,14 @@ class PseaAnswer(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     comments = models.TextField(blank=True, null=True)
-    assessment = models.ForeignKey('PseaAssessment', models.DO_NOTHING, related_name='PseaAnswer_assessment')
-    indicator = models.ForeignKey('PseaIndicator', models.DO_NOTHING, related_name='PseaAnswer_indicator')
-    rating = models.ForeignKey('PseaRating', models.DO_NOTHING, related_name='PseaAnswer_rating')
+    assessment = models.ForeignKey("PseaAssessment", models.DO_NOTHING, related_name="PseaAnswer_assessment")
+    indicator = models.ForeignKey("PseaIndicator", models.DO_NOTHING, related_name="PseaAnswer_indicator")
+    rating = models.ForeignKey("PseaRating", models.DO_NOTHING, related_name="PseaAnswer_rating")
 
     class Meta:
         managed = False
-        db_table = 'psea_answer'
-        unique_together = (('assessment', 'indicator'),)
+        db_table = "psea_answer"
+        unique_together = (("assessment", "indicator"),)
 
 
 class PseaAnswerevidence(models.TenantModel):
@@ -1619,12 +2189,12 @@ class PseaAnswerevidence(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     description = models.TextField(blank=True, null=True)
-    answer = models.ForeignKey(PseaAnswer, models.DO_NOTHING, related_name='PseaAnswerevidence_answer')
-    evidence = models.ForeignKey('PseaEvidence', models.DO_NOTHING, related_name='PseaAnswerevidence_evidence')
+    answer = models.ForeignKey(PseaAnswer, models.DO_NOTHING, related_name="PseaAnswerevidence_answer")
+    evidence = models.ForeignKey("PseaEvidence", models.DO_NOTHING, related_name="PseaAnswerevidence_evidence")
 
     class Meta:
         managed = False
-        db_table = 'psea_answerevidence'
+        db_table = "psea_answerevidence"
 
 
 class PseaAssessment(models.TenantModel):
@@ -1635,24 +2205,26 @@ class PseaAssessment(models.TenantModel):
     overall_rating = models.IntegerField(blank=True, null=True)
     assessment_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=30)
-    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='PseaAssessment_partner')
+    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name="PseaAssessment_partner")
     assessment_ingo_reason = models.CharField(max_length=32, blank=True, null=True)
     assessment_type = models.CharField(max_length=16)
 
     class Meta:
         managed = False
-        db_table = 'psea_assessment'
+        db_table = "psea_assessment"
 
 
 class PseaAssessmentFocalPoints(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    assessment = models.ForeignKey(PseaAssessment, models.DO_NOTHING, related_name='PseaAssessmentFocalPoints_assessment')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PseaAssessmentFocalPoints_user')
+    assessment = models.ForeignKey(
+        PseaAssessment, models.DO_NOTHING, related_name="PseaAssessmentFocalPoints_assessment"
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="PseaAssessmentFocalPoints_user")
 
     class Meta:
         managed = False
-        db_table = 'psea_assessment_focal_points'
-        unique_together = (('assessment', 'user'),)
+        db_table = "psea_assessment_focal_points"
+        unique_together = (("assessment", "user"),)
 
 
 class PseaAssessmentstatushistory(models.TenantModel):
@@ -1660,12 +2232,14 @@ class PseaAssessmentstatushistory(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     status = models.CharField(max_length=30)
-    assessment = models.ForeignKey(PseaAssessment, models.DO_NOTHING, related_name='PseaAssessmentstatushistory_assessment')
+    assessment = models.ForeignKey(
+        PseaAssessment, models.DO_NOTHING, related_name="PseaAssessmentstatushistory_assessment"
+    )
     comment = models.TextField()
 
     class Meta:
         managed = False
-        db_table = 'psea_assessmentstatushistory'
+        db_table = "psea_assessmentstatushistory"
 
 
 class PseaAssessor(models.TenantModel):
@@ -1674,24 +2248,30 @@ class PseaAssessor(models.TenantModel):
     modified = models.DateTimeField()
     assessor_type = models.CharField(max_length=30)
     order_number = models.CharField(max_length=30)
-    assessment = models.OneToOneField(PseaAssessment, models.DO_NOTHING, related_name='PseaAssessor_assessment')
-    auditor_firm = models.ForeignKey('PurchaseOrderAuditorfirm', models.DO_NOTHING, related_name='PseaAssessor_auditor_firm', blank=True, null=True)
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='PseaAssessor_user', blank=True, null=True)
+    assessment = models.OneToOneField(PseaAssessment, models.DO_NOTHING, related_name="PseaAssessor_assessment")
+    auditor_firm = models.ForeignKey(
+        "PurchaseOrderAuditorfirm", models.DO_NOTHING, related_name="PseaAssessor_auditor_firm", blank=True, null=True
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="PseaAssessor_user", blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'psea_assessor'
+        db_table = "psea_assessor"
 
 
 class PseaAssessorAuditorFirmStaff(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    assessor = models.ForeignKey(PseaAssessor, models.DO_NOTHING, related_name='PseaAssessorAuditorFirmStaff_assessor')
-    auditorstaffmember = models.ForeignKey('PurchaseOrderAuditorstaffmember', models.DO_NOTHING, related_name='PseaAssessorAuditorFirmStaff_auditorstaffmember')
+    assessor = models.ForeignKey(PseaAssessor, models.DO_NOTHING, related_name="PseaAssessorAuditorFirmStaff_assessor")
+    auditorstaffmember = models.ForeignKey(
+        "PurchaseOrderAuditorstaffmember",
+        models.DO_NOTHING,
+        related_name="PseaAssessorAuditorFirmStaff_auditorstaffmember",
+    )
 
     class Meta:
         managed = False
-        db_table = 'psea_assessor_auditor_firm_staff'
-        unique_together = (('assessor', 'auditorstaffmember'),)
+        db_table = "psea_assessor_auditor_firm_staff"
+        unique_together = (("assessor", "auditorstaffmember"),)
 
 
 class PseaEvidence(models.TenantModel):
@@ -1704,7 +2284,7 @@ class PseaEvidence(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'psea_evidence'
+        db_table = "psea_evidence"
 
 
 class PseaIndicator(models.TenantModel):
@@ -1719,29 +2299,29 @@ class PseaIndicator(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'psea_indicator'
+        db_table = "psea_indicator"
 
 
 class PseaIndicatorEvidences(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    indicator = models.ForeignKey(PseaIndicator, models.DO_NOTHING, related_name='PseaIndicatorEvidences_indicator')
-    evidence = models.ForeignKey(PseaEvidence, models.DO_NOTHING, related_name='PseaIndicatorEvidences_evidence')
+    indicator = models.ForeignKey(PseaIndicator, models.DO_NOTHING, related_name="PseaIndicatorEvidences_indicator")
+    evidence = models.ForeignKey(PseaEvidence, models.DO_NOTHING, related_name="PseaIndicatorEvidences_evidence")
 
     class Meta:
         managed = False
-        db_table = 'psea_indicator_evidences'
-        unique_together = (('evidence', 'indicator'),)
+        db_table = "psea_indicator_evidences"
+        unique_together = (("evidence", "indicator"),)
 
 
 class PseaIndicatorRatings(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    indicator = models.ForeignKey(PseaIndicator, models.DO_NOTHING, related_name='PseaIndicatorRatings_indicator')
-    rating = models.ForeignKey('PseaRating', models.DO_NOTHING, related_name='PseaIndicatorRatings_rating')
+    indicator = models.ForeignKey(PseaIndicator, models.DO_NOTHING, related_name="PseaIndicatorRatings_indicator")
+    rating = models.ForeignKey("PseaRating", models.DO_NOTHING, related_name="PseaIndicatorRatings_rating")
 
     class Meta:
         managed = False
-        db_table = 'psea_indicator_ratings'
-        unique_together = (('indicator', 'rating'),)
+        db_table = "psea_indicator_ratings"
+        unique_together = (("indicator", "rating"),)
 
 
 class PseaRating(models.TenantModel):
@@ -1754,7 +2334,7 @@ class PseaRating(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'psea_rating'
+        db_table = "psea_rating"
 
 
 class ReportsAppliedindicator(models.TenantModel):
@@ -1762,8 +2342,16 @@ class ReportsAppliedindicator(models.TenantModel):
     context_code = models.CharField(max_length=50, blank=True, null=True)
     assumptions = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
-    indicator = models.ForeignKey('ReportsIndicatorblueprint', models.DO_NOTHING, related_name='ReportsAppliedindicator_indicator', blank=True, null=True)
-    lower_result = models.ForeignKey('ReportsLowerresult', models.DO_NOTHING, related_name='ReportsAppliedindicator_lower_result')
+    indicator = models.ForeignKey(
+        "ReportsIndicatorblueprint",
+        models.DO_NOTHING,
+        related_name="ReportsAppliedindicator_indicator",
+        blank=True,
+        null=True,
+    )
+    lower_result = models.ForeignKey(
+        "ReportsLowerresult", models.DO_NOTHING, related_name="ReportsAppliedindicator_lower_result"
+    )
     means_of_verification = models.CharField(max_length=255, blank=True, null=True)
     cluster_indicator_id = models.IntegerField(blank=True, null=True)
     cluster_indicator_title = models.CharField(max_length=1024, blank=True, null=True)
@@ -1771,7 +2359,9 @@ class ReportsAppliedindicator(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     response_plan_name = models.CharField(max_length=1024, blank=True, null=True)
-    section = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ReportsAppliedindicator_section', blank=True, null=True)
+    section = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="ReportsAppliedindicator_section", blank=True, null=True
+    )
     is_active = models.BooleanField()
     is_high_frequency = models.BooleanField()
     baseline = models.JSONField(blank=True, null=True)
@@ -1783,30 +2373,40 @@ class ReportsAppliedindicator(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_appliedindicator'
-        unique_together = (('indicator', 'lower_result'),)
+        db_table = "reports_appliedindicator"
+        unique_together = (("indicator", "lower_result"),)
 
 
 class ReportsAppliedindicatorDisaggregation(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    appliedindicator = models.ForeignKey(ReportsAppliedindicator, models.DO_NOTHING, related_name='ReportsAppliedindicatorDisaggregation_appliedindicator')
-    disaggregation = models.ForeignKey('ReportsDisaggregation', models.DO_NOTHING, related_name='ReportsAppliedindicatorDisaggregation_disaggregation')
+    appliedindicator = models.ForeignKey(
+        ReportsAppliedindicator,
+        models.DO_NOTHING,
+        related_name="ReportsAppliedindicatorDisaggregation_appliedindicator",
+    )
+    disaggregation = models.ForeignKey(
+        "ReportsDisaggregation", models.DO_NOTHING, related_name="ReportsAppliedindicatorDisaggregation_disaggregation"
+    )
 
     class Meta:
         managed = False
-        db_table = 'reports_appliedindicator_disaggregation'
-        unique_together = (('appliedindicator', 'disaggregation'),)
+        db_table = "reports_appliedindicator_disaggregation"
+        unique_together = (("appliedindicator", "disaggregation"),)
 
 
 class ReportsAppliedindicatorLocations(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    appliedindicator = models.ForeignKey(ReportsAppliedindicator, models.DO_NOTHING, related_name='ReportsAppliedindicatorLocations_appliedindicator')
-    location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='ReportsAppliedindicatorLocations_location')
+    appliedindicator = models.ForeignKey(
+        ReportsAppliedindicator, models.DO_NOTHING, related_name="ReportsAppliedindicatorLocations_appliedindicator"
+    )
+    location = models.ForeignKey(
+        LocationsLocation, models.DO_NOTHING, related_name="ReportsAppliedindicatorLocations_location"
+    )
 
     class Meta:
         managed = False
-        db_table = 'reports_appliedindicator_locations'
-        unique_together = (('appliedindicator', 'location'),)
+        db_table = "reports_appliedindicator_locations"
+        unique_together = (("appliedindicator", "location"),)
 
 
 class ReportsCountryprogramme(models.TenantModel):
@@ -1819,7 +2419,7 @@ class ReportsCountryprogramme(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_countryprogramme'
+        db_table = "reports_countryprogramme"
 
 
 class ReportsDisaggregation(models.TenantModel):
@@ -1831,7 +2431,7 @@ class ReportsDisaggregation(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_disaggregation'
+        db_table = "reports_disaggregation"
 
 
 class ReportsDisaggregationvalue(models.TenantModel):
@@ -1840,11 +2440,13 @@ class ReportsDisaggregationvalue(models.TenantModel):
     modified = models.DateTimeField()
     value = models.CharField(max_length=20)
     active = models.BooleanField()
-    disaggregation = models.ForeignKey(ReportsDisaggregation, models.DO_NOTHING, related_name='ReportsDisaggregationvalue_disaggregation')
+    disaggregation = models.ForeignKey(
+        ReportsDisaggregation, models.DO_NOTHING, related_name="ReportsDisaggregationvalue_disaggregation"
+    )
 
     class Meta:
         managed = False
-        db_table = 'reports_disaggregationvalue'
+        db_table = "reports_disaggregationvalue"
 
 
 class ReportsIndicator(models.TenantModel):
@@ -1856,9 +2458,15 @@ class ReportsIndicator(models.TenantModel):
     current = models.IntegerField(blank=True, null=True)
     sector_current = models.IntegerField(blank=True, null=True)
     view_on_dashboard = models.BooleanField()
-    result = models.ForeignKey('ReportsResult', models.DO_NOTHING, related_name='ReportsIndicator_result', blank=True, null=True)
-    sector = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ReportsIndicator_sector', blank=True, null=True)
-    unit = models.ForeignKey('ReportsUnit', models.DO_NOTHING, related_name='ReportsIndicator_unit', blank=True, null=True)
+    result = models.ForeignKey(
+        "ReportsResult", models.DO_NOTHING, related_name="ReportsIndicator_result", blank=True, null=True
+    )
+    sector = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="ReportsIndicator_sector", blank=True, null=True
+    )
+    unit = models.ForeignKey(
+        "ReportsUnit", models.DO_NOTHING, related_name="ReportsIndicator_unit", blank=True, null=True
+    )
     baseline = models.CharField(max_length=255, blank=True, null=True)
     ram_indicator = models.BooleanField()
     target = models.CharField(max_length=255, blank=True, null=True)
@@ -1869,8 +2477,8 @@ class ReportsIndicator(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_indicator'
-        unique_together = (('name', 'result', 'sector'),)
+        db_table = "reports_indicator"
+        unique_together = (("name", "result", "sector"),)
 
 
 class ReportsIndicatorblueprint(models.TenantModel):
@@ -1889,7 +2497,7 @@ class ReportsIndicatorblueprint(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_indicatorblueprint'
+        db_table = "reports_indicatorblueprint"
 
 
 class ReportsInterventionactivity(models.TenantModel):
@@ -1900,24 +2508,34 @@ class ReportsInterventionactivity(models.TenantModel):
     context_details = models.TextField(blank=True, null=True)
     unicef_cash = models.DecimalField(max_digits=20, decimal_places=2)
     cso_cash = models.DecimalField(max_digits=20, decimal_places=2)
-    result = models.ForeignKey('ReportsLowerresult', models.DO_NOTHING, related_name='ReportsInterventionactivity_result')
+    result = models.ForeignKey(
+        "ReportsLowerresult", models.DO_NOTHING, related_name="ReportsInterventionactivity_result"
+    )
     code = models.CharField(max_length=50, blank=True, null=True)
     is_active = models.BooleanField()
 
     class Meta:
         managed = False
-        db_table = 'reports_interventionactivity'
+        db_table = "reports_interventionactivity"
 
 
 class ReportsInterventionactivityTimeFrames(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    interventionactivity = models.ForeignKey(ReportsInterventionactivity, models.DO_NOTHING, related_name='ReportsInterventionactivityTimeFrames_interventionactivity')
-    interventiontimeframe = models.ForeignKey('ReportsInterventiontimeframe', models.DO_NOTHING, related_name='ReportsInterventionactivityTimeFrames_interventiontimeframe')
+    interventionactivity = models.ForeignKey(
+        ReportsInterventionactivity,
+        models.DO_NOTHING,
+        related_name="ReportsInterventionactivityTimeFrames_interventionactivity",
+    )
+    interventiontimeframe = models.ForeignKey(
+        "ReportsInterventiontimeframe",
+        models.DO_NOTHING,
+        related_name="ReportsInterventionactivityTimeFrames_interventiontimeframe",
+    )
 
     class Meta:
         managed = False
-        db_table = 'reports_interventionactivity_time_frames'
-        unique_together = (('interventionactivity', 'interventiontimeframe'),)
+        db_table = "reports_interventionactivity_time_frames"
+        unique_together = (("interventionactivity", "interventiontimeframe"),)
 
 
 class ReportsInterventionactivityitem(models.TenantModel):
@@ -1927,7 +2545,9 @@ class ReportsInterventionactivityitem(models.TenantModel):
     name = models.CharField(max_length=150)
     unicef_cash = models.DecimalField(max_digits=20, decimal_places=2)
     cso_cash = models.DecimalField(max_digits=20, decimal_places=2)
-    activity = models.ForeignKey(ReportsInterventionactivity, models.DO_NOTHING, related_name='ReportsInterventionactivityitem_activity')
+    activity = models.ForeignKey(
+        ReportsInterventionactivity, models.DO_NOTHING, related_name="ReportsInterventionactivityitem_activity"
+    )
     no_units = models.DecimalField(max_digits=20, decimal_places=2)
     unit = models.CharField(max_length=150)
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
@@ -1935,7 +2555,7 @@ class ReportsInterventionactivityitem(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_interventionactivityitem'
+        db_table = "reports_interventionactivityitem"
 
 
 class ReportsInterventiontimeframe(models.TenantModel):
@@ -1944,27 +2564,31 @@ class ReportsInterventiontimeframe(models.TenantModel):
     modified = models.DateTimeField()
     start_date = models.DateField()
     end_date = models.DateField()
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='ReportsInterventiontimeframe_intervention')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="ReportsInterventiontimeframe_intervention"
+    )
     quarter = models.SmallIntegerField()
 
     class Meta:
         managed = False
-        db_table = 'reports_interventiontimeframe'
+        db_table = "reports_interventiontimeframe"
 
 
 class ReportsLowerresult(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=500)
     code = models.CharField(max_length=50, blank=True, null=True)
-    result_link = models.ForeignKey(PartnersInterventionresultlink, models.DO_NOTHING, related_name='ReportsLowerresult_result_link')
+    result_link = models.ForeignKey(
+        PartnersInterventionresultlink, models.DO_NOTHING, related_name="ReportsLowerresult_result_link"
+    )
     created = models.DateTimeField()
     modified = models.DateTimeField()
     is_active = models.BooleanField()
 
     class Meta:
         managed = False
-        db_table = 'reports_lowerresult'
-        unique_together = (('code', 'result_link'),)
+        db_table = "reports_lowerresult"
+        unique_together = (("code", "result_link"),)
 
 
 class ReportsOffice(models.TenantModel):
@@ -1973,7 +2597,7 @@ class ReportsOffice(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_office'
+        db_table = "reports_office"
 
 
 class ReportsQuarter(models.TenantModel):
@@ -1985,7 +2609,7 @@ class ReportsQuarter(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_quarter'
+        db_table = "reports_quarter"
 
 
 class ReportsReportingrequirement(models.TenantModel):
@@ -1996,25 +2620,29 @@ class ReportsReportingrequirement(models.TenantModel):
     end_date = models.DateField(blank=True, null=True)
     due_date = models.DateField()
     report_type = models.CharField(max_length=50)
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='ReportsReportingrequirement_intervention')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="ReportsReportingrequirement_intervention"
+    )
 
     class Meta:
         managed = False
-        db_table = 'reports_reportingrequirement'
+        db_table = "reports_reportingrequirement"
 
 
 class ReportsResult(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     name = models.TextField()
     code = models.CharField(max_length=50, blank=True, null=True)
-    result_type = models.ForeignKey('ReportsResulttype', models.DO_NOTHING, related_name='ReportsResult_result_type')
-    sector = models.ForeignKey('ReportsSector', models.DO_NOTHING, related_name='ReportsResult_sector', blank=True, null=True)
+    result_type = models.ForeignKey("ReportsResulttype", models.DO_NOTHING, related_name="ReportsResult_result_type")
+    sector = models.ForeignKey(
+        "ReportsSector", models.DO_NOTHING, related_name="ReportsResult_sector", blank=True, null=True
+    )
     gic_code = models.CharField(max_length=8, blank=True, null=True)
     gic_name = models.CharField(max_length=255, blank=True, null=True)
     humanitarian_tag = models.BooleanField()
     level = models.IntegerField()
     lft = models.IntegerField()
-    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='ReportsResult_parent', blank=True, null=True)
+    parent = models.ForeignKey("self", models.DO_NOTHING, related_name="ReportsResult_parent", blank=True, null=True)
     rght = models.IntegerField()
     sic_code = models.CharField(max_length=8, blank=True, null=True)
     sic_name = models.CharField(max_length=255, blank=True, null=True)
@@ -2027,7 +2655,13 @@ class ReportsResult(models.TenantModel):
     from_date = models.DateField(blank=True, null=True)
     to_date = models.DateField(blank=True, null=True)
     ram = models.BooleanField()
-    country_programme = models.ForeignKey(ReportsCountryprogramme, models.DO_NOTHING, related_name='ReportsResult_country_programme', blank=True, null=True)
+    country_programme = models.ForeignKey(
+        ReportsCountryprogramme,
+        models.DO_NOTHING,
+        related_name="ReportsResult_country_programme",
+        blank=True,
+        null=True,
+    )
     created = models.DateTimeField()
     modified = models.DateTimeField()
     humanitarian_marker_code = models.CharField(max_length=255, blank=True, null=True)
@@ -2037,8 +2671,8 @@ class ReportsResult(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_result'
-        unique_together = (('country_programme', 'wbs'),)
+        db_table = "reports_result"
+        unique_together = (("country_programme", "wbs"),)
 
 
 class ReportsResulttype(models.TenantModel):
@@ -2047,7 +2681,7 @@ class ReportsResulttype(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_resulttype'
+        db_table = "reports_resulttype"
 
 
 class ReportsSector(models.TenantModel):
@@ -2064,7 +2698,7 @@ class ReportsSector(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_sector'
+        db_table = "reports_sector"
 
 
 class ReportsSpecialreportingrequirement(models.TenantModel):
@@ -2073,11 +2707,13 @@ class ReportsSpecialreportingrequirement(models.TenantModel):
     modified = models.DateTimeField()
     description = models.CharField(max_length=256)
     due_date = models.DateField()
-    intervention = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='ReportsSpecialreportingrequirement_intervention')
+    intervention = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="ReportsSpecialreportingrequirement_intervention"
+    )
 
     class Meta:
         managed = False
-        db_table = 'reports_specialreportingrequirement'
+        db_table = "reports_specialreportingrequirement"
 
 
 class ReportsUnit(models.TenantModel):
@@ -2086,17 +2722,21 @@ class ReportsUnit(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'reports_unit'
+        db_table = "reports_unit"
 
 
 class ReportsUsertenantprofile(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name='ReportsUsertenantprofile_office', blank=True, null=True)
-    profile = models.OneToOneField('UsersUserprofile', models.DO_NOTHING, related_name='ReportsUsertenantprofile_profile')
+    office = models.ForeignKey(
+        ReportsOffice, models.DO_NOTHING, related_name="ReportsUsertenantprofile_office", blank=True, null=True
+    )
+    profile = models.OneToOneField(
+        "UsersUserprofile", models.DO_NOTHING, related_name="ReportsUsertenantprofile_profile"
+    )
 
     class Meta:
         managed = False
-        db_table = 'reports_usertenantprofile'
+        db_table = "reports_usertenantprofile"
 
 
 class SnapshotActivity(models.TenantModel):
@@ -2107,12 +2747,14 @@ class SnapshotActivity(models.TenantModel):
     action = models.CharField(max_length=50)
     data = models.JSONField()
     change = models.JSONField()
-    by_user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='SnapshotActivity_by_user')
-    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='SnapshotActivity_target_content_type')
+    by_user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="SnapshotActivity_by_user")
+    target_content_type = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, related_name="SnapshotActivity_target_content_type"
+    )
 
     class Meta:
         managed = False
-        db_table = 'snapshot_activity'
+        db_table = "snapshot_activity"
 
 
 class T2FItineraryitem(models.TenantModel):
@@ -2123,24 +2765,30 @@ class T2FItineraryitem(models.TenantModel):
     arrival_date = models.DateField()
     overnight_travel = models.BooleanField()
     mode_of_travel = models.CharField(max_length=5)
-    dsa_region = models.ForeignKey('PublicsDsaregion', models.DO_NOTHING, related_name='T2FItineraryitem_dsa_region', blank=True, null=True)
-    travel = models.ForeignKey('T2FTravel', models.DO_NOTHING, related_name='T2FItineraryitem_travel')
-    field_order = models.IntegerField(db_column='_order')  # Field renamed because it started with '_'.
+    dsa_region = models.ForeignKey(
+        "PublicsDsaregion", models.DO_NOTHING, related_name="T2FItineraryitem_dsa_region", blank=True, null=True
+    )
+    travel = models.ForeignKey("T2FTravel", models.DO_NOTHING, related_name="T2FItineraryitem_travel")
+    field_order = models.IntegerField(db_column="_order")  # Field renamed because it started with '_'.
 
     class Meta:
         managed = False
-        db_table = 't2f_itineraryitem'
+        db_table = "t2f_itineraryitem"
 
 
 class T2FItineraryitemAirlines(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    itineraryitem = models.ForeignKey(T2FItineraryitem, models.DO_NOTHING, related_name='T2FItineraryitemAirlines_itineraryitem')
-    airlinecompany = models.ForeignKey('PublicsAirlinecompany', models.DO_NOTHING, related_name='T2FItineraryitemAirlines_airlinecompany')
+    itineraryitem = models.ForeignKey(
+        T2FItineraryitem, models.DO_NOTHING, related_name="T2FItineraryitemAirlines_itineraryitem"
+    )
+    airlinecompany = models.ForeignKey(
+        "PublicsAirlinecompany", models.DO_NOTHING, related_name="T2FItineraryitemAirlines_airlinecompany"
+    )
 
     class Meta:
         managed = False
-        db_table = 't2f_itineraryitem_airlines'
-        unique_together = (('airlinecompany', 'itineraryitem'),)
+        db_table = "t2f_itineraryitem_airlines"
+        unique_together = (("airlinecompany", "itineraryitem"),)
 
 
 class T2FTravel(models.TenantModel):
@@ -2171,53 +2819,75 @@ class T2FTravel(models.TenantModel):
     preserved_expenses_local = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     approved_cost_traveler = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     approved_cost_travel_agencies = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
-    currency = models.ForeignKey('PublicsCurrency', models.DO_NOTHING, related_name='T2FTravel_currency', blank=True, null=True)
-    office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name='T2FTravel_office', blank=True, null=True)
-    supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='T2FTravel_supervisor', blank=True, null=True)
-    traveler = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='T2FTravel_traveler', blank=True, null=True)
+    currency = models.ForeignKey(
+        "PublicsCurrency", models.DO_NOTHING, related_name="T2FTravel_currency", blank=True, null=True
+    )
+    office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name="T2FTravel_office", blank=True, null=True)
+    supervisor = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="T2FTravel_supervisor", blank=True, null=True
+    )
+    traveler = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="T2FTravel_traveler", blank=True, null=True
+    )
     first_submission_date = models.DateTimeField(blank=True, null=True)
     preserved_expenses_usd = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
-    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='T2FTravel_section', blank=True, null=True)
+    section = models.ForeignKey(
+        ReportsSector, models.DO_NOTHING, related_name="T2FTravel_section", blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 't2f_travel'
+        db_table = "t2f_travel"
 
 
 class T2FTravelactivity(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     travel_type = models.CharField(max_length=64)
     date = models.DateField(blank=True, null=True)
-    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='T2FTravelactivity_partner', blank=True, null=True)
-    partnership = models.ForeignKey(PartnersIntervention, models.DO_NOTHING, related_name='T2FTravelactivity_partnership', blank=True, null=True)
-    primary_traveler = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='T2FTravelactivity_primary_traveler')
-    result = models.ForeignKey(ReportsResult, models.DO_NOTHING, related_name='T2FTravelactivity_result', blank=True, null=True)
+    partner = models.ForeignKey(
+        PartnersPartnerorganization, models.DO_NOTHING, related_name="T2FTravelactivity_partner", blank=True, null=True
+    )
+    partnership = models.ForeignKey(
+        PartnersIntervention, models.DO_NOTHING, related_name="T2FTravelactivity_partnership", blank=True, null=True
+    )
+    primary_traveler = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="T2FTravelactivity_primary_traveler"
+    )
+    result = models.ForeignKey(
+        ReportsResult, models.DO_NOTHING, related_name="T2FTravelactivity_result", blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 't2f_travelactivity'
+        db_table = "t2f_travelactivity"
 
 
 class T2FTravelactivityLocations(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    travelactivity = models.ForeignKey(T2FTravelactivity, models.DO_NOTHING, related_name='T2FTravelactivityLocations_travelactivity')
-    location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='T2FTravelactivityLocations_location')
+    travelactivity = models.ForeignKey(
+        T2FTravelactivity, models.DO_NOTHING, related_name="T2FTravelactivityLocations_travelactivity"
+    )
+    location = models.ForeignKey(
+        LocationsLocation, models.DO_NOTHING, related_name="T2FTravelactivityLocations_location"
+    )
 
     class Meta:
         managed = False
-        db_table = 't2f_travelactivity_locations'
-        unique_together = (('location', 'travelactivity'),)
+        db_table = "t2f_travelactivity_locations"
+        unique_together = (("location", "travelactivity"),)
 
 
 class T2FTravelactivityTravels(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    travelactivity = models.ForeignKey(T2FTravelactivity, models.DO_NOTHING, related_name='T2FTravelactivityTravels_travelactivity')
-    travel = models.ForeignKey(T2FTravel, models.DO_NOTHING, related_name='T2FTravelactivityTravels_travel')
+    travelactivity = models.ForeignKey(
+        T2FTravelactivity, models.DO_NOTHING, related_name="T2FTravelactivityTravels_travelactivity"
+    )
+    travel = models.ForeignKey(T2FTravel, models.DO_NOTHING, related_name="T2FTravelactivityTravels_travel")
 
     class Meta:
         managed = False
-        db_table = 't2f_travelactivity_travels'
-        unique_together = (('travel', 'travelactivity'),)
+        db_table = "t2f_travelactivity_travels"
+        unique_together = (("travel", "travelactivity"),)
 
 
 class T2FTravelattachment(models.TenantModel):
@@ -2225,45 +2895,49 @@ class T2FTravelattachment(models.TenantModel):
     type = models.CharField(max_length=64)
     name = models.CharField(max_length=255)
     file = models.CharField(max_length=255, blank=True, null=True)
-    travel = models.ForeignKey(T2FTravel, models.DO_NOTHING, related_name='T2FTravelattachment_travel')
+    travel = models.ForeignKey(T2FTravel, models.DO_NOTHING, related_name="T2FTravelattachment_travel")
 
     class Meta:
         managed = False
-        db_table = 't2f_travelattachment'
+        db_table = "t2f_travelattachment"
 
 
 class TpmTpmactivity(models.TenantModel):
-    activity_ptr = models.OneToOneField(ActivitiesActivity, models.DO_NOTHING, related_name='TpmTpmactivity_activity_ptr')
+    activity_ptr = models.OneToOneField(
+        ActivitiesActivity, models.DO_NOTHING, related_name="TpmTpmactivity_activity_ptr"
+    )
     additional_information = models.TextField()
     is_pv = models.BooleanField()
-    tpm_visit = models.ForeignKey('TpmTpmvisit', models.DO_NOTHING, related_name='TpmTpmactivity_tpm_visit')
-    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='TpmTpmactivity_section')
+    tpm_visit = models.ForeignKey("TpmTpmvisit", models.DO_NOTHING, related_name="TpmTpmactivity_tpm_visit")
+    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name="TpmTpmactivity_section")
 
     class Meta:
         managed = False
-        db_table = 'tpm_tpmactivity'
+        db_table = "tpm_tpmactivity"
 
 
 class TpmTpmactivityOffices(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    tpmactivity = models.ForeignKey(TpmTpmactivity, models.DO_NOTHING, related_name='TpmTpmactivityOffices_tpmactivity')
-    office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name='TpmTpmactivityOffices_office')
+    tpmactivity = models.ForeignKey(TpmTpmactivity, models.DO_NOTHING, related_name="TpmTpmactivityOffices_tpmactivity")
+    office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name="TpmTpmactivityOffices_office")
 
     class Meta:
         managed = False
-        db_table = 'tpm_tpmactivity_offices'
-        unique_together = (('office', 'tpmactivity'),)
+        db_table = "tpm_tpmactivity_offices"
+        unique_together = (("office", "tpmactivity"),)
 
 
 class TpmTpmactivityUnicefFocalPoints(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    tpmactivity = models.ForeignKey(TpmTpmactivity, models.DO_NOTHING, related_name='TpmTpmactivityUnicefFocalPoints_tpmactivity')
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TpmTpmactivityUnicefFocalPoints_user')
+    tpmactivity = models.ForeignKey(
+        TpmTpmactivity, models.DO_NOTHING, related_name="TpmTpmactivityUnicefFocalPoints_tpmactivity"
+    )
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="TpmTpmactivityUnicefFocalPoints_user")
 
     class Meta:
         managed = False
-        db_table = 'tpm_tpmactivity_unicef_focal_points'
-        unique_together = (('tpmactivity', 'user'),)
+        db_table = "tpm_tpmactivity_unicef_focal_points"
+        unique_together = (("tpmactivity", "user"),)
 
 
 class TpmTpmvisit(models.TenantModel):
@@ -2282,35 +2956,45 @@ class TpmTpmvisit(models.TenantModel):
     date_of_tpm_reported = models.DateField(blank=True, null=True)
     date_of_tpm_report_rejected = models.DateField(blank=True, null=True)
     date_of_unicef_approved = models.DateField(blank=True, null=True)
-    tpm_partner = models.ForeignKey('TpmpartnersTpmpartner', models.DO_NOTHING, related_name='TpmTpmvisit_tpm_partner', blank=True, null=True)
+    tpm_partner = models.ForeignKey(
+        "TpmpartnersTpmpartner", models.DO_NOTHING, related_name="TpmTpmvisit_tpm_partner", blank=True, null=True
+    )
     cancel_comment = models.TextField()
-    author = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TpmTpmvisit_author', blank=True, null=True)
+    author = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="TpmTpmvisit_author", blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'tpm_tpmvisit'
+        db_table = "tpm_tpmvisit"
 
 
 class TpmTpmvisitTpmPartnerFocalPoints(models.TenantModel):
     id = models.IntegerField(primary_key=True)
-    tpmvisit = models.ForeignKey(TpmTpmvisit, models.DO_NOTHING, related_name='TpmTpmvisitTpmPartnerFocalPoints_tpmvisit')
-    tpmpartnerstaffmember = models.ForeignKey('TpmpartnersTpmpartnerstaffmember', models.DO_NOTHING, related_name='TpmTpmvisitTpmPartnerFocalPoints_tpmpartnerstaffmember')
+    tpmvisit = models.ForeignKey(
+        TpmTpmvisit, models.DO_NOTHING, related_name="TpmTpmvisitTpmPartnerFocalPoints_tpmvisit"
+    )
+    tpmpartnerstaffmember = models.ForeignKey(
+        "TpmpartnersTpmpartnerstaffmember",
+        models.DO_NOTHING,
+        related_name="TpmTpmvisitTpmPartnerFocalPoints_tpmpartnerstaffmember",
+    )
 
     class Meta:
         managed = False
-        db_table = 'tpm_tpmvisit_tpm_partner_focal_points'
-        unique_together = (('tpmpartnerstaffmember', 'tpmvisit'),)
+        db_table = "tpm_tpmvisit_tpm_partner_focal_points"
+        unique_together = (("tpmpartnerstaffmember", "tpmvisit"),)
 
 
 class TpmTpmvisitreportrejectcomment(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     rejected_at = models.DateTimeField()
     reject_reason = models.TextField()
-    tpm_visit = models.ForeignKey(TpmTpmvisit, models.DO_NOTHING, related_name='TpmTpmvisitreportrejectcomment_tpm_visit')
+    tpm_visit = models.ForeignKey(
+        TpmTpmvisit, models.DO_NOTHING, related_name="TpmTpmvisitreportrejectcomment_tpm_visit"
+    )
 
     class Meta:
         managed = False
-        db_table = 'tpm_tpmvisitreportrejectcomment'
+        db_table = "tpm_tpmvisitreportrejectcomment"
 
 
 class TravelActivity(models.TenantModel):
@@ -2319,15 +3003,27 @@ class TravelActivity(models.TenantModel):
     modified = models.DateTimeField()
     activity_date = models.DateField()
     activity_type = models.CharField(max_length=64)
-    location = models.ForeignKey(LocationsLocation, models.DO_NOTHING, related_name='TravelActivity_location', blank=True, null=True)
-    monitoring_activity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='TravelActivity_monitoring_activity', blank=True, null=True)
-    partner = models.ForeignKey(PartnersPartnerorganization, models.DO_NOTHING, related_name='TravelActivity_partner', blank=True, null=True)
-    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='TravelActivity_section', blank=True, null=True)
-    trip = models.ForeignKey('TravelTrip', models.DO_NOTHING, related_name='TravelActivity_trip')
+    location = models.ForeignKey(
+        LocationsLocation, models.DO_NOTHING, related_name="TravelActivity_location", blank=True, null=True
+    )
+    monitoring_activity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="TravelActivity_monitoring_activity",
+        blank=True,
+        null=True,
+    )
+    partner = models.ForeignKey(
+        PartnersPartnerorganization, models.DO_NOTHING, related_name="TravelActivity_partner", blank=True, null=True
+    )
+    section = models.ForeignKey(
+        ReportsSector, models.DO_NOTHING, related_name="TravelActivity_section", blank=True, null=True
+    )
+    trip = models.ForeignKey("TravelTrip", models.DO_NOTHING, related_name="TravelActivity_trip")
 
     class Meta:
         managed = False
-        db_table = 'travel_activity'
+        db_table = "travel_activity"
 
 
 class TravelItineraryitem(models.TenantModel):
@@ -2338,12 +3034,18 @@ class TravelItineraryitem(models.TenantModel):
     end_date = models.DateField(blank=True, null=True)
     travel_method = models.CharField(max_length=150)
     destination = models.CharField(max_length=150)
-    trip = models.ForeignKey('TravelTrip', models.DO_NOTHING, related_name='TravelItineraryitem_trip')
-    monitoring_activity = models.ForeignKey(FieldMonitoringPlanningMonitoringactivity, models.DO_NOTHING, related_name='TravelItineraryitem_monitoring_activity', blank=True, null=True)
+    trip = models.ForeignKey("TravelTrip", models.DO_NOTHING, related_name="TravelItineraryitem_trip")
+    monitoring_activity = models.ForeignKey(
+        FieldMonitoringPlanningMonitoringactivity,
+        models.DO_NOTHING,
+        related_name="TravelItineraryitem_monitoring_activity",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'travel_itineraryitem'
+        db_table = "travel_itineraryitem"
 
 
 class TravelReport(models.TenantModel):
@@ -2351,11 +3053,11 @@ class TravelReport(models.TenantModel):
     created = models.DateTimeField()
     modified = models.DateTimeField()
     narrative = models.TextField()
-    trip = models.OneToOneField('TravelTrip', models.DO_NOTHING, related_name='TravelReport_trip')
+    trip = models.OneToOneField("TravelTrip", models.DO_NOTHING, related_name="TravelReport_trip")
 
     class Meta:
         managed = False
-        db_table = 'travel_report'
+        db_table = "travel_report"
 
 
 class TravelTrip(models.TenantModel):
@@ -2368,17 +3070,23 @@ class TravelTrip(models.TenantModel):
     description = models.TextField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    office = models.ForeignKey(ReportsOffice, models.DO_NOTHING, related_name='TravelTrip_office', blank=True, null=True)
-    section = models.ForeignKey(ReportsSector, models.DO_NOTHING, related_name='TravelTrip_section', blank=True, null=True)
-    supervisor = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_supervisor', blank=True, null=True)
-    traveller = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='TravelTrip_traveller')
+    office = models.ForeignKey(
+        ReportsOffice, models.DO_NOTHING, related_name="TravelTrip_office", blank=True, null=True
+    )
+    section = models.ForeignKey(
+        ReportsSector, models.DO_NOTHING, related_name="TravelTrip_section", blank=True, null=True
+    )
+    supervisor = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="TravelTrip_supervisor", blank=True, null=True
+    )
+    traveller = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="TravelTrip_traveller")
     user_info_text = models.JSONField()
     additional_notes = models.TextField(blank=True, null=True)
     not_as_planned = models.BooleanField()
 
     class Meta:
         managed = False
-        db_table = 'travel_trip'
+        db_table = "travel_trip"
 
 
 class TravelTripstatushistory(models.TenantModel):
@@ -2387,11 +3095,11 @@ class TravelTripstatushistory(models.TenantModel):
     modified = models.DateTimeField()
     status = models.CharField(max_length=30)
     comment = models.TextField()
-    trip = models.ForeignKey(TravelTrip, models.DO_NOTHING, related_name='TravelTripstatushistory_trip')
+    trip = models.ForeignKey(TravelTrip, models.DO_NOTHING, related_name="TravelTripstatushistory_trip")
 
     class Meta:
         managed = False
-        db_table = 'travel_tripstatushistory'
+        db_table = "travel_tripstatushistory"
 
 
 class UnicefAttachmentsAttachment(models.TenantModel):
@@ -2402,14 +3110,28 @@ class UnicefAttachmentsAttachment(models.TenantModel):
     hyperlink = models.CharField(max_length=1000)
     object_id = models.IntegerField(blank=True, null=True)
     code = models.CharField(max_length=64)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='UnicefAttachmentsAttachment_content_type', blank=True, null=True)
-    file_type = models.ForeignKey('UnicefAttachmentsFiletype', models.DO_NOTHING, related_name='UnicefAttachmentsAttachment_file_type', blank=True, null=True)
-    uploaded_by = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='UnicefAttachmentsAttachment_uploaded_by', blank=True, null=True)
+    content_type = models.ForeignKey(
+        "DjangoContentType",
+        models.DO_NOTHING,
+        related_name="UnicefAttachmentsAttachment_content_type",
+        blank=True,
+        null=True,
+    )
+    file_type = models.ForeignKey(
+        "UnicefAttachmentsFiletype",
+        models.DO_NOTHING,
+        related_name="UnicefAttachmentsAttachment_file_type",
+        blank=True,
+        null=True,
+    )
+    uploaded_by = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="UnicefAttachmentsAttachment_uploaded_by", blank=True, null=True
+    )
     ip_address = models.GenericIPAddressField()
 
     class Meta:
         managed = False
-        db_table = 'unicef_attachments_attachment'
+        db_table = "unicef_attachments_attachment"
 
 
 class UnicefAttachmentsAttachmentflat(models.TenantModel):
@@ -2420,23 +3142,33 @@ class UnicefAttachmentsAttachmentflat(models.TenantModel):
     filename = models.CharField(max_length=1024)
     uploaded_by = models.CharField(max_length=255)
     created = models.CharField(max_length=50)
-    attachment = models.ForeignKey(UnicefAttachmentsAttachment, models.DO_NOTHING, related_name='UnicefAttachmentsAttachmentflat_attachment')
+    attachment = models.ForeignKey(
+        UnicefAttachmentsAttachment, models.DO_NOTHING, related_name="UnicefAttachmentsAttachmentflat_attachment"
+    )
     ip_address = models.GenericIPAddressField()
 
     class Meta:
         managed = False
-        db_table = 'unicef_attachments_attachmentflat'
+        db_table = "unicef_attachments_attachmentflat"
 
 
 class UnicefAttachmentsAttachmentlink(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     object_id = models.IntegerField(blank=True, null=True)
-    attachment = models.ForeignKey(UnicefAttachmentsAttachment, models.DO_NOTHING, related_name='UnicefAttachmentsAttachmentlink_attachment')
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='UnicefAttachmentsAttachmentlink_content_type', blank=True, null=True)
+    attachment = models.ForeignKey(
+        UnicefAttachmentsAttachment, models.DO_NOTHING, related_name="UnicefAttachmentsAttachmentlink_attachment"
+    )
+    content_type = models.ForeignKey(
+        "DjangoContentType",
+        models.DO_NOTHING,
+        related_name="UnicefAttachmentsAttachmentlink_content_type",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         managed = False
-        db_table = 'unicef_attachments_attachmentlink'
+        db_table = "unicef_attachments_attachmentlink"
 
 
 class UnicefAttachmentsFiletype(models.TenantModel):
@@ -2449,8 +3181,8 @@ class UnicefAttachmentsFiletype(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'unicef_attachments_filetype'
-        unique_together = (('code', 'name'),)
+        db_table = "unicef_attachments_filetype"
+        unique_together = (("code", "name"),)
 
 
 class UnicefLocationsCartodbtable(models.TenantModel):
@@ -2465,7 +3197,9 @@ class UnicefLocationsCartodbtable(models.TenantModel):
     color = models.CharField(max_length=7)
     level = models.IntegerField()
     lft = models.IntegerField()
-    parent = models.ForeignKey('self', models.DO_NOTHING, related_name='UnicefLocationsCartodbtable_parent', blank=True, null=True)
+    parent = models.ForeignKey(
+        "self", models.DO_NOTHING, related_name="UnicefLocationsCartodbtable_parent", blank=True, null=True
+    )
     rght = models.IntegerField()
     tree_id = models.IntegerField()
     remap_table_name = models.CharField(max_length=254, blank=True, null=True)
@@ -2476,7 +3210,7 @@ class UnicefLocationsCartodbtable(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'unicef_locations_cartodbtable'
+        db_table = "unicef_locations_cartodbtable"
 
 
 class UnicefLocationsGatewaytype(models.TenantModel):
@@ -2488,7 +3222,7 @@ class UnicefLocationsGatewaytype(models.TenantModel):
 
     class Meta:
         managed = False
-        db_table = 'unicef_locations_gatewaytype'
+        db_table = "unicef_locations_gatewaytype"
 
 
 class UnicefSnapshotActivity(models.TenantModel):
@@ -2499,9 +3233,11 @@ class UnicefSnapshotActivity(models.TenantModel):
     action = models.CharField(max_length=50)
     data = models.JSONField()
     change = models.JSONField()
-    by_user = models.ForeignKey('AuthUser', models.DO_NOTHING, related_name='UnicefSnapshotActivity_by_user')
-    target_content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, related_name='UnicefSnapshotActivity_target_content_type')
+    by_user = models.ForeignKey("AuthUser", models.DO_NOTHING, related_name="UnicefSnapshotActivity_by_user")
+    target_content_type = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, related_name="UnicefSnapshotActivity_target_content_type"
+    )
 
     class Meta:
         managed = False
-        db_table = 'unicef_snapshot_activity'
+        db_table = "unicef_snapshot_activity"

@@ -10,15 +10,14 @@ from etools_datamart.apps.multitenant.postgresql.utils import raw_sql
 
 
 class DatabaseCreation(original_creation.DatabaseCreation):
-
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         """
         Internal implementation - create the test db tables.
         """
         test_database_name = self._get_test_db_name()
         test_db_params = {
-            'dbname': self.connection.ops.quote_name(test_database_name),
-            'suffix': self.sql_table_creation_suffix(),
+            "dbname": self.connection.ops.quote_name(test_database_name),
+            "suffix": self.sql_table_creation_suffix(),
         }
         # Create the test database and connect to it.
         with self._nodb_cursor() as cursor:
@@ -30,23 +29,23 @@ class DatabaseCreation(original_creation.DatabaseCreation):
                 if keepdb:
                     return test_database_name
 
-                sys.stderr.write(
-                    "Got an error creating the test database: %s\n" % e)
+                sys.stderr.write("Got an error creating the test database: %s\n" % e)
                 if not autoclobber:
                     confirm = input(
                         "Type 'yes' if you would like to try deleting the test "
-                        "database '%s', or 'no' to cancel: " % test_database_name)
-                if autoclobber or confirm == 'yes':
+                        "database '%s', or 'no' to cancel: " % test_database_name
+                    )
+                if autoclobber or confirm == "yes":
                     try:
                         if verbosity >= 1:
-                            print("Destroying old test database for alias %s..." % (
-                                self._get_database_display_str(verbosity, test_database_name),
-                            ))
-                        cursor.execute(raw_sql('DROP DATABASE %(dbname)s' % test_db_params))
+                            print(
+                                "Destroying old test database for alias %s..."
+                                % (self._get_database_display_str(verbosity, test_database_name),)
+                            )
+                        cursor.execute(raw_sql("DROP DATABASE %(dbname)s" % test_db_params))
                         self._execute_create_test_db(cursor, test_db_params, keepdb)
                     except Exception as e:
-                        sys.stderr.write(
-                            "Got an error recreating the test database: %s\n" % e)
+                        sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                         sys.exit(2)
                 else:
                     print("Tests cancelled.")
@@ -63,14 +62,17 @@ class DatabaseCreation(original_creation.DatabaseCreation):
 
         test_database_name = self._get_test_db_name()
         if verbosity >= 1:
-            action = 'Creating'
+            action = "Creating"
             if keepdb:
                 action = "Using existing"
 
-            print("%s test database for alias %s..." % (
-                action,
-                self._get_database_display_str(verbosity, test_database_name),
-            ))
+            print(
+                "%s test database for alias %s..."
+                % (
+                    action,
+                    self._get_database_display_str(verbosity, test_database_name),
+                )
+            )
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. This is to handle the case
@@ -108,29 +110,36 @@ SET default_tablespace = '';
         if verbosity >= 1:
             print("Restoring %s" % public_dump)
 
-        cmds = ["pg_restore",
-                "-U", self.connection.settings_dict['USER'],
-                "-p", str(self.connection.settings_dict['PORT']),
-                "-h", self.connection.settings_dict['HOST'],
-                "-d", self.connection.settings_dict['NAME'],
-                "--no-owner",
-                "--clean",
-                "--if-exists",
-                "--disable-triggers",
-                "--exit-on-error",
-                str(public_dump)]
+        cmds = [
+            "pg_restore",
+            "-U",
+            self.connection.settings_dict["USER"],
+            "-p",
+            str(self.connection.settings_dict["PORT"]),
+            "-h",
+            self.connection.settings_dict["HOST"],
+            "-d",
+            self.connection.settings_dict["NAME"],
+            "--no-owner",
+            "--clean",
+            "--if-exists",
+            "--disable-triggers",
+            "--exit-on-error",
+            str(public_dump),
+        ]
         try:
             subprocess.check_call(cmds)
         except BaseException as e:
             print(" ======= UNRECOVERABLE ERROR ========= ")
             print(e)
             print(" ".join(cmds))
-            if hasattr(sys, '_called_from_test'):
+            if hasattr(sys, "_called_from_test"):
                 import pytest
+
                 pytest.exit("--")
             sys.exit(2)
         try:
-            cur.execute(raw_sql(header.format(schema='public')))
+            cur.execute(raw_sql(header.format(schema="public")))
         except BaseException as e:
             raise BaseException(f"Error creating schema 'public'") from e
 
@@ -142,8 +151,9 @@ SET default_tablespace = '';
 
             try:
                 sql = tenant_dump.read_text()
-                sql = sql.replace("[[schema]]", schema).replace("SET default_tablespace = '';",
-                                                                header.format(schema=schema))
+                sql = sql.replace("[[schema]]", schema).replace(
+                    "SET default_tablespace = '';", header.format(schema=schema)
+                )
                 cur.execute(raw_sql(sql))
             except BaseException as e:
                 raise BaseException(f"Error creating schema {schema}") from e
@@ -154,9 +164,9 @@ SET default_tablespace = '';
         return test_database_name
 
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
-        cursor.execute(raw_sql('CREATE DATABASE %(dbname)s %(suffix)s' % parameters))
+        cursor.execute(raw_sql("CREATE DATABASE %(dbname)s %(suffix)s" % parameters))
         try:
-            cursor.execute(raw_sql('CREATE ROLE etoolusr'))
+            cursor.execute(raw_sql("CREATE ROLE etoolusr"))
         except Exception:
             pass
 

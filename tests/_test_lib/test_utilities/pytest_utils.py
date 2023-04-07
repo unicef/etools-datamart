@@ -40,6 +40,7 @@ class ArgsDecorator:
     ...   def test_example(self): pass
 
     """
+
     PREFIX = None
 
     def __init__(self, *ids):
@@ -50,19 +51,19 @@ class ArgsDecorator:
 
     def __repr__(self):
         d = self.__dict__.copy()
-        name = ','.join(d.pop('tickets_id'))
-        return '<MarkDecorator %r %r>' % (name, d)
+        name = ",".join(d.pop("tickets_id"))
+        return "<MarkDecorator %r %r>" % (name, d)
 
     def __call__(self, *args, **kwargs):
-        """ if passed a single callable argument: decorate it with mark info.
-            otherwise add *args/**kwargs in-place to mark information. """
+        """if passed a single callable argument: decorate it with mark info.
+        otherwise add *args/**kwargs in-place to mark information."""
         from _pytest.mark import Mark, MarkInfo
+
         if args:
             func = args[0]
-            if len(args) == 1 and hasattr(func, '__call__') or \
-                    hasattr(func, '__bases__'):
-                if hasattr(func, '__bases__'):
-                    if hasattr(func, 'pytestmark'):
+            if len(args) == 1 and hasattr(func, "__call__") or hasattr(func, "__bases__"):
+                if hasattr(func, "__bases__"):
+                    if hasattr(func, "pytestmark"):
                         markers = func.pytestmark
                         if not isinstance(markers, list):
                             func.pytestmark = [markers, self]
@@ -72,7 +73,7 @@ class ArgsDecorator:
                         func.pytestmark = [self]
                 else:
                     for x in self.tickets_id:
-                        name = '%s%s' % (self.PREFIX, x)
+                        name = "%s%s" % (self.PREFIX, x)
                         holder = getattr(func, name, None)
                         mark = Mark(name, self.args, self.kwargs)
                         if holder is None:
@@ -88,4 +89,4 @@ class ArgsDecorator:
 
 
 class ticket(ArgsDecorator):
-    PREFIX = 't'
+    PREFIX = "t"

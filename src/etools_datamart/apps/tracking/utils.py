@@ -9,15 +9,15 @@ def reset_all_counters():
 
 
 def refresh_all_counters():
-    cache.delete('tracking-counters')
+    cache.delete("tracking-counters")
 
 
 def get_all_counters():
-    numbers = cache.get('tracking-counters')
+    numbers = cache.get("tracking-counters")
     if not numbers:
         numbers = {}
         for m in DailyCounter, UserCounter, MonthlyCounter, PathCounter, APIRequestLog:
             numbers[m._meta.verbose_name] = m.objects.count()
-        cache.set('tracking-counters', numbers)
+        cache.set("tracking-counters", numbers)
 
     return numbers

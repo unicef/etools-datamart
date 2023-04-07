@@ -16,7 +16,7 @@ from .partner import Partner
 
 class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
     def process_country(self):
-        for record in AuditMicroassessment.objects.select_related('engagement_ptr'):
+        for record in AuditMicroassessment.objects.select_related("engagement_ptr"):
             record.id = record.engagement_ptr_id
             record.sub_type = AuditMicroassessment
             record.engagement_ptr._impl = record
@@ -26,12 +26,12 @@ class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
             self.increment_counter(op)
 
     def get_subject_area(self, record: AuditEngagement, values: dict, **kwargs):
-        filters = {'blueprint__category__code': "ma_subject_areas"}
+        filters = {"blueprint__category__code": "ma_subject_areas"}
         value, count = self._get_risks(record, **filters)
         return value
 
     def get_test_subject_areas(self, record: AuditEngagement, values: dict, **kwargs):
-        filters = {'blueprint__category__code': "test_subject_areas"}
+        filters = {"blueprint__category__code": "test_subject_areas"}
         value, count = self._get_risks(record, **filters)
         values["test_subject_areas_count"] = count
         return value
@@ -40,12 +40,12 @@ class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
         return AuditDetailedfindinginfo.objects.filter(micro_assesment__pk=record.pk).count()
 
     def risk_rating_helper(self, record: AuditEngagement, header):
-        filters = {'blueprint__category__code': "ma_subject_areas", 'blueprint__header': header}
+        filters = {"blueprint__category__code": "ma_subject_areas", "blueprint__header": header}
         value, extra, text = self._get_risk(record, **filters)
         return text
 
     def get_overall_risk_rating(self, record: AuditEngagement, values: dict, **kwargs):
-        filters = {'blueprint__category__code': "ma_global_assessment"}
+        filters = {"blueprint__category__code": "ma_global_assessment"}
         value, extra, text = self._get_risk(record, **filters)
         return text
 
@@ -72,10 +72,10 @@ class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
 
 
 class MicroAssessment(EtoolsDataMartModel):
-    TYPE_MICRO_ASSESSMENT = 'ma'
+    TYPE_MICRO_ASSESSMENT = "ma"
 
     TYPES = Choices(
-        (TYPE_MICRO_ASSESSMENT, _('Micro Assessment')),
+        (TYPE_MICRO_ASSESSMENT, _("Micro Assessment")),
     )
     reference_number = models.CharField(max_length=100, blank=True, null=True)
     engagement_type = models.CharField(
@@ -85,9 +85,9 @@ class MicroAssessment(EtoolsDataMartModel):
         choices=TYPES,
         db_index=True,
     )
-    status = models.CharField(max_length=30, blank=True, null=True,
-                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
-                              db_index=True)
+    status = models.CharField(
+        max_length=30, blank=True, null=True, choices=AuditEngagementConsts.DISPLAY_STATUSES, db_index=True
+    )
     created = models.DateField(blank=True, null=True)
 
     # Engagement Overview
@@ -95,8 +95,13 @@ class MicroAssessment(EtoolsDataMartModel):
     agreement = models.CharField(max_length=300, blank=True, null=True)
     auditor = models.CharField(max_length=255, blank=True, null=True)
     auditor_number = models.CharField(max_length=30, blank=True, null=True)
-    shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
-                                blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
+    shared_ip_with = ArrayField(
+        models.CharField(max_length=20, blank=True, null=True),
+        blank=True,
+        null=True,
+        default=list,
+        verbose_name=_("Shared Audit with"),
+    )
 
     # Report Section
     # sections = models.TextField(blank=True, null=True)
@@ -149,16 +154,16 @@ class MicroAssessment(EtoolsDataMartModel):
             subject_area="-",
             subject_area_extra="i",
             test_subject_areas="-",
-            test_subject_areas_count='i',
-            implementing_partner_risk_rating='-',
-            findings_count='-',
-            overall_risk_rating='-',
-            programme_management_risk_rating='-',
-            organizational_structure_and_staffing_risk_rating='-',
-            accounting_policies_and_procedures_risk_rating='-',
-            fixed_assets_and_inventory_risk_rating='-',
-            financial_reporting_and_monitoring_risk_rating='-',
-            procurement_and_contract_administration_risk_rating='-',
-            action_points='-',
-            action_points_data='i',
+            test_subject_areas_count="i",
+            implementing_partner_risk_rating="-",
+            findings_count="-",
+            overall_risk_rating="-",
+            programme_management_risk_rating="-",
+            organizational_structure_and_staffing_risk_rating="-",
+            accounting_policies_and_procedures_risk_rating="-",
+            fixed_assets_and_inventory_risk_rating="-",
+            financial_reporting_and_monitoring_risk_rating="-",
+            procurement_and_contract_administration_risk_rating="-",
+            action_points="-",
+            action_points_data="i",
         )

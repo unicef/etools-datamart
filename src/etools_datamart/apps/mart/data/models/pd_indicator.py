@@ -9,11 +9,10 @@ from etools_datamart.apps.sources.etools.models import models, ReportsAppliedind
 
 
 class PDIndicatorLoader(EtoolsLoader):
-
     def get_values(self, record):
         values = super().get_values(record)
         for k, v in values.items():
-            if k in ['target_denominator', 'target_numerator', 'baseline_denominator', 'baseline_numerator']:
+            if k in ["target_denominator", "target_numerator", "baseline_denominator", "baseline_numerator"]:
                 values[k] = SafeDecimal(v)
                 if values[k]:
                     values[k]._validate_for_field(PDIndicator._meta.get_field(k))
@@ -71,17 +70,13 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     )
 
     # target = models.TextField()  # This field type is a guess.
-    target_denominator = models.DecimalField(blank=True, null=True,
-                                             max_digits=25, decimal_places=3)
+    target_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
 
-    target_numerator = models.DecimalField(blank=True, null=True,
-                                           max_digits=25, decimal_places=3)
+    target_numerator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
-    baseline_denominator = models.DecimalField(blank=True, null=True,
-                                               max_digits=20, decimal_places=3)
-    baseline_numerator = models.DecimalField(blank=True, null=True,
-                                             max_digits=20, decimal_places=3)
+    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
+    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
 
     # from lower_result
     lower_result_name = models.CharField(max_length=500, blank=True, null=True)
@@ -113,80 +108,82 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     loader = PDIndicatorLoader()
 
     class Meta:
-        unique_together = (('schema_name',
-                            'source_id',
-                            'source_location_id',
-                            'source_disaggregation_id',
-                            ),)
+        unique_together = (
+            (
+                "schema_name",
+                "source_id",
+                "source_location_id",
+                "source_disaggregation_id",
+            ),
+        )
 
     class Options:
         source = ReportsAppliedindicator
-        queryset = ReportsAppliedindicator.objects.select_related('indicator', 'section').all
+        queryset = ReportsAppliedindicator.objects.select_related("indicator", "section").all
 
-        key = lambda loader, record: dict(schema_name=loader.context['country'].schema_name,
-                                          source_id=record.pk,
-                                          source_location_id=record.location.pk,
-                                          source_disaggregation_id=record.disaggregation.pk)
+        key = lambda loader, record: dict(
+            schema_name=loader.context["country"].schema_name,
+            source_id=record.pk,
+            source_location_id=record.location.pk,
+            source_disaggregation_id=record.disaggregation.pk,
+        )
 
-        mapping = add_location_mapping(dict(
-            title='indicator.title',
-            unit='indicator.unit',
-            target_denominator=lambda loader, record: record.target.get('d'),
-            target_numerator=lambda loader, record: record.target.get('v'),
-            baseline_denominator=lambda loader, record: record.baseline.get('d'),
-            baseline_numerator=lambda loader, record: record.baseline.get('v'),
-
-            display_type='indicator.display_type`',
-            section_name='section.name',
-            lower_result_name='lower_result.name',
-            result_link_intervention='lower_result.result_link.intervention.pk',
-            pd_reference_number='lower_result.result_link.intervention.reference_number',
-            pd_url='-',
-
-            disaggregation_name='disaggregation.name',
-            disaggregation_active='disaggregation.active',
-
-            location_name='location.name',
-            location_pcode='location.p_code',
-            location_level='location.admin_level',
-            location_levelname='location.admin_level_name',
-            location=lambda loader, record: Location.objects.filter(source_id=record.id,
-                                                                    schema_name=loader.context[
-                                                                        'country'].schema_name).first(),
-
-            source_disaggregation_id='disaggregation.id',
-            source_location_id='location.id',
-
-            # ----
-            # baseline_denominator="N/A",
-            # baseline_numerator="N/A",
-            cluster_indicator_id="=",
-            cluster_indicator_title="=",
-            cluster_name="=",
-            # cp_output="lower_result.result_link.cp_output.name",
-            # cp_output_id="N/A",
-            denominator_label="=",
-            # disaggregation_active="N/A",
-            # disaggregation_name="N/A",
-            is_active="=",
-            is_high_frequency="=",
-            label="=",
-            # location_level="N/A",
-            # location_levelname="N/A",
-            # location_name="N/A",
-            # location_pcode="N/A",
-            means_of_verification="=",
-            measurement_specifications="=",
-            numerator_label="=",
-            # pd_output == lower_result.result_link.
-            # pd_output_indicator_last_modify_date="N/A",
-            # pd_output_indicator_title="N/A",
-            # pd_output_name="N/A",
-            # pd_output_section="N/A",
-            # pd_sffa_reference_number="N/A",
-            # response_plan_name="N/A",
-            # source_disaggregation_id="N/A",
-            # target_denominator="N/A",
-            # target_numerator="N/A",
-            # unit="N/A",
-        ))
+        mapping = add_location_mapping(
+            dict(
+                title="indicator.title",
+                unit="indicator.unit",
+                target_denominator=lambda loader, record: record.target.get("d"),
+                target_numerator=lambda loader, record: record.target.get("v"),
+                baseline_denominator=lambda loader, record: record.baseline.get("d"),
+                baseline_numerator=lambda loader, record: record.baseline.get("v"),
+                display_type="indicator.display_type`",
+                section_name="section.name",
+                lower_result_name="lower_result.name",
+                result_link_intervention="lower_result.result_link.intervention.pk",
+                pd_reference_number="lower_result.result_link.intervention.reference_number",
+                pd_url="-",
+                disaggregation_name="disaggregation.name",
+                disaggregation_active="disaggregation.active",
+                location_name="location.name",
+                location_pcode="location.p_code",
+                location_level="location.admin_level",
+                location_levelname="location.admin_level_name",
+                location=lambda loader, record: Location.objects.filter(
+                    source_id=record.id, schema_name=loader.context["country"].schema_name
+                ).first(),
+                source_disaggregation_id="disaggregation.id",
+                source_location_id="location.id",
+                # ----
+                # baseline_denominator="N/A",
+                # baseline_numerator="N/A",
+                cluster_indicator_id="=",
+                cluster_indicator_title="=",
+                cluster_name="=",
+                # cp_output="lower_result.result_link.cp_output.name",
+                # cp_output_id="N/A",
+                denominator_label="=",
+                # disaggregation_active="N/A",
+                # disaggregation_name="N/A",
+                is_active="=",
+                is_high_frequency="=",
+                label="=",
+                # location_level="N/A",
+                # location_levelname="N/A",
+                # location_name="N/A",
+                # location_pcode="N/A",
+                means_of_verification="=",
+                measurement_specifications="=",
+                numerator_label="=",
+                # pd_output == lower_result.result_link.
+                # pd_output_indicator_last_modify_date="N/A",
+                # pd_output_indicator_title="N/A",
+                # pd_output_name="N/A",
+                # pd_output_section="N/A",
+                # pd_sffa_reference_number="N/A",
+                # response_plan_name="N/A",
+                # source_disaggregation_id="N/A",
+                # target_denominator="N/A",
+                # target_numerator="N/A",
+                # unit="N/A",
+            )
+        )

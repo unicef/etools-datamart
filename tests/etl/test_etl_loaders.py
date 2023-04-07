@@ -8,7 +8,7 @@ from etools_datamart.apps.etl.loader import loadeables
 
 
 def pytest_generate_tests(metafunc):
-    if 'loader' in metafunc.fixturenames:
+    if "loader" in metafunc.fixturenames:
         m = []
         ids = []
         for model_name in sorted(loadeables):
@@ -24,9 +24,9 @@ def pytest_generate_tests(metafunc):
             #     'data.auditresult',
             # ]:
             #     m.append(pytest.param(model.loader, marks=pytest.mark.xfail))
-            if model._meta.app_label == 'prp':
+            if model._meta.app_label == "prp":
                 m.append(pytest.param(model.loader, marks=pytest.mark.skip))
-            elif model._meta.app_label == 'rapidpro':
+            elif model._meta.app_label == "rapidpro":
                 m.append(pytest.param(model.loader, marks=pytest.mark.skip))
             else:
                 m.append(model.loader)
@@ -36,11 +36,10 @@ def pytest_generate_tests(metafunc):
 
 
 def truncate_model_table(model):
-    conn = connections['default']
+    conn = connections["default"]
     cursor = conn.cursor()
     # cursor.execute(f'TRUNCATE TABLE "{model._meta.db_table}"')
-    cursor.execute('TRUNCATE TABLE "{0}" '
-                   'RESTART IDENTITY CASCADE;'.format(model._meta.db_table))
+    cursor.execute('TRUNCATE TABLE "{0}" ' "RESTART IDENTITY CASCADE;".format(model._meta.db_table))
 
 
 @pytest.mark.django_db
@@ -59,7 +58,7 @@ def test_loader_load(loader):
         assert loader.model.objects.count() >= 0
         assert ret.processed >= 0
         assert ret.deleted == 0
-        assert not loader.model.objects.exclude(seen=ret.context['today']).exists()
+        assert not loader.model.objects.exclude(seen=ret.context["today"]).exists()
         assert ret.deleted == 0
     else:
-        print('------------skipping {}'.format(loader.model.__name__))
+        print("------------skipping {}".format(loader.model.__name__))

@@ -13,17 +13,20 @@ from etools_datamart.apps.sources.etools.models import (
 
 from .utils import set_primary_key
 
-models.ManyToManyField(LocationsLocation,
-                       through=ActivitiesActivityLocations,
-                       ).contribute_to_class(ActivitiesActivity, 'locations')
+models.ManyToManyField(
+    LocationsLocation,
+    through=ActivitiesActivityLocations,
+).contribute_to_class(ActivitiesActivity, "locations")
 
-models.ManyToManyField(AuthUser,
-                       through=TpmTpmactivityUnicefFocalPoints,
-                       ).contribute_to_class(TpmTpmactivity, 'unicef_focal_points')
+models.ManyToManyField(
+    AuthUser,
+    through=TpmTpmactivityUnicefFocalPoints,
+).contribute_to_class(TpmTpmactivity, "unicef_focal_points")
 
-models.ManyToManyField(ReportsOffice,
-                       through=TpmTpmactivityOffices,
-                       ).contribute_to_class(TpmTpmactivity, 'offices')
+models.ManyToManyField(
+    ReportsOffice,
+    through=TpmTpmactivityOffices,
+).contribute_to_class(TpmTpmactivity, "offices")
 
 
 # pk = TpmTpmactivity._meta.get_field('activity_ptr')
@@ -41,11 +44,11 @@ def get_reference_number(self):
 TpmTpmactivity.reference_number = property(get_reference_number)
 # TpmTpmactivity.activity = property(lambda self: self.activity_ptr)
 
-set_primary_key(TpmTpmactivity, 'activity_ptr')
+set_primary_key(TpmTpmactivity, "activity_ptr")
 
-TpmTpmactivity.task_number = property(lambda self:
-                                      list(self.tpm_visit.tpm_activities.values_list('id', flat=True)).index(
-                                          self.id) + 1)
+TpmTpmactivity.task_number = property(
+    lambda self: list(self.tpm_visit.tpm_activities.values_list("id", flat=True)).index(self.id) + 1
+)
 
 
 def fix_related_names(model, names):
@@ -58,7 +61,6 @@ def fix_related_names(model, names):
         assert getattr(related_model(), related_name)
 
 
-related = (['tpm_visit', 'activities'],
-           )
+related = (["tpm_visit", "activities"],)
 
 fix_related_names(TpmTpmactivity, related)

@@ -8,10 +8,12 @@ from etools_datamart.apps.sources.etools.models import (
     ReportsDisaggregation,
 )
 
-models.ManyToManyField(ReportsDisaggregation,
-                       through=ReportsAppliedindicatorDisaggregation,
-                       ).contribute_to_class(ReportsAppliedindicator, 'disaggregations')
+models.ManyToManyField(
+    ReportsDisaggregation,
+    through=ReportsAppliedindicatorDisaggregation,
+).contribute_to_class(ReportsAppliedindicator, "disaggregations")
 
-models.ManyToManyField(LocationsLocation,
-                       through=ReportsAppliedindicatorLocations,
-                       ).contribute_to_class(ReportsAppliedindicator, 'locations')
+models.ManyToManyField(
+    LocationsLocation,
+    through=ReportsAppliedindicatorLocations,
+).contribute_to_class(ReportsAppliedindicator, "locations")

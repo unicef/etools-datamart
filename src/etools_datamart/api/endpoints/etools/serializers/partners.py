@@ -37,14 +37,16 @@ class AssessmentSerializer(EToolsSerializer):
 
 
 class PlannedengagementSerializer(EToolsSerializer):
-
     partner = serializers.SerializerMethodField()
     vendor_number = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
 
     def get_partner_object(self, obj):
-        return [partner for partner in PartnersPartnerorganization.objects.filter(
-            pk=obj.partner_id) if partner.schema == obj.schema][0]
+        return [
+            partner
+            for partner in PartnersPartnerorganization.objects.filter(pk=obj.partner_id)
+            if partner.schema == obj.schema
+        ][0]
 
     def get_partner(self, obj):
         return self.get_partner_object(obj).name
@@ -57,4 +59,4 @@ class PlannedengagementSerializer(EToolsSerializer):
 
     class Meta:
         model = models.PartnersPlannedengagement
-        fields = '__all__'
+        fields = "__all__"

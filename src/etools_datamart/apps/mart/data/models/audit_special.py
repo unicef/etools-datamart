@@ -16,7 +16,7 @@ from .partner import Partner
 
 class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
     def process_country(self):
-        for record in AuditSpecialaudit.objects.select_related('engagement_ptr'):
+        for record in AuditSpecialaudit.objects.select_related("engagement_ptr"):
             record.id = record.engagement_ptr_id
             record.sub_type = AuditSpecialaudit
             record.engagement_ptr._impl = record
@@ -25,16 +25,15 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
-
     def get_special_procedures_count(self, record, values, field_name):
         return AuditSpecialauditrecommendation.objects.filter(audit=record._impl).count()
 
 
 class AuditSpecial(EtoolsDataMartModel):
-    TYPE_SPECIAL_AUDIT = 'sa'
+    TYPE_SPECIAL_AUDIT = "sa"
 
     TYPES = Choices(
-        (TYPE_SPECIAL_AUDIT, _('Special Audit')),
+        (TYPE_SPECIAL_AUDIT, _("Special Audit")),
     )
     reference_number = models.CharField(max_length=100, blank=True, null=True)
     engagement_type = models.CharField(
@@ -44,9 +43,9 @@ class AuditSpecial(EtoolsDataMartModel):
         choices=TYPES,
         db_index=True,
     )
-    status = models.CharField(max_length=30, blank=True, null=True,
-                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
-                              db_index=True)
+    status = models.CharField(
+        max_length=30, blank=True, null=True, choices=AuditEngagementConsts.DISPLAY_STATUSES, db_index=True
+    )
     created = models.DateField(blank=True, null=True)
 
     # Engagement Overview Section
@@ -58,8 +57,13 @@ class AuditSpecial(EtoolsDataMartModel):
     date_of_final_report = models.DateField(null=True, blank=True)
     total_value = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
     joint_audit = models.BooleanField(null=True, blank=True)
-    shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
-                                blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
+    shared_ip_with = ArrayField(
+        models.CharField(max_length=20, blank=True, null=True),
+        blank=True,
+        null=True,
+        default=list,
+        verbose_name=_("Shared Audit with"),
+    )
     sections = models.TextField(blank=True, null=True)
     sections_data = JSONField(blank=True, null=True, default=dict)
     offices = models.TextField(blank=True, null=True)
@@ -90,9 +94,9 @@ class AuditSpecial(EtoolsDataMartModel):
             auditor_number="agreement.auditor_firm.vendor_number",
             agreement="agreement.order_number",  # PurchaseOrder
             partner="-",
-            sections='-',
-            offices='-',
-            special_procedures_count='-',
-            action_points='-',
-            action_points_data='i',
+            sections="-",
+            offices="-",
+            special_procedures_count="-",
+            action_points="-",
+            action_points_data="i",
         )

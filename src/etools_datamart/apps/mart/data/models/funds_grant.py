@@ -14,4 +14,4 @@ class Grant(EtoolsDataMartModel):
 
     class Options:
         source = FundsGrant
-        mapping = dict(donor='donor.name')
+        mapping = dict(donor="donor.name")

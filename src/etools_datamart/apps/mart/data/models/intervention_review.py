@@ -48,19 +48,17 @@ class InterventionReview(InterventionSimpleAbstract, EtoolsDataMartModel):
         source = PartnersInterventionreview
         depends = (Intervention,)
         mapping = dict(
-            pd_number='intervention.number',
-            pd_title='intervention.title',
-            partner='intervention.agreement.partner.name',
-            partner_cso_type='intervention.agreement.partner.cso_type',
-            partner_type='intervention.agreement.partner.partner_type',
-            partner_vendor_number='intervention.agreement.partner.vendor_number',
-            review_created='created',
-            review_modified='modified',
-            overall_approver='-',
-            submitted_by='-'
+            pd_number="intervention.number",
+            pd_title="intervention.title",
+            partner="intervention.agreement.partner.name",
+            partner_cso_type="intervention.agreement.partner.cso_type",
+            partner_type="intervention.agreement.partner.partner_type",
+            partner_vendor_number="intervention.agreement.partner.vendor_number",
+            review_created="created",
+            review_modified="modified",
+            overall_approver="-",
+            submitted_by="-",
         )
         queryset = lambda: PartnersInterventionreview.objects.select_related(
-            'intervention',
-            'intervention__agreement',
-            'intervention__agreement__partner'
+            "intervention", "intervention__agreement", "intervention__agreement__partner"
         )

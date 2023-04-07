@@ -8,8 +8,7 @@ class InvalidSchema(Exception):
         self.schema = schema
 
     def __str__(self):
-        return "Invalid schema%s: %s" % (pluralize(self.schema),
-                                         ','.join(self.schema))
+        return "Invalid schema%s: %s" % (pluralize(self.schema), ",".join(self.schema))
 
 
 class NotAuthorizedSchema(PermissionDenied):

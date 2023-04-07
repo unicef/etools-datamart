@@ -1,8 +1,5 @@
-
 def router_factory(db_name, app_list, syncdb=True):  # noqa
-
     class InnerRouter(object):
-
         def db_for_read(self, model, **hints):
             if model._meta.app_label in app_list:
                 return db_name

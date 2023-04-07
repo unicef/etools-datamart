@@ -10,8 +10,8 @@ import etools_datamart
 
 
 class Command(BaseCommand):
-    args = ''
-    help = 'Help text here....'
+    args = ""
+    help = "Help text here...."
     requires_migrations_checks = False
     requires_system_checks = []
 
@@ -20,33 +20,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
+        parser.add_argument("--pidfile", dest="pidfile", default=None, type=int, help="target process pidfile")
         parser.add_argument(
-            '--pidfile',
-            dest='pidfile',
-            default=None,
-            type=int,
-            help='target process pidfile')
-        parser.add_argument(
-            '--host',
-            dest='host',
-            default='http://127.0.0.1:8000',
-            help='run deployment related actions')
-        parser.add_argument(
-            '--timeout',
-            '-t',
-            dest='timeout',
-            default=60 * 5,
-            type=int,
-            help='check timeout')
+            "--host", dest="host", default="http://127.0.0.1:8000", help="run deployment related actions"
+        )
+        parser.add_argument("--timeout", "-t", dest="timeout", default=60 * 5, type=int, help="check timeout")
 
     def handle(self, *args, **options):
         sleep = 5
-        pidfile = options['pidfile']
-        timeout = options['timeout']
-        host = options['host']
+        pidfile = options["pidfile"]
+        timeout = options["timeout"]
+        host = options["host"]
         try:
             if pidfile:
-                with open(pidfile, 'r') as f:
+                with open(pidfile, "r") as f:
                     pid = f.read()
                 p = psutil.Process(int(pid))
                 stop_at = time.time() + timeout
@@ -61,21 +48,21 @@ class Command(BaseCommand):
                 stop_at = time.time() + timeout
                 while True:
                     try:
-                        url = '%s/healthcheck/%s/' % (host, etools_datamart.VERSION)
+                        url = "%s/healthcheck/%s/" % (host, etools_datamart.VERSION)
                         res = requests.get(url, timeout=1)
                         assert res.status_code == 200
-                        self.stdout.write('Success')
+                        self.stdout.write("Success")
                         sys.exit(0)
                     except Exception:
-                        self.stdout.write('.', ending='')
+                        self.stdout.write(".", ending="")
                         self.stdout._out.flush()
 
                     if time.time() > stop_at:
-                        self.stdout.write('Error')
+                        self.stdout.write("Error")
                         sys.exit(1)
                     time.sleep(sleep)
         except KeyboardInterrupt:
-            self.stdout.write('')
+            self.stdout.write("")
             sys.exit(1)
         except Exception as e:
             self.stdout.write(str(e))

@@ -14,9 +14,7 @@ class AgreementLoader(EtoolsLoader):
         # PartnersPartnerstaffmember.objects.filter(agreement_authorizations=original)
         officers = []
         for authorized in record.authorized_officers.all():
-            officers.append('%s %s (%s)' % (authorized.last_name,
-                                            authorized.first_name,
-                                            authorized.email))
+            officers.append("%s %s (%s)" % (authorized.last_name, authorized.first_name, authorized.email))
         return ",".join(officers)
 
 
@@ -26,17 +24,17 @@ class Agreement(EtoolsDataMartModel):
     start = models.DateField(blank=True, null=True)
     end = models.DateField(blank=True, null=True)
 
-    agreement_type = models.CharField(max_length=10,
-                                      choices=PartnersAgreementConst.AGREEMENT_TYPES,
-                                      blank=True, null=True, db_index=True)
+    agreement_type = models.CharField(
+        max_length=10, choices=PartnersAgreementConst.AGREEMENT_TYPES, blank=True, null=True, db_index=True
+    )
     agreement_number = models.CharField(max_length=45, blank=True, null=True)
     attached_agreement = models.CharField(max_length=1024, blank=True, null=True)
     signed_by_unicef_date = models.DateField(blank=True, null=True)
     signed_by_partner_date = models.DateField(blank=True, null=True)
 
-    status = models.CharField(max_length=32,
-                              choices=PartnersAgreementConst.STATUS_CHOICES,
-                              db_index=True, blank=True, null=True)
+    status = models.CharField(
+        max_length=32, choices=PartnersAgreementConst.STATUS_CHOICES, db_index=True, blank=True, null=True
+    )
     reference_number_year = models.IntegerField(blank=True, null=True)
     special_conditions_pca = models.BooleanField(blank=True, null=True)
 
@@ -58,13 +56,14 @@ class Agreement(EtoolsDataMartModel):
     loader = AgreementLoader()
 
     class Meta:
-        unique_together = ('schema_name', 'agreement_number')
+        unique_together = ("schema_name", "agreement_number")
 
     class Options:
         source = PartnersAgreement
-        mapping = {'partner_name': 'partner.name',
-                   'vendor_number': 'partner.vendor_number',
-                   'country_programme': 'country_programme.name',
-                   'signed_by': 'signed_by.name',
-                   'signed_by_partner': 'partner_manager.name'
-                   }
+        mapping = {
+            "partner_name": "partner.name",
+            "vendor_number": "partner.vendor_number",
+            "country_programme": "country_programme.name",
+            "signed_by": "signed_by.name",
+            "signed_by_partner": "partner_manager.name",
+        }

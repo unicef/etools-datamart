@@ -1,1 +1,1 @@
-PRP_URL = 'http://www.partnerreportingportal.org'
+PRP_URL = "http://www.partnerreportingportal.org"

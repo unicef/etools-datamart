@@ -24,7 +24,7 @@ logger = logging.getLogger()
 
 
 def jwt_get_username_from_payload(payload):
-    return payload.get('preferred_username', payload.get('unique_name'))
+    return payload.get("preferred_username", payload.get("unique_name"))
 
 
 def get_client_ip(environ):
@@ -36,9 +36,9 @@ def get_client_ip(environ):
     value may be forged from a client.
     """
     try:
-        return environ['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
+        return environ["HTTP_X_FORWARDED_FOR"].split(",")[0].strip()
     except (KeyError, IndexError):
-        return environ.get('REMOTE_ADDR')
+        return environ.get("REMOTE_ADDR")
 
 
 class URLTokenAuthentication(BaseAuthentication):
@@ -52,7 +52,7 @@ class AnonymousAuthentication(BaseAuthentication):
         service = view.get_service()
         if service.access == acl.ACL_ACCESS_OPEN:
             User = get_user_model()
-            user = User.objects.get_or_create(username='anonymous')[0]
+            user = User.objects.get_or_create(username="anonymous")[0]
             request.user = user
             login(request, user, fqn(ModelBackend))
             return (user, None)
@@ -64,7 +64,7 @@ class IPBasedAuthentication(BaseAuthentication):
             ip = get_client_ip(request.META)
             if ip in conf.FREE_AUTH_IPS:
                 User = get_user_model()
-                user = User.objects.get_or_create(username=ip, email=f'noreply@{ip}.org')
+                user = User.objects.get_or_create(username=ip, email=f"noreply@{ip}.org")
                 request.user = user
                 # login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
                 return (user, None)
@@ -72,7 +72,6 @@ class IPBasedAuthentication(BaseAuthentication):
 
 class JWTAuthentication(authentication.JSONWebTokenAuthentication):
     def authenticate(self, request):
-
         jwt_value = self.get_token_from_request(request)
 
         if jwt_value is None:  # pragma: no cover
@@ -83,16 +82,16 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
             request.user = user
             # login(request, user, 'social_core.backends.azuread_tenant.AzureADTenantOAuth2')
         except TypeError:  # pragma: no cover
-            raise PermissionDenied(detail='No valid authentication provided')
+            raise PermissionDenied(detail="No valid authentication provided")
         except AuthenticationFailed as e:  # pragma: no cover
-            raise PermissionDenied(detail='JWT Authentication Failed: %s' % e)
+            raise PermissionDenied(detail="JWT Authentication Failed: %s" % e)
         return user, jwt_value
 
     def authenticate_credentials(self, payload):
         User = get_user_model()
         username = jwt_get_username_from_payload(payload)
         if not username:
-            msg = _('Invalid payload.')
+            msg = _("Invalid payload.")
             raise exceptions.AuthenticationFailed(msg)
         try:
             user = User.objects.get_by_natural_key(username)
@@ -102,22 +101,20 @@ class JWTAuthentication(authentication.JSONWebTokenAuthentication):
                     s = DatamartSynchronizer()
                     user_info = s.get_user(username)
                     pk, values = s.get_record(user_info)
-                    user, created = User.objects.update_or_create(**pk,
-                                                                  defaults=values)
+                    user, created = User.objects.update_or_create(**pk, defaults=values)
                 except Exception:
                     raise exceptions.AuthenticationFailed("Unable to retrieve user data")
             else:
-                user, created = User.objects.update_or_create(username=username,
-                                                              email=username)
+                user, created = User.objects.update_or_create(username=username, email=username)
             if created:
                 default_group(user=user, is_new=created)
         except Exception as e:
             logger.exception(e)
-            msg = _('Invalid signature.')
+            msg = _("Invalid signature.")
             raise exceptions.AuthenticationFailed(msg)
 
         if not user.is_active:
-            msg = _('User account is disabled.')
+            msg = _("User account is disabled.")
             raise exceptions.AuthenticationFailed(msg)
         return user
 
@@ -127,11 +124,11 @@ def basicauth(view):
         if request.user.is_authenticated:
             return view(request, *args, **kwargs)
 
-        if 'HTTP_AUTHORIZATION' in request.META:
-            auth = request.META['HTTP_AUTHORIZATION'].split()
+        if "HTTP_AUTHORIZATION" in request.META:
+            auth = request.META["HTTP_AUTHORIZATION"].split()
             if len(auth) == 2:
                 if auth[0].lower() == "basic":
-                    uname, passwd = base64.b64decode(auth[1].encode()).decode().split(':')
+                    uname, passwd = base64.b64decode(auth[1].encode()).decode().split(":")
                     user = authenticate(username=uname, password=passwd)
                     if user is not None and user.is_active:
                         request.user = user
@@ -139,7 +136,7 @@ def basicauth(view):
 
         response = HttpResponse()
         response.status_code = 401
-        response['WWW-Authenticate'] = 'Basic realm="datamart"'
+        response["WWW-Authenticate"] = 'Basic realm="datamart"'
         return response
 
     return wrap

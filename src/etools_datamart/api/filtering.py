@@ -14,16 +14,13 @@ from etools_datamart.apps.security.utils import conn, get_allowed_schemas
 from etools_datamart.apps.sources.etools.models import UsersCountry
 
 # from unicef_rest_framework.state import state
-cache = caches['api']
+cache = caches["api"]
 
-months = ['jan', 'feb', 'mar',
-          'apr', 'may', 'jun',
-          'jul', 'aug', 'sep',
-          'oct', 'nov', 'dec']
+months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
 
 
 def get_schema_names(query_args):
-    """ accept a string with a comma separated list of names,codes,bussines aread codes
+    """accept a string with a comma separated list of names,codes,bussines aread codes
     and returns a set of schema names
 
     >>> get_schema_names("Bolivia,4020,SYR")
@@ -60,8 +57,8 @@ def get_schema_names(query_args):
 
 
 class CountryFilter(BaseFilterBackend):
-    query_param = 'country_name'
-    template = 'api/country_filter.html'
+    query_param = "country_name"
+    template = "api/country_filter.html"
 
     # @cached_property
     # def valid_schemas(self):
@@ -117,16 +114,14 @@ class CountryFilter(BaseFilterBackend):
     def to_html(self, request, queryset, view):
         self.get_query_args(request)
         template = loader.get_template(self.template)
-        context = {'countries': sorted(conn.all_schemas),
-                   'selection': self.query_args,
-                   'header': 'aaaaaa'}
+        context = {"countries": sorted(conn.all_schemas), "selection": self.query_args, "header": "aaaaaa"}
         return template.render(context, request)
 
 
 class TenantCountryFilter(CountryFilter):
     def filter_queryset(self, request, queryset, view):
-        assert queryset.model._meta.app_label == 'etools'
-        conn = connections['etools']
+        assert queryset.model._meta.app_label == "etools"
+        conn = connections["etools"]
         selection = self.get_filters(request)
         if not selection:
             if request.user.is_superuser:
@@ -140,6 +135,7 @@ class TenantCountryFilter(CountryFilter):
 
 #
 
+
 class SetHeaderMixin:
     # must be the first one
     def filter_queryset(self, request, queryset, view):
@@ -149,17 +145,18 @@ class SetHeaderMixin:
         return ret
 
 
-class DatamartQueryStringFilterBackend(SetHeaderMixin,
-                                       CoreAPIQueryStringFilterBackend,
-                                       # MonthProcessor,
-                                       # CountryNameProcessor,
-                                       ):
+class DatamartQueryStringFilterBackend(
+    SetHeaderMixin,
+    CoreAPIQueryStringFilterBackend,
+    # MonthProcessor,
+    # CountryNameProcessor,
+):
     pass
 
 
 class CountryNameFilter(BaseFilterBackend):
-    query_param = 'country_name'
-    template = 'api/country_filter.html'
+    query_param = "country_name"
+    template = "api/country_filter.html"
 
     def get_query(self, request):
         if f"{self.query_param}!" in request.GET:
@@ -171,7 +168,7 @@ class CountryNameFilter(BaseFilterBackend):
 
     @cached_property
     def all_countries(self):
-        return sorted(UsersCountry.objects.values_list('name', flat=True))
+        return sorted(UsersCountry.objects.values_list("name", flat=True))
 
     def get_query_args(self, request):
         negate, value = self.get_query(request)
@@ -181,7 +178,7 @@ class CountryNameFilter(BaseFilterBackend):
             else:
                 self.query_args = self.all_countries
         else:
-            self.query_args = value.split(',')
+            self.query_args = value.split(",")
         self.negate = negate
 
     def filter_queryset(self, request, queryset, view):
@@ -196,7 +193,5 @@ class CountryNameFilter(BaseFilterBackend):
     def to_html(self, request, queryset, view):
         self.get_query_args(request)
         template = loader.get_template(self.template)
-        context = {'countries': self.all_countries,
-                   'selection': self.query_args,
-                   'header': 'aaaaaa'}
+        context = {"countries": self.all_countries, "selection": self.query_args, "header": "aaaaaa"}
         return template.render(context, request)

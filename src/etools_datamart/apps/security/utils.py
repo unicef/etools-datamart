@@ -13,8 +13,8 @@ from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.apps.sources.etools.models import UsersUserprofile
 from etools_datamart.libs.version import get_full_version
 
-conn = connections['etools']
-cache = caches['default']
+conn = connections["etools"]
+cache = caches["default"]
 
 
 @lru_cache(2)
@@ -28,11 +28,11 @@ def get_allowed_schemas(user):
             values = conn.all_schemas
         else:
             with conn.noschema():
-                aa = flatten(list(SchemaAccessControl.objects.filter(group__user=user).values_list('schemas')))
+                aa = flatten(list(SchemaAccessControl.objects.filter(group__user=user).values_list("schemas")))
                 etools_user = UsersUserprofile.objects.filter(user__email=user.email).first()
                 if etools_user:
                     etools_allowed = etools_user.countries_available.exclude(**settings.SCHEMA_EXCLUDE)
-                    aa.extend(set(etools_allowed.values_list('schema_name', flat=True)))
+                    aa.extend(set(etools_allowed.values_list("schema_name", flat=True)))
             values = list(filter(None, aa))
         cache.set(key, list(values))
     return set(values)
@@ -45,6 +45,7 @@ def get_allowed_services(user):
     if user.is_superuser or config.DISABLE_SERVICE_RESTRICTIONS:
         return Service.objects.all()
     return Service.objects.filter(groupaccesscontrol__group__user=user)
+
 
 # def schema_is_valid(*schema):
 #     return schema in conn.all_schemas

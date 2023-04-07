@@ -6,15 +6,15 @@ import pytest
 
 from etools_datamart.apps.multitenant.models import TenantModel
 
-conn = connections['etools']
+conn = connections["etools"]
 
 
 def pytest_generate_tests(metafunc):
-    if 'modeladmin' in metafunc.fixturenames:
+    if "modeladmin" in metafunc.fixturenames:
         m = []
         ids = []
         for model, admin in site._registry.items():
-            if model._meta.app_label == 'etools':
+            if model._meta.app_label == "etools":
                 m.append(admin)
                 ids.append(admin.__class__.__name__)
 
@@ -38,8 +38,7 @@ def test_change(django_app, admin_user, modeladmin):
         key = f"{obj.pk}-bolivia"
     else:
         key = obj.pk
-    url = reverse(f"admin:{opts.app_label}_{opts.model_name}_change",
-                  args=[key])
+    url = reverse(f"admin:{opts.app_label}_{opts.model_name}_change", args=[key])
     res = django_app.get(url, user=admin_user)
     assert res.status_code == 200, url
 
@@ -87,7 +86,7 @@ def test_select_schema(django_app, admin_user):
     res = res.form.submit()
     assert res.status_code == 200
 
-    res.form['bolivia'] = True
+    res.form["bolivia"] = True
     res = res.form.submit()
     assert res.status_code == 302
 

@@ -67,22 +67,22 @@ class Subscription(models.Model):
     EXCEL = 2
     PDF = 3
 
-    TYPES = ((NONE, 'None'),
-             (MESSAGE, 'Email'),
-             (EXCEL, 'Email+Excel'),
-             (PDF, 'Email+Pdf'),
-             )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
-                             related_name='subscriptions')
+    TYPES = (
+        (NONE, "None"),
+        (MESSAGE, "Email"),
+        (EXCEL, "Email+Excel"),
+        (PDF, "Email+Pdf"),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name="subscriptions")
     type = models.IntegerField(choices=TYPES)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
-    kwargs = models.CharField(max_length=500, blank=True, null=False, default='')
+    kwargs = models.CharField(max_length=500, blank=True, null=False, default="")
     last_notification = models.DateField(blank=True, null=True)
 
     objects = SubscriptionManager()
 
     class Meta:
-        unique_together = ('user', 'content_type', 'kwargs')
+        unique_together = ("user", "content_type", "kwargs")
 
     def __str__(self):
         return f"#{self.pk} {self.user} {self.get_type_display()} {self.content_type}"

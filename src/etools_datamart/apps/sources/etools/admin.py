@@ -7,16 +7,16 @@ from . import models
 
 @register(models.AuthUser)
 class AuthUserAdmin(EToolsModelAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
-    search_fields = ('username', 'first_name', 'last_name', 'email')
-    ordering = ('username',)
+    list_display = ("username", "email", "first_name", "last_name", "is_staff")
+    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
+    search_fields = ("username", "first_name", "last_name", "email")
+    ordering = ("username",)
 
 
 @register(models.UsersUserprofile)
 class UsersUserprofileAdmin(EToolsModelAdmin):
-    list_display = ('country', 'office')
-    search_fields = ('user__username', 'user__email')
+    list_display = ("country", "office")
+    search_fields = ("user__username", "user__email")
 
 
 # @register(models.ActionPointsActionpoint)
@@ -31,8 +31,8 @@ class ActivitiesActivityAdmin(TenantModelAdmin):
 
 @register(models.PartnersPartnerorganization)
 class PartnerOrganizationAdmin(TenantModelAdmin):
-    list_display = ('vendor_number', 'partner_type', 'name', 'short_name', 'schema')
-    search_fields = ('name',)
+    list_display = ("vendor_number", "partner_type", "name", "short_name", "schema")
+    search_fields = ("name",)
     # list_filter = ('schema',)
 
 
@@ -60,7 +60,7 @@ class AuditEngagementAdmin(TenantModelAdmin):
 
 @register(models.PartnersIntervention)
 class PartnersInterventionAdmin(TenantModelAdmin):
-    list_display = ('number', 'title', 'document_type', 'schema')
+    list_display = ("number", "title", "document_type", "schema")
     # list_filter = ('document_type',)
 
 
@@ -76,12 +76,16 @@ class ReportsAppliedindicatorAdmin(TenantModelAdmin):
 
 @register(models.ReportsResult)
 class ReportsResultAdmin(TenantModelAdmin):
-    list_display = ('name', 'code', 'result_type',)
+    list_display = (
+        "name",
+        "code",
+        "result_type",
+    )
 
 
 @register(models.ReportsResulttype)
 class ReportsResulttypeAdmin(TenantModelAdmin):
-    list_display = ('id', 'name', 'schema')
+    list_display = ("id", "name", "schema")
 
 
 @register(models.PartnersPlannedengagement)
@@ -101,7 +105,10 @@ class FundsreservationitemAdmin(TenantModelAdmin):
 
 @register(models.HactAggregatehact)
 class HactAggregatehactAdmin(TenantModelAdmin):
-    list_display = ('schema', 'year',)
+    list_display = (
+        "schema",
+        "year",
+    )
 
 
 @register(models.TpmTpmvisit)
@@ -111,30 +118,34 @@ class TpmTpmvisitAdmin(TenantModelAdmin):
 
 @register(models.UsersCountry)
 class UsersCountryAdmin(EToolsModelAdmin):
-    list_display = ('name', 'schema_name', 'business_area_code', 'country_short_code')
-    search_fields = ('name', 'schema_name', 'business_area_code')
+    list_display = ("name", "schema_name", "business_area_code", "country_short_code")
+    search_fields = ("name", "schema_name", "business_area_code")
 
 
 @register(models.LocationsLocation)
 class LocationsLocationAdmin(TenantModelAdmin):
-    list_display = ('name', 'latitude', 'longitude')
-    search_fields = ('name',)
+    list_display = ("name", "latitude", "longitude")
+    search_fields = ("name",)
 
 
 # UnicefAttachments
 
+
 @register(models.UnicefAttachmentsAttachment)
 class UnicefAttachmentsAttachmentAdmin(TenantModelAdmin):
-    list_display = ('code', 'file')
-    list_filter = ('content_type', 'code')
-    search_fields = ('file', )
+    list_display = ("code", "file")
+    list_filter = ("content_type", "code")
+    search_fields = ("file",)
 
 
 @register(models.UnicefAttachmentsAttachmentflat)
 class UnicefAttachmentsAttachmentflatAdmin(TenantModelAdmin):
-    list_display = ('object_link', 'file_type', 'file_link', 'filename')
+    list_display = ("object_link", "file_type", "file_link", "filename")
 
 
 @register(models.UnicefAttachmentsAttachmentlink)
 class UnicefAttachmentsAttachmentlinkAdmin(TenantModelAdmin):
-    list_display = ('object_id', 'attachment',)
+    list_display = (
+        "object_id",
+        "attachment",
+    )

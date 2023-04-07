@@ -7,7 +7,10 @@ from .serializers import DataMartSerializer
 class InterventionPlannedVisitsSerializer(DataMartSerializer):
     class Meta(DataMartSerializer.Meta):
         model = models.InterventionPlannedVisits
-        exclude = ('seen', 'source_id',)
+        exclude = (
+            "seen",
+            "source_id",
+        )
 
 
 class InterventionPlannedVisitsViewSet(common.DataMartViewSet):

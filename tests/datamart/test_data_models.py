@@ -4,29 +4,26 @@ from django.apps import apps
 from django.db import connections
 
 EXCLUDED_MODELS = [
-    'GeoName',
+    "GeoName",
 ]
 
 
 def pytest_generate_tests(metafunc):
-    if 'context' in metafunc.fixturenames:
-        config = apps.get_app_config('data')
+    if "context" in metafunc.fixturenames:
+        config = apps.get_app_config("data")
         models = []
         ids = []
         for m in config.get_models():
             if m.__name__ not in EXCLUDED_MODELS:
-                ctx = {'country': 1, 'year': 2019}
+                ctx = {"country": 1, "year": 2019}
                 models.append([m, ctx])
                 ids.append(m.__name__)
         metafunc.parametrize("model,context", models, ids=ids)
-    elif 'model' in metafunc.fixturenames:
-        config = apps.get_app_config('data')
+    elif "model" in metafunc.fixturenames:
+        config = apps.get_app_config("data")
         metafunc.parametrize(
             "model",
-            [
-                m for m in config.get_models()
-                if m.__name__ not in EXCLUDED_MODELS
-            ],
+            [m for m in config.get_models() if m.__name__ not in EXCLUDED_MODELS],
         )
 
 
@@ -47,8 +44,8 @@ def test_model_sync_deleted_records(model):
 
 
 def test_model_sync_get_queryset(db, model, context):
-    connection = connections['etools']
-    connection.set_schemas(['lebanon'])
+    connection = connections["etools"]
+    connection.set_schemas(["lebanon"])
     loader = model().loader
     loader.context = context
     assert loader.get_queryset().count() >= 0

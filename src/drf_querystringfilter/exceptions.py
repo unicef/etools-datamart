@@ -4,7 +4,7 @@ class QueryFilterException(Exception):
 
 class InvalidPattern(TypeError):
     def __init__(self, pattern, *args, **kwargs):
-        msg = '{} is not a valid regular expression'.format(pattern)
+        msg = "{} is not a valid regular expression".format(pattern)
         super().__init__(msg)
 
 
@@ -15,8 +15,7 @@ class InvalidQueryArgumentError(QueryFilterException):
 
 
 class InvalidQueryValueError(QueryFilterException):
-
-    def __init__(self, field, argument='', *args, **kwargs):
+    def __init__(self, field, argument="", *args, **kwargs):
         msg = "Invalid value '{}' for parameter {}".format(argument, field)
         super().__init__(msg)
 

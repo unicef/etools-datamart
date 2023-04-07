@@ -7,7 +7,7 @@ from .. import common
 class PDIndicatorSerializer(DataMartSerializer):
     class Meta:
         model = models.PDIndicator
-        fields = '__all__'
+        fields = "__all__"
 
 
 class PDIndicatorViewSet(common.DataMartViewSet):

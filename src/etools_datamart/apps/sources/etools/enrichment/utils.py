@@ -15,10 +15,11 @@ def create_alias(model, aliases):
 
 
 def add_m2m(master, name: str, detail, through, related_name=None):
-    models.ManyToManyField(detail,
-                           through=through,
-                           related_name=related_name,
-                           ).contribute_to_class(master, name)
+    models.ManyToManyField(
+        detail,
+        through=through,
+        related_name=related_name,
+    ).contribute_to_class(master, name)
 
 
 # def add_m2m2(master, name: str, detail, through):
@@ -27,9 +28,9 @@ def add_m2m(master, name: str, detail, through, related_name=None):
 #                            ).contribute_to_class(master, name)
 #
 
+
 def set_primary_key(model, field_name):
     pk = model._meta.get_field(field_name)
     model._meta.pk = pk
     model._meta.auto_field = pk
-    model._meta.fields = ImmutableList([f for f in model._meta.fields
-                                        if not isinstance(f, AutoField)])
+    model._meta.fields = ImmutableList([f for f in model._meta.fields if not isinstance(f, AutoField)])

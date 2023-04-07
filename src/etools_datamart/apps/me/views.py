@@ -8,16 +8,12 @@ from django.views.generic.edit import FormView
 
 # from etools_datamart.apps.sources.etools import get_allowed_schemas, get_allowed_services
 from etools_datamart.apps.me.forms import ProfileForm
-# @login_required
-# def profile(request):
-#     context = {'form': ProfileForm()}
-#     return TemplateResponse(request, 'index.html', context)
 from etools_datamart.apps.security.utils import get_allowed_schemas, get_allowed_services
 
 
 class ProfileView(FormView):
     form_class = ProfileForm
-    template_name = 'me/profile.html'
+    template_name = "me/profile.html"
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -40,16 +36,18 @@ class ProfileView(FormView):
         return pwd
 
     def get_context_data(self, **kwargs):
-        kwargs.update({'page': 'profile',
-                       'business_areas': sorted(get_allowed_schemas(self.request.user)),
-                       'services': get_allowed_services(self.request.user),
-                       'user': self.request.user
-                       })
+        kwargs.update(
+            {
+                "page": "profile",
+                "business_areas": sorted(get_allowed_schemas(self.request.user)),
+                "services": get_allowed_services(self.request.user),
+                "user": self.request.user,
+            }
+        )
         return super().get_context_data(**kwargs)
 
     def get_initial(self):
-        return {
-        }
+        return {}
 
     # def get_success_url(self):
     #     return self.request.path
@@ -60,6 +58,6 @@ class ProfileView(FormView):
         pwd = self.generate()
         self.request.user.set_password(pwd)
         self.request.user.save()
-        ctx['password'] = pwd
+        ctx["password"] = pwd
         login(self.request, self.request.user, self.request.session[BACKEND_SESSION_KEY])
         return self.render_to_response(ctx)

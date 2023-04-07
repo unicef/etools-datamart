@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class SystemFilterBackend(BaseFilterBackend):
-
     def filter_queryset(self, request, queryset, view):
         # _system_filters has been set by cache.SystemFilterKeyBit
         # if hasattr(request._request, "_system_filters"):
@@ -20,7 +19,7 @@ class SystemFilterBackend(BaseFilterBackend):
         filter = SystemFilter.objects.match(request, view)
         if filter:
             queryset = filter.filter_queryset(queryset)
-            view.store('system-filters', filter.get_querystring())
+            view.store("system-filters", filter.get_querystring())
         return queryset
 
 
@@ -29,10 +28,10 @@ class CoreAPIQueryStringFilterBackend(QueryStringFilterBackend):
 
 
 class ExportFilter(django_filters.FilterSet):
-    filename = django_filters.CharFilter(lookup_expr='icontains', label='Filename')
-    name = django_filters.CharFilter(lookup_expr='icontains', label='Description')
-    as_user__username = django_filters.CharFilter(lookup_expr='icontains', label='Owner')
+    filename = django_filters.CharFilter(lookup_expr="icontains", label="Filename")
+    name = django_filters.CharFilter(lookup_expr="icontains", label="Description")
+    as_user__username = django_filters.CharFilter(lookup_expr="icontains", label="Owner")
 
     class Meta:
         model = Export
-        fields = ['name', 'filename', 'as_user__username', 'format', 'refresh', 'enabled']
+        fields = ["name", "filename", "as_user__username", "format", "refresh", "enabled"]

@@ -6,8 +6,8 @@ from django.db import connections, OperationalError
 
 
 class Command(BaseCommand):
-    args = ''
-    help = 'Help text here....'
+    args = ""
+    help = "Help text here...."
     requires_migrations_checks = False
     requires_system_checks = []
 
@@ -18,30 +18,35 @@ class Command(BaseCommand):
         super().add_arguments(parser)
 
         parser.add_argument(
-            '--sleep', default=1,
+            "--sleep",
+            default=1,
             action="store",
             type=int,
-            help='sleep time between attempt',
+            help="sleep time between attempt",
         )
         parser.add_argument(
-            '--wait', default=False,
+            "--wait",
+            default=False,
             action="store_true",
-            help='wait until database is available',
+            help="wait until database is available",
         )
         parser.add_argument(
-            '--debug', default=False,
+            "--debug",
+            default=False,
             action="store_true",
-            help='debug mode. WARNING can dump passwords',
+            help="debug mode. WARNING can dump passwords",
         )
         parser.add_argument(
-            '--timeout', default=30,
+            "--timeout",
+            default=30,
             type=int,
-            help='timeout in sec before OperationalError',
+            help="timeout in sec before OperationalError",
         )
 
         parser.add_argument(
-            '--connection', default='default',
-            help='timeout in sec before OperationalError',
+            "--connection",
+            default="default",
+            help="timeout in sec before OperationalError",
         )
 
     def _get_cursor(self, conn):
@@ -49,7 +54,7 @@ class Command(BaseCommand):
         return conn
 
     def handle(self, *args, **options):
-        conn = connections[options['connection']]
+        conn = connections[options["connection"]]
         elapsed = 0
         retcode = 1
         try:
@@ -59,15 +64,17 @@ class Command(BaseCommand):
                 try:
                     conn = self._get_cursor(conn)
                 except OperationalError as e:
-                    if options['wait'] and elapsed < options['timeout']:
-                        self.stdout.write("." * elapsed, ending='\r')
+                    if options["wait"] and elapsed < options["timeout"]:
+                        self.stdout.write("." * elapsed, ending="\r")
                         self.stdout.flush()
-                        time.sleep(options['sleep'])
+                        time.sleep(options["sleep"])
                         elapsed += 1
                     else:
-                        self.stderr.write(f"\nDatabase on {conn.settings_dict['HOST']}:{conn.settings_dict['PORT']} "
-                                          f"is not available after {elapsed} secs")
-                        if options['debug']:
+                        self.stderr.write(
+                            f"\nDatabase on {conn.settings_dict['HOST']}:{conn.settings_dict['PORT']} "
+                            f"is not available after {elapsed} secs"
+                        )
+                        if options["debug"]:
                             self.stderr.write(f"Error is: {e}")
                         retcode = 1
                         break
@@ -76,5 +83,5 @@ class Command(BaseCommand):
                     retcode = 0
                     break
         except KeyboardInterrupt:  # pragma: no-cover
-            self.stdout.write('Interrupted')
+            self.stdout.write("Interrupted")
         sys.exit(retcode)

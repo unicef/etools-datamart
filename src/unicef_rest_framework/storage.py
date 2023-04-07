@@ -11,7 +11,6 @@ from storages.utils import setting
 
 
 class OverwriteStorage(FileSystemStorage):
-
     def get_available_name(self, name, max_length=None):
         if self.exists(name):
             os.remove(os.path.join(settings.MEDIA_ROOT, name))
@@ -19,6 +18,7 @@ class OverwriteStorage(FileSystemStorage):
 
 
 # from .file import RedisFile
+
 
 class RedisFile(object):
     def __init__(self, redis_key, redis_connection=None):
@@ -54,7 +54,7 @@ class RedisFile(object):
     def writelines(self, s):
         self._complain_ifclosed()
         if isinstance(s, str):
-            s = s.split('\n')
+            s = s.split("\n")
         self.redis.rpush(self.redis_key, *s)
 
     def next(self):
@@ -106,7 +106,7 @@ class RedisFile(object):
 class RedisStorage(Storage):
     _redis_connection = None
 
-    def __init__(self, host='localhost', port=6379, db=0, password=None):
+    def __init__(self, host="localhost", port=6379, db=0, password=None):
         self._redis_connection = Redis(host, port, db, password)
 
     def _open(self, name, *args, **kwargs):
@@ -124,7 +124,7 @@ class RedisStorage(Storage):
         return name
 
     def url(self, name):
-        return u''
+        return ""
 
     def exists(self, name):
         return self._redis_connection.exists(name)
@@ -137,7 +137,7 @@ class RedisStorage(Storage):
 class UnicefAzureStorage(AzureStorage):
     # override defaults
     upload_max_conn = setting("AZURE_UPLOAD_MAX_CONN", 2)
-    timeout = setting('AZURE_CONNECTION_TIMEOUT_SECS', 300)
+    timeout = setting("AZURE_CONNECTION_TIMEOUT_SECS", 300)
 
     # new values
     auto_sign = setting("AZURE_AUTO_SIGN")
@@ -148,10 +148,10 @@ class UnicefAzureStorage(AzureStorage):
         super().__init__()
 
     def url(self, name, expire=None):
-        if hasattr(self.service, 'make_blob_url'):
+        if hasattr(self.service, "make_blob_url"):
             if self.auto_sign:
-                start = (datetime.utcnow() + timedelta(seconds=-120)).strftime('%Y-%m-%dT%H:%M:%SZ')
-                expiry = (datetime.utcnow() + timedelta(seconds=self.access_ttl)).strftime('%Y-%m-%dT%H:%M:%SZ')
+                start = (datetime.utcnow() + timedelta(seconds=-120)).strftime("%Y-%m-%dT%H:%M:%SZ")
+                expiry = (datetime.utcnow() + timedelta(seconds=self.access_ttl)).strftime("%Y-%m-%dT%H:%M:%SZ")
                 sas_token = self.service.generate_blob_shared_access_signature(
                     self.azure_container,
                     name,
@@ -168,4 +168,4 @@ class UnicefAzureStorage(AzureStorage):
                 sas_token=sas_token,
             )
         else:
-            return "{}{}/{}".format(setting('MEDIA_URL'), self.azure_container, name)
+            return "{}{}/{}".format(setting("MEDIA_URL"), self.azure_container, name)

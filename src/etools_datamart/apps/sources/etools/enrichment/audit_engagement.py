@@ -48,19 +48,22 @@ from .utils import set_primary_key
 #                      related_name='+',
 #                      on_delete=models.PROTECT).contribute_to_class(AuditSpotcheck, 'engagement')
 
-set_primary_key(AuditSpotcheck, 'engagement_ptr')
-set_primary_key(AuditMicroassessment, 'engagement_ptr')
-set_primary_key(AuditAudit, 'engagement_ptr')
-set_primary_key(AuditSpecialaudit, 'engagement_ptr')
+set_primary_key(AuditSpotcheck, "engagement_ptr")
+set_primary_key(AuditMicroassessment, "engagement_ptr")
+set_primary_key(AuditAudit, "engagement_ptr")
+set_primary_key(AuditSpecialaudit, "engagement_ptr")
 
-models.ManyToManyField(PartnersPartnerstaffmember,
-                       through=AuditEngagementAuthorizedOfficers,
-                       ).contribute_to_class(AuditEngagement, 'authorized_officers')
+models.ManyToManyField(
+    PartnersPartnerstaffmember,
+    through=AuditEngagementAuthorizedOfficers,
+).contribute_to_class(AuditEngagement, "authorized_officers")
 
-models.ManyToManyField(PurchaseOrderAuditorstaffmember,
-                       through=AuditEngagementStaffMembers,
-                       ).contribute_to_class(AuditEngagement, 'staff_members')
+models.ManyToManyField(
+    PurchaseOrderAuditorstaffmember,
+    through=AuditEngagementStaffMembers,
+).contribute_to_class(AuditEngagement, "staff_members")
 
-models.ManyToManyField(PartnersIntervention,
-                       through=AuditEngagementActivePd,
-                       ).contribute_to_class(AuditEngagement, 'active_pd')
+models.ManyToManyField(
+    PartnersIntervention,
+    through=AuditEngagementActivePd,
+).contribute_to_class(AuditEngagement, "active_pd")

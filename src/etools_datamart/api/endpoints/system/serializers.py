@@ -6,4 +6,4 @@ from etools_datamart.apps.etl import models
 class TaskLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.EtlTask
-        exclude = ('content_type', 'id')
+        exclude = ("content_type", "id")

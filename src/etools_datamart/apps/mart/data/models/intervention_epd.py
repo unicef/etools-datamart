@@ -27,12 +27,12 @@ class InterventionSimpleAbstract(models.Model):
     class Options:
         depends = (Intervention,)
         mapping = dict(
-            pd_number='number',
-            pd_title='title',
-            partner='agreement.partner.name',
-            partner_cso_type='agreement.partner.cso_type',
-            partner_type='agreement.partner.partner_type',
-            partner_vendor_number='agreement.partner.vendor_number'
+            pd_number="number",
+            pd_title="title",
+            partner="agreement.partner.name",
+            partner_cso_type="agreement.partner.cso_type",
+            partner_type="agreement.partner.partner_type",
+            partner_vendor_number="agreement.partner.vendor_number",
         )
 
 
@@ -41,7 +41,6 @@ class InterventionEPDLoader(EtoolsLoader):
 
 
 class InterventionEPD(InterventionSimpleAbstract, EtoolsDataMartModel):
-
     budget_owner = models.CharField(max_length=150, blank=True, null=True)
     context = models.TextField(blank=True, null=True)
     date_sent_to_partner = models.DateField(blank=True, null=True)
@@ -73,7 +72,7 @@ class InterventionEPD(InterventionSimpleAbstract, EtoolsDataMartModel):
     loader = InterventionEPDLoader()
 
     class Meta:
-        ordering = ('country_name', 'pd_title')
+        ordering = ("country_name", "pd_title")
         verbose_name = "Intervention ePD"
 
     class Options:
@@ -81,5 +80,5 @@ class InterventionEPD(InterventionSimpleAbstract, EtoolsDataMartModel):
         queryset = lambda: PartnersIntervention.objects.all()
         mapping = dict(
             **InterventionSimpleAbstract.Options.mapping,
-            budget_owner='budget_owner.username',
+            budget_owner="budget_owner.username",
         )

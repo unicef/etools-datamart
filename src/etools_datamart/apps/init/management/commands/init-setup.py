@@ -14,7 +14,6 @@ from django.db import connections
 from constance import config
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule
 from post_office.models import EmailTemplate
-# from redisboard.models import RedisServer
 from strategy_field.utils import fqn
 
 from unicef_rest_framework.models import PeriodicTask, Preload
@@ -89,21 +88,17 @@ export_ready_html = """<div>Dear {{user.label}},</div>
 <div>UNICEF Datamart</div>
 """
 
-RESTRICTED_AREAS = {'234R': ['mpawlowski@unicef.org',
-                             'jmege@unicef.org',
-                             'nukhan@unicef.org']}
+RESTRICTED_AREAS = {"234R": ["mpawlowski@unicef.org", "jmege@unicef.org", "nukhan@unicef.org"]}
 
 
 def get_everybody_available_areas():
-    conn = connections['etools']
-    return [c.schema_name for c in conn.get_tenants()
-            if c.business_area_code not in RESTRICTED_AREAS.keys()]
+    conn = connections["etools"]
+    return [c.schema_name for c in conn.get_tenants() if c.business_area_code not in RESTRICTED_AREAS.keys()]
 
 
 def get_restricted_areas():
-    conn = connections['etools']
-    return [c.schema_name for c in conn.get_tenants()
-            if c.business_area_code in RESTRICTED_AREAS.keys()]
+    conn = connections["etools"]
+    return [c.schema_name for c in conn.get_tenants() if c.business_area_code in RESTRICTED_AREAS.keys()]
 
 
 class Command(BaseCommand):
@@ -111,100 +106,77 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--deploy',
-            action='store_true',
-            dest='deploy',
-            default=False,
-            help='run deployment related actions')
+            "--deploy", action="store_true", dest="deploy", default=False, help="run deployment related actions"
+        )
         parser.add_argument(
-            '--all',
-            action='store_true',
-            dest='all',
-            default=False,
-            help='select all options but `demo`')
+            "--all", action="store_true", dest="all", default=False, help="select all options but `demo`"
+        )
         parser.add_argument(
-            '--interactive',
-            action='store_true',
-            dest='interactive',
+            "--interactive",
+            action="store_true",
+            dest="interactive",
             default=False,
-            help='select all production deployment options')
+            help="select all production deployment options",
+        )
+
+        parser.add_argument("--collectstatic", action="store_true", dest="collectstatic", default=False, help="")
+
+        parser.add_argument("--users", action="store_true", dest="users", default=False, help="")
 
         parser.add_argument(
-            '--collectstatic',
-            action='store_true',
-            dest='collectstatic',
+            "--migrate",
+            action="store_true",
+            dest="migrate",
             default=False,
-            help='')
+            help="select all production deployment options",
+        )
+
+        parser.add_argument("--tasks", action="store_true", dest="tasks", default=False, help="schedule tasks")
 
         parser.add_argument(
-            '--users',
-            action='store_true',
-            dest='users',
-            default=False,
-            help='')
-
-        parser.add_argument(
-            '--migrate',
-            action='store_true',
-            dest='migrate',
-            default=False,
-            help='select all production deployment options')
-
-        parser.add_argument(
-            '--tasks',
-            action='store_true',
-            dest='tasks',
-            default=False,
-            help='schedule tasks')
-
-        parser.add_argument(
-            '--refresh',
-            action='store_true',
-            dest='refresh',
-            default=False,
-            help='refresh datamart tables')
+            "--refresh", action="store_true", dest="refresh", default=False, help="refresh datamart tables"
+        )
 
     def handle(self, *args, **options):
-        verbosity = options['verbosity']
-        migrate = options['migrate']
-        _all = options['all']
-        deploy = options['deploy']
+        verbosity = options["verbosity"]
+        migrate = options["migrate"]
+        _all = options["all"]
+        deploy = options["deploy"]
         if deploy:
             _all = True
         ModelUser = get_user_model()
-        locks = caches['lock']
-        lock = locks.lock('init-setup', timeout=60 * 10)
+        locks = caches["lock"]
+        lock = locks.lock("init-setup", timeout=60 * 10)
         if not lock.acquire(blocking=False):
             self.stderr.write("Another process is running setup. Nothing to do.")
             return ""
         try:
-            if options['collectstatic'] or _all:
+            if options["collectstatic"] or _all:
                 self.stdout.write(f"Run collectstatic")
-                call_command('collectstatic', verbosity=verbosity - 1, interactive=False)
+                call_command("collectstatic", verbosity=verbosity - 1, interactive=False)
 
             if migrate or _all:
                 self.stdout.write(f"Run migrations")
-                call_command('migrate', verbosity=verbosity - 1)
+                call_command("migrate", verbosity=verbosity - 1)
 
             self.stdout.write(f"Create group `Public areas access`")
-            public_areas, __ = Group.objects.get_or_create(name='Public areas access')
-            config.DEFAULT_GROUP = 'Public areas access'
+            public_areas, __ = Group.objects.get_or_create(name="Public areas access")
+            config.DEFAULT_GROUP = "Public areas access"
 
             self.stdout.write(f"Create group `Restricted areas access`")
-            restricted_areas, __ = Group.objects.get_or_create(name='Restricted areas access')
+            restricted_areas, __ = Group.objects.get_or_create(name="Restricted areas access")
 
-            if options['users'] or _all:
+            if options["users"] or _all:
                 if settings.DEBUG:
-                    pwd = '123'
-                    admin = os.environ.get('USER', 'admin')
+                    pwd = "123"
+                    admin = os.environ.get("USER", "admin")
                 else:
-                    pwd = os.environ.get('ADMIN_PASSWORD', ModelUser.objects.make_random_password())
-                    admin = os.environ.get('ADMIN_USERNAME', 'admin')
+                    pwd = os.environ.get("ADMIN_PASSWORD", ModelUser.objects.make_random_password())
+                    admin = os.environ.get("ADMIN_USERNAME", "admin")
 
-                self._admin_user, created = ModelUser.objects.get_or_create(username=admin,
-                                                                            defaults={"is_superuser": True,
-                                                                                      "is_staff": True,
-                                                                                      "password": make_password(pwd)})
+                self._admin_user, created = ModelUser.objects.get_or_create(
+                    username=admin, defaults={"is_superuser": True, "is_staff": True, "password": make_password(pwd)}
+                )
 
                 if created:  # pragma: no cover
                     self.stdout.write(f"Created superuser `{admin}` with password `{pwd}`")
@@ -212,20 +184,20 @@ class Command(BaseCommand):
                     self.stdout.write(f"Superuser `{admin}` already exists`.")
 
                 self.stdout.write(f"Create anonymous")
-                anonymous, created = ModelUser.objects.get_or_create(username='anonymous',
-                                                                     defaults={"is_superuser": False,
-                                                                               "is_staff": False})
+                anonymous, created = ModelUser.objects.get_or_create(
+                    username="anonymous", defaults={"is_superuser": False, "is_staff": False}
+                )
 
-                if os.environ.get('AUTOCREATE_USERS'):
+                if os.environ.get("AUTOCREATE_USERS"):
                     self.stdout.write("Found 'AUTOCREATE_USERS' environment variable")
                     self.stdout.write("Going to create new users")
                     try:
-                        for entry in os.environ.get('AUTOCREATE_USERS').split('|'):
-                            email, pwd = entry.split(',')
-                            u, created = ModelUser.objects.get_or_create(username=email,
-                                                                         defaults={"is_superuser": False,
-                                                                                   "is_staff": False,
-                                                                                   "password": make_password(pwd)})
+                        for entry in os.environ.get("AUTOCREATE_USERS").split("|"):
+                            email, pwd = entry.split(",")
+                            u, created = ModelUser.objects.get_or_create(
+                                username=email,
+                                defaults={"is_superuser": False, "is_staff": False, "password": make_password(pwd)},
+                            )
 
                             if created:
                                 self.stdout.write(f"Created user {u}")
@@ -237,14 +209,17 @@ class Command(BaseCommand):
                         warnings.warn(f"Unable to create default users. {e}")
 
             self.stdout.write(f"Grants public schemas to group `Endpoints all access`")
-            SchemaAccessControl.objects.update_or_create(group=public_areas,
-                                                         defaults={'schemas': get_everybody_available_areas()})
+            SchemaAccessControl.objects.update_or_create(
+                group=public_areas, defaults={"schemas": get_everybody_available_areas()}
+            )
 
             self.stdout.write(f"Grants restricted schemas to group `Restricted areas access`")
-            SchemaAccessControl.objects.update_or_create(group=restricted_areas,
-                                                         defaults={'schemas': get_restricted_areas()})
+            SchemaAccessControl.objects.update_or_create(
+                group=restricted_areas, defaults={"schemas": get_restricted_areas()}
+            )
 
             from unicef_rest_framework.models import Service
+
             created, deleted, total = Service.objects.load_services()
             self.stdout.write(f"{total} services found. {created} new. {deleted} deleted")
 
@@ -252,13 +227,11 @@ class Command(BaseCommand):
                 GroupAccessControl.objects.get_or_create(
                     group=public_areas,
                     service=service,
-                    defaults={'serializers': ['*'],
-                              'policy': GroupAccessControl.POLICY_ALLOW}
+                    defaults={"serializers": ["*"], "policy": GroupAccessControl.POLICY_ALLOW},
                 )
             for area, users in RESTRICTED_AREAS.items():
                 for email in users:
-                    u, __ = ModelUser.objects.get_or_create(username=email,
-                                                            email=email)
+                    u, __ = ModelUser.objects.get_or_create(username=email, email=email)
                     u.groups.add(public_areas)
                     u.groups.add(restricted_areas)
 
@@ -270,62 +243,60 @@ class Command(BaseCommand):
             #     RedisServer.objects.get_or_create(hostname=spec.hostname,
             #                                       port=int(spec.port))
 
-            if options['tasks'] or _all or options['refresh']:
+            if options["tasks"] or _all or options["refresh"]:
                 preload_cron, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=1)
                 midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
-                CrontabSchedule.objects.get_or_create(hour='0, 6, 12, 18')
-                CrontabSchedule.objects.get_or_create(hour='0, 12')
+                CrontabSchedule.objects.get_or_create(hour="0, 6, 12, 18")
+                CrontabSchedule.objects.get_or_create(hour="0, 12")
                 IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
 
                 every_minute, __ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
 
-                PeriodicTask.objects.get_or_create(name=f"PRELOAD ",
-                                                   defaults={'task': fqn(preload_all),
-                                                             'crontab': preload_cron})
+                PeriodicTask.objects.get_or_create(
+                    name=f"PRELOAD ", defaults={"task": fqn(preload_all), "crontab": preload_cron}
+                )
 
                 # tasks = app.get_all_etls()
                 loaders = []
                 for loadeable in loadeables:
                     model = apps.get_model(loadeable)
                     loaders.append(model.loader.task.name)
-                    __, is_new = PeriodicTask.objects.get_or_create(name=f"ETL {model.loader.task.name}",
-                                                                    defaults={'task': model.loader.task.name,
-                                                                              'service': Service.objects.get_for_model(
-                                                                                  model),
-                                                                              'crontab': midnight})
+                    __, is_new = PeriodicTask.objects.get_or_create(
+                        name=f"ETL {model.loader.task.name}",
+                        defaults={
+                            "task": model.loader.task.name,
+                            "service": Service.objects.get_for_model(model),
+                            "crontab": midnight,
+                        },
+                    )
                     if is_new:
                         self.stdout.write(f"NEW load task {model.loader.task.name} scheduled at {midnight}")
 
                 User = get_user_model()
-                user = User.objects.get(username='system')
+                user = User.objects.get(username="system")
                 # preload
                 for service in Service.objects.all():
-                    Preload.objects.get_or_create(
-                        url=service.endpoint,
-                        params={},
-                        as_user=user
-                    )
+                    Preload.objects.get_or_create(url=service.endpoint, params={}, as_user=user)
 
                 EtlTask.objects.inspect()
-                PeriodicTask.objects.get_or_create(task='send_queued_mail',
-                                                   defaults={'name': 'process mail queue',
-                                                             'interval': every_minute})
+                PeriodicTask.objects.get_or_create(
+                    task="send_queued_mail", defaults={"name": "process mail queue", "interval": every_minute}
+                )
 
-            EmailTemplate.objects.get_or_create(name='dataset_changed_attachment',
-                                                defaults=dict(subject='Dataset changed',
-                                                              content=MAIL_ATTACHMENT,
-                                                              html_content=MAIL_ATTACHMENT_HTML))
+            EmailTemplate.objects.get_or_create(
+                name="dataset_changed_attachment",
+                defaults=dict(subject="Dataset changed", content=MAIL_ATTACHMENT, html_content=MAIL_ATTACHMENT_HTML),
+            )
 
-            EmailTemplate.objects.get_or_create(name='dataset_changed',
-                                                defaults=dict(subject='Dataset changed',
-                                                              content=MAIL,
-                                                              html_content=MAIL_HTML))
-            EmailTemplate.objects.get_or_create(name='export_ready',
-                                                defaults=dict(subject='dataset ready',
-                                                              content=MAIL_ATTACHMENT,
-                                                              html_content=MAIL_ATTACHMENT_HTML))
+            EmailTemplate.objects.get_or_create(
+                name="dataset_changed", defaults=dict(subject="Dataset changed", content=MAIL, html_content=MAIL_HTML)
+            )
+            EmailTemplate.objects.get_or_create(
+                name="export_ready",
+                defaults=dict(subject="dataset ready", content=MAIL_ATTACHMENT, html_content=MAIL_ATTACHMENT_HTML),
+            )
 
-            if options['refresh'] or deploy:
+            if options["refresh"] or deploy:
                 self.stdout.write("Refreshing datamart...")
                 for model_name in loadeables:
                     model = apps.get_model(model_name)

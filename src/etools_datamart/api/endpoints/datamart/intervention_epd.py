@@ -5,10 +5,12 @@ from .serializers import DataMartSerializer
 
 
 class InterventionEPDSerializer(DataMartSerializer):
-
     class Meta(DataMartSerializer.Meta):
         model = models.InterventionEPD
-        exclude = ('seen', 'source_id',)
+        exclude = (
+            "seen",
+            "source_id",
+        )
 
 
 class InterventionEPDViewSet(common.DataMartViewSet):

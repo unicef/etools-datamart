@@ -12,4 +12,4 @@ class HACTAggreagateSerializer(DataMartSerializer):
 class HACTAggreagateViewSet(common.DataMartViewSet):
     serializer_class = HACTAggreagateSerializer
     queryset = models.HACT.objects.all()
-    filter_fields = ('year', 'last_modify_date')
+    filter_fields = ("year", "last_modify_date")

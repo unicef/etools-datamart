@@ -17,7 +17,10 @@ class SpotCheckFindingSerializer(DataMartSerializer):
 
     class Meta(DataMartSerializer.Meta):
         model = models.SpotCheckFindings
-        exclude = ('seen', 'source_id',)
+        exclude = (
+            "seen",
+            "source_id",
+        )
 
     def get_url(self, obj):
         try:
@@ -30,9 +33,9 @@ class SpotCheckFindingSerializer(DataMartSerializer):
 
     def get_partner_name(self, obj):
         try:
-            return obj.partner['name']
+            return obj.partner["name"]
         except KeyError:
-            return 'N/A'
+            return "N/A"
 
 
 class SpotCheckFindingDataSerializer(SpotCheckFindingSerializer):
@@ -41,7 +44,7 @@ class SpotCheckFindingDataSerializer(SpotCheckFindingSerializer):
 
 class SpotCheckFindingFilterForm(forms.Form):
     date_of_final_report = DateRangePickerField(
-        label='Date of Final Report',
+        label="Date of Final Report",
         required=False,
     )
 
@@ -51,13 +54,8 @@ class SpotCheckFindingViewSet(DataMartViewSet):
 
     serializer_class = SpotCheckFindingSerializer
     queryset = models.SpotCheckFindings.objects.all()
-    filter_fields = (
-        'date_of_final_report',
-    )
-    serializers_fieldsets = {
-        'std': SpotCheckFindingSerializer,
-        'dates': SpotCheckFindingDataSerializer
-    }
+    filter_fields = ("date_of_final_report",)
+    serializers_fieldsets = {"std": SpotCheckFindingSerializer, "dates": SpotCheckFindingDataSerializer}
 
     def get_querystringfilter_form(self, request, filter):
         return SpotCheckFindingFilterForm(request.GET, filter.form_prefix)

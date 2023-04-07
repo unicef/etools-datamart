@@ -4,8 +4,6 @@ from .service import Service
 
 
 class PeriodicTask(models.PeriodicTask):
-    service = models.models.ForeignKey(Service,
-                                       on_delete=models.models.CASCADE,
-                                       blank=True,
-                                       null=True,
-                                       related_name='periodic_tasks')
+    service = models.models.ForeignKey(
+        Service, on_delete=models.models.CASCADE, blank=True, null=True, related_name="periodic_tasks"
+    )

@@ -26,18 +26,19 @@ def frozenfixture2(use_request=False):
 
         @wraps(func)
         def _inner(*args, **kwargs):
-            parts = [os.path.dirname(func.__code__.co_filename),
-                     BASE_DATADIR,
-                     func.__module__,
-                     func.__name__, ]
-            if 'request' in kwargs:
-                request = kwargs['request']
-                viewset = request.getfixturevalue('viewset')
+            parts = [
+                os.path.dirname(func.__code__.co_filename),
+                BASE_DATADIR,
+                func.__module__,
+                func.__name__,
+            ]
+            if "request" in kwargs:
+                request = kwargs["request"]
+                viewset = request.getfixturevalue("viewset")
                 parts.append(viewset.__name__)
 
-            destination = os.path.join(*parts
-                                       ) + '.fixture.json'
-            if os.path.exists(destination) and not os.environ.get('API_CHECKER_RESET'):
+            destination = os.path.join(*parts) + ".fixture.json"
+            if os.path.exists(destination) and not os.environ.get("API_CHECKER_RESET"):
                 return load_fixtures(destination)[func.__name__]
             mktree(os.path.dirname(destination))
             data = func(*args, **kwargs)
@@ -50,41 +51,39 @@ def frozenfixture2(use_request=False):
 
 
 def pytest_generate_tests(metafunc, *args):
-    if 'viewset' in metafunc.fixturenames:
+    if "viewset" in metafunc.fixturenames:
         params = []
         ids = []
         for prefix, viewset, basenametry in router.registry:
-            if prefix.startswith('sources/prp/'):
+            if prefix.startswith("sources/prp/"):
                 sers = viewset.serializers_fieldsets.keys()
                 for ser in sers:
                     params.append([viewset, ser])
-                    ids.append(f'{prefix}/{viewset.__name__}-{ser}')
+                    ids.append(f"{prefix}/{viewset.__name__}-{ser}")
         metafunc.parametrize("viewset,serializer", params, ids=ids)
 
 
 @frozenfixture2()
 def data(db, request):
     # TIPS: database access is forbidden in pytest_generate_tests
-    viewset = request.getfixturevalue('viewset')
+    viewset = request.getfixturevalue("viewset")
     factory = factories_registry[viewset.serializer_class.Meta.model]
-    data = (factory(schema_name='bolivia'),
-            factory(schema_name='chad'),
-            factory(schema_name='lebanon'))
+    data = (factory(schema_name="bolivia"), factory(schema_name="chad"), factory(schema_name="lebanon"))
     return data
 
 
 @contract(recorder_class=MyRecorder)
 def test_list(viewset, serializer, data):
     url = f"{viewset.get_service().endpoint}"
-    return [url, {'-serializer': serializer}]
+    return [url, {"-serializer": serializer}]
 
 
 @frozenfixture2()
 def record(db, request):
     # TIPS: database access is forbidden in pytest_generate_tests
-    viewset = request.getfixturevalue('viewset')
+    viewset = request.getfixturevalue("viewset")
     factory = factories_registry[viewset.serializer_class.Meta.model]
-    return factory(schema_name='bolivia')
+    return factory(schema_name="bolivia")
 
 
 @contract(recorder_class=MyRecorder)

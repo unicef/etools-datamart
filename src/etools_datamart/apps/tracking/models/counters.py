@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class CounterManager(models.Manager):
     def truncate(self):
-        conn = connections['default']
+        conn = connections["default"]
         cursor = conn.cursor()
         cursor.execute(f'TRUNCATE TABLE "{self.model._meta.db_table}"')
 
@@ -25,13 +25,13 @@ class AbstractCounter(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('-day',)
-        get_latest_by = 'day'
+        ordering = ("-day",)
+        get_latest_by = "day"
 
     objects = CounterManager()
 
     def __str__(self):
-        return self.day.strftime('%d %b %Y')
+        return self.day.strftime("%d %b %Y")
 
 
 class DailyCounter(AbstractCounter):
@@ -39,26 +39,23 @@ class DailyCounter(AbstractCounter):
 
 
 class MonthlyCounter(AbstractCounter):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
-                             blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, blank=True, null=True)
 
     class Meta:
-        unique_together = ('day', 'user')
+        unique_together = ("day", "user")
 
 
 class PathCounter(AbstractCounter):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE,
-                                blank=True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
     path = models.CharField(max_length=255, db_index=True)
 
     class Meta:
-        unique_together = ('day', 'path')
-        ordering = ('-day',)
+        unique_together = ("day", "path")
+        ordering = ("-day",)
 
 
 class UserCounter(AbstractCounter):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
-                             blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, blank=True, null=True)
 
     class Meta:
-        unique_together = ('day', 'user')
+        unique_together = ("day", "user")

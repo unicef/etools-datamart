@@ -23,9 +23,10 @@ from etools_datamart.apps.etl.results import etl_decoder, etl_dumps, etl_loads, 
 
 def test_encoder():
     e = EtlEncoder()
-    assert e.encode(
-        EtlResult(1, 1, 1)) == '{"__type__": "__EtlResult__", ' \
-                               '"data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null, "processed": 0, "total_records": 0}}'
+    assert (
+        e.encode(EtlResult(1, 1, 1)) == '{"__type__": "__EtlResult__", '
+        '"data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null, "processed": 0, "total_records": 0}}'
+    )
 
 
 def test_encoder2():
@@ -39,23 +40,23 @@ def test_decode():
 
 
 def test_decode2():
-    assert etl_decoder({"__type__": "__EtlResult__",
-                        "data": {"created": 1,
-                                 "updated": 1,
-                                 "unchanged": 1,
-                                 "deleted": 0,
-                                 "status": "SUCCESS",
-                                 "error": None}})
+    assert etl_decoder(
+        {
+            "__type__": "__EtlResult__",
+            "data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": None},
+        }
+    )
 
 
 def test_dumps():
-    assert etl_dumps(
-        EtlResult(1, 1,
-                  1)) == '{"__type__": "__EtlResult__", "data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null, "processed": 0, "total_records": 0}}'
+    assert (
+        etl_dumps(EtlResult(1, 1, 1))
+        == '{"__type__": "__EtlResult__", "data": {"created": 1, "updated": 1, "unchanged": 1, "deleted": 0, "status": "SUCCESS", "error": null, "processed": 0, "total_records": 0}}'
+    )
 
 
 def test_dumps2():
-    assert etl_dumps({} == '{}')
+    assert etl_dumps({} == "{}")
 
 
 def test_loads():

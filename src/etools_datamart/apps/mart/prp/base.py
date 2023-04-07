@@ -30,9 +30,11 @@ class PrpDataMartModel(models.Model, metaclass=PrpDataMartModelBase):
     @class_property
     def service(self):
         from unicef_rest_framework.models import Service
+
         return Service.objects.get(source_model=ContentType.objects.get_for_model(self))
 
     @class_property
     def linked_services(self):
         from unicef_rest_framework.models import Service
+
         return [s for s in Service.objects.all() if s.managed_model == self]

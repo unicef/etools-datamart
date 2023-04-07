@@ -43,7 +43,8 @@ class IndicatorSerializer(DataMartSerializer):
             # "disaggregation_active",
             # "source_disaggregation_id",
             # "pd_output_indicator",
-            "last_modify_date")
+            "last_modify_date",
+        )
 
 
 class IndicatorLightSerializer(DataMartSerializer):
@@ -51,29 +52,28 @@ class IndicatorLightSerializer(DataMartSerializer):
         model = models.ReportIndicator
         exclude = None
         fields = (
-            'country_name',
-            'schema_name',
-            'partner_name',
-            'partner_vendor_number',
-            'pd_sffa_reference_number',
-            'lower_result_name',
-            'pd_output_indicator_title',
-            'unit',
-            'display_type',
-            'baseline_numerator',
-            'baseline_denominator',
-            'target_numerator',
-            'target_denominator',
-            'means_of_verification',
+            "country_name",
+            "schema_name",
+            "partner_name",
+            "partner_vendor_number",
+            "pd_sffa_reference_number",
+            "lower_result_name",
+            "pd_output_indicator_title",
+            "unit",
+            "display_type",
+            "baseline_numerator",
+            "baseline_denominator",
+            "target_numerator",
+            "target_denominator",
+            "means_of_verification",
         )
 
 
 class IndicatorViewSet(common.DataMartViewSet):
     serializer_class = IndicatorSerializer
     queryset = models.ReportIndicator.objects.all()
-    filter_fields = ('year', 'last_modify_date')
+    filter_fields = ("year", "last_modify_date")
     serializers_fieldsets = {
-        'std': None,
-        'light': IndicatorLightSerializer,
+        "std": None,
+        "light": IndicatorLightSerializer,
     }
-

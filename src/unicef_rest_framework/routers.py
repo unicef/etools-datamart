@@ -17,6 +17,7 @@ class APIRootView(views.APIView):
     """
     The default basic root view for DefaultRouter
     """
+
     _ignore_model_permissions = True
     schema = None  # exclude from schema
     api_root_dict = None
@@ -38,14 +39,10 @@ class APIRootView(views.APIView):
                 else:
                     continue
             if namespace:
-                url_name = namespace + ':' + url_name
+                url_name = namespace + ":" + url_name
             try:
                 ret[key] = reverse(
-                    url_name,
-                    args=args,
-                    kwargs=kwargs,
-                    request=request,
-                    format=kwargs.get('format', None)
+                    url_name, args=args, kwargs=kwargs, request=request, format=kwargs.get("format", None)
                 )
             except NoReverseMatch:
                 # Don't bail out if eg. no list routes exist, only detail routes.
@@ -62,39 +59,36 @@ class APIReadOnlyRouter(APIRouter):
     routes = [
         # List route.
         Route(
-            url=r'^{prefix}{trailing_slash}$',
+            url=r"^{prefix}{trailing_slash}$",
             mapping={
-                'get': 'list',
+                "get": "list",
             },
-            name='{basename}-list',
+            name="{basename}-list",
             detail=False,
-            initkwargs={'suffix': 'List'}
+            initkwargs={"suffix": "List"},
         ),
         # Dynamically generated list routes. Generated using
         # @button(detail=False) decorator on methods of the viewset.
         DynamicRoute(
-            url=r'^{prefix}/{url_path}{trailing_slash}$',
-            name='{basename}-{url_name}',
-            detail=False,
-            initkwargs={}
+            url=r"^{prefix}/{url_path}{trailing_slash}$", name="{basename}-{url_name}", detail=False, initkwargs={}
         ),
         # Detail route.
         Route(
-            url=r'^{prefix}/{lookup}{trailing_slash}$',
+            url=r"^{prefix}/{lookup}{trailing_slash}$",
             mapping={
-                'get': 'retrieve',
+                "get": "retrieve",
             },
-            name='{basename}-detail',
+            name="{basename}-detail",
             detail=True,
-            initkwargs={'suffix': 'Instance'}
+            initkwargs={"suffix": "Instance"},
         ),
         # Dynamically generated detail routes. Generated using
         # @button(detail=True) decorator on methods of the viewset.
         DynamicRoute(
-            url=r'^{prefix}/{lookup}/{url_path}{trailing_slash}$',
-            name='{basename}-{url_name}',
+            url=r"^{prefix}/{lookup}/{url_path}{trailing_slash}$",
+            name="{basename}-{url_name}",
             detail=True,
-            initkwargs={}
+            initkwargs={},
         ),
     ]
 

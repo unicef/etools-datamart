@@ -122,7 +122,7 @@ class IndicatorIndicatorreportAdmin(DatamartSourceModelAdmin, ModelAdmin):
 
 @register(models.IndicatorReportable)
 class IndicatorReportableAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = ['content_type']
+    list_filter = ["content_type"]
 
 
 @register(models.IndicatorReportableDisaggregations)
@@ -247,7 +247,7 @@ class UnicefProgrammedocumentUnicefOfficersAdmin(DatamartSourceModelAdmin, Model
 
 @register(models.UnicefProgressreport)
 class UnicefProgressreportAdmin(DatamartSourceModelAdmin, ModelAdmin):
-    list_filter = ['status']
+    list_filter = ["status"]
 
 
 @register(models.UnicefProgressreportattachment)
@@ -263,4 +263,3 @@ class UnicefReportingperioddatesAdmin(DatamartSourceModelAdmin, ModelAdmin):
 @register(models.UnicefSection)
 class UnicefSectionAdmin(DatamartSourceModelAdmin, ModelAdmin):
     list_filter = []
-

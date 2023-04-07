@@ -10,21 +10,21 @@ class DataMartModelBase(ModelBase):
         parents = [b for b in bases if isinstance(b, DataMartModelBase)]
         if not parents:
             return super_new(cls, name, bases, attrs)
-        loader = attrs.pop('loader', None)
-        config = attrs.pop('Options', None)
+        loader = attrs.pop("loader", None)
+        config = attrs.pop("Options", None)
 
         new_class = super_new(cls, name, bases, attrs, **kwargs)
         if not loader:  # no custom loader use default
             loader = cls.loader_class()
-        base_config = getattr(new_class, '_etl_config', None)
+        base_config = getattr(new_class, "_etl_config", None)
 
         if not config:
             config = cls.loader_option_class(base_config)
         else:
             config = cls.loader_option_class(config)
 
-        new_class.add_to_class('_etl_config', config)
-        new_class.add_to_class('loader', loader)
+        new_class.add_to_class("_etl_config", config)
+        new_class.add_to_class("loader", loader)
         #
         # attr_meta = attrs.get('Meta', None)
         # attr_loader = attrs.get('Loader', None)

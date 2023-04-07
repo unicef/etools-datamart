@@ -65,6 +65,7 @@ unicef-realm = "*"
 xhtml2pdf = "*"
 
 [dev-packages]
+black = "*"
 drf-api-checker = "*"
 django-webtest = "*"
 factory-boy = "*"

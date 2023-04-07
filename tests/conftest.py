@@ -40,8 +40,8 @@ from _pytest.fixtures import SubRequest
 
 def pytest_configure(config):
     # enable this to remove deprecations
-    os.environ['CELERY_TASK_ALWAYS_EAGER'] = "1"
-    os.environ['STATIC_ROOT'] = tempfile.gettempdir()
+    os.environ["CELERY_TASK_ALWAYS_EAGER"] = "1"
+    os.environ["STATIC_ROOT"] = tempfile.gettempdir()
     sys._called_from_pytest = True
     # if not config.option.help:
     #     _setup_models()
@@ -49,6 +49,7 @@ def pytest_configure(config):
 
 def pytest_unconfigure(config):
     import sys
+
     del sys._called_from_pytest
 
 
@@ -56,7 +57,7 @@ def pytest_unconfigure(config):
 # warnings.simplefilter('ignore', RemovedInPytest4Warning)
 # warnings.simplefilter('ignore', PendingDeprecationWarning)
 # warnings.simplefilter('ignore', UserWarning)
-warnings.simplefilter('ignore', RuntimeWarning, lineno=1421)
+warnings.simplefilter("ignore", RuntimeWarning, lineno=1421)
 
 
 # def pytest_sessionstart(session):
@@ -88,21 +89,24 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture(scope='session')
-def django_db_setup(request,
-                    django_test_environment,
-                    django_db_blocker,
-                    django_db_use_migrations,
-                    django_db_keepdb,
-                    django_db_createdb,
-                    django_db_modify_db_settings,
-                    enable_migration_signals,
-                    pytestconfig):
+@pytest.fixture(scope="session")
+def django_db_setup(
+    request,
+    django_test_environment,
+    django_db_blocker,
+    django_db_use_migrations,
+    django_db_keepdb,
+    django_db_createdb,
+    django_db_modify_db_settings,
+    enable_migration_signals,
+    pytestconfig,
+):
     if django_db_createdb or enable_migration_signals:
         warnings.warn("Warning: pre/post migrate signals are enabled \n")
     else:
         warnings.warn("Warning: pre/post migrate signals have been disabled\n")
         import django.core.management.commands.migrate
+
         django.core.management.commands.migrate.emit_pre_migrate_signal = MagicMock()
         django.core.management.commands.migrate.emit_post_migrate_signal = MagicMock()
 
@@ -110,6 +114,7 @@ def django_db_setup(request,
     from django.test.utils import setup_databases, teardown_databases
 
     from pytest_django.fixtures import _disable_native_migrations
+
     setup_databases_args = {}
 
     if not django_db_use_migrations:
@@ -126,13 +131,9 @@ def django_db_setup(request,
     # E   LINE 1: ..."."app_label", "django_content_type"."model" FROM "django_co...
     # E                                                                ^
     #
-    signals.post_migrate.disconnect(dispatch_uid='constance.create_perm')
+    signals.post_migrate.disconnect(dispatch_uid="constance.create_perm")
     with django_db_blocker.unblock():
-        db_cfg = setup_databases(
-            verbosity=request.config.option.verbose,
-            interactive=False,
-            **setup_databases_args
-        )
+        db_cfg = setup_databases(verbosity=request.config.option.verbose, interactive=False, **setup_databases_args)
 
     def _teardown_database():
         with django_db_blocker.unblock():
@@ -153,9 +154,10 @@ def django_db_setup(request,
         Service.objects.load_services()
         UserAccessControl.objects.all().delete()
         APIRequestLog.objects.truncate()
-        UserFactory(username='system', is_superuser=True)
+        UserFactory(username="system", is_superuser=True)
         from django.contrib.sites.models import Site
-        Site.objects.get_or_create(domain='example.com', name='example.com')
+
+        Site.objects.get_or_create(domain="example.com", name="example.com")
         assert Service.objects.exists()
         assert not APIRequestLog.objects.exists()
 
@@ -163,12 +165,14 @@ def django_db_setup(request,
 @pytest.fixture
 def user1(db):
     from test_utilities.factories import UserFactory
+
     return UserFactory()
 
 
 @pytest.fixture
 def user2(db):
     from test_utilities.factories import UserFactory
+
     return UserFactory()
 
 
@@ -176,9 +180,10 @@ def user2(db):
 def reset(monkeypatch):
     # from etools_datamart.state import state
     from django.db import connections
+
     monkeypatch.setattr("etools_datamart.apps.security.utils.cache", MagicMock(get=lambda *a: []))
     # state.request = None
-    conn = connections['etools']
+    conn = connections["etools"]
     conn.set_schemas([])
     conn.search_path = None
 
@@ -212,10 +217,11 @@ def enable_threadstats(request):
 @pytest.fixture()
 def service(db):
     from unicef_rest_framework.models import Service
-    service = Service.objects.order_by('?').first()
+
+    service = Service.objects.order_by("?").first()
     if not service:
         Service.objects.load_services()
-        service = Service.objects.order_by('?').first()
+        service = Service.objects.order_by("?").first()
     return service
 
 
@@ -231,36 +237,34 @@ def data_service(db):
 @pytest.fixture()
 def number_of_partnerorganization(db):
     # number of partners.PartnerOrganization records in each tenant
-    return int((Path(__file__).parent / 'COUNT_PARTNERS_PARTNERORGANIZATION').read_text())
+    return int((Path(__file__).parent / "COUNT_PARTNERS_PARTNERORGANIZATION").read_text())
 
 
 @pytest.fixture()
 def number_of_intervention(db):
     # number of partners.Intervention
-    return int((Path(__file__).parent / 'COUNT_PARTNERS_INTERVENTION').read_text())
+    return int((Path(__file__).parent / "COUNT_PARTNERS_INTERVENTION").read_text())
 
 
 @pytest.fixture()
 def etools_user(db):
     from etools_datamart.apps.sources.etools.models import AuthUser
+
     return AuthUser.objects.get(id=1)
 
 
 @pytest.fixture()
 def staff_user(etools_user):
     from test_utilities.factories import UserFactory
-    return UserFactory(username=etools_user.username,
-                       email=etools_user.email,
-                       is_staff=True)
+
+    return UserFactory(username=etools_user.username, email=etools_user.email, is_staff=True)
 
 
 @pytest.fixture()
 def user(etools_user):
     from test_utilities.factories import UserFactory
 
-    return UserFactory(username=etools_user.username,
-                       azure_id=uuid.uuid4(),
-                       email=etools_user.email)
+    return UserFactory(username=etools_user.username, azure_id=uuid.uuid4(), email=etools_user.email)
 
 
 @pytest.fixture()

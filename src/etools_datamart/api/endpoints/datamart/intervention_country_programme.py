@@ -5,10 +5,12 @@ from .serializers import DataMartSerializer
 
 
 class InterventionCountryProgrammeSerializer(DataMartSerializer):
-
     class Meta(DataMartSerializer.Meta):
         model = models.InterventionCountryProgramme
-        exclude = ('seen', 'source_id',)
+        exclude = (
+            "seen",
+            "source_id",
+        )
 
 
 class InterventionCPViewSet(common.DataMartViewSet):

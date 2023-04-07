@@ -13,14 +13,17 @@ from etools_datamart.apps.core.admin_mixins import DisplayAllMixin, ReadOnlyMixi
 
 
 class TenantChangeList(ChangeList):
-    IGNORED_PARAMS = ['country_name', ]
+    IGNORED_PARAMS = [
+        "country_name",
+    ]
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
-        return reverse('admin:%s_%s_change' % (self.opts.app_label,
-                                               self.opts.model_name),
-                       args=[quote(f"{pk}-{ result.schema}")],
-                       current_app=self.model_admin.admin_site.name)
+        return reverse(
+            "admin:%s_%s_change" % (self.opts.app_label, self.opts.model_name),
+            args=[quote(f"{pk}-{ result.schema}")],
+            current_app=self.model_admin.admin_site.name,
+        )
 
     def get_filters_params(self, params=None):
         ret = super().get_filters_params(params)
@@ -31,16 +34,16 @@ class TenantChangeList(ChangeList):
 
 
 class SchemaFilter(ListFilter):
-    template = 'schemafilter.html'
-    title = 'country_name'
-    parameter_name = 'country_name'
+    template = "schemafilter.html"
+    title = "country_name"
+    parameter_name = "country_name"
 
     def __init__(self, request, params, model, model_admin):
         super().__init__(request, params, model, model_admin)
         self.request = request
         self.model = model
         self.model_admin = model_admin
-        self.conn = connections['etools']
+        self.conn = connections["etools"]
         if self.parameter_name in params:
             value = params.pop(self.parameter_name)
             self.used_parameters[self.parameter_name] = value
@@ -49,15 +52,15 @@ class SchemaFilter(ListFilter):
         self.all_filters = changelist.get_query_string({"from": self.request.path}, [])
         value = self.request.GET.get(self.parameter_name, "").split(",")
         yield {
-            'selected': value == [''],
-            'query_string': changelist.get_query_string({}, [self.parameter_name]),
-            'display': 'All',
+            "selected": value == [""],
+            "query_string": changelist.get_query_string({}, [self.parameter_name]),
+            "display": "All",
         }
         for lookup in self.conn.get_tenants():
             yield {
-                'selected': str(lookup.schema_name) in value,
-                'query_string': changelist.get_query_string({self.parameter_name: lookup.schema_name}, []),
-                'display': lookup.name,
+                "selected": str(lookup.schema_name) in value,
+                "query_string": changelist.get_query_string({self.parameter_name: lookup.schema_name}, []),
+                "display": lookup.name,
             }
 
     def has_output(self):
@@ -73,11 +76,9 @@ class SchemaFilter(ListFilter):
 
 
 class EToolsModelAdmin(ExtraButtonsMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
-
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        if request.method == 'POST':
-            redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
-                                                               self.opts.model_name))
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        if request.method == "POST":
+            redirect_url = reverse("admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name))
 
             self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
             return HttpResponseRedirect(redirect_url)
@@ -85,19 +86,21 @@ class EToolsModelAdmin(ExtraButtonsMixin, DisplayAllMixin, ReadOnlyMixin, ModelA
 
 
 class TenantModelAdmin(ExtraButtonsMixin, DisplayAllMixin, ReadOnlyMixin, ModelAdmin):
-    list_filter = [SchemaFilter, ]
+    list_filter = [
+        SchemaFilter,
+    ]
 
     # def get_queryset(self, request):
     #     super().get_queryset(request)
 
     def get_object(self, request, object_id, from_field=None):
-        pk, schema = object_id.split('-')
+        pk, schema = object_id.split("-")
         queryset = self.get_queryset(request)
         model = queryset.model
         field = model._meta.pk if from_field is None else model._meta.get_field(from_field)
         try:
             pk = field.to_python(pk)
-            conn = connections['etools']
+            conn = connections["etools"]
             conn.set_schemas([schema])
             return queryset.get(**{field.name: pk})
         except MultipleObjectsReturned:  # pragma: no cover
@@ -105,10 +108,9 @@ class TenantModelAdmin(ExtraButtonsMixin, DisplayAllMixin, ReadOnlyMixin, ModelA
         except (model.DoesNotExist, ValidationError, ValueError):  # pragma: no cover
             return None
 
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        if request.method == 'POST':
-            redirect_url = reverse('admin:%s_%s_changelist' % (self.opts.app_label,
-                                                               self.opts.model_name))
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        if request.method == "POST":
+            redirect_url = reverse("admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name))
 
             self.message_user(request, "This admin is read-only. Record not saved.", level=messages.WARNING)
             return HttpResponseRedirect(redirect_url)

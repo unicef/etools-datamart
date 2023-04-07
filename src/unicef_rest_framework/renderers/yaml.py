@@ -12,16 +12,16 @@ def labelize(v):
 
 
 class YAMLRenderer(ContentDispositionMixin, BaseRenderer):
-    format = 'yaml'
+    format = "yaml"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        response = renderer_context['response']
+        response = renderer_context["response"]
         self.process_response(renderer_context)
         if response.status_code != 200:
-            return ''
+            return ""
         try:
             return super().render(data, accepted_media_type, renderer_context)
 
         except Exception as e:
             logger.exception(e)
-            raise Exception(f'Error processing request {e}') from e
+            raise Exception(f"Error processing request {e}") from e

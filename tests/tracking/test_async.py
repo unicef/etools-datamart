@@ -36,7 +36,7 @@ def test_async_main_thread_terminated(enable_threadstats, monkeypatch):
 
 
 def test_async_timeout(enable_threadstats, monkeypatch):
-    monkeypatch.setattr(AsyncQueue, '_timed_queue_join', lambda *args: False)
+    monkeypatch.setattr(AsyncQueue, "_timed_queue_join", lambda *args: False)
     # monkeypatch.setattr(AsyncQueue, '_async_timeout', lambda *args: True)
 
     logger = Logger(shutdown_timeout=0.1)
@@ -51,7 +51,7 @@ def test_async_timeout(enable_threadstats, monkeypatch):
 
 
 def test_async_missing_start(enable_threadstats, monkeypatch):
-    monkeypatch.setattr(AsyncQueue, 'start', lambda s: False)
+    monkeypatch.setattr(AsyncQueue, "start", lambda s: False)
 
     logger = Logger()
     logger.stop()
@@ -59,7 +59,7 @@ def test_async_missing_start(enable_threadstats, monkeypatch):
 
 
 def test_missing_thread(enable_threadstats, monkeypatch):
-    monkeypatch.setattr(AsyncQueue, 'start', lambda s: True)
+    monkeypatch.setattr(AsyncQueue, "start", lambda s: True)
     logger = Logger()
     logger.queue([1, 1, 1])
     logger.stop()
@@ -68,6 +68,6 @@ def test_missing_thread(enable_threadstats, monkeypatch):
 
 def test_async__timed_queue_join(enable_threadstats, monkeypatch):
     logger = Logger()
-    monkeypatch.setattr(logger, '_queue', Mock(all_tasks_done=Mock(), unfinished_tasks=True), raising=False)
+    monkeypatch.setattr(logger, "_queue", Mock(all_tasks_done=Mock(), unfinished_tasks=True), raising=False)
 
     assert not logger._timed_queue_join(1)

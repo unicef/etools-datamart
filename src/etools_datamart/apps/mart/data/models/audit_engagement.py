@@ -23,25 +23,30 @@ from etools_datamart.apps.sources.etools.models import (
 
 from .partner import Partner
 
-attachment_codes = {AuditAudit: 'audit_final_report',
-                    AuditMicroassessment: 'micro_assessment_final_report',
-                    AuditSpecialaudit: 'special_audit_final_report',
-                    AuditSpotcheck: 'spotcheck_final_report',
-                    }
+attachment_codes = {
+    AuditAudit: "audit_final_report",
+    AuditMicroassessment: "micro_assessment_final_report",
+    AuditSpecialaudit: "special_audit_final_report",
+    AuditSpotcheck: "spotcheck_final_report",
+}
 
-URLMAP = {'AuditSpotcheck': "%s/ap/spot-checks/%s/overview/?schema=%s",
-          'AuditMicroassessment': "%s/ap/micro-assessments/%s/overview/?schema=%s",
-          'AuditSpecialaudit': "%s/ap/special-audits/%s/overview/?schema=%s",
-          'AuditAudit': "%s/ap/audits/%s/overview/?schema=%s",
-          'TpmTpmactivity': "%s/t2f/edit-travel/%s/?schema=%s",
-          'T2FTravelactivity': "%s/t2f/edit-travel/%s/?schema=%s"}
+URLMAP = {
+    "AuditSpotcheck": "%s/ap/spot-checks/%s/overview/?schema=%s",
+    "AuditMicroassessment": "%s/ap/micro-assessments/%s/overview/?schema=%s",
+    "AuditSpecialaudit": "%s/ap/special-audits/%s/overview/?schema=%s",
+    "AuditAudit": "%s/ap/audits/%s/overview/?schema=%s",
+    "TpmTpmactivity": "%s/t2f/edit-travel/%s/?schema=%s",
+    "T2FTravelactivity": "%s/t2f/edit-travel/%s/?schema=%s",
+}
 
-MODULEMAP = {'AuditSpotcheck': "fam",
-             'AuditMicroassessment': "fam",
-             'AuditSpecialaudit': "fam",
-             'AuditAudit': "fam",
-             'TpmTpmactivity': "tpm",
-             'T2FTravelactivity': "trips"}
+MODULEMAP = {
+    "AuditSpotcheck": "fam",
+    "AuditMicroassessment": "fam",
+    "AuditSpecialaudit": "fam",
+    "AuditAudit": "fam",
+    "TpmTpmactivity": "tpm",
+    "T2FTravelactivity": "trips",
+}
 
 
 class EngagementMixin:
@@ -49,29 +54,35 @@ class EngagementMixin:
 
     def get_partner(self, record: AuditEngagement, values: dict, **kwargs):
         try:
-            p = Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.pk)
+            p = Partner.objects.get(schema_name=self.context["country"].schema_name, source_id=record.partner.pk)
             return {
-                'name': p.name,
-                'vendor_number': p.vendor_number,
-                'id': p.pk,
-                'source_id': p.source_id,
-                'type': p.partner_type,
-                'cso_type': p.cso_type,
-                'reported_cy': str(p.reported_cy),
-                'total_ct_cy': str(p.total_ct_cy),
+                "name": p.name,
+                "vendor_number": p.vendor_number,
+                "id": p.pk,
+                "source_id": p.source_id,
+                "type": p.partner_type,
+                "cso_type": p.cso_type,
+                "reported_cy": str(p.reported_cy),
+                "total_ct_cy": str(p.total_ct_cy),
             }
         except Partner.DoesNotExist:
-            return {key: 'N/A' for key in ['name', 'vendor_number', 'id', 'source_id', 'type', 'cso_type',
-                                           'reported_cy', 'total_ct_cy']}
+            return {
+                key: "N/A"
+                for key in [
+                    "name",
+                    "vendor_number",
+                    "id",
+                    "source_id",
+                    "type",
+                    "cso_type",
+                    "reported_cy",
+                    "total_ct_cy",
+                ]
+            }
 
     def _get_risk(self, record: AuditEngagement, **kwargs):
         try:
-            risk = AuditRisk.objects.get(
-                engagement=record,
-                **kwargs
-            )
+            risk = AuditRisk.objects.get(engagement=record, **kwargs)
             extra = risk.extra
             value = risk.value
             text = RiskConst.VALUES[value]
@@ -81,18 +92,15 @@ class EngagementMixin:
 
     def _get_risks(self, record: AuditEngagement, **kwargs):
         try:
-            risks = AuditRisk.objects.filter(
-                engagement=record,
-                **kwargs
-            )
-            value = ', '.join([risk.blueprint.header for risk in risks])
+            risks = AuditRisk.objects.filter(engagement=record, **kwargs)
+            value = ", ".join([risk.blueprint.header for risk in risks])
             count = risks.count()
         except AuditRisk.DoesNotExist:
             value, count = "", -1
         return value, count
 
     def get_rating(self, record: AuditEngagement, values: dict, **kwargs):
-        filters = {'blueprint__category__code': "ma_global_assessment"}
+        filters = {"blueprint__category__code": "ma_global_assessment"}
         value, extra, text = self._get_risk(record, **filters)
         values["rating_extra"] = extra
         return text
@@ -107,25 +115,28 @@ class EngagementMixin:
                     description=rec.section.description,
                 ),
             )
-        values['sections_data'] = data
-        return ", ".join([loc['name'] for loc in data])
+        values["sections_data"] = data
+        return ", ".join([loc["name"] for loc in data])
 
     def get_offices(self, record: AuditEngagement, values: dict, **kwargs):
         data = []
         for rec in record.AuditEngagementOffices_engagement.all():
-            data.append(dict(source_id=rec.office.id,
-                             name=rec.office.name,
-                             ))
-        values['offices_data'] = data
-        return ", ".join([office['name'] for office in data])
+            data.append(
+                dict(
+                    source_id=rec.office.id,
+                    name=rec.office.name,
+                )
+            )
+        values["offices_data"] = data
+        return ", ".join([office["name"] for office in data])
 
     def get_action_points(self, record, values, **kwargs):
         aggr = "category__description"
-        st, pr = 'status', 'high_priority'
+        st, pr = "status", "high_priority"
         qs = ActionPointsActionpoint.objects.filter(engagement=record)
         by_status = list(qs.order_by(st).values(st).annotate(count=Count(st)))
         by_priority = list(qs.order_by(pr).values(pr).annotate(count=Count(pr)))
-        values['action_points_data'] = by_status + by_priority
+        values["action_points_data"] = by_status + by_priority
         return list(qs.order_by(aggr).values(aggr).annotate(count=Count(aggr)))
 
     def get_status(self, record, values, **kwargs):
@@ -148,46 +159,45 @@ class EngagementMixin:
 class EngagementlLoader(EngagementMixin, EtoolsLoader):
     def get_queryset(self):
         return AuditEngagement.objects.select_related(
-            'partner',
-            'agreement',
-            'po_item',
-            'risks',
+            "partner",
+            "agreement",
+            "po_item",
+            "risks",
         ).all()
 
     def get_content_type(self, sub_type):
-        mapping = {AuditAudit: 'audit',
-                   AuditEngagement: 'engagement',
-                   AuditMicroassessment: 'microassessment',
-                   AuditSpecialaudit: 'specialaudit',
-                   AuditSpotcheck: 'spotcheck',
-                   }
-        return DjangoContentType.objects.get(app_label='audit',
-                                             model=mapping[sub_type])
+        mapping = {
+            AuditAudit: "audit",
+            AuditEngagement: "engagement",
+            AuditMicroassessment: "microassessment",
+            AuditSpecialaudit: "specialaudit",
+            AuditSpotcheck: "spotcheck",
+        }
+        return DjangoContentType.objects.get(app_label="audit", model=mapping[sub_type])
 
     def get_engagement_attachments(self, record: AuditEngagement, values: dict, **kwargs):
         # audit_engagement
         ret = UnicefAttachmentsAttachment.objects.filter(
-            object_id=record.id,
-            code='audit_engagement',
-            content_type=self.get_content_type(AuditEngagement)).values_list('file', flat=True)
+            object_id=record.id, code="audit_engagement", content_type=self.get_content_type(AuditEngagement)
+        ).values_list("file", flat=True)
 
         return ", ".join(ret)
 
     def get_report_attachments(self, record: AuditEngagement, values: dict, **kwargs):
         # audit_report
         ret = UnicefAttachmentsAttachment.objects.filter(
-            object_id=record.id,
-            code='audit_report',
-            content_type=self.get_content_type(AuditEngagement)).values_list('file', flat=True)
+            object_id=record.id, code="audit_report", content_type=self.get_content_type(AuditEngagement)
+        ).values_list("file", flat=True)
 
         return ", ".join(ret)
 
     def get_final_report(self, record: AuditEngagement, values: dict, **kwargs):
-        if getattr(record._impl, 'final_report', None):
+        if getattr(record._impl, "final_report", None):
             return UnicefAttachmentsAttachment.objects.get(
                 object_id=record.id,
                 code=attachment_codes[record.sub_type],
-                content_type=self.get_content_type(record.sub_type)).file
+                content_type=self.get_content_type(record.sub_type),
+            ).file
 
     def get_values(self, record: AuditEngagement):
         values = {}
@@ -197,45 +207,50 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
     def get_authorized_officers(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
         for o in record.authorized_officers.all():
-            ret.append({'last_name': o.last_name,
-                        'first_name': o.first_name,
-                        'partner': o.partner.name,
-                        'email': o.email,
-                        })
-        values['authorized_officers_data'] = ret
-        return ", ".join([o['email'] for o in ret])
+            ret.append(
+                {
+                    "last_name": o.last_name,
+                    "first_name": o.first_name,
+                    "partner": o.partner.name,
+                    "email": o.email,
+                }
+            )
+        values["authorized_officers_data"] = ret
+        return ", ".join([o["email"] for o in ret])
 
     def get_active_pd(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
-        for o in (AuditEngagementActivePd.objects
-                  .select_related('intervention')
-                  .filter(engagement=record)):
-            ret.append({'title': o.intervention.title,
-                        'number': o.intervention.number,
-                        'status': o.intervention.status,
-                        'document_type': o.intervention.document_type,
-                        })
+        for o in AuditEngagementActivePd.objects.select_related("intervention").filter(engagement=record):
+            ret.append(
+                {
+                    "title": o.intervention.title,
+                    "number": o.intervention.number,
+                    "status": o.intervention.status,
+                    "document_type": o.intervention.document_type,
+                }
+            )
 
-        values['active_pd_data'] = ret
-        return ", ".join([o['number'] for o in ret])
+        values["active_pd_data"] = ret
+        return ", ".join([o["number"] for o in ret])
 
     def get_partner_id(self, record: AuditEngagement, values: dict, **kwargs):
         try:
-            return Partner.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.partner.id).pk
+            return Partner.objects.get(schema_name=self.context["country"].schema_name, source_id=record.partner.id).pk
         except Partner.DoesNotExist:
             return None
 
     def get_staff_members(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
         for o in record.staff_members.all():
-            ret.append({'last_name': o.user.last_name,
-                        'first_name': o.user.first_name,
-                        'email': o.user.email,
-                        })
-        values['staff_members_data'] = ret
-        return ", ".join([o['email'] for o in ret])
+            ret.append(
+                {
+                    "last_name": o.user.last_name,
+                    "first_name": o.user.first_name,
+                    "email": o.user.email,
+                }
+            )
+        values["staff_members_data"] = ret
+        return ", ".join([o["email"] for o in ret])
 
     # def get_active_pd(self, original: AuditEngagement, values: dict):
     #     return None
@@ -250,12 +265,13 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
 
     def get_key_internal_control_weaknesses(self, record: AuditEngagement, values: dict, **kwargs):
         qs = AuditRisk.objects.filter(
-            blueprint__category__header='Key Internal Controls Weaknesses', engagement_id=record.id)
+            blueprint__category__header="Key Internal Controls Weaknesses", engagement_id=record.id
+        )
         return [risk.blueprint.header for risk in qs]
 
     def process_country(self):
         for m in [AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck, AuditAudit]:
-            for record in m.objects.select_related('engagement_ptr'):
+            for record in m.objects.select_related("engagement_ptr"):
                 record.id = record.engagement_ptr_id
                 record.sub_type = m
                 record.engagement_ptr._impl = record
@@ -266,16 +282,16 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
 
 
 class Engagement(EtoolsDataMartModel):
-    TYPE_AUDIT = 'audit'
-    TYPE_MICRO_ASSESSMENT = 'ma'
-    TYPE_SPOT_CHECK = 'sc'
-    TYPE_SPECIAL_AUDIT = 'sa'
+    TYPE_AUDIT = "audit"
+    TYPE_MICRO_ASSESSMENT = "ma"
+    TYPE_SPOT_CHECK = "sc"
+    TYPE_SPECIAL_AUDIT = "sa"
 
     TYPES = Choices(
-        (TYPE_AUDIT, _('Audit')),
-        (TYPE_MICRO_ASSESSMENT, _('Micro Assessment')),
-        (TYPE_SPOT_CHECK, _('Spot Check')),
-        (TYPE_SPECIAL_AUDIT, _('Special Audit')),
+        (TYPE_AUDIT, _("Audit")),
+        (TYPE_MICRO_ASSESSMENT, _("Micro Assessment")),
+        (TYPE_SPOT_CHECK, _("Spot Check")),
+        (TYPE_SPECIAL_AUDIT, _("Special Audit")),
     )
 
     # DISPLAY_STATUSES = Choices(
@@ -304,8 +320,9 @@ class Engagement(EtoolsDataMartModel):
     # Base fields
     active_pd = models.TextField(blank=True, null=True)
     active_pd_data = JSONField(blank=True, null=True)
-    additional_supporting_documentation_provided = models.DecimalField(blank=True, null=True, decimal_places=2,
-                                                                       max_digits=20)
+    additional_supporting_documentation_provided = models.DecimalField(
+        blank=True, null=True, decimal_places=2, max_digits=20
+    )
     agreement = models.CharField(max_length=300, blank=True, null=True)
     auditor = models.CharField(max_length=255, blank=True, null=True)
     auditor_number = models.CharField(max_length=30, blank=True, null=True)
@@ -326,8 +343,7 @@ class Engagement(EtoolsDataMartModel):
     date_of_report_submit = models.DateField(null=True, blank=True)
     end_date = models.DateField(blank=True, null=True, db_index=True)
     engagement_attachments = models.TextField(blank=True, null=True)
-    engagement_type = models.CharField(max_length=300, blank=True,
-                                       null=True, choices=TYPES, db_index=True)
+    engagement_type = models.CharField(max_length=300, blank=True, null=True, choices=TYPES, db_index=True)
     exchange_rate = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     explanation_for_additional_information = models.TextField(blank=True, null=True)
     joint_audit = models.BooleanField(default=False, blank=True, null=True)
@@ -340,9 +356,9 @@ class Engagement(EtoolsDataMartModel):
     staff_members = models.TextField(blank=True, null=True)
     staff_members_data = JSONField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True, db_index=True)
-    status = models.CharField(max_length=30, blank=True, null=True,
-                              choices=AuditEngagementConsts.DISPLAY_STATUSES,
-                              db_index=True)
+    status = models.CharField(
+        max_length=30, blank=True, null=True, choices=AuditEngagementConsts.DISPLAY_STATUSES, db_index=True
+    )
     total_value = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     write_off_required = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
 
@@ -351,13 +367,19 @@ class Engagement(EtoolsDataMartModel):
     # final_report is shared across all Engagement types
     final_report = models.CharField(max_length=300, blank=True, null=True)
 
-    shared_ip_with = ArrayField(models.CharField(max_length=20, blank=True, null=True),
-                                blank=True, null=True, default=list, verbose_name=_('Shared Audit with'))
+    shared_ip_with = ArrayField(
+        models.CharField(max_length=20, blank=True, null=True),
+        blank=True,
+        null=True,
+        default=list,
+        verbose_name=_("Shared Audit with"),
+    )
 
     # SpotCheck
     spotcheck_total_amount_tested = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=20)
-    spotcheck_total_amount_of_ineligible_expenditure = models.DecimalField(null=True, blank=True, decimal_places=2,
-                                                                           max_digits=20)
+    spotcheck_total_amount_of_ineligible_expenditure = models.DecimalField(
+        null=True, blank=True, decimal_places=2, max_digits=20
+    )
     spotcheck_internal_controls = models.TextField(null=True, blank=True)
     spotcheck_final_report = models.CharField(max_length=300, blank=True, null=True)
     # MicroAssessment
@@ -385,8 +407,7 @@ class Engagement(EtoolsDataMartModel):
 
     audited_expenditure = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
     financial_findings = models.DecimalField(blank=True, null=True, default=0, decimal_places=2, max_digits=20)
-    audit_opinion = models.CharField(max_length=20, choices=AUDIT_OPTIONS,
-                                     blank=True, null=True, db_index=True)
+    audit_opinion = models.CharField(max_length=20, choices=AUDIT_OPTIONS, blank=True, null=True, db_index=True)
     # final_report = CodedGenericRelation(Attachment, code='audit_final_report')
 
     # SpecialAudit
@@ -413,21 +434,21 @@ class Engagement(EtoolsDataMartModel):
             auditor="agreement.auditor_firm.name",
             auditor_number="agreement.auditor_firm.vendor_number",
             authorized_officers="-",
-            engagement_attachments='-',
-            report_attachments='-',
-            staff_members='-',
+            engagement_attachments="-",
+            report_attachments="-",
+            staff_members="-",
             partner="-",
             po_item="po_item.number",  # PurchaseOrderItem
             final_report="-",
-            spotcheck_total_amount_tested='_impl.total_amount_tested',
-            spotcheck_total_amount_of_ineligible_expenditure='_impl.total_amount_of_ineligible_expenditure',
-            spotcheck_final_report='_impl.final_report',
-            spotcheck_internal_controls='_impl.internal_controls',
-            audited_expenditure='_impl.audited_expenditure',
-            financial_findings='_impl.financial_findings',
-            audit_opinion='_impl.audit_opinion',
+            spotcheck_total_amount_tested="_impl.total_amount_tested",
+            spotcheck_total_amount_of_ineligible_expenditure="_impl.total_amount_of_ineligible_expenditure",
+            spotcheck_final_report="_impl.final_report",
+            spotcheck_internal_controls="_impl.internal_controls",
+            audited_expenditure="_impl.audited_expenditure",
+            financial_findings="_impl.financial_findings",
+            audit_opinion="_impl.audit_opinion",
             action_points="-",
             rating="-",
             rating_extra="i",
-            key_internal_control_weaknesses='-',
+            key_internal_control_weaknesses="-",
         )

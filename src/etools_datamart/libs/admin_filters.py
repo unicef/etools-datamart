@@ -29,52 +29,57 @@ class RangeFilter(SimpleListFilter):
 
 
 class SizeFilter(RangeFilter):
-    title = 'Size'
-    parameter_name = 'size'
-    template = 'adminfilters/combobox.html'
+    title = "Size"
+    parameter_name = "size"
+    template = "adminfilters/combobox.html"
 
     def __init__(self, request, params, model, model_admin):
         self.ranges = {}
-        for i, s in enumerate([KILO,
-                               KILO * 10,
-                               MEGA,
-                               MEGA * 5,
-                               MEGA * 10,
-                               ]):
-            self.ranges[i] = ('> %s' % humanize_size(s), dict(response_length__gt=s))
+        for i, s in enumerate(
+            [
+                KILO,
+                KILO * 10,
+                MEGA,
+                MEGA * 5,
+                MEGA * 10,
+            ]
+        ):
+            self.ranges[i] = ("> %s" % humanize_size(s), dict(response_length__gt=s))
         super().__init__(request, params, model, model_admin)
 
 
 class TimeFilter(RangeFilter):
-    title = 'Time'
-    parameter_name = 'time'
-    template = 'adminfilters/combobox.html'
+    title = "Time"
+    parameter_name = "time"
+    template = "adminfilters/combobox.html"
 
     def __init__(self, request, params, model, model_admin):
         self.ranges = {
-            0: ('< 1s', dict(response_ms__lte=SECOND)),
+            0: ("< 1s", dict(response_ms__lte=SECOND)),
         }
         for sec in range(1, 11):
-            self.ranges[sec] = ('> %ss' % sec, dict(response_ms__gte=SECOND * sec))
+            self.ranges[sec] = ("> %ss" % sec, dict(response_ms__gte=SECOND * sec))
         super().__init__(request, params, model, model_admin)
 
 
 class StatusFilter(ChoicesFieldListFilter):
-    title = 'Status'
+    title = "Status"
 
     def __init__(self, field, request, params, model, model_admin, field_path):
         super().__init__(field, request, params, model, model_admin, field_path)
-        self.lookup_kwarg_since = '%s__gte' % field_path
-        self.lookup_kwarg_until = '%s__lt' % field_path
+        self.lookup_kwarg_since = "%s__gte" % field_path
+        self.lookup_kwarg_until = "%s__lt" % field_path
 
     def choices(self, changelist):
         choices = []
-        for item in ['2xx', '3xx', '4xx', '5xx']:
+        for item in ["2xx", "3xx", "4xx", "5xx"]:
             flt = int(item[0]) * 100
             filterdict = {self.lookup_kwarg_since: flt, self.lookup_kwarg_until: flt + 100}
-            choices.append({
-                'selected': True,
-                'query_string': changelist.get_query_string(filterdict, [self.lookup_kwarg_isnull]),
-                'display': item
-            },)
+            choices.append(
+                {
+                    "selected": True,
+                    "query_string": changelist.get_query_string(filterdict, [self.lookup_kwarg_isnull]),
+                    "display": item,
+                },
+            )
         return choices

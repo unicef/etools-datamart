@@ -28,22 +28,30 @@ class ServiceManager(models.Manager):
         return self.model.objects.get(viewset=viewset)
 
     def get_for_model(self, model):
-        return self.model.objects.filter(source_model__app_label=model._meta.app_label,
-                                         source_model__model=model._meta.model_name,
-                                         ).first()
+        return self.model.objects.filter(
+            source_model__app_label=model._meta.app_label,
+            source_model__model=model._meta.model_name,
+        ).first()
 
-    def check_or_create(self, prefix, viewset, basename, url_name, ):
+    def check_or_create(
+        self,
+        prefix,
+        viewset,
+        basename,
+        url_name,
+    ):
         name = fqn(viewset)
         source_model = ContentType.objects.get_for_model(viewset().get_queryset().model)
-        service, isnew = self.model.objects.get_or_create(viewset=viewset,
-                                                          defaults={
-                                                              'name': name,
-                                                              'cache_ttl': '1y',
-                                                              'access': getattr(viewset, 'default_access',
-                                                                                conf.DEFAULT_ACCESS),
-                                                              'description': getattr(viewset, '__doc__', ""),
-                                                              'source_model': source_model
-                                                          })
+        service, isnew = self.model.objects.get_or_create(
+            viewset=viewset,
+            defaults={
+                "name": name,
+                "cache_ttl": "1y",
+                "access": getattr(viewset, "default_access", conf.DEFAULT_ACCESS),
+                "description": getattr(viewset, "__doc__", ""),
+                "source_model": source_model,
+            },
+        )
 
         with disable_concurrency(service):
             service.url_name = url_name
@@ -59,8 +67,7 @@ class ServiceManager(models.Manager):
         created = deleted = 0
         list_name = router.routes[0].name
         for prefix, viewset, basename in router.registry:
-            service, isnew = self.check_or_create(prefix, viewset, basename,
-                                                  list_name.format(basename=basename))
+            service, isnew = self.check_or_create(prefix, viewset, basename, list_name.format(basename=basename))
             # try:
             if isnew:
                 created += 1
@@ -91,41 +98,38 @@ class ServiceManager(models.Manager):
 
 
 class Service(MasterDataModel):
-    name = models.CharField(max_length=200, help_text='unique service name',
-                            db_index=True, unique=True)
+    name = models.CharField(max_length=200, help_text="unique service name", db_index=True, unique=True)
     description = models.TextField(blank=True, null=True)
-    viewset = StrategyClassField(help_text='class FQN',
-                                 unique=True, db_index=True)
-    basename = models.CharField(max_length=200, help_text='viewset basename')
-    suffix = models.CharField(max_length=200, help_text='url suffix')
-    url_name = models.CharField(max_length=300, help_text='url name as per drf reverse')
-    access = models.IntegerField(choices=[(k, v) for k, v in acl.ACL_LABELS.items()],
-                                 default=acl.ACL_ACCESS_LOGIN,
-                                 help_text="Required privileges")
+    viewset = StrategyClassField(help_text="class FQN", unique=True, db_index=True)
+    basename = models.CharField(max_length=200, help_text="viewset basename")
+    suffix = models.CharField(max_length=200, help_text="url suffix")
+    url_name = models.CharField(max_length=300, help_text="url name as per drf reverse")
+    access = models.IntegerField(
+        choices=[(k, v) for k, v in acl.ACL_LABELS.items()],
+        default=acl.ACL_ACCESS_LOGIN,
+        help_text="Required privileges",
+    )
 
-    confidentiality = models.IntegerField(choices=acl.CONFIDENTIALITY_CHOICES,
-                                          default=acl.CLASS_INTERNAL)
+    confidentiality = models.IntegerField(choices=acl.CONFIDENTIALITY_CHOICES, default=acl.CLASS_INTERNAL)
 
     hidden = models.BooleanField(default=False)
 
     cache_version = models.IntegerField(default=1)
-    cache_ttl = models.CharField(default='1d', max_length=5)
-    cache_key = models.CharField(max_length=1000,
-                                 null=True, blank=True,
-                                 help_text='Key used to invalidate service cache')
+    cache_ttl = models.CharField(default="1d", max_length=5)
+    cache_key = models.CharField(
+        max_length=1000, null=True, blank=True, help_text="Key used to invalidate service cache"
+    )
 
-    source_model = models.ForeignKey(ContentType,
-                                     models.CASCADE,
-                                     blank=True,
-                                     help_text="model used as primary datasource")
+    source_model = models.ForeignKey(
+        ContentType, models.CASCADE, blank=True, help_text="model used as primary datasource"
+    )
 
-    linked_models = models.ManyToManyField(ContentType,
-                                           related_name='+',
-                                           blank=True,
-                                           help_text="models that the service depends on")
+    linked_models = models.ManyToManyField(
+        ContentType, related_name="+", blank=True, help_text="models that the service depends on"
+    )
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
         verbose_name_plural = "Services"
 
     objects = ServiceManager()
@@ -146,7 +150,7 @@ class Service(MasterDataModel):
     @cached_property
     def endpoint(self):
         try:
-            return reverse(f'api:{self.basename}-list', args=['latest'])
+            return reverse(f"api:{self.basename}-list", args=["latest"])
         except Exception:
             pass
 
@@ -155,8 +159,8 @@ class Service(MasterDataModel):
         return "{} ({})".format(self.viewset.__name__, self.viewset.source)
 
     def doc_url(self):
-        base = '/api/+redoc/#operation/'
-        path = self.suffix.replace('/', '_')
+        base = "/api/+redoc/#operation/"
+        path = self.suffix.replace("/", "_")
         return "{0}api_{1}_list".format(base, path)
 
     @cached_property

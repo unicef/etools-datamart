@@ -12,4 +12,4 @@ class RGroupFactory(RegisterModelFactory):
 
     class Meta:
         model = models.Group
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)

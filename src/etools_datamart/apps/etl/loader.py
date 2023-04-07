@@ -24,16 +24,16 @@ from etools_datamart.apps.etl.exceptions import (
 from etools_datamart.celery import app
 
 loadeables = set()
-locks = caches['lock']
-cache = caches['default']
+locks = caches["lock"]
+cache = caches["default"]
 
 # logger = logging.getLogger(__name__)
 logger = get_task_logger(__name__)
 
-CREATED = 'created'
-UPDATED = 'updated'
-UNCHANGED = 'unchanged'
-DELETED = 'deleted'
+CREATED = "created"
+UPDATED = "updated"
+UNCHANGED = "unchanged"
+DELETED = "deleted"
 
 RUN_UNKNOWN = 0
 RUN_MANUAL = 1
@@ -41,21 +41,42 @@ RUN_COMMAND = 2
 RUN_SCHEDULE = 3
 RUN_QUEUED = 4
 RUN_AS_REQUIREMENT = 5
-RUN_TYPES = ((RUN_UNKNOWN, ""),
-             (RUN_MANUAL, "Manual"),
-             (RUN_COMMAND, "cli"),
-             (RUN_SCHEDULE, "Celery"),
-             (RUN_QUEUED, "Forced queue"),
-             (RUN_AS_REQUIREMENT, "Required by task"),
-             )
+RUN_TYPES = (
+    (RUN_UNKNOWN, ""),
+    (RUN_MANUAL, "Manual"),
+    (RUN_COMMAND, "cli"),
+    (RUN_SCHEDULE, "Celery"),
+    (RUN_QUEUED, "Forced queue"),
+    (RUN_AS_REQUIREMENT, "Required by task"),
+)
 
 
 class EtlResult:
-    __slots__ = [CREATED, UPDATED, UNCHANGED, DELETED, 'processed', 'total_records',
-                 'status', 'context', 'error', 'retry']
+    __slots__ = [
+        CREATED,
+        UPDATED,
+        UNCHANGED,
+        DELETED,
+        "processed",
+        "total_records",
+        "status",
+        "context",
+        "error",
+        "retry",
+    ]
 
-    def __init__(self, updated=0, created=0, unchanged=0, deleted=0,
-                 status='SUCCESS', context=None, error=None, retry=False, **kwargs):
+    def __init__(
+        self,
+        updated=0,
+        created=0,
+        unchanged=0,
+        deleted=0,
+        status="SUCCESS",
+        context=None,
+        error=None,
+        retry=False,
+        **kwargs,
+    ):
         self.created = created
         self.updated = updated
         self.unchanged = unchanged
@@ -78,14 +99,16 @@ class EtlResult:
     #     setattr(self, counter, getattr(self, counter) + value)
 
     def as_dict(self):
-        return {'created': self.created,
-                'updated': self.updated,
-                'unchanged': self.unchanged,
-                'deleted': self.deleted,
-                'status': self.status,
-                'error': self.error,
-                'processed': self.processed,
-                'total_records': self.total_records}
+        return {
+            "created": self.created,
+            "updated": self.updated,
+            "unchanged": self.unchanged,
+            "deleted": self.deleted,
+            "status": self.status,
+            "error": self.error,
+            "processed": self.processed,
+            "total_records": self.total_records,
+        }
 
 
 undefined = object()
@@ -93,10 +116,24 @@ undefined = object()
 
 class BaseLoaderOptions:
     DEFAULT_KEY = lambda loader, record: dict(source_id=record.pk)
-    __attrs__ = ['mapping', 'celery', 'source', 'last_modify_field',
-                 'queryset', 'key', 'locks', 'filters', 'sync_deleted_records', 'truncate',
-                 'depends', 'timeout', 'lock_key', 'always_update', 'fields_to_compare',
-                 'exclude_from_compare']
+    __attrs__ = [
+        "mapping",
+        "celery",
+        "source",
+        "last_modify_field",
+        "queryset",
+        "key",
+        "locks",
+        "filters",
+        "sync_deleted_records",
+        "truncate",
+        "depends",
+        "timeout",
+        "lock_key",
+        "always_update",
+        "fields_to_compare",
+        "exclude_from_compare",
+    ]
 
     def __init__(self, base=None):
         self.mapping = {}
@@ -115,7 +152,7 @@ class BaseLoaderOptions:
         self.sync_deleted_records = lambda loader: True
         self.truncate = False
         self.fields_to_compare = None
-        self.exclude_from_compare = ['seen']
+        self.exclude_from_compare = ["seen"]
 
         if base:
             for attr in self.__attrs__:
@@ -152,15 +189,14 @@ class LoaderTask(celery.Task):
         try:
             if self.loader.etl_task.task_id:
                 return EtlResult()
-            kwargs.setdefault('ignore_dependencies', False)
-            kwargs.setdefault('force_requirements', True)
+            kwargs.setdefault("ignore_dependencies", False)
+            kwargs.setdefault("force_requirements", True)
             return self.loader.load(**kwargs)
         except (RequiredIsRunning, RequiredIsMissing) as e:  # pragma: no cover
-            st = f'RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}'
+            st = f"RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}"
             self.loader.etl_task.status = st
             self.loader.etl_task.save()
-            raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES,
-                             countdown=config.ETL_RETRY_COUNTDOWN)
+            raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES, countdown=config.ETL_RETRY_COUNTDOWN)
         except BaseException as e:  # pragma: no cover
             logger.exception(e)
             # self.loader.etl_task.status = 'ERROR'
@@ -187,11 +223,11 @@ def equal(current, new_value):
 def has_attr(obj, attr):
     """Recursive get object's attribute. May use dot notation."""
     none = object()
-    if '.' not in attr:
+    if "." not in attr:
         ret = getattr(obj, attr, none)
     else:
-        L = attr.split('.')
-        ret = has_attr(getattr(obj, L[0], none), '.'.join(L[1:]))
+        L = attr.split(".")
+        ret = has_attr(getattr(obj, L[0], none), ".".join(L[1:]))
     return ret != none
 
 
@@ -236,14 +272,14 @@ class BaseLoader:
         return self.etl_task.last_run
 
     def is_running(self):
-        return self.etl_task.status == 'RUNNING'
+        return self.etl_task.status == "RUNNING"
 
     def need_refresh(self, other):
-        if not self.etl_task.last_success or self.etl_task.status != 'SUCCESS':
-            logger.info('%s: Refresh needed due no successfully run' % self)
+        if not self.etl_task.last_success or self.etl_task.status != "SUCCESS":
+            logger.info("%s: Refresh needed due no successfully run" % self)
             return True
         if self.etl_task.last_success.date() < timezone.now().date():
-            logger.info('%s: Refresh needed because last success too old' % self)
+            logger.info("%s: Refresh needed because last success too old" % self)
             return True
         else:
             pass
@@ -258,37 +294,38 @@ class BaseLoader:
             current = getattr(record, field_name)
 
             if not equal(current, new):
-                verbosity = self.context['verbosity']
+                verbosity = self.context["verbosity"]
                 if verbosity >= 2:  # pragma: no cover
-                    stdout = self.context['stdout']
-                    stdout.write("Detected field changed '%s': current: %s(%s) new value: %s(%s)\n" %
-                                 (field_name,
-                                  getattr(record, field_name),
-                                  type(getattr(record, field_name)),
-                                  getattr(other, field_name),
-                                  type(getattr(other, field_name))
-                                  ))
+                    stdout = self.context["stdout"]
+                    stdout.write(
+                        "Detected field changed '%s': current: %s(%s) new value: %s(%s)\n"
+                        % (
+                            field_name,
+                            getattr(record, field_name),
+                            type(getattr(record, field_name)),
+                            getattr(other, field_name),
+                            type(getattr(other, field_name)),
+                        )
+                    )
                     stdout.flush()
 
                 return True
         return False
 
     def process_record(self, filters, values):
-        stdout = self.context['stdout']
-        verbosity = self.context['verbosity']
+        stdout = self.context["stdout"]
+        verbosity = self.context["verbosity"]
         if stdout and verbosity > 2:  # pragma: no cover
-            stdout.write('.')
+            stdout.write(".")
             stdout.flush()
         try:
-            self.record, created = self.model.objects.get_or_create(**filters,
-                                                                    defaults=values)
+            self.record, created = self.model.objects.get_or_create(**filters, defaults=values)
             if created:
                 op = CREATED
             else:
                 if self.config.always_update or self.is_record_changed(self.record, values):
                     op = UPDATED
-                    self.record, __ = self.model.objects.update_or_create(**filters,
-                                                                          defaults=values)
+                    self.record, __ = self.model.objects.update_or_create(**filters, defaults=values)
                 else:
                     op = UNCHANGED
             return op
@@ -296,18 +333,16 @@ class BaseLoader:
             raise LoaderException(f"Error in {self}: {e}") from e
 
     def get_mart_values(self, record=None):
-        ret = {'seen': self.context['today']
-               }
+        ret = {"seen": self.context["today"]}
         if record:
-            ret['source_id'] = record.id
+            ret["source_id"] = record.id
         return ret
 
     def get_final_mapping(self):
         self.mapping = {}
         mart_fields = self.model._meta.concrete_fields
         for field in mart_fields:
-            if field.name not in ['country_name', 'schema_name', 'area_code', 'source_id',
-                                  'id', 'last_modify_date']:
+            if field.name not in ["country_name", "schema_name", "area_code", "source_id", "id", "last_modify_date"]:
                 self.mapping[field.name] = field.name
         if self.config.mapping:  # pragma: no branch
             self.mapping.update(self.config.mapping)
@@ -315,7 +350,7 @@ class BaseLoader:
     def get_values(self, record):
         ret = self.get_mart_values(record)
         for k, v in self.mapping.items():
-            if k in ret or v == 'i':
+            if k in ret or v == "i":
                 continue
             else:
                 ret[k] = self.get_value(k, v, record, ret)
@@ -333,19 +368,19 @@ class BaseLoader:
         ret = undefined
         # if value_or_func is None:
         #     ret  None
-        if value_or_func == 'N/A':
-            ret = 'N/A'
+        if value_or_func == "N/A":
+            ret = "N/A"
         elif isinstance(value_or_func, str) and hasattr(self, value_or_func) and callable(getattr(self, value_or_func)):
             getter = getattr(self, value_or_func)
             _value = getter(original_record, current_mapping, field_name=field_name)
             if _value != self.noop:
                 ret = _value
-        elif value_or_func == '-' or hasattr(self, 'get_%s' % field_name):
-            getter = getattr(self, 'get_%s' % field_name)
+        elif value_or_func == "-" or hasattr(self, "get_%s" % field_name):
+            getter = getattr(self, "get_%s" % field_name)
             _value = getter(record=original_record, values=current_mapping, field_name=field_name)
             if _value != self.noop:
                 ret = _value
-        elif value_or_func == '__self__':
+        elif value_or_func == "__self__":
             try:
                 ret = self.model.objects.get(source_id=getattr(original_record, field_name).id)
             except AttributeError:
@@ -355,7 +390,7 @@ class BaseLoader:
                 ret = None
         elif callable(value_or_func):
             ret = value_or_func(self, original_record)
-        elif value_or_func == '=' and has_attr(original_record, field_name):
+        elif value_or_func == "=" and has_attr(original_record, field_name):
             ret = get_attr(original_record, field_name)
         elif not isinstance(value_or_func, str):
             ret = value_or_func
@@ -386,10 +421,13 @@ class BaseLoader:
     @cached_property
     def etl_task(self):
         from etools_datamart.apps.etl.models import EtlTask
-        return EtlTask.objects.get_or_create(task=self.task.name,
-                                             content_type=ContentType.objects.get_for_model(self.config.model),
-                                             table_name=self.config.model._meta.db_table,
-                                             defaults={'status': '--'})[0]
+
+        return EtlTask.objects.get_or_create(
+            task=self.task.name,
+            content_type=ContentType.objects.get_for_model(self.config.model),
+            table_name=self.config.model._meta.db_table,
+            defaults={"status": "--"},
+        )[0]
 
     def on_start(self, run_type):
         logger.info(f"Start loader {self}")
@@ -399,11 +437,7 @@ class BaseLoader:
 
         if self.config.fields_to_compare is None:
             self.fields_to_compare = [f for f in self.mapping.keys() if f not in self.config.exclude_from_compare]
-        defs = {'status': 'RUNNING',
-                'elapsed': None,
-                'results': {},
-                'run_type': run_type,
-                'last_run': timezone.now()}
+        defs = {"status": "RUNNING", "elapsed": None, "results": {}, "run_type": run_type, "last_run": timezone.now()}
         self.etl_task.update(**defs)
 
     def on_end(self, error=None, retry=False):
@@ -413,30 +447,29 @@ class BaseLoader:
         self.results.total_records = self.model.objects.count()
 
         cost = time.time() - self._start
-        defs = {'elapsed': cost,
-                'results': self.results.as_dict()}
+        defs = {"elapsed": cost, "results": self.results.as_dict()}
 
         if retry:
-            defs['status'] = 'RETRY'
-            defs['results'] = str(error)
+            defs["status"] = "RETRY"
+            defs["results"] = str(error)
         elif error:
-            defs['status'] = 'FAILURE'
-            defs['results'] = str(error)
-            defs['last_failure'] = timezone.now()
+            defs["status"] = "FAILURE"
+            defs["results"] = str(error)
+            defs["last_failure"] = timezone.now()
         else:
-            defs['status'] = 'SUCCESS'
+            defs["status"] = "SUCCESS"
             if self.results.error:
-                defs['status'] = 'ERROR'
-                defs['last_failure'] = timezone.now()
+                defs["status"] = "ERROR"
+                defs["last_failure"] = timezone.now()
             else:
-                defs['last_success'] = timezone.now()
-                defs['last_failure'] = None
+                defs["last_success"] = timezone.now()
+                defs["last_failure"] = None
                 if self.results.created > 0 or self.results.updated > 0:
-                    defs['last_changes'] = timezone.now()
+                    defs["last_changes"] = timezone.now()
                     for service in self.config.model.linked_services:
                         service.invalidate_cache()
                         # Subscription.objects.notify(self.config.model)
-                defs['results']['checks'] = self.consistency_check()
+                defs["results"]["checks"] = self.consistency_check()
         self.etl_task.update(**defs)
         self.etl_task.snapshot()
 
@@ -447,16 +480,25 @@ class BaseLoader:
 
     def increment_counter(self, op):
         self.results.incr(op)
-        self.context['records'] += 1
-        if self.context['max_records'] and self.context['records'] >= self.context['max_records']:
+        self.context["records"] += 1
+        if self.context["max_records"] and self.context["records"] >= self.context["max_records"]:
             raise MaxRecordsException
 
     def update_context(self, **kwargs):
         self.context.update(kwargs)
         return self.context
 
-    def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
-             only_delta=True, run_type=RUN_UNKNOWN, **kwargs):
+    def load(
+        self,
+        *,
+        verbosity=0,
+        stdout=None,
+        ignore_dependencies=False,
+        max_records=None,
+        only_delta=True,
+        run_type=RUN_UNKNOWN,
+        **kwargs,
+    ):
         raise NotImplementedError()
 
     def consistency_check(self):

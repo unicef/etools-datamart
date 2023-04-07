@@ -26,13 +26,12 @@ def test_api_web_index(username):
 
     client = APIClient()
     client.force_authenticate(user)
-    res = client.get('/api/latest/')
+    res = client.get("/api/latest/")
     assert res.status_code == 200, res.content
 
 
 @pytest.mark.parametrize("username", ("admin", "user1"))
-@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet,
-                                     FAMIndicatorViewSet, UserStatsViewSet])
+@pytest.mark.parametrize("viewset", [PMPIndicatorsViewSet, InterventionViewSet, FAMIndicatorViewSet, UserStatsViewSet])
 def test_list_web(username, viewset):
     user = User.objects.get(username=username)
     client = APIClient()

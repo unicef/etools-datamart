@@ -20,13 +20,11 @@ logger = get_task_logger(__name__)
 
 
 class TembaLoaderOptions(BaseLoaderOptions):
-    __attrs__ = BaseLoaderOptions.__attrs__ + ['host', 'temba_object']
-    DEFAULT_KEY = lambda loader, record: dict(uuid=record.uuid,
-                                              organization=loader.context['organization'])
+    __attrs__ = BaseLoaderOptions.__attrs__ + ["host", "temba_object"]
+    DEFAULT_KEY = lambda loader, record: dict(uuid=record.uuid, organization=loader.context["organization"])
 
 
 class TembaLoader(BaseLoader):
-
     def get_fetch_method(self, org):
         return
 
@@ -42,10 +40,10 @@ class TembaLoader(BaseLoader):
                 return None
 
     def get_mart_values(self, record: TembaObject = None):
-        organization = self.context['organization']
-        ret = {'organization': organization}
+        organization = self.context["organization"]
+        ret = {"organization": organization}
         if record:
-            ret['source_id'] = record.uuid
+            ret["source_id"] = record.uuid
         return ret
 
     def get_values(self, record: TembaObject):
@@ -60,18 +58,18 @@ class TembaLoader(BaseLoader):
 
             if resolver is None:
                 ret[dm_field_name] = None
-            elif resolver == 'N/A':
-                ret[dm_field_name] = 'N/A'
-            elif resolver == 'i':
+            elif resolver == "N/A":
+                ret[dm_field_name] = "N/A"
+            elif resolver == "i":
                 continue
-            elif resolver == '-' or hasattr(self, 'get_%s' % dm_field_name):
-                getter = getattr(self, 'get_%s' % dm_field_name)
+            elif resolver == "-" or hasattr(self, "get_%s" % dm_field_name):
+                getter = getattr(self, "get_%s" % dm_field_name)
                 _value = getter(record, ret, field_name=dm_field_name)
                 if _value != self.noop:
                     ret[dm_field_name] = _value
             elif callable(resolver):
                 ret[dm_field_name] = resolver(self, record)
-            elif resolver == '=' and has_attr(record, dm_field_name):
+            elif resolver == "=" and has_attr(record, dm_field_name):
                 ret[dm_field_name] = get_attr(record, dm_field_name)
             elif not isinstance(resolver, str):
                 ret[dm_field_name] = resolver
@@ -80,14 +78,14 @@ class TembaLoader(BaseLoader):
                 _value = getter(record, ret, field_name=dm_field_name)
                 if _value != self.noop:
                     ret[dm_field_name] = _value
-            elif dm_field_name == resolver and isinstance(remote_attr, TembaObject) and isinstance(dm_field,
-                                                                                                   ForeignKey):
+            elif (
+                dm_field_name == resolver and isinstance(remote_attr, TembaObject) and isinstance(dm_field, ForeignKey)
+            ):
                 ref = getattr(record, resolver, None)
                 fk = self.model._meta.get_field(dm_field_name)
-                if has_attr(ref, 'uuid'):
+                if has_attr(ref, "uuid"):
                     try:
-                        ret[dm_field_name] = self.get_foreign_key(fk.remote_field.model,
-                                                                  ref)
+                        ret[dm_field_name] = self.get_foreign_key(fk.remote_field.model, ref)
                     except ObjectDoesNotExist as e:
                         capture_exception(e)
                         ret[dm_field_name] = None
@@ -111,17 +109,27 @@ class TembaLoader(BaseLoader):
     def on_end(self, error=None, retry=False):
         super().on_end(error, retry)
 
-    def load(self, *, verbosity=0, stdout=None, ignore_dependencies=False, max_records=None,
-             only_delta=True, run_type=RUN_UNKNOWN, api_token=None, **kwargs):
+    def load(
+        self,
+        *,
+        verbosity=0,
+        stdout=None,
+        ignore_dependencies=False,
+        max_records=None,
+        only_delta=True,
+        run_type=RUN_UNKNOWN,
+        api_token=None,
+        **kwargs
+    ):
         from .models import Organization, Source
+
         sources = Source.objects.filter(is_active=True)
         self.results = EtlResult()
         with push_scope() as scope:
             scope.set_tag("loader", "rapidpro.%s" % self.__class__.__name__)
             try:
                 if api_token:
-                    Source.objects.get_or_create(api_token=api_token,
-                                                 defaults={'name': api_token})
+                    Source.objects.get_or_create(api_token=api_token, defaults={"name": api_token})
                     sources = sources.filter(api_token=api_token)
 
                 self.on_start(run_type)
@@ -133,15 +141,18 @@ class TembaLoader(BaseLoader):
                     if verbosity > 0:
                         stdout.write("  fetching organization info")
 
-                    org, __ = Organization.objects.get_or_create(source=source,
-                                                                 defaults={'name': oo.name,
-                                                                           'country': oo.country,
-                                                                           'primary_language': oo.primary_language,
-                                                                           'timezone': oo.timezone,
-                                                                           'date_style': oo.date_style,
-                                                                           'languages': oo.languages,
-                                                                           'anon': oo.anon
-                                                                           })
+                    org, __ = Organization.objects.get_or_create(
+                        source=source,
+                        defaults={
+                            "name": oo.name,
+                            "country": oo.country,
+                            "primary_language": oo.primary_language,
+                            "timezone": oo.timezone,
+                            "date_style": oo.date_style,
+                            "languages": oo.languages,
+                            "anon": oo.anon,
+                        },
+                    )
                     if verbosity > 0:
                         stdout.write("  found organization %s" % oo.name)
 
@@ -149,21 +160,22 @@ class TembaLoader(BaseLoader):
                     getter = getattr(client, func)
 
                     args_spec = inspect.getfullargspec(getter)
-                    if 'after' in args_spec.args and self.etl_task.last_success:
+                    if "after" in args_spec.args and self.etl_task.last_success:
                         filters = dict(after=self.etl_task.last_success)
                     else:
                         filters = {}
 
                     data = getter(**filters)
-                    self.update_context(today=timezone.now(),
-                                        max_records=max_records,
-                                        verbosity=verbosity,
-                                        records=0,
-                                        only_delta=only_delta,
-                                        is_empty=not self.model.objects.exists(),
-                                        stdout=stdout,
-                                        organization=source.organization
-                                        )
+                    self.update_context(
+                        today=timezone.now(),
+                        max_records=max_records,
+                        verbosity=verbosity,
+                        records=0,
+                        only_delta=only_delta,
+                        is_empty=not self.model.objects.exists(),
+                        stdout=stdout,
+                        organization=source.organization,
+                    )
                     if verbosity > 0:
                         stdout.write("  fetching data")
                     for page in data.iterfetches():
