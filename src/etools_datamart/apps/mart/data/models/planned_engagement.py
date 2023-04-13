@@ -1,8 +1,8 @@
+from django.db import models
+
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models import Partner
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from django.db import models
-
 from etools_datamart.apps.sources.etools.models import PartnersPlannedengagement
 
 
@@ -29,7 +29,7 @@ class PartnersPlannedEngagement(EtoolsDataMartModel):
         source = PartnersPlannedengagement
         depends = (Partner,)
         mapping = dict(
-            partner_name='partner.name',
-            type='partner.cso_type',
-            vendor_number='partner.vendor_number',
+            partner_name="partner.name",
+            type="partner.cso_type",
+            vendor_number="partner.vendor_number",
         )

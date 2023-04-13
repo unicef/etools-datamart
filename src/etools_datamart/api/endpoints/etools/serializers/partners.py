@@ -38,7 +38,6 @@ class AssessmentSerializer(EToolsSerializer):
 
 
 class PlannedengagementSerializer(EToolsSerializer):
-
     class Meta:
         model = PartnersPlannedEngagement
-        fields = '__all__'
+        fields = "__all__"

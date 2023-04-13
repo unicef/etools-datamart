@@ -386,8 +386,17 @@ class PartnerAdmin(DataModelAdmin):
 
 @register(models.PartnersPlannedEngagement)
 class PlannedEngagementAdmin(DataModelAdmin):
-    list_display = ('schema_name', 'partner_name', 'type', 'vendor_number',)
-    search_fields = ('schema_name', 'vendor_number', 'partner_name',)
+    list_display = (
+        "schema_name",
+        "partner_name",
+        "type",
+        "vendor_number",
+    )
+    search_fields = (
+        "schema_name",
+        "vendor_number",
+        "partner_name",
+    )
 
 
 @register(models.PartnerHact)
