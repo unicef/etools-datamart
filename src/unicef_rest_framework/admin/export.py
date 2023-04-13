@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -7,6 +9,7 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminfilters.mixin import AdminFiltersMixin
 from adminfilters.value import ValueFilter
+from humanize import precisedelta
 
 from unicef_rest_framework.utils import humanize_size
 
@@ -43,6 +46,7 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
         "status_code",
         "size",
         "response_ms",
+        "delta",
         "api",
         "download",
         "queue_task",
@@ -82,6 +86,9 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
             return mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
 
     size.admin_order_field = "response_length"
+
+    def delta(self, obj):
+        return precisedelta(timedelta(milliseconds=obj.response_ms)) if obj else '-'
 
     @button()
     def check_file(self, request, pk):
