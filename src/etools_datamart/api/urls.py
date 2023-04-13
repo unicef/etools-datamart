@@ -19,9 +19,9 @@ router.register(r"sources/etools/funds/fundsreservationheader", endpoints.Etools
 router.register(r"sources/etools/funds/fundsreservationitem", endpoints.EtoolsFundsreservationitemViewSet)
 router.register(r"sources/etools/funds/grant", endpoints.EtoolsGrantViewSet)
 router.register(r"sources/etools/partners/assessment", endpoints.EtoolsAssessmentViewSet)
-router.register(r"sources/etools/partners/plannedengagement", endpoints.EtoolsPlannedengagementViewSet)
 router.register(r"sources/etools/workspaces", endpoints.EtoolsWorkspaceViewSet)
 
+router.register(r"datamart/partners/plannedengagement", endpoints.EtoolsPlannedengagementViewSet)
 router.register(r"datamart/attachment/attachment", endpoints.AttachmentViewSet)
 router.register(r"datamart/funds/grants", endpoints.GrantViewSet)
 router.register(r"datamart/audit/audit", endpoints.AuditViewSet)

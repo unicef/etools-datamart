@@ -1,5 +1,7 @@
 from etools_datamart.api.endpoints import common
+from etools_datamart.api.endpoints.common import APIReadOnlyModelViewSet
 from etools_datamart.api.endpoints.etools import serializers
+from etools_datamart.apps.mart.data.models import PartnersPlannedEngagement
 from etools_datamart.apps.sources.etools import models
 
 # class PartnerViewSet(common.APIMultiTenantReadOnlyModelViewSet):
@@ -22,6 +24,6 @@ class EtoolsAssessmentViewSet(common.APIMultiTenantReadOnlyModelViewSet):
 #     queryset = models.PartnersIntervention.objects.all()
 
 
-class EtoolsPlannedengagementViewSet(common.APIMultiTenantReadOnlyModelViewSet):
+class EtoolsPlannedengagementViewSet(APIReadOnlyModelViewSet):
     serializer_class = serializers.PlannedengagementSerializer
-    queryset = models.PartnersPlannedengagement.objects.all()
+    queryset = PartnersPlannedEngagement.objects.all()

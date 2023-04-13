@@ -28,6 +28,7 @@ from .partners_agreement import Agreement  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
 from .partners_staffmember import PartnerStaffMember  # noqa
 from .pd_indicator import PDIndicator  # noqa
+from .planned_engagement import PartnersPlannedEngagement  # noqa
 from .pmp import PMPIndicators  # noqa
 from .psea import PseaAnswer, PseaAssessment  # noqa
 from .report_sector import Section  # noqa

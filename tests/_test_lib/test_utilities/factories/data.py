@@ -402,3 +402,8 @@ class PartnerStaffMemberFactory(DataMartModelFactory):
 class ResultFactory(DataMartModelFactory):
     class Meta:
         model = models.Result
+
+
+class PartnersPlannedEngagementFactory(DataMartModelFactory):
+    class Meta:
+        model = models.PartnersPlannedEngagement
