@@ -91,7 +91,7 @@ class TPMActivityLoader(EtoolsLoader):
         # tpm_partner : TpmpartnersTpmpartner =
         # staffmembers = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=original.tpm_visit)
         ret = []
-        for member in record.visit.tpm_partner_focal_points.all():
+        for member in record.tpm_visit.tpm_partner_focal_points.all():
             ret.append(
                 dict(
                     email=member.user.email,
@@ -108,7 +108,7 @@ class TPMActivityLoader(EtoolsLoader):
         locs = []
         # intervention: PartnersIntervention = original.activity.intervention
         # for location in original.activity.locations.order_by('id'):
-        for location in record.activity.locations.order_by("id"):
+        for location in record.activity_ptr.locations.order_by("id"):
             locs.append(
                 dict(
                     source_id=location.id,
@@ -122,15 +122,24 @@ class TPMActivityLoader(EtoolsLoader):
         return ", ".join([l["name"] for l in locs])
 
     def get_queryset(self):
-        return TpmTpmactivity.objects.select_related("activity_ptr")
+        return TpmTpmactivity.objects\
+            .select_related(
+                "section",
+                "activity_ptr",
+                "activity_ptr__cp_output",
+                "activity_ptr__intervention",
+                "tpm_visit",
+                "tpm_visit__tpm_partner",
+                "tpm_visit__author")\
+            .prefetch_related(
+                "tpm_visit__tpm_partner_focal_points",
+                "tpm_visit__tpm_partner_focal_points__user",
+                "activity_ptr__locations")
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for tpm_activity in qs.all():
             tpm_activity.id = tpm_activity.activity_ptr_id
-            tpm_activity.activity = tpm_activity.activity_ptr
-            tpm_activity.visit = tpm_activity.tpm_visit
-
             filters = self.config.key(self, tpm_activity)
             values = self.get_values(tpm_activity)
             op = self.process_record(filters, values)
@@ -215,10 +224,10 @@ class TPMActivity(EtoolsDataMartModel):
             author_name="tpm_visit.author.name",
             cancel_comment="tpm_visit.cancel_comment",
             # country_name="=",
-            cp_output="activity.cp_output.name",
-            cp_output_id="activity.cp_output.vision_id",
+            cp_output="activity_ptr.cp_output.name",
+            cp_output_id="activity_ptr.cp_output.vision_id",
             # created="=",
-            date="activity.date",
+            date="activity_ptr.date",
             date_of_assigned="tpm_visit.date_of_assigned",
             date_of_cancelled="tpm_visit.date_of_cancelled",
             date_of_tpm_accepted="tpm_visit.date_of_tpm_accepted",
@@ -237,11 +246,11 @@ class TPMActivity(EtoolsDataMartModel):
             # location_pcode="=",
             offices="-",
             offices_data="i",
-            partner_name="activity.partner.name",
-            partner_vendor_number="activity.partner.vendor_number",
-            pd_ssfa_reference_number="activity.intervention.reference_number",
-            pd_ssfa_title="activity.intervention.title",
-            reject_comment="activity.reject_comment",
+            partner_name="activity_ptr.partner.name",
+            partner_vendor_number="activity_ptr.partner.vendor_number",
+            pd_ssfa_reference_number="activity_ptr.intervention.reference_number",
+            pd_ssfa_title="activity_ptr.intervention.title",
+            reject_comment="activity_ptr.reject_comment",
             report_attachments="=",
             # schema_name="=",
             section="section.name",

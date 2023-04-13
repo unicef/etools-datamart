@@ -28,7 +28,10 @@ from etools_datamart.apps.sources.etools.models import (
 
 class PartnerHactLoader(EtoolsLoader):
     def get_queryset(self):
-        return PartnersPartnerorganization.objects.all()
+        return PartnersPartnerorganization.objects\
+            .prefetch_related(
+                'ActivitiesActivity_partner__TpmTpmactivity_activity_ptr',
+                'FieldMonitoringPlanningMonitoringactivitygroup_partner')
 
     def get_programmatic_visits(self, record, values, **kwargs):
         pv_year = T2FTravel.objects.filter(
@@ -38,30 +41,29 @@ class PartnerHactLoader(EtoolsLoader):
             end_date__year=datetime.now().year,
             t2ftravelactivity__partner=record,
         )
-        tpmv = TpmTpmactivity.objects.filter(
-            is_pv=True,
-            activity_ptr__partner=record,
-            tpm_visit__status=TpmTpmvisitConst.UNICEF_APPROVED,
-            activity_ptr__date__year=datetime.now().year,
+        tpmv = record.ActivitiesActivity_partner.filter(
+            TpmTpmactivity_activity_ptr__is_pv=True,
+            TpmTpmactivity_activity_ptr__tpm_visit__status=TpmTpmvisitConst.UNICEF_APPROVED,
+            date__year=datetime.now().year,
         )
 
-        fmvgs = (
-            FieldMonitoringPlanningMonitoringactivitygroup.objects.filter(
-                partner=record,
-                FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup__monitoringactivity__status="completed",
-            )
-            .annotate(
-                end_date=Max(
-                    "FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup__monitoringactivity__end_date"
-                ),
-            )
-            .filter(end_date__year=datetime.now().year)
-            .distinct()
-        )
+        # fmvgs = (
+        #     FieldMonitoringPlanningMonitoringactivitygroup.objects.filter(
+        #         partner=record,
+        #         FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup__monitoringactivity__status="completed",
+        #     )
+        #     .annotate(
+        #         end_date=Max(
+        #             "FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup__monitoringactivity__end_date"
+        #         ),
+        #     )
+        #     .filter(end_date__year=datetime.now().year)
+        #     .distinct()
+        # )
 
         # field monitoring activities qualify as programmatic visits if during a monitoring activity the hact
         # question was answered with an overall rating and the visit is completed
-        grouped_activities = FieldMonitoringPlanningMonitoringactivitygroup.objects.filter(partner=record).values_list(
+        grouped_activities = record.FieldMonitoringPlanningMonitoringactivitygroup_partner.values_list(
             "FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup__monitoringactivity__id",
             flat=True,
         )
@@ -105,7 +107,7 @@ class PartnerHactLoader(EtoolsLoader):
                 }
             )
 
-        fm_visits = fmvgs
+        # fm_visits = fmvgs
         # for visit in fm_visits:
         #     visits.append({
         #         'module': 'fm',
