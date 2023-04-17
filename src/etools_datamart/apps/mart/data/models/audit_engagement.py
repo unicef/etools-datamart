@@ -157,7 +157,6 @@ class EngagementMixin:
 
 
 class EngagementlLoader(EngagementMixin, EtoolsLoader):
-
     def get_content_type(self, sub_type):
         mapping = {
             AuditAudit: "audit",
@@ -264,18 +263,18 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
 
     def process_country(self):
         for m in [AuditMicroassessment, AuditSpecialaudit, AuditSpotcheck, AuditAudit]:
-            for record in m.objects\
-                    .select_related(
-                        "engagement_ptr",
-                        "engagement_ptr__partner",
-                        "engagement_ptr__agreement",
-                        "engagement_ptr__agreement__auditor_firm",
-                        "engagement_ptr__po_item").\
-                    prefetch_related(
-                        "engagement_ptr__authorized_officers",
-                        "engagement_ptr__staff_members",
-                        "engagement_ptr__AuditEngagementSections_engagement",
-                        "engagement_ptr__AuditEngagementOffices_engagement"):
+            for record in m.objects.select_related(
+                "engagement_ptr",
+                "engagement_ptr__partner",
+                "engagement_ptr__agreement",
+                "engagement_ptr__agreement__auditor_firm",
+                "engagement_ptr__po_item",
+            ).prefetch_related(
+                "engagement_ptr__authorized_officers",
+                "engagement_ptr__staff_members",
+                "engagement_ptr__AuditEngagementSections_engagement",
+                "engagement_ptr__AuditEngagementOffices_engagement",
+            ):
                 record.id = record.engagement_ptr_id
                 record.sub_type = m
                 record.engagement_ptr._impl = record

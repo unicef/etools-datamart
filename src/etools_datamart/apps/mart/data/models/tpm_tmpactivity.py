@@ -122,19 +122,19 @@ class TPMActivityLoader(EtoolsLoader):
         return ", ".join([l["name"] for l in locs])
 
     def get_queryset(self):
-        return TpmTpmactivity.objects\
-            .select_related(
-                "section",
-                "activity_ptr",
-                "activity_ptr__cp_output",
-                "activity_ptr__intervention",
-                "tpm_visit",
-                "tpm_visit__tpm_partner",
-                "tpm_visit__author")\
-            .prefetch_related(
-                "tpm_visit__tpm_partner_focal_points",
-                "tpm_visit__tpm_partner_focal_points__user",
-                "activity_ptr__locations")
+        return TpmTpmactivity.objects.select_related(
+            "section",
+            "activity_ptr",
+            "activity_ptr__cp_output",
+            "activity_ptr__intervention",
+            "tpm_visit",
+            "tpm_visit__tpm_partner",
+            "tpm_visit__author",
+        ).prefetch_related(
+            "tpm_visit__tpm_partner_focal_points",
+            "tpm_visit__tpm_partner_focal_points__user",
+            "activity_ptr__locations",
+        )
 
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())

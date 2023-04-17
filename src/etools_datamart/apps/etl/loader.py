@@ -281,8 +281,6 @@ class BaseLoader:
         if self.etl_task.last_success.date() < timezone.now().date():
             logger.info("%s: Refresh needed because last success too old" % self)
             return True
-        else:
-            pass
         return False
 
     def is_record_changed(self, record, values):

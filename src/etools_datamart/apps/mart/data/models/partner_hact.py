@@ -28,10 +28,10 @@ from etools_datamart.apps.sources.etools.models import (
 
 class PartnerHactLoader(EtoolsLoader):
     def get_queryset(self):
-        return PartnersPartnerorganization.objects\
-            .prefetch_related(
-                'ActivitiesActivity_partner__TpmTpmactivity_activity_ptr',
-                'FieldMonitoringPlanningMonitoringactivitygroup_partner')
+        return PartnersPartnerorganization.objects.prefetch_related(
+            "ActivitiesActivity_partner__TpmTpmactivity_activity_ptr",
+            "FieldMonitoringPlanningMonitoringactivitygroup_partner",
+        )
 
     def get_programmatic_visits(self, record, values, **kwargs):
         pv_year = T2FTravel.objects.filter(

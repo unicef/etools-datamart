@@ -1,10 +1,19 @@
+3.55
+------
+* improved performances
+* added newrelic
+* introduced black
+
+
 3.54.2
 ------
 * fixes
 
+
 3.54.1
 ------
 * added newrelic
+
 
 3.54
 ------

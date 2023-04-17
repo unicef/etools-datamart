@@ -88,7 +88,7 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
     size.admin_order_field = "response_length"
 
     def delta(self, obj):
-        return precisedelta(timedelta(milliseconds=obj.response_ms)) if obj else '-'
+        return precisedelta(timedelta(milliseconds=obj.response_ms)) if obj else "-"
 
     @button()
     def check_file(self, request, pk):

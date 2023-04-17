@@ -186,18 +186,15 @@ class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):
 
     class Options:
         source = ReportsAppliedindicator
-        queryset = lambda: ReportsAppliedindicator.objects\
-            .select_related(
-                "indicator",
-                "section",
-                "lower_result",
-                "lower_result__result_link",
-                "lower_result__result_link__cp_output",
-                "lower_result__result_link__intervention",
-                "lower_result__result_link__intervention__agreement__partner") \
-            .prefetch_related(
-                "locations",
-                "disaggregations")
+        queryset = lambda: ReportsAppliedindicator.objects.select_related(
+            "indicator",
+            "section",
+            "lower_result",
+            "lower_result__result_link",
+            "lower_result__result_link__cp_output",
+            "lower_result__result_link__intervention",
+            "lower_result__result_link__intervention__agreement__partner",
+        ).prefetch_related("locations", "disaggregations")
         mapping = dict(
             partner_name="lower_result.result_link.intervention.agreement.partner.name",
             partner_vendor_number="lower_result.result_link.intervention.agreement.partner.vendor_number",

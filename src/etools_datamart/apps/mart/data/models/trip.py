@@ -175,14 +175,9 @@ class Trip(EtoolsDataMartModel):
             source_id=travel.id,
             source_activity_id=travel.activity.id,
         )
-        queryset = lambda: T2FTravelactivity.objects\
-            .select_related(
-                "result",
-                "partner",
-                "partnership",
-                "primary_traveler")\
-            .prefetch_related(
-                "travels")
+        queryset = lambda: T2FTravelactivity.objects.select_related(
+            "result", "partner", "partnership", "primary_traveler"
+        ).prefetch_related("travels")
         mapping = dict(
             # cp_output="activity.result.name",
             cp_output="i",

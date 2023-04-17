@@ -15,7 +15,9 @@ from .partner import Partner
 
 class SpotCheckLoader(EngagementMixin, EtoolsLoader):
     def process_country(self):
-        for record in AuditSpotcheck.objects.select_related("engagement_ptr"):
+        for record in AuditSpotcheck.objects.select_related("engagement_ptr").prefetch_related(
+            "engagement_ptr__AuditEngagementOffices_engagement"
+        ):
             record.id = record.engagement_ptr_id
             record.sub_type = AuditSpotcheck
             record.engagement_ptr._impl = record
@@ -107,6 +109,9 @@ class SpotCheckFindings(EtoolsDataMartModel):
     date_of_report_submit = models.DateField(blank=True, null=True)
     date_of_final_report = models.DateField(null=True, blank=True)
     date_of_cancel = models.DateField(blank=True, null=True)
+
+    offices = models.TextField(blank=True, null=True)
+    offices_data = JSONField(blank=True, null=True, default=dict)
 
     # Action Points
     action_points = JSONField(blank=True, null=True, default=dict)
