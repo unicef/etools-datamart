@@ -24,8 +24,11 @@ class FMQuestionLoader(EtoolsLoader):
             "activity_question__question__category",
             "started_checklist",
             "started_checklist__method",
+            "activity_question__monitoring_activity",
+            "activity_question__monitoring_activity__location",
             "activity_question__monitoring_activity__location_site",
             "activity_question__partner",
+            "activity_question__cp_output",
             "activity_question__intervention",
             "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
         ).prefetch_related(
