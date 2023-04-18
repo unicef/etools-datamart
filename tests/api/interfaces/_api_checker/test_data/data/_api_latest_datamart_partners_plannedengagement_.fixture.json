@@ -1,0 +1,79 @@
+{
+    "data": {
+        "master": [
+            {
+                "model": "data.partnersplannedengagement",
+                "pk": 1,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-04-18T10:02:20.506Z",
+                    "seen": null,
+                    "country_name": "bolivia",
+                    "schema_name": "bolivia",
+                    "area_code": "",
+                    "partner_name": null,
+                    "vendor_number": null,
+                    "type": null,
+                    "created": null,
+                    "modified": null,
+                    "spot_check_planned_q1": null,
+                    "spot_check_planned_q2": null,
+                    "spot_check_planned_q3": null,
+                    "spot_check_planned_q4": null,
+                    "scheduled_audit": null,
+                    "special_audit": null,
+                    "spot_check_follow_up": null
+                }
+            },
+            {
+                "model": "data.partnersplannedengagement",
+                "pk": 2,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-04-18T10:02:20.507Z",
+                    "seen": null,
+                    "country_name": "chad",
+                    "schema_name": "chad",
+                    "area_code": "",
+                    "partner_name": null,
+                    "vendor_number": null,
+                    "type": null,
+                    "created": null,
+                    "modified": null,
+                    "spot_check_planned_q1": null,
+                    "spot_check_planned_q2": null,
+                    "spot_check_planned_q3": null,
+                    "spot_check_planned_q4": null,
+                    "scheduled_audit": null,
+                    "special_audit": null,
+                    "spot_check_follow_up": null
+                }
+            },
+            {
+                "model": "data.partnersplannedengagement",
+                "pk": 3,
+                "fields": {
+                    "source_id": null,
+                    "last_modify_date": "2023-04-18T10:02:20.507Z",
+                    "seen": null,
+                    "country_name": "lebanon",
+                    "schema_name": "lebanon",
+                    "area_code": "",
+                    "partner_name": null,
+                    "vendor_number": null,
+                    "type": null,
+                    "created": null,
+                    "modified": null,
+                    "spot_check_planned_q1": null,
+                    "spot_check_planned_q2": null,
+                    "spot_check_planned_q3": null,
+                    "spot_check_planned_q4": null,
+                    "scheduled_audit": null,
+                    "special_audit": null,
+                    "spot_check_follow_up": null
+                }
+            }
+        ],
+        "deps": []
+    }
+}

@@ -2,10 +2,10 @@
     "record": {
         "master": {
             "model": "data.spotcheckfindings",
-            "pk": 4,
+            "pk": 265,
             "fields": {
                 "source_id": null,
-                "last_modify_date": "2022-12-20T15:54:11.333Z",
+                "last_modify_date": "2023-04-18T10:02:24.575Z",
                 "seen": null,
                 "country_name": "bolivia",
                 "schema_name": "bolivia",
@@ -43,6 +43,8 @@
                 "date_of_report_submit": null,
                 "date_of_final_report": null,
                 "date_of_cancel": null,
+                "offices": null,
+                "offices_data": {},
                 "action_points": {},
                 "action_points_data": {}
             }

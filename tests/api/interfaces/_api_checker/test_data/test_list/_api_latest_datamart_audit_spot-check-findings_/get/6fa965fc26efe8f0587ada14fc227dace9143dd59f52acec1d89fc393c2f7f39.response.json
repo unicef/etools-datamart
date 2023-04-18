@@ -4,19 +4,20 @@
         "Content-Type": "application/json",
         "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
-        "ETag": "\"51868255513e22cda770126a6cdec27c\"",
+        "ETag": "\"55617c2c8c38ada2592b6dd9c0703b78\"",
         "X-Frame-Options": "DENY",
         "view": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
         "service": "etools_datamart.api.endpoints.datamart.audit_spotcheck.SpotCheckFindingViewSet",
         "cache-version": "1",
         "system-filters": "",
-        "cache-key": "51868255513e22cda770126a6cdec27c",
+        "cache-key": "55617c2c8c38ada2592b6dd9c0703b78",
         "cache-hit": "False",
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "3357",
-        "Referrer-Policy": "same-origin"
+        "Content-Length": "3456",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "count": 3,
@@ -66,6 +67,8 @@
                 "date_of_report_submit": null,
                 "date_of_final_report": null,
                 "date_of_cancel": null,
+                "offices": null,
+                "offices_data": {},
                 "action_points": {},
                 "action_points_data": {}
             },
@@ -110,6 +113,8 @@
                 "date_of_report_submit": null,
                 "date_of_final_report": null,
                 "date_of_cancel": null,
+                "offices": null,
+                "offices_data": {},
                 "action_points": {},
                 "action_points_data": {}
             },
@@ -154,6 +159,8 @@
                 "date_of_report_submit": null,
                 "date_of_final_report": null,
                 "date_of_cancel": null,
+                "offices": null,
+                "offices_data": {},
                 "action_points": {},
                 "action_points_data": {}
             }
