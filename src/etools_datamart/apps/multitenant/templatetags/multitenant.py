@@ -15,9 +15,10 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def schemas(context):
-    conn = connections['etools']
-    context['schemas'] = conn.schemas
+    conn = connections["etools"]
+    context["schemas"] = conn.schemas
     return ""
+
 
 #
 # @register.simple_tag(takes_context=True)

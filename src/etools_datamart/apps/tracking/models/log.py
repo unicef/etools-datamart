@@ -10,26 +10,24 @@ logger = logging.getLogger(__name__)
 
 
 class APIRequestLogManager(models.Manager):
-
     def truncate(self):
-        conn = connections['default']
+        conn = connections["default"]
         cursor = conn.cursor()
         cursor.execute(f'TRUNCATE TABLE "{self.model._meta.db_table}"')
 
 
 class APIRequestLog(models.Model):
     """Logs API requests by time, user, etc"""
+
     # user or None for anon
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE,
-                             blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, blank=True, null=True)
 
     # timestamp of request
-    requested_at = models.DateTimeField(db_index=True,
-                                        default=now)
+    requested_at = models.DateTimeField(db_index=True, default=now)
 
     # number of milliseconds to respond
-    response_ms = models.PositiveIntegerField('ms', default=0)
-    response_length = models.BigIntegerField('length', default=0)
+    response_ms = models.PositiveIntegerField("ms", default=0)
+    response_length = models.BigIntegerField("length", default=0)
 
     # request path
     path = models.CharField(max_length=255, db_index=True)
@@ -56,10 +54,10 @@ class APIRequestLog(models.Model):
     viewset = StrategyClassField(blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Access Log'
-        verbose_name_plural = 'Access Log'
-        ordering = ('-id', )
-        get_latest_by = 'requested_at'
+        verbose_name = "Access Log"
+        verbose_name_plural = "Access Log"
+        ordering = ("-id",)
+        get_latest_by = "requested_at"
 
     objects = APIRequestLogManager()
 

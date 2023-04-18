@@ -42,7 +42,7 @@ def raw_sql(s):
 
 @contextmanager
 def current_schema(schema):
-    conn = connections['etools']
+    conn = connections["etools"]
     _old = conn.schemas
     conn.set_schemas([schema])
     yield

@@ -15,9 +15,9 @@ def extend(base, other):
 def _get_location(loader, record):
     try:
         if record.location:
-            return Location.objects.filter(source_id=record.location.id,
-                                           schema_name=loader.context[
-                                               'country'].schema_name).first()
+            return Location.objects.filter(
+                source_id=record.location.id, schema_name=loader.context["country"].schema_name
+            ).first()
     except Exception as e:
         process_exception(e)
     return None
@@ -25,13 +25,16 @@ def _get_location(loader, record):
 
 def add_location_mapping(base):
     ret = dict(base)
-    ret.update(**{'location_source_id': 'location.id',
-                  'location_name': 'location.name',
-                  'location_pcode': 'location.p_code',
-                  'location_level': 'location.admin_level',
-                  'location_levelname': 'location.admin_level_name',
-                  'location': _get_location
-                  })
+    ret.update(
+        **{
+            "location_source_id": "location.id",
+            "location_name": "location.name",
+            "location_pcode": "location.p_code",
+            "location_level": "location.admin_level",
+            "location_levelname": "location.admin_level_name",
+            "location": _get_location,
+        }
+    )
     return ret
 
 
@@ -53,7 +56,7 @@ class NestedLocationLoaderMixin:
     def get_locations(self, record, values: dict, **kwargs):
         locs = []
         locations = getattr(record, self.location_m2m_field)
-        for location in locations.order_by('id'):
+        for location in locations.order_by("id"):
             location_data = dict(
                 source_id=location.id,
                 name=location.name,
@@ -61,19 +64,18 @@ class NestedLocationLoaderMixin:
                 level=location.admin_level,
                 levelname=location.admin_level_name,
                 latitude=None,
-                longitude=None
+                longitude=None,
             )
             try:
-                loc = Location.objects.get(source_id=location.id,
-                                           schema_name=self.context['country'].schema_name)
+                loc = Location.objects.get(source_id=location.id, schema_name=self.context["country"].schema_name)
                 location_data["latitude"] = loc.latitude
                 location_data["longitude"] = loc.longitude
             except Exception as e:
                 process_exception(e)
 
             locs.append(location_data)
-        values['locations_data'] = locs
-        return ", ".join([l['name'] for l in locs])
+        values["locations_data"] = locs
+        return ", ".join([l["name"] for l in locs])
 
 
 class NestedLocationMixin(models.Model):

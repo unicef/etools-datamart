@@ -5,15 +5,18 @@ from rest_framework.renderers import JSONRenderer
 
 
 class MSJSONRenderer(JSONRenderer):
-    media_type = 'application/json'
-    format = 'ms-json'
+    media_type = "application/json"
+    format = "ms-json"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        view = renderer_context['view']
+        view = renderer_context["view"]
         data = {f"{view.__class__.__name__}_JSONResult": json.dumps(data)}
         ret = json.dumps(
-            data, cls=self.encoder_class,
-            indent=0, ensure_ascii=self.ensure_ascii,
-            allow_nan=not self.strict, separators=SHORT_SEPARATORS
+            data,
+            cls=self.encoder_class,
+            indent=0,
+            ensure_ascii=self.ensure_ascii,
+            allow_nan=not self.strict,
+            separators=SHORT_SEPARATORS,
         )
-        return bytes(ret.encode('utf-8'))
+        return bytes(ret.encode("utf-8"))

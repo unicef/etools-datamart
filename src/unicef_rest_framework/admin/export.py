@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -7,6 +9,7 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminfilters.mixin import AdminFiltersMixin
 from adminfilters.value import ValueFilter
+from humanize import precisedelta
 
 from unicef_rest_framework.utils import humanize_size
 
@@ -25,24 +28,41 @@ def check(modeladmin, request, queryset):
 
 def queue(modeladmin, request, queryset):
     from unicef_rest_framework.tasks import preload
+
     for t in queryset:
         preload.apply_async(args=[t.id])
 
 
 class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
     list_display = (
-        'name', 'url', 'filename', 'as_user', 'format', 'enabled', 'refresh', 'last_run', 'status_code', 'size',
-        'response_ms', 'api', 'download', 'queue_task'
+        "name",
+        "url",
+        "filename",
+        "as_user",
+        "format",
+        "enabled",
+        "refresh",
+        "last_run",
+        "status_code",
+        "size",
+        "response_ms",
+        "delta",
+        "api",
+        "download",
+        "queue_task",
     )
-    date_hierarchy = 'last_run'
-    search_fields = ('id', 'url', 'name', 'filename', 'url')
+    date_hierarchy = "last_run"
+    search_fields = ("id", "url", "name", "filename", "url")
     list_filter = (
-        ('as_user__username', ValueFilter.factory(title='User', lookup_name='icontains')),
-        ('status_code', StatusFilter),
-        SizeFilter, 'enabled', 'refresh', 'format',
+        ("as_user__username", ValueFilter.factory(title="User", lookup_name="icontains")),
+        ("status_code", StatusFilter),
+        SizeFilter,
+        "enabled",
+        "refresh",
+        "format",
     )
     actions = [queue, check]
-    raw_id_fields = ('as_user', )
+    raw_id_fields = ("as_user",)
 
     def format(self, obj):
         return obj.stem
@@ -52,30 +72,33 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
 
     def download(self, obj):
         if obj.etag:
-            url = reverse('urf:export-fetch', args=[obj.pk])
+            url = reverse("urf:export-fetch", args=[obj.pk])
             return mark_safe("<a href='{0}' title='{0}' target='_new'>download</a>".format(url))
-        return '--'
+        return "--"
 
     def queue_task(self, obj):
         opts = self.model._meta
-        url = reverse('admin:%s_%s_queue' % (opts.app_label, opts.model_name), args=[obj.id])
+        url = reverse("admin:%s_%s_queue" % (opts.app_label, opts.model_name), args=[obj.id])
         return mark_safe(f'<a href="{url}">queue</a>')
 
     def size(self, obj):
         if obj.response_length:
             return mark_safe("<nobr>{0}</nobr>".format(humanize_size(obj.response_length)))
 
-    size.admin_order_field = 'response_length'
+    size.admin_order_field = "response_length"
+
+    def delta(self, obj):
+        return precisedelta(timedelta(milliseconds=obj.response_ms)) if obj else "-"
 
     @button()
     def check_file(self, request, pk):
         obj = self.model.objects.get(id=pk)
         if obj.check_file():
-            self.message_user(request, 'File exists.')
+            self.message_user(request, "File exists.")
         else:
-            self.message_user(request, 'File does not exists.', messages.ERROR)
+            self.message_user(request, "File does not exists.", messages.ERROR)
 
-    @button(label='Goto API')
+    @button(label="Goto API")
     def goto(self, request, pk):
         obj = self.model.objects.get(id=pk)
         return HttpResponseRedirect(obj.get_full_url())
@@ -83,6 +106,7 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
     @button()
     def queue(self, request, pk):
         from unicef_rest_framework.tasks import export
+
         obj = self.get_object(request, pk)
         export.apply_async(args=[pk])
         self.message_user(request, f"Export generation '{obj.name}' queued", messages.SUCCESS)
@@ -91,19 +115,21 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
     @button()
     def run(self, request, pk):
         from unicef_rest_framework.tasks import export
+
         export(pk)
 
     @button()
     def force_run(self, request, pk):
         from unicef_rest_framework.tasks import export
+
         obj = self.model.objects.get(id=pk)
         obj.status_code = -1
         obj.etag = None
         obj.save()
         export(pk)
 
-    @button(label='Download')
+    @button(label="Download")
     def _download(self, request, pk):
         obj = self.model.objects.get(id=pk)
-        url = reverse('urf:export-fetch', args=[obj.pk])
+        url = reverse("urf:export-fetch", args=[obj.pk])
         return HttpResponseRedirect(url)

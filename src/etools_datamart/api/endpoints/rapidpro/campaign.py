@@ -8,13 +8,16 @@ from etools_datamart.apps.mart.rapidpro import models
 
 
 class CampaignFilterForm(forms.Form):
-    archived = CleareableSelect2ChoiceField(required=False,
-                                            choices=((None, 'All'),
-                                                     (False, 'False'),
-                                                     (True, 'True'),))
+    archived = CleareableSelect2ChoiceField(
+        required=False,
+        choices=(
+            (None, "All"),
+            (False, "False"),
+            (True, "True"),
+        ),
+    )
 
-    created_on = DateRangePickerField(label='Created between',
-                                            required=False)
+    created_on = DateRangePickerField(label="Created between", required=False)
 
 
 class CampaignSerializer(DataMartSerializer):
@@ -26,9 +29,9 @@ class CampaignSerializer(DataMartSerializer):
 class CampaignViewSet(RapidProViewSet):
     serializer_class = CampaignSerializer
     queryset = models.Campaign.objects.all()
-    serializers_fieldsets = {'std': CampaignSerializer}
+    serializers_fieldsets = {"std": CampaignSerializer}
     querystringfilter_form_base_class = CampaignFilterForm
-    filter_fields = ['organization', 'archived', 'created_on']
+    filter_fields = ["organization", "archived", "created_on"]
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)

@@ -41,21 +41,22 @@ class InterventionManagementBudget(InterventionSimpleAbstract, EtoolsDataMartMod
         source = PartnersInterventionmanagementbudgetitem
         depends = (Intervention,)
         mapping = dict(
-            pd_number='budget.intervention.number',
-            pd_title='budget.intervention.title',
-            partner='budget.intervention.agreement.partner.name',
-            partner_cso_type='budget.intervention.agreement.partner.cso_type',
-            partner_type='budget.intervention.agreement.partner.partner_type',
-            partner_vendor_number='budget.intervention.agreement.partner.vendor_number',
+            pd_number="budget.intervention.number",
+            pd_title="budget.intervention.title",
+            partner="budget.intervention.agreement.partner.name",
+            partner_cso_type="budget.intervention.agreement.partner.cso_type",
+            partner_type="budget.intervention.agreement.partner.partner_type",
+            partner_vendor_number="budget.intervention.agreement.partner.vendor_number",
             # budget fields
-            budget_created='budget.created',
-            budget_modified='budget.modified',
-            act1_unicef='budget.act1_unicef',
-            act1_partner='budget.act1_partner',
-            act2_unicef='budget.act2_unicef',
-            act2_partner='budget.act2_partner',
-            act3_unicef='budget.act3_unicef',
-            act3_partner='budget.act3_partner',
+            budget_created="budget.created",
+            budget_modified="budget.modified",
+            act1_unicef="budget.act1_unicef",
+            act1_partner="budget.act1_partner",
+            act2_unicef="budget.act2_unicef",
+            act2_partner="budget.act2_partner",
+            act3_unicef="budget.act3_unicef",
+            act3_partner="budget.act3_partner",
         )
-        queryset = lambda: PartnersInterventionmanagementbudgetitem.objects\
-            .select_related('budget', 'budget__intervention')
+        queryset = lambda: PartnersInterventionmanagementbudgetitem.objects.select_related(
+            "budget", "budget__intervention"
+        )

@@ -7,7 +7,7 @@ from unicef_security.models import User
 
 @pytest.fixture
 def system_user(db):
-    return User.objects.get(username='system')
+    return User.objects.get(username="system")
 
 
 @pytest.fixture

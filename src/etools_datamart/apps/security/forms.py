@@ -5,7 +5,7 @@ from django.forms import ModelForm
 
 from .models import SchemaAccessControl
 
-conn = connections['etools']
+conn = connections["etools"]
 
 
 class SchemaAccessControlForm(ModelForm):
@@ -14,11 +14,11 @@ class SchemaAccessControlForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['schemas'].choices = zip(conn.all_schemas, conn.all_schemas)
+        self.fields["schemas"].choices = zip(conn.all_schemas, conn.all_schemas)
 
     class Meta:
         model = SchemaAccessControl
-        fields = ('group', 'schemas')
+        fields = ("group", "schemas")
 
     def clean_schemas(self):
-        return sorted(self.cleaned_data['schemas'])
+        return sorted(self.cleaned_data["schemas"])

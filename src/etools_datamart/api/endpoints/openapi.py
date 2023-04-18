@@ -73,13 +73,14 @@ Retrieve entries in the second/third/fourth quarter (April 1 to June 30):
 - {HOST}latest/datamart/interventions/?submission_date__quarter__gte=2
 
 
-""".format(HOST=swagger_settings.DEFAULT_API_URL)
+""".format(
+    HOST=swagger_settings.DEFAULT_API_URL
+)
 
 
 class DatamartAutoSchema(AutoSchema):
-
     def _get_operation_id(self, path, method):
-        return 'a___sss'
+        return "a___sss"
         # return super()._get_operation_id(path, method)
 
 
@@ -90,7 +91,7 @@ class DatamartSchemaGenerator(OpenAPISchemaGenerator):
 schema_view = get_schema_view(
     openapi.Info(
         title="eTools Datamart API",
-        default_version='v1',
+        default_version="v1",
         description=description,
         # terms_of_service="https://",
         # contact=openapi.Contact(email="contact@snippets.local"),

@@ -4,29 +4,29 @@ from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorblu
 
 
 def convert_string_number_to_float(num):
-    return float(num.replace(',', '')) if type(num) == str else float(num)
+    return float(num.replace(",", "")) if type(num) == str else float(num)
 
 
 def get_calculated_baseline(self):
     baseline = json.loads(self.baseline)
-    if not baseline['v']:
+    if not baseline["v"]:
         return 0.0
 
     if self.blueprint.unit == IndicatorIndicatorblueprint.NUMBER:
-        return convert_string_number_to_float(baseline['v'])
+        return convert_string_number_to_float(baseline["v"])
     else:
-        return convert_string_number_to_float(baseline['v']) / convert_string_number_to_float(baseline['d'])
+        return convert_string_number_to_float(baseline["v"]) / convert_string_number_to_float(baseline["d"])
 
 
 def get_calculated_target(self):
     target = json.loads(self.target)
-    if not target['v']:
+    if not target["v"]:
         return 0.0
 
     if self.blueprint.unit == IndicatorIndicatorblueprint.NUMBER:
-        return convert_string_number_to_float(target['v'])
+        return convert_string_number_to_float(target["v"])
     else:
-        return convert_string_number_to_float(target['v']) / convert_string_number_to_float(target['d'])
+        return convert_string_number_to_float(target["v"]) / convert_string_number_to_float(target["d"])
 
 
 IndicatorReportable.calculated_baseline = property(get_calculated_baseline)

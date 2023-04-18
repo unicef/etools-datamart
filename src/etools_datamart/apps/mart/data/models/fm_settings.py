@@ -7,30 +7,26 @@ from etools_datamart.apps.sources.etools.models import FieldMonitoringSettingsLo
 
 
 class LocationsiteLoader(EtoolsLoader):
-
     def get_parent(self, record: FieldMonitoringSettingsLocationsite, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
-        loc_fields = ['id', 'name', 'p_code', 'level', 'source_id', 'admin_level', 'admin_level_name']
+
+        loc_fields = ["id", "name", "p_code", "level", "source_id", "admin_level", "admin_level_name"]
 
         try:
-            instance = Location.objects.get(
-                schema_name=self.context['country'].schema_name,
-                source_id=record.parent.pk
-            )
+            instance = Location.objects.get(schema_name=self.context["country"].schema_name, source_id=record.parent.pk)
             return {
-                'id': instance.pk,
-                'name': instance.name,
-                'p_code': instance.p_code,
-                'admin_level': instance.admin_level,
-                'source_id': instance.source_id,
-                'location_type': instance.admin_level_name
+                "id": instance.pk,
+                "name": instance.name,
+                "p_code": instance.p_code,
+                "admin_level": instance.admin_level,
+                "source_id": instance.source_id,
+                "location_type": instance.admin_level_name,
             }
         except Location.DoesNotExist:
-            return {key: 'N/A' for key in loc_fields}
+            return {key: "N/A" for key in loc_fields}
 
 
 class Locationsite(EtoolsDataMartModel):
-
     name = models.CharField(max_length=254)
     p_code = models.CharField(max_length=32)
     point = geomodels.PointField(blank=True, null=True)
@@ -42,5 +38,5 @@ class Locationsite(EtoolsDataMartModel):
     class Options:
         source = FieldMonitoringSettingsLocationsite
         mapping = dict(
-            parent='-',
+            parent="-",
         )

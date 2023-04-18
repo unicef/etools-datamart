@@ -17,9 +17,7 @@ def tasklog():
 def tasklog_scheduled(tasklog):
     midnight, __ = CrontabSchedule.objects.get_or_create(minute=0, hour=0)
     task = EtlTask.objects.latest()
-    PeriodicTask.objects.get_or_create(task=task.task,
-                                       defaults={'name': task.task,
-                                                 'crontab': midnight})
+    PeriodicTask.objects.get_or_create(task=task.task, defaults={"name": task.task, "crontab": midnight})
 
 
 def test_tasklog_changelist(django_app, admin_user, tasklog_scheduled):
@@ -43,8 +41,8 @@ def test_tasklog_unlock(django_app, admin_user, tasklog):
     assert res.status_code == 200
     res = res.click("Unlock")
     res = res.forms[1].submit().follow()
-    storage = res.context['messages']
-    assert [m.message for m in storage] == ['Successfully executed']
+    storage = res.context["messages"]
+    assert [m.message for m in storage] == ["Successfully executed"]
 
 
 def test_tasklog_queue(django_app, admin_user, tasklog):
@@ -53,7 +51,7 @@ def test_tasklog_queue(django_app, admin_user, tasklog):
     assert res.status_code == 200
     res = res.click("Queue")
     res = res.follow()
-    storage = res.context['messages']
+    storage = res.context["messages"]
     assert [m.message for m in storage] == [f"Task '{tasklog.task}' queued"]
 
 
@@ -61,11 +59,11 @@ def test_tasklog_queue_action(django_app, admin_user, tasklog):
     tasklog.loader.task.delay = lambda **kw: True
     url = reverse("admin:etl_etltask_changelist")
     res = django_app.get(url, user=admin_user)
-    res.forms['changelist-form']['action'].value = 'queue'
-    res.forms['changelist-form']['_selected_action'] = [tasklog.id]
-    res = res.forms['changelist-form'].submit().maybe_follow()
+    res.forms["changelist-form"]["action"].value = "queue"
+    res.forms["changelist-form"]["_selected_action"] = [tasklog.id]
+    res = res.forms["changelist-form"].submit().maybe_follow()
     assert res.status_code == 200
-    storage = res.context['messages']
+    storage = res.context["messages"]
     assert storage
     # assert [m.message for m in storage] in [
     #     ["Task 'load_data_actionpoint' queued"], ['1 task queued']
@@ -84,5 +82,5 @@ def test_tasklog_inspect(django_app, admin_user, tasklog):
     assert res.status_code == 200
     res = res.click("Inspect").maybe_follow()
     assert res.status_code == 200
-    storage = res.context['messages']
-    assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ['success'], [m.message for m in storage]
+    storage = res.context["messages"]
+    assert [messages.DEFAULT_TAGS[m.level] for m in storage] == ["success"], [m.message for m in storage]

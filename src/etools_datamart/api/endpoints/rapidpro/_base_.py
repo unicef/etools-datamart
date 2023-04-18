@@ -29,8 +29,8 @@ class RapidProPagination(APIPagination):
 
 
 class OrganizationFilter(BaseFilterBackend):
-    query_param = 'organization'
-    template = 'api/select2_filter.html'
+    query_param = "organization"
+    template = "api/select2_filter.html"
 
     def get_query(self, request):
         if f"{self.query_param}!" in request.GET:
@@ -43,7 +43,7 @@ class OrganizationFilter(BaseFilterBackend):
         self.query_args = []
         negate, value = self.get_query(request)
         if value:
-            self.query_args = [int(a) for a in value.split(',')]
+            self.query_args = [int(a) for a in value.split(",")]
         self.negate = negate
 
     def filter_queryset(self, request, queryset, view):
@@ -55,25 +55,28 @@ class OrganizationFilter(BaseFilterBackend):
     def to_html(self, request, queryset, view):
         self.get_query_args(request)
         template = loader.get_template(self.template)
-        context = {'elements': Organization.objects.values_list('id', 'name'),
-                   'selection': self.query_args,
-                   'query_param': self.query_param,
-                   'label': 'Organization',
-                   'header': 'aaaaaa'}
+        context = {
+            "elements": Organization.objects.values_list("id", "name"),
+            "selection": self.query_args,
+            "query_param": self.query_param,
+            "label": "Organization",
+            "header": "aaaaaa",
+        }
         return template.render(context, request)
 
 
 class RapidProViewSet(BaseAPIReadOnlyModelViewSet):
     pagination_class = RapidProPagination
-    filter_backends = [OrganizationFilter,
-                       DatamartQueryStringFilterBackend,
-                       OrderingFilter,
-                       DynamicSerializerFilter,
-                       ]
+    filter_backends = [
+        OrganizationFilter,
+        DatamartQueryStringFilterBackend,
+        OrderingFilter,
+        DynamicSerializerFilter,
+    ]
 
     @property
     def paginator(self):
-        if not hasattr(self, '_paginator'):
+        if not hasattr(self, "_paginator"):
             if self.pagination_class is None:
                 self._paginator = None
             else:

@@ -13,4 +13,4 @@ class HACTHistorySerializer(DataMartSerializer):
 class HACTHistoryViewSet(common.DataMartViewSet):
     serializer_class = HACTHistorySerializer
     queryset = models.HACTHistory.objects.all()
-    filter_fields = ('year', 'last_modify_date')
+    filter_fields = ("year", "last_modify_date")

@@ -16,35 +16,41 @@ def get_git_changeset():
     """
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     git_log = subprocess.Popen(
-        'git log --pretty=format:%ct --quiet -1 HEAD',
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        shell=True, cwd=repo_dir, universal_newlines=True,
+        "git log --pretty=format:%ct --quiet -1 HEAD",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
+        cwd=repo_dir,
+        universal_newlines=True,
     )
     timestamp = git_log.communicate()[0]
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
     except ValueError:  # pragma: no cover
         return None
-    return timestamp.strftime('%Y%m%d%H%M%S')
+    return timestamp.strftime("%Y%m%d%H%M%S")
 
 
 @functools.lru_cache(1)
-def get_git_status(clean='', dirty='*'):
+def get_git_status(clean="", dirty="*"):
     import subprocess
+
     try:
-        uncommited = subprocess.check_output(['git', 'status', '-s'],
-                                             stderr=None)
+        uncommited = subprocess.check_output(["git", "status", "-s"], stderr=None)
         return dirty if uncommited else clean
     except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no-cover
-        return ''
+        return ""
 
 
 def get_full_version():  # pragma: no cover
     from etools_datamart import VERSION
+
     commit = get_git_changeset()
     if commit:
         return f"{VERSION} - {commit} {get_git_status()}"
     return VERSION
+
+
 #
 #
 # def get_version_tuple(version):

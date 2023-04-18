@@ -7,9 +7,9 @@ from faker import Faker
 
 from .factories import GroupFactory
 
-whitespace = ' \t\n\r\v\f'
-lowercase = 'abcdefghijklmnopqrstuvwxyz'
-uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+whitespace = " \t\n\r\v\f"
+lowercase = "abcdefghijklmnopqrstuvwxyz"
+uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 letters = lowercase + uppercase
 ascii_lowercase = lowercase
 ascii_uppercase = uppercase
@@ -19,7 +19,7 @@ faker = Faker()
 
 
 def text(length, choices=ascii_letters):
-    """ returns a random (fixed length) string
+    """returns a random (fixed length) string
 
     :param length: string length
     :param choices: string containing all the chars can be used to build the string
@@ -27,7 +27,7 @@ def text(length, choices=ascii_letters):
     .. seealso::
        :py:func:`rtext`
     """
-    return ''.join(choice(choices) for x in range(length))
+    return "".join(choice(choices) for x in range(length))
 
 
 def get_group(name=None, permissions=None):
@@ -35,21 +35,27 @@ def get_group(name=None, permissions=None):
     permission_names = permissions or []
     for permission_name in permission_names:
         try:
-            app_label, codename = permission_name.split('.')
+            app_label, codename = permission_name.split(".")
         except ValueError:
             raise ValueError("Invalid permission name `{0}`".format(permission_name))
         try:
             permission = Permission.objects.get(content_type__app_label=app_label, codename=codename)
         except Permission.DoesNotExist:
-            raise Permission.DoesNotExist('Permission `{0}` does not exists', permission_name)
+            raise Permission.DoesNotExist("Permission `{0}` does not exists", permission_name)
 
         group.permissions.add(permission)
     return group
 
 
 class user_grant_permissions(ContextDecorator):  # noqa
-    caches = ['_group_perm_cache', '_user_perm_cache', '_dsspermissionchecker',
-              '_officepermissionchecker', '_perm_cache', '_dss_acl_cache']
+    caches = [
+        "_group_perm_cache",
+        "_user_perm_cache",
+        "_dsspermissionchecker",
+        "_officepermissionchecker",
+        "_perm_cache",
+        "_dss_acl_cache",
+    ]
 
     def __init__(self, user, permissions=None):
         self.user = user

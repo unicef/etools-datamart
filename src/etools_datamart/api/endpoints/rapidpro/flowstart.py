@@ -8,13 +8,16 @@ from etools_datamart.apps.mart.rapidpro import models
 
 
 class FlowStartFilterForm(forms.Form):
-    archived = CleareableSelect2ChoiceField(required=False,
-                                            choices=((None, 'All'),
-                                                     (False, 'False'),
-                                                     (True, 'True'),))
+    archived = CleareableSelect2ChoiceField(
+        required=False,
+        choices=(
+            (None, "All"),
+            (False, "False"),
+            (True, "True"),
+        ),
+    )
 
-    created_on = DateRangePickerField(label='Created between',
-                                      required=False)
+    created_on = DateRangePickerField(label="Created between", required=False)
 
 
 class FlowStartSerializer(DataMartSerializer):
@@ -27,9 +30,9 @@ class FlowStartViewSet(RapidProViewSet):
     serializer_class = FlowStartSerializer
     queryset = models.FlowStart.objects.all()
     # filter_fields = ('created', 'date_of_completion', 'due_date')
-    serializers_fieldsets = {'std': FlowStartSerializer}
+    serializers_fieldsets = {"std": FlowStartSerializer}
     querystringfilter_form_base_class = FlowStartFilterForm
-    filter_fields = ['organization', 'archived', 'created_on']
+    filter_fields = ["organization", "archived", "created_on"]
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(*args, **kwargs)

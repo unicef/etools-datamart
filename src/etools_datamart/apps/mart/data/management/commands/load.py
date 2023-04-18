@@ -14,14 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 def setup_logging(verbosity):
-    level = {3: logging.DEBUG,
-             2: logging.INFO,
-             1: logging.ERROR,
-             0: logging.NOTSET}[verbosity]
+    level = {3: logging.DEBUG, 2: logging.INFO, 1: logging.ERROR, 0: logging.NOTSET}[verbosity]
 
-    targets = ['etools_datamart.apps.mart.data.loader']
+    targets = ["etools_datamart.apps.mart.data.loader"]
     consoleLogger = logging.StreamHandler()
-    formatter = logging.Formatter('%(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(levelname)s - %(message)s")
     consoleLogger.setLevel(logging.DEBUG)
     consoleLogger.setFormatter(formatter)
     rootLogger = logging.getLogger()
@@ -35,92 +32,103 @@ def setup_logging(verbosity):
 
 
 class Command(BaseCommand):
-    args = ''
-    help = ''
+    args = ""
+    help = ""
     requires_system_checks = []
     requires_migrations_checks = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
 
     def add_arguments(self, parser):
-        parser.add_argument('args',
-                            metavar='models', nargs='*', help='One or more application label.')
+        parser.add_argument("args", metavar="models", nargs="*", help="One or more application label.")
 
-        parser.add_argument('-e', '--exclude',
-                            metavar='excludes',
-                            nargs='*', help='exclude.')
+        parser.add_argument("-e", "--exclude", metavar="excludes", nargs="*", help="exclude.")
 
         parser.add_argument(
-            '--truncate', action='store_true',
+            "--truncate",
+            action="store_true",
             help="Truncate table before load",
         )
 
         parser.add_argument(
-            '--all', action='store_true',
+            "--all",
+            action="store_true",
             help="Run all loaders.",
         )
         parser.add_argument(
-            '--api-token', action='store',
+            "--api-token",
+            action="store",
             help="RapidPRO token",
         )
         parser.add_argument(
-            '--ignore-changes', action='store_true',
+            "--ignore-changes",
+            action="store_true",
             help=".",
         )
         parser.add_argument(
-            '--unlock', action='store_true',
+            "--unlock",
+            action="store_true",
             help="Unlock all loaders.",
         )
         parser.add_argument(
-            '--no-deps', action='store_true',
+            "--no-deps",
+            action="store_true",
             help="Ignore status of required datasets",
         )
         parser.add_argument(
-            '--process-deps', action='store_true',
+            "--process-deps",
+            action="store_true",
             help="process all dependencies first",
         )
 
         parser.add_argument(
-            '--no-delta', action='store_true',
+            "--no-delta",
+            action="store_true",
             help="Do not use last_modify_field if present. Reload full dataset.",
         )
 
         parser.add_argument(
-            '--debug', action='store_true',
+            "--debug",
+            action="store_true",
             help="maximum logging level",
         )
 
         parser.add_argument(
-            '--elapsed', action='store_true',
+            "--elapsed",
+            action="store_true",
             help="measure elapsed time",
         )
 
         parser.add_argument(
-            '--failed', action='store_true',
+            "--failed",
+            action="store_true",
             help="Run only failed tasks",
         )
 
         parser.add_argument(
-            '--async', action='store_true',
+            "--async",
+            action="store_true",
             help="Run only failed tasks",
         )
 
-        parser.add_argument('-c',
-                            '--countries',
-                            help="Run only selected countries",
-                            )
+        parser.add_argument(
+            "-c",
+            "--countries",
+            help="Run only selected countries",
+        )
 
-        parser.add_argument('-r',
-                            '--records',
-                            type=int,
-                            help="Only load <n> records",
-                            )
+        parser.add_argument(
+            "-r",
+            "--records",
+            type=int,
+            help="Only load <n> records",
+        )
 
     def notify(self, model, created, name, tpl="  {op} {model} `{name}`"):
         if self.verbosity > 2:
             op = {True: "Created", False: "Updated"}[created]
             self.stdout.write(tpl.format(op=op, model=model, name=name))
         elif self.verbosity > 1:
-            self.stdout.write('.', ending='')
+            self.stdout.write(".", ending="")
 
     def calculate_deps(self, names):
         def process(model):
@@ -137,38 +145,38 @@ class Command(BaseCommand):
         return model_names
 
     def handle(self, *model_names, **options):
-        self.verbosity = options['verbosity']
+        self.verbosity = options["verbosity"]
 
-        _all = options['all']
-        debug = options['debug']
-        unlock = options['unlock']
-        excludes = options['exclude'] or []
-        records = options['records']
-        countries = options['countries']
-        no_delta = options['no_delta']
-        truncate = options['truncate']
-        asyncronous = options['async']
+        _all = options["all"]
+        debug = options["debug"]
+        unlock = options["unlock"]
+        excludes = options["exclude"] or []
+        records = options["records"]
+        countries = options["countries"]
+        no_delta = options["no_delta"]
+        truncate = options["truncate"]
+        asyncronous = options["async"]
 
         if debug:
             setup_logging(self.verbosity)
         if _all:
             model_names = sorted([m for m in loadeables if m not in excludes])
-        elif options['failed']:
-            qs = EtlTask.objects.exclude(status__in=['SUCCESS', 'RUNNING'])
+        elif options["failed"]:
+            qs = EtlTask.objects.exclude(status__in=["SUCCESS", "RUNNING"])
             model_names = [t.loader.model_name for t in qs]
 
         if countries:
-            connection = connections['etools']
-            schemas = [c for c in connection.get_tenants() if c.schema_name in countries.split(',')]
+            connection = connections["etools"]
+            schemas = [c for c in connection.get_tenants() if c.schema_name in countries.split(",")]
         else:
             schemas = None
         if not model_names:
             for model_name in sorted(list(loadeables)):
                 self.stdout.write(model_name)
         else:
-            if options['elapsed']:
+            if options["elapsed"]:
                 global_start_time = time.time()
-            if options['process_deps']:
+            if options["process_deps"]:
                 model_names = self.calculate_deps(model_names)
 
             try:
@@ -178,8 +186,8 @@ class Command(BaseCommand):
                     try:
                         model = apps.get_model(model_name)
                     except LookupError:
-                        self.stderr.write(f'Invalid model {model_name}')
-                        self.stderr.write(f'Available choices are:')
+                        self.stderr.write(f"Invalid model {model_name}")
+                        self.stderr.write(f"Available choices are:")
                         for model_name in sorted(list(loadeables)):
                             self.stderr.write(f"  - {model_name}")
                         return ""
@@ -193,34 +201,37 @@ class Command(BaseCommand):
                             self.stdout.write(f"Truncating {model_name}")
                             model.objects.truncate()
                     elapsed = ""
-                    if options['elapsed']:
+                    if options["elapsed"]:
                         start_time = time.time()
 
-                    model.loader.config.always_update = options['ignore_changes']
-                    config = dict(api_token=options.get('api_token'),
-                                  ignore_dependencies=options['no_deps'],
-                                  verbosity=self.verbosity - 1,
-                                  run_type=RUN_COMMAND,
-                                  max_records=records,
-                                  countries=schemas,
-                                  only_delta=not no_delta)
+                    model.loader.config.always_update = options["ignore_changes"]
+                    config = dict(
+                        api_token=options.get("api_token"),
+                        ignore_dependencies=options["no_deps"],
+                        verbosity=self.verbosity - 1,
+                        run_type=RUN_COMMAND,
+                        max_records=records,
+                        countries=schemas,
+                        only_delta=not no_delta,
+                    )
                     if asyncronous:
                         aresult = model.loader.task.apply_async(**config)
                         res = aresult.get()
                     else:
                         res = model.loader.load(**config, stdout=self.stdout)
-                    if options['elapsed']:
+                    if options["elapsed"]:
                         elapsed_time = time.time() - start_time
                         elapsed = "in %s" % strfelapsed(elapsed_time)
 
-                    self.stdout.write(f"{model_name:30}: "
-                                      f"  created: {res.created:>6}"
-                                      f"  updated: {res.updated:>6}"
-                                      f"  unchanged: {res.unchanged:>6}"
-                                      f"  deleted: {res.deleted:>6}"
-                                      f" {elapsed}\n"
-                                      )
-                if options['elapsed']:
+                    self.stdout.write(
+                        f"{model_name:30}: "
+                        f"  created: {res.created:>6}"
+                        f"  updated: {res.updated:>6}"
+                        f"  unchanged: {res.unchanged:>6}"
+                        f"  deleted: {res.deleted:>6}"
+                        f" {elapsed}\n"
+                    )
+                if options["elapsed"]:
                     global_elapsed_time = time.time() - global_start_time
                     global_elapsed = "in %s" % strfelapsed(global_elapsed_time)
                     self.stdout.write(f"Loadig total time: {global_elapsed}")

@@ -28,28 +28,27 @@ class TaskLogManager(models.Manager):
         results = {True: 0, False: 0}
         new = []
         for task in tasks:
-            t, created = self.get_or_create(content_type=ContentType.objects.get_for_model(task.linked_model),
-                                            defaults=dict(
-                                                task=task.name,
-                                                status='',
-                                                last_run=None,
-                                                table_name=task.linked_model._meta.db_table))
+            t, created = self.get_or_create(
+                content_type=ContentType.objects.get_for_model(task.linked_model),
+                defaults=dict(task=task.name, status="", last_run=None, table_name=task.linked_model._meta.db_table),
+            )
             results[created] += 1
             new.append(t.id)
         self.exclude(id__in=new).delete()
-        return {'created': results[True], 'updated': results[False]}
+        return {"created": results[True], "updated": results[False]}
 
 
 class EtlTask(models.Model):
-    STATUSES = (('QUEUED', 'QUEUED'),
-                ('RUNNING', 'RUNNING'),
-                ('FAILURE', 'FAILURE'),
-                ('SUCCESS', 'SUCCESS'),
-                ('ERROR', 'ERROR'),
-                # ('NODATA', 'NO DATA'),
-                )
+    STATUSES = (
+        ("QUEUED", "QUEUED"),
+        ("RUNNING", "RUNNING"),
+        ("FAILURE", "FAILURE"),
+        ("SUCCESS", "SUCCESS"),
+        ("ERROR", "ERROR"),
+        # ('NODATA', 'NO DATA'),
+    )
     task = models.CharField(max_length=200, unique=True)
-    task_id = models.CharField('UUID', blank=True, null=True, max_length=36, unique=True)
+    task_id = models.CharField("UUID", blank=True, null=True, max_length=36, unique=True)
     last_run = models.DateTimeField(blank=True, null=True, help_text="last execution time")
     status = models.CharField(max_length=200, blank=True, null=True)
     elapsed = models.IntegerField(blank=True, null=True)
@@ -66,8 +65,8 @@ class EtlTask(models.Model):
     objects = TaskLogManager()
 
     class Meta:
-        get_latest_by = 'last_run'
-        ordering = ('task',)
+        get_latest_by = "last_run"
+        ordering = ("task",)
 
     def __str__(self):
         return f"{self.task} {self.status}"
@@ -95,12 +94,10 @@ class EtlTask(models.Model):
             pass
 
     def snapshot(self):
-        if self.status == 'SUCCESS':
-            return EtlTaskHistory.objects.create(task=self.task,
-                                                 timestamp=self.last_run,
-                                                 elapsed=self.elapsed,
-                                                 delta=None
-                                                 )
+        if self.status == "SUCCESS":
+            return EtlTaskHistory.objects.create(
+                task=self.task, timestamp=self.last_run, elapsed=self.elapsed, delta=None
+            )
 
 
 class EtlTaskHistory(models.Model):
@@ -111,8 +108,8 @@ class EtlTaskHistory(models.Model):
     delta_percentage = models.FloatField(blank=True, null=True, default=None)
 
     class Meta:
-        get_latest_by = 'last_run'
-        ordering = ('-timestamp', 'task')
+        get_latest_by = "last_run"
+        ordering = ("-timestamp", "task")
 
 
 class Config(models.Model):

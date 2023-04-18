@@ -57,8 +57,8 @@ class classproperty(object):
 
 
 class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelViewSet):
-    serializer_field_param = '-serializer'
-    dynamic_fields_param = '+fields'
+    serializer_field_param = "-serializer"
+    dynamic_fields_param = "+fields"
 
     object_cache_key_func = rest_framework_extensions.utils.default_object_cache_key_func
     list_cache_key_func = ListKeyConstructor()
@@ -66,41 +66,43 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
     object_etag_func = rest_framework_extensions.utils.default_object_etag_func
     list_etag_func = ListKeyConstructor()
 
-    authentication_classes = (SessionAuthentication,
-                              IPBasedAuthentication,
-                              TokenAuthentication,
-                              JWTAuthentication,
-                              BasicAuthentication,
-                              TokenAuthentication,
-                              IPBasedAuthentication,
-                              URLTokenAuthentication,
-                              AnonymousAuthentication,
-                              )
+    authentication_classes = (
+        SessionAuthentication,
+        IPBasedAuthentication,
+        TokenAuthentication,
+        JWTAuthentication,
+        BasicAuthentication,
+        TokenAuthentication,
+        IPBasedAuthentication,
+        URLTokenAuthentication,
+        AnonymousAuthentication,
+    )
     default_access = acl.ACL_ACCESS_LOGIN
     content_negotiation_class = CT
-    filter_backends = [QueryStringFilterBackend,
-                       OrderingFilter,
-                       DynamicSerializerFilter]
+    filter_backends = [QueryStringFilterBackend, OrderingFilter, DynamicSerializerFilter]
 
-    renderer_classes = [JSONRenderer,
-                        URFBrowsableAPIRenderer,
-                        CSVRenderer,
-                        YAMLRenderer,
-                        XLSXRenderer,
-                        HTMLRenderer,
-                        PDFRenderer,
-                        MSJSONRenderer,
-                        XMLRenderer,
-                        MSXmlRenderer,
-                        TextRenderer,
-                        IQYRenderer,
-                        ]
-    ordering_fields = ('id',)
-    ordering = 'id'
+    renderer_classes = [
+        JSONRenderer,
+        URFBrowsableAPIRenderer,
+        CSVRenderer,
+        YAMLRenderer,
+        XLSXRenderer,
+        HTMLRenderer,
+        PDFRenderer,
+        MSJSONRenderer,
+        XMLRenderer,
+        MSXmlRenderer,
+        TextRenderer,
+        IQYRenderer,
+    ]
+    ordering_fields = ("id",)
+    ordering = "id"
     filter_blacklist = []
     filter_fields = []
     # pagination_class = paginator()
-    permission_classes = [ServicePermission, ]
+    permission_classes = [
+        ServicePermission,
+    ]
     serializers_fieldsets = {}
 
     def get_filter_backends(self):
@@ -124,7 +126,7 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
     @transaction.non_atomic_requests
     def dispatch(self, request, *args, **kwargs):
         request._view = self
-        if hasattr(request, 'api_info'):
+        if hasattr(request, "api_info"):
             request.api_info["view"] = fqn(self)
             request.api_info["service"] = self.get_service()
 
@@ -138,20 +140,21 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
     @lru_cache()
     def get_service(cls):
         from unicef_rest_framework.models import Service
+
         return Service.objects.get_for_viewset(cls)
 
-    @etag(etag_func='list_etag_func')
-    @cache_response(key_func='list_cache_key_func', cache='api')
+    @etag(etag_func="list_etag_func")
+    @cache_response(key_func="list_cache_key_func", cache="api")
     def options(self, request, *args, **kwargs):
         return super().options(request, *args, **kwargs)
 
-    @etag(etag_func='object_etag_func')
-    @cache_response(key_func='object_cache_key_func', cache='api')
+    @etag(etag_func="object_etag_func")
+    @cache_response(key_func="object_cache_key_func", cache="api")
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-    @etag(etag_func='list_etag_func')
-    @cache_response(key_func='list_cache_key_func', cache='api')
+    @etag(etag_func="list_etag_func")
+    @cache_response(key_func="list_cache_key_func", cache="api")
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -160,7 +163,7 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
         """
         The paginator instance associated with the view, or `None`.
         """
-        if not hasattr(self, '_paginator'):
+        if not hasattr(self, "_paginator"):
             if self.pagination_class is None:
                 self._paginator = None
             else:
@@ -176,12 +179,11 @@ class URFReadOnlyModelViewSet(DynamicSerializerMixin, viewsets.ReadOnlyModelView
 
 
 class ExportList(FilterView):
-
     model = Export
     filterset_class = ExportFilter
 
 
-@method_decorator(basicauth, 'dispatch')
+@method_decorator(basicauth, "dispatch")
 class ExportFetch(LoginRequiredMixin, DetailView):
     model = Export
 
@@ -194,10 +196,9 @@ class ExportFetch(LoginRequiredMixin, DetailView):
                 capture_exception(e)
                 return JsonResponse({"error": "File not found"}, status=404)
 
-            response = StreamingHttpResponse(c, status=200,
-                                             content_type=record.format)
-            if record.save_as or record.format != 'application/json':
-                response['Content-Disposition'] = u'attachment; filename="%s"' % record.filename
+            response = StreamingHttpResponse(c, status=200, content_type=record.format)
+            if record.save_as or record.format != "application/json":
+                response["Content-Disposition"] = 'attachment; filename="%s"' % record.filename
             return response
         return JsonResponse({"error": "Permission denied"}, status=403)
 
@@ -207,7 +208,7 @@ class ExportObjectMixin(LoginRequiredMixin):
     form_class = ExportForm
 
     def get_success_url(self):
-        return reverse('urf:export-list')
+        return reverse("urf:export-list")
 
     def form_valid(self, form):
         form.instance.as_user = self.request.user
@@ -216,48 +217,52 @@ class ExportObjectMixin(LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        url = self.request.GET.get('url')
+        url = self.request.GET.get("url")
         path, params = parse_url(url)
-        qs = get_query_string(params, remove=['page_size', 'format'])
-        data.update({'breadcrumblist': self.breadcrumbs,
-                     'url': url,
-                     'source': "{}{}{}".format(settings.ABSOLUTE_BASE_URL, path, qs),
-                     'path': path,
-                     'qs': qs
-                     })
+        qs = get_query_string(params, remove=["page_size", "format"])
+        data.update(
+            {
+                "breadcrumblist": self.breadcrumbs,
+                "url": url,
+                "source": "{}{}{}".format(settings.ABSOLUTE_BASE_URL, path, qs),
+                "path": path,
+                "qs": qs,
+            }
+        )
         return data
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         if not self.request.user.is_superuser:
-            form.fields.pop('enabled')
+            form.fields.pop("enabled")
         return form
 
-class ExportCreate(ExportObjectMixin, CreateView):
 
+class ExportCreate(ExportObjectMixin, CreateView):
     def get_form_kwargs(self):
-        path, params = parse_url(self.request.GET.get('url'), remove=['page_size'])
+        path, params = parse_url(self.request.GET.get("url"), remove=["page_size"])
         kwargs = super().get_form_kwargs()
-        kwargs.update({'url': path,
-                       'params': params,
-                       })
+        kwargs.update(
+            {
+                "url": path,
+                "params": params,
+            }
+        )
         return kwargs
 
     def get_initial(self):
-        return {'name': self.breadcrumbs[-1][0],
-                'filename': self.breadcrumbs[-1][0]}
+        return {"name": self.breadcrumbs[-1][0], "filename": self.breadcrumbs[-1][0]}
 
     @cached_property
     def breadcrumbs(self):
-        url = self.request.GET.get('url')
+        url = self.request.GET.get("url")
         return get_breadcrumbs(url, self.request)
 
 
 class ExportUpdate(ExportObjectMixin, UpdateView):
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({'url': self.object.url})
+        kwargs.update({"url": self.object.url})
         return kwargs
 
     @cached_property
@@ -269,11 +274,14 @@ class ExportUpdate(ExportObjectMixin, UpdateView):
         data = super().get_context_data(**kwargs)
 
         path, params = parse_url(self.object.url)
-        qs = get_query_string(self.object.params, remove=['page_size', 'format'])
-        data.update({'record': self.object,
-                     'url': self.object.get_full_url(),
-                     'path': path,
-                     'source': "{}{}{}".format(settings.ABSOLUTE_BASE_URL, path, qs),
-                     'qs': qs
-                     })
+        qs = get_query_string(self.object.params, remove=["page_size", "format"])
+        data.update(
+            {
+                "record": self.object,
+                "url": self.object.get_full_url(),
+                "path": path,
+                "source": "{}{}{}".format(settings.ABSOLUTE_BASE_URL, path, qs),
+                "qs": qs,
+            }
+        )
         return data

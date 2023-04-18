@@ -10,7 +10,7 @@ _thread_locals = threading.local()
 
 class ApiInfo(dict):
     def str(self, key):
-        return str(self.get(key, ''))
+        return str(self.get(key, ""))
 
 
 class ApiMiddleware(object):

@@ -19,47 +19,67 @@ from unicef_rest_framework.models import Service
 
 logger = logging.getLogger(__name__)
 
-ACL_ICONS = {acl.ACL_ACCESS_OPEN: ('icon-angry', 'red'),
-             acl.ACL_ACCESS_LOGIN: ('icon-smile', 'orange'),
-             acl.ACL_ACCESS_RESTRICTED: ('icon-evil', 'green'),
-             acl.ACL_ACCESS_RESERVED: ('icon-frustrated', 'black'),
-             }
+ACL_ICONS = {
+    acl.ACL_ACCESS_OPEN: ("icon-angry", "red"),
+    acl.ACL_ACCESS_LOGIN: ("icon-smile", "orange"),
+    acl.ACL_ACCESS_RESTRICTED: ("icon-evil", "green"),
+    acl.ACL_ACCESS_RESERVED: ("icon-frustrated", "black"),
+}
 
 
 def get_stash_url(obj, label=None, **kwargs):
     if not obj:
-        return ''
+        return ""
     qn = fqn(obj)
-    url = "{}{}.py".format(config.SOURCE_REPOSITORY,
-                           os.path.dirname(qn.replace('.', '/')))
+    url = "{}{}.py".format(config.SOURCE_REPOSITORY, os.path.dirname(qn.replace(".", "/")))
     attrs = " ".join(['{}="{}"'.format(k, v) for k, v in kwargs.items()])
-    return mark_safe('<a class="code" {} href="{}?c={}">{}</a>'.format(attrs,
-                                                                       url,
-                                                                       qn,
-                                                                       label or qn.split('.')[-1]))
+    return mark_safe('<a class="code" {} href="{}?c={}">{}</a>'.format(attrs, url, qn, label or qn.split(".")[-1]))
 
 
 class ServiceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
-    list_display = ('short_name', 'visible', 'access', 'cache_version', 'suffix', 'json', 'admin')
-    list_filter = ('hidden', 'access')
+    list_display = ("short_name", "visible", "access", "cache_version", "suffix", "json", "admin")
+    list_filter = ("hidden", "access")
 
-    search_fields = ('name', 'viewset')
-    readonly_fields = ('cache_version', 'cache_ttl', 'cache_key', 'viewset', 'name', 'uuid',
-                       'last_modify_user', 'source_model', 'endpoint', 'basename', 'suffix')
+    search_fields = ("name", "viewset")
+    readonly_fields = (
+        "cache_version",
+        "cache_ttl",
+        "cache_key",
+        "viewset",
+        "name",
+        "uuid",
+        "last_modify_user",
+        "source_model",
+        "endpoint",
+        "basename",
+        "suffix",
+    )
     form = ServiceForm
     mass_update_hints = []
-    mass_update_exclude = ['linked_models', 'source_model', 'viewset', 'suffix', 'name',
-                           'version']
-    filter_horizontal = ('linked_models',)
-    fieldsets = [("", {"fields": ('name',
-                                  'description',
-                                  ('access', 'hidden',),
-                                  # 'confidentiality',
-                                  ('source_model', 'basename'),
-                                  ('suffix', 'endpoint'),
-                                  'linked_models',
-                                  )})]
-    actions = [mass_update, ]
+    mass_update_exclude = ["linked_models", "source_model", "viewset", "suffix", "name", "version"]
+    filter_horizontal = ("linked_models",)
+    fieldsets = [
+        (
+            "",
+            {
+                "fields": (
+                    "name",
+                    "description",
+                    (
+                        "access",
+                        "hidden",
+                    ),
+                    # 'confidentiality',
+                    ("source_model", "basename"),
+                    ("suffix", "endpoint"),
+                    "linked_models",
+                )
+            },
+        )
+    ]
+    actions = [
+        mass_update,
+    ]
 
     # change_list_template = 'admin/unicef_rest_framework/service/change_list.html'
 
@@ -71,24 +91,24 @@ class ServiceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return mark_safe('<a href="{}">code</a>'.format(url))
 
     sourcecode.allow_tags = True
-    sourcecode.short_description = 'sourcecode'
+    sourcecode.short_description = "sourcecode"
 
     def acl_page(self, object):
         url = reverse("admin:unicef_rest_framework_service_acl", args=[object.pk])
         return mark_safe('<a href="{}">acl</a>'.format(url))
 
     acl_page.allow_tags = True
-    acl_page.short_description = 'ACL'
+    acl_page.short_description = "ACL"
 
     def short_name(self, obj):
         return "%s.%s" % (obj.source_model.app_label, obj.source_model.model)
 
     def security(self, object):
-
-        return mark_safe('<i title="{}" '
-                         'class="icon {}" '
-                         'style="color: {};font-size:14pt"></i>'.format(object.get_access_display(),
-                                                                        *ACL_ICONS[object.access]))
+        return mark_safe(
+            '<i title="{}" '
+            'class="icon {}" '
+            'style="color: {};font-size:14pt"></i>'.format(object.get_access_display(), *ACL_ICONS[object.access])
+        )
 
     security.allow_tags = True
 
@@ -96,25 +116,25 @@ class ServiceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         if obj.endpoint:
             return mark_safe("<a href='{}' target='a'>api</a>".format(obj.endpoint))
         else:
-            return ''
+            return ""
 
     json.allow_tags = True
-    json.short_description = 'view'
+    json.short_description = "view"
 
     def admin(self, obj):
         if obj.managed_model:
             opts = obj.managed_model._meta
             try:
-                admin_url = reverse(admin_urlname(opts, 'changelist'))
+                admin_url = reverse(admin_urlname(opts, "changelist"))
                 return mark_safe("<a href='{}' target='a'>{}</a>".format(admin_url, opts.object_name))
             except NoReverseMatch:
                 return mark_safe('<span class="error red">{}</span>'.format(opts.object_name))
 
         else:
-            return ''
+            return ""
 
     admin.allow_tags = True
-    admin.short_description = 'model'
+    admin.short_description = "model"
 
     def visible(self, obj):
         return not obj.hidden
@@ -123,14 +143,13 @@ class ServiceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
     @button()
     def refresh(self, request):
-        msgs = {False: 'No new services found',
-                True: 'Found {} new services. Removed {}'}
+        msgs = {False: "No new services found", True: "Found {} new services. Removed {}"}
         created, deleted, total = Service.objects.load_services()
         self.message_user(request, msgs[bool(created | deleted)].format(created, deleted))
         info = self.model._meta.app_label, self.model._meta.model_name
-        return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % info))
+        return HttpResponseRedirect(reverse("admin:%s_%s_changelist" % info))
 
-    @button(label='Invalidate Cache')
+    @button(label="Invalidate Cache")
     def invalidate_all_cache(self, request):
         Service.objects.invalidate_cache()
 
@@ -148,8 +167,7 @@ class ServiceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     def data(self, request, pk):
         service = Service.objects.get(pk=pk)
         model = service.managed_model
-        url = reverse('admin:%s_%s_changelist' % (model._meta.app_label,
-                                                  model._meta.model_name))
+        url = reverse("admin:%s_%s_changelist" % (model._meta.app_label, model._meta.model_name))
         return HttpResponseRedirect(url)
 
     @button()
@@ -157,9 +175,9 @@ class ServiceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         service = Service.objects.get(pk=pk)
         service.invalidate_cache()
         if request.is_ajax():
-            return HttpResponse(service.cache_version, content_type='text/plain')
+            return HttpResponse(service.cache_version, content_type="text/plain")
         else:
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     # @button(visible=False)
     # def code(self, request, pk):

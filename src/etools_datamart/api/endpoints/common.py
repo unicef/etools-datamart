@@ -27,20 +27,19 @@ from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthor
 from etools_datamart.apps.security.cache import SchemaAccessKeyBit
 from etools_datamart.libs.mystica import MysticaBasicAuthentication
 
-__all__ = ['APIMultiTenantReadOnlyModelViewSet']
+__all__ = ["APIMultiTenantReadOnlyModelViewSet"]
 
 
 class UpdatesMixin:
-
-    @action(methods=['get'], detail=False)
+    @action(methods=["get"], detail=False)
     def updates(self, request, version):
-        """ Returns only records changed from last ETL task"""
+        """Returns only records changed from last ETL task"""
         task = EtlTask.objects.get_for_model(self.queryset.model)
         if task.last_changes:
-            offset = task.last_changes.strftime('%Y-%m-%d %H:%M')
+            offset = task.last_changes.strftime("%Y-%m-%d %H:%M")
             queryset = self.queryset.filter(last_modify_date__gte=offset)
         else:
-            offset = 'none'
+            offset = "none"
             queryset = self.queryset.all()
         queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
@@ -62,16 +61,16 @@ class CountryAwareKeyConstructor(ListKeyConstructor):
     schemas = SchemaAccessKeyBit()
 
 
-class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet,
-                                  metaclass=AutoRegisterMetaClass):
+class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet, metaclass=AutoRegisterMetaClass):
     authentication_classes = URFReadOnlyModelViewSet.authentication_classes + (MysticaBasicAuthentication,)
-    filter_backends = [DatamartQueryStringFilterBackend,
-                       OrderingFilter,
-                       DynamicSerializerFilter,
-                       ]
-    ordering_fields = ('id',)
-    ordering = 'id'
-    family = 'datamart'
+    filter_backends = [
+        DatamartQueryStringFilterBackend,
+        OrderingFilter,
+        DynamicSerializerFilter,
+    ]
+    ordering_fields = ("id",)
+    ordering = "id"
+    family = "datamart"
     querystringfilter_form_base_class = forms.Form
 
     def get_querystringfilter_form(self, request, filter):
@@ -82,17 +81,24 @@ class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet,
         return ret
 
     def drf_ignore_filter(self, request, field):
-        return field in [self.serializer_field_param,
-                         self.dynamic_fields_param,
-                         'cursor', CountryFilter.query_param, 'month',
-                         'ordering', 'page_size', 'format', 'page']
+        return field in [
+            self.serializer_field_param,
+            self.dynamic_fields_param,
+            "cursor",
+            CountryFilter.query_param,
+            "month",
+            "ordering",
+            "page_size",
+            "format",
+            "page",
+        ]
 
     def raise_uncaught_exception(self, exc):
         capture_exception(exc)
         return super().raise_uncaught_exception(exc)
 
     def handle_exception(self, exc):
-        conn = connections['etools']
+        conn = connections["etools"]
         if isinstance(exc, (QueryFilterException,)):
             # FieldError can happen due cache attempt to create
             return Response({"error": str(exc)}, status=400)
@@ -107,19 +113,19 @@ class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet,
         elif isinstance(exc, InvalidSerializerError):
             return Response({"error": str(exc)}, status=400)
         elif isinstance(exc, InvalidSchema):
-            return Response({"error": str(exc),
-                             "hint": "Removes wrong schema from selection",
-                             "valid": sorted(conn.all_schemas)
-                             }, status=400)
+            return Response(
+                {"error": str(exc), "hint": "Removes wrong schema from selection", "valid": sorted(conn.all_schemas)},
+                status=400,
+            )
         return super().handle_exception(exc)
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         selection = self.kwargs[lookup_url_kwarg]
-        if selection == '_lastest_':
+        if selection == "_lastest_":
             queryset = self.filter_queryset(self.get_queryset())
             try:
-                obj = queryset.latest('id')
+                obj = queryset.latest("id")
             except (TypeError, ValueError, ValidationError, ObjectDoesNotExist):  # pragma: no cover
                 raise Http404
             else:
@@ -130,22 +136,23 @@ class BaseAPIReadOnlyModelViewSet(URFReadOnlyModelViewSet,
 
 
 class APIReadOnlyModelViewSet(BaseAPIReadOnlyModelViewSet):
-    filter_backends = [CountryFilter,
-                       DatamartQueryStringFilterBackend,
-                       OrderingFilter,
-                       DynamicSerializerFilter,
-                       ]
+    filter_backends = [
+        CountryFilter,
+        DatamartQueryStringFilterBackend,
+        OrderingFilter,
+        DynamicSerializerFilter,
+    ]
 
 
 def one_schema(func):
     @wraps(func)
     def _inner(self, request, *args, **kwargs):
-        if 'country_name' not in request.GET:
-            return Response({'error': 'country_name parameter is mandatory'}, status=400)
-        if ',' in request.GET['country_name']:
-            return Response({'error': 'only one country is allowed'}, status=400)
+        if "country_name" not in request.GET:
+            return Response({"error": "country_name parameter is mandatory"}, status=400)
+        if "," in request.GET["country_name"]:
+            return Response({"error": "only one country is allowed"}, status=400)
         ret = func(self, request, *args, **kwargs)
-        ret['X-Schema'] = ','.join(connections['etools'].schemas)
+        ret["X-Schema"] = ",".join(connections["etools"].schemas)
         return ret
 
     return _inner
@@ -155,22 +162,23 @@ def schema_header(func):
     @wraps(func)
     def _inner(self, request, *args, **kwargs):
         ret = func(self, request, *args, **kwargs)
-        ret['X-Schema'] = ','.join(connections['etools'].schemas)
+        ret["X-Schema"] = ",".join(connections["etools"].schemas)
         return ret
 
     return _inner
 
 
 class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
-    filter_backends = [TenantCountryFilter,
-                       SystemFilterBackend,
-                       DatamartQueryStringFilterBackend,
-                       OrderingFilter,
-                       DynamicSerializerFilter,
-                       ]
-    family = 'etools'
-    ordering_fields = ('id',)
-    ordering = 'id'
+    filter_backends = [
+        TenantCountryFilter,
+        SystemFilterBackend,
+        DatamartQueryStringFilterBackend,
+        OrderingFilter,
+        DynamicSerializerFilter,
+    ]
+    family = "etools"
+    ordering_fields = ("id",)
+    ordering = "id"
 
     @one_schema
     def retrieve(self, request, *args, **kwargs):
@@ -182,12 +190,14 @@ class APIMultiTenantReadOnlyModelViewSet(APIReadOnlyModelViewSet):
 
     def get_schema_fields(self):
         ret = super().get_schema_fields()
-        ret.append(coreapi.Field(
-            name='_schema',
-            required=False,
-            location='query',
-            schema=coreschema.String(description="comma separated list of schemas")
-        ))
+        ret.append(
+            coreapi.Field(
+                name="_schema",
+                required=False,
+                location="query",
+                schema=coreschema.String(description="comma separated list of schemas"),
+            )
+        )
         return ret
 
 

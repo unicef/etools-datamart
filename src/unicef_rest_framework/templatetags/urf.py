@@ -32,7 +32,7 @@ def get_item(dictionary, key):
     return dictionary.get(key, "")
 
 
-@register.filter(name='fqn')
+@register.filter(name="fqn")
 def _fqn(obj):
     if obj:
         return fqn(obj)
@@ -41,18 +41,16 @@ def _fqn(obj):
 @register.simple_tag(takes_context=True)
 def code(context, obj):
     if not obj:
-        return ''
+        return ""
     elif isinstance(obj, (list, tuple)):
         return ", ".join(obj)
     elif isinstance(obj, six.string_types):
         return obj
-    service = context['service']
+    service = context["service"]
     qn = fqn(obj)
     # return qn
     url = reverse("admin:unicef_rest_framework_service_code", args=[service.pk])
-    return mark_safe('<a class ="code" href="{}?c={}">{}</a>'.format(url,
-                                                                     qn,
-                                                                     qn.split('.')[-1]))
+    return mark_safe('<a class ="code" href="{}?c={}">{}</a>'.format(url, qn, qn.split(".")[-1]))
 
 
 @register.simple_tag(takes_context=True)

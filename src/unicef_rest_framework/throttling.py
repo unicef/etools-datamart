@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 class APIRateThrottle(BaseThrottle):
-    cache = caches['default']
+    cache = caches["default"]
     timer = time.time
-    cache_format = 'throttle_%(scope)s_%(ident)s'
+    cache_format = "throttle_%(scope)s_%(ident)s"
     rate = None
 
     def __init__(self):
@@ -35,9 +35,9 @@ class APIRateThrottle(BaseThrottle):
         """
         if rate is None:
             return (None, None)
-        num, period = rate.split('/')
+        num, period = rate.split("/")
         num_requests = int(num)
-        duration = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}[period[0]]
+        duration = {"s": 1, "m": 60, "h": 3600, "d": 86400}[period[0]]
         return (num_requests, duration)
 
     def _add_throttle_info(self, request):
@@ -71,8 +71,7 @@ class APIRateThrottle(BaseThrottle):
             self._add_throttle_info(request)
             return allow
         except Exception:
-            logger.critical("Unable to throttle", extra={'request': request,
-                                                         'stack': True})
+            logger.critical("Unable to throttle", extra={"request": request, "stack": True})
             return True
 
     def throttle_success(self):
@@ -107,24 +106,21 @@ class APIRateThrottle(BaseThrottle):
 
 
 class ViewRateThrottle(APIRateThrottle):
-    cache_format = 'throttle_%(view)s_%(ident)s'
+    cache_format = "throttle_%(view)s_%(ident)s"
 
     def get_rate(self, request, view):
-        return getattr(view, 'throttle_rate', None)
+        return getattr(view, "throttle_rate", None)
 
     def get_cache_key(self, request, view):
         self.pk = request.user.pk
         ident = self.pk
 
-        return self.cache_format % {
-            'view': view.fqn,
-            'ident': ident
-        }
+        return self.cache_format % {"view": view.fqn, "ident": ident}
 
 
 class ACLRateThrottle(APIRateThrottle):
-    cache_format = 'throttle_acl_%(view)s_%(ident)s'
-    cache = caches['default']
+    cache_format = "throttle_acl_%(view)s_%(ident)s"
+    cache = caches["default"]
 
     def get_rate(self, request, view):
         try:
@@ -135,7 +131,7 @@ class ACLRateThrottle(APIRateThrottle):
             return None
         acl = UserAccessControl.objects.filter(user=request.user, service=service).first()
 
-        if acl is None or acl.rate == '*':
+        if acl is None or acl.rate == "*":
             return None
 
         return acl.rate
@@ -144,7 +140,4 @@ class ACLRateThrottle(APIRateThrottle):
         messages.info(request._request, request._request.user.pk)
         ident = request._request.user.pk
 
-        return self.cache_format % {
-            'view': view.fqn,
-            'ident': ident
-        }
+        return self.cache_format % {"view": view.fqn, "ident": ident}

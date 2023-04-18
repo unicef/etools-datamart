@@ -42,7 +42,7 @@ class RegisterModelFactory(factory.django.DjangoModelFactory, metaclass=AutoRegi
 
 class APIRequestLogFactory(RegisterModelFactory):
     requested_at = timezone.now()
-    remote_addr = factory.Faker('ipv4_public')
+    remote_addr = factory.Faker("ipv4_public")
 
     class Meta:
         model = APIRequestLog
@@ -51,7 +51,7 @@ class APIRequestLogFactory(RegisterModelFactory):
 class ServiceFactory(RegisterModelFactory):
     class Meta:
         model = unicef_rest_framework.models.Service
-        django_get_or_create = ('viewset',)
+        django_get_or_create = ("viewset",)
 
 
 class GroupFactory(RegisterModelFactory):
@@ -59,21 +59,21 @@ class GroupFactory(RegisterModelFactory):
 
     class Meta:
         model = Group
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)
 
 
 class UserFactory(RegisterModelFactory):
     class Meta:
         model = unicef_security.models.User
-        django_get_or_create = ('username',)
+        django_get_or_create = ("username",)
 
     username = factory.Sequence(lambda n: "user%03d" % n)
 
-    last_name = factory.Faker('last_name')
-    first_name = factory.Faker('first_name')
+    last_name = factory.Faker("last_name")
+    first_name = factory.Faker("first_name")
 
     email = factory.Sequence(lambda n: "m%03d@mailinator.com" % n)
-    password = 'password'
+    password = "password"
     is_superuser = False
     is_active = True
 
@@ -81,9 +81,9 @@ class UserFactory(RegisterModelFactory):
     def _prepare(cls, create, **kwargs):
         from ..perms import user_grant_permissions
 
-        permissions = kwargs.pop('permissions', [])
+        permissions = kwargs.pop("permissions", [])
 
-        password = kwargs.pop('password')
+        password = kwargs.pop("password")
         user = super()._prepare(cls, create, **kwargs)
         if password:
             user.set_password(password)
@@ -98,7 +98,7 @@ class AdminFactory(UserFactory):
 
 
 class AnonUserFactory(UserFactory):
-    username = 'anonymous'
+    username = "anonymous"
 
 
 class UserAccessControlFactory(RegisterModelFactory):
@@ -107,13 +107,13 @@ class UserAccessControlFactory(RegisterModelFactory):
 
     class Meta:
         model = unicef_rest_framework.models.UserAccessControl
-        django_get_or_create = ('user', 'service')
+        django_get_or_create = ("user", "service")
 
 
 class SystemFilterFactory(RegisterModelFactory):
     class Meta:
         model = unicef_rest_framework.models.SystemFilter
-        django_get_or_create = ('user', 'service')
+        django_get_or_create = ("user", "service")
 
     @factory.post_generation
     def rules(self, create, extracted, **kwargs):
@@ -129,7 +129,7 @@ class SystemFilterFactory(RegisterModelFactory):
 
 
 class SubscriptionFactory(RegisterModelFactory):
-    kwargs = ''
+    kwargs = ""
     user = SubFactory(UserFactory)
     type = Subscription.MESSAGE
 
@@ -137,15 +137,15 @@ class SubscriptionFactory(RegisterModelFactory):
 
     class Meta:
         model = Subscription
-        django_get_or_create = ('user', 'content_type')
+        django_get_or_create = ("user", "content_type")
 
 
 class EmailTemplateFactory(RegisterModelFactory):
-    name = 'dataset_changed'
+    name = "dataset_changed"
 
     class Meta:
         model = EmailTemplate
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)
 
 
 class RegionFactory(RegisterModelFactory):
@@ -154,12 +154,12 @@ class RegionFactory(RegisterModelFactory):
 
     class Meta:
         model = unicef_realm.models.Region
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)
 
 
 class SchemaAccessControlFactory(RegisterModelFactory):
     group = factory.SubFactory(GroupFactory)
-    schemas = ['bolivia', 'chad']
+    schemas = ["bolivia", "chad"]
 
     class Meta:
         model = SchemaAccessControl
@@ -171,4 +171,4 @@ class BusinessAreaFactory(RegisterModelFactory):
 
     class Meta:
         model = unicef_realm.models.BusinessArea
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)

@@ -16,8 +16,8 @@ def get_create_model(editor, model):  # pragma: no cover
             continue
         # Check constraints can go on the column SQL here
         db_params = field.db_parameters(connection=editor.connection)
-        if db_params['check']:
-            definition += " CHECK (%s)" % db_params['check']
+        if db_params["check"]:
+            definition += " CHECK (%s)" % db_params["check"]
         # Autoincrement SQL (for backends with inline variant)
         col_type_suffix = field.db_type_suffix(connection=editor.connection)
         if col_type_suffix:
@@ -35,10 +35,13 @@ def get_create_model(editor, model):  # pragma: no cover
             elif editor.connection.features.supports_foreign_keys:
                 editor.deferred_sql.append(editor._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
         # Add the SQL to our big list
-        column_sqls.append("%s %s" % (
-            editor.quote_name(field.column),
-            definition,
-        ))
+        column_sqls.append(
+            "%s %s"
+            % (
+                editor.quote_name(field.column),
+                definition,
+            )
+        )
         # Autoincrement SQL (for backends with post table definition variant)
         if field.get_internal_type() in ("AutoField", "BigAutoField"):
             autoinc_sql = editor.connection.ops.autoinc_sql(model._meta.db_table, field.column)
@@ -53,12 +56,12 @@ def get_create_model(editor, model):  # pragma: no cover
     # Make the table
     sql = editor.sql_create_table % {
         "table": editor.quote_name(model._meta.db_table),
-        "definition": ", ".join(column_sqls)
+        "definition": ", ".join(column_sqls),
     }
     if model._meta.db_tablespace:
         tablespace_sql = editor.connection.ops.tablespace_sql(model._meta.db_tablespace)
         if tablespace_sql:
-            sql += ' ' + tablespace_sql
+            sql += " " + tablespace_sql
     return sql
 
 
@@ -67,13 +70,13 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     def determine_metadata(self, request, view):
         metadata = super().determine_metadata(request, view)
-        metadata['filters'] = getattr(view, 'filter_fields', '')
-        metadata['filter_blacklist'] = getattr(view, 'filter_blacklist', '')
-        metadata['ordering'] = getattr(view, 'ordering_fields', '')
-        if hasattr(view, 'serializers_fieldsets'):
-            metadata['serializers'] = ", ".join(view.serializers_fieldsets.keys())
+        metadata["filters"] = getattr(view, "filter_fields", "")
+        metadata["filter_blacklist"] = getattr(view, "filter_blacklist", "")
+        metadata["ordering"] = getattr(view, "ordering_fields", "")
+        if hasattr(view, "serializers_fieldsets"):
+            metadata["serializers"] = ", ".join(view.serializers_fieldsets.keys())
         else:  # pragma: no cover
-            metadata['serializers'] = 'std'
+            metadata["serializers"] = "std"
 
             # from django.db import connection
         # with connection.schema_editor() as editor:

@@ -8,5 +8,4 @@ class BusinessAreaViewSet(common.APIReadOnlyModelViewSet):
     pagination_class = None
     serializer_class = serializers.BusinessAreaSerializer
     queryset = models.BusinessArea.objects.all()
-    filter_fields = ('code', 'name', 'long_name',
-                     'region', 'country', 'last_modify_date')
+    filter_fields = ("code", "name", "long_name", "region", "country", "last_modify_date")

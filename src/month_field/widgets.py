@@ -10,25 +10,21 @@ from django.utils.dates import MONTHS
 
 
 class MonthSelectorWidget(widgets.MultiWidget):
-    template_name = 'month_field/multiwidget.html'
+    template_name = "month_field/multiwidget.html"
 
     def __init__(self, attrs=None):
         # create choices for days, months, years
         months = {"": "--"}
         months.update(MONTHS)
         _attrs = attrs or {}  # default class
-        _attrs['style'] = 'width:20%;'
-        _widgets = [widgets.Select(attrs=_attrs, choices=months.items()),
-                    widgets.NumberInput(attrs=_attrs)
-                    ]
+        _attrs["style"] = "width:20%;"
+        _widgets = [widgets.Select(attrs=_attrs, choices=months.items()), widgets.NumberInput(attrs=_attrs)]
         super().__init__(_widgets, attrs)
 
     @property
     def media(self):
         media = self._get_media()
-        media.add_css({
-            'screen': (static('month/field/widget_month.css'),)
-        })
+        media.add_css({"screen": (static("month/field/widget_month.css"),)})
         return media
 
     def decompress(self, value):
@@ -41,16 +37,13 @@ class MonthSelectorWidget(widgets.MultiWidget):
         return [None, None]
 
     def format_output(self, rendered_widgets):
-        return ''.join(rendered_widgets)
+        return "".join(rendered_widgets)
 
     def value_from_datadict(self, data, files, name):
-        datelist = [
-            widget.value_from_datadict(data, files, name + '_%s' % i)
-            for i, widget in enumerate(self.widgets)]
+        datelist = [widget.value_from_datadict(data, files, name + "_%s" % i) for i, widget in enumerate(self.widgets)]
         try:
-            D = date(day=1, month=int(datelist[0]),
-                     year=int(datelist[1]))
+            D = date(day=1, month=int(datelist[0]), year=int(datelist[1]))
         except (ValueError, TypeError):
-            return ''
+            return ""
         else:
             return str(D)

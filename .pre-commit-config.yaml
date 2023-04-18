@@ -1,60 +1,20 @@
-exclude: '^$'
-fail_fast: false
 repos:
--   repo: local
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
     hooks:
       - id: isort
-        args:
-            - --check-only
-        name: isort
-        entry: isort
-        language: system
-        types: [python]
         stages: [commit]
-
-      - id: check-manifest
-        name: check-manifest
-        entry: check-manifest
-        language: system
-        types: [python]
-        files: '^$'
-        always_run: true
-        stages: [manual]
-
--   repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v2.0.0
+  - repo: https://github.com/ambv/black
+    rev: 23.1.0
     hooks:
-    -   id: debug-statements
-        exclude: manage.py
+      - id: black
+        args: [--config=backend/pyproject.toml]
+        exclude: "migrations|snapshots"
         stages: [commit]
-
-    -   id: flake8
-        args:
-        - --config=setup.cfg
-#        - src/
-#        - tests/
-        stages: [commit]
-
-    -   id: check-merge-conflict
-        stages: [commit]
-
-#-   repo: git://github.com/Yelp/detect-secrets
-#    rev: 0.9.1
-#    hooks:
-#    -   id: detect-secrets
-#        args: ['--baseline', '.secrets.baseline']
-#        stages: [push]
-
--   repo: https://github.com/saxix/pch
-    rev: 5c9a8e2
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
     hooks:
-    -   id: check-version-release-match
-        args:
-        - --pythonpath=src
-        - --package=etools_datamart
-        stages: [push]
-
-    -   id: check-untracked
-        args:
-        - src
-        - tests
+      - id: flake8
+        args: [--config=backend/.flake8]
+        additional_dependencies: [flake8-bugbear==22.9.23]
+        stages: [ commit ]

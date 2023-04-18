@@ -15,16 +15,15 @@ logger = logging.getLogger(__name__)
 def invalidate_cache(service_id):
     service = Service.objects.get(service_id)
     service.invalidate_cache()
-    return {"cache_version": service.cache_version,
-            "service": service.name}
+    return {"cache_version": service.cache_version, "service": service.name}
 
 
 @default_app.task()
 def preload_all():
-    for t in Preload.objects.filter(enabled=True).values_list('id', flat=True):
+    for t in Preload.objects.filter(enabled=True).values_list("id", flat=True):
         preload.apply_async(args=[t])
 
-    for t in Export.objects.filter(enabled=True, refresh=True).values_list('id', flat=True):
+    for t in Export.objects.filter(enabled=True, refresh=True).values_list("id", flat=True):
         export.apply_async(args=[t])
 
 
@@ -42,11 +41,13 @@ def export(target_id):
     if settings.EXPORT_NOTIFICATIONS_ENABLED and target.notify and target.as_user.email:
         mail.send(
             target.as_user.email,  # List of email addresses also accepted
-            'notification@datamart.unicef.io',
-            template='export_ready',
-            context={'target': target,
-                     'user': target.as_user,
-                     'download_url': reverse('urf:export-fetch', args=[target.id])}
+            "notification@datamart.unicef.io",
+            template="export_ready",
+            context={
+                "target": target,
+                "user": target.as_user,
+                "download_url": reverse("urf:export-fetch", args=[target.id]),
+            },
         )
     return response.status_code
 
@@ -56,5 +57,5 @@ def force_refresh():
     qs = Export.objects.filter(status_code=304, enabled=True, refresh=True)
     qs.update(status_code=-1, etag=None)
 
-    for exp in qs.values_list('id', flat=True):
+    for exp in qs.values_list("id", flat=True):
         export.apply_async(args=[exp])

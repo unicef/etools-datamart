@@ -8,11 +8,11 @@ from etools_datamart.apps.sources.etools.models import AuthUser
 
 class EtoolsUserLoader(CommonSchemaLoader):
     def get_groups(self, record, values, **kwargs):
-        return ", ".join(record.groups.values_list('name', flat=True))
+        return ", ".join(record.groups.values_list("name", flat=True))
 
     def get_countries_available(self, record, values, **kwargs):
         try:
-            return ", ".join(record.profile.countries_available.values_list('name', flat=True))
+            return ", ".join(record.profile.countries_available.values_list("name", flat=True))
         except ObjectDoesNotExist:  # pragma: no cover
             return ""
 
@@ -67,20 +67,20 @@ class EtoolsUser(EtoolsDataMartModel):
         truncate = True
         key = lambda loader, record: dict(source_id=record.id)
 
-        mapping = dict(job_title='profile.job_title',
-                       phone_number='profile.phone_number',
-                       partner_staff_member='profile.partner_staff_member',
-                       guid='profile.guid',
-                       org_unit_code='profile.org_unit_code',
-                       org_unit_name='profile.org_unit_name',
-                       post_number='profile.post_number',
-                       post_title='profile.post_title',
-                       staff_id='profile.staff_id',
-                       vendor_number='profile.vendor_number',
-                       country_name='profile.country.name',
-                       office='profile.office.name',
-                       country_override='i',
-                       oic='profile.oic.office',
-                       supervisor='profile.oic.office',
-
-                       )
+        mapping = dict(
+            job_title="profile.job_title",
+            phone_number="profile.phone_number",
+            partner_staff_member="profile.partner_staff_member",
+            guid="profile.guid",
+            org_unit_code="profile.org_unit_code",
+            org_unit_name="profile.org_unit_name",
+            post_number="profile.post_number",
+            post_title="profile.post_title",
+            staff_id="profile.staff_id",
+            vendor_number="profile.vendor_number",
+            country_name="profile.country.name",
+            office="profile.office.name",
+            country_override="i",
+            oic="profile.oic.office",
+            supervisor="profile.oic.office",
+        )

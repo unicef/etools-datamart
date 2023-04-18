@@ -14,4 +14,4 @@ class SchemaAccessKeyBit(KeyBitBase):
                 value = get_allowed_schemas(request.user)
 
         hashed_value = hashlib.md5(str(value).encode()).hexdigest()
-        return {'countries': hashed_value}
+        return {"countries": hashed_value}

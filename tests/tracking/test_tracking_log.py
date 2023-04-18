@@ -24,7 +24,7 @@ def user(admin_user):
 def django_app(django_app_mixin, system_user):
     APIRequestLog.objects.truncate()
     django_app_mixin._patch_settings()
-    django_app_mixin.extra_environ = {'REMOTE_ADDR': '192.168.66.66'}
+    django_app_mixin.extra_environ = {"REMOTE_ADDR": "192.168.66.66"}
     django_app_mixin.renew_app()
     django_app_mixin.app.set_user(system_user)
     yield django_app_mixin.app
@@ -43,10 +43,10 @@ def test_log(enable_stats, django_app, system_user, reset_stats, settings):
     assert res.status_code == 200
     log = APIRequestLog.objects.first()
     assert log
-    assert log.method == 'GET'
-    assert log.content_type == 'application/json'
-    assert log.remote_addr == '192.168.66.66'
-    assert log.host == 'testserver'
+    assert log.method == "GET"
+    assert log.content_type == "application/json"
+    assert log.remote_addr == "192.168.66.66"
+    assert log.host == "testserver"
     assert log.user == system_user
     assert log.viewset == InterventionViewSet
     assert log.service == fqn(InterventionViewSet)
@@ -68,22 +68,25 @@ def test_log(enable_stats, django_app, system_user, reset_stats, settings):
 @pytest.mark.parametrize("code", [200, 500])
 @pytest.mark.parametrize("stats", [True, False])
 @pytest.mark.parametrize("user_type", [AnonymousUser, UserFactory, AdminFactory])
-@pytest.mark.parametrize("middleware", [StatsMiddleware, ])
+@pytest.mark.parametrize(
+    "middleware",
+    [
+        StatsMiddleware,
+    ],
+)
 @pytest.mark.django_db(transaction=False)
 def test_middleware(rf, settings, user_type, middleware, stats, code):
     user = user_type()
     settings.ENABLE_LIVE_STATS = stats
 
-    view = InterventionViewSet.as_view({'get': 'list'})
+    view = InterventionViewSet.as_view({"get": "list"})
     service = InterventionViewSet.get_service()
     url = service.endpoint
 
-    m = middleware(lambda r: Mock(status_code=code, content='abc',
-                                  accepted_media_type='text/plain'))
+    m = middleware(lambda r: Mock(status_code=code, content="abc", accepted_media_type="text/plain"))
     request = rf.get(url)
     request.user = user
-    request.api_info = {'view': view,
-                        'service': service}
+    request.api_info = {"view": view, "service": service}
     m(request)
     m(request)  # two times to trigger ENABLE_LIVE_STATS
     sleep(1)

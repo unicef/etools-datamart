@@ -9,12 +9,12 @@ from unicef_rest_framework import acl
 
 class AppSettings(object):
     defaults = {
-        'API_CACHE': 'default',
-        'FREE_AUTH_IPS': [],
-        'ROUTER': 'unicef_rest_framework.urls.router',
-        'DEFAULT_ACCESS': acl.ACL_ACCESS_LOGIN,
-        'get_current_user': 'get_current_user',
-        'get_current_request': 'get_current_request',
+        "API_CACHE": "default",
+        "FREE_AUTH_IPS": [],
+        "ROUTER": "unicef_rest_framework.urls.router",
+        "DEFAULT_ACCESS": acl.ACL_ACCESS_LOGIN,
+        "get_current_user": "get_current_user",
+        "get_current_request": "get_current_request",
     }
 
     def __init__(self, prefix):
@@ -28,7 +28,8 @@ class AppSettings(object):
     def __getattr__(self, name):
         if name in self.defaults.keys():
             from django.conf import settings
-            name_with_prefix = (self.prefix + '_' + name).upper()
+
+            name_with_prefix = (self.prefix + "_" + name).upper()
             raw_value = getattr(settings, name_with_prefix, self.defaults[name])
             value = self._set_attr(name_with_prefix, raw_value)
             setattr(settings, name_with_prefix, raw_value)
@@ -37,15 +38,15 @@ class AppSettings(object):
         raise AttributeError(name)
 
     def _set_attr(self, prefix_name, value):
-        name = prefix_name[len(self.prefix) + 1:]
-        if name in ('ROUTER', ):
+        name = prefix_name[len(self.prefix) + 1 :]
+        if name in ("ROUTER",):
             try:
                 obj = import_by_name(value)
             except (ImportError, ValueError, AttributeError):
                 raise ImportError(f"Cannot import '{value}'. Check your settings.{prefix_name}")
             setattr(self, name, obj)
             return obj
-        elif name in ('get_current_user', 'get_current_request', 'get_current_user'):
+        elif name in ("get_current_user", "get_current_request", "get_current_user"):
             try:
                 if isinstance(value, str):
                     func = get_callable(value)
@@ -54,7 +55,8 @@ class AppSettings(object):
                 else:
                     raise ImproperlyConfigured(
                         f"{value} is not a valid value for `{name}`. "
-                        "It must be a callable or a fullpath to callable. ")
+                        "It must be a callable or a fullpath to callable. "
+                    )
             except Exception as e:
                 raise ImproperlyConfigured(e)
             setattr(self, name, func)
@@ -70,11 +72,11 @@ class AppSettings(object):
         @see :ref:`django:setting-changed`_
         """
         if setting.startswith(self.prefix):
-            name = setting[len(self.prefix) + 1:]
+            name = setting[len(self.prefix) + 1 :]
             try:
                 delattr(self, name)
             except AttributeError:
                 pass
 
 
-conf = AppSettings('UNICEF_REST_FRAMEWORK')
+conf = AppSettings("UNICEF_REST_FRAMEWORK")

@@ -23,19 +23,22 @@ class Camera(Polaroid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Expiry can be timedelta or None for never expire.
-        self.app.add_defaults({
-            'monitors_expire_success': timedelta(days=1),
-            'monitors_expire_error': timedelta(days=3),
-            'monitors_expire_pending': timedelta(days=5),
-        })
+        self.app.add_defaults(
+            {
+                "monitors_expire_success": timedelta(days=1),
+                "monitors_expire_error": timedelta(days=3),
+                "monitors_expire_pending": timedelta(days=5),
+            }
+        )
 
     @property
     def TaskState(self):
         """Return the data model to store task state in."""
-        return symbol_by_name('etools_datamart.apps.etl.models.EtlTask')
+        return symbol_by_name("etools_datamart.apps.etl.models.EtlTask")
 
     def django_setup(self):
         import django
+
         django.setup()
 
     def install(self):
@@ -47,12 +50,12 @@ class Camera(Polaroid):
         uuid, task = uuid_task
 
         defaults = {
-            'task': task.name,
-            'task_id': uuid,
-            'status': task.state,
-            'last_run': fromtimestamp(task.timestamp),
-            'results': task.result or task.exception,
-            'traceback': task.traceback,
+            "task": task.name,
+            "task_id": uuid,
+            "status": task.state,
+            "last_run": fromtimestamp(task.timestamp),
+            "results": task.result or task.exception,
+            "traceback": task.traceback,
         }
         if task.state == states.STARTED:
             pass
@@ -60,13 +63,13 @@ class Camera(Polaroid):
             # defaults['last_success'] = timezone.now()
             # defaults['last_failure'] = None
             # defaults['elapsed'] = task.runtime
-            defaults['task_id'] = None
+            defaults["task_id"] = None
         elif task.state == states.FAILURE:
             # defaults['last_failure'] = timezone.now()
             # defaults['elapsed'] = task.runtime
-            defaults['task_id'] = None
+            defaults["task_id"] = None
         elif task.state == states.RETRY:
-            defaults['task_id'] = None
+            defaults["task_id"] = None
             # defaults['last_failure'] = timezone.now()
         self.TaskState.objects.filter(task=task.name).update(**defaults)
 

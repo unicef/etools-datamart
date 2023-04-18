@@ -9,26 +9,21 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    args = ''
-    help = ''
+    args = ""
+    help = ""
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--all',
-            action='store_true',
-            dest='all',
-            default=False,
-            help='select all options but `demo`')
+            "--all", action="store_true", dest="all", default=False, help="select all options but `demo`"
+        )
 
     def handle(self, *args, **options):
         router = conf.ROUTER
 
         list_name = router.routes[0].name
         for prefix, viewset, basename in router.registry:
-            service, ok = Service.objects.check_or_create(prefix,
-                                                          viewset,
-                                                          basename,
-                                                          list_name.format(basename=basename)
-                                                          )
-        for service in Service.objects.order_by('name'):
+            service, ok = Service.objects.check_or_create(
+                prefix, viewset, basename, list_name.format(basename=basename)
+            )
+        for service in Service.objects.order_by("name"):
             print("{0.id:4} {0.name:30} {0.endpoint:40}".format(service))

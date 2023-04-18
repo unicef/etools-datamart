@@ -29,7 +29,7 @@ SCHEMAMAP = {
 
 class QueryStringFilterBackend(BaseFilterBackend):
     template = "querystringfilter/filter.html"
-    form_prefix = ''
+    form_prefix = ""
     allowed_joins = -1
     field_casting = {}
 
@@ -37,17 +37,14 @@ class QueryStringFilterBackend(BaseFilterBackend):
         self.unknown_arguments = []
 
     def get_form_class(self, request, view):
-        if hasattr(view, 'querystringfilter_form_class'):
+        if hasattr(view, "querystringfilter_form_class"):
             return view.querystringfilter_form_class
-        fields = OrderedDict([
-            (name, forms.CharField(required=False))
-            for name in view.filter_fields or []])
+        fields = OrderedDict([(name, forms.CharField(required=False)) for name in view.filter_fields or []])
 
-        return type(str('%sForm' % self.__class__.__name__),
-                    (forms.Form,), fields)
+        return type(str("%sForm" % self.__class__.__name__), (forms.Form,), fields)
 
     def get_form(self, request, view):
-        if hasattr(view, 'get_querystringfilter_form'):
+        if hasattr(view, "get_querystringfilter_form"):
             return view.get_querystringfilter_form(request, self)
 
         Form = self.get_form_class(request, view)
@@ -56,8 +53,7 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
     def to_html(self, request, queryset, view):
         template = loader.get_template(self.template)
-        context = {'form': self.get_form(request, view),
-                   'header': 'aaaaaa'}
+        context = {"form": self.get_form(request, view), "header": "aaaaaa"}
         return template.render(context, request)
 
     @lru_cache(100)
@@ -74,17 +70,16 @@ class QueryStringFilterBackend(BaseFilterBackend):
             except FieldDoesNotExist:
                 description = ""
                 coreapi_type = coreschema.String
-            ret.append(coreapi.Field(
-                name=field,
-                required=False,
-                location='query',
-                schema=coreapi_type(
-                    title=force_str(field),
-                    description=description
-
-                ),
-                description='--',
-                example='example'))
+            ret.append(
+                coreapi.Field(
+                    name=field,
+                    required=False,
+                    location="query",
+                    schema=coreapi_type(title=force_str(field), description=description),
+                    description="--",
+                    example="example",
+                )
+            )
         return ret
 
     def field_type(self, field_name):
@@ -108,12 +103,12 @@ class QueryStringFilterBackend(BaseFilterBackend):
         return params_list
 
     def ignore_filter(self, request, field, view):
-        if hasattr(view, 'drf_ignore_filter'):
+        if hasattr(view, "drf_ignore_filter"):
             return view.drf_ignore_filter(request, field)
         return False
 
     def _get_mapping(self, view):
-        if hasattr(view, 'get_serializer'):
+        if hasattr(view, "get_serializer"):
             # try:
             return view.get_serializer().fields
         else:
@@ -132,12 +127,12 @@ class QueryStringFilterBackend(BaseFilterBackend):
 
         """
         self.opts = queryset.model._meta
-        filter_fields = getattr(view, 'filter_fields', None)
+        filter_fields = getattr(view, "filter_fields", None)
         self.exclude = {}
         self.filters = {}
 
         if filter_fields:
-            blacklist = RexList(getattr(view, 'filter_blacklist', []))
+            blacklist = RexList(getattr(view, "filter_blacklist", []))
             mapping = self._get_mapping(view)
 
             for fieldname_arg in self.query_params:
@@ -162,14 +157,17 @@ class QueryStringFilterBackend(BaseFilterBackend):
                     if filter_field_name in blacklist:
                         raise InvalidQueryArgumentError(fieldname_arg)
                     parts = None
-                    if '__' in filter_field_name:
-                        parts = filter_field_name.split('__')
+                    if "__" in filter_field_name:
+                        parts = filter_field_name.split("__")
                         filter_field_name = parts[0]
                         op = parts[-1]
                     else:
-                        op = ''
-                    processor = getattr(self, 'process_{}'.format(filter_field_name),
-                                        getattr(view, 'drfqs_filter_{}'.format(filter_field_name), None))
+                        op = ""
+                    processor = getattr(
+                        self,
+                        "process_{}".format(filter_field_name),
+                        getattr(view, "drfqs_filter_{}".format(filter_field_name), None),
+                    )
 
                     if (filter_field_name not in filter_fields) and (not processor):
                         self.unknown_arguments.append((fieldname_arg, filter_field_name))
@@ -188,15 +186,17 @@ class QueryStringFilterBackend(BaseFilterBackend):
                         real_field_name = filter_field_name
 
                     if processor:
-                        payload = {'field': filter_field_name,
-                                   'request': request,
-                                   'param': fieldname_arg,
-                                   'negate': negate,
-                                   'op': op,
-                                   'field_name': real_field_name,
-                                   'parts': parts,
-                                   'value': raw_value,
-                                   'real_field_name': real_field_name}
+                        payload = {
+                            "field": filter_field_name,
+                            "request": request,
+                            "param": fieldname_arg,
+                            "negate": negate,
+                            "op": op,
+                            "field_name": real_field_name,
+                            "parts": parts,
+                            "value": raw_value,
+                            "real_field_name": real_field_name,
+                        }
                         _f, _e = processor(dict(self.filters), dict(self.exclude), **payload)
                         self.filters.update(**_f)
                         self.exclude.update(**_e)
@@ -209,12 +209,12 @@ class QueryStringFilterBackend(BaseFilterBackend):
                             f = "{}__{}".format(real_field_name, "__".join(parts[1:]))
                         else:
                             f = filter_field_name
-                        if op in ['in', 'contained_by']:
-                            value = raw_value.split(',')
-                        elif op == 'acontains':
-                            value = raw_value.split(',')
-                            f = f.replace('__acontains', '__contains')
-                        elif op == 'isnull':
+                        if op in ["in", "contained_by"]:
+                            value = raw_value.split(",")
+                        elif op == "acontains":
+                            value = raw_value.split(",")
+                            f = f.replace("__acontains", "__contains")
+                        elif op == "isnull":
                             value = parse_bool(raw_value)
                         elif value_type == bool:
                             value = parse_bool(raw_value)
@@ -234,12 +234,16 @@ class QueryStringFilterBackend(BaseFilterBackend):
         self.request = request
         try:
             filters, exclude = self._get_filters(request, queryset, view)
-            request.api_info['qs_filter'] = filters
-            request.api_info['qs_exclude'] = exclude
+            request.api_info["qs_filter"] = filters
+            request.api_info["qs_exclude"] = exclude
             qs = queryset.filter(**filters).exclude(**exclude)
-            logger.debug("""Filtering using:
+            logger.debug(
+                """Filtering using:
 {}
-{}""".format(filters, exclude))
+{}""".format(
+                    filters, exclude
+                )
+            )
             # if '_distinct' in self.query_params:
             #     f = self.get_param_value('_distinct')
             #     qs = qs.order_by(*f).distinct(*f)

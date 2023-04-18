@@ -50,13 +50,13 @@ class TenantRelatedPopulator(RelatedPopulator):
         if self.reorder_for_init:  # pragma: no cover
             obj_data = self.reorder_for_init(row)
         else:
-            obj_data = row[self.cols_start:self.cols_end]
+            obj_data = row[self.cols_start : self.cols_end]
         if obj_data[self.pk_idx] is None:
             obj = None
         else:
             init_list = self.init_list.copy()
-            if 'schema' in init_list:
-                init_list.remove('schema')
+            if "schema" in init_list:
+                init_list.remove("schema")
             obj = self.model_cls.from_db(self.db, init_list, obj_data)
             if self.related_populators:  # pragma: no cover
                 for rel_iter in self.related_populators:
@@ -69,7 +69,7 @@ class TenantRelatedPopulator(RelatedPopulator):
 # need to be overridden on because TenantRelatedPopulator()
 def get_related_populators(klass_info, select, db):
     iterators = []
-    related_klass_infos = klass_info.get('related_klass_infos', [])
+    related_klass_infos = klass_info.get("related_klass_infos", [])
     for rel_klass_info in related_klass_infos:
         rel_cls = TenantRelatedPopulator(rel_klass_info, select, db)
         iterators.append(rel_cls)
@@ -86,13 +86,11 @@ class TenantModelIterable(ModelIterable):
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
         results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
-        select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
-                                                  compiler.annotation_col_map)
-        model_cls = klass_info['model']
-        select_fields = klass_info['select_fields']
+        select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info, compiler.annotation_col_map)
+        model_cls = klass_info["model"]
+        select_fields = klass_info["select_fields"]
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
-        init_list = [f[0].target.attname
-                     for f in select[model_fields_start:model_fields_end]]
+        init_list = [f[0].target.attname for f in select[model_fields_start:model_fields_end]]
         related_populators = get_related_populators(klass_info, select, db)
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
@@ -120,13 +118,12 @@ class TenantModelIterable(ModelIterable):
 
 
 class TenantQuerySet(QuerySet):
-
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
         self._iterable_class = TenantModelIterable
 
     def filter_schemas(self, *schemas):
-        conn = connections['etools']
+        conn = connections["etools"]
         if schemas and schemas[0]:
             conn.set_schemas(schemas)
         else:

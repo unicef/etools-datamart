@@ -17,7 +17,7 @@ from strategy_field.utils import fqn
 
 from unicef_rest_framework.models import SystemFilter
 
-cache = caches['default']
+cache = caches["default"]
 
 
 def parse_ttl(ttl):
@@ -29,13 +29,15 @@ def parse_ttl(ttl):
     604800
 
     """
-    durations = {'s': 1,
-                 'm': 60,  # minute
-                 'h': 3600,  # hour
-                 'd': 86400,  # day
-                 'w': 604800,  # week
-                 'y': 31536000}  # year
-    rex = re.compile(r'((\d+)([smhdwy]))')
+    durations = {
+        "s": 1,
+        "m": 60,  # minute
+        "h": 3600,  # hour
+        "d": 86400,  # day
+        "w": 604800,  # week
+        "y": 31536000,
+    }  # year
+    rex = re.compile(r"((\d+)([smhdwy]))")
     try:
         groups = rex.findall(ttl)
         if not groups:
@@ -102,8 +104,7 @@ def humanize_ttl(value, months=True):  # noqa
             if months == 1:
                 return _("1 year, 1 month")
             else:
-                return _gettext("1 year, %d month",
-                                "1 year, %d months", months) % months
+                return _gettext("1 year, %d month", "1 year, %d months", months) % months
         else:
             return _gettext("1 year, %d day", "1 year, %d days", days) % days
     else:
@@ -113,41 +114,40 @@ def humanize_ttl(value, months=True):  # noqa
 class CacheVersionKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         version = view_instance.get_service().cache_version
-        view_instance.request._request.api_info['cache-version'] = version
-        return {'cache_version': str(version),
-                'version': str(config.CACHE_VERSION)}
+        view_instance.request._request.api_info["cache-version"] = version
+        return {"cache_version": str(version), "version": str(config.CACHE_VERSION)}
 
 
 class SystemFilterKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         flt = SystemFilter.objects.match(request, view_instance)
         request._request._system_filters = flt
-        qs = flt.get_querystring() if flt else ''
-        request._request.api_info['system-filters'] = qs
-        return {'systemfilter': qs}
+        qs = flt.get_querystring() if flt else ""
+        request._request.api_info["system-filters"] = qs
+        return {"systemfilter": qs}
 
 
 class QueryPathKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
-        return {'path': str(request.path)}
+        return {"path": str(request.path)}
 
 
 class SuperuserKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
-        return {'admin': request.user.is_superuser}
+        return {"admin": request.user.is_superuser}
 
 
 class IsStaffKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
-        return {'staff': request.user.is_staff}
+        return {"staff": request.user.is_staff}
 
 
 class DevelopKeyBit(KeyBitBase):
     def get_data(self, params, view_instance, view_method, request, args, kwargs):
         if not config.CACHE_ENABLED:
-            return {'dev': str(time.time())}
-        if request.META.get('HTTP_X_DM_CACHE') == 'disabled':
-            return {'dev': str(time.time())}
+            return {"dev": str(time.time())}
+        if request.META.get("HTTP_X_DM_CACHE") == "disabled":
+            return {"dev": str(time.time())}
         return {}
 
 
@@ -160,10 +160,10 @@ class SmartQueryParamsKeyBit(QueryParamsKeyBit):
 
     def get_source_dict(self, params, view_instance, view_method, request, args, kwargs):
         values = request.GET.copy()
-        if not values.get('ordering', None) == view_instance.ordering:
-            values['ordering'] = view_instance.ordering
+        if not values.get("ordering", None) == view_instance.ordering:
+            values["ordering"] = view_instance.ordering
         if not values.get(view_instance.serializer_field_param, None):
-            values[view_instance.serializer_field_param] = 'std'
+            values[view_instance.serializer_field_param] = "std"
         return values
 
 
@@ -172,7 +172,7 @@ class ListKeyConstructor(KeyConstructor):
     system_filter = SystemFilterKeyBit()
     path = QueryPathKeyBit()
     format = bits.FormatKeyBit()
-    headers = bits.HeadersKeyBit(['Accept'])
+    headers = bits.HeadersKeyBit(["Accept"])
     dev = DevelopKeyBit()
     admin = SuperuserKeyBit()
     staff = IsStaffKeyBit()
@@ -180,7 +180,7 @@ class ListKeyConstructor(KeyConstructor):
 
     def get_key(self, view_instance, view_method, request, args, kwargs):
         key = super().get_key(view_instance, view_method, request, args, kwargs)
-        view_instance.request._request.api_info['cache-key'] = key
+        view_instance.request._request.api_info["cache-key"] = key
         return key
 
 
@@ -194,49 +194,35 @@ class APIETAGProcessor(ETAGProcessor):
 
 
 class APICacheResponse(CacheResponse):
-    def __init__(self,
-                 timeout=None,
-                 key_func=None,
-                 cache=None,
-                 cache_errors=None):
+    def __init__(self, timeout=None, key_func=None, cache=None, cache_errors=None):
         self.cache_name = cache or extensions_api_settings.DEFAULT_USE_CACHE
-        super().__init__(timeout=timeout, key_func=key_func,
-                                               cache=cache, cache_errors=cache_errors)
+        super().__init__(timeout=timeout, key_func=key_func, cache=cache, cache_errors=cache_errors)
 
-    def process_cache_response(self,
-                               view_instance,
-                               view_method,
-                               request,
-                               args,
-                               kwargs):
+    def process_cache_response(self, view_instance, view_method, request, args, kwargs):
         cache = caches[self.cache_name]
         if config.CACHE_ENABLED:
             key = self.calculate_key(
-                view_instance=view_instance,
-                view_method=view_method,
-                request=request,
-                args=args,
-                kwargs=kwargs
+                view_instance=view_instance, view_method=view_method, request=request, args=args, kwargs=kwargs
             )
             response = cache.get(key)
         else:
             response = None
-            key = '--'
+            key = "--"
         if not response:
-            view_instance.request._request.api_info['cache-hit'] = False
+            view_instance.request._request.api_info["cache-hit"] = False
             response = view_method(view_instance, request, *args, **kwargs)
             response = view_instance.finalize_response(request, response, *args, **kwargs)
             response.render()  # should be rendered, before picklining while storing to cache
             if config.CACHE_ENABLED and response.status_code == 200:  # pragma: no cover
-                expire = parse_ttl(view_instance.get_service().cache_ttl or '1y')
+                expire = parse_ttl(view_instance.get_service().cache_ttl or "1y")
                 cache.set(key, response, expire)
         else:
-            view_instance.request._request.api_info['cache-hit'] = True
+            view_instance.request._request.api_info["cache-hit"] = True
 
-        view_instance.store('cache-ttl', view_instance.get_service().cache_ttl)
-        view_instance.store('service', view_instance.get_service())
-        view_instance.store('view', fqn(view_instance))
-        if not hasattr(response, '_closable_objects'):  # pragma: no cover
+        view_instance.store("cache-ttl", view_instance.get_service().cache_ttl)
+        view_instance.store("service", view_instance.get_service())
+        view_instance.store("view", fqn(view_instance))
+        if not hasattr(response, "_closable_objects"):  # pragma: no cover
             response._closable_objects = []
 
         return response

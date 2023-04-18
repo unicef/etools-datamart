@@ -12,16 +12,20 @@ class WorkspaceSerializer(DataMartSerializer):
 
     class Meta(DataMartSerializer.Meta):
         model = UsersCountry
-        exclude = ('local_currency', 'vision_sync_enabled', 'vision_last_synced',
-                   'initial_zoom', )
+        exclude = (
+            "local_currency",
+            "vision_sync_enabled",
+            "vision_last_synced",
+            "initial_zoom",
+        )
 
     def get_currency_name(self, obj):
-        return getattr(obj.local_currency, 'code', None)
+        return getattr(obj.local_currency, "code", None)
 
     def get_currency_code(self, obj):
-        return getattr(obj.local_currency, 'name', None)
+        return getattr(obj.local_currency, "name", None)
 
 
 class EtoolsWorkspaceViewSet(common.APIReadOnlyModelViewSet):
     serializer_class = WorkspaceSerializer
-    queryset = UsersCountry.objects.select_related('local_currency').exclude(schema_name__in=['public'])
+    queryset = UsersCountry.objects.select_related("local_currency").exclude(schema_name__in=["public"])

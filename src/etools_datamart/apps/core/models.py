@@ -4,18 +4,13 @@ from django.db.models.manager import BaseManager
 
 
 class DataMartQuerySet(QuerySet):
-
     def get(self, *args, **kwargs):
         try:
             return super().get(*args, **kwargs)
         except self.model.DoesNotExist as e:
-            raise self.model.DoesNotExist(
-                "%s  (%s %s)" % (e, args, kwargs)
-            )
+            raise self.model.DoesNotExist("%s  (%s %s)" % (e, args, kwargs))
         except self.model.MultipleObjectsReturned as e:  # pragma: no cover
-            raise self.model.MultipleObjectsReturned(
-                "%s (%s %s) " % (e, args, kwargs)
-            )
+            raise self.model.MultipleObjectsReturned("%s (%s %s) " % (e, args, kwargs))
 
     def filter_schemas(self, *schemas):
         if schemas and schemas[0]:
@@ -24,12 +19,10 @@ class DataMartQuerySet(QuerySet):
 
 
 class DataMartManager(BaseManager.from_queryset(DataMartQuerySet)):
-
     def truncate(self, reset=True):
         if reset:
-            restart = 'RESTART IDENTITY'
+            restart = "RESTART IDENTITY"
         else:
-            restart = ''
-        with connections['default'].cursor() as cursor:
-            cursor.execute('TRUNCATE TABLE "{0}" {1} CASCADE;'.format(self.model._meta.db_table,
-                                                                      restart))
+            restart = ""
+        with connections["default"].cursor() as cursor:
+            cursor.execute('TRUNCATE TABLE "{0}" {1} CASCADE;'.format(self.model._meta.db_table, restart))

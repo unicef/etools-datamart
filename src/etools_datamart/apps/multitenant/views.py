@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class SelectSchema(FormView):
-    template_name = 'schemas.html'
+    template_name = "schemas.html"
     form_class = SchemasForm
     success_url = reverse_lazy("admin:index")
 
@@ -25,23 +25,23 @@ class SelectSchema(FormView):
         self.params = dict(self.request.GET.items())
 
         # self.selected = self.request.COOKIES.get('schemas', '').split(",")
-        self.selected = self.params.get('country_name', "").split(",")
+        self.selected = self.params.get("country_name", "").split(",")
 
         return {k: True for k in self.selected}
 
     def get_success_url(self):
         self.params = dict(self.request.GET.items())
-        _from = self.request.GET.getlist('from', ['/'])[0]
-        if '_all' in self.selected:
-            qs = self.get_query_string({}, ['from', 'country_name'])
+        _from = self.request.GET.getlist("from", ["/"])[0]
+        if "_all" in self.selected:
+            qs = self.get_query_string({}, ["from", "country_name"])
         else:
-            qs = self.get_query_string({'country_name': ','.join(self.selected)}, ['from'])
+            qs = self.get_query_string({"country_name": ",".join(self.selected)}, ["from"])
         return f"{_from}{qs}"
 
     def form_valid(self, form):
         self.selected = [k for (k, v) in form.cleaned_data.items() if v]
         if len(self.selected) == len(form.cleaned_data):
-            self.selected = ['_all']
+            self.selected = ["_all"]
 
         response = HttpResponseRedirect(self.get_success_url())
         # state.schemas = self.selected

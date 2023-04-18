@@ -7,13 +7,12 @@ from etools_datamart.apps.sources.etools.models import PseaAnswer, PseaAssessmen
 
 
 class PseaAssessmentLoader(EtoolsLoader):
-
     def get_assessor(self, record: PseaAssessment, values: dict, **kwargs):
-        assessor = getattr(record, 'PseaAssessor_assessment', None)
+        assessor = getattr(record, "PseaAssessor_assessment", None)
         if assessor:
             return {
-                'assessor_type': assessor.assessor_type,
-                'name': assessor.auditor_firm.name if assessor.auditor_firm else assessor.user.email
+                "assessor_type": assessor.assessor_type,
+                "name": assessor.auditor_firm.name if assessor.auditor_firm else assessor.user.email,
             }
 
     def get_focal_points(self, record: PseaAssessment, values: dict, **kwargs):
@@ -40,13 +39,13 @@ class PseaAssessment(EtoolsDataMartModel):
 
     class Options:
         source = PseaAssessment
-        depends = (Partner, )
+        depends = (Partner,)
         mapping = dict(
             partner_name="partner.name",
             vendor_number="partner.vendor_number",
             cso_type="partner.cso_type",
-            assessor='-',
-            focal_points='-'
+            assessor="-",
+            focal_points="-",
         )
 
 
@@ -88,5 +87,5 @@ class PseaAnswer(EtoolsDataMartModel):
             indicator_active="indicator.active",
             indicator_rating_instructions="indicator.rating_instructions",
             rating_label="rating.label",
-            rating_active="rating.active"
+            rating_active="rating.active",
         )

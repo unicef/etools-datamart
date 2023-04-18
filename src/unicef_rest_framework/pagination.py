@@ -15,14 +15,18 @@ from unicef_rest_framework.exceptions import InvalidPaginationError
 
 
 class PageFilter(BaseFilterBackend):
-    template = 'rest_framework/filters/paging.html'
-    pagination_param = 'page_size'
+    template = "rest_framework/filters/paging.html"
+    pagination_param = "page_size"
 
     def get_form(self, request, view):
-        Frm = type("SerializerForm", (forms.Form,),
-                   {view.pagination_class.page_size_query_param: forms.IntegerField(label="Page Size", required=False)})
-        return Frm(request.GET,
-                   initial={view.pagination_class.page_size_query_param: self.get_pagination(request, view)})
+        Frm = type(
+            "SerializerForm",
+            (forms.Form,),
+            {view.pagination_class.page_size_query_param: forms.IntegerField(label="Page Size", required=False)},
+        )
+        return Frm(
+            request.GET, initial={view.pagination_class.page_size_query_param: self.get_pagination(request, view)}
+        )
 
     def filter_queryset(self, request, queryset, view):
         return queryset
@@ -33,11 +37,12 @@ class PageFilter(BaseFilterBackend):
 
     def get_template_context(self, request, queryset, view):
         current = self.get_pagination(request, view)
-        context = {'request': request,
-                   'current': current,
-                   'form': self.get_form(request, view),
-                   'param': view.pagination_class.page_size_query_param,
-                   }
+        context = {
+            "request": request,
+            "current": current,
+            "form": self.get_form(request, view),
+            "param": view.pagination_class.page_size_query_param,
+        }
         return context
 
     def to_html(self, request, queryset, view):
@@ -51,7 +56,7 @@ class PageFilter(BaseFilterBackend):
 
 
 class CurrentPageField(serializers.Field):
-    page_field = 'page'
+    page_field = "page"
 
     def to_native(self, value):
         page = value.number
@@ -59,7 +64,7 @@ class CurrentPageField(serializers.Field):
 
 
 class NumPagesField(serializers.Field):
-    page_field = 'page'
+    page_field = "page"
 
     def to_native(self, value):
         pages = value.paginator.num_pages
@@ -68,48 +73,57 @@ class NumPagesField(serializers.Field):
 
 class APIPagination(PageNumberPagination):
     page_size = 20
-    page_query_param = 'page'
+    page_query_param = "page"
 
     # Client can control the page size using this query parameter.
     # Default is 'None'. Set to eg 'page_size' to enable usage.
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
 
     # Set to an integer to limit the maximum page size the client may request.
     # Only relevant if 'page_size_query_param' has also been set.
     max_page_size = 1000
     allow_single_page_response = settings.API_PAGINATION_SINGLE_PAGE_ENABLED
     disable_pagination_key = settings.API_PAGINATION_OVERRIDE_KEY
-    last_page_strings = ('last',)
+    last_page_strings = ("last",)
 
     def get_paginated_response(self, data):
-        if hasattr(self, 'page'):
-            return Response(OrderedDict([
-                ('count', self.page.paginator.count),
-                ('next', self.get_next_link()),
-                ('current_page', self.page.number),
-                ('total_pages', self.page.paginator.num_pages),
-                ('previous', self.get_previous_link()),
-                ('results', data)
-            ]))
+        if hasattr(self, "page"):
+            return Response(
+                OrderedDict(
+                    [
+                        ("count", self.page.paginator.count),
+                        ("next", self.get_next_link()),
+                        ("current_page", self.page.number),
+                        ("total_pages", self.page.paginator.num_pages),
+                        ("previous", self.get_previous_link()),
+                        ("results", data),
+                    ]
+                )
+            )
         else:
-            return Response(OrderedDict([
-                ('count', len(data)),
-                ('next', 'N/A'),
-                ('current_page', 1),
-                ('total_pages', 1),
-                ('previous', 'N/A'),
-                ('results', data)
-            ]))
+            return Response(
+                OrderedDict(
+                    [
+                        ("count", len(data)),
+                        ("next", "N/A"),
+                        ("current_page", 1),
+                        ("total_pages", 1),
+                        ("previous", "N/A"),
+                        ("results", data),
+                    ]
+                )
+            )
 
     def get_page_size(self, request):
         try:
             desired = request.query_params[self.page_size_query_param]
             if desired == "-1":
-                if self.allow_single_page_response or \
-                        (request.META.get('HTTP_PAGINATION_KEY', None) == self.disable_pagination_key):
+                if self.allow_single_page_response or (
+                    request.META.get("HTTP_PAGINATION_KEY", None) == self.disable_pagination_key
+                ):
                     return sys.maxsize
                 else:
-                    raise InvalidPaginationError('Pagination cannot be disabled')
+                    raise InvalidPaginationError("Pagination cannot be disabled")
         except KeyError:
             pass
         return super().get_page_size(request)
@@ -137,8 +151,8 @@ class APIPagination(PageNumberPagination):
         return replace_query_param(url, self.page_query_param, page_number)
 
 
-def paginator(ordering='-created'):
-    return type("TenantPaginator", (CursorPagination,), {'ordering': ordering})
+def paginator(ordering="-created"):
+    return type("TenantPaginator", (CursorPagination,), {"ordering": ordering})
 
 
 CreationPaginator = paginator()

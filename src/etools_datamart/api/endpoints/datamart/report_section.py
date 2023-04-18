@@ -12,5 +12,8 @@ class SectionSerializer(DataMartSerializer):
 class SectionViewSet(common.DataMartViewSet):
     serializer_class = SectionSerializer
     queryset = models.Section.objects.all()
-    filter_fields = ('name', 'alternate_name', 'dashboard')
-    ordering_fields = ("name", "alternate_name",)
+    filter_fields = ("name", "alternate_name", "dashboard")
+    ordering_fields = (
+        "name",
+        "alternate_name",
+    )

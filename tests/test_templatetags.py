@@ -11,6 +11,8 @@ def test_server_ip():
     assert server_ip({"request": request}) == "localhost"
 
 
-def test_subscription_select(admin_user, ):
+def test_subscription_select(
+    admin_user,
+):
     ct = ContentType.objects.first()
-    assert subscription_select({'user': admin_user}, Mock(content_type=ct))
+    assert subscription_select({"user": admin_user}, Mock(content_type=ct))

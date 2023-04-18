@@ -69,8 +69,8 @@ def get_related_module(self):
 
 
 def get_reference_number(self, country):
-    return '{}/{}/{}/APD'.format(
-        country.country_short_code or '',
+    return "{}/{}/{}/APD".format(
+        country.country_short_code or "",
         self.created.year,
         self.id,
     )

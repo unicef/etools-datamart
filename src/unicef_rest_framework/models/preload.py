@@ -26,11 +26,11 @@ class Client(APIClient):
 
     def _base_environ(self, **request):
         env = super()._base_environ(**request)
-        env['HTTP_USER_AGENT'] = 'Datamart/%s' % etools_datamart.VERSION
-        env['REMOTE_ADDR'] = '127.0.0.1'
-        env['SERVER_NAME'] = 'localhost'
-        env['SERVER_PORT'] = '80'
-        env['HTTP_PAGINATION_KEY'] = settings.API_PAGINATION_OVERRIDE_KEY
+        env["HTTP_USER_AGENT"] = "Datamart/%s" % etools_datamart.VERSION
+        env["REMOTE_ADDR"] = "127.0.0.1"
+        env["SERVER_NAME"] = "localhost"
+        env["SERVER_PORT"] = "80"
+        env["HTTP_PAGINATION_KEY"] = settings.API_PAGINATION_OVERRIDE_KEY
         return env
 
     def request(self, **kwargs):
@@ -48,12 +48,12 @@ class AbstractPreload(models.Model):
 
     status_code = models.IntegerField(blank=True, null=True)
     response_length = models.IntegerField(blank=True, null=True)
-    response_ms = models.PositiveIntegerField('ms', default=0, blank=True, null=True)
+    response_ms = models.PositiveIntegerField("ms", default=0, blank=True, null=True)
     etag = models.CharField(max_length=300, blank=True, null=True)
 
     class Meta:
-        unique_together = ('url', 'as_user', 'params')
-        ordering = ('url',)
+        unique_together = ("url", "as_user", "params")
+        ordering = ("url",)
         abstract = True
 
     def clean(self):
@@ -61,8 +61,7 @@ class AbstractPreload(models.Model):
         self.check_url(True)
 
     def get_full_url(self):
-        return "%s%s?%s" % (settings.ABSOLUTE_BASE_URL, self.url,
-                            urlencode(self.params))
+        return "%s%s?%s" % (settings.ABSOLUTE_BASE_URL, self.url, urlencode(self.params))
 
     def check_url(self, validate=True):
         try:
@@ -71,11 +70,10 @@ class AbstractPreload(models.Model):
             if self.as_user:
                 client.force_authenticate(self.as_user)
             params = dict(self.params)
-            params['page_size'] = 10
+            params["page_size"] = 10
             res = client.head(target, data=params)
             if res.status_code != 200:
-                raise Exception('Invalid Response: %s on %s' % (res.status_code,
-                                                                self.get_full_url()))
+                raise Exception("Invalid Response: %s on %s" % (res.status_code, self.get_full_url()))
         except Exception as e:
             if validate:
                 raise ValidationError(str(e))
@@ -83,7 +81,7 @@ class AbstractPreload(models.Model):
                 return False
 
     def get_client(self, **kwargs):
-        return Client(HTTP_IF_NONE_MATCH=self.etag or 'Not-Set', **kwargs)
+        return Client(HTTP_IF_NONE_MATCH=self.etag or "Not-Set", **kwargs)
 
     def run(self, *, target=None, params=None, pre_save=None):
         try:
@@ -97,7 +95,7 @@ class AbstractPreload(models.Model):
             self.status_code = response.status_code
             if self.status_code == 200:
                 self.response_length = len(response.content)
-                self.etag = response['ETag']
+                self.etag = response["ETag"]
                 response_timedelta = timezone.now() - self.last_run
                 self.response_ms = int(response_timedelta.total_seconds() * 1000)
             if pre_save:

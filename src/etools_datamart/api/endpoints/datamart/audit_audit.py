@@ -17,7 +17,10 @@ class AuditSerializer(DataMartSerializer):
 
     class Meta(DataMartSerializer.Meta):
         model = models.Audit
-        exclude = ('seen', 'source_id',)
+        exclude = (
+            "seen",
+            "source_id",
+        )
 
     def get_url(self, obj):
         try:
@@ -30,25 +33,24 @@ class AuditSerializer(DataMartSerializer):
 
     def get_partner_name(self, obj):
         try:
-            return obj.partner['name']
+            return obj.partner["name"]
         except KeyError:
-            return 'N/A'
+            return "N/A"
 
 
 class AuditFilterForm(forms.Form):
     date_of_final_report = DateRangePickerField(
-        label='Date of Final Report',
+        label="Date of Final Report",
         required=False,
     )
+
 
 class AuditViewSet(DataMartViewSet):
     querystringfilter_form_base_class = AuditFilterForm
 
     serializer_class = AuditSerializer
     queryset = models.Audit.objects.all()
-    filter_fields = (
-        'date_of_final_report',
-    )
+    filter_fields = ("date_of_final_report",)
 
     def get_querystringfilter_form(self, request, filter):
         return AuditFilterForm(request.GET, filter.form_prefix)

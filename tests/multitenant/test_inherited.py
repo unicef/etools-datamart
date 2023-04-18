@@ -9,14 +9,13 @@ from etools_datamart.apps.sources.etools.models import (
     AuditSpotcheck,
 )
 
-conn = connections['etools']
+conn = connections["etools"]
 
 
-@pytest.mark.parametrize("model", [AuditSpotcheck, AuditAudit,
-                                   AuditMicroassessment, AuditSpecialaudit])
+@pytest.mark.parametrize("model", [AuditSpotcheck, AuditAudit, AuditMicroassessment, AuditSpecialaudit])
 def test_spotcheck(db, model):
     # lebanon, bolivia, kenya
-    conn.set_schemas(['bolivia'])
+    conn.set_schemas(["bolivia"])
     assert model.objects.all().count() >= 0
     instance = model.objects.first()
     if instance:

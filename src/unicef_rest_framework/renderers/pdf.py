@@ -35,30 +35,31 @@ def link_callback(uri, rel):
 
     # make sure that file exists
     if not os.path.isfile(path):
-        raise Exception(
-            'media URI must start with %s or %s' % (sUrl, mUrl)
-        )
+        raise Exception("media URI must start with %s or %s" % (sUrl, mUrl))
     return path
 
 
 class PDFRenderer(ContentDispositionMixin, HTMLRenderer):
-    media_type = 'application/pdf'
-    format = 'pdf'
-    charset = 'utf-8'
-    render_style = 'text'
+    media_type = "application/pdf"
+    format = "pdf"
+    charset = "utf-8"
+    render_style = "text"
 
     def get_template(self, meta):
-        return loader.select_template([
-            f'renderers/pdf/{meta.app_label}/{meta.model_name}.html',
-            f'renderers/pdf/{meta.app_label}/pdf.html',
-            'renderers/pdf.html'])
+        return loader.select_template(
+            [
+                f"renderers/pdf/{meta.app_label}/{meta.model_name}.html",
+                f"renderers/pdf/{meta.app_label}/pdf.html",
+                "renderers/pdf.html",
+            ]
+        )
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        response = renderer_context['response']
+        response = renderer_context["response"]
         self.process_response(renderer_context)
 
         if response.status_code != 200:
-            return ''
+            return ""
         try:
             html = super().render(data, accepted_media_type, renderer_context)
 
@@ -67,9 +68,9 @@ class PDFRenderer(ContentDispositionMixin, HTMLRenderer):
             pisaStatus = pisa.CreatePDF(html, dest=buffer, link_callback=link_callback)
             # if error then show some funy view
             if pisaStatus.err:
-                raise Exception('We had some errors <pre>' + html + '</pre>')
+                raise Exception("We had some errors <pre>" + html + "</pre>")
             buffer.seek(0)
             return buffer.read()
         except Exception as e:
             logger.exception(e)
-            raise Exception('Error processing request') from e
+            raise Exception("Error processing request") from e

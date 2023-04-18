@@ -48,21 +48,21 @@ class MyRecorder(Recorder):
 
 
 def pytest_generate_tests(metafunc, *args):
-    if 'viewset' in metafunc.fixturenames:
+    if "viewset" in metafunc.fixturenames:
         params = []
         ids = []
         for prefix, viewset, basenametry in router.registry:
-            if prefix.startswith('datamart/rapidpro/'):
+            if prefix.startswith("datamart/rapidpro/"):
                 pass
-            elif prefix.startswith('datamart/'):
+            elif prefix.startswith("datamart/"):
                 sers = viewset.serializers_fieldsets.keys()
                 if sers:
                     for ser in sers:
                         params.append([viewset, ser])
-                        ids.append(f'{viewset.__name__}-{ser}')
+                        ids.append(f"{viewset.__name__}-{ser}")
                 else:
-                    params.append([viewset, 'std'])
-                    ids.append(f'{viewset.__name__}-std')
+                    params.append([viewset, "std"])
+                    ids.append(f"{viewset.__name__}-std")
                 # params.append(viewset)
                 # ids.append(f'{viewset.__name__}')
         metafunc.parametrize("viewset,serializer", params, ids=ids)
@@ -73,34 +73,32 @@ def url(request):
 
 
 def aaaa(seed, request):
-    viewset = request.getfixturevalue('viewset')
-    url = viewset.get_service().endpoint.strip('.').replace('/', '_')
-    return os.path.join(seed, url) + '.fixture.json'
+    viewset = request.getfixturevalue("viewset")
+    url = viewset.get_service().endpoint.strip(".").replace("/", "_")
+    return os.path.join(seed, url) + ".fixture.json"
 
 
 @frozenfixture(fixture_name=aaaa)
 def data(db, request):
     # TIPS: database access is forbidden in pytest_generate_tests
-    viewset = request.getfixturevalue('viewset')
+    viewset = request.getfixturevalue("viewset")
     factory = factories_registry[viewset.serializer_class.Meta.model]
-    data = (factory(schema_name='bolivia'),
-            factory(schema_name='chad'),
-            factory(schema_name='lebanon'))
+    data = (factory(schema_name="bolivia"), factory(schema_name="chad"), factory(schema_name="lebanon"))
     return data
 
 
 @contract(recorder_class=MyRecorder)
 def test_list(request, viewset, serializer, data):
     url = f"{viewset.get_service().endpoint}"
-    return [url, {'-serializer': serializer}]
+    return [url, {"-serializer": serializer}]
 
 
 @frozenfixture(fixture_name=aaaa)
 def record(db, request):
     # TIPS: database access is forbidden in pytest_generate_tests
-    viewset = request.getfixturevalue('viewset')
+    viewset = request.getfixturevalue("viewset")
     factory = factories_registry[viewset.serializer_class.Meta.model]
-    return factory(schema_name='bolivia')
+    return factory(schema_name="bolivia")
 
 
 @contract(recorder_class=MyRecorder)

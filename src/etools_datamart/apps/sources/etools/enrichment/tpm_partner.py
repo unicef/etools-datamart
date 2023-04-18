@@ -6,6 +6,7 @@ from etools_datamart.apps.sources.etools.models import (
     UsersCountry,
 )
 
-models.ManyToManyField(UsersCountry,
-                       through=TpmpartnersTpmpartnerCountries,
-                       ).contribute_to_class(TpmpartnersTpmpartner, 'countries')
+models.ManyToManyField(
+    UsersCountry,
+    through=TpmpartnersTpmpartnerCountries,
+).contribute_to_class(TpmpartnersTpmpartner, "countries")

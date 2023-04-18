@@ -12,10 +12,9 @@ one_table = [
 ]
 
 multi_table = [
-    'SELECT f1,f2 FROM t1 INNER JOIN t2 ON f1=f2 ORDER BY f1',
+    "SELECT f1,f2 FROM t1 INNER JOIN t2 ON f1=f2 ORDER BY f1",
     'SELECT "f1","f2" FROM "t1" INNER JOIN "t2" ON "f1"="f2" ORDER BY "f1" ASC',
     'SELECT "s1"."f1","f2" FROM "t1" INNER JOIN "t2" ON "f1"="f2" ORDER BY "f1" ASC',
-
     'SELECT "s1"."t1"."f1", "t2"."f2" FROM "t1" INNER JOIN "t2" ON "f1"="f2" ORDER BY "t1"."f1" ASC',
     'SELECT "s1"."t1"."f1", "t2"."f2" FROM "t1" RIGHT JOIN "t2" ON "f1"="f2" ORDER BY "t1"."f1" ASC',
     'SELECT "s1"."t1"."f1", "t2"."f2" FROM "t1" LEFT JOIN "t2" ON "f1"="f2" ORDER BY "t1"."f1" ASC',
@@ -24,16 +23,14 @@ multi_table = [
 ]
 
 ordered_table = [
-    'SELECT DISTINCT * FROM t1 ORDER BY f1,f2',
-    'SELECT * FROM t1 ORDER BY f1,f2 DESC',
+    "SELECT DISTINCT * FROM t1 ORDER BY f1,f2",
+    "SELECT * FROM t1 ORDER BY f1,f2 DESC",
 ]
 
-filtered_table = [
-
-]
+filtered_table = []
 
 
-@pytest.mark.parametrize('sql', one_table)
+@pytest.mark.parametrize("sql", one_table)
 def test_single_table(sql):
     p = Parser(sql)
     # assert p.unknown == []
@@ -51,11 +48,11 @@ def test_star():
     assert p.tables == ['"t1"']
 
 
-@pytest.mark.parametrize('sql', ordered_table)
+@pytest.mark.parametrize("sql", ordered_table)
 def test_order(sql):
     p = Parser(sql)
     p.parse()
-    assert p.parts['from'] == ' FROM t1'
+    assert p.parts["from"] == " FROM t1"
 
 
 def test_where1():
@@ -70,7 +67,7 @@ def test_where2():
     assert p.where == "WHERE f1=%s"
 
 
-@pytest.mark.parametrize('sql', ordered_table)
+@pytest.mark.parametrize("sql", ordered_table)
 def test_split(sql):
     p = Parser(sql)
     assert p.join(p.split(sql)) == sql
@@ -84,23 +81,27 @@ def test_add_schema1():
 
 def test_count_multitenant():
     p = Parser('SELECT COUNT(*) FROM "t1"')
-    assert p.with_schemas("b",
-                          "c") == 'SELECT COUNT(*) FROM ' \
-                                  '(SELECT id, \'b\' AS __schema FROM "b"."t1" ' \
-                                  'UNION ALL ' \
-                                  'SELECT id, \'c\' AS __schema FROM "c"."t1") as __count'
+    assert (
+        p.with_schemas("b", "c") == "SELECT COUNT(*) FROM "
+        '(SELECT id, \'b\' AS __schema FROM "b"."t1" '
+        "UNION ALL "
+        'SELECT id, \'c\' AS __schema FROM "c"."t1") as __count'
+    )
 
 
 def test_select_multitenant():
     p = Parser('SELECT * FROM "t1"')
-    assert p.with_schemas("b",
-                          "c") == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT *, \'c\' AS __schema FROM "c"."t1") as __query'
+    assert (
+        p.with_schemas("b", "c")
+        == 'SELECT * FROM (SELECT *, \'b\' AS __schema FROM "b"."t1" UNION ALL SELECT *, \'c\' AS __schema FROM "c"."t1") as __query'
+    )
 
 
 def test_select_with_order_multitenant():
     p = Parser('SELECT * FROM "t1" ORDER BY "f1"')
-    assert p.with_schemas("b",
-                          "c") == 'SELECT * FROM ' \
-                                  '(SELECT *, \'b\' AS __schema FROM "b"."t1" ' \
-                                  'UNION ALL ' \
-                                  'SELECT *, \'c\' AS __schema FROM "c"."t1") as __query ORDER BY f1'
+    assert (
+        p.with_schemas("b", "c") == "SELECT * FROM "
+        '(SELECT *, \'b\' AS __schema FROM "b"."t1" '
+        "UNION ALL "
+        'SELECT *, \'c\' AS __schema FROM "c"."t1") as __query ORDER BY f1'
+    )

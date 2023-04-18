@@ -14,15 +14,17 @@ class UserStatsSerializer(DataMartSerializer):
 
     class Meta(DataMartSerializer.Meta):
         model = models.UserStats
-        read_only = ['last_modify_date', ]
+        read_only = [
+            "last_modify_date",
+        ]
 
     def get_month(self, obj):
-        return datetime.strftime(obj.month._date, '%b %Y')
+        return datetime.strftime(obj.month._date, "%b %Y")
 
 
 class UserStatsViewSet(common.DataMartViewSet):
     serializer_class = UserStatsSerializer
     filter_backends = [MonthFilterBackend] + common.DataMartViewSet.filter_backends
     queryset = models.UserStats.objects.all()
-    filter_fields = ('last_modify_date', )
+    filter_fields = ("last_modify_date",)
     serializers_fieldsets = {"std": None}

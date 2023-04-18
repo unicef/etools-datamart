@@ -4,10 +4,11 @@ from etools_datamart.api.urls import router
 
 
 def pytest_generate_tests(metafunc):
-    if 'url' in metafunc.fixturenames:
-        urls = filter(lambda url: 'system/' in url,
-                      [reverse("api:%s" % url.name, args=['latest'])
-                       for url in router.urls if url.name.endswith('-list')])
+    if "url" in metafunc.fixturenames:
+        urls = filter(
+            lambda url: "system/" in url,
+            [reverse("api:%s" % url.name, args=["latest"]) for url in router.urls if url.name.endswith("-list")],
+        )
         metafunc.parametrize("url", urls)
 
 

@@ -17,7 +17,10 @@ class MicroAssessmentSerializer(DataMartSerializer):
 
     class Meta(DataMartSerializer.Meta):
         model = models.MicroAssessment
-        exclude = ('seen', 'source_id',)
+        exclude = (
+            "seen",
+            "source_id",
+        )
 
     def get_url(self, obj):
         try:
@@ -30,20 +33,21 @@ class MicroAssessmentSerializer(DataMartSerializer):
 
     def get_partner_name(self, obj):
         try:
-            return obj.partner['name']
+            return obj.partner["name"]
         except KeyError:
-            return 'N/A'
+            return "N/A"
 
 
 class MicroAssessmentFilterForm(forms.Form):
     date_of_field_visit = DateRangePickerField(
-        label='Date of Field Visit',
+        label="Date of Field Visit",
         required=False,
     )
     date_of_final_report = DateRangePickerField(
-        label='Date of Final Report',
+        label="Date of Final Report",
         required=False,
     )
+
 
 class MicroAssessmentViewSet(DataMartViewSet):
     querystringfilter_form_base_class = MicroAssessmentFilterForm
@@ -51,8 +55,8 @@ class MicroAssessmentViewSet(DataMartViewSet):
     serializer_class = MicroAssessmentSerializer
     queryset = models.MicroAssessment.objects.all()
     filter_fields = (
-        'date_of_field_visit',
-        'date_of_final_report',
+        "date_of_field_visit",
+        "date_of_final_report",
     )
 
     def get_querystringfilter_form(self, request, filter):

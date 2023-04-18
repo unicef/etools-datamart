@@ -12,8 +12,8 @@ class FundsReservationLoader(EtoolsLoader):
         if record.fund_reservation.intervention:
             try:
                 return Intervention.objects.get(
-                    schema_name=self.context['country'].schema_name,
-                    source_id=record.fund_reservation.intervention.pk)
+                    schema_name=self.context["country"].schema_name, source_id=record.fund_reservation.intervention.pk
+                )
             except Intervention.DoesNotExist:
                 pass
 
@@ -36,8 +36,7 @@ class FundsReservation(EtoolsDataMartModel):
     # modified = models.DateTimeField()
     actual_amt_local = models.DecimalField(max_digits=20, decimal_places=2)
     outstanding_amt_local = models.DecimalField(max_digits=20, decimal_places=2)
-    total_amt_local = models.DecimalField(max_digits=20, decimal_places=2,
-                                          blank=True, null=True)
+    total_amt_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     multi_curr_flag = models.BooleanField()
     completed_flag = models.BooleanField(default=None, blank=True, null=True)
     delegated = models.BooleanField(default=None, blank=True, null=True)
@@ -69,49 +68,46 @@ class FundsReservation(EtoolsDataMartModel):
     # internals
     source_id = models.IntegerField()
     source_intervention_id = models.IntegerField()
-    intervention = models.ForeignKey(Intervention,
-                                     models.SET_NULL,
-                                     related_name='funds', blank=True, null=True)
+    intervention = models.ForeignKey(Intervention, models.SET_NULL, related_name="funds", blank=True, null=True)
 
     loader = FundsReservationLoader()
 
     class Meta:
-        unique_together = (('schema_name', 'source_id'),)
+        unique_together = (("schema_name", "source_id"),)
         verbose_name = "Funds Reservation"
 
     class Options:
         depends = (Intervention,)
         source = FundsFundsreservationitem
-        queryset = lambda: FundsFundsreservationitem.objects.select_related('fund_reservation')
-        last_modify_field = 'modified'
+        queryset = lambda: FundsFundsreservationitem.objects.select_related("fund_reservation")
+        last_modify_field = "modified"
         # key = lambda loader, record: dict(country_name=loader.context['country'].name,
         #                                   schema_name=loader.context['country'].schema_name,
         #                                   fr_number=record.fund_reservation.fr_number)
 
         mapping = dict(
-            vendor_code='fund_reservation.vendor_code',
-            fr_number='fund_reservation.fr_number',
-            document_date='fund_reservation.document_date',
-            pd_ssfa_number='fund_reservation.number',
-            fr_type='fund_reservation.fr_type',
-            currency='fund_reservation.currency',
-
-            document_text='fund_reservation.document_text',
-            start_date='fund_reservation.start_date',
-            end_date='fund_reservation.end_date',
-            actual_amt='fund_reservation.actual_amt',
-            intervention_amt='fund_reservation.intervention_amt',
-            outstanding_amt='fund_reservation.outstanding_amt',
-            total_amt='fund_reservation.total_amt',
-            actual_amt_local='fund_reservation.actual_amt_local',
+            vendor_code="fund_reservation.vendor_code",
+            fr_number="fund_reservation.fr_number",
+            document_date="fund_reservation.document_date",
+            pd_ssfa_number="fund_reservation.number",
+            fr_type="fund_reservation.fr_type",
+            currency="fund_reservation.currency",
+            document_text="fund_reservation.document_text",
+            start_date="fund_reservation.start_date",
+            end_date="fund_reservation.end_date",
+            actual_amt="fund_reservation.actual_amt",
+            intervention_amt="fund_reservation.intervention_amt",
+            outstanding_amt="fund_reservation.outstanding_amt",
+            total_amt="fund_reservation.total_amt",
+            actual_amt_local="fund_reservation.actual_amt_local",
             total_amt_local="fund_reservation.total_amt_local",
-            outstanding_amt_local='fund_reservation.outstanding_amt_local',
-            multi_curr_flag='fund_reservation.multi_curr_flag',
-            completed_flag='fund_reservation.completed_flag',
+            outstanding_amt_local="fund_reservation.outstanding_amt_local",
+            multi_curr_flag="fund_reservation.multi_curr_flag",
+            completed_flag="fund_reservation.completed_flag",
             intervention_title="fund_reservation.intervention.title",
-            delegated='i',
-            source_id='id',
-            source_intervention_id='fund_reservation.id',
+            delegated="i",
+            source_id="id",
+            source_intervention_id="fund_reservation.id",
             wbs="wbs",
             fund="fund",
             pd_reference_number="fund_reservation.intervention.reference_number",

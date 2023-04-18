@@ -8,7 +8,6 @@ class LoaderException(Exception):
 
 
 class RequiredIsRunning(Exception):
-
     def __init__(self, req, *args: object) -> None:
         self.req = req
 
@@ -17,7 +16,6 @@ class RequiredIsRunning(Exception):
 
 
 class RequiredIsMissing(Exception):
-
     def __init__(self, req, *args: object) -> None:
         self.req = req
 

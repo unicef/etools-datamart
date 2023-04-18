@@ -24,11 +24,10 @@ def client(user):
     return client
 
 
-@pytest.mark.parametrize('flt', ['country_name=bolivia', 'country_name=bolivia,chad',
-                                 'country_name=BOL,0810'])
+@pytest.mark.parametrize("flt", ["country_name=bolivia", "country_name=bolivia,chad", "country_name=BOL,0810"])
 def test_filter_cache_country_arg(db, client, flt, monkeypatch):
     fake = MockCache()
-    monkeypatch.setattr('etools_datamart.api.filtering.cache', fake)
+    monkeypatch.setattr("etools_datamart.api.filtering.cache", fake)
     url = f"/api/latest/sources/etools/partners/assessment/?%s" % flt
     with user_allow_service(client.handler._force_user, EtoolsAssessmentViewSet):
         with user_allow_country(client.handler._force_user, ["bolivia", "chad"]):
@@ -59,9 +58,9 @@ def test_filter_cache_country_arg(db, client, flt, monkeypatch):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('user_type', [UserFactory, AdminFactory])
-@pytest.mark.parametrize('viewset', [PartnerViewSet, InterventionViewSet])
-@pytest.mark.parametrize('op', ['=', '!='])
+@pytest.mark.parametrize("user_type", [UserFactory, AdminFactory])
+@pytest.mark.parametrize("viewset", [PartnerViewSet, InterventionViewSet])
+@pytest.mark.parametrize("op", ["=", "!="])
 def test_filter_country_invalid(viewset, user_type, op):
     user = user_type()
     client = APIClient()
@@ -108,10 +107,11 @@ def test_filter_country_invalid(viewset, user_type, op):
 #
 #
 
-@pytest.mark.parametrize('ct', ['text/html', 'application/json'])
-@pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', '', '12-'])
+
+@pytest.mark.parametrize("ct", ["text/html", "application/json"])
+@pytest.mark.parametrize("flt", ["10", "oct", "10-2018", "current", "", "12-"])
 def test_filter_datamart_month(db, client, flt, ct):
-    FAMIndicatorFactory(month='2018-12')
+    FAMIndicatorFactory(month="2018-12")
     client.force_authenticate(AdminFactory())
 
     url = f"/api/latest/datamart/fam-indicators/?month=%s" % flt
@@ -120,8 +120,8 @@ def test_filter_datamart_month(db, client, flt, ct):
     # assert res.json()
 
 
-@pytest.mark.parametrize('ct', ['text/html', 'application/json'])
-@pytest.mark.parametrize('flt', ['2000-01-01'])
+@pytest.mark.parametrize("ct", ["text/html", "application/json"])
+@pytest.mark.parametrize("flt", ["2000-01-01"])
 def test_filter_datamart_fundsreservation(db, client, flt, ct):
     FundsReservationFactory()
     client.force_authenticate(AdminFactory())
@@ -130,6 +130,7 @@ def test_filter_datamart_fundsreservation(db, client, flt, ct):
     res = client.get(url, HTTP_ACCEPT=ct)
     assert res.status_code == 200
     # assert res.json()
+
 
 #
 # @pytest.mark.parametrize('flt', ['10', 'oct', '10-2018', 'current', '', '10-'])

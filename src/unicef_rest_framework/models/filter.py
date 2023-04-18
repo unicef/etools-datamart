@@ -44,16 +44,16 @@ class SystemFilterManager(models.Manager):
     def match(self, request, view):
         if request.user and request.user.is_authenticated:
             try:
-                return SystemFilter.objects.get(service=view.get_service(),
-                                                user=request.user)
+                return SystemFilter.objects.get(service=view.get_service(), user=request.user)
             except SystemFilter.DoesNotExist:
                 return None
 
 
 class SystemFilter(models.Model):
-    """ Store 'hardcoded' filters per user
+    """Store 'hardcoded' filters per user
     @see AutoFilterRule
     """
+
     application = models.ForeignKey(Application, models.CASCADE, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, blank=True, null=True)
     group = models.ForeignKey(Group, models.CASCADE, blank=True, null=True)
@@ -64,8 +64,7 @@ class SystemFilter(models.Model):
     objects = SystemFilterManager()
 
     class Meta:
-        unique_together = (('service', 'user'),
-                           ('service', 'group'))
+        unique_together = (("service", "user"), ("service", "group"))
 
     def __str__(self):
         return f"{self.user}/{self.service}"
@@ -103,13 +102,13 @@ class SystemFilter(models.Model):
 
 
 class SystemFilterFieldRule(models.Model):
-    filter = models.ForeignKey(SystemFilter, models.CASCADE, related_name='rules')
+    filter = models.ForeignKey(SystemFilter, models.CASCADE, related_name="rules")
     field = models.CharField(max_length=500)
     value = models.CharField(max_length=300, blank=True, null=True)
     override_field = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('filter', 'field')
+        unique_together = ("filter", "field")
 
     def __str__(self):
         return f"{self.filter}: {self.field}={self.value}"
@@ -121,4 +120,4 @@ class SystemFilterParam(models.Model):
     value = models.CharField(max_length=300, blank=True, null=True)
 
     class Meta:
-        unique_together = ('filter', 'param')
+        unique_together = ("filter", "param")

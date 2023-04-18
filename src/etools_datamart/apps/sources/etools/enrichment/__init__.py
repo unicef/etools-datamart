@@ -28,14 +28,15 @@ def apply():
         utils,
     )
 
-    app_models = apps.get_app_config('etools').get_models()
+    app_models = apps.get_app_config("etools").get_models()
     for model in app_models:
-        for attr in ['name', 'username']:
+        for attr in ["name", "username"]:
             if hasattr(model, attr):
-                setattr(model, '__str__', partialmethod(partial(utils.label, attr)))
+                setattr(model, "__str__", partialmethod(partial(utils.label, attr)))
                 break
 
     from etools_datamart.apps.sources.etools import models
+
     consts.enrich(models.ActionPointsActionpoint, consts.ActionPointConsts)
     consts.enrich(models.AuditEngagement, consts.AuditEngagementConsts)
     consts.enrich(models.PartnersPartnerorganization, consts.PartnerOrganizationConst)

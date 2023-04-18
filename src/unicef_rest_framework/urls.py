@@ -11,16 +11,14 @@ admin.autodiscover()
 
 router = APIRouter()
 
-app_name = 'urf'
+app_name = "urf"
 
 urlpatterns = (
-    path(r'api-token-auth/', obtain_jwt_token),
-    path(r'api-token-refresh/', refresh_jwt_token),
-    path(r'api-token-verify/', verify_jwt_token),
-
-    path(r'exports/', ExportList.as_view(), name='export-list'),
-    path(r'exports/<int:pk>/', ExportUpdate.as_view(), name='export-update'),
-    path(r'exports/book/', ExportCreate.as_view(), name='export-create'),
-    path(r'exports/fetch/<int:pk>/', ExportFetch.as_view(), name='export-fetch'),
-
+    path(r"api-token-auth/", obtain_jwt_token),
+    path(r"api-token-refresh/", refresh_jwt_token),
+    path(r"api-token-verify/", verify_jwt_token),
+    path(r"exports/", ExportList.as_view(), name="export-list"),
+    path(r"exports/<int:pk>/", ExportUpdate.as_view(), name="export-update"),
+    path(r"exports/book/", ExportCreate.as_view(), name="export-create"),
+    path(r"exports/fetch/<int:pk>/", ExportFetch.as_view(), name="export-fetch"),
 )
