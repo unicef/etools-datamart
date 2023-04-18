@@ -365,6 +365,9 @@ DATETIME_INPUT_FORMATS = [
     "%m/%d/%y %H:%M",  # '10/25/06 14:30'
     "%m/%d/%y",  # '10/25/06'
 ]
+# Load records for the past 2 years e.g. trip, travelactivities
+YEAR_DELTA = env('YEAR_DELTA', default=2)
+
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")

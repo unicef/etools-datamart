@@ -1,3 +1,6 @@
+import datetime
+
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import JSONField
@@ -175,8 +178,13 @@ class Trip(EtoolsDataMartModel):
             source_id=travel.id,
             source_activity_id=travel.activity.id,
         )
-        queryset = lambda: T2FTravelactivity.objects.select_related(
-            "result", "partner", "partnership", "primary_traveler"
+        queryset = lambda: T2FTravelactivity.objects.filter(
+            date__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA
+        ).select_related(
+            "result",
+            "partner",
+            "partnership",
+            "primary_traveler"
         ).prefetch_related("travels")
         mapping = dict(
             # cp_output="activity.result.name",

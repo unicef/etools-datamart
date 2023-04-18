@@ -13,7 +13,7 @@ from etools_datamart.apps.sources.etools.models import (
 
 class InterventionBudgetLoader(InterventionLoader):
     def get_queryset(self):
-        return PartnersInterventionbudget.objects
+        return PartnersInterventionbudget.objects.select_related("intervention")
 
     def process_country(self):
         for record in self.get_queryset().exclude(intervention__isnull=True):

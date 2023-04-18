@@ -1,3 +1,6 @@
+import datetime
+
+from django.conf import settings
 from django.db import models
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
@@ -7,6 +10,19 @@ from etools_datamart.apps.sources.etools.models import T2FTravelactivity
 
 
 class TravelActivityLoader(EtoolsLoader):
+    def get_queryset(self):
+        return self.config.source.objects.filter(
+            date__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA
+        ).select_related(
+            "partner",
+            "partnership",
+            "primary_traveler",
+            "result"
+        ).prefetch_related(
+            "travels",
+            "locations"
+        )
+
     def process_country(self):
         qs = self.filter_queryset(self.get_queryset())
         for record in qs.order_by("id", "-date"):
