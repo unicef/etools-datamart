@@ -153,10 +153,6 @@ INTERNAL_IPS = ["127.0.0.1", "localhost"]
 # to load the ernationalization machinery.
 USE_I18N = True
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale.
-USE_L10N = True
-
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
