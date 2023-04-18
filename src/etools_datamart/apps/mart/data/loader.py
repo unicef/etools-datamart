@@ -191,8 +191,7 @@ class EtoolsLoader(BaseLoader):
                     for requirement in self.config.depends:
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
-                        if requirement.loader.need_refresh(self):
-                            raise RequiredIsMissing(requirement)
+                        requirement.loader.check_refresh()
                 connection = connections["etools"]
                 if kwargs.get("countries"):
                     countries = kwargs["countries"]
@@ -360,22 +359,7 @@ class CommonSchemaLoader(EtoolsLoader):
                     for requirement in self.config.depends:
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
-                        if requirement.loader.need_refresh(self):
-                            # if not force_requirements:
-                            raise RequiredIsMissing(requirement)
-                            # else:
-                            # logger.info(f"Load required dataset {requirement}")
-                            # requirement.loader.task.apply_async(
-                            #     kwargs={"force_requirements": force_requirements,
-                            #             "run_type": RUN_AS_REQUIREMENT}
-                            # )
-                            # raise RequiredIsQueued(requirement)
-                            # logger.info(f"Load required dataset {requirement}")
-                            # requirement.loader.load(stdout=stdout,
-                            #                         force_requirements=force_requirements,
-                            #                         run_type=RUN_AS_REQUIREMENT)
-                        else:
-                            logger.info(f"Loader {requirement} is uptodate")
+                        requirement.loader.check_refresh()
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:

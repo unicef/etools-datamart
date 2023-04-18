@@ -2,7 +2,6 @@ import json
 import time
 from uuid import UUID
 
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.utils import timezone
@@ -274,16 +273,17 @@ class BaseLoader:
     def is_running(self):
         return self.etl_task.status == "RUNNING"
 
-    def need_refresh(self, other):
+    def check_refresh(self):
+        self.etl_task.refresh_from_db()
         if not self.etl_task.last_success or self.etl_task.status != "SUCCESS":
             logger.info("%s: Refresh needed due no successfully run" % self)
-            return True
+            raise RequiredIsMissing(self.model)
         if self.etl_task.last_success.date() < timezone.now().date():
             logger.info("%s: Refresh needed because last success too old" % self)
-            return True
-        return False
-
+            raise RequiredIsMissing(self.model)
+        logger.info(f"Loader {self} is uptodate")
     def is_record_changed(self, record, values):
+
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
             if not hasattr(other, field_name):

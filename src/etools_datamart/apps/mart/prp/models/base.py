@@ -99,10 +99,7 @@ class PrpBaseLoader(BaseLoader):
                     for requirement in self.config.depends:
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
-                        if requirement.loader.need_refresh(self):
-                            raise RequiredIsMissing(requirement)
-                        else:
-                            logger.info(f"Loader {requirement} is uptodate")
+                        requirement.loader.check_refresh()
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
