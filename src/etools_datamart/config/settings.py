@@ -432,7 +432,7 @@ CONSTANCE_CONFIG = {
     "DISABLE_SCHEMA_RESTRICTIONS": (env("DISABLE_SCHEMA_RESTRICTIONS"), "Disable per user schema authorizations"),
     "DISABLE_SERVICE_RESTRICTIONS": (env("DISABLE_SERVICE_RESTRICTIONS"), "Disable per user service authorizations"),
     "ETL_MAX_RETRIES": (5, "Max retries for dependent tasks", int),
-    "ETL_RETRY_COUNTDOWN": (180, "Retry counddown in seconds", int),
+    "ETL_RETRY_COUNTDOWN": (180, "Retry countdown in seconds", int),
     "ALLOW_EMAIL_PASSWORD": (False, "Allow send local password by email", bool),
 }
 
