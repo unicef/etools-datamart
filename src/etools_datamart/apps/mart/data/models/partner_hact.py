@@ -41,10 +41,11 @@ class PartnerHactLoader(EtoolsLoader):
             end_date__year=datetime.now().year,
             t2ftravelactivity__partner=record,
         )
-        tpmv = record.ActivitiesActivity_partner.filter(
-            TpmTpmactivity_activity_ptr__is_pv=True,
-            TpmTpmactivity_activity_ptr__tpm_visit__status=TpmTpmvisitConst.UNICEF_APPROVED,
-            date__year=datetime.now().year,
+        tpmv = TpmTpmactivity.objects.filter(
+            is_pv=True,
+            activity_ptr__partner=record,
+            tpm_visit__status=TpmTpmvisitConst.UNICEF_APPROVED,
+            activity_ptr__date__year=datetime.now().year,
         )
 
         # fmvgs = (
