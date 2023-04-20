@@ -11,16 +11,10 @@ from etools_datamart.apps.sources.etools.models import T2FTravelactivity
 
 class TravelActivityLoader(EtoolsLoader):
     def get_queryset(self):
-        return self.config.source.objects.filter(
-            date__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA
-        ).select_related(
-            "partner",
-            "partnership",
-            "primary_traveler",
-            "result"
-        ).prefetch_related(
-            "travels",
-            "locations"
+        return (
+            self.config.source.objects.filter(date__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA)
+            .select_related("partner", "partnership", "primary_traveler", "result")
+            .prefetch_related("travels", "locations")
         )
 
     def process_country(self):

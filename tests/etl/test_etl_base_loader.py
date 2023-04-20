@@ -22,9 +22,7 @@ def test_load_requiredismissing(loader1):
     # update_context() is mocked only to prevent not needed long-running test
     # because update_context() is invoked only if RequiredIsMissing is not raised
     # we do not want to wait the full load only to detect the error
-    with mock.patch(
-        "%s.update_context" % fqn(loader1), side_effect=Exception("missing to raise RequiredIsMissing")
-    ):
+    with mock.patch("%s.update_context" % fqn(loader1), side_effect=Exception("missing to raise RequiredIsMissing")):
         with pytest.raises(RequiredIsMissing):
             loader1.load(max_records=2, force_requirements=False)
 

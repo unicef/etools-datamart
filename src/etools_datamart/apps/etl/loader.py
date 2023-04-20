@@ -271,6 +271,7 @@ class BaseLoader:
         return self.etl_task.last_run
 
     def is_running(self):
+        self.etl_task.refresh_from_db()
         return self.etl_task.status == "RUNNING"
 
     def check_refresh(self):
@@ -282,8 +283,8 @@ class BaseLoader:
             logger.info("%s: Refresh needed because last success too old" % self)
             raise RequiredIsMissing(self.model)
         logger.info(f"Loader {self} is uptodate")
-    def is_record_changed(self, record, values):
 
+    def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
             if not hasattr(other, field_name):
