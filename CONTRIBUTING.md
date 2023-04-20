@@ -51,3 +51,13 @@ Initialize app
     $ pipenv shell
     $ ./manage.py init-setup --all
     $ ./manage.py runserver
+
+
+EtoolsDataMartModel Options
+==============
+
+    
+If any filtering of the queryset is requested (e.g. records for the past YEAR_DELTA years), 
+then make sure to set in Option class, the **sync_deleted_records** flag to False if you don't want the diff records to be deleted: 
+
+    sync_deleted_records = lambda a: False

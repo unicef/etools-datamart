@@ -1,5 +1,7 @@
+import datetime
 import logging
 
+from django.conf import settings
 from django.db import models
 from django.db.models import F, JSONField, Sum
 from django.utils.functional import cached_property
@@ -192,7 +194,9 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return PartnersIntervention.objects.select_related(
+        return PartnersIntervention.objects.filter(
+            end__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA
+        ).select_related(
             "agreement",
             "agreement__partner",
         ).prefetch_related(
@@ -396,6 +400,7 @@ class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartMode
         unique_together = ("schema_name", "intervention_id")
 
     class Options(InterventionAbstract.Options):
+        sync_deleted_records = lambda a: False
         mapping = dict(
             **InterventionAbstract.Options.mapping,
             locations_data="i",
