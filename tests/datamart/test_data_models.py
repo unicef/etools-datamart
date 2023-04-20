@@ -3,6 +3,8 @@ from unittest.mock import Mock
 from django.apps import apps
 from django.db import connections
 
+import pytest
+
 EXCLUDED_MODELS = [
     "GeoName",
 ]
@@ -39,6 +41,7 @@ def test_model_options(model):
     assert model().loader.config.source
 
 
+@pytest.mark.django_db()
 def test_model_sync_deleted_records(model):
     assert model().loader.config.sync_deleted_records(Mock()) in [True, False]
 

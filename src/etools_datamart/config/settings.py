@@ -434,6 +434,7 @@ CONSTANCE_CONFIG = {
     "ETL_MAX_RETRIES": (5, "Max retries for dependent tasks", int),
     "ETL_RETRY_COUNTDOWN": (180, "Retry countdown in seconds", int),
     "ALLOW_EMAIL_PASSWORD": (False, "Allow send local password by email", bool),
+    "SYNC_DELETED_RECORDS": (True, "Deletes the records that not in the loaded queryset", bool),
 }
 
 CELERY_ACCEPT_CONTENT = ["etljson", "application/json"]
