@@ -148,7 +148,7 @@ class BaseLoaderOptions:
         self.depends = ()
         self.filters = None
         self.last_modify_field = None
-        self.sync_deleted_records = lambda loader: True
+        self.sync_deleted_records = lambda a: config.SYNC_DELETED_RECORDS
         self.truncate = False
         self.fields_to_compare = None
         self.exclude_from_compare = ["seen"]
@@ -271,6 +271,7 @@ class BaseLoader:
         return self.etl_task.last_run
 
     def is_running(self):
+        self.etl_task.refresh_from_db()
         return self.etl_task.status == "RUNNING"
 
     def check_refresh(self):
@@ -282,8 +283,8 @@ class BaseLoader:
             logger.info("%s: Refresh needed because last success too old" % self)
             raise RequiredIsMissing(self.model)
         logger.info(f"Loader {self} is uptodate")
-    def is_record_changed(self, record, values):
 
+    def is_record_changed(self, record, values):
         other = type(record)(**values)
         for field_name in self.fields_to_compare:
             if not hasattr(other, field_name):

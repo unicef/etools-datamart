@@ -153,10 +153,6 @@ INTERNAL_IPS = ["127.0.0.1", "localhost"]
 # to load the ernationalization machinery.
 USE_I18N = True
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale.
-USE_L10N = True
-
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
@@ -365,6 +361,9 @@ DATETIME_INPUT_FORMATS = [
     "%m/%d/%y %H:%M",  # '10/25/06 14:30'
     "%m/%d/%y",  # '10/25/06'
 ]
+# Load records for the past 2 years e.g. trip, travelactivities
+YEAR_DELTA = env("YEAR_DELTA", default=2)
+
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
@@ -433,8 +432,9 @@ CONSTANCE_CONFIG = {
     "DISABLE_SCHEMA_RESTRICTIONS": (env("DISABLE_SCHEMA_RESTRICTIONS"), "Disable per user schema authorizations"),
     "DISABLE_SERVICE_RESTRICTIONS": (env("DISABLE_SERVICE_RESTRICTIONS"), "Disable per user service authorizations"),
     "ETL_MAX_RETRIES": (5, "Max retries for dependent tasks", int),
-    "ETL_RETRY_COUNTDOWN": (180, "Retry counddown in seconds", int),
+    "ETL_RETRY_COUNTDOWN": (180, "Retry countdown in seconds", int),
     "ALLOW_EMAIL_PASSWORD": (False, "Allow send local password by email", bool),
+    "SYNC_DELETED_RECORDS": (True, "Deletes the records that not in the loaded queryset", bool),
 }
 
 CELERY_ACCEPT_CONTENT = ["etljson", "application/json"]

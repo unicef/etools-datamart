@@ -90,6 +90,8 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
     def delta(self, obj):
         return precisedelta(timedelta(milliseconds=obj.response_ms)) if obj else "-"
 
+    delta.admin_order_field = "response_ms"
+
     @button()
     def check_file(self, request, pk):
         obj = self.model.objects.get(id=pk)
