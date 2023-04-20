@@ -148,7 +148,7 @@ class BaseLoaderOptions:
         self.depends = ()
         self.filters = None
         self.last_modify_field = None
-        self.sync_deleted_records = lambda loader: True
+        self.sync_deleted_records = lambda a: config.SYNC_DELETED_RECORDS
         self.truncate = False
         self.fields_to_compare = None
         self.exclude_from_compare = ["seen"]
