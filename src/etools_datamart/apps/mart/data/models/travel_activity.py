@@ -63,6 +63,7 @@ class TravelActivity(LocationMixin, EtoolsDataMartModel):
         # depends = (Travel, Location)
         source = T2FTravelactivity
         last_modify_field = None
+        sync_deleted_records = lambda a: False
         key = lambda loader, record: dict(
             country_name=loader.context["country"].name,
             schema_name=loader.context["country"].schema_name,

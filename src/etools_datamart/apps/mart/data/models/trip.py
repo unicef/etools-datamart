@@ -173,6 +173,7 @@ class Trip(EtoolsDataMartModel):
         ordering_fields = ("id",)
         ordering = "id"
         # last_modify_field = 'modified'
+        sync_deleted_records = lambda a: False
         key = lambda loader, travel: dict(
             schema_name=loader.context["country"].schema_name,
             source_id=travel.id,
