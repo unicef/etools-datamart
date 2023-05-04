@@ -8,29 +8,33 @@ from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorloc
 
 class IndicatorByLocationLoader(PrpBaseLoader):
     def get_queryset(self):
-        qs = IndicatorIndicatorlocationdata.objects.exclude(
-            Q(indicator_report__progress_report__isnull=True)
-            | Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"])
-        ).select_related(
+        qs = (
+            IndicatorIndicatorlocationdata.objects.exclude(
+                Q(indicator_report__progress_report__isnull=True)
+                | Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"])
+            )
+            .select_related(
                 "indicator_report",
                 "indicator_report__project",
                 "indicator_report__project__partner",
                 "indicator_report__progress_report__programme_document",
                 "indicator_report__progress_report__programme_document__workspace",
                 "indicator_report__reportable",
-        ).annotate(
-            country=F("indicator_report__progress_report__programme_document__workspace__title"),
-            location_source_id=F("location__id"),
-            location_name=F("location__name"),
-            location_pcode=F("location__p_code"),
-            location_level=F("location__admin_level"),
-            location_levelname=F("location__admin_level_name"),
-            title_of_indicator=F("indicator_report__title"),
-            reference_number=F("indicator_report__progress_report__programme_document__reference_number"),
-            project=F("indicator_report__project__title"),
-            partner=F("indicator_report__project__partner__title"),
-            indicator_baseline=F("indicator_report__reportable__baseline"),
-            indicator_target=F("indicator_report__reportable__target"),
+            )
+            .annotate(
+                country=F("indicator_report__progress_report__programme_document__workspace__title"),
+                location_source_id=F("location__id"),
+                location_name=F("location__name"),
+                location_pcode=F("location__p_code"),
+                location_level=F("location__admin_level"),
+                location_levelname=F("location__admin_level_name"),
+                title_of_indicator=F("indicator_report__title"),
+                reference_number=F("indicator_report__progress_report__programme_document__reference_number"),
+                project=F("indicator_report__project__title"),
+                partner=F("indicator_report__project__partner__title"),
+                indicator_baseline=F("indicator_report__reportable__baseline"),
+                indicator_target=F("indicator_report__reportable__target"),
+            )
         )
         return qs
 

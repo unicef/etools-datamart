@@ -8,25 +8,29 @@ from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorrep
 
 class IndicatorReportLoader(PrpBaseLoader):
     def get_queryset(self):
-        qs = IndicatorIndicatorreport.objects.exclude(
-            Q(progress_report__isnull=True) | Q(progress_report__status__in=["Due", "Ove", "Sen"])
-        ).select_related(
-            "progress_report",
-            "progress_report__programme_document__workspace",
-            "reportable",
-            "reportable__blueprint"
-        ).annotate(
-            business_area=F("progress_report__programme_document__workspace__business_area_code"),
-            intervention_reference_number=F("progress_report__programme_document__reference_number"),
-            partner=F("progress_report__programme_document__partner__title"),
-            performance_indicator=F("reportable__blueprint__title"),
-            report_type=F("progress_report__report_type"),
-            report_number=F("progress_report__report_number"),
-            target=F("reportable__target"),
-            baseline=F("reportable__baseline"),
-            unit=F("reportable__blueprint__unit"),
-            total_cumulative_progress=F("reportable__total"),
-            pd_output_progress_status=F("overall_status"),
+        qs = (
+            IndicatorIndicatorreport.objects.exclude(
+                Q(progress_report__isnull=True) | Q(progress_report__status__in=["Due", "Ove", "Sen"])
+            )
+            .select_related(
+                "progress_report",
+                "progress_report__programme_document__workspace",
+                "reportable",
+                "reportable__blueprint",
+            )
+            .annotate(
+                business_area=F("progress_report__programme_document__workspace__business_area_code"),
+                intervention_reference_number=F("progress_report__programme_document__reference_number"),
+                partner=F("progress_report__programme_document__partner__title"),
+                performance_indicator=F("reportable__blueprint__title"),
+                report_type=F("progress_report__report_type"),
+                report_number=F("progress_report__report_number"),
+                target=F("reportable__target"),
+                baseline=F("reportable__baseline"),
+                unit=F("reportable__blueprint__unit"),
+                total_cumulative_progress=F("reportable__total"),
+                pd_output_progress_status=F("overall_status"),
+            )
         )
         return qs
 
