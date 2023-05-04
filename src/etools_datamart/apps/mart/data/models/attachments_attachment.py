@@ -8,6 +8,14 @@ from .partner import Partner
 
 
 class AttachmentLoader(EtoolsLoader):
+    def get_queryset(self):
+        return self.config.source.objects.select_related(
+            "attachment",
+            "attachment__file_type",
+            "attachment__content_type",
+            "attachment__uploaded_by",
+        )
+
     def get_linked_to(self, record: AttachmentsAttachmentflat, values: dict, **kwargs):
         return None
 
@@ -48,12 +56,13 @@ class Attachment(EtoolsDataMartModel):
         mapping = dict(
             file="attachment.file",
             attachment_source_id="attachment.pk",
+            file_type="attachment.file_type.name",
             file_type_id="file_type.pk",
             content_type="attachment.content_type.model",
             hyperlink="attachment.hyperlink",
             object_id="attachment.object_id",
             code="attachment.code",
-            uploaded_by="uploaded_by.username",
+            uploaded_by="attachment.uploaded_by.username",
             # linked_to='-',
             # ct='-',
         )
