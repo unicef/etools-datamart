@@ -10,6 +10,11 @@ class IndicatorReportLoader(PrpBaseLoader):
     def get_queryset(self):
         qs = IndicatorIndicatorreport.objects.exclude(
             Q(progress_report__isnull=True) | Q(progress_report__status__in=["Due", "Ove", "Sen"])
+        ).select_related(
+            "progress_report",
+            "progress_report__programme_document__workspace",
+            "reportable",
+            "reportable__blueprint"
         ).annotate(
             business_area=F("progress_report__programme_document__workspace__business_area_code"),
             intervention_reference_number=F("progress_report__programme_document__reference_number"),

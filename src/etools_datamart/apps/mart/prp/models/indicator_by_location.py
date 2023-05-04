@@ -11,6 +11,13 @@ class IndicatorByLocationLoader(PrpBaseLoader):
         qs = IndicatorIndicatorlocationdata.objects.exclude(
             Q(indicator_report__progress_report__isnull=True)
             | Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"])
+        ).select_related(
+                "indicator_report",
+                "indicator_report__project",
+                "indicator_report__project__partner",
+                "indicator_report__progress_report__programme_document",
+                "indicator_report__progress_report__programme_document__workspace",
+                "indicator_report__reportable",
         ).annotate(
             country=F("indicator_report__progress_report__programme_document__workspace__title"),
             location_source_id=F("location__id"),
