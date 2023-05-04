@@ -205,6 +205,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+if DEBUG:
+    MIDDLEWARE.extend(
+        [
+            "debug_toolbar.middleware.DebugToolbarMiddleware",
+        ]
+    )
 
 AUTHENTICATION_BACKENDS = [
     # 'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
@@ -330,6 +336,13 @@ INSTALLED_APPS = [
     "django_extensions",
     "unicef_realm",
 ]
+if DEBUG:
+    INSTALLED_APPS.extend(
+        [
+            "debug_toolbar",
+        ]
+    )
+
 DATE_FORMAT = "%d %b %Y"
 DATE_INPUT_FORMATS = [
     "%Y-%m-%d",

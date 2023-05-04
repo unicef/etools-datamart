@@ -49,7 +49,7 @@ class PeriodicTaskPreloadForm(PeriodicTaskForm):
 
 
 class PeriodicTaskAdmin(ExtraButtonsMixin, admin.PeriodicTaskAdmin):
-    list_display = ("name", "enabled", "schedule", "one_off", "total_run_count")
+    list_display = ("name", "enabled", "schedule", "last_run_at", "one_off", "total_run_count")
     list_filter = (
         "enabled",
         "last_run_at",

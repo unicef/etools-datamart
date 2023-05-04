@@ -2,7 +2,6 @@ from django.apps import apps
 from django.core import checks
 from django.core.checks import Error
 
-# from etools_datamart.apps.data.loader import loadeables
 from etools_datamart.apps.etl.loader import loadeables
 
 
@@ -14,7 +13,7 @@ def check_loader(app_configs, **kwargs):
         cfg = model.loader.config
         # if cfg.queryset  is None and  cfg.source is None:
         #     errors.append(Error(
-        #         "LoaderOptions must set 'source' or 'queryset' attribunte",
+        #         "LoaderOptions must set 'source' or 'queryset' attribute",
         #         hint='',
         #         obj=model.loader,
         #         id='H001',

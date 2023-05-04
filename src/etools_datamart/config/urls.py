@@ -23,6 +23,13 @@ urlpatterns = [
     path(r"explorer/", include("explorer.urls")),
 ]
 
+if settings.DEBUG:
+    urlpatterns.extend(
+        [
+            path("__debug__/", include("debug_toolbar.urls")),
+        ]
+    )
+
 
 def trigger_error(request):
     division_by_zero = 1 / 0  # noqa
