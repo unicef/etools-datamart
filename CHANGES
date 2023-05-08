@@ -1,3 +1,16 @@
+3.56
+------
+* efficiency data report
+* django 4.2
+
+
+3.55.1
+------
+* sync deleted params
+* humanize export running time
+* refresh from db task object
+
+
 3.55.1
 ------
 * sync deleted params

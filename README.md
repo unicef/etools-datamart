@@ -44,3 +44,12 @@ scheduler 0 0,4,8,12,16,20 * * *
 
 - Preload: 1.00 am
 - Force Refresh: * 1 * * 0 (304 cached)
+
+### Geonode
+
+file https://datamart.unicef.io/api/latest/datamart/locations/?ordering=id&-serializer=ram
+
+needs location to have latitude and longitude
+from etools_datamart.apps.mart.data.tasks import *
+update_geonames()
+

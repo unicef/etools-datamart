@@ -8,47 +8,65 @@ from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorloc
 
 class DataReportLoader(PrpBaseLoader):
     def get_queryset(self):
-        qs = IndicatorIndicatorlocationdata.objects.exclude(
-            Q(indicator_report__progress_report__isnull=True)
-            | Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"])
-        ).annotate(
-            report_type=F("indicator_report__progress_report__report_type"),
-            country_name=F("indicator_report__progress_report__programme_document__workspace__title"),
-            business_area=F("indicator_report__progress_report__programme_document__workspace__business_area_code"),
-            partner_name=F("indicator_report__progress_report__programme_document__partner__title"),
-            partner_vendor_number=F("indicator_report__progress_report__programme_document__partner__vendor_number"),
-            etools_intervention_id=F("indicator_report__progress_report__programme_document__external_id"),
-            prp_intervention_id=F("indicator_report__progress_report__programme_document__id"),
-            intervention_reference_number=F("indicator_report__progress_report__programme_document__reference_number"),
-            submitted_by=F("indicator_report__progress_report__submitted_by__username"),
-            performance_indicator=F("indicator_report__reportable__blueprint__title"),
-            target=F("indicator_report__reportable__target"),
-            cluster_indicator=F("indicator_report__reportable__is_cluster_indicator"),
-            indicator_type=F("indicator_report__reportable__blueprint__display_type"),
-            high_frequency=F("indicator_report__reportable__is_unicef_hf_indicator"),
-            means_of_verification=F("indicator_report__reportable__means_of_verification"),
-            achievement_in_reporting_period=F("indicator_report__total"),
-            total_cumulative_progress=F("indicator_report__reportable__total"),
-            report_number=F("indicator_report__progress_report__report_number"),
-            due_date=F("indicator_report__progress_report__due_date"),
-            reporting_period_start_date=F("indicator_report__progress_report__start_date"),
-            reporting_period_end_date=F("indicator_report__progress_report__end_date"),
-            reporting_period_due_date=F("indicator_report__progress_report__due_date"),
-            report_submission_date=F("indicator_report__progress_report__submission_date"),
-            narrative=F("indicator_report__progress_report__narrative"),
-            report_status=F("indicator_report__report_status"),
-            pd_output_title=F("indicator_report__reportable__parent_indicator__blueprint__title"),
-            pd_output_progress_status=F("indicator_report__overall_status"),
-            pd_output_narrative_assessment=F("indicator_report__narrative_assessment"),
-            calculation_method_across_location=F(
-                "indicator_report__reportable__blueprint__calculation_formula_across_locations"
-            ),
-            calculation_method_across_reporting_periods=F(
-                "indicator_report__reportable__blueprint__calculation_formula_across_periods"
-            ),
-            current_location=F("location__name"),
-            p_code=F("location__p_code"),
-            admin_level=F("location__admin_level"),
+        qs = (
+            IndicatorIndicatorlocationdata.objects.exclude(
+                Q(indicator_report__progress_report__isnull=True)
+                | Q(indicator_report__progress_report__status__in=["Due", "Ove", "Sen"])
+            )
+            .select_related(
+                "indicator_report",
+                "indicator_report__progress_report",
+                "indicator_report__progress_report__programme_document",
+                "indicator_report__progress_report__programme_document__partner",
+                "indicator_report__progress_report__submitted_by",
+                "indicator_report__reportable",
+                "indicator_report__reportable__blueprint",
+                "indicator_report__reportable__parent_indicator",
+                "location",
+            )
+            .annotate(
+                report_type=F("indicator_report__progress_report__report_type"),
+                country_name=F("indicator_report__progress_report__programme_document__workspace__title"),
+                business_area=F("indicator_report__progress_report__programme_document__workspace__business_area_code"),
+                partner_name=F("indicator_report__progress_report__programme_document__partner__title"),
+                partner_vendor_number=F(
+                    "indicator_report__progress_report__programme_document__partner__vendor_number"
+                ),
+                etools_intervention_id=F("indicator_report__progress_report__programme_document__external_id"),
+                prp_intervention_id=F("indicator_report__progress_report__programme_document__id"),
+                intervention_reference_number=F(
+                    "indicator_report__progress_report__programme_document__reference_number"
+                ),
+                submitted_by=F("indicator_report__progress_report__submitted_by__username"),
+                performance_indicator=F("indicator_report__reportable__blueprint__title"),
+                target=F("indicator_report__reportable__target"),
+                cluster_indicator=F("indicator_report__reportable__is_cluster_indicator"),
+                indicator_type=F("indicator_report__reportable__blueprint__display_type"),
+                high_frequency=F("indicator_report__reportable__is_unicef_hf_indicator"),
+                means_of_verification=F("indicator_report__reportable__means_of_verification"),
+                achievement_in_reporting_period=F("indicator_report__total"),
+                total_cumulative_progress=F("indicator_report__reportable__total"),
+                report_number=F("indicator_report__progress_report__report_number"),
+                due_date=F("indicator_report__progress_report__due_date"),
+                reporting_period_start_date=F("indicator_report__progress_report__start_date"),
+                reporting_period_end_date=F("indicator_report__progress_report__end_date"),
+                reporting_period_due_date=F("indicator_report__progress_report__due_date"),
+                report_submission_date=F("indicator_report__progress_report__submission_date"),
+                narrative=F("indicator_report__progress_report__narrative"),
+                report_status=F("indicator_report__report_status"),
+                pd_output_title=F("indicator_report__reportable__parent_indicator__blueprint__title"),
+                pd_output_progress_status=F("indicator_report__overall_status"),
+                pd_output_narrative_assessment=F("indicator_report__narrative_assessment"),
+                calculation_method_across_location=F(
+                    "indicator_report__reportable__blueprint__calculation_formula_across_locations"
+                ),
+                calculation_method_across_reporting_periods=F(
+                    "indicator_report__reportable__blueprint__calculation_formula_across_periods"
+                ),
+                current_location=F("location__name"),
+                p_code=F("location__p_code"),
+                admin_level=F("location__admin_level"),
+            )
         )
         return qs
 
@@ -56,12 +74,18 @@ class DataReportLoader(PrpBaseLoader):
         values = super().get_values(record)
         ct = record.indicator_report.reportable.content_type
         if ct.model == "lowerleveloutput":
-            ll = UnicefLowerleveloutput.objects.get(id=record.indicator_report.reportable.object_id)
+            ll = UnicefLowerleveloutput.objects.select_related("cp_output", "cp_output__programme_document").get(
+                id=record.indicator_report.reportable.object_id
+            )
             values["pd_output_title"] = ll.title
             values["cp_output"] = ll.cp_output.title
             values["etools_cp_output_id"] = ll.cp_output.external_cp_output_id
             values["programme_document"] = ll.cp_output.programme_document.reference_number
-            pd2sections = ll.cp_output.programme_document.UnicefProgrammedocumentSections_programmedocument.all()
+            pd2sections = (
+                ll.cp_output.programme_document.UnicefProgrammedocumentSections_programmedocument.all().select_related(
+                    "section"
+                )
+            )
             values["section"] = ", ".join([pd2section.section.name for pd2section in pd2sections])
 
         return values
