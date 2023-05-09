@@ -19,10 +19,10 @@ class ReportsResultSerializer(EToolsSerializer):
         exclude = ()
 
 
-class AssessmentSerializer(EToolsSerializer):
-    class Meta:
-        model = models.PartnersAssessment
-        exclude = ()
+# class AssessmentSerializer(EToolsSerializer):
+#     class Meta:
+#         model = models.PartnersAssessment
+#         exclude = ()
 
 
 # class AgreementSerializer(EToolsSerializer):

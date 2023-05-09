@@ -1,10 +1,10 @@
 import pytest
+from _test_lib.test_utilities.factories import AssessmentFactory
 from rest_framework.reverse import reverse
 
-from etools_datamart.api.endpoints import EtoolsAssessmentViewSet
+from etools_datamart.api.endpoints import PartnerAssessmentViewSet
 from etools_datamart.api.urls import router
 from etools_datamart.apps.multitenant.postgresql.utils import current_schema
-from etools_datamart.apps.sources.etools.models import PartnersAssessment
 
 
 def pytest_generate_tests(metafunc):
@@ -37,7 +37,7 @@ def test_list(client, url, format, schema):
 
 
 def test_list_with_no_schema_search_all_schemas(client):
-    url = reverse("api:partnersassessment-list", args=["latest"])
+    url = reverse("api:assessment-list", args=["latest"])
     res = client.get(url)
     assert res.status_code == 200, res.content
 
@@ -50,25 +50,21 @@ def test_retrieve(client, url, format):
     assert res.json()
 
 
-def test_retrieve_requires_only_one_schema(client):
-    url = reverse("api:partnersassessment-detail", args=["latest", "_lastest_"])
-    url = f"{url}?country_name=bolivia,chad"
+def test_retrieve_multiple_schemas(client):
+    schemas = ["bolivia", "chad"]
+    url = reverse("api:assessment-list", args=["latest"])
+    url = f"{url}?country_name={','.join(schemas)}"
+    print(url)
+    for schema_name in schemas:
+        AssessmentFactory(schema_name=schema_name, country_name=schema_name.capitalize())
     res = client.get(url)
-    assert res.status_code == 400, res.content
-    assert res.json()["error"] == "only one country is allowed"
-
-
-def test_retrieve_requires_one_schema(client):
-    url = reverse("api:partnersassessment-detail", args=["latest", "_lastest_"])
-    res = client.get(url)
-    assert res.status_code == 400
-    assert res.json()["error"] == "country_name parameter is mandatory"
+    assert res.status_code == 200, res.content
 
 
 def test_retrieve_id(client):
-    url = EtoolsAssessmentViewSet.get_service().endpoint
+    url = PartnerAssessmentViewSet.get_service().endpoint
     with current_schema("bolivia"):
-        target = PartnersAssessment.objects.first()
+        target = AssessmentFactory(schema_name="bolivia", country_name="Bolivia")
     res = client.get(f"{url}{target.pk}/?country_name=bolivia")
     assert res.status_code == 200, res
     assert res.json()

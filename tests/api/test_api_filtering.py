@@ -4,7 +4,7 @@ from test_utilities.factories import AdminFactory, FAMIndicatorFactory, FundsRes
 
 from unicef_rest_framework.test_utils import user_allow_country, user_allow_service
 
-from etools_datamart.api.endpoints import EtoolsAssessmentViewSet, InterventionViewSet, PartnerViewSet
+from etools_datamart.api.endpoints import InterventionViewSet, PartnerAssessmentViewSet, PartnerViewSet
 
 
 class MockCache:
@@ -28,8 +28,8 @@ def client(user):
 def test_filter_cache_country_arg(db, client, flt, monkeypatch):
     fake = MockCache()
     monkeypatch.setattr("etools_datamart.api.filtering.cache", fake)
-    url = f"/api/latest/sources/etools/partners/assessment/?%s" % flt
-    with user_allow_service(client.handler._force_user, EtoolsAssessmentViewSet):
+    url = f"/api/latest/datamart/partners/assessment/?%s" % flt
+    with user_allow_service(client.handler._force_user, PartnerAssessmentViewSet):
         with user_allow_country(client.handler._force_user, ["bolivia", "chad"]):
             client.get(url)
             res = client.get(url)

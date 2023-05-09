@@ -9,9 +9,9 @@ from etools_datamart.apps.sources.etools import models
 #     queryset = models.PartnersPartnerorganization.objects.all()
 
 
-class EtoolsAssessmentViewSet(common.APIMultiTenantReadOnlyModelViewSet):
-    serializer_class = serializers.AssessmentSerializer
-    queryset = models.PartnersAssessment.objects.all()
+# class EtoolsAssessmentViewSet(common.APIMultiTenantReadOnlyModelViewSet):
+#     serializer_class = serializers.AssessmentSerializer
+#     queryset = models.PartnersAssessment.objects.all()
 
 
 # class AgreementViewSet(common.APIMultiTenantReadOnlyModelViewSet):

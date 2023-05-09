@@ -46,6 +46,13 @@ class AgreementFactory(DataMartModelFactory):
         model = models.Agreement
 
 
+class AssessmentFactory(DataMartModelFactory):
+    requested_date = timezone.now()
+
+    class Meta:
+        model = models.Assessment
+
+
 class InterventionFactory(DataMartModelFactory):
     metadata = {}
     title = factory.Sequence(lambda n: "title%03d" % n)

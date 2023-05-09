@@ -25,6 +25,7 @@ from .location import GeoName, Location  # noqa
 from .partner import Partner  # noqa
 from .partner_hact import PartnerHact  # noqa
 from .partners_agreement import Agreement  # noqa
+from .partners_assessment import Assessment  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
 from .partners_staffmember import PartnerStaffMember  # noqa
 from .pd_indicator import PDIndicator  # noqa

@@ -24,6 +24,7 @@ from .intervention_review import InterventionReviewViewSet
 from .location import LocationSiteViewSet, LocationViewSet
 from .office import OfficeViewSet
 from .partners_agreement import PartnerAgreementViewSet
+from .partners_assessment import PartnerAssessmentViewSet
 from .partners_hact import PartnerHactViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
 from .partners_partner import PartnerHACTActiveViewSet, PartnerViewSet
