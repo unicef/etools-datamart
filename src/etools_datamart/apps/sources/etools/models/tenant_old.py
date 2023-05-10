@@ -559,79 +559,6 @@ class DjangoComments(models.TenantModel):
         db_table = "django_comments"
 
 
-class EfaceEfaceform(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    deleted_at = models.DateTimeField()
-    reference_number_year = models.IntegerField()
-    reference_number = models.CharField(unique=True, max_length=64, blank=True, null=True)
-    request_type = models.CharField(max_length=3)
-    request_represents_expenditures = models.BooleanField()
-    expenditures_disbursed = models.BooleanField()
-    notes = models.TextField()
-    authorized_amount_date_start = models.DateField(blank=True, null=True)
-    requested_amount_date_start = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=20)
-    date_submitted = models.DateTimeField(blank=True, null=True)
-    date_cancelled = models.DateTimeField(blank=True, null=True)
-    rejection_reason = models.TextField()
-    transaction_rejection_reason = models.TextField()
-    cancel_reason = models.TextField()
-    intervention = models.ForeignKey(
-        "PartnersIntervention", models.DO_NOTHING, related_name="EfaceEfaceform_intervention"
-    )
-    date_approved = models.DateTimeField(blank=True, null=True)
-    date_closed = models.DateTimeField(blank=True, null=True)
-    date_pending = models.DateTimeField(blank=True, null=True)
-    date_rejected = models.DateTimeField(blank=True, null=True)
-    submitted_by = models.ForeignKey(
-        "AuthUser", models.DO_NOTHING, related_name="EfaceEfaceform_submitted_by", blank=True, null=True
-    )
-    submitted_by_unicef_date = models.DateField(blank=True, null=True)
-    authorized_amount_date_end = models.DateField(blank=True, null=True)
-    reporting_actual_project_expenditure = models.DecimalField(max_digits=20, decimal_places=2)
-    reporting_authorized_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    reporting_balance = models.DecimalField(max_digits=20, decimal_places=2)
-    reporting_expenditures_accepted_by_agency = models.DecimalField(max_digits=20, decimal_places=2)
-    requested_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    requested_amount_date_end = models.DateField(blank=True, null=True)
-    requested_authorized_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    requested_outstanding_authorized_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    currency = models.CharField(max_length=5)
-
-    class Meta:
-        managed = False
-        db_table = "eface_efaceform"
-
-
-class EfaceFormactivity(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    description = models.TextField()
-    coding = models.CharField(max_length=100)
-    reporting_authorized_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    reporting_actual_project_expenditure = models.DecimalField(max_digits=20, decimal_places=2)
-    reporting_expenditures_accepted_by_agency = models.DecimalField(max_digits=20, decimal_places=2)
-    reporting_balance = models.DecimalField(max_digits=20, decimal_places=2)
-    requested_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    requested_authorized_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    requested_outstanding_authorized_amount = models.DecimalField(max_digits=20, decimal_places=2)
-    form = models.ForeignKey(EfaceEfaceform, models.DO_NOTHING, related_name="EfaceFormactivity_form")
-    eepm_kind = models.CharField(max_length=15)
-    kind = models.CharField(max_length=8)
-    pd_activity = models.ForeignKey(
-        "ReportsInterventionactivity",
-        models.DO_NOTHING,
-        related_name="EfaceFormactivity_pd_activity",
-        blank=True,
-        null=True,
-    )
-
-    class Meta:
-        managed = False
-        db_table = "eface_formactivity"
-
-
 class FieldMonitoringDataCollectionActivityoverallfinding(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     narrative_finding = models.TextField()
@@ -1458,6 +1385,9 @@ class PartnersAgreement(models.TenantModel):
     )
     reference_number_year = models.IntegerField()
     special_conditions_pca = models.BooleanField()
+    terms_acknowledged_by = models.ForeignKey(
+        "AuthUser", models.DO_NOTHING, related_name="PartnersAgreement_terms_acknowledged_by", blank=True, null=True
+    )
 
     class Meta:
         managed = False
@@ -1615,10 +1545,10 @@ class PartnersIntervention(models.TenantModel):
     reference_number_year = models.IntegerField(blank=True, null=True)
     activation_letter = models.CharField(max_length=1024, blank=True, null=True)
     termination_doc = models.CharField(max_length=1024, blank=True, null=True)
+    cfei_number = models.CharField(max_length=150, blank=True, null=True)
     budget_owner = models.ForeignKey(
         "AuthUser", models.DO_NOTHING, related_name="PartnersIntervention_budget_owner", blank=True, null=True
     )
-    cfei_number = models.CharField(max_length=150)
     context = models.TextField(blank=True, null=True)
     date_sent_to_partner = models.DateField(blank=True, null=True)
     equity_narrative = models.TextField(blank=True, null=True)
@@ -1645,6 +1575,10 @@ class PartnersIntervention(models.TenantModel):
     accepted_on_behalf_of_partner = models.BooleanField()
     activation_protocol = models.TextField(blank=True, null=True)
     confidential = models.BooleanField()
+    has_activities_involving_children = models.BooleanField()
+    has_data_processing_agreement = models.BooleanField()
+    has_special_conditions_for_construction = models.BooleanField()
+    final_review_approved = models.BooleanField()
 
     class Meta:
         managed = False
@@ -1888,15 +1822,15 @@ class PartnersInterventionmanagementbudgetitem(models.TenantModel):
 class PartnersInterventionplannedvisits(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     year = models.IntegerField()
-    programmatic_q4 = models.IntegerField()
     intervention = models.ForeignKey(
         PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionplannedvisits_intervention"
     )
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    programmatic_q1 = models.IntegerField()
-    programmatic_q2 = models.IntegerField()
-    programmatic_q3 = models.IntegerField()
+    programmatic_q1 = models.IntegerField(default=0)
+    programmatic_q2 = models.IntegerField(default=0)
+    programmatic_q3 = models.IntegerField(default=0)
+    programmatic_q4 = models.IntegerField(default=0)
 
     class Meta:
         managed = False
@@ -2649,6 +2583,7 @@ class ReportsLowerresult(models.TenantModel):
     )
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    is_active = models.BooleanField()
 
     class Meta:
         managed = False
