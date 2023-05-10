@@ -95,7 +95,7 @@ class InterventionAbstract(models.Model):
     status = models.CharField(max_length=32, null=True, db_index=True, choices=PartnersInterventionConst.STATUSES)
     submission_date = models.DateField(null=True)
     submission_date_prc = models.DateField(null=True)
-    title = models.CharField(max_length=256, null=True, db_index=True)
+    title = models.CharField(max_length=306, null=True, db_index=True)
     total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     total_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     unicef_cash = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
