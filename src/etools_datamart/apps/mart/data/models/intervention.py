@@ -95,7 +95,7 @@ class InterventionAbstract(models.Model):
     status = models.CharField(max_length=32, null=True, db_index=True, choices=PartnersInterventionConst.STATUSES)
     submission_date = models.DateField(null=True)
     submission_date_prc = models.DateField(null=True)
-    title = models.CharField(max_length=256, null=True, db_index=True)
+    title = models.CharField(max_length=306, null=True, db_index=True)
     total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     total_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     unicef_cash = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
@@ -108,6 +108,12 @@ class InterventionAbstract(models.Model):
     # unicef_signatory_last_name = models.CharField(max_length=30, null=True)
     updated = models.DateTimeField(null=True)
     last_pv_date = models.DateField(null=True, blank=True)
+
+    has_activities_involving_children = models.BooleanField(null=True)
+    has_data_processing_agreement = models.BooleanField(null=True)
+    has_special_conditions_for_construction = models.BooleanField(null=True)
+    final_review_approved = models.BooleanField(null=True)
+    other_details = models.TextField(blank=True, null=True)
 
     # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
 

@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"72238982abf908c85affb28541bebabd\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.audit_engagement.EngagementDetailViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.audit_engagement.EngagementDetailViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "455",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
+    },
+    "data": {
+        "po_item": null,
+        "engagement_type": null,
+        "start_date": null,
+        "end_date": null,
+        "partner": "Partner1",
+        "partner_contacted_at": null,
+        "vendor_number": "123",
+        "auditor": null,
+        "total_value": "0.00",
+        "spotcheck_total_amount_tested": null,
+        "date_of_field_visit": null,
+        "final_report": null,
+        "agreement": null,
+        "rating": null,
+        "rating_extra": null,
+        "spotcheck_total_amount_of_ineligible_expenditure": null,
+        "financial_findings": "0.00",
+        "action_points": null,
+        "status": null,
+        "audit_opinion": null
+    },
+    "content_type": "application/json"
+}

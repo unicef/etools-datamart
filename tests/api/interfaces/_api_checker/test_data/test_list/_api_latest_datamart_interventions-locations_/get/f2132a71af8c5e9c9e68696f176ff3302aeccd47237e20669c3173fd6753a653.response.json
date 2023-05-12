@@ -15,7 +15,7 @@
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "6159",
+        "Content-Length": "6684",
         "Referrer-Policy": "same-origin",
         "Cross-Origin-Opener-Policy": "same-origin"
     },
@@ -109,6 +109,11 @@
                 "unicef_signatory_name": null,
                 "updated": null,
                 "last_pv_date": null,
+                "has_activities_involving_children": null,
+                "has_data_processing_agreement": null,
+                "has_special_conditions_for_construction": null,
+                "final_review_approved": null,
+                "other_details": null,
                 "location": null
             },
             {
@@ -194,6 +199,11 @@
                 "unicef_signatory_name": null,
                 "updated": null,
                 "last_pv_date": null,
+                "has_activities_involving_children": null,
+                "has_data_processing_agreement": null,
+                "has_special_conditions_for_construction": null,
+                "final_review_approved": null,
+                "other_details": null,
                 "location": null
             },
             {
@@ -279,6 +289,11 @@
                 "unicef_signatory_name": null,
                 "updated": null,
                 "last_pv_date": null,
+                "has_activities_involving_children": null,
+                "has_data_processing_agreement": null,
+                "has_special_conditions_for_construction": null,
+                "final_review_approved": null,
+                "other_details": null,
                 "location": null
             }
         ]
