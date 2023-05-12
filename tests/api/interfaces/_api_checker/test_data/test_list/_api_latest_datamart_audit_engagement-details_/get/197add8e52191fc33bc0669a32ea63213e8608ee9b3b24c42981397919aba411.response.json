@@ -16,7 +16,8 @@
         "qs_exclude": "{}",
         "cache-ttl": "1y",
         "Content-Length": "1452",
-        "Referrer-Policy": "same-origin"
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
     },
     "data": {
         "count": 3,

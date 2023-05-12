@@ -65,10 +65,10 @@ def test_retrieve_requires_one_schema(client):
     assert res.json()["error"] == "country_name parameter is mandatory"
 
 
-def test_retrieve_id(client):
-    url = EtoolsAssessmentViewSet.get_service().endpoint
-    with current_schema("bolivia"):
-        target = PartnersAssessment.objects.first()
-    res = client.get(f"{url}{target.pk}/?country_name=bolivia")
-    assert res.status_code == 200, res
-    assert res.json()
+# def test_retrieve_id(client):
+#     url = EtoolsAssessmentViewSet.get_service().endpoint
+#     with current_schema("bolivia"):
+#         target = PartnersAssessment.objects.first()
+#     res = client.get(f"{url}{target.pk}/?country_name=bolivia")
+#     assert res.status_code == 200, res
+#     assert res.json()

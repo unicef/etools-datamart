@@ -52,6 +52,7 @@ class Agreement(EtoolsDataMartModel):
     signed_by_partner = models.CharField(max_length=100, blank=True, null=True)
     partner_authorized_officers = models.TextField(blank=True, null=True)
     agreement_amendments = models.TextField(blank=True, null=True)
+    terms_acknowledged_by = models.CharField(max_length=200, blank=True, null=True)
 
     loader = AgreementLoader()
 
@@ -66,4 +67,5 @@ class Agreement(EtoolsDataMartModel):
             "country_programme": "country_programme.name",
             "signed_by": "signed_by.name",
             "signed_by_partner": "partner_manager.name",
+            "terms_acknowledged_by": "terms_acknowledged_by.name",
         }

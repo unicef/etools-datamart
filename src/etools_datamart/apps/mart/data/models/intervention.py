@@ -109,6 +109,12 @@ class InterventionAbstract(models.Model):
     updated = models.DateTimeField(null=True)
     last_pv_date = models.DateField(null=True, blank=True)
 
+    has_activities_involving_children = models.BooleanField(null=True)
+    has_data_processing_agreement = models.BooleanField(null=True)
+    has_special_conditions_for_construction = models.BooleanField(null=True)
+    final_review_approved = models.BooleanField(null=True)
+    other_details = models.TextField(blank=True, null=True)
+
     # disbursement_percent = models.IntegerField('Disbursement To Date (%)')
 
     class Meta:
