@@ -15,7 +15,7 @@
         "qs_filter": "{}",
         "qs_exclude": "{}",
         "cache-ttl": "1y",
-        "Content-Length": "5808",
+        "Content-Length": "6333",
         "Referrer-Policy": "same-origin",
         "Cross-Origin-Opener-Policy": "same-origin"
     },
@@ -104,7 +104,12 @@
                 "unicef_focal_points_data": {},
                 "unicef_signatory_name": null,
                 "updated": null,
-                "last_pv_date": null
+                "last_pv_date": null,
+                "has_activities_involving_children": null,
+                "has_data_processing_agreement": null,
+                "has_special_conditions_for_construction": null,
+                "final_review_approved": null,
+                "other_details": null
             },
             {
                 "id": 2,
@@ -184,7 +189,12 @@
                 "unicef_focal_points_data": {},
                 "unicef_signatory_name": null,
                 "updated": null,
-                "last_pv_date": null
+                "last_pv_date": null,
+                "has_activities_involving_children": null,
+                "has_data_processing_agreement": null,
+                "has_special_conditions_for_construction": null,
+                "final_review_approved": null,
+                "other_details": null
             },
             {
                 "id": 3,
@@ -264,7 +274,12 @@
                 "unicef_focal_points_data": {},
                 "unicef_signatory_name": null,
                 "updated": null,
-                "last_pv_date": null
+                "last_pv_date": null,
+                "has_activities_involving_children": null,
+                "has_data_processing_agreement": null,
+                "has_special_conditions_for_construction": null,
+                "final_review_approved": null,
+                "other_details": null
             }
         ]
     },
