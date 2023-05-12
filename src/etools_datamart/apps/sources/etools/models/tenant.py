@@ -265,6 +265,7 @@ class AuditEngagement(models.TenantModel):
     exchange_rate = models.DecimalField(max_digits=20, decimal_places=2)
     currency_of_report = models.CharField(max_length=5, blank=True, null=True)
     reference_number = models.CharField(max_length=100, blank=True, null=True)
+    year_of_audit = models.SmallIntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1509,7 +1510,7 @@ class PartnersIntervention(models.TenantModel):
     modified = models.DateTimeField()
     document_type = models.CharField(max_length=255)
     number = models.CharField(unique=True, max_length=64, blank=True, null=True)
-    title = models.CharField(max_length=256)
+    title = models.CharField(max_length=306)
     status = models.CharField(max_length=32)
     start = models.DateField(blank=True, null=True)
     end = models.DateField(blank=True, null=True)
@@ -1579,6 +1580,7 @@ class PartnersIntervention(models.TenantModel):
     has_data_processing_agreement = models.BooleanField()
     has_special_conditions_for_construction = models.BooleanField()
     final_review_approved = models.BooleanField()
+    other_details = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1822,20 +1824,38 @@ class PartnersInterventionmanagementbudgetitem(models.TenantModel):
 class PartnersInterventionplannedvisits(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     year = models.IntegerField()
+    programmatic_q4 = models.IntegerField()
     intervention = models.ForeignKey(
         PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionplannedvisits_intervention"
     )
     created = models.DateTimeField()
     modified = models.DateTimeField()
-    programmatic_q1 = models.IntegerField(default=0)
-    programmatic_q2 = models.IntegerField(default=0)
-    programmatic_q3 = models.IntegerField(default=0)
-    programmatic_q4 = models.IntegerField(default=0)
+    programmatic_q1 = models.IntegerField()
+    programmatic_q2 = models.IntegerField()
+    programmatic_q3 = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = "partners_interventionplannedvisits"
         unique_together = (("intervention", "year"),)
+
+
+class PartnersInterventionplannedvisitsite(models.TenantModel):
+    id = models.IntegerField(primary_key=True)
+    quarter = models.SmallIntegerField()
+    planned_visits = models.ForeignKey(
+        PartnersInterventionplannedvisits,
+        models.DO_NOTHING,
+        related_name="PartnersInterventionplannedvisitsite_planned_visits",
+    )
+    site = models.ForeignKey(
+        FieldMonitoringSettingsLocationsite, models.DO_NOTHING, related_name="PartnersInterventionplannedvisitsite_site"
+    )
+
+    class Meta:
+        managed = False
+        db_table = "partners_interventionplannedvisitsite"
+        unique_together = (("planned_visits", "quarter", "site"),)
 
 
 class PartnersInterventionreportingperiod(models.TenantModel):

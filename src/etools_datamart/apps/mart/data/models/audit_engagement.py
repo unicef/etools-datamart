@@ -419,6 +419,7 @@ class Engagement(EtoolsDataMartModel):
     # ActionPoints
     action_points = JSONField(blank=True, null=True)
     key_internal_control_weaknesses = JSONField(blank=True, null=True)
+    year_of_audit = models.SmallIntegerField(blank=True, null=True)
 
     # datamart
     loader = EngagementlLoader()

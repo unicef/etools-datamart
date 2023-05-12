@@ -13,7 +13,7 @@ conn = connections["etools"]
 
 pytestmark = pytest.mark.django_db
 
-PARTNER_ORGANIZATION_COUNT = 77
+PARTNER_ORGANIZATION_COUNT = 35
 
 
 def test_query_public(db):
