@@ -3,7 +3,7 @@ from django.db import models
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.sources.etools.models import FundsFundsreservationitem
 
-from . import FundsReservation, FundsReservationHeader
+from . import FundsReservationHeader
 from .base import EtoolsDataMartModel
 
 
