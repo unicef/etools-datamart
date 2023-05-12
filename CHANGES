@@ -11,6 +11,13 @@
 * refresh from db task object
 
 
+3.55.1
+------
+* sync deleted params
+* humanize export running time
+* refresh from db task object
+
+
 3.55
 ------
 * improved performances
