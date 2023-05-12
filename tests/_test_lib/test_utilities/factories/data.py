@@ -174,6 +174,34 @@ class FundsReservationFactory(DataMartModelFactory):
         model = models.FundsReservation
 
 
+class FundsReservationHeaderFactory(DataMartModelFactory):
+    vendor_code = factory.Sequence(lambda n: f"code{n}")
+
+    actual_amt = 101
+    intervention_amt = 102
+    outstanding_amt = 103
+    total_amt = 104
+    actual_amt_local = 105
+    outstanding_amt_local = 106
+    multi_curr_flag = False
+    created = timezone.now()
+    modified = timezone.now()
+
+    class Meta:
+        model = models.FundsReservationHeader
+
+
+class FundsReservationItemFactory(DataMartModelFactory):
+    line_item = factory.Sequence(lambda n: n + 1)
+    overall_amount = 107
+    overall_amount_dc = 108
+    created = timezone.now()
+    modified = timezone.now()
+
+    class Meta:
+        model = models.FundsReservationItem
+
+
 class PDIndicatorFactory(DataMartModelFactory):
     is_active = True
     is_high_frequency = True
