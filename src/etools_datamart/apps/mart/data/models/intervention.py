@@ -426,9 +426,9 @@ class InterventionByLocationLoader(InterventionLoader):
         return values
 
     def process_country(self):
-        qs = self.filter_queryset(self.get_queryset())
+        qs = self.filter_queryset(self.get_queryset().prefetch_related("flat_locations"))
         for intervention in qs.all():
-            for location in intervention.flat_locations.all().order_by("id"):
+            for location in intervention.flat_locations.all():
                 intervention.location = location
                 filters = self.config.key(self, intervention)
                 values = self.get_values(intervention)
