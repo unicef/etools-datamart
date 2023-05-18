@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class InterventionSimpleAbstract(models.Model):
     pd_number = models.CharField(max_length=64, blank=True, null=True)
-    pd_title = models.CharField(max_length=256, null=True, db_index=True)
+    pd_title = models.CharField(max_length=306, null=True, db_index=True)
 
     # PARTNER
     partner = models.CharField(max_length=255, blank=True, null=True)
