@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"4c9ea98ac7035992f0a71a142ce278e4\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.funds_reservation_item.FundsReservationItemViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.funds_reservation_item.FundsReservationItemViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "409",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
+    },
+    "data": {
+        "id": 3,
+        "source_id": null,
+        "last_modify_date": "12 May 2023 15:34:09",
+        "seen": null,
+        "country_name": "bolivia",
+        "area_code": "",
+        "fund_reservation_number": "",
+        "fr_ref_number": "",
+        "line_item": 1,
+        "wbs": "",
+        "grant_number": "",
+        "fund": "",
+        "overall_amount": "107.00",
+        "overall_amount_dc": "108.00",
+        "due_date": null,
+        "line_item_text": null,
+        "created": "12 May 2023 15:33:47",
+        "modified": "12 May 2023 15:33:47",
+        "donor": null,
+        "donor_code": null
+    },
+    "content_type": "application/json"
+}

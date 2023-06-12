@@ -384,6 +384,31 @@ class PartnerAdmin(DataModelAdmin):
     )
 
 
+@register(models.Assessment)
+class AssessmentAdmin(DataModelAdmin):
+    list_display = (
+        "type",
+        "partner_name",
+        "vendor_number",
+        "approving_officer",
+        "expected_budget",
+        "requested_date",
+        "completed_date",
+        "current",
+        "active",
+    )
+    date_hierarchy = "created"
+    list_filter = ("type", "active", "current")
+    search_fields = (
+        "type",
+        "names_of_other_agencies",
+        "partner_name",
+        "vendor_number",
+        "approving_officer",
+        "requesting_officer",
+    )
+
+
 @register(models.PartnersPlannedEngagement)
 class PlannedEngagementAdmin(DataModelAdmin):
     list_display = (
