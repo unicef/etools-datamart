@@ -33,7 +33,7 @@ class FundsReservationHeader(EtoolsDataMartModel):
     loader = EtoolsLoader()
 
     class Meta:
-        unique_together = (("fr_number", "vendor_code"),)
+        unique_together = (("schema_name", "fr_number", "vendor_code"),)
 
     class Options:
         depends = (Intervention,)
