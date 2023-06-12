@@ -27,7 +27,7 @@ class FundsReservationItem(EtoolsDataMartModel):
     loader = EtoolsLoader()
 
     class Meta:
-        unique_together = (("fund_reservation_number", "line_item"),)
+        unique_together = (("schema_name", "fund_reservation_number", "line_item"),)
 
     class Options:
         depends = (FundsReservationHeader,)
