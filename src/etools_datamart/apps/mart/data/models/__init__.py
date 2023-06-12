@@ -10,6 +10,8 @@ from .audit_spotcheck import SpotCheckFindings  # noqa
 from .fam import FAMIndicator  # noqa
 from .fm_questions import FMOntrack, FMOptions, FMQuestion  # noqa
 from .fm_settings import Locationsite  # noqa
+from .fund_reservation_header import FundsReservationHeader  # noqa
+from .fund_reservation_item import FundsReservationItem  # noqa
 from .funds_grant import Grant  # noqa
 from .funds_reservation import FundsReservation  # noqa
 from .hact import HACT  # noqa
@@ -25,6 +27,7 @@ from .location import GeoName, Location  # noqa
 from .partner import Partner  # noqa
 from .partner_hact import PartnerHact  # noqa
 from .partners_agreement import Agreement  # noqa
+from .partners_assessment import Assessment  # noqa
 from .partners_interventionbudget import InterventionBudget  # noqa
 from .partners_staffmember import PartnerStaffMember  # noqa
 from .pd_indicator import PDIndicator  # noqa

@@ -1,0 +1,38 @@
+{
+    "record": {
+        "master": {
+            "model": "data.fundsreservationheader",
+            "pk": 3,
+            "fields": {
+                "source_id": null,
+                "last_modify_date": "2023-05-12T15:37:29.753Z",
+                "seen": null,
+                "country_name": "bolivia",
+                "schema_name": "bolivia",
+                "area_code": "",
+                "vendor_code": "",
+                "fr_number": "",
+                "document_date": null,
+                "fr_type": "",
+                "currency": "",
+                "document_text": "",
+                "start_date": null,
+                "end_date": null,
+                "actual_amt": "101.00",
+                "intervention_amt": "102.00",
+                "outstanding_amt": "103.00",
+                "total_amt": "104.00",
+                "created": "2023-05-12T15:37:19.489Z",
+                "modified": "2023-05-12T15:37:19.489Z",
+                "actual_amt_local": "105.00",
+                "outstanding_amt_local": "106.00",
+                "total_amt_local": null,
+                "multi_curr_flag": false,
+                "completed_flag": null,
+                "delegated": null,
+                "pd_reference_number": null
+            }
+        },
+        "deps": []
+    }
+}

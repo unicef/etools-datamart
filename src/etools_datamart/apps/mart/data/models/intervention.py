@@ -200,15 +200,11 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return (
-            PartnersIntervention.objects.filter(end__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA)
-            .select_related(
-                "agreement",
-                "agreement__partner",
-            )
-            .prefetch_related(
-                "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
-            )
+        return PartnersIntervention.objects.select_related(
+            "agreement",
+            "agreement__partner",
+        ).prefetch_related(
+            "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
         )
 
     @cached_property
@@ -408,7 +404,6 @@ class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartMode
         unique_together = ("schema_name", "intervention_id")
 
     class Options(InterventionAbstract.Options):
-        sync_deleted_records = lambda a: False
         mapping = dict(
             **InterventionAbstract.Options.mapping,
             locations_data="i",
@@ -426,9 +421,9 @@ class InterventionByLocationLoader(InterventionLoader):
         return values
 
     def process_country(self):
-        qs = self.filter_queryset(self.get_queryset())
+        qs = self.filter_queryset(self.get_queryset().prefetch_related("flat_locations"))
         for intervention in qs.all():
-            for location in intervention.flat_locations.all().order_by("id"):
+            for location in intervention.flat_locations.all():
                 intervention.location = location
                 filters = self.config.key(self, intervention)
                 values = self.get_values(intervention)

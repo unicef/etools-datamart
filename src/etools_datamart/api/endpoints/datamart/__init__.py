@@ -12,6 +12,8 @@ from .famindicator import FAMIndicatorViewSet
 from .fm_questions import FMOntrackViewSet, FMOptionsViewSet, FMQuestionViewSet
 from .funds_grant import GrantViewSet
 from .funds_reservation import FundsReservationViewSet
+from .funds_reservation_header import FundsReservationHeaderViewSet
+from .funds_reservation_item import FundsReservationItemViewSet
 from .hact_aggregate import HACTAggreagateViewSet
 from .hact_history import HACTHistoryViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
@@ -24,6 +26,7 @@ from .intervention_review import InterventionReviewViewSet
 from .location import LocationSiteViewSet, LocationViewSet
 from .office import OfficeViewSet
 from .partners_agreement import PartnerAgreementViewSet
+from .partners_assessment import PartnerAssessmentViewSet
 from .partners_hact import PartnerHactViewSet
 from .partners_interventionbudget import InterventionBudgetViewSet
 from .partners_partner import PartnerHACTActiveViewSet, PartnerViewSet
