@@ -8,11 +8,6 @@ class EtoolsGrantViewSet(common.APIMultiTenantReadOnlyModelViewSet):
     queryset = models.FundsGrant.objects.all()
 
 
-class EtoolsFundsreservationitemViewSet(common.APIMultiTenantReadOnlyModelViewSet):
-    serializer_class = serializers.EToolsFundsreservationitemSerializer
-    queryset = models.FundsFundsreservationitem.objects.all()
-
-
 class EtoolsFundsReservationHeaderViewSet(common.APIMultiTenantReadOnlyModelViewSet):
     serializer_class = serializers.EToolsFundsReservationHeaderSerializer
     queryset = models.FundsFundsreservationheader.objects.all()

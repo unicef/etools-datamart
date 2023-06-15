@@ -191,17 +191,6 @@ class FundsReservationHeaderFactory(DataMartModelFactory):
         model = models.FundsReservationHeader
 
 
-class FundsReservationItemFactory(DataMartModelFactory):
-    line_item = factory.Sequence(lambda n: n + 1)
-    overall_amount = 107
-    overall_amount_dc = 108
-    created = timezone.now()
-    modified = timezone.now()
-
-    class Meta:
-        model = models.FundsReservationItem
-
-
 class PDIndicatorFactory(DataMartModelFactory):
     is_active = True
     is_high_frequency = True

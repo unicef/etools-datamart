@@ -11,7 +11,6 @@ from .fam import FAMIndicator  # noqa
 from .fm_questions import FMOntrack, FMOptions, FMQuestion  # noqa
 from .fm_settings import Locationsite  # noqa
 from .fund_reservation_header import FundsReservationHeader  # noqa
-from .fund_reservation_item import FundsReservationItem  # noqa
 from .funds_grant import Grant  # noqa
 from .funds_reservation import FundsReservation  # noqa
 from .hact import HACT  # noqa
