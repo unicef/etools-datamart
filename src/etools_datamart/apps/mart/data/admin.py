@@ -246,6 +246,19 @@ class UserStatsAdmin(DataModelAdmin):
     date_hierarchy = "month"
 
 
+@register(models.Workspace)
+class WorkspaceAdmin(DataModelAdmin):
+    list_display = (
+        "name",
+        "schema_name",
+        "business_area_code",
+        "iso3_code",
+        "vision_sync_enabled",
+        "vision_last_synced",
+    )
+    search_fields = ("name", "schema_name", "business_area_code", "iso3_code")
+
+
 @register(models.HACT)
 class HACTAdmin(DataModelAdmin):
     list_display = (

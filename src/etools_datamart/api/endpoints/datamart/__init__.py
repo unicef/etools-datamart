@@ -13,7 +13,6 @@ from .fm_questions import FMOntrackViewSet, FMOptionsViewSet, FMQuestionViewSet
 from .funds_grant import GrantViewSet
 from .funds_reservation import FundsReservationViewSet
 from .funds_reservation_header import FundsReservationHeaderViewSet
-from .funds_reservation_item import FundsReservationItemViewSet
 from .hact_aggregate import HACTAggreagateViewSet
 from .hact_history import HACTHistoryViewSet
 from .intervention import InterventionByLocationViewSet, InterventionViewSet
@@ -45,3 +44,4 @@ from .travel_trips import TravelTripViewSet
 from .trips import TripViewSet
 from .user import EtoolsUserViewSet
 from .userstats import UserStatsViewSet
+from .workspace import WorkspaceViewSet
