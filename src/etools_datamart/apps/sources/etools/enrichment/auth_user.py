@@ -3,11 +3,11 @@ from django.db import models
 
 from unicef_security.models import User
 
-from etools_datamart.apps.sources.etools.models import AuthGroup, AuthUser, AuthUserGroups
+from etools_datamart.apps.sources.etools.models import AuthGroup, AuthUser, AuthUserOldGroups
 
 models.ManyToManyField(
     AuthGroup,
-    through=AuthUserGroups,
+    through=AuthUserOldGroups,
 ).contribute_to_class(AuthUser, "groups")
 
 AuthUser.is_authenticated = True
