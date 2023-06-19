@@ -44,3 +44,4 @@ from .travel_trips import TravelTripViewSet
 from .trips import TripViewSet
 from .user import EtoolsUserViewSet
 from .userstats import UserStatsViewSet
+from .workspace import WorkspaceViewSet

@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, Origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"80e53233a7ed2e1a280c845cad508a27\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.workspace.WorkspaceViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.workspace.WorkspaceViewSet",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-hit": "False",
+        "cache-ttl": "1y",
+        "Content-Length": "377",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
+    },
+    "data": {
+        "id": 4,
+        "source_id": null,
+        "last_modify_date": "19 Jun 2023 11:19:27",
+        "seen": null,
+        "name": "name003",
+        "business_area_code": "ba_code003",
+        "initial_zoom": 4,
+        "latitude": null,
+        "longitude": null,
+        "country_short_code": "s_code003",
+        "vision_sync_enabled": true,
+        "vision_last_synced": null,
+        "currency_code": null,
+        "currency_name": null,
+        "long_name": "long_name003",
+        "iso3_code": null,
+        "custom_dashboards": null
+    },
+    "content_type": "application/json"
+}

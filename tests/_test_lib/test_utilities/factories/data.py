@@ -431,3 +431,17 @@ class ResultFactory(DataMartModelFactory):
 class PartnersPlannedEngagementFactory(DataMartModelFactory):
     class Meta:
         model = models.PartnersPlannedEngagement
+
+
+class WorkspaceFactory(RegisterModelFactory):
+    schema_name = factory.Sequence(lambda n: "schema%03d" % n)
+    name = factory.Sequence(lambda n: "name%03d" % n)
+    long_name = factory.Sequence(lambda n: "long_name%03d" % n)
+    business_area_code = factory.Sequence(lambda n: "ba_code%03d" % n)
+    initial_zoom = factory.Sequence(lambda n: n + 1)
+    country_short_code = factory.Sequence(lambda n: "s_code%03d" % n)
+    vision_sync_enabled = True
+
+    class Meta:
+        model = models.Workspace
+        django_get_or_create = ("name",)

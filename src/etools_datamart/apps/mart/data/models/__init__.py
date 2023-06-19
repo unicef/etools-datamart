@@ -45,3 +45,4 @@ from .travel_trip import TravelTrip  # noqa
 from .trip import ModeOfTravel, Trip  # noqa
 from .user import EtoolsUser  # noqa
 from .userstats import UserStats  # noqa
+from .workspace import Workspace  # noqa

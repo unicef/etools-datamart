@@ -15,7 +15,7 @@ class ReadOnlyRouter(APIReadOnlyRouter):
 
 
 router = ReadOnlyRouter()
-router.register(r"sources/etools/workspaces", endpoints.EtoolsWorkspaceViewSet)
+router.register(r"datamart/workspaces", endpoints.WorkspaceViewSet)
 
 router.register(r"datamart/attachment/attachment", endpoints.AttachmentViewSet)
 router.register(r"datamart/funds/grants", endpoints.GrantViewSet)
