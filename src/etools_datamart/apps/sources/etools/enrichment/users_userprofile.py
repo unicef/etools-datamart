@@ -4,7 +4,7 @@ from etools_datamart.apps.sources.etools.models import (
     AuthUser,
     UsersCountry,
     UsersUserprofile,
-    UsersUserprofileCountriesAvailable,
+    UsersUserprofileOldCountriesAvailable,
 )
 
 f = [f for f in UsersUserprofile._meta.local_fields if f.name != "user_id"]
@@ -18,5 +18,5 @@ models.OneToOneField(AuthUser, related_name="profile", on_delete=models.PROTECT)
 # Fix UsersUserprofile ManyToManyField
 models.ManyToManyField(
     UsersCountry,
-    through=UsersUserprofileCountriesAvailable,
+    through=UsersUserprofileOldCountriesAvailable,
 ).contribute_to_class(UsersUserprofile, "countries_available")

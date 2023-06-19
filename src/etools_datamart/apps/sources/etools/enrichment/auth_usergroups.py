@@ -1,9 +1,9 @@
 from django.db import models
 
-from etools_datamart.apps.sources.etools.models import AuthUser, AuthUserGroups
+from etools_datamart.apps.sources.etools.models import AuthUser, AuthUserOldGroups
 
-f = [f for f in AuthUserGroups._meta.local_fields if f.name != "user_id"]
-AuthUserGroups._meta.local_fields = f
-AuthUserGroups._meta.unique_together = []
+f = [f for f in AuthUserOldGroups._meta.local_fields if f.name != "user_id"]
+AuthUserOldGroups._meta.local_fields = f
+AuthUserOldGroups._meta.unique_together = []
 
-models.OneToOneField(AuthUser, on_delete=models.PROTECT).contribute_to_class(AuthUserGroups, "user")
+models.OneToOneField(AuthUser, on_delete=models.PROTECT).contribute_to_class(AuthUserOldGroups, "user")

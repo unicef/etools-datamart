@@ -8,15 +8,18 @@ SET
 
 UPDATE _SCHEMA_.partners_partnerorganization
 SET
-  name          = CONCAT('Partner', id),
   address       = CONCAT('Address', id),
   email         = CONCAT('email', id, '@nowhere.org'),
   phone_number  = id,
-  vendor_number = id,
   total_ct_cp   = id,
   total_ct_cy   = id,
   net_ct_cy     = id,
   city          = CONCAT('City ', id);
+
+UPDATE organizations_organization
+SET
+  name          = CONCAT('Partner', id),
+  vendor_number = id;
 
 UPDATE _SCHEMA_.reports_indicator
 SET name = CONCAT('Report', id);
