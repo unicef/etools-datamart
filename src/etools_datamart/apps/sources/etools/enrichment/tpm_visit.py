@@ -1,7 +1,7 @@
 from django.db import models
 
 from etools_datamart.apps.sources.etools.models import (
-    TpmpartnersTpmpartnerstaffmember,
+    AuthUser,
     TpmTpmactivity,
     TpmTpmvisit,
     TpmTpmvisitTpmPartnerFocalPoints,
@@ -10,7 +10,7 @@ from etools_datamart.apps.sources.etools.models import (
 from .utils import create_alias
 
 models.ManyToManyField(
-    TpmpartnersTpmpartnerstaffmember,
+    AuthUser,
     through=TpmTpmvisitTpmPartnerFocalPoints,
 ).contribute_to_class(TpmTpmvisit, "tpm_partner_focal_points")
 
