@@ -97,6 +97,8 @@ class InterventionAbstract(models.Model):
     submission_date_prc = models.DateField(null=True)
     title = models.CharField(max_length=306, null=True, db_index=True)
     total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    has_unfunded_cash = models.BooleanField(null=True)
+    total_unfunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     total_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     unicef_cash = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     unicef_cash_local = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
@@ -182,6 +184,8 @@ class InterventionAbstract(models.Model):
             start_date="start",
             status="=",
             total="PartnersInterventionbudget_intervention.total",
+            has_unfunded_cash="PartnersInterventionbudget_intervention.has_unfunded_cash",
+            total_unfunded="PartnersInterventionbudget_intervention.total_unfunded",
             total_local="PartnersInterventionbudget_intervention.total_local",
             unicef_cash="PartnersInterventionbudget_intervention.unicef_cash",
             unicef_cash_local="PartnersInterventionbudget_intervention.unicef_cash_local",

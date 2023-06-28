@@ -77,7 +77,7 @@ class EtoolsUser(EtoolsDataMartModel):
             post_number="profile.post_number",
             post_title="profile.post_title",
             staff_id="profile.staff_id",
-            vendor_number="profile.vendor_number",
+            vendor_number="profile.organization.vendor_number",
             country_name="profile.country.name",
             office="profile.office.name",
             country_override="i",

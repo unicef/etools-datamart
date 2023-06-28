@@ -29,7 +29,7 @@ class PartnersPlannedEngagement(EtoolsDataMartModel):
         source = PartnersPlannedengagement
         depends = (Partner,)
         mapping = dict(
-            partner_name="partner.name",
-            type="partner.cso_type",
-            vendor_number="partner.vendor_number",
+            partner_name="partner.organization.name",
+            type="partner.organization.cso_type",
+            vendor_number="partner.organization.vendor_number",
         )
