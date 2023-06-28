@@ -31,7 +31,7 @@ class PartnerStaffMember(EtoolsDataMartModel):
         source = PartnersPartnerstaffmember
         mapping = {
             "partner_id": "partner.id",
-            "partner": "partner.name",
-            "vendor_number": "partner.vendor_number",
+            "partner": "partner.organization.name",
+            "vendor_number": "partner.organization.vendor_number",
             "user": "-",
         }

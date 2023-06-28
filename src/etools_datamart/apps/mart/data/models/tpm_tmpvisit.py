@@ -153,14 +153,14 @@ class TPMVisit(EtoolsDataMartModel):
         source = TpmTpmvisit
         mapping = dict(
             author_name="author.name",
-            partner_name="tpm_partner.name",
+            partner_name="tpm_partner.organization.name",
             source_partner_id="tpm_partner.id",
             task_reference_number="N/A",
             tpm_name="N/A",
             # cp_output='N/A',
             # pd_ssfa_title='N/A',
             # pd_ssfa_reference_number='N/A',
-            vendor_number="tpm_partner.vendor_number",
+            vendor_number="tpm_partner.organization.vendor_number",
             visit_reference_number="reference_number",
             visit_status="status",
             visit_start_date="start_date",
