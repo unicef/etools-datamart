@@ -139,7 +139,7 @@ class ActionPointLoader(EtoolsLoader):
             engagement_code = "a" if eng_type == AuditEngagementConsts.TYPE_AUDIT else eng_type
             return "{}/{}/{}/{}/{}".format(
                 self.context["country"].country_short_code or "",
-                record.partner.name[:5],
+                record.partner.organization.name[:5],
                 engagement_code.upper(),
                 record.created.year,
                 record.id,
@@ -249,13 +249,13 @@ class ActionPoint(LocationMixin, EtoolsDataMartModel):
                 intervention_source_id="intervention.id",
                 intervention_title="intervention.title",
                 office="office.name",
-                partner_name="partner.name",
+                partner_name="partner.organization.name",
                 partner_source_id="partner.id",
                 section_source_id="section.id",
                 section_type="section.name",
                 tpm_activity_source_id="tpm_activity.id",
                 travel_activity_source_id="travel_activity.id",
                 travel_activity_travel_type="travel_activity.travel_type",
-                vendor_number="partner.vendor_number",
+                vendor_number="partner.organization.vendor_number",
             )
         )

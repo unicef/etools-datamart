@@ -1359,6 +1359,7 @@ class PartnersAgreement(models.TenantModel):
     partner = models.ForeignKey(
         "PartnersPartnerorganization", models.DO_NOTHING, related_name="PartnersAgreement_partner"
     )
+    # TODO: realms cleanup
     old_partner_manager = models.ForeignKey(
         "PartnersPartnerstaffmember",
         models.DO_NOTHING,
@@ -1531,6 +1532,7 @@ class PartnersIntervention(models.TenantModel):
     signed_by_partner_date = models.DateField(blank=True, null=True)
     population_focus = models.CharField(max_length=130, blank=True, null=True)
     agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name="PartnersIntervention_agreement")
+    # TODO: realms cleanup
     old_partner_authorized_officer_signatory = models.ForeignKey(
         "PartnersPartnerstaffmember",
         models.DO_NOTHING,
