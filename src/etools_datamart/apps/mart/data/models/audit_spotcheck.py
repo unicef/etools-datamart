@@ -127,8 +127,8 @@ class SpotCheckFindings(EtoolsDataMartModel):
         sync_deleted_records = lambda a: False
         depends = (Partner,)
         mapping = dict(
-            auditor="agreement.auditor_firm.name",
-            auditor_number="agreement.auditor_firm.vendor_number",
+            auditor="agreement.auditor_firm.organization.name",
+            auditor_number="agreement.auditor_firm.organization.vendor_number",
             spotcheck_total_amount_tested="_impl.total_amount_tested",
             spotcheck_total_amount_of_ineligible_expenditure="_impl.total_amount_of_ineligible_expenditure",
             partner="-",

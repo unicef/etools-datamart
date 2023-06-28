@@ -141,7 +141,7 @@ class InterventionAbstract(models.Model):
             country_programme_id="country_programme.pk",
             cp_outputs="-",
             created="=",
-            cso_type="agreement.partner.cso_type",
+            cso_type="agreement.partner.organization.cso_type",
             currency="PartnersInterventionbudget_intervention.currency",
             days_from_submission_to_signature="-",
             days_from_prc_review_to_signature="-",
@@ -166,7 +166,7 @@ class InterventionAbstract(models.Model):
             partner_focal_points="-",
             partner_focal_points_data="i",
             partner_id="-",
-            partner_name="agreement.partner.name",
+            partner_name="agreement.partner.organization.name",
             partner_sea_risk_rating="i",
             partner_signatory_email="partner_authorized_officer_signatory.email",
             partner_signatory_first_name="partner_authorized_officer_signatory.first_name",
@@ -174,8 +174,8 @@ class InterventionAbstract(models.Model):
             partner_signatory_phone="partner_authorized_officer_signatory.phone",
             partner_signatory_title="partner_authorized_officer_signatory.title",
             partner_source_id="agreement.partner.id",
-            partner_type="agreement.partner.type",
-            partner_vendor_number="agreement.partner.vendor_number",
+            partner_type="agreement.partner.organization.organization_type",
+            partner_vendor_number="agreement.partner.organization.vendor_number",
             planned_programmatic_visits="-",
             prc_review_document="-",
             sections="-",
@@ -320,14 +320,14 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         data = []
         ret = []
         for member in record.partner_focal_points.all():
-            # member is PartnersPartnerstaffmember
-            ret.append("{0.last_name} {0.first_name} ({0.email}) {0.phone}".format(member))
+            # member is AUTH_USER_MODEL
+            ret.append("{0.last_name} {0.first_name} ({0.email}) {0.profile.phone_number}".format(member))
             data.append(
                 dict(
                     last_name=member.last_name,
                     first_name=member.first_name,
                     email=member.email,
-                    phone=member.phone,
+                    phone=member.profile.phone_number,
                 )
             )
 

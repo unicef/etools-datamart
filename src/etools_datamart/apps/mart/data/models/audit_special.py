@@ -90,8 +90,8 @@ class AuditSpecial(EtoolsDataMartModel):
         sync_deleted_records = lambda a: False
         depends = (Partner,)
         mapping = dict(
-            auditor="agreement.auditor_firm.name",
-            auditor_number="agreement.auditor_firm.vendor_number",
+            auditor="agreement.auditor_firm.organization.name",
+            auditor_number="agreement.auditor_firm.organization.vendor_number",
             agreement="agreement.order_number",  # PurchaseOrder
             partner="-",
             sections="-",

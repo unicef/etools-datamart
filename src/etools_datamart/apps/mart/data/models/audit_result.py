@@ -87,10 +87,10 @@ class AuditResult(EtoolsDataMartModel):
         sync_deleted_records = lambda loader: False
         mapping = {
             "source_id": "engagement_ptr.id",
-            "vendor": "engagement_ptr.partner.name",
+            "vendor": "engagement_ptr.partner.organization.name",
             "status": "engagement_ptr.status",
-            "vendor_number": "engagement_ptr.partner.vendor_number",
-            "partner_type": "engagement_ptr.partner.partner_type",
+            "vendor_number": "engagement_ptr.partner.organization.vendor_number",
+            "partner_type": "engagement_ptr.partner.organization.organization_type",
             "risk_rating": "engagement_ptr.partner.rating",
             "date_of_draft_report_to_ip": "engagement_ptr.date_of_draft_report_to_ip",
             "amount_refunded": "engagement_ptr.amount_refunded",

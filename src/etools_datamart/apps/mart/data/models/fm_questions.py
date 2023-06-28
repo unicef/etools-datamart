@@ -98,7 +98,7 @@ class FMQuestionLoader(EtoolsLoader):
             elif rec.activity_question.partner:
                 partner = rec.activity_question.partner
                 values["entity_type"] = "Partner"
-                values["entity_instance"] = partner.name
+                values["entity_instance"] = partner.organization.name
             op = self.process_record(filters, values)
             self.increment_counter(op)
 
@@ -253,7 +253,7 @@ class FMQuestion(EtoolsDataMartModel):
             answer_options="-",
             entity_type="i",
             entity_instance="i",
-            vendor_number="activity_question.partner.vendor_number",
+            vendor_number="activity_question.partner.organization.vendor_number",
             reference_number="activity_question.intervention.reference_number",
             question_collection_methods="-",
             collection_method="started_checklist.method.name",
@@ -301,7 +301,7 @@ class FMOntrackLoader(EtoolsLoader):
                 values["programme_areas"] = None
                 values["entity_type"] = "PD/SSFA"
             elif rec.partner:
-                values["entity"] = rec.partner.name
+                values["entity"] = rec.partner.organization.name
                 values["outcome"] = None
                 values["output"] = None
                 values["programme_areas"] = None
@@ -467,7 +467,7 @@ class FMOntrack(EtoolsDataMartModel):
             outcome="i",
             output="i",
             programme_areas="i",
-            vendor_number="partner.vendor_number",
+            vendor_number="partner.organization.vendor_number",
             reference_number="intervention.reference_number",
             sections="-",
             person_responsible_email="monitoring_activity.visit_lead.email",
