@@ -361,6 +361,21 @@ class FundsReservationAdmin(DataModelAdmin):
     date_hierarchy = "start_date"
 
 
+@register(models.FundsReservationHeader)
+class FundsReservationHeaderAdmin(DataModelAdmin):
+    search_fields = ("fr_number", "pd_reference_number", "vendor_code")
+    list_display = (
+        "country_name",
+        "fr_number",
+        "pd_reference_number",
+        "fr_type",
+        "actual_amt_local",
+        "total_amt_local",
+    )
+    list_filter = ("fr_type",)
+    date_hierarchy = "start_date"
+
+
 @register(models.PDIndicator)
 class PDIndicatorAdmin(DataModelAdmin):
     list_display = ("title", "unit", "display_type")
