@@ -2,13 +2,28 @@ from django.db import models
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
-from etools_datamart.apps.sources.etools.models import PartnersPartnerstaffmember
+from etools_datamart.apps.sources.etools.models import AuthUser, PartnersPartnerorganization, UsersRealm
 
 
 class PartnerStaffMemberLoader(EtoolsLoader):
-    def get_user(self, record: PartnersPartnerstaffmember, values: dict, **kwargs):
-        if record.user:
-            return "{0.last_name} {0.first_name} ({0.email})".format(record.user)
+    def process_country(self):
+        for partner in PartnersPartnerorganization.objects.all().select_related("organization"):
+            for user_realm in UsersRealm.objects.filter(
+                country=self.context["country"], organization=partner.organization, group__name__startswith="IP "
+            ).select_related("user", "user__profile"):
+                filters = self.config.key(self, user_realm.user)
+                values = self.get_values(user_realm.user)
+                values["source_id"] = user_realm.user.id
+                values["user"] = "{0.last_name} {0.first_name} ({0.email})".format(user_realm.user)
+                values["phone"] = user_realm.user.profile.phone_number
+                values["title"] = user_realm.user.profile.job_title
+                values["partner"] = partner.organization.name
+                values["partner_id"] = partner.id
+                values["vendor_number"] = partner.organization.vendor_number
+                values["active"] = user_realm.is_active
+                print(values)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
 
 class PartnerStaffMember(EtoolsDataMartModel):
@@ -28,10 +43,4 @@ class PartnerStaffMember(EtoolsDataMartModel):
     loader = PartnerStaffMemberLoader()
 
     class Options:
-        source = PartnersPartnerstaffmember
-        mapping = {
-            "partner_id": "partner.id",
-            "partner": "partner.organization.name",
-            "vendor_number": "partner.organization.vendor_number",
-            "user": "-",
-        }
+        source = AuthUser
