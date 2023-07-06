@@ -132,7 +132,6 @@ class TPMActivityLoader(EtoolsLoader):
             "tpm_visit__author",
         ).prefetch_related(
             "tpm_visit__tpm_partner_focal_points",
-            "tpm_visit__tpm_partner_focal_points__user",
             "activity_ptr__locations",
         )
 
