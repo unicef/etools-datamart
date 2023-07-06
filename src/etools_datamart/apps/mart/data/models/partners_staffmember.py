@@ -21,7 +21,7 @@ class PartnerStaffMemberLoader(EtoolsLoader):
                 values["partner_id"] = partner.id
                 values["vendor_number"] = partner.organization.vendor_number
                 values["active"] = user_realm.is_active
-                print(values)
+
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
