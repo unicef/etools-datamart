@@ -42,7 +42,7 @@ class TPMVisitLoader(EtoolsLoader):
 
             tpm_focal_points = []
             qs = TpmTpmvisitTpmPartnerFocalPoints.objects.filter(tpmvisit=visit)
-            tpm_focal_points.extend(qs.values_list("tpmpartnerstaffmember__user__email", flat=True))
+            tpm_focal_points.extend(qs.values_list("user__email", flat=True))
 
             visit.tpm_focal_points = ",".join(tpm_focal_points)
             try:
