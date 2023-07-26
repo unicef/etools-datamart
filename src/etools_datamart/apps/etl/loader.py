@@ -132,6 +132,8 @@ class BaseLoaderOptions:
         "always_update",
         "fields_to_compare",
         "exclude_from_compare",
+        "archive_delta",
+        "archive_field",
     ]
 
     def __init__(self, base=None):

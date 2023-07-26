@@ -45,11 +45,12 @@ Totalbudget(ideally at most granular level tied to activity / result)
 Utilised budget(same conditions as above)
 Report  #
 """
-
+from datetime import timedelta
 
 from django.db import transaction
 from django.utils import timezone
 
+from dateutil.utils import today
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
@@ -131,6 +132,9 @@ class PrpBaseLoader(BaseLoader):
 
                     if stdout and verbosity > 0:
                         stdout.write("\n")
+
+                    if self.config.sync_deleted_records(self):
+                        self.remove_deleted()
                     # deleted = self.model.objects.exclude(seen=today).delete()[0]
                     # self.results.deleted = deleted
                 except MaxRecordsException:
@@ -158,3 +162,14 @@ class PrpBaseLoader(BaseLoader):
                     logger.warning(e)
 
         return self.results
+
+    def remove_deleted(self):
+        existing = list(self.get_queryset().only("id").values_list("id", flat=True))
+        to_delete = self.model.objects.exclude(source_id__in=existing)
+
+        if self.config.archive_delta and self.config.archive_field:
+            archived_excluded = {f"{self.config.archive_field}__lt": today() - timedelta(self.config.archive_delta)}
+            to_delete = to_delete.exclude(**archived_excluded)
+
+        self.results.deleted += to_delete.count()
+        to_delete.delete()

@@ -253,6 +253,8 @@ class DataReport(PrpDataMartModel):
         return f"{self.country_name} | {self.partner_name} | {self.cp_output} | {self.intervention_reference_number} | {self.pd_result}"
 
     class Options:
+        archive_delta = config.DEFAULT_ARCHIVE_DELTA
+        archive_field = "last_modify_date"
         mapping = {
             "indicator_report": "indicator_report_title",
             "programme_document": "i",
