@@ -132,6 +132,8 @@ class BaseLoaderOptions:
         "always_update",
         "fields_to_compare",
         "exclude_from_compare",
+        "archive_delta",
+        "archive_field",
     ]
 
     def __init__(self, base=None):
@@ -149,6 +151,8 @@ class BaseLoaderOptions:
         self.filters = None
         self.last_modify_field = None
         self.sync_deleted_records = lambda a: config.SYNC_DELETED_RECORDS
+        self.archive_delta = None
+        self.archive_field = None
         self.truncate = False
         self.fields_to_compare = None
         self.exclude_from_compare = ["seen"]
