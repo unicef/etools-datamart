@@ -148,6 +148,9 @@ class EtoolsLoader(BaseLoader):
         country = self.context["country"]
         existing = list(self.get_queryset().only("id").values_list("id", flat=True))
         to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
+        if self.archive_delta and self.archive_field:
+            archived_excluded = {f"{self.archive_field}__lt": self.archive_delta}
+            to_delete = to_delete.exclude(**archived_excluded)
         self.results.deleted += to_delete.count()
         to_delete.delete()
 
