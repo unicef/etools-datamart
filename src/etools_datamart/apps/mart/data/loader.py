@@ -1,4 +1,5 @@
 import time
+from datetime import timedelta
 from inspect import isclass
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.db import connections, models, transaction
 from django.utils import timezone
 
 from celery.utils.log import get_task_logger
+from dateutil.utils import today
 from dynamic_serializer.core import get_attr
 from redis.exceptions import LockError
 
@@ -148,8 +150,8 @@ class EtoolsLoader(BaseLoader):
         country = self.context["country"]
         existing = list(self.get_queryset().only("id").values_list("id", flat=True))
         to_delete = self.model.objects.filter(schema_name=country.schema_name).exclude(source_id__in=existing)
-        if self.archive_delta and self.archive_field:
-            archived_excluded = {f"{self.archive_field}__lt": self.archive_delta}
+        if self.config.archive_delta and self.config.archive_field:
+            archived_excluded = {f"{self.config.archive_field}__lt": today() - timedelta(self.config.archive_delta)}
             to_delete = to_delete.exclude(**archived_excluded)
         self.results.deleted += to_delete.count()
         to_delete.delete()
