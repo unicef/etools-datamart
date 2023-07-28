@@ -1,3 +1,9 @@
+3.60
+----
+* added realms updates
+* django 4.2 support
+
+
 3.59
 ----
 * PRP sync last 180 days
@@ -97,7 +103,7 @@
 
 3.51.10
 -------
-* interevention add outstanding_amt_local
+* intervention add outstanding_amt_local
 
 
 3.51.9
