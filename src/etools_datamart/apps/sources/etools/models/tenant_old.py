@@ -1359,6 +1359,7 @@ class PartnersAgreement(models.TenantModel):
     partner = models.ForeignKey(
         "PartnersPartnerorganization", models.DO_NOTHING, related_name="PartnersAgreement_partner"
     )
+    # TODO: realms cleanup
     old_partner_manager = models.ForeignKey(
         "PartnersPartnerstaffmember",
         models.DO_NOTHING,
@@ -1531,6 +1532,7 @@ class PartnersIntervention(models.TenantModel):
     signed_by_partner_date = models.DateField(blank=True, null=True)
     population_focus = models.CharField(max_length=130, blank=True, null=True)
     agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name="PartnersIntervention_agreement")
+    # TODO: realms cleanup
     old_partner_authorized_officer_signatory = models.ForeignKey(
         "PartnersPartnerstaffmember",
         models.DO_NOTHING,
@@ -1812,6 +1814,9 @@ class PartnersInterventionbudget(models.TenantModel):
     total_unicef_cash_local_wo_hq = models.DecimalField(max_digits=20, decimal_places=2)
     partner_supply_local = models.DecimalField(max_digits=20, decimal_places=2)
     total_partner_contribution_local = models.DecimalField(max_digits=20, decimal_places=2)
+    has_unfunded_cash = models.BooleanField()
+    total_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
+    unfunded_hq_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -1831,6 +1836,9 @@ class PartnersInterventionmanagementbudget(models.TenantModel):
     intervention = models.OneToOneField(
         PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionmanagementbudget_intervention"
     )
+    act1_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
+    act2_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
+    act3_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -1851,6 +1859,7 @@ class PartnersInterventionmanagementbudgetitem(models.TenantModel):
     no_units = models.DecimalField(max_digits=20, decimal_places=2)
     unit = models.CharField(max_length=150)
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
+    unfunded_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -2562,6 +2571,7 @@ class ReportsInterventionactivity(models.TenantModel):
     )
     code = models.CharField(max_length=50, blank=True, null=True)
     is_active = models.BooleanField()
+    unfunded_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -2601,6 +2611,7 @@ class ReportsInterventionactivityitem(models.TenantModel):
     unit = models.CharField(max_length=150)
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
     code = models.CharField(max_length=50, blank=True, null=True)
+    unfunded_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False

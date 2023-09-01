@@ -89,17 +89,6 @@ class AuthUser(models.Model):
         db_table = "auth_user"
 
 
-class AuthUserOldGroups(models.Model):
-    id = models.IntegerField(primary_key=True)
-    user_id = models.IntegerField()
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name="AuthUserOldGroups_group")
-
-    class Meta:
-        managed = False
-        db_table = "auth_user_old_groups"
-        unique_together = (("group", "user_id"),)
-
-
 class AuthUserUserPermissions(models.Model):
     id = models.IntegerField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="AuthUserUserPermissions_user")
@@ -320,6 +309,7 @@ class DjangoCeleryResultsTaskresult(models.Model):
     task_name = models.CharField(max_length=255, blank=True, null=True)
     worker = models.CharField(max_length=100, blank=True, null=True)
     date_created = models.DateTimeField()
+    periodic_task_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1177,6 +1167,25 @@ class UsersRealm(models.Model):
         unique_together = (("country", "group", "organization", "user"),)
 
 
+class UsersStageduser(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_json = models.JSONField()
+    request_state = models.CharField(max_length=10)
+    state_timestamp = models.DateTimeField()
+    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name="UsersStageduser_country")
+    organization = models.ForeignKey(
+        OrganizationsOrganization, models.DO_NOTHING, related_name="UsersStageduser_organization"
+    )
+    requester = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="UsersStageduser_requester")
+    reviewer = models.ForeignKey(
+        AuthUser, models.DO_NOTHING, related_name="UsersStageduser_reviewer", blank=True, null=True
+    )
+
+    class Meta:
+        managed = False
+        db_table = "users_stageduser"
+
+
 class UsersUserprofile(models.Model):
     id = models.IntegerField(primary_key=True)
     job_title = models.CharField(max_length=255, blank=True, null=True)
@@ -1217,21 +1226,6 @@ class UsersUserprofile(models.Model):
     class Meta:
         managed = False
         db_table = "users_userprofile"
-
-
-class UsersUserprofileOldCountriesAvailable(models.Model):
-    id = models.IntegerField(primary_key=True)
-    userprofile = models.ForeignKey(
-        UsersUserprofile, models.DO_NOTHING, related_name="UsersUserprofileOldCountriesAvailable_userprofile"
-    )
-    country = models.ForeignKey(
-        UsersCountry, models.DO_NOTHING, related_name="UsersUserprofileOldCountriesAvailable_country"
-    )
-
-    class Meta:
-        managed = False
-        db_table = "users_userprofile_old_countries_available"
-        unique_together = (("country", "userprofile"),)
 
 
 class UsersWorkspacecounter(models.Model):

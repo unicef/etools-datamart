@@ -1359,14 +1359,6 @@ class PartnersAgreement(models.TenantModel):
     partner = models.ForeignKey(
         "PartnersPartnerorganization", models.DO_NOTHING, related_name="PartnersAgreement_partner"
     )
-    # TODO: realms cleanup
-    old_partner_manager = models.ForeignKey(
-        "PartnersPartnerstaffmember",
-        models.DO_NOTHING,
-        related_name="PartnersAgreement_old_partner_manager",
-        blank=True,
-        null=True,
-    )
     signed_by = models.ForeignKey(
         "AuthUser", models.DO_NOTHING, related_name="PartnersAgreement_signed_by", blank=True, null=True
     )
@@ -1403,23 +1395,6 @@ class PartnersAgreementAuthorizedOfficers(models.TenantModel):
         managed = False
         db_table = "partners_agreement_authorized_officers"
         unique_together = (("agreement", "user"),)
-
-
-class PartnersAgreementOldAuthorizedOfficers(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    agreement = models.ForeignKey(
-        PartnersAgreement, models.DO_NOTHING, related_name="PartnersAgreementOldAuthorizedOfficers_agreement"
-    )
-    partnerstaffmember = models.ForeignKey(
-        "PartnersPartnerstaffmember",
-        models.DO_NOTHING,
-        related_name="PartnersAgreementOldAuthorizedOfficers_partnerstaffmember",
-    )
-
-    class Meta:
-        managed = False
-        db_table = "partners_agreement_old_authorized_officers"
-        unique_together = (("agreement", "partnerstaffmember"),)
 
 
 class PartnersAgreementamendment(models.TenantModel):
@@ -1532,14 +1507,6 @@ class PartnersIntervention(models.TenantModel):
     signed_by_partner_date = models.DateField(blank=True, null=True)
     population_focus = models.CharField(max_length=130, blank=True, null=True)
     agreement = models.ForeignKey(PartnersAgreement, models.DO_NOTHING, related_name="PartnersIntervention_agreement")
-    # TODO: realms cleanup
-    old_partner_authorized_officer_signatory = models.ForeignKey(
-        "PartnersPartnerstaffmember",
-        models.DO_NOTHING,
-        related_name="PartnersIntervention_old_partner_authorized_officer_signatory",
-        blank=True,
-        null=True,
-    )
     unicef_signatory = models.ForeignKey(
         "AuthUser", models.DO_NOTHING, related_name="PartnersIntervention_unicef_signatory", blank=True, null=True
     )
@@ -1650,23 +1617,6 @@ class PartnersInterventionOffices(models.TenantModel):
         unique_together = (("intervention", "office"),)
 
 
-class PartnersInterventionOldPartnerFocalPoints(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    intervention = models.ForeignKey(
-        PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionOldPartnerFocalPoints_intervention"
-    )
-    partnerstaffmember = models.ForeignKey(
-        "PartnersPartnerstaffmember",
-        models.DO_NOTHING,
-        related_name="PartnersInterventionOldPartnerFocalPoints_partnerstaffmember",
-    )
-
-    class Meta:
-        managed = False
-        db_table = "partners_intervention_old_partner_focal_points"
-        unique_together = (("intervention", "partnerstaffmember"),)
-
-
 class PartnersInterventionPartnerFocalPoints(models.TenantModel):
     id = models.IntegerField(primary_key=True)
     intervention = models.ForeignKey(
@@ -1743,13 +1693,6 @@ class PartnersInterventionamendment(models.TenantModel):
     difference = models.JSONField()
     is_active = models.BooleanField()
     kind = models.CharField(max_length=20)
-    old_partner_authorized_officer_signatory = models.ForeignKey(
-        "PartnersPartnerstaffmember",
-        models.DO_NOTHING,
-        related_name="PartnersInterventionamendment_old_partner_authorized_officer_signatory",
-        blank=True,
-        null=True,
-    )
     related_objects_map = models.JSONField()
     signed_by_partner_date = models.DateField(blank=True, null=True)
     signed_by_unicef_date = models.DateField(blank=True, null=True)
@@ -1814,9 +1757,6 @@ class PartnersInterventionbudget(models.TenantModel):
     total_unicef_cash_local_wo_hq = models.DecimalField(max_digits=20, decimal_places=2)
     partner_supply_local = models.DecimalField(max_digits=20, decimal_places=2)
     total_partner_contribution_local = models.DecimalField(max_digits=20, decimal_places=2)
-    has_unfunded_cash = models.BooleanField()
-    total_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
-    unfunded_hq_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -1836,9 +1776,6 @@ class PartnersInterventionmanagementbudget(models.TenantModel):
     intervention = models.OneToOneField(
         PartnersIntervention, models.DO_NOTHING, related_name="PartnersInterventionmanagementbudget_intervention"
     )
-    act1_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
-    act2_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
-    act3_unfunded = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -1859,7 +1796,6 @@ class PartnersInterventionmanagementbudgetitem(models.TenantModel):
     no_units = models.DecimalField(max_digits=20, decimal_places=2)
     unit = models.CharField(max_length=150)
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
-    unfunded_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -2151,28 +2087,6 @@ class PartnersPartnerplannedvisits(models.TenantModel):
         managed = False
         db_table = "partners_partnerplannedvisits"
         unique_together = (("partner", "year"),)
-
-
-class PartnersPartnerstaffmember(models.TenantModel):
-    id = models.IntegerField(primary_key=True)
-    title = models.CharField(max_length=100, blank=True, null=True)
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
-    email = models.CharField(unique=True, max_length=128)
-    phone = models.CharField(max_length=64, blank=True, null=True)
-    partner = models.ForeignKey(
-        PartnersPartnerorganization, models.DO_NOTHING, related_name="PartnersPartnerstaffmember_partner"
-    )
-    active = models.BooleanField()
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    user = models.OneToOneField(
-        "AuthUser", models.DO_NOTHING, related_name="PartnersPartnerstaffmember_user", blank=True, null=True
-    )
-
-    class Meta:
-        managed = False
-        db_table = "partners_partnerstaffmember"
 
 
 class PartnersPlannedengagement(models.TenantModel):
@@ -2571,7 +2485,6 @@ class ReportsInterventionactivity(models.TenantModel):
     )
     code = models.CharField(max_length=50, blank=True, null=True)
     is_active = models.BooleanField()
-    unfunded_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False
@@ -2611,7 +2524,6 @@ class ReportsInterventionactivityitem(models.TenantModel):
     unit = models.CharField(max_length=150)
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
     code = models.CharField(max_length=50, blank=True, null=True)
-    unfunded_cash = models.DecimalField(max_digits=20, decimal_places=2)
 
     class Meta:
         managed = False

@@ -1,14 +1,6 @@
-# Fix User ManyToManyField
-from django.db import models
-
 from unicef_security.models import User
 
-from etools_datamart.apps.sources.etools.models import AuthGroup, AuthUser, AuthUserOldGroups
-
-models.ManyToManyField(
-    AuthGroup,
-    through=AuthUserOldGroups,
-).contribute_to_class(AuthUser, "groups")
+from etools_datamart.apps.sources.etools.models import AuthUser
 
 AuthUser.is_authenticated = True
 AuthUser.set_password = User.set_password

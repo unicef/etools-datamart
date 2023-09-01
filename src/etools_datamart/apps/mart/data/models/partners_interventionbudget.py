@@ -22,7 +22,7 @@ class InterventionBudgetLoader(InterventionLoader):
             values["source_id"] = record.id
             values["budget_cso_contribution"] = record.partner_contribution_local
             values["budget_unicef_cash"] = record.unicef_cash_local
-            values["budget_total_unfunded"] = record.total_unfunded
+            # values["budget_total_unfunded"] = record.total_unfunded
             values["budget_total"] = record.total_local
             values["budget_currency"] = record.currency
             values["budget_unicef_supply"] = record.in_kind_amount_local
@@ -54,7 +54,7 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
     budget_currency = models.CharField(max_length=5, blank=True, null=True)
     budget_total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     budget_unicef_cash = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-    budget_total_unfunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    # budget_total_unfunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     budget_unicef_supply = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     fr_numbers = models.TextField(max_length=100, blank=True, null=True)
     fr_numbers_data = JSONField(blank=True, null=True, default=dict)

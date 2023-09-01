@@ -10,7 +10,6 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionresultlink,
     PartnersInterventionSections,
     PartnersInterventionUnicefFocalPoints,
-    PartnersPartnerstaffmember,
     ReportsOffice,
     ReportsResult,
     ReportsSector,
