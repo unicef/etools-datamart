@@ -11,7 +11,6 @@ def apply():
         actionpoint,
         audit_engagement,
         auth_user,
-        auth_usergroups,
         consts,
         partners_agreement,
         partners_intervention,

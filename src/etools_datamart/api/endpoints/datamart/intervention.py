@@ -47,10 +47,10 @@ class InterventionSerializerV2(DataMartSerializer):
     class Meta:
         model = models.Intervention
         fields = (
-            "partner_name",  # agreement.partner.name
-            "partner_vendor_number",  # agreement.partner.vendor_number
-            "partner_type",  # agreement.partner.partner_type
-            "cso_type",  # agreement.partner.cso_type
+            "partner_name",  # agreement.partner.organization.name
+            "partner_vendor_number",  # agreement.partner.organization.vendor_number
+            "partner_type",  # agreement.partner.organization.organization_type
+            "cso_type",  # agreement.partner.organization.cso_type
             "country_name",
             "schema_name",
             "area_code",

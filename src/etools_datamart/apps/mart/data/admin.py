@@ -361,6 +361,21 @@ class FundsReservationAdmin(DataModelAdmin):
     date_hierarchy = "start_date"
 
 
+@register(models.FundsReservationHeader)
+class FundsReservationHeaderAdmin(DataModelAdmin):
+    search_fields = ("fr_number", "pd_reference_number", "vendor_code")
+    list_display = (
+        "country_name",
+        "fr_number",
+        "pd_reference_number",
+        "fr_type",
+        "actual_amt_local",
+        "total_amt_local",
+    )
+    list_filter = ("fr_type",)
+    date_hierarchy = "start_date"
+
+
 @register(models.PDIndicator)
 class PDIndicatorAdmin(DataModelAdmin):
     list_display = ("title", "unit", "display_type")
@@ -388,7 +403,7 @@ class TravelAdmin(DataModelAdmin):
 
 @register(models.Partner)
 class PartnerAdmin(DataModelAdmin):
-    list_display = ("name", "partner_type", "vendor_number", "cso_type", "rating", "lead_office", "lead_section")
+    list_display = ("vendor_number", "name", "partner_type", "cso_type", "rating", "lead_office", "lead_section")
     date_hierarchy = "created"
     list_filter = ("partner_type", "last_pv_date", "hidden", "cso_type", "rating")
     search_fields = (

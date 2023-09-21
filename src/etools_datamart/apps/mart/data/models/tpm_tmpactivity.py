@@ -94,9 +94,9 @@ class TPMActivityLoader(EtoolsLoader):
         for member in record.tpm_visit.tpm_partner_focal_points.all():
             ret.append(
                 dict(
-                    email=member.user.email,
-                    first_name=member.user.first_name,
-                    last_name=member.user.last_name,
+                    email=member.email,
+                    first_name=member.first_name,
+                    last_name=member.last_name,
                 )
             )
 
@@ -132,7 +132,6 @@ class TPMActivityLoader(EtoolsLoader):
             "tpm_visit__author",
         ).prefetch_related(
             "tpm_visit__tpm_partner_focal_points",
-            "tpm_visit__tpm_partner_focal_points__user",
             "activity_ptr__locations",
         )
 
@@ -246,8 +245,8 @@ class TPMActivity(EtoolsDataMartModel):
             # location_pcode="=",
             offices="-",
             offices_data="i",
-            partner_name="activity_ptr.partner.name",
-            partner_vendor_number="activity_ptr.partner.vendor_number",
+            partner_name="activity_ptr.partner.organization.name",
+            partner_vendor_number="activity_ptr.partner.organization.vendor_number",
             pd_ssfa_reference_number="activity_ptr.intervention.reference_number",
             pd_ssfa_title="activity_ptr.intervention.title",
             reject_comment="activity_ptr.reject_comment",
@@ -262,7 +261,7 @@ class TPMActivity(EtoolsDataMartModel):
             # tpm_focal_point_name="=",
             tpm_focal_points="-",
             tpm_focal_points_data="i",
-            tpm_name="tpm_visit.tpm_partner.name",
+            tpm_name="tpm_visit.tpm_partner.organization.name",
             # unicef_focal_point_email="=",
             # unicef_focal_point_name="=",
             unicef_focal_points="=",

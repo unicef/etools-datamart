@@ -82,7 +82,7 @@ class TravelActivity(LocationMixin, EtoolsDataMartModel):
                 # 'location_levelname': 'location.admin_level_name',
                 "travel_reference_number": "travel.reference_number",
                 "primary_traveler": "primary_traveler.email",
-                "partner_name": "partner.name",
+                "partner_name": "partner.organization.name",
                 "partnership_number": "partnership.number",
                 "result_name": "result.name",
                 "result_code": "result.code",

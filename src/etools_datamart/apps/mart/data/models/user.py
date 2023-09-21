@@ -8,11 +8,11 @@ from etools_datamart.apps.sources.etools.models import AuthUser
 
 class EtoolsUserLoader(CommonSchemaLoader):
     def get_groups(self, record, values, **kwargs):
-        return ", ".join(record.groups.values_list("name", flat=True))
+        return ", ".join(record.UsersRealm_user.values_list("group__name", flat=True).distinct())
 
     def get_countries_available(self, record, values, **kwargs):
         try:
-            return ", ".join(record.profile.countries_available.values_list("name", flat=True))
+            return ", ".join(record.UsersRealm_user.values_list("country__name", flat=True).distinct())
         except ObjectDoesNotExist:  # pragma: no cover
             return ""
 
@@ -40,7 +40,7 @@ class EtoolsUser(EtoolsDataMartModel):
     post_number = models.CharField(max_length=32, blank=True, null=True)
     post_title = models.CharField(max_length=64, blank=True, null=True)
     staff_id = models.CharField(max_length=32, blank=True, null=True)
-    vendor_number = models.CharField(unique=True, max_length=32, blank=True, null=True)
+    vendor_number = models.CharField(max_length=32, blank=True, null=True)
 
     # country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name='userscountry_users_userprofile_country_id', blank=True, null=True)
     # office = models.ForeignKey(UsersOffice, models.DO_NOTHING, related_name='usersoffice_users_userprofile_office_id', blank=True, null=True)
@@ -77,7 +77,7 @@ class EtoolsUser(EtoolsDataMartModel):
             post_number="profile.post_number",
             post_title="profile.post_title",
             staff_id="profile.staff_id",
-            vendor_number="profile.vendor_number",
+            vendor_number="profile.organization.vendor_number",
             country_name="profile.country.name",
             office="profile.office.name",
             country_override="i",
