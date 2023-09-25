@@ -12,7 +12,7 @@ class PseaAssessmentLoader(EtoolsLoader):
         if assessor:
             return {
                 "assessor_type": assessor.assessor_type,
-                "name": assessor.auditor_firm.name if assessor.auditor_firm else assessor.user.email,
+                "name": assessor.auditor_firm.organization.name if assessor.auditor_firm else assessor.user.email,
             }
 
     def get_focal_points(self, record: PseaAssessment, values: dict, **kwargs):
