@@ -44,7 +44,7 @@ class Export(AbstractPreload):
     notify = models.BooleanField(default=False, help_text="Send me an email when file is available")
 
     class Meta:
-        unique_together = ("url", "as_user", "params", "format")
+        unique_together = ("url", "params", "format")
         ordering = ("name",)
 
     def __str__(self):
