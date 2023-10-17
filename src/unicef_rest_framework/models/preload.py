@@ -91,6 +91,8 @@ class AbstractPreload(models.Model):
             if self.as_user:
                 client.force_authenticate(self.as_user)
             params = params or self.params
+            if hasattr(self, "check_file") and not self.check_file():
+                client.defaults["HTTP_IF_NONE_MATCH"] = "Not-Set"
             response = client.get(target, data=params)
             self.status_code = response.status_code
             if self.status_code == 200:
