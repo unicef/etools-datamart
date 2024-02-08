@@ -193,7 +193,7 @@ class Trip(EtoolsDataMartModel):
             locations="-",
             locations_data="i",
             office_name="office.name",
-            partner_name="activity.partner.organization.name",
+            partner_name="activity.partner.name",
             pd_ssfa_reference_number="activity.partnership.number",
             pd_ssfa_title="activity.partnership.title",
             primary_traveler="activity.primary_traveler.email",
@@ -208,6 +208,6 @@ class Trip(EtoolsDataMartModel):
             trip_activity_reference_number="activity.reference_number",
             trip_activity_type="activity.travel_type",
             trip_url=lambda loader, record: "t2f/edit-travel/%s" % record.id,
-            vendor_number="activity.partner.organization.vendor_number",
+            vendor_number="activity.partner.vendor_number",
             source_activity_id="activity.id",
         )

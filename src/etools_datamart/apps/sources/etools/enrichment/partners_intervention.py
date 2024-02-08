@@ -10,6 +10,7 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionresultlink,
     PartnersInterventionSections,
     PartnersInterventionUnicefFocalPoints,
+    PartnersPartnerstaffmember,
     ReportsOffice,
     ReportsResult,
     ReportsSector,
@@ -53,8 +54,7 @@ models.ManyToManyField(
 ).contribute_to_class(PartnersIntervention, "unicef_focal_points")
 
 models.ManyToManyField(
-    AuthUser,
-    related_name="interventions",
+    PartnersPartnerstaffmember,
     through=PartnersInterventionPartnerFocalPoints,
 ).contribute_to_class(PartnersIntervention, "partner_focal_points")
 

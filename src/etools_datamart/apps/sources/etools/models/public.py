@@ -89,6 +89,17 @@ class AuthUser(models.Model):
         db_table = "auth_user"
 
 
+class AuthUserGroups(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_id = models.IntegerField()
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name="AuthUserGroups_group")
+
+    class Meta:
+        managed = False
+        db_table = "auth_user_groups"
+        unique_together = (("group", "user_id"),)
+
+
 class AuthUserUserPermissions(models.Model):
     id = models.IntegerField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="AuthUserUserPermissions_user")
@@ -309,7 +320,6 @@ class DjangoCeleryResultsTaskresult(models.Model):
     task_name = models.CharField(max_length=255, blank=True, null=True)
     worker = models.CharField(max_length=100, blank=True, null=True)
     date_created = models.DateTimeField()
-    periodic_task_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -532,26 +542,6 @@ class NotificationNotification(models.Model):
     class Meta:
         managed = False
         db_table = "notification_notification"
-
-
-class OrganizationsOrganization(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    name = models.CharField(max_length=255, blank=True, null=True)
-    vendor_number = models.CharField(unique=True, max_length=30)
-    organization_type = models.CharField(max_length=50, blank=True, null=True)
-    cso_type = models.CharField(max_length=50, blank=True, null=True)
-    short_name = models.CharField(max_length=50, blank=True, null=True)
-    other = models.JSONField(blank=True, null=True)
-    parent = models.ForeignKey(
-        "self", models.DO_NOTHING, related_name="OrganizationsOrganization_parent", blank=True, null=True
-    )
-
-    class Meta:
-        managed = False
-        db_table = "organizations_organization"
-        unique_together = (("name", "vendor_number"),)
 
 
 class Permissions2Permission(models.Model):
@@ -804,6 +794,8 @@ class PurchaseOrderAuditorfirm(models.Model):
     id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    vendor_number = models.CharField(unique=True, max_length=30)
+    name = models.CharField(max_length=255)
     street_address = models.CharField(max_length=500)
     city = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=32)
@@ -815,9 +807,6 @@ class PurchaseOrderAuditorfirm(models.Model):
     deleted_flag = models.BooleanField()
     vision_synced = models.BooleanField()
     unicef_users_allowed = models.BooleanField()
-    organization = models.OneToOneField(
-        OrganizationsOrganization, models.DO_NOTHING, related_name="PurchaseOrderAuditorfirm_organization"
-    )
 
     class Meta:
         managed = False
@@ -1020,6 +1009,8 @@ class TpmpartnersTpmpartner(models.Model):
     id = models.IntegerField(primary_key=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
+    vendor_number = models.CharField(unique=True, max_length=30)
+    name = models.CharField(max_length=255)
     street_address = models.CharField(max_length=500)
     city = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=32)
@@ -1030,9 +1021,6 @@ class TpmpartnersTpmpartner(models.Model):
     blocked = models.BooleanField()
     hidden = models.BooleanField()
     deleted_flag = models.BooleanField()
-    organization = models.OneToOneField(
-        OrganizationsOrganization, models.DO_NOTHING, related_name="TpmpartnersTpmpartner_organization"
-    )
 
     class Meta:
         managed = False
@@ -1149,43 +1137,6 @@ class UsersOffice(models.Model):
         db_table = "users_office"
 
 
-class UsersRealm(models.Model):
-    id = models.IntegerField(primary_key=True)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    is_active = models.BooleanField()
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name="UsersRealm_country")
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING, related_name="UsersRealm_group")
-    organization = models.ForeignKey(
-        OrganizationsOrganization, models.DO_NOTHING, related_name="UsersRealm_organization"
-    )
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="UsersRealm_user")
-
-    class Meta:
-        managed = False
-        db_table = "users_realm"
-        unique_together = (("country", "group", "organization", "user"),)
-
-
-class UsersStageduser(models.Model):
-    id = models.IntegerField(primary_key=True)
-    user_json = models.JSONField()
-    request_state = models.CharField(max_length=10)
-    state_timestamp = models.DateTimeField()
-    country = models.ForeignKey(UsersCountry, models.DO_NOTHING, related_name="UsersStageduser_country")
-    organization = models.ForeignKey(
-        OrganizationsOrganization, models.DO_NOTHING, related_name="UsersStageduser_organization"
-    )
-    requester = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name="UsersStageduser_requester")
-    reviewer = models.ForeignKey(
-        AuthUser, models.DO_NOTHING, related_name="UsersStageduser_reviewer", blank=True, null=True
-    )
-
-    class Meta:
-        managed = False
-        db_table = "users_stageduser"
-
-
 class UsersUserprofile(models.Model):
     id = models.IntegerField(primary_key=True)
     job_title = models.CharField(max_length=255, blank=True, null=True)
@@ -1214,18 +1165,25 @@ class UsersUserprofile(models.Model):
     supervisor = models.ForeignKey(
         AuthUser, models.DO_NOTHING, related_name="UsersUserprofile_supervisor", blank=True, null=True
     )
-    organization = models.ForeignKey(
-        OrganizationsOrganization,
-        models.DO_NOTHING,
-        related_name="UsersUserprofile_organization",
-        blank=True,
-        null=True,
-    )
-    receive_tpm_notifications = models.BooleanField()
 
     class Meta:
         managed = False
         db_table = "users_userprofile"
+
+
+class UsersUserprofileCountriesAvailable(models.Model):
+    id = models.IntegerField(primary_key=True)
+    userprofile = models.ForeignKey(
+        UsersUserprofile, models.DO_NOTHING, related_name="UsersUserprofileCountriesAvailable_userprofile"
+    )
+    country = models.ForeignKey(
+        UsersCountry, models.DO_NOTHING, related_name="UsersUserprofileCountriesAvailable_country"
+    )
+
+    class Meta:
+        managed = False
+        db_table = "users_userprofile_countries_available"
+        unique_together = (("country", "userprofile"),)
 
 
 class UsersWorkspacecounter(models.Model):

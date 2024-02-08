@@ -1,8 +1,8 @@
 from etools_datamart.apps.sources.etools.models import (
-    AuthUser,
     PartnersAgreement,
     PartnersAgreementamendment,
     PartnersAgreementAuthorizedOfficers,
+    PartnersPartnerstaffmember,
 )
 
 from .utils import add_m2m
@@ -32,7 +32,7 @@ PartnersAgreement.base_number = property(get_base_number)
 add_m2m(
     PartnersAgreement,
     "authorized_officers",
-    AuthUser,
+    PartnersPartnerstaffmember,
     through=PartnersAgreementAuthorizedOfficers,
     related_name="agreement_authorizations",
 )

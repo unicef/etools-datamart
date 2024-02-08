@@ -194,11 +194,10 @@ class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):
             "lower_result__result_link__cp_output",
             "lower_result__result_link__intervention",
             "lower_result__result_link__intervention__agreement__partner",
-            "lower_result__result_link__intervention__agreement__partner__organization",
         ).prefetch_related("locations", "disaggregations")
         mapping = dict(
-            partner_name="lower_result.result_link.intervention.agreement.partner.organization.name",
-            partner_vendor_number="lower_result.result_link.intervention.agreement.partner.organization.vendor_number",
+            partner_name="lower_result.result_link.intervention.agreement.partner.name",
+            partner_vendor_number="lower_result.result_link.intervention.agreement.partner.vendor_number",
             baseline_denominator="-",
             baseline_numerator="-",
             cluster_indicator_id="=",

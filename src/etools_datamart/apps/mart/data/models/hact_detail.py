@@ -180,9 +180,9 @@ class HACTHistory(EtoolsDataMartModel):
         sync_deleted_records = lambda loader: False
         truncate = True
         mapping = dict(
-            partner_name="partner.organization.name",
-            partner_type="partner.organization.organization_type",
-            vendor_number="partner.organization.vendor_number",
+            partner_name="partner.name",
+            partner_type="partner.partner_type",
+            vendor_number="partner.vendor_number",
             partner_source_id="partner.id",
             assessment_type="partner.type_of_assessment",
             year="year",

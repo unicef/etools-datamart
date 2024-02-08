@@ -8,7 +8,7 @@ from . import models
 @register(models.AuthUser)
 class AuthUserAdmin(EToolsModelAdmin):
     list_display = ("username", "email", "first_name", "last_name", "is_staff")
-    list_filter = ("is_staff", "is_superuser", "is_active")
+    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("username", "first_name", "last_name", "email")
     ordering = ("username",)
 
@@ -31,11 +31,8 @@ class ActivitiesActivityAdmin(TenantModelAdmin):
 
 @register(models.PartnersPartnerorganization)
 class PartnerOrganizationAdmin(TenantModelAdmin):
-    list_display = (
-        "id",
-        "schema",
-    )
-    # search_fields = ("name",)
+    list_display = ("vendor_number", "partner_type", "name", "short_name", "schema")
+    search_fields = ("name",)
     # list_filter = ('schema',)
 
 

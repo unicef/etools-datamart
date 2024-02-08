@@ -9,8 +9,9 @@ from etools_datamart.apps.sources.etools.models import (
     AuditMicroassessment,
     AuditSpecialaudit,
     AuditSpotcheck,
-    AuthUser,
     PartnersIntervention,
+    PartnersPartnerstaffmember,
+    PurchaseOrderAuditorstaffmember,
 )
 
 from .utils import set_primary_key
@@ -53,13 +54,12 @@ set_primary_key(AuditAudit, "engagement_ptr")
 set_primary_key(AuditSpecialaudit, "engagement_ptr")
 
 models.ManyToManyField(
-    AuthUser,
-    related_name="engagements",
+    PartnersPartnerstaffmember,
     through=AuditEngagementAuthorizedOfficers,
 ).contribute_to_class(AuditEngagement, "authorized_officers")
 
 models.ManyToManyField(
-    AuthUser,
+    PurchaseOrderAuditorstaffmember,
     through=AuditEngagementStaffMembers,
 ).contribute_to_class(AuditEngagement, "staff_members")
 

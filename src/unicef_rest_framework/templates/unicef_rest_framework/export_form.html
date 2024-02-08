@@ -24,9 +24,6 @@
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    {% if object.check_file and request.user.is_superuser %}
-                        <p><b>Status Code: </b>{{ object.status_code }}</p>
-                    {% endif %}
                     <input type="submit" class="btn btn-primary" value="Save">
                 </form>
                 {% else %}
@@ -38,18 +35,17 @@
                     <p><b>Filename: </b>{{ object.filename }}</p>
                     <p><b>Save as: </b>{{ object.save_as }}</p>
                     <p><b>Response Length: </b>{{ object.response_length }}</p>
+                    <p><b>Status Code: </b>{{ object.status_code }}</p>
                     <p><b>Last Run: </b>{{ object.last_run }}</p>
                 {% endif %}
             </div>
             <div class="col-lg-4">
                 <br>
-                {% if object.check_file %}
-                    <h4><b><a class="btn btn-primary btn-block" href="{% url "urf:export-fetch" object.id %}">Download</a></b></h4>
+                {% if object.last_run %}
+                    <h4><b><a href="{% url "urf:export-fetch" object.id %}">Download</a></b></h4>
                 {% endif %}
                 <br><br>
                 {% if request.user.is_superuser and object.id %}
-                    <h4><b><a class="btn btn-primary btn-block" href="{% url "admin:unicef_rest_framework_export_run" object.id %}">Run</a></b></h4>
-                    <br><br>
                     <h4><b><a href="{% url "admin:unicef_rest_framework_export_change" object.id %}" target="_blank">Admin</a></b></h4>
                     <br><br>
                 {% endif %}

@@ -1,10 +1,5 @@
-from datetime import timedelta
-
 from django.db import models
 from django.db.models import F, Q
-
-from constance import config
-from dateutil.utils import today
 
 from etools_datamart.apps.mart.prp.base import PrpDataMartModel
 from etools_datamart.apps.mart.prp.models.base import PrpBaseLoader
@@ -14,8 +9,9 @@ from etools_datamart.apps.sources.source_prp.models import IndicatorIndicatorrep
 class IndicatorReportLoader(PrpBaseLoader):
     def get_queryset(self):
         qs = (
-            IndicatorIndicatorreport.objects.filter(modified__gte=today() - timedelta(config.DEFAULT_ARCHIVE_DELTA))
-            .exclude(Q(progress_report__isnull=True) | Q(progress_report__status__in=["Due", "Ove", "Sen"]))
+            IndicatorIndicatorreport.objects.exclude(
+                Q(progress_report__isnull=True) | Q(progress_report__status__in=["Due", "Ove", "Sen"])
+            )
             .select_related(
                 "progress_report",
                 "progress_report__programme_document__workspace",
@@ -65,6 +61,4 @@ class IndicatorReport(PrpDataMartModel):
         return f"{self.business_area} | {self.intervention_reference_number} | {self.pd_output_progress_status}"
 
     class Options:
-        archive_delta = config.DEFAULT_ARCHIVE_DELTA
-        archive_field = "last_modify_date"
         mapping = {}

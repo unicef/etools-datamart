@@ -2,7 +2,7 @@
     "status_code": 200,
     "headers": {
         "Content-Type": "application/json",
-        "Vary": "Accept, origin, Cookie",
+        "Vary": "Accept, Origin, Cookie",
         "Allow": "GET, HEAD, OPTIONS",
         "ETag": "\"b714494348891dc72b4d590c29c17c10\"",
         "X-Frame-Options": "DENY",

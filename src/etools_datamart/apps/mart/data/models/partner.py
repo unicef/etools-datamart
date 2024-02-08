@@ -14,7 +14,7 @@ from etools_datamart.apps.sources.etools.models import PartnersPartnerorganizati
 
 class PartnerLoader(EtoolsLoader):
     def get_queryset(self):
-        return PartnersPartnerorganization.objects.select_related("planned_engagement", "organization").all()
+        return PartnersPartnerorganization.objects.select_related("planned_engagement").all()
 
     def get_last_pv_date(self, record, values, **kwargs):
         # FIXME: improves this
@@ -170,11 +170,4 @@ class Partner(EtoolsDataMartModel):
         key = lambda loader, record: dict(
             schema_name=loader.context["country"].schema_name,
             source_id=record.id,
-        )
-        mapping = dict(
-            name="organization.name",
-            vendor_number="organization.vendor_number",
-            partner_type="organization.organization_type",
-            cso_type="organization.cso_type",
-            short_name="organization.short_name",
         )

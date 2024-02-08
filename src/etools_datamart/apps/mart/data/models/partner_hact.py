@@ -133,7 +133,7 @@ class PartnerHactLoader(EtoolsLoader):
                 engagement_code = spot_check.engagement_ptr.engagement_type
             return "{}/{}/{}/{}/{}".format(
                 spot_check.schema or "",
-                spot_check.engagement_ptr.partner.organization.name[:5],
+                spot_check.engagement_ptr.partner.name[:5],
                 engagement_code.upper(),
                 spot_check.engagement_ptr.created.year,
                 spot_check.engagement_ptr.id,
@@ -195,11 +195,4 @@ class PartnerHact(EtoolsDataMartModel):
         key = lambda loader, record: dict(
             schema_name=loader.context["country"].schema_name,
             source_id=record.id,
-        )
-        mapping = dict(
-            name="organization.name",
-            vendor_number="organization.vendor_number",
-            partner_type="organization.organization_type",
-            cso_type="organization.cso_type",
-            short_name="organization.short_name",
         )

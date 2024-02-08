@@ -203,7 +203,7 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
                 {
                     "last_name": o.last_name,
                     "first_name": o.first_name,
-                    "partner": record.partner.organization.name,
+                    "partner": o.partner.name,
                     "email": o.email,
                 }
             )
@@ -236,9 +236,9 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
         for o in record.staff_members.all():
             ret.append(
                 {
-                    "last_name": o.last_name,
-                    "first_name": o.first_name,
-                    "email": o.email,
+                    "last_name": o.user.last_name,
+                    "first_name": o.user.first_name,
+                    "email": o.user.email,
                 }
             )
         values["staff_members_data"] = ret
@@ -435,8 +435,8 @@ class Engagement(EtoolsDataMartModel):
             active_pd="-",
             active_pd_data="i",
             agreement="agreement.order_number",  # PurchaseOrder
-            auditor="agreement.auditor_firm.organization.name",
-            auditor_number="agreement.auditor_firm.organization.vendor_number",
+            auditor="agreement.auditor_firm.name",
+            auditor_number="agreement.auditor_firm.vendor_number",
             authorized_officers="-",
             engagement_attachments="-",
             report_attachments="-",

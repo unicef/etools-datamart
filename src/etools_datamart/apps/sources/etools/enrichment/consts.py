@@ -344,13 +344,13 @@ class PartnersInterventionConst:
     CANCELLED = "cancelled"
 
     PD = "PD"
-    SPD = "SPD"
+    SHPD = "SHPD"
     SSFA = "SSFA"
 
     INTERVENTION_TYPES = (
         (PD, "Programme Document"),
-        (SPD, "Simplified Programme Document"),
-        # (SSFA, "SSFA"),
+        (SHPD, "Simplified Humanitarian Programme Document"),
+        (SSFA, "SSFA"),
     )
     STATUSES = (
         (DRAFT, "Draft"),

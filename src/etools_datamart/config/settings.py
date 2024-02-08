@@ -449,7 +449,6 @@ CONSTANCE_CONFIG = {
     "ALLOW_EMAIL_PASSWORD": (False, "Allow send local password by email", bool),
     "SYNC_DELETED_RECORDS": (True, "Deletes the records that not in the loaded queryset", bool),
     "DEFAULT_ARCHIVE_DELTA": (180, "Days to freeze data, no changes or deletion", int),
-    "START_YEAR_FILTER": (2015, "Starting year for the year picker", int),
 }
 
 CELERY_ACCEPT_CONTENT = ["etljson", "application/json"]

@@ -7,7 +7,6 @@ from unicef_rest_framework.forms import DateRangePickerField, Select2ChoiceField
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
 from etools_datamart.apps.mart.data import models
-from etools_datamart.apps.sources.etools.enrichment.consts import TravelType
 
 from .. import common
 
@@ -73,9 +72,6 @@ class TripFilterForm(forms.Form):
     # travel_reference_number__istartswith = forms.CharField(label='Reference Number',
     #                                                        required=False)
     travel_type = forms.CharField(label="Travel Type", required=False)
-    trip_activity_type__in = Select2MultipleChoiceField(
-        label="Activity Type", required=False, choices=TravelType.CHOICES
-    )
     result_type = Select2MultipleChoiceField(
         label="Result Type",
         required=False,
@@ -101,8 +97,6 @@ class TripFilterForm(forms.Form):
         filters = data.copy()
         if "mode_of_travel__acontains" in filters:
             filters.setlist("mode_of_travel__acontains", data["mode_of_travel__acontains"].split(","))
-        if "trip_activity_type__in" in filters:
-            filters.setlist("trip_activity_type__in", data["trip_activity_type__in"].split(","))
         super().__init__(filters, files, auto_id, prefix, initial, *args, **kwargs)
 
 
@@ -116,7 +110,6 @@ class TripViewSet(common.DataMartViewSet):
     queryset = models.Trip.objects.all()
     filter_fields = (
         "travel_type",
-        "trip_activity_type",
         "result_type",
         # 'primary_traveler',
         "start_date",

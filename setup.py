@@ -43,7 +43,7 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
-        "Framework :: Django :: 4.2",
+        "Framework :: Django :: 3.2",
         "License :: OSI Approved :: MIT",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",

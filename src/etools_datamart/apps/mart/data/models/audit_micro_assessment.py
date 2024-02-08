@@ -146,8 +146,8 @@ class MicroAssessment(EtoolsDataMartModel):
         depends = (Partner,)
         mapping = dict(
             agreement="agreement.order_number",  # PurchaseOrder
-            auditor="agreement.auditor_firm.organization.name",
-            auditor_number="agreement.auditor_firm.organization.vendor_number",
+            auditor="agreement.auditor_firm.name",
+            auditor_number="agreement.auditor_firm.vendor_number",
             partner="-",
             rating="-",
             rating_extra="i",
