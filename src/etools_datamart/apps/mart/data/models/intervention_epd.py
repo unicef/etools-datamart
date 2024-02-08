@@ -29,10 +29,10 @@ class InterventionSimpleAbstract(models.Model):
         mapping = dict(
             pd_number="number",
             pd_title="title",
-            partner="agreement.partner.name",
-            partner_cso_type="agreement.partner.cso_type",
-            partner_type="agreement.partner.partner_type",
-            partner_vendor_number="agreement.partner.vendor_number",
+            partner="agreement.partner.organization.name",
+            partner_cso_type="agreement.partner.organization.cso_type",
+            partner_type="agreement.partner.organization.organization_type",
+            partner_vendor_number="agreement.partner.organization.vendor_number",
         )
 
 

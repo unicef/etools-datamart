@@ -34,6 +34,7 @@ class FundsReservationHeader(EtoolsDataMartModel):
 
     class Meta:
         unique_together = (("schema_name", "fr_number", "vendor_code"),)
+        verbose_name = "Funds Reservation Header"
 
     class Options:
         depends = (Intervention,)

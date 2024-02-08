@@ -265,6 +265,9 @@ class ExportUpdate(ExportObjectMixin, UpdateView):
         kwargs.update({"url": self.object.url})
         return kwargs
 
+    def get_success_url(self):
+        return reverse("urf:export-update", args=[self.object.id])
+
     @cached_property
     def breadcrumbs(self):
         url = self.object.get_full_url()

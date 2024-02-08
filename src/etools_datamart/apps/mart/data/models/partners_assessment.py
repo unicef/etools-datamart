@@ -37,12 +37,12 @@ class Assessment(EtoolsDataMartModel):
     class Options:
         source = PartnersAssessment
         queryset = lambda: PartnersAssessment.objects.select_related(
-            "partner", "approving_officer", "requesting_officer"
+            "partner", "partner__organization", "approving_officer", "requesting_officer"
         )
         depends = (Partner,)
         mapping = dict(
-            partner_name="partner.name",
-            vendor_number="partner.vendor_number",
+            partner_name="partner.organization.name",
+            vendor_number="partner.organization.vendor_number",
             approving_officer="approving_officer.get_display_name",
             requesting_officer="requesting_officer.get_display_name",
         )

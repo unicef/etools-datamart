@@ -12,7 +12,7 @@ class PseaAssessmentLoader(EtoolsLoader):
         if assessor:
             return {
                 "assessor_type": assessor.assessor_type,
-                "name": assessor.auditor_firm.name if assessor.auditor_firm else assessor.user.email,
+                "name": assessor.auditor_firm.organization.name if assessor.auditor_firm else assessor.user.email,
             }
 
     def get_focal_points(self, record: PseaAssessment, values: dict, **kwargs):
@@ -41,9 +41,9 @@ class PseaAssessment(EtoolsDataMartModel):
         source = PseaAssessment
         depends = (Partner,)
         mapping = dict(
-            partner_name="partner.name",
-            vendor_number="partner.vendor_number",
-            cso_type="partner.cso_type",
+            partner_name="partner.organization.name",
+            vendor_number="partner.organization.vendor_number",
+            cso_type="partner.organization.cso_type",
             assessor="-",
             focal_points="-",
         )
@@ -76,9 +76,9 @@ class PseaAnswer(EtoolsDataMartModel):
         source = PseaAnswer
         depends = (Partner, PseaAssessment)
         mapping = dict(
-            assessment_partner_name="assessment.partner.name",
-            assessment_cso_type="assessment.partner.cso_type",
-            assessment_vendor_number="assessment.partner.vendor_number",
+            assessment_partner_name="assessment.partner.organization.name",
+            assessment_cso_type="assessment.partner.organization.cso_type",
+            assessment_vendor_number="assessment.partner.organization.vendor_number",
             assessment_reference_number="assessment.reference_number",
             assessment_status="assessment.status",
             assessment_date="assessment.assessment_date",

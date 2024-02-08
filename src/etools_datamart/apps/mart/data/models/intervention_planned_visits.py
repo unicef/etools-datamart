@@ -33,11 +33,12 @@ class InterventionPlannedVisits(EtoolsDataMartModel):
             "intervention",
             "intervention__agreement",
             "intervention__agreement__partner",
+            "intervention__agreement__partner__organization",
         )
         key = lambda loader, record: dict(schema_name=loader.context["country"].schema_name, source_id=record.pk)
         mapping = dict(
-            partner_vendor_number="intervention.agreement.partner.vendor_number",
-            partner_name="intervention.agreement.partner.name",
+            partner_vendor_number="intervention.agreement.partner.organization.vendor_number",
+            partner_name="intervention.agreement.partner.organization.name",
             pd_status="intervention.status",
             pd_reference_number="intervention.reference_number",
             year="=",

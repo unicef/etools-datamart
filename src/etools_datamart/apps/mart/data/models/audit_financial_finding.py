@@ -24,9 +24,6 @@ class AuditFinancialfindingLoader(EtoolsLoader):
             except Audit.DoesNotExist:
                 pass
 
-    def get_title(self, record, values, field_name):
-        return AuditFinancialFindingsConsts.TITLE_CHOICES[getattr(record, field_name)]
-
 
 class AuditFinancialFinding(EtoolsDataMartModel):
     created = models.DateField(auto_now=True)
