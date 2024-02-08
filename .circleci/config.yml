@@ -116,7 +116,9 @@ jobs:
               docker push unicef/datamart:latest
             elif (echo "master" | grep -q "$CIRCLE_BRANCH"); then
               docker tag unicef/datamart:$BASE_TAG unicef/datamart:latest_prod
+              docker tag unicef/datamart:$BASE_TAG unicef/datamart:4.2
               docker push unicef/datamart:latest_prod
+              docker push unicef/datamart:4.2
             else
               echo "Not a followed branch not pushing latest"
             fi

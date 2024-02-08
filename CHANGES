@@ -1,4 +1,15 @@
-3.60
+4.2
+----
+* tweaked unique together on export
+* fm questions: added filter
+
+
+4.1
+----
+* tweaks realms
+
+
+4.0
 ----
 * added realms updates
 * django 4.2 support
