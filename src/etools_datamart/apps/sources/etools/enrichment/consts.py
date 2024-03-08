@@ -60,6 +60,13 @@ class PartnerOrganizationConst:
     RATING_LOW = "Low"
     RATING_NOT_REQUIRED = "Not Required"
 
+    PSEA_RATING_HIGH = "Low Capacity (High Risk)"
+    PSEA_RATING_MEDIUM = "Medium Capacity (Moderate Risk)"
+    PSEA_RATING_LOW = "Full Capacity (Low Risk)"
+    RATING_HIGH_RISK_ASSUMED = "Low Capacity Assumed - Emergency"
+    RATING_LOW_RISK_ASSUMED = "No Contact with Beneficiaries"
+    RATING_NOT_ASSESSED = "Not Assessed"
+
     RISK_RATINGS = (
         (RATING_HIGH, "High"),
         (RATING_SIGNIFICANT, "Significant"),

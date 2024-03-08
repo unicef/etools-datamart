@@ -29,36 +29,59 @@ aliases = (
 
 def min_req_programme_visits(self):
     programme_visits = 0
-    ct = self.net_ct_cy or 0  # Must be integer, but net_ct_cy could be None
+    if self.partner_type not in [PartnerType.BILATERAL_MULTILATERAL, PartnerType.UN_AGENCY]:
+        ct = self.net_ct_cy or 0  # Must be integer, but net_ct_cy could be None
 
-    if ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL:
-        programme_visits = 0
-    elif PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL < ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL2:
-        programme_visits = 1
-    elif (
-        PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL2 < ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL3
-    ):
-        if self.rating in [PartnerOrganizationConst.RATING_HIGH, PartnerOrganizationConst.RATING_SIGNIFICANT]:
-            programme_visits = 3
-        elif self.rating in [
-            PartnerOrganizationConst.RATING_MEDIUM,
-        ]:
-            programme_visits = 2
-        elif self.rating in [
-            PartnerOrganizationConst.RATING_LOW,
-        ]:
+        if ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL:
+            programme_visits = 0
+        elif (
+            PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL
+            < ct
+            <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL2
+        ):
             programme_visits = 1
-    else:
-        if self.rating in [PartnerOrganizationConst.RATING_HIGH, PartnerOrganizationConst.RATING_SIGNIFICANT]:
-            programme_visits = 4
-        elif self.rating in [
-            PartnerOrganizationConst.RATING_MEDIUM,
-        ]:
-            programme_visits = 3
-        elif self.rating in [
-            PartnerOrganizationConst.RATING_LOW,
-        ]:
-            programme_visits = 2
+        elif (
+            PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL2
+            < ct
+            <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL3
+        ):
+            if self.highest_risk_rating_name in [
+                PartnerOrganizationConst.RATING_HIGH,
+                PartnerOrganizationConst.PSEA_RATING_HIGH,
+                PartnerOrganizationConst.RATING_HIGH_RISK_ASSUMED,
+                PartnerOrganizationConst.RATING_SIGNIFICANT,
+            ]:
+                programme_visits = 3
+            elif self.highest_risk_rating_name in [
+                PartnerOrganizationConst.RATING_MEDIUM,
+                PartnerOrganizationConst.PSEA_RATING_MEDIUM,
+            ]:
+                programme_visits = 2
+            elif self.highest_risk_rating_name in [
+                PartnerOrganizationConst.RATING_LOW,
+                PartnerOrganizationConst.RATING_LOW_RISK_ASSUMED,
+                PartnerOrganizationConst.PSEA_RATING_LOW,
+            ]:
+                programme_visits = 1
+        else:
+            if self.highest_risk_rating_name in [
+                PartnerOrganizationConst.RATING_HIGH,
+                PartnerOrganizationConst.PSEA_RATING_HIGH,
+                PartnerOrganizationConst.RATING_HIGH_RISK_ASSUMED,
+                PartnerOrganizationConst.RATING_SIGNIFICANT,
+            ]:
+                programme_visits = 4
+            elif self.highest_risk_rating_name in [
+                PartnerOrganizationConst.RATING_MEDIUM,
+                PartnerOrganizationConst.PSEA_RATING_MEDIUM,
+            ]:
+                programme_visits = 3
+            elif self.highest_risk_rating_name in [
+                PartnerOrganizationConst.RATING_LOW,
+                PartnerOrganizationConst.RATING_LOW_RISK_ASSUMED,
+                PartnerOrganizationConst.PSEA_RATING_LOW,
+            ]:
+                programme_visits = 2
     return programme_visits
 
 
