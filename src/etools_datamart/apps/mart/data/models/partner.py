@@ -38,6 +38,7 @@ class PartnerLoader(EtoolsLoader):
                 "spot_check_planned_q4": rec.spot_check_planned_q4,
                 "scheduled_audit": rec.scheduled_audit,
                 "special_audit": rec.special_audit,
+                "required_audit": sum(rec.special_audit, rec.scheduled_audit),
                 "spot_check_follow_up": rec.spot_check_follow_up,
             }
         except BaseException:
