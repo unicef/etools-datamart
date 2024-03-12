@@ -29,7 +29,7 @@ aliases = (
 
 def min_req_programme_visits(self):
     programme_visits = 0
-    if self.partner_type not in [PartnerType.BILATERAL_MULTILATERAL, PartnerType.UN_AGENCY]:
+    if self.organization.organization_type not in [PartnerType.BILATERAL_MULTILATERAL, PartnerType.UN_AGENCY]:
         ct = self.net_ct_cy or 0  # Must be integer, but net_ct_cy could be None
 
         if ct <= PartnerOrganizationConst.CT_MR_AUDIT_TRIGGER_LEVEL:
