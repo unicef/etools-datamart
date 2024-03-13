@@ -191,7 +191,7 @@ class EtoolsLoader(BaseLoader):
         truncate = self.config.truncate
         try:
             self.on_start(run_type)
-            if lock or True:  # pragma: no branch
+            if lock:  # pragma: no branch
                 if not ignore_dependencies:
                     for requirement in self.config.depends:
                         if requirement.loader.is_running():
