@@ -1,5 +1,6 @@
 # unicef/etools-prp-base:latest
-ARG BASE_TAG=installed
+#ARG BASE_TAG=installed
+ARG BASE_TAG=latest
 FROM unicef/datamart:$BASE_TAG
 
 ADD src /code/
