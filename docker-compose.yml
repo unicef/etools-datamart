@@ -11,7 +11,7 @@ x-datamart-defaults: &datamart_defaults
   environment:
       DEBUG: 0
       DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
-      #DATABASE_URL_ETOOLS: postgis://postgres:@db-etools:5432/etools
+      #NOTE: Please update ETOOLS DB server IP/name and port specific to your enviroment.
       DATABASE_URL_ETOOLS: postgis://postgres:@192.168.244.151:5442/etools
       DATABASE_URL_PRP: postgis://postgres:@db-prp:5432/prp
       AUTOCREATE_USERS: "admin,123"
