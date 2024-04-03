@@ -22,7 +22,7 @@ IGNORED_TABLES = RegexList(
         "waffle_.*",
         "djcelery_.*",
         "celery_.*",
-        "snapshotactivity"
+        "snapshotactivity",
         # Tenant
     ]
 )

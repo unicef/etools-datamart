@@ -45,6 +45,7 @@ Totalbudget(ideally at most granular level tied to activity / result)
 Utilised budget(same conditions as above)
 Report  #
 """
+
 from django.db import models
 
 from .base import PrpDataMartModel
