@@ -1,0 +1,114 @@
+version: '2'
+x-devdatamart-defaults: &devdatamart_defaults
+  build:
+    context: .
+    dockerfile: ./Dockerfile-dev
+  depends_on:
+    - db
+    - redis
+  volumes:
+    - "$PWD:/code"
+  environment:
+      DEBUG: 0
+      DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
+      #NOTE: Please update ETOOLS DB server IP/name and port specific to your enviroment.
+      DATABASE_URL_ETOOLS: postgis://postgres:@192.168.24.151:5442/etools
+      DATABASE_URL_PRP: postgis://postgres:@db-prp:5432/prp
+      AUTOCREATE_USERS: "admin,123"
+      CACHE_URL: "redis://redis:6379/1"
+      CACHE_URL_LOCK: "redis://redis:6379/1"
+      CACHE_URL_API: "redis://redis:6379/1"
+      CACHE_URL_TEMPLATE: "redis://redis:6379/1"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/2"
+      CSRF_COOKIE_SECURE: 0
+      SECURE_BROWSER_XSS_FILTER: 0
+      SECURE_CONTENT_TYPE_NOSNIFF: 0
+      SECURE_FRAME_DENY: 0
+      SECURE_HSTS_PRELOAD: 0
+      SECURE_SSL_REDIRECT: 0
+      SESSION_COOKIE_HTTPONLY: 0
+      SESSION_COOKIE_SECURE: 0
+      STATIC_ROOT: /code/src/etools_datamart/apps/web/static/
+      GEOS_LIBRARY_PATH: "/usr/lib/libgeos_c.so.1"
+      GDAL_LIBRARY_PATH: "/usr/lib/libgdal.so"
+      EXPORT_FILE_STORAGE: "django.core.files.storage.FileSystemStorage"
+services:
+  proxy:
+    image: traefik:v2.1
+    command: --api.insecure=True --providers.docker
+    ports:
+      - "8083:80"
+      - "8084:8080"
+    container_name: datamart_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  datamart:
+    container_name: datamart
+    << : *devdatamart_defaults
+    command: bash -c "python manage.py init-setup --migrate && python manage.py runserver 0.0.0.0:8080"
+    #command: ls -l 
+    labels:
+      - "traefik.http.routers.datamart.rule=PathPrefix(`/`)"
+      - traefik.http.routers.datamart.service=datamart
+      - traefik.http.services.datamart.loadBalancer.server.port=8080
+      - traefik.enable=true
+    volumes:
+      - $PWD:/code
+  beat:
+    container_name: datamart_beat
+    << : *devdatamart_defaults
+    working_dir: /code/src
+    command: celery -A etools_datamart beat --loglevel=debug
+    volumes:
+      - $PWD:/code
+
+  worker:
+    container_name: datamart_worker
+    << : *devdatamart_defaults
+    working_dir: /code/src
+    command: celery -A etools_datamart worker --loglevel=debug
+    volumes:
+      - $PWD:/code
+
+  db:
+    image: postgis/postgis:12-3.2
+    container_name: datamart_db
+    ports:
+      - "15432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      #POSTGRES_PASSWORD:
+      #POSTGRES_USER: postgres
+      POSTGRES_DB: etools_datamart
+    volumes:
+      - "$PWD/build/db:/var/lib/postgresql/data"
+
+  # Rely on etools and prp database instances running locally
+  #db-etools:
+  #  image: postgis/postgis:12-3.2
+  #  container_name: datamart_etools
+  #  shm_size: '1gb'
+  #  environment:
+  #    POSTGRES_USER: postgres
+  #    POSTGRES_PASSWORD:
+  #    POSTGRES_DB: etools
+  #  volumes:
+  #    - "$PWD/build/etools:/var/lib/postgresql/data"
+
+  db-prp:
+    image: postgis/postgis:12-3.2
+    shm_size: '1gb'
+    container_name: datamart_prp
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      #POSTGRES_USER: postgres
+      #POSTGRES_PASSWORD:
+      POSTGRES_DB: prp
+    volumes:
+      - "$PWD/build/prp:/var/lib/postgresql/data"
+
+  redis:
+    image: redis:alpine
+    container_name: datamart_redis

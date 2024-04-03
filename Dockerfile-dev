@@ -1,0 +1,25 @@
+# unicef/etools-prp-base:latest
+#ARG BASE_TAG=installed
+ARG BASE_TAG=latest
+FROM unicef/datamart:$BASE_TAG
+
+#expect mapping of code 
+VOLUME /code
+
+WORKDIR /code/
+RUN apk add bash
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# CLEANUP
+# Disabled for now, till move to etools-base
+# See https://github.com/unicef/etools/pull/2716
+# RUN apk del .build-deps
+
+#RUN python manage.py collectstatic --noinput
+
+RUN pipenv install --dev  
+
+EXPOSE 8000
+
