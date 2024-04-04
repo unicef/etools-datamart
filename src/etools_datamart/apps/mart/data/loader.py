@@ -145,7 +145,7 @@ class EtoolsLoader(BaseLoader):
             values = self.get_values(record)
             op = self.process_record(filters, values)
             self.increment_counter(op)
-            
+
     def remove_deleted(self):
         country = self.context["country"]
         existing = list(self.get_queryset().only("id").values_list("id", flat=True))
