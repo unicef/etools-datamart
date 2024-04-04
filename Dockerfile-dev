@@ -19,7 +19,7 @@ ENV PYTHONUNBUFFERED 1
 
 #RUN python manage.py collectstatic --noinput
 
-RUN pipenv install --dev  
+RUN pipenv install --ignore-pipfile --dev
 
 EXPOSE 8000
 
