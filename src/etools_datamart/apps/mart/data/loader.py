@@ -139,12 +139,15 @@ class EtoolsLoader(BaseLoader):
         return qs
 
     def process_country(self):
+        batch_size = 1000
         qs = self.filter_queryset(self.get_queryset())
-        for record in qs.all():
-            filters = self.config.key(self, record)
-            values = self.get_values(record)
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        for batch_start in range(0, qs.count(), batch_size):
+            batch = qs[batch_start : batch_start + batch_size]
+            for record in batch.iterator():
+                filters = self.config.key(self, record)
+                values = self.get_values(record)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
     def remove_deleted(self):
         country = self.context["country"]
