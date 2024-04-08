@@ -7,9 +7,9 @@ from django.db.models import JSONField
 from django.utils import timezone
 
 from rest_framework.test import APIClient, ForceAuthClientHandler
-from unicef_security.models import User
 
 import etools_datamart
+from etools_datamart.apps.core.models import User
 
 
 class ClientHandler(ForceAuthClientHandler):

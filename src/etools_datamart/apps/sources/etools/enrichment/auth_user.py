@@ -1,5 +1,4 @@
-from unicef_security.models import User
-
+from etools_datamart.apps.core.models import User
 from etools_datamart.apps.sources.etools.models import AuthUser
 
 AuthUser.is_authenticated = True

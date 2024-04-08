@@ -3,13 +3,13 @@ from django.utils import timezone
 
 import factory
 import unicef_realm.models
-import unicef_security.models
 from factory import SubFactory
 from factory.base import FactoryMetaClass
 from post_office.models import EmailTemplate
 
 import unicef_rest_framework.models
 
+from etools_datamart.apps.core.models import User
 from etools_datamart.apps.security.models import SchemaAccessControl
 from etools_datamart.apps.subscriptions.models import Subscription
 from etools_datamart.apps.tracking.models import APIRequestLog
@@ -64,7 +64,7 @@ class GroupFactory(RegisterModelFactory):
 
 class UserFactory(RegisterModelFactory):
     class Meta:
-        model = unicef_security.models.User
+        model = User
         django_get_or_create = ("username",)
 
     username = factory.Sequence(lambda n: "user%03d" % n)

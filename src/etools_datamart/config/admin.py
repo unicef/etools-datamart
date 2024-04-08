@@ -23,7 +23,7 @@ DEFAULT_INDEX_SECTIONS = {
     "Source/PRP": ["source_prp"],
     "Security": [
         "auth",
-        "unicef_security.User",
+        "core.User",
         "security",
         "unicef_rest_framework.GroupAccessControl",
         "unicef_rest_framework.UserAccessControl",
