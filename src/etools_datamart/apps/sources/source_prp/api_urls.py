@@ -22,7 +22,7 @@ router.register(r"sources/prp/indicatorreportable", api.IndicatorReportableViewS
 router.register(r"sources/prp/indicatorreportabledisaggregations", api.IndicatorReportableDisaggregationsViewSet)
 router.register(r"sources/prp/indicatorreportablelocationgoal", api.IndicatorReportablelocationgoalViewSet)
 router.register(r"sources/prp/indicatorreportingentity", api.IndicatorReportingentityViewSet)
-router.register(r"sources/prp/partnerpartner", api.PartnerPartnerViewSet)
+router.register(r"sources/prp/partnerpartner", api.PartnerPartnerViewSet, basename="prp_partners")
 router.register(r"sources/prp/partnerpartnerclusters", api.PartnerPartnerClustersViewSet)
 router.register(r"sources/prp/partnerpartneractivity", api.PartnerPartneractivityViewSet)
 router.register(r"sources/prp/partnerpartneractivitylocations", api.PartnerPartneractivityLocationsViewSet)
@@ -35,7 +35,9 @@ router.register(r"sources/prp/partnerpartnerprojectclusters", api.PartnerPartner
 router.register(r"sources/prp/partnerpartnerprojectlocations", api.PartnerPartnerprojectLocationsViewSet)
 router.register(r"sources/prp/partnerpartnerprojectfunding", api.PartnerPartnerprojectfundingViewSet)
 router.register(r"sources/prp/uniceffinalreview", api.UnicefFinalreviewViewSet)
-router.register(r"sources/prp/uniceflocationscartodbtable", api.UnicefLocationsCartodbtableViewSet)
+router.register(
+    r"sources/prp/uniceflocationscartodbtable", api.UnicefLocationsCartodbtableViewSet, basename="prp_cartodb"
+)
 router.register(r"sources/prp/uniceflocationsgatewaytype", api.UnicefLocationsGatewaytypeViewSet)
 router.register(r"sources/prp/uniceflowerleveloutput", api.UnicefLowerleveloutputViewSet)
 router.register(r"sources/prp/unicefpdresultlink", api.UnicefPdresultlinkViewSet)
