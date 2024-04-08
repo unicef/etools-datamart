@@ -558,7 +558,7 @@ SOCIAL_AUTH_KEY = env.str("AZURE_CLIENT_ID")
 SOCIAL_AUTH_SECRET = env.str("AZURE_CLIENT_SECRET")
 SOCIAL_AUTH_TENANT_ID = env.str("AZURE_TENANT")
 SOCIAL_AUTH_RESOURCE = "https://graph.microsoft.com/"
-SOCIAL_AUTH_USER_MODEL = "unicef_security.User"
+SOCIAL_AUTH_USER_MODEL = "core.User"
 
 # POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
 SCOPE = [
@@ -642,7 +642,7 @@ SCHEMA_EXCLUDE = {"schema_name__in": env.list("IGNORED_SCHEMAS")}
 ENABLE_LIVE_STATS = env("ENABLE_LIVE_STATS")
 
 REALM_TARGET_MODEL = "unicef_realm.BusinessArea"
-AUTH_USER_MODEL = "unicef_security.User"
+AUTH_USER_MODEL = "core.User"
 
 
 def extra(r):

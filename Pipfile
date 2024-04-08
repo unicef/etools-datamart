@@ -62,7 +62,7 @@ requests = "*"
 social-auth-core = "*"
 sentry-sdk = "*"
 swagger-spec-validator = "*"
-unicef-security = "<1.5"
+unicef-security = "*"
 unicef-realm = "*"
 xhtml2pdf = "*"
 
