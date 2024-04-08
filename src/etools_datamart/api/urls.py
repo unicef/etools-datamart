@@ -79,7 +79,7 @@ router.register(r"datamart/tpm-visits", endpoints.TPMVisitViewSet)
 router.register(r"datamart/tpm-activities", endpoints.TPMActivityViewSet)
 router.register(r"datamart/partners_hact", endpoints.PartnerHactViewSet)
 router.register(r"datamart/partners_hact_active", endpoints.PartnerHACTActiveViewSet)
-router.register(r"datamart/partners", endpoints.PartnerViewSet)
+router.register(r"datamart/partners", endpoints.PartnerViewSet, basename="partners")
 
 router.register(r"prp/indicator-report", endpoints.IndicatorReportViewSet)
 router.register(r"prp/datareport", endpoints.DataReportViewSet)
@@ -87,13 +87,11 @@ router.register(r"prp/datareport", endpoints.DataReportViewSet)
 router.register(r"system/monitor", endpoints.MonitorViewSet)
 
 from etools_datamart.apps.sources.source_prp import api_urls  # noqa isort:skip
-from etools_datamart.apps.sources.source_prp.backward_api_urls import backward_compatible_router  # noqa isort:skip
 
 from .endpoints.rapidpro import _urls_  # noqa isort:skip
 
 urlpatterns = [
     re_path(r"(?P<version>(v1|v2|latest))/", include(router.urls)),
-    re_path(r"(?P<version>(v1|v2|latest))/", include(backward_compatible_router.urls)),
     re_path(r"\+sw(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     path(r"+swagger/", endpoints.schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path(r"+redoc/", endpoints.schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),

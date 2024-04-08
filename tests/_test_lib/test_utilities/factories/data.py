@@ -216,6 +216,8 @@ class PartnerFactory(DataMartModelFactory):
     vision_synced = True
     deleted_flag = False
     hidden = False
+    reported_cy = factory.fuzzy.FuzzyInteger(1000, 20000)
+    total_ct_cy = factory.fuzzy.FuzzyInteger(1000, 20000)
 
     class Meta:
         model = models.Partner
