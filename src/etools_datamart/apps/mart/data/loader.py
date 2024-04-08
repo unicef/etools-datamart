@@ -139,7 +139,9 @@ class EtoolsLoader(BaseLoader):
         return qs
 
     def process_country(self):
-        batch_size = 1000
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{self.batch_size}")
+
         qs = self.filter_queryset(self.get_queryset())
         for batch_start in range(0, qs.count(), batch_size):
             batch = qs[batch_start : batch_start + batch_size]
