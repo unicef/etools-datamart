@@ -1,6 +1,13 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import connections
 from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
+
+from unicef_security.models import SecurityMixin
+
+
+class User(AbstractUser, SecurityMixin):
+    pass
 
 
 class DataMartQuerySet(QuerySet):
