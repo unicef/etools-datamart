@@ -92,7 +92,7 @@ class DatamartAdminSite(AdminSite):
         key = f"2apps_groups:{request.user.id}:{get_full_version()}:{config.CACHE_VERSION}"
         app_list = self.get_app_list(request)
         groups = cache.get(key)
-        if not groups:
+        if not groups or not isinstance(groups, dict):
             sections = getattr(settings, "INDEX_SECTIONS", DEFAULT_INDEX_SECTIONS)
             groups = OrderedDict([(k, []) for k in sections.keys()])
 

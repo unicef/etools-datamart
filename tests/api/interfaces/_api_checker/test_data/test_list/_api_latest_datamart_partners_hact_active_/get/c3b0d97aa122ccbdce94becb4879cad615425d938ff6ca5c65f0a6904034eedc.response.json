@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Cookie",
+        "Allow": "GET, HEAD, OPTIONS",
+        "ETag": "\"d4ce59536c946a53368d0c1ebaa10dec\"",
+        "X-Frame-Options": "DENY",
+        "view": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerHACTActiveViewSet",
+        "service": "etools_datamart.api.endpoints.datamart.partners_partner.PartnerHACTActiveViewSet",
+        "cache-version": "1",
+        "system-filters": "",
+        "cache-key": "d4ce59536c946a53368d0c1ebaa10dec",
+        "cache-hit": "False",
+        "qs_filter": "{}",
+        "qs_exclude": "{}",
+        "cache-ttl": "1y",
+        "Content-Length": "351",
+        "Referrer-Policy": "same-origin",
+        "Cross-Origin-Opener-Policy": "same-origin"
+    },
+    "data": {
+        "count": 3,
+        "next": null,
+        "current_page": 1,
+        "total_pages": 1,
+        "previous": null,
+        "results": [
+            {
+                "name": "name000",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
+            },
+            {
+                "name": "name001",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
+            },
+            {
+                "name": "name002",
+                "alternate_name": null,
+                "partner_type": null,
+                "country": null,
+                "email": null
+            }
+        ]
+    },
+    "content_type": "application/json"
+}
