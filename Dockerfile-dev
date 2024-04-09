@@ -3,20 +3,23 @@
 ARG BASE_TAG=latest
 FROM unicef/datamart:$BASE_TAG
 
-ADD src /code/
-ADD manage.py /code/manage.py
+#expect mapping of code 
+VOLUME /code
 
 WORKDIR /code/
 RUN apk add bash
 
+ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /code
 
 # CLEANUP
 # Disabled for now, till move to etools-base
 # See https://github.com/unicef/etools/pull/2716
 # RUN apk del .build-deps
 
-RUN python manage.py collectstatic --noinput
+#RUN python manage.py collectstatic --noinput
+
+RUN pipenv install --ignore-pipfile --dev
 
 EXPOSE 8000
+
