@@ -36,7 +36,6 @@ class FAMIndicatorLoader(EtoolsLoader):
         country = self.context["country"]
         start_date = self.context["today"].date()
         month = Month.from_date(start_date)
-        FAMIndicator.objects.filter(month=month.as_date(), schema_name=country.schema_name)
         engagements = (AuditSpotcheck, AuditAudit, AuditSpecialaudit, AuditMicroassessment)
         for model in engagements:
             realname = "_".join(model._meta.db_table.split("_")[1:])
