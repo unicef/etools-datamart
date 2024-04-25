@@ -135,11 +135,20 @@ class ActionPointFilterForm(forms.Form):
         ),
     )
 
+    status = CleareableSelect2ChoiceField(
+        label="Status",
+        required=False,
+        choices=(
+            ('open', "Open"),
+            ('completed', "Completed"),
+        ),
+    )
+
 
 class ActionPointViewSet(common.DataMartViewSet):
     serializer_class = ActionPointSerializer
     queryset = models.ActionPoint.objects.all()
-    filter_fields = ("created", "date_of_completion", "due_date", "high_priority")
+    filter_fields = ("created", "date_of_completion", "due_date", "high_priority", "status")
     serializers_fieldsets = {"std": ActionPointSerializer, "v2": ActionPointSerializerV2}
     querystringfilter_form_base_class = ActionPointFilterForm
 
