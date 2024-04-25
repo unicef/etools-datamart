@@ -140,7 +140,7 @@ class ActionPointFilterForm(forms.Form):
         required=False,
         choices=(
             ('open', "Open"),
-            ('completed', "Completed'"),
+            ('completed', "Completed"),
         ),
     )
 
