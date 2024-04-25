@@ -139,8 +139,8 @@ class ActionPointFilterForm(forms.Form):
         label="Status",
         required=False,
         choices=(
-            ('open', "Open"),
-            ('completed', "Completed"),
+            ("open", "Open"),
+            ("completed", "Completed"),
         ),
     )
 
