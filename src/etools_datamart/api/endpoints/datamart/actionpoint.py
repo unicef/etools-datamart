@@ -142,7 +142,7 @@ class ActionPointFilterForm(forms.Form):
             ('open', "Open"),
             ('completed', "Completed'"),
         ),
-    ))
+    )
 
 
 class ActionPointViewSet(common.DataMartViewSet):
