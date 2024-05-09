@@ -112,3 +112,18 @@ services:
   redis:
     image: redis:alpine
     container_name: datamart_redis
+  
+  rabbitmq:
+    image: rabbitmq:3.12.14-management-alpine
+    container_name: datamart_rabbitmq  
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "FORRABBITMQCLUSTERNODES" 
+      RABBITMQ_DEFAULT_USER: "datamart"
+      RABBITMQ_DEFAULT_PASS: "unicef"
+      RABBITMQ_DEFAULT_VHOST: "/datamart"
+    ports:
+    - "15672:15672"
+    - "5672:5672"
+    volumes:
+      - $PWD/build/rabbitmq/data:/var/lib/rabbitmq
+      - $PWD/build/rabbitmq/log:/var/log/rabbitmq

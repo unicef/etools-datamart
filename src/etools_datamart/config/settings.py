@@ -34,7 +34,7 @@ env = environ.Env(
     CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
     CACHE_URL_TEMPLATE=(str, "redis://127.0.0.1:6379/2?key_prefix=template"),
     CELERY_TASK_ALWAYS_EAGER=(bool, False),
-    CELERY_BROKER_URL=(str, "redis://127.0.0.1:6379/2"),
+    CELERY_BROKER_URL=(str, "amqp://datamart:unicef@rabbitmq:5672/datamart"),
     CELERY_RESULT_BACKEND=(str, "redis://127.0.0.1:6379/3"),
     CSRF_COOKIE_SECURE=(bool, True),
     EXPLORER_TOKEN=(str, "EXPLORER_DATAMART_TOKEN"),
