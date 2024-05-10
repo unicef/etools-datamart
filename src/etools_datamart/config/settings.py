@@ -221,7 +221,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 MYSTICA_PASSWORD = env("MYSTICA_PASSWORD")
 
-env.cache()["OPTIONS"]["TIMEOUT"] = 600
+env.cache()["TIMEOUT"] = 600
 
 CACHES = {
     "default": env.cache(),
