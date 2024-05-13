@@ -29,6 +29,8 @@ env = environ.Env(
     AZURE_STORAGE_ACCESS_MODE=(str, "r"),
     AZURE_STORAGE_ACCESS_TTL=(int, 60 * 60 * 24),
     AZURE_TENANT=(str, ""),
+    CACHES_DISABLED=(bool, False),
+    CACHES=(str, ""),
     CACHE_URL=(str, "redis://127.0.0.1:6379/1"),
     CACHE_URL_API=(str, "redis://127.0.0.1:6379/2?key_prefix=api"),
     CACHE_URL_LOCK=(str, "redis://127.0.0.1:6379/2?key_prefix=lock"),
@@ -226,6 +228,16 @@ CACHES = {
     "lock": env.cache("CACHE_URL_LOCK"),
     "api": env.cache("CACHE_URL_API"),
 }
+
+if env("CACHES_DISABLED"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }
+elif len(env("CACHES")) > 8:
+    CACHES = env("CACHES")
+
 
 ROOT_URLCONF = "etools_datamart.config.urls"
 
