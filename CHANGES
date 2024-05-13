@@ -1,3 +1,8 @@
+4.5
+----
+* disable/enable cache with enviroment variable CASHES_DISABLED
+* allow flexible cache configuration by passing CACHES enviroment variable
+
 4.4
 ----
 * added action point filter
