@@ -1,6 +1,10 @@
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import JSONField
 from django.utils.translation import gettext as _
+
+from celery.utils.log import get_task_logger
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
@@ -12,6 +16,8 @@ from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringSettingsQuestionMethods,
     ReportsSector,
 )
+
+logger = get_task_logger(__name__)
 
 
 class FMQuestionLoader(EtoolsLoader):
@@ -83,24 +89,32 @@ class FMQuestionLoader(EtoolsLoader):
         return getattr(checklist_finding, "narrative_finding", None)
 
     def process_country(self):
-        for rec in self.get_queryset():
-            filters = self.config.key(self, rec)
-            values = self.get_values(rec)
-            if rec.activity_question.cp_output:
-                cp_output = rec.activity_question.cp_output
-                values["entity_type"] = "CP Output"
-                values["entity_instance"] = cp_output.name
-                values["output"] = cp_output.wbs
-            elif rec.activity_question.intervention:
-                pd = rec.activity_question.intervention
-                values["entity_type"] = "PD/SSFA"
-                values["entity_instance"] = pd.reference_number
-            elif rec.activity_question.partner:
-                partner = rec.activity_question.partner
-                values["entity_type"] = "Partner"
-                values["entity_instance"] = partner.organization.name
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = self.get_queryset()
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for rec in page.object_list:
+                filters = self.config.key(self, rec)
+                values = self.get_values(rec)
+                if rec.activity_question.cp_output:
+                    cp_output = rec.activity_question.cp_output
+                    values["entity_type"] = "CP Output"
+                    values["entity_instance"] = cp_output.name
+                    values["output"] = cp_output.wbs
+                elif rec.activity_question.intervention:
+                    pd = rec.activity_question.intervention
+                    values["entity_type"] = "PD/SSFA"
+                    values["entity_instance"] = pd.reference_number
+                elif rec.activity_question.partner:
+                    partner = rec.activity_question.partner
+                    values["entity_type"] = "Partner"
+                    values["entity_instance"] = partner.organization.name
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
     def get_location(self, record: FieldMonitoringDataCollectionFinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
@@ -285,29 +299,39 @@ class FMOntrackLoader(EtoolsLoader):
         return "On track" if record.on_track else "Off track"
 
     def process_country(self):
-        for rec in self.get_queryset():
-            filters = self.config.key(self, rec)
-            values = self.get_values(rec)
-            if rec.cp_output:
-                values["entity"] = rec.cp_output.name
-                values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
-                values["output"] = rec.cp_output.wbs
-                values["programme_areas"] = f"{rec.cp_output.programme_area_code} {rec.cp_output.programme_area_name}"
-                values["entity_type"] = "CP Output"
-            elif rec.intervention:
-                values["entity"] = rec.intervention.reference_number
-                values["outcome"] = None
-                values["output"] = None
-                values["programme_areas"] = None
-                values["entity_type"] = "PD/SSFA"
-            elif rec.partner:
-                values["entity"] = rec.partner.organization.name
-                values["outcome"] = None
-                values["output"] = None
-                values["programme_areas"] = None
-                values["entity_type"] = "Partner"
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = self.get_queryset()
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for rec in page.object_list:
+                filters = self.config.key(self, rec)
+                values = self.get_values(rec)
+                if rec.cp_output:
+                    values["entity"] = rec.cp_output.name
+                    values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
+                    values["output"] = rec.cp_output.wbs
+                    values["programme_areas"] = (
+                        f"{rec.cp_output.programme_area_code} {rec.cp_output.programme_area_name}"
+                    )
+                    values["entity_type"] = "CP Output"
+                elif rec.intervention:
+                    values["entity"] = rec.intervention.reference_number
+                    values["outcome"] = None
+                    values["output"] = None
+                    values["programme_areas"] = None
+                    values["entity_type"] = "PD/SSFA"
+                elif rec.partner:
+                    values["entity"] = rec.partner.organization.name
+                    values["outcome"] = None
+                    values["output"] = None
+                    values["programme_areas"] = None
+                    values["entity_type"] = "Partner"
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
     def get_sections(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         data = []

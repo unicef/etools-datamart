@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import F, JSONField, Sum
 from django.utils.functional import cached_property
@@ -425,14 +426,21 @@ class InterventionByLocationLoader(InterventionLoader):
         return values
 
     def process_country(self):
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
         qs = self.filter_queryset(self.get_queryset().prefetch_related("flat_locations"))
-        for intervention in qs.all():
-            for location in intervention.flat_locations.all():
-                intervention.location = location
-                filters = self.config.key(self, intervention)
-                values = self.get_values(intervention)
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for intervention in page.object_list:
+                for location in intervention.flat_locations.all():
+                    intervention.location = location
+                    filters = self.config.key(self, intervention)
+                    values = self.get_values(intervention)
+                    op = self.process_record(filters, values)
+                    self.increment_counter(op)
 
 
 class InterventionByLocation(LocationMixin, InterventionAbstract, EtoolsDataMartModel):

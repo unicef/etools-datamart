@@ -1,6 +1,10 @@
 import json
 
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
+
+from celery.utils.log import get_task_logger
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
@@ -37,6 +41,8 @@ from etools_datamart.apps.sources.etools.models import HactHacthistory
     },
     "outstanding_findings": 0,
 }
+
+logger = get_task_logger(__name__)
 
 
 def get_item(d, target, default: object = "N/A", sep="|"):
@@ -118,11 +124,19 @@ class HACTDetailLoader(EtoolsLoader):
         return ret
 
     def process_country(self):
-        for rec in self.get_queryset():
-            filters = self.config.key(self, rec)
-            values = self.get_values(rec)
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = self.get_queryset()
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for rec in page.object_list:
+                filters = self.config.key(self, rec)
+                values = self.get_values(rec)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
 
 class HACTHistory(EtoolsDataMartModel):

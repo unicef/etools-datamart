@@ -4,6 +4,7 @@ from inspect import isclass
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 from django.db import connections, models, transaction
 from django.utils import timezone
 
@@ -143,9 +144,11 @@ class EtoolsLoader(BaseLoader):
         logger.debug(f"Batch size:{batch_size}")
 
         qs = self.filter_queryset(self.get_queryset())
-        for batch_start in range(0, qs.count(), batch_size):
-            batch = qs[batch_start : batch_start + batch_size]
-            for record in batch.iterator():
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for record in page.object_list:
                 filters = self.config.key(self, record)
                 values = self.get_values(record)
                 op = self.process_record(filters, values)

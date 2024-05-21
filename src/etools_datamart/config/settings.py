@@ -83,7 +83,7 @@ env = environ.Env(
     GEONAMES_URL=(str, "http://api.geonames.org/findNearbyJSON"),
     GEONAMES_USERNAME=(str, "ntrncic"),
     REQUEST_TIMEOUT=(int, 300),
-    RESULTSET_BATCH_SIZE=(int, 1000),
+    RESULTSET_BATCH_SIZE=(int, 200),
 )
 
 

@@ -1,4 +1,8 @@
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.db.models import JSONField
+
+from celery.utils.log import get_task_logger
 
 from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
@@ -10,24 +14,34 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionbudget,
 )
 
+logger = get_task_logger(__name__)
+
 
 class InterventionBudgetLoader(InterventionLoader):
     def get_queryset(self):
         return PartnersInterventionbudget.objects.select_related("intervention")
 
     def process_country(self):
-        for record in self.get_queryset().exclude(intervention__isnull=True):
-            filters = self.config.key(self, record)
-            values = self.get_values(record.intervention)
-            values["source_id"] = record.id
-            values["budget_cso_contribution"] = record.partner_contribution_local
-            values["budget_unicef_cash"] = record.unicef_cash_local
-            # values["budget_total_unfunded"] = record.total_unfunded
-            values["budget_total"] = record.total_local
-            values["budget_currency"] = record.currency
-            values["budget_unicef_supply"] = record.in_kind_amount_local
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = self.get_queryset().exclude(intervention__isnull=True)
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for record in page.object_list:
+                filters = self.config.key(self, record)
+                values = self.get_values(record.intervention)
+                values["source_id"] = record.id
+                values["budget_cso_contribution"] = record.partner_contribution_local
+                values["budget_unicef_cash"] = record.unicef_cash_local
+                # values["budget_total_unfunded"] = record.total_unfunded
+                values["budget_total"] = record.total_local
+                values["budget_currency"] = record.currency
+                values["budget_unicef_supply"] = record.in_kind_amount_local
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
     def get_fr_numbers(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []

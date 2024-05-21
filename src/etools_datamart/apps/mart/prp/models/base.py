@@ -48,15 +48,20 @@ Report  #
 
 from datetime import timedelta
 
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.utils import timezone
 
+from celery.utils.log import get_task_logger
 from dateutil.utils import today
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
 from etools_datamart.sentry import process_exception
+
+logger = get_task_logger(__name__)
 
 
 class PrpBaseLoader(BaseLoader):
@@ -125,11 +130,18 @@ class PrpBaseLoader(BaseLoader):
                     if truncate:
                         self.model.objects.truncate()
                     qs = self.filter_queryset(self.get_queryset())
-                    for record in qs.all():
-                        filters = self.config.key(self, record)
-                        values = self.get_values(record)
-                        op = self.process_record(filters, values)
-                        self.increment_counter(op)
+
+                    batch_size = settings.RESULTSET_BATCH_SIZE
+                    logger.debug(f"Batch size:{batch_size}")
+
+                    paginator = Paginator(qs, batch_size)
+                    for page_idx in paginator.page_range:
+                        page = paginator.page(page_idx)
+                        for record in page.object_list:
+                            filters = self.config.key(self, record)
+                            values = self.get_values(record)
+                            op = self.process_record(filters, values)
+                            self.increment_counter(op)
 
                     if stdout and verbosity > 0:
                         stdout.write("\n")
