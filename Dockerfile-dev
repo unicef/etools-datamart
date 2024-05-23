@@ -17,9 +17,10 @@ ENV PYTHONUNBUFFERED 1
 # See https://github.com/unicef/etools/pull/2716
 # RUN apk del .build-deps
 
-#RUN python manage.py collectstatic --noinput
+COPY Pipfile .
+COPY Pipfile.lock .
 
-RUN pipenv install --ignore-pipfile --dev
+RUN pipenv install --ignore-pipfile  --system
 
 EXPOSE 8000
 

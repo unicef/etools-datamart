@@ -1,3 +1,8 @@
+4.5
+----
+* batched etl loading to reduce memory usage
+
+
 4.4
 ----
 * added action point filter

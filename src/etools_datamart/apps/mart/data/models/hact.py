@@ -13,6 +13,7 @@ class HACTLoader(EtoolsLoader):
         # return HactAggregatehact.objects.filter(year=self.context['year'])
 
     def process_country(self):
+        # TODO: Analyze more before batch processing
         country = self.context["country"]
         for year in range(2018, self.context["today"].year + 1):
             self.context["year"] = year

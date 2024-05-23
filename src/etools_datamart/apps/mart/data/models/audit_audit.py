@@ -1,9 +1,12 @@
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import JSONField, Sum
 from django.utils.translation import gettext as _
 
 from _decimal import DivisionByZero, InvalidOperation
+from celery.utils.log import get_task_logger
 from model_utils import Choices
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
@@ -14,17 +17,27 @@ from etools_datamart.apps.sources.etools.models import AuditAudit, AuditFinancia
 
 from .partner import Partner
 
+logger = get_task_logger(__name__)
+
 
 class AuditLoader(EngagementMixin, EtoolsLoader):
     def process_country(self):
-        for record in AuditAudit.objects.select_related("engagement_ptr"):
-            record.id = record.engagement_ptr_id
-            record.sub_type = AuditAudit
-            record.engagement_ptr._impl = record
-            filters = self.config.key(self, record.engagement_ptr)
-            values = self.get_values(record.engagement_ptr)
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = AuditAudit.objects.select_related("engagement_ptr")
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for record in page.object_list:
+                record.id = record.engagement_ptr_id
+                record.sub_type = AuditAudit
+                record.engagement_ptr._impl = record
+                filters = self.config.key(self, record.engagement_ptr)
+                values = self.get_values(record.engagement_ptr)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
     def get_financial_findings_count(self, record, values, field_name):
         qs = AuditFinancialfinding.objects.filter(audit=record._impl)

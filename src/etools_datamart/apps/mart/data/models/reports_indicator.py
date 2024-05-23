@@ -1,11 +1,17 @@
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import JSONField
+
+from celery.utils.log import get_task_logger
 
 from etools_datamart.apps.mart.data.fields import SafeDecimal
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.mart.data.models.mixins import NestedLocationLoaderMixin, NestedLocationMixin
 from etools_datamart.apps.sources.etools.models import PartnersIntervention, ReportsAppliedindicator, ReportsLowerresult
+
+logger = get_task_logger(__name__)
 
 
 def get_pd_output_names(obj: PartnersIntervention):
@@ -77,12 +83,19 @@ class ReportIndicatorLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join([l["name"] for l in ret])
 
     def process_country(self):
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
         qs = self.filter_queryset(self.get_queryset())
-        for record in qs.all():
-            filters = self.config.key(self, record)
-            values = self.get_values(record)
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for record in page.object_list:
+                filters = self.config.key(self, record)
+                values = self.get_values(record)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
 
 class ReportIndicator(NestedLocationMixin, EtoolsDataMartModel):

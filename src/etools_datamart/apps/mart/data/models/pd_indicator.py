@@ -1,4 +1,8 @@
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.shortcuts import reverse
+
+from celery.utils.log import get_task_logger
 
 from etools_datamart.apps.mart.data.fields import SafeDecimal
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
@@ -6,6 +10,8 @@ from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.mart.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.sources.etools.models import models, ReportsAppliedindicator
+
+logger = get_task_logger(__name__)
 
 
 class PDIndicatorLoader(EtoolsLoader):
@@ -20,16 +26,23 @@ class PDIndicatorLoader(EtoolsLoader):
         return values
 
     def process_country(self):
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
         qs = self.filter_queryset(self.get_queryset())
-        for indicator in qs.all():
-            for disaggregation in indicator.disaggregations.all():
-                indicator.disaggregation = disaggregation
-                for location in indicator.locations.all():
-                    indicator.location = location
-                    filters = self.config.key(self, indicator)
-                    values = self.get_values(indicator)
-                    op = self.process_record(filters, values)
-                    self.increment_counter(op)
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for indicator in page.object_list:
+                for disaggregation in indicator.disaggregations.all():
+                    indicator.disaggregation = disaggregation
+                    for location in indicator.locations.all():
+                        indicator.location = location
+                        filters = self.config.key(self, indicator)
+                        values = self.get_values(indicator)
+                        op = self.process_record(filters, values)
+                        self.increment_counter(op)
 
     def get_pd_url(self, record: ReportsAppliedindicator, values: dict, **kwargs):
         return reverse(
