@@ -26,6 +26,7 @@ class AuditFinancialfindingLoader(EtoolsLoader):
             page = paginator.page(page_idx)
             for record in page.object_list:
                 try:
+                    # TODO: Prefetch matching Audit
                     audit = Audit.objects.get(source_id=record.audit_id, schema_name=country.schema_name)
                     filters = self.config.key(self, record)
                     values = self.get_values(record)

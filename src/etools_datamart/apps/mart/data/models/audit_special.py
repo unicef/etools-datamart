@@ -24,7 +24,11 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
 
-        qs = AuditSpecialaudit.objects.select_related("engagement_ptr")
+        qs = AuditSpecialaudit.objects.select_related(
+            "engagement_ptr",
+            "engagement_ptr__agreement",
+            "engagement_ptr__agreement__auditor_firm__organization",
+        )
 
         paginator = Paginator(qs, batch_size)
         for page_idx in paginator.page_range:

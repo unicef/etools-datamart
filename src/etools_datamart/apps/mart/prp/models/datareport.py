@@ -26,6 +26,7 @@ class DataReportLoader(PrpBaseLoader):
                 "indicator_report__progress_report",
                 "indicator_report__progress_report__programme_document",
                 "indicator_report__progress_report__programme_document__partner",
+                "indicator_report__progress_report__programme_document__workspace",
                 "indicator_report__progress_report__submitted_by",
                 "indicator_report__reportable",
                 "indicator_report__reportable__blueprint",

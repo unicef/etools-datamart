@@ -193,8 +193,15 @@ class Trip(EtoolsDataMartModel):
         )
         queryset = (
             lambda: T2FTravelactivity.objects.filter(date__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA)
-            .select_related("result", "partner", "partnership", "primary_traveler")
+            .select_related(
+                "result",
+                "partner",
+                "partner__organization",
+                "partnership",
+                "primary_traveler",
+            )
             .prefetch_related("travels")
+            # TODO:  Prefetch improvements on travels, t2f_travelattachment, auth_user
         )
         mapping = dict(
             # cp_output="activity.result.name",

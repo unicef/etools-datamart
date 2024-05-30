@@ -233,7 +233,8 @@ class EtoolsLoader(BaseLoader):
                     is_empty=not self.model.objects.exists(),
                     stdout=stdout,
                 )
-                sid = transaction.savepoint()
+                # sid = transaction.savepoint()
+                sid = None
                 total_countries = len(countries)
                 try:
                     self.results.context = self.context
@@ -242,6 +243,7 @@ class EtoolsLoader(BaseLoader):
                     if truncate:
                         self.model.objects.truncate()
                     for i, country in enumerate(countries, 1):
+                        sid = transaction.savepoint()
                         cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
                         self.context["country"] = country
                         if stdout and verbosity > 0:
@@ -271,7 +273,8 @@ class EtoolsLoader(BaseLoader):
                 except MaxRecordsException:
                     pass
                 except Exception:
-                    transaction.savepoint_rollback(sid)
+                    if sid:
+                        transaction.savepoint_rollback(sid)
                     raise
             else:
                 logger.info(f"Unable to get lock for {self}")

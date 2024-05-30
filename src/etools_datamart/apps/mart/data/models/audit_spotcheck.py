@@ -23,8 +23,11 @@ class SpotCheckLoader(EngagementMixin, EtoolsLoader):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
 
-        qs = AuditSpotcheck.objects.select_related("engagement_ptr").prefetch_related(
-            "engagement_ptr__AuditEngagementOffices_engagement"
+        qs = AuditSpotcheck.objects.select_related(
+            "engagement_ptr",
+            "engagement_ptr_agreement__auditor_firm__organization",
+        ).prefetch_related(
+            "engagement_ptr__AuditEngagementOffices_engagement",
         )
 
         paginator = Paginator(qs, batch_size)
@@ -40,6 +43,7 @@ class SpotCheckLoader(EngagementMixin, EtoolsLoader):
                 self.increment_counter(op)
 
     def _get_priority_findings(self, record: AuditEngagement, priority: str):
+        # TODO: Prefetch  related AuditFinding
         return list(
             AuditFinding.objects.filter(
                 spot_check=record._impl,

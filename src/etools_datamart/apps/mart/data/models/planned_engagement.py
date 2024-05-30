@@ -27,6 +27,10 @@ class PartnersPlannedEngagement(EtoolsDataMartModel):
 
     class Options:
         source = PartnersPlannedengagement
+        queryset = lambda: PartnersPlannedengagement.objects.select_related(
+            "partner__organization",
+        )
+
         depends = (Partner,)
         mapping = dict(
             partner_name="partner.organization.name",
