@@ -23,8 +23,11 @@ class SpotCheckLoader(EngagementMixin, EtoolsLoader):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
 
-        qs = AuditSpotcheck.objects.select_related("engagement_ptr").prefetch_related(
-            "engagement_ptr__AuditEngagementOffices_engagement"
+        qs = AuditSpotcheck.objects.select_related(
+            "engagement_ptr",
+            "engagement_ptr__agreement__auditor_firm__organization",
+        ).prefetch_related(
+            "engagement_ptr__AuditEngagementOffices_engagement",
         )
 
         paginator = Paginator(qs, batch_size)
