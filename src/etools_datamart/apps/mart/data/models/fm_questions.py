@@ -90,7 +90,6 @@ class FMQuestionLoader(EtoolsLoader):
                 method_name_list.append(method_name)
 
         methods = ", ".join(method_name_list)
-        print(f"Methods:{methods}")
         return methods
 
     # def get_summary_answer(
@@ -125,8 +124,6 @@ class FMQuestionLoader(EtoolsLoader):
     def populate_field_monitoring_settings_method(self):
         qs = FieldMonitoringSettingsMethod.objects.all().values("id", "name")
         self.dds_field_monitoring_settings_method = pd.DataFrame(list(qs))
-        print(f"DF Shape:{self.dds_field_monitoring_settings_method.shape}")
-        print(f"DF row 0:{self.dds_field_monitoring_settings_method.head}")
 
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
