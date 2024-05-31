@@ -206,9 +206,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return PartnersIntervention.objects.select_related(
-            "agreement", "agreement__partner"
-        ).prefetch_related(
+        return PartnersIntervention.objects.select_related("agreement", "agreement__partner").prefetch_related(
             "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
         )
 
