@@ -15,6 +15,7 @@ from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, cache, EtlResult, has_attr, RUN_UNKNOWN
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.libs.time import strfelapsed
 from etools_datamart.sentry import process_exception
 
@@ -145,7 +146,7 @@ class EtoolsLoader(BaseLoader):
 
         qs = self.filter_queryset(self.get_queryset())
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for record in page.object_list:

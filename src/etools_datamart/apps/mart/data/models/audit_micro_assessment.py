@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from celery.utils.log import get_task_logger
 from model_utils import Choices
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
@@ -26,7 +27,7 @@ class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
 
         qs = AuditMicroassessment.objects.select_related("engagement_ptr")
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for record in page.object_list:

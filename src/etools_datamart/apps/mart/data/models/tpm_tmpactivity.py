@@ -7,6 +7,7 @@ from django.utils.functional import cached_property
 from celery.utils.log import get_task_logger
 from dynamic_serializer.core import get_attr
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import DjangoContentType, TpmTpmactivity, UnicefAttachmentsAttachment
@@ -146,7 +147,7 @@ class TPMActivityLoader(EtoolsLoader):
 
         qs = self.filter_queryset(self.get_queryset())
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for tpm_activity in page.object_list:

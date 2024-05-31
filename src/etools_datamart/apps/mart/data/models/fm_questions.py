@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 import pandas as pd
 from celery.utils.log import get_task_logger
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
@@ -133,7 +134,7 @@ class FMQuestionLoader(EtoolsLoader):
 
         self.populate_field_monitoring_settings_method()
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
 
@@ -345,7 +346,7 @@ class FMOntrackLoader(EtoolsLoader):
 
         qs = self.get_queryset()
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for rec in page.object_list:

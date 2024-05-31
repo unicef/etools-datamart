@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import PartnersIntervention, PartnersPartnerorganization
@@ -26,7 +27,7 @@ class PMPIndicatorLoader(EtoolsLoader):
 
         qs = self.get_queryset()
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for partner in page.object_list:

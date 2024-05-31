@@ -9,6 +9,7 @@ from _decimal import DivisionByZero, InvalidOperation
 from celery.utils.log import get_task_logger
 from model_utils import Choices
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
@@ -30,7 +31,7 @@ class AuditLoader(EngagementMixin, EtoolsLoader):
             "engagement_ptr__agreement__auditor_firm__organization",
         )
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for record in page.object_list:
