@@ -18,7 +18,15 @@ class AuditResultLoader(EtoolsLoader):
         return ret
 
     def get_queryset(self):
-        return super().get_queryset()
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "engagement_ptr",
+                "engagement_ptr__partner",
+                "engagement_ptr__partner__organization",
+            )
+        )
 
     def get_count_high_risk_findings(self, record, values, field_name):
         return AuditRisk.objects.filter(value=4, engagement=record.engagement_ptr).count()

@@ -4,6 +4,7 @@ from django.db.models import JSONField
 
 from celery.utils.log import get_task_logger
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.mart.data.models.intervention import InterventionAbstract, InterventionLoader
@@ -27,7 +28,7 @@ class InterventionBudgetLoader(InterventionLoader):
 
         qs = self.get_queryset().exclude(intervention__isnull=True)
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for record in page.object_list:

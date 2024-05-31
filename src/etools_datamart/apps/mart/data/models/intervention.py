@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import F, JSONField, Sum
 from django.utils.functional import cached_property
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
@@ -205,10 +206,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return PartnersIntervention.objects.select_related(
-            "agreement",
-            "agreement__partner",
-        ).prefetch_related(
+        return PartnersIntervention.objects.select_related("agreement", "agreement__partner").prefetch_related(
             "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
         )
 
@@ -431,7 +429,7 @@ class InterventionByLocationLoader(InterventionLoader):
 
         qs = self.filter_queryset(self.get_queryset().prefetch_related("flat_locations"))
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for intervention in page.object_list:

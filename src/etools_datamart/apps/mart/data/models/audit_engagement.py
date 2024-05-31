@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 
 from model_utils import Choices
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts, RiskConst

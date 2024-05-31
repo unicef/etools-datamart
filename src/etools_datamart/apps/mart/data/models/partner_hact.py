@@ -27,8 +27,11 @@ from etools_datamart.apps.sources.etools.models import (
 
 
 class PartnerHactLoader(EtoolsLoader):
+    # TODO: Add Prefetch
     def get_queryset(self):
-        return PartnersPartnerorganization.objects.prefetch_related(
+        return PartnersPartnerorganization.objects.select_related(
+            "organization",
+        ).prefetch_related(
             "ActivitiesActivity_partner__TpmTpmactivity_activity_ptr",
             "FieldMonitoringPlanningMonitoringactivitygroup_partner",
         )
@@ -64,11 +67,13 @@ class PartnerHactLoader(EtoolsLoader):
 
         # field monitoring activities qualify as programmatic visits if during a monitoring activity the hact
         # question was answered with an overall rating and the visit is completed
+        # TODO: use actually prefetched records.
         grouped_activities = record.FieldMonitoringPlanningMonitoringactivitygroup_partner.values_list(
             "FieldMonitoringPlanningMonitoringactivitygroupMonitorin69Fc_monitoringactivitygroup__monitoringactivity__id",
             flat=True,
         )
 
+        # TODO: Try to load this as a prefetched data
         question_sq = FieldMonitoringDataCollectionActivityquestionoverallfinding.objects.filter(
             activity_question__monitoring_activity_id=OuterRef("id"),
             activity_question__question__is_hact=True,

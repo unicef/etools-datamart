@@ -4,6 +4,7 @@ from django.db import models
 
 from celery.utils.log import get_task_logger
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import AuthUser, PartnersPartnerorganization, UsersRealm
@@ -18,7 +19,7 @@ class PartnerStaffMemberLoader(EtoolsLoader):
 
         qs = PartnersPartnerorganization.objects.all().select_related("organization")
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for partner in page.object_list:

@@ -65,6 +65,7 @@ swagger-spec-validator = "*"
 unicef-security = "*"
 unicef-realm = "*"
 xhtml2pdf = "*"
+pandas = "*"
 
 [dev-packages]
 black = "*"

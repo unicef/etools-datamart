@@ -1,3 +1,8 @@
+4.6
+----
+* First phase of reducing sql queries in etl loaders to reduce execution time
+* Apply ordering spacialized paginator
+
 4.5
 ----
 * batched etl loading to reduce memory usage

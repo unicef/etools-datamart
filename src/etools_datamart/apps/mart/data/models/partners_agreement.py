@@ -63,6 +63,9 @@ class Agreement(EtoolsDataMartModel):
         source = PartnersAgreement
         queryset = lambda: PartnersAgreement.objects.select_related(
             "partner__organization",
+            "signed_by",
+            "partner_manager",
+            "terms_acknowledged_by",
         )
         mapping = {
             "partner_name": "partner.organization.name",

@@ -1,17 +1,21 @@
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import models
-from django.db.models import JSONField
+from django.db.models import JSONField, Prefetch
 from django.utils.translation import gettext as _
 
+import pandas as pd
 from celery.utils.log import get_task_logger
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringDataCollectionActivityoverallfinding,
+    FieldMonitoringDataCollectionActivityquestionoverallfinding,
     FieldMonitoringDataCollectionChecklistoverallfinding,
     FieldMonitoringDataCollectionFinding,
+    FieldMonitoringSettingsMethod,
     FieldMonitoringSettingsOption,
     FieldMonitoringSettingsQuestionMethods,
     ReportsSector,
@@ -24,7 +28,8 @@ class FMQuestionLoader(EtoolsLoader):
     """Loader for FM Questions"""
 
     def get_queryset(self):
-        return self.config.source.objects.select_related(
+
+        qs = self.config.source.objects.select_related(
             "activity_question",
             "activity_question__question",
             "activity_question__question__category",
@@ -34,13 +39,29 @@ class FMQuestionLoader(EtoolsLoader):
             "activity_question__monitoring_activity__location",
             "activity_question__monitoring_activity__location_site",
             "activity_question__partner",
+            "activity_question__partner__organization",
             "activity_question__cp_output",
             "activity_question__intervention",
             "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
         ).prefetch_related(
-            "activity_question__question__FieldMonitoringSettingsQuestionMethods_question",
-            "activity_question__question__FieldMonitoringSettingsOption_question",
+            Prefetch(
+                "activity_question__question__FieldMonitoringSettingsQuestionMethods_question",
+                queryset=FieldMonitoringSettingsQuestionMethods.objects.all(),
+                to_attr="prefetched_FieldMonitoringSettingsQuestionMethods",
+            ),
+            Prefetch(
+                "activity_question__question__FieldMonitoringSettingsOption_question",
+                queryset=FieldMonitoringSettingsOption.objects.all(),
+                to_attr="prefetched_FieldMonitoringSettingsOption",
+            ),
+            Prefetch(
+                "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
+                queryset=FieldMonitoringDataCollectionActivityquestionoverallfinding.objects.all(),
+                to_attr="prefetched_FieldMonitoringDataCollectionActivityquestionoverallfinding",
+            ),
         )
+
+        return qs
 
     def get_answer_options(
         self,
@@ -48,8 +69,8 @@ class FMQuestionLoader(EtoolsLoader):
         values: dict,
         **kwargs,
     ):
-        option_qs = record.activity_question.question.FieldMonitoringSettingsOption_question.all()
-        return ", ".join([o.label for o in option_qs.all()])
+        option_qs = record.activity_question.question.prefetched_FieldMonitoringSettingsOption
+        return ", ".join([o.label for o in option_qs])
 
     def get_question_collection_methods(
         self,
@@ -57,8 +78,20 @@ class FMQuestionLoader(EtoolsLoader):
         values: dict,
         **kwargs,
     ):
-        methods_qs = record.activity_question.question.FieldMonitoringSettingsQuestionMethods_question.all()
-        return ", ".join([m.method.name for m in methods_qs.all()])
+        methods_qs = record.activity_question.question.prefetched_FieldMonitoringSettingsQuestionMethods
+        method_name_list = []
+
+        for m in methods_qs:
+            result = self.dds_field_monitoring_settings_method[
+                self.dds_field_monitoring_settings_method["id"] == m.method_id
+            ]["name"]
+
+            if not result.empty:
+                method_name = result.iloc[0]
+                method_name_list.append(method_name)
+
+        methods = ", ".join(method_name_list)
+        return methods
 
     # def get_summary_answer(
     #         self,
@@ -80,6 +113,7 @@ class FMQuestionLoader(EtoolsLoader):
         values: dict,
         **kwargs,
     ):
+        # TODO: Prefetch related
         checklist_finding = FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
             partner=record.activity_question.partner,
             intervention=record.activity_question.intervention,
@@ -88,16 +122,24 @@ class FMQuestionLoader(EtoolsLoader):
         ).first()
         return getattr(checklist_finding, "narrative_finding", None)
 
+    def populate_field_monitoring_settings_method(self):
+        qs = FieldMonitoringSettingsMethod.objects.all().values("id", "name")
+        self.dds_field_monitoring_settings_method = pd.DataFrame(list(qs))
+
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
 
         qs = self.get_queryset()
 
-        paginator = Paginator(qs, batch_size)
+        self.populate_field_monitoring_settings_method()
+
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
+
             for rec in page.object_list:
+
                 filters = self.config.key(self, rec)
                 values = self.get_values(rec)
                 if rec.activity_question.cp_output:
@@ -304,7 +346,7 @@ class FMOntrackLoader(EtoolsLoader):
 
         qs = self.get_queryset()
 
-        paginator = Paginator(qs, batch_size)
+        paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for rec in page.object_list:
