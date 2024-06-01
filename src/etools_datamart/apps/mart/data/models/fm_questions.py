@@ -1,5 +1,4 @@
 import datetime
-import time
 
 from django.conf import settings
 from django.db import models, transaction
@@ -107,7 +106,6 @@ class FMQuestionLoader(EtoolsLoader):
 
         methods = ", ".join(method_name_list)
         return methods
-
 
     def get_overall_finding(
         self,
