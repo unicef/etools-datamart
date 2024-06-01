@@ -27,53 +27,65 @@ logger = get_task_logger(__name__)
 
 class FMQuestionLoader(EtoolsLoader):
     """Loader for FM Questions"""
+
     TRANSACTION_BY_BATCH = True
 
     def get_queryset(self):
-        narrative_finding_subquery = FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
-            started_checklist_id=OuterRef('started_checklist_id')
-        ).filter(Q(
-            Q(partner_id=OuterRef('activity_question__partner_id')) |
-            Q(cp_output_id=OuterRef('activity_question__cp_output_id')) |
-            Q(intervention_id=OuterRef('activity_question__intervention_id')))
-        ).values('narrative_finding')[:1]
+        narrative_finding_subquery = (
+            FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
+                started_checklist_id=OuterRef("started_checklist_id")
+            )
+            .filter(
+                Q(
+                    Q(partner_id=OuterRef("activity_question__partner_id"))
+                    | Q(cp_output_id=OuterRef("activity_question__cp_output_id"))
+                    | Q(intervention_id=OuterRef("activity_question__intervention_id"))
+                )
+            )
+            .values("narrative_finding")[:1]
+        )
 
-        qs = self.config.source.objects.select_related(
-            "activity_question",
-            "activity_question__question",
-            "activity_question__question__category",
-            "started_checklist",
-            "started_checklist__method",
-            "activity_question__monitoring_activity",
-            "activity_question__monitoring_activity__location",
-            "activity_question__monitoring_activity__location_site",
-            "activity_question__partner",
-            "activity_question__partner__organization",
-            "activity_question__cp_output",
-            "activity_question__intervention",
-            "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
-        ).prefetch_related(
-            Prefetch(
-                "activity_question__question__FieldMonitoringSettingsQuestionMethods_question",
-                queryset=FieldMonitoringSettingsQuestionMethods.objects.all(),
-                to_attr="prefetched_FieldMonitoringSettingsQuestionMethods",
-            ),
-            Prefetch(
-                "activity_question__question__FieldMonitoringSettingsOption_question",
-                queryset=FieldMonitoringSettingsOption.objects.all(),
-                to_attr="prefetched_FieldMonitoringSettingsOption",
-            ),
-            Prefetch(
+        qs = (
+            self.config.source.objects.select_related(
+                "activity_question",
+                "activity_question__question",
+                "activity_question__question__category",
+                "started_checklist",
+                "started_checklist__method",
+                "activity_question__monitoring_activity",
+                "activity_question__monitoring_activity__location",
+                "activity_question__monitoring_activity__location_site",
+                "activity_question__partner",
+                "activity_question__partner__organization",
+                "activity_question__cp_output",
+                "activity_question__intervention",
                 "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
-                queryset=FieldMonitoringDataCollectionActivityquestionoverallfinding.objects.all(),
-                to_attr="prefetched_FieldMonitoringDataCollectionActivityquestionoverallfinding",
-            ),
-        ).annotate(
-            site_name=F("activity_question__monitoring_activity__location_site__name"),
-            location_name=F("activity_question__monitoring_activity__location__name"),
-            narrative_overall_finding=Subquery(narrative_finding_subquery),
-            myvalue=F("value")
-        ).all()
+            )
+            .prefetch_related(
+                Prefetch(
+                    "activity_question__question__FieldMonitoringSettingsQuestionMethods_question",
+                    queryset=FieldMonitoringSettingsQuestionMethods.objects.all(),
+                    to_attr="prefetched_FieldMonitoringSettingsQuestionMethods",
+                ),
+                Prefetch(
+                    "activity_question__question__FieldMonitoringSettingsOption_question",
+                    queryset=FieldMonitoringSettingsOption.objects.all(),
+                    to_attr="prefetched_FieldMonitoringSettingsOption",
+                ),
+                Prefetch(
+                    "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
+                    queryset=FieldMonitoringDataCollectionActivityquestionoverallfinding.objects.all(),
+                    to_attr="prefetched_FieldMonitoringDataCollectionActivityquestionoverallfinding",
+                ),
+            )
+            .annotate(
+                site_name=F("activity_question__monitoring_activity__location_site__name"),
+                location_name=F("activity_question__monitoring_activity__location__name"),
+                narrative_overall_finding=Subquery(narrative_finding_subquery),
+                myvalue=F("value"),
+            )
+            .all()
+        )
 
         return qs
 
