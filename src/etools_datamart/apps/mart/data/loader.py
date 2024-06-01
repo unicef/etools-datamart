@@ -4,7 +4,6 @@ from inspect import isclass
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator
 from django.db import connections, models, transaction
 from django.utils import timezone
 
@@ -244,7 +243,8 @@ class EtoolsLoader(BaseLoader):
                     if truncate:
                         self.model.objects.truncate()
                     for i, country in enumerate(countries, 1):
-                        sid = transaction.savepoint()
+                        if not getattr(self, "TRANSACTION_BY_BATCH", False):
+                            sid = transaction.savepoint()
                         cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
                         self.context["country"] = country
                         if stdout and verbosity > 0:
