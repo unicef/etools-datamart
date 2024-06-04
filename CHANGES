@@ -1,3 +1,9 @@
+4.7
+----
+* Further improvements on data.fmquestion
+* Further improvements on data.intervention
+* Page size increase for speed up
+
 4.6
 ----
 * First phase of reducing sql queries in etl loaders to reduce execution time
