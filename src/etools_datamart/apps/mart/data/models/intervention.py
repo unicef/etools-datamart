@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import models
-from django.db.models import F, JSONField, Sum
+from django.db.models import F, JSONField, Prefetch, Q, Subquery, Sum
 from django.utils.functional import cached_property
 
 from etools_datamart.apps.etl.paginator import DatamartPaginator
@@ -16,6 +16,8 @@ from etools_datamart.apps.sources.etools.models import (
     FundsFundsreservationheader,
     PartnersIntervention,
     PartnersInterventionamendment,
+    PartnersInterventionattachment,
+    PartnersInterventionbudget,
     PartnersInterventionplannedvisits,
     ReportsAppliedindicator,
     T2FTravelactivity,
@@ -206,8 +208,48 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return PartnersIntervention.objects.select_related("agreement", "agreement__partner").prefetch_related(
-            "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
+        return PartnersIntervention.objects.select_related(
+            "agreement",
+            "agreement__partner",
+            "agreement__partner__organization",
+            "unicef_signatory",
+            "country_programme",
+            "partner_authorized_officer_signatory",
+        ).prefetch_related(
+            "sections",
+            "flat_locations",
+            "offices",
+            "unicef_focal_points",
+            "partner_focal_points",
+            "result_links",
+            Prefetch(
+                "PartnersInterventionbudget_intervention",
+                queryset=PartnersInterventionbudget.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionamendment_intervention",
+                queryset=PartnersInterventionamendment.objects.all().order_by("signed_date"),
+            ),
+            Prefetch(
+                "FundsFundsreservationheader_intervention",
+                queryset=FundsFundsreservationheader.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionattachment_intervention",
+                queryset=PartnersInterventionattachment.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionplannedvisits_intervention",
+                queryset=PartnersInterventionplannedvisits.objects.filter(year=self.context["today"].year),
+            ),
+            Prefetch(
+                "T2FTravelactivity_partnership",
+                queryset=T2FTravelactivity.objects.filter(
+                    travel_type=TravelType.PROGRAMME_MONITORING,
+                    travels__status="completed",
+                    date__isnull=False,
+                ).order_by("date"),
+            ),
         )
 
     @cached_property
@@ -230,14 +272,9 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return None
 
     def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionplannedvisits.objects.filter(intervention=record)
-        qs = qs.filter(year=self.context["today"].year)
-        qs = qs.annotate(
-            planned=F("programmatic_q1") + F("programmatic_q2") + F("programmatic_q3") + F("programmatic_q4")
-        )
-        record = qs.first()
-        if record:
-            return record.planned
+        for item in record.PartnersInterventionplannedvisits_intervention.all():
+            planned = item.programmatic_q1 + item.programmatic_q2 + item.programmatic_q3
+            return planned
 
     def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
         qs = record.PartnersInterventionattachment_intervention.all()
@@ -245,12 +282,16 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(qs.values_list("type__name", flat=True))
 
     def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionamendment.objects.filter(intervention=record).order_by("signed_date")
-        values["number_of_amendments"] = qs.count()
-        if qs:
-            values["last_amendment_date"] = qs.latest("signed_date").signed_date
-        types = [str(t) for t in qs.values_list("types", flat=True)]
-        return ", ".join(types)
+        count = 0
+        values["last_amendment_date"] = None
+        types_list = []
+        for item in record.PartnersInterventionamendment_intervention.all():
+            count = count + 1
+            values["last_amendment_date"] = item.signed_date
+            types_list.append(str(item.types))
+
+        values["number_of_amendments"] = count
+        return ", ".join(types_list)
 
     def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
         i1 = record.review_date_prc
@@ -278,17 +319,10 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join([sec["name"] for sec in data])
 
     def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
-        ta = (
-            T2FTravelactivity.objects.filter(
-                partnership__pk=record.pk,
-                travel_type=TravelType.PROGRAMME_MONITORING,
-                travels__status="completed",
-                date__isnull=False,
-            )
-            .order_by("date")
-            .last()
-        )
-        return ta.date if ta else None
+        ta_date = None
+        for item in record.T2FTravelactivity_partnership.all():
+            ta_date = item.date
+        return ta_date
 
     def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
         if record.unicef_signatory:
@@ -338,14 +372,19 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(ret)
 
     def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
-        return ", ".join(
-            FundsFundsreservationheader.objects.filter(intervention=record).values_list("fr_number", flat=True)
-        )
+        fr_number_list = []
+
+        for item in record.FundsFundsreservationheader_intervention.all():
+            fr_number_list.append(item.fr_number)
+
+        return ", ".join(fr_number_list)
 
     def get_outstanding_amt_local(self, record: PartnersIntervention, values: dict, **kwargs):
-        return FundsFundsreservationheader.objects.filter(intervention=record).aggregate(Sum("outstanding_amt_local"))[
-            "outstanding_amt_local__sum"
-        ]
+        sum_outstanding_amt_local = 0
+        for item in record.FundsFundsreservationheader_intervention.all():
+            sum_outstanding_amt_local = sum_outstanding_amt_local + item.outstanding_amt_local
+
+        return sum_outstanding_amt_local
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
         values["cp_outputs_data"] = list(record.result_links.values("name", "wbs"))
