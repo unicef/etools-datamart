@@ -24,8 +24,9 @@ class PartnerLoader(EtoolsLoader):
                     "T2FTravelactivity_partner",
                     queryset=T2FTravelactivity.objects.filter(
                         travel_type=TravelType.PROGRAMME_MONITORING,
-                        travels__status="completed",
                         date__isnull=False,
+                        travels__status="completed",
+                        travels__traveler="primary_traveler",
                     ).order_by("date"),
                 ),
             )
