@@ -3,7 +3,7 @@ from datetime import date
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import F, JSONField
+from django.db.models import F, JSONField, Prefetch
 from django.utils.translation import gettext_lazy as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
@@ -14,18 +14,26 @@ from etools_datamart.apps.sources.etools.models import PartnersPartnerorganizati
 
 class PartnerLoader(EtoolsLoader):
     def get_queryset(self):
-        return PartnersPartnerorganization.objects.select_related("planned_engagement", "organization").all()
+        return (
+            PartnersPartnerorganization.objects.select_related(
+                "planned_engagement",
+                "organization",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "T2FTravelactivity_partner",
+                    queryset=T2FTravelactivity.objects.filter(
+                        travel_type=TravelType.PROGRAMME_MONITORING,
+                        travels__status="completed",
+                        date__isnull=False,
+                    ).order_by("date"),
+                ),
+            )
+            .all()
+        )
 
     def get_last_pv_date(self, record, values, **kwargs):
-        # FIXME: improves this
-        activity = T2FTravelactivity.objects.filter(
-            partnership__agreement__partner=record,
-            travel_type=TravelType.PROGRAMME_MONITORING,
-            date__isnull=False,
-            travels__status="completed",
-            travels__traveler=F("primary_traveler"),
-        ).first()
-        if activity:
+        for activity in record.T2FTravelactivity_partner.all():
             return activity.date
 
     def get_planned_engagement(self, record, values, **kwargs):
