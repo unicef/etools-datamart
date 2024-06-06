@@ -26,7 +26,7 @@ class PartnerLoader(EtoolsLoader):
                         travel_type=TravelType.PROGRAMME_MONITORING,
                         date__isnull=False,
                         travels__status="completed",
-                        travels__traveler="primary_traveler",
+                        travels__traveler=F("primary_traveler"),
                     ).order_by("date"),
                 ),
             )
