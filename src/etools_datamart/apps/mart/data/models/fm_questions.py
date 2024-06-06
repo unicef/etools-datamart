@@ -55,9 +55,9 @@ class FMQuestionLoader(EtoolsLoader):
                 to_attr="prefetched_FieldMonitoringSettingsOption",
             ),
             Prefetch(
-                "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
-                queryset=FieldMonitoringDataCollectionActivityquestionoverallfinding.objects.all(),
-                to_attr="prefetched_FieldMonitoringDataCollectionActivityquestionoverallfinding",
+                "started_checklist__FieldMonitoringDataCollectionChecklistoverallfinding_started_checklist",
+                queryset=FieldMonitoringDataCollectionChecklistoverallfinding.objects.all(),
+                to_attr="prefetched_FieldMonitoringDataCollectionChecklistoverallfinding",
             ),
         )
 
@@ -113,14 +113,17 @@ class FMQuestionLoader(EtoolsLoader):
         values: dict,
         **kwargs,
     ):
-        # TODO: Prefetch related
-        checklist_finding = FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
-            partner=record.activity_question.partner,
-            intervention=record.activity_question.intervention,
-            cp_output=record.activity_question.cp_output,
-            started_checklist=record.started_checklist,
-        ).first()
-        return getattr(checklist_finding, "narrative_finding", None)
+        # TODO: Use one-shot query mechanism to make search optimal
+        nf = None
+        for fndg in record.started_checklist.prefetched_FieldMonitoringDataCollectionChecklistoverallfinding:
+            if (
+                record.activity_question.intervention_id == fndg.intervention_id
+                and record.activity_question.partner_id == fndg.partner_id
+                and record.activity_question.cp_output_id == fndg.cp_output_id
+            ):
+                return fndg.narrative_finding
+
+        return nf
 
     def populate_field_monitoring_settings_method(self):
         qs = FieldMonitoringSettingsMethod.objects.all().values("id", "name")
