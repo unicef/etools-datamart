@@ -34,8 +34,10 @@ class PartnerLoader(EtoolsLoader):
         )
 
     def get_last_pv_date(self, record, values, **kwargs):
+        activity_date = None
         for activity in record.T2FTravelactivity_partner.all():
             return activity.date
+        return activity_date
 
     def get_planned_engagement(self, record, values, **kwargs):
         try:

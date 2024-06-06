@@ -19,7 +19,9 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionattachment,
     PartnersInterventionbudget,
     PartnersInterventionplannedvisits,
+    PartnersInterventionresultlink,
     ReportsAppliedindicator,
+    ReportsLowerresult,
     T2FTravelactivity,
 )
 
@@ -250,6 +252,10 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                     date__isnull=False,
                 ).order_by("date"),
             ),
+            Prefetch(
+                "PartnersInterventionresultlink_intervention__ReportsLowerresult_result_link__ReportsAppliedindicator_lower_result",
+                queryset=ReportsAppliedindicator.objects.all(),
+            ),
         )
 
     @cached_property
@@ -346,11 +352,15 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join([off["name"] for off in data])
 
     def get_clusters(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=record)
         clusters = set()
-        for applied_indicator in qs.all():
-            if applied_indicator.cluster_name:
-                clusters.add(applied_indicator.cluster_name)
+        for result_link in record.PartnersInterventionresultlink_intervention.all():
+            # print(type(result_link))
+            for lower_result in result_link.ReportsLowerresult_result_link.all():
+                # print(type(lower_result))
+                for applied_indicator in lower_result.ReportsAppliedindicator_lower_result.all():
+                    # print(type(applied_indicator))
+                    if applied_indicator.cluster_name:
+                        clusters.add(applied_indicator.cluster_name)
         return ", ".join(clusters)
 
     def get_partner_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
