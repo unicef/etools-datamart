@@ -2,16 +2,20 @@ import datetime
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import JSONField
 from django.utils.translation import gettext as _
 
+from celery.utils.log import get_task_logger
 from dynamic_serializer.core import get_attr
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.sources.etools.models import T2FTravel, T2FTravelactivity, T2FTravelattachment
 
 from .base import EtoolsDataMartModel
+
+logger = get_task_logger(__name__)
 
 
 class TravelAttachment(object):
@@ -28,14 +32,22 @@ class TripLoader(EtoolsLoader):
         to_delete.delete()
 
     def process_country(self):
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
         qs = self.filter_queryset(self.get_queryset())
-        for t2f_travel_activity in qs.all().order_by("id"):
-            for travel in t2f_travel_activity.travels.all():
-                travel.activity = t2f_travel_activity
-                filters = self.config.key(self, travel)
-                values = self.get_values(travel)
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
+
+        paginator = Paginator(qs.all().order_by("id"), batch_size)
+
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for t2f_travel_activity in page.object_list:
+                for travel in t2f_travel_activity.travels.all():
+                    travel.activity = t2f_travel_activity
+                    filters = self.config.key(self, travel)
+                    values = self.get_values(travel)
+                    op = self.process_record(filters, values)
+                    self.increment_counter(op)
 
     def get_is_second_traveler(self, record: T2FTravel, values: dict, **kwargs):
         return record.traveler != record.activity.primary_traveler
@@ -181,8 +193,15 @@ class Trip(EtoolsDataMartModel):
         )
         queryset = (
             lambda: T2FTravelactivity.objects.filter(date__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA)
-            .select_related("result", "partner", "partnership", "primary_traveler")
+            .select_related(
+                "result",
+                "partner",
+                "partner__organization",
+                "partnership",
+                "primary_traveler",
+            )
             .prefetch_related("travels")
+            # TODO:  Prefetch improvements on travels, t2f_travelattachment, auth_user
         )
         mapping = dict(
             # cp_output="activity.result.name",

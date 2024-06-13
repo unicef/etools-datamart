@@ -1,40 +1,59 @@
 import datetime
 
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
+
+from celery.utils.log import get_task_logger
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.mart.data.models.mixins import add_location_mapping, LocationMixin
 from etools_datamart.apps.sources.etools.models import T2FTravelactivity
 
+logger = get_task_logger(__name__)
+
 
 class TravelActivityLoader(EtoolsLoader):
     def get_queryset(self):
         return (
             self.config.source.objects.filter(date__year__gte=datetime.datetime.now().year - settings.YEAR_DELTA)
-            .select_related("partner", "partnership", "primary_traveler", "result")
+            .select_related(
+                "partner",
+                "partner__organization",
+                "partnership",
+                "primary_traveler",
+                "result",
+            )
             .prefetch_related("travels", "locations")
         )
 
     def process_country(self):
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
         qs = self.filter_queryset(self.get_queryset())
-        for record in qs.order_by("id", "-date"):
-            record.travel = record.travels.order_by("id").first()
-            if record.travel:
-                if record.locations.exists():
-                    for location in record.locations.order_by("id"):
-                        record.location = location
+        qs = qs.order_by("id", "-date")
+
+        paginator = Paginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for record in page.object_list:
+                record.travel = record.travels.order_by("id").first()
+                if record.travel:
+                    if record.locations.exists():
+                        for location in record.locations.order_by("id"):
+                            record.location = location
+                            filters = self.config.key(self, record)
+                            values = self.get_values(record)
+                            op = self.process_record(filters, values)
+                            self.increment_counter(op)
+                    else:
+                        record.location = None
                         filters = self.config.key(self, record)
                         values = self.get_values(record)
                         op = self.process_record(filters, values)
                         self.increment_counter(op)
-                else:
-                    record.location = None
-                    filters = self.config.key(self, record)
-                    values = self.get_values(record)
-                    op = self.process_record(filters, values)
-                    self.increment_counter(op)
 
 
 class TravelActivity(LocationMixin, EtoolsDataMartModel):

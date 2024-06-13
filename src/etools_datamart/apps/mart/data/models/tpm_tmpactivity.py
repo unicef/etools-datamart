@@ -1,12 +1,18 @@
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import JSONField
 from django.utils.functional import cached_property
 
+from celery.utils.log import get_task_logger
 from dynamic_serializer.core import get_attr
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import DjangoContentType, TpmTpmactivity, UnicefAttachmentsAttachment
+
+logger = get_task_logger(__name__)
 
 
 class TPMActivityLoader(EtoolsLoader):
@@ -136,13 +142,20 @@ class TPMActivityLoader(EtoolsLoader):
         )
 
     def process_country(self):
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
         qs = self.filter_queryset(self.get_queryset())
-        for tpm_activity in qs.all():
-            tpm_activity.id = tpm_activity.activity_ptr_id
-            filters = self.config.key(self, tpm_activity)
-            values = self.get_values(tpm_activity)
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+
+        paginator = DatamartPaginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for tpm_activity in page.object_list:
+                tpm_activity.id = tpm_activity.activity_ptr_id
+                filters = self.config.key(self, tpm_activity)
+                values = self.get_values(tpm_activity)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
 
 class TPMActivity(EtoolsDataMartModel):

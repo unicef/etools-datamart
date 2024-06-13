@@ -18,7 +18,9 @@ class IndicatorReportLoader(PrpBaseLoader):
             .exclude(Q(progress_report__isnull=True) | Q(progress_report__status__in=["Due", "Ove", "Sen"]))
             .select_related(
                 "progress_report",
+                "progress_report__programme_document",
                 "progress_report__programme_document__workspace",
+                "progress_report__programme_document__partner",
                 "reportable",
                 "reportable__blueprint",
             )

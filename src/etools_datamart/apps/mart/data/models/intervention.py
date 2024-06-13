@@ -2,10 +2,12 @@ import datetime
 import logging
 
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import F, JSONField, Sum
 from django.utils.functional import cached_property
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
@@ -204,10 +206,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return PartnersIntervention.objects.select_related(
-            "agreement",
-            "agreement__partner",
-        ).prefetch_related(
+        return PartnersIntervention.objects.select_related("agreement", "agreement__partner").prefetch_related(
             "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
         )
 
@@ -425,14 +424,21 @@ class InterventionByLocationLoader(InterventionLoader):
         return values
 
     def process_country(self):
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
         qs = self.filter_queryset(self.get_queryset().prefetch_related("flat_locations"))
-        for intervention in qs.all():
-            for location in intervention.flat_locations.all():
-                intervention.location = location
-                filters = self.config.key(self, intervention)
-                values = self.get_values(intervention)
-                op = self.process_record(filters, values)
-                self.increment_counter(op)
+
+        paginator = DatamartPaginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for intervention in page.object_list:
+                for location in intervention.flat_locations.all():
+                    intervention.location = location
+                    filters = self.config.key(self, intervention)
+                    values = self.get_values(intervention)
+                    op = self.process_record(filters, values)
+                    self.increment_counter(op)
 
 
 class InterventionByLocation(LocationMixin, InterventionAbstract, EtoolsDataMartModel):

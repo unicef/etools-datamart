@@ -1,40 +1,93 @@
-from django.db import models
-from django.db.models import JSONField
+import datetime
+
+from django.conf import settings
+from django.db import models, transaction
+from django.db.models import F, JSONField, OuterRef, Prefetch, Q, Subquery
 from django.utils.translation import gettext as _
 
+import pandas as pd
+from celery.utils.log import get_task_logger
+
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringDataCollectionActivityoverallfinding,
+    FieldMonitoringDataCollectionActivityquestionoverallfinding,
     FieldMonitoringDataCollectionChecklistoverallfinding,
     FieldMonitoringDataCollectionFinding,
+    FieldMonitoringSettingsMethod,
     FieldMonitoringSettingsOption,
     FieldMonitoringSettingsQuestionMethods,
     ReportsSector,
 )
 
+logger = get_task_logger(__name__)
+
 
 class FMQuestionLoader(EtoolsLoader):
     """Loader for FM Questions"""
 
+    TRANSACTION_BY_BATCH = True
+
     def get_queryset(self):
-        return self.config.source.objects.select_related(
-            "activity_question",
-            "activity_question__question",
-            "activity_question__question__category",
-            "started_checklist",
-            "started_checklist__method",
-            "activity_question__monitoring_activity",
-            "activity_question__monitoring_activity__location",
-            "activity_question__monitoring_activity__location_site",
-            "activity_question__partner",
-            "activity_question__cp_output",
-            "activity_question__intervention",
-            "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
-        ).prefetch_related(
-            "activity_question__question__FieldMonitoringSettingsQuestionMethods_question",
-            "activity_question__question__FieldMonitoringSettingsOption_question",
+        narrative_finding_subquery = (
+            FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
+                started_checklist_id=OuterRef("started_checklist_id")
+            )
+            .filter(
+                Q(
+                    Q(partner_id=OuterRef("activity_question__partner_id"))
+                    | Q(cp_output_id=OuterRef("activity_question__cp_output_id"))
+                    | Q(intervention_id=OuterRef("activity_question__intervention_id"))
+                )
+            )
+            .values("narrative_finding")[:1]
         )
+
+        qs = (
+            self.config.source.objects.select_related(
+                "activity_question",
+                "activity_question__question",
+                "activity_question__question__category",
+                "started_checklist",
+                "started_checklist__method",
+                "activity_question__monitoring_activity",
+                "activity_question__monitoring_activity__location",
+                "activity_question__monitoring_activity__location_site",
+                "activity_question__partner",
+                "activity_question__partner__organization",
+                "activity_question__cp_output",
+                "activity_question__intervention",
+                "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "activity_question__question__FieldMonitoringSettingsQuestionMethods_question",
+                    queryset=FieldMonitoringSettingsQuestionMethods.objects.all(),
+                    to_attr="prefetched_FieldMonitoringSettingsQuestionMethods",
+                ),
+                Prefetch(
+                    "activity_question__question__FieldMonitoringSettingsOption_question",
+                    queryset=FieldMonitoringSettingsOption.objects.all(),
+                    to_attr="prefetched_FieldMonitoringSettingsOption",
+                ),
+                Prefetch(
+                    "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
+                    queryset=FieldMonitoringDataCollectionActivityquestionoverallfinding.objects.all(),
+                    to_attr="prefetched_FieldMonitoringDataCollectionActivityquestionoverallfinding",
+                ),
+            )
+            .annotate(
+                site_name=F("activity_question__monitoring_activity__location_site__name"),
+                location_name=F("activity_question__monitoring_activity__location__name"),
+                narrative_overall_finding=Subquery(narrative_finding_subquery),
+                myvalue=F("value"),
+            )
+            .all()
+        )
+
+        return qs
 
     def get_answer_options(
         self,
@@ -42,8 +95,8 @@ class FMQuestionLoader(EtoolsLoader):
         values: dict,
         **kwargs,
     ):
-        option_qs = record.activity_question.question.FieldMonitoringSettingsOption_question.all()
-        return ", ".join([o.label for o in option_qs.all()])
+        option_qs = record.activity_question.question.prefetched_FieldMonitoringSettingsOption
+        return ", ".join([o.label for o in option_qs])
 
     def get_question_collection_methods(
         self,
@@ -51,22 +104,20 @@ class FMQuestionLoader(EtoolsLoader):
         values: dict,
         **kwargs,
     ):
-        methods_qs = record.activity_question.question.FieldMonitoringSettingsQuestionMethods_question.all()
-        return ", ".join([m.method.name for m in methods_qs.all()])
+        methods_qs = record.activity_question.question.prefetched_FieldMonitoringSettingsQuestionMethods
+        method_name_list = []
 
-    # def get_summary_answer(
-    #         self,
-    #         record: FieldMonitoringDataCollectionFinding,
-    #         values: dict,
-    #         **kwargs,
-    # ):
-    #     overall_finding = FieldMonitoringDataCollectionActivityoverallfinding.objects.filter(
-    #         partner=record.activity_question.partner,
-    #         intervention=record.activity_question.intervention,
-    #         cp_output=record.activity_question.cp_output,
-    #         monitoring_activity=record.activity_question.monitoring_activity
-    #     ).first()
-    #     return getattr(overall_finding, 'narrative_finding', None)
+        for m in methods_qs:
+            result = self.dds_field_monitoring_settings_method[
+                self.dds_field_monitoring_settings_method["id"] == m.method_id
+            ]["name"]
+
+            if not result.empty:
+                method_name = result.iloc[0]
+                method_name_list.append(method_name)
+
+        methods = ", ".join(method_name_list)
+        return methods
 
     def get_overall_finding(
         self,
@@ -74,33 +125,99 @@ class FMQuestionLoader(EtoolsLoader):
         values: dict,
         **kwargs,
     ):
-        checklist_finding = FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
-            partner=record.activity_question.partner,
-            intervention=record.activity_question.intervention,
-            cp_output=record.activity_question.cp_output,
-            started_checklist=record.started_checklist,
-        ).first()
-        return getattr(checklist_finding, "narrative_finding", None)
+        return record.narrative_overall_finding
+
+    def populate_field_monitoring_settings_method(self):
+        qs = FieldMonitoringSettingsMethod.objects.all().values("id", "name")
+        self.dds_field_monitoring_settings_method = pd.DataFrame(list(qs))
 
     def process_country(self):
-        for rec in self.get_queryset():
-            filters = self.config.key(self, rec)
-            values = self.get_values(rec)
-            if rec.activity_question.cp_output:
-                cp_output = rec.activity_question.cp_output
-                values["entity_type"] = "CP Output"
-                values["entity_instance"] = cp_output.name
-                values["output"] = cp_output.wbs
-            elif rec.activity_question.intervention:
-                pd = rec.activity_question.intervention
-                values["entity_type"] = "PD/SSFA"
-                values["entity_instance"] = pd.reference_number
-            elif rec.activity_question.partner:
-                partner = rec.activity_question.partner
-                values["entity_type"] = "Partner"
-                values["entity_instance"] = partner.organization.name
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = 2000
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = self.get_queryset()
+        schema_name = self.context["country"].schema_name
+
+        self.populate_field_monitoring_settings_method()
+
+        paginator = DatamartPaginator(qs, batch_size)
+        sid = None
+
+        logger.debug(f"number of pages size:{len(paginator.page_range)}")
+
+        for page_idx in paginator.page_range:
+            if getattr(self, "TRANSACTION_BY_BATCH", False):
+                sid = transaction.savepoint()
+            try:
+                page = paginator.page(page_idx)
+                logger.debug(f"{page_idx} out of {len(paginator.page_range)} pages done")
+
+                # First get all the records that currently exist to avoid get_or_create on process record
+                ids_from_etools = list(page.object_list.values_list("id", flat=True))
+
+                local_objects = self.model.objects.filter(source_id__in=ids_from_etools, schema_name=schema_name)
+                local_source_ids = local_objects.values_list("source_id", flat=True)
+
+                # figure out which ones we don't have at all locally
+                to_create_remote_ids = [id for id in ids_from_etools if id not in local_source_ids]
+
+                # figure out which ones to update:
+                # this will be a list of update local objects with the new values if the local objects need updating
+                # create a map in memory with source_id and record
+                local_object_dict = {i.source_id: i for i in local_objects}
+                to_update = []
+                to_create = []
+
+                for rec in page.object_list:
+                    values = self.get_values(rec)
+                    # turns out changes are detected due to the mismatch in type for dates
+                    for key, value in values.items():
+                        if isinstance(value, datetime.date):
+                            values[key] = value.strftime("%Y-%m-%d")
+
+                    if rec.activity_question.cp_output:
+                        cp_output = rec.activity_question.cp_output
+                        values["entity_type"] = "CP Output"
+                        values["entity_instance"] = cp_output.name
+                        values["output"] = cp_output.wbs
+                    elif rec.activity_question.intervention:
+                        pd = rec.activity_question.intervention
+                        values["entity_type"] = "PD/SSFA"
+                        values["entity_instance"] = pd.reference_number
+                    elif rec.activity_question.partner:
+                        partner = rec.activity_question.partner
+                        values["entity_type"] = "Partner"
+                        values["entity_instance"] = partner.organization.name
+
+                    if rec.id in to_create_remote_ids:
+                        new_instance = self.model(**values)
+                        new_instance.source_id = rec.id
+                        new_instance.schema_name = schema_name
+                        to_create.append(new_instance)
+                        self.increment_counter("created")
+                        continue
+                    else:
+                        local_object_to_update = local_object_dict[rec.id]
+                        if self.config.always_update or self.is_record_changed(local_object_to_update, values):
+                            for field, value in values.items():
+                                setattr(local_object_to_update, field, value)
+                            to_update.append(local_object_to_update)
+                            self.increment_counter("updated")
+                        else:
+                            self.increment_counter("unchanged")
+
+                # Time to bulk_create
+                self.model.objects.bulk_create(to_create)
+                # time to bulk_update
+                self.model.objects.bulk_update(to_update, fields=self.mapping.keys())
+
+            except Exception:
+                if sid:
+                    transaction.savepoint_rollback(sid)
+                raise
+            else:
+                if sid:
+                    transaction.savepoint_commit(sid)
 
     def get_location(self, record: FieldMonitoringDataCollectionFinding, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
@@ -259,14 +376,15 @@ class FMQuestion(EtoolsDataMartModel):
             collection_method="started_checklist.method.name",
             answer="value",
             summary_answer="activity_question.FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question.value",
-            overall_finding="-",
+            overall_finding="narrative_overall_finding",
             monitoring_activity_id="activity_question.monitoring_activity.pk",
             monitoring_activity="activity_question.monitoring_activity.number",
             specific_details="i",
             date_of_capture="",
             monitoring_activity_end_date="activity_question.monitoring_activity.end_date",
             location="-",
-            site="activity_question.monitoring_activity.location_site.name",
+            site="site_name",
+            # site="activity_question.monitoring_activity.location_site.name",
             category="activity_question.question.category.name",
             information_source="started_checklist.information_source",
             is_hact="activity_question.question.is_hact",
@@ -285,29 +403,39 @@ class FMOntrackLoader(EtoolsLoader):
         return "On track" if record.on_track else "Off track"
 
     def process_country(self):
-        for rec in self.get_queryset():
-            filters = self.config.key(self, rec)
-            values = self.get_values(rec)
-            if rec.cp_output:
-                values["entity"] = rec.cp_output.name
-                values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
-                values["output"] = rec.cp_output.wbs
-                values["programme_areas"] = f"{rec.cp_output.programme_area_code} {rec.cp_output.programme_area_name}"
-                values["entity_type"] = "CP Output"
-            elif rec.intervention:
-                values["entity"] = rec.intervention.reference_number
-                values["outcome"] = None
-                values["output"] = None
-                values["programme_areas"] = None
-                values["entity_type"] = "PD/SSFA"
-            elif rec.partner:
-                values["entity"] = rec.partner.organization.name
-                values["outcome"] = None
-                values["output"] = None
-                values["programme_areas"] = None
-                values["entity_type"] = "Partner"
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = self.get_queryset()
+
+        paginator = DatamartPaginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for rec in page.object_list:
+                filters = self.config.key(self, rec)
+                values = self.get_values(rec)
+                if rec.cp_output:
+                    values["entity"] = rec.cp_output.name
+                    values["outcome"] = rec.cp_output.parent.wbs if rec.cp_output.parent else None
+                    values["output"] = rec.cp_output.wbs
+                    values["programme_areas"] = (
+                        f"{rec.cp_output.programme_area_code} {rec.cp_output.programme_area_name}"
+                    )
+                    values["entity_type"] = "CP Output"
+                elif rec.intervention:
+                    values["entity"] = rec.intervention.reference_number
+                    values["outcome"] = None
+                    values["output"] = None
+                    values["programme_areas"] = None
+                    values["entity_type"] = "PD/SSFA"
+                elif rec.partner:
+                    values["entity"] = rec.partner.organization.name
+                    values["outcome"] = None
+                    values["output"] = None
+                    values["programme_areas"] = None
+                    values["entity_type"] = "Partner"
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
     def get_sections(self, record: FieldMonitoringDataCollectionActivityoverallfinding, values: dict, **kwargs):
         data = []

@@ -14,6 +14,7 @@ from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
 from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, cache, EtlResult, has_attr, RUN_UNKNOWN
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.libs.time import strfelapsed
 from etools_datamart.sentry import process_exception
 
@@ -143,9 +144,11 @@ class EtoolsLoader(BaseLoader):
         logger.debug(f"Batch size:{batch_size}")
 
         qs = self.filter_queryset(self.get_queryset())
-        for batch_start in range(0, qs.count(), batch_size):
-            batch = qs[batch_start : batch_start + batch_size]
-            for record in batch.iterator():
+
+        paginator = DatamartPaginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for record in page.object_list:
                 filters = self.config.key(self, record)
                 values = self.get_values(record)
                 op = self.process_record(filters, values)
@@ -230,7 +233,8 @@ class EtoolsLoader(BaseLoader):
                     is_empty=not self.model.objects.exists(),
                     stdout=stdout,
                 )
-                sid = transaction.savepoint()
+                # sid = transaction.savepoint()
+                sid = None
                 total_countries = len(countries)
                 try:
                     self.results.context = self.context
@@ -239,6 +243,8 @@ class EtoolsLoader(BaseLoader):
                     if truncate:
                         self.model.objects.truncate()
                     for i, country in enumerate(countries, 1):
+                        if not getattr(self, "TRANSACTION_BY_BATCH", False):
+                            sid = transaction.savepoint()
                         cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
                         self.context["country"] = country
                         if stdout and verbosity > 0:
@@ -268,7 +274,8 @@ class EtoolsLoader(BaseLoader):
                 except MaxRecordsException:
                     pass
                 except Exception:
-                    transaction.savepoint_rollback(sid)
+                    if sid:
+                        transaction.savepoint_rollback(sid)
                     raise
             else:
                 logger.info(f"Unable to get lock for {self}")

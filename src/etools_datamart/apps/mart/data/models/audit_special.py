@@ -1,10 +1,14 @@
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import JSONField
 from django.utils.translation import gettext as _
 
+from celery.utils.log import get_task_logger
 from model_utils import Choices
 
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
@@ -13,17 +17,31 @@ from etools_datamart.apps.sources.etools.models import AuditSpecialaudit, AuditS
 
 from .partner import Partner
 
+logger = get_task_logger(__name__)
+
 
 class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
     def process_country(self):
-        for record in AuditSpecialaudit.objects.select_related("engagement_ptr"):
-            record.id = record.engagement_ptr_id
-            record.sub_type = AuditSpecialaudit
-            record.engagement_ptr._impl = record
-            filters = self.config.key(self, record.engagement_ptr)
-            values = self.get_values(record.engagement_ptr)
-            op = self.process_record(filters, values)
-            self.increment_counter(op)
+        batch_size = settings.RESULTSET_BATCH_SIZE
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = AuditSpecialaudit.objects.select_related(
+            "engagement_ptr",
+            "engagement_ptr__agreement",
+            "engagement_ptr__agreement__auditor_firm__organization",
+        )
+
+        paginator = DatamartPaginator(qs, batch_size)
+        for page_idx in paginator.page_range:
+            page = paginator.page(page_idx)
+            for record in page.object_list:
+                record.id = record.engagement_ptr_id
+                record.sub_type = AuditSpecialaudit
+                record.engagement_ptr._impl = record
+                filters = self.config.key(self, record.engagement_ptr)
+                values = self.get_values(record.engagement_ptr)
+                op = self.process_record(filters, values)
+                self.increment_counter(op)
 
     def get_special_procedures_count(self, record, values, field_name):
         return AuditSpecialauditrecommendation.objects.filter(audit=record._impl).count()

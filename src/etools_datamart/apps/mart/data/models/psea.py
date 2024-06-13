@@ -40,6 +40,7 @@ class PseaAssessment(EtoolsDataMartModel):
     class Options:
         source = PseaAssessment
         depends = (Partner,)
+        # TODO: Join partner.organization
         mapping = dict(
             partner_name="partner.organization.name",
             vendor_number="partner.organization.vendor_number",
@@ -75,6 +76,7 @@ class PseaAnswer(EtoolsDataMartModel):
     class Options:
         source = PseaAnswer
         depends = (Partner, PseaAssessment)
+        # TODO: Join to assessment.partner.organization, assessment, indicator
         mapping = dict(
             assessment_partner_name="assessment.partner.organization.name",
             assessment_cso_type="assessment.partner.organization.cso_type",
