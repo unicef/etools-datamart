@@ -1,9 +1,14 @@
 from django.db import models
+from django.db.models import JSONField, Prefetch
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersAgreementConst
-from etools_datamart.apps.sources.etools.models import PartnersAgreement
+from etools_datamart.apps.sources.etools.models import (
+    PartnersAgreement,
+    PartnersAgreementamendment,
+    PartnersAgreementAuthorizedOfficers,
+)
 
 
 class AgreementLoader(EtoolsLoader):
@@ -61,12 +66,25 @@ class Agreement(EtoolsDataMartModel):
 
     class Options:
         source = PartnersAgreement
-        queryset = lambda: PartnersAgreement.objects.select_related(
+        # queryset = lambda: PartnersAgreement.objects.select_related(
+        queryset = PartnersAgreement.objects.select_related(
             "partner__organization",
             "signed_by",
             "partner_manager",
             "terms_acknowledged_by",
+            "country_programme",
+        ).prefetch_related
+        (
+            Prefetch(
+                "PartnersAgreementamendment_agreement",
+                queryset=PartnersAgreementamendment.objects.all(),
+            ),
+            Prefetch(
+                "PartnersAgreementAuthorizedOfficers_agreement",
+                queryset=PartnersAgreementAuthorizedOfficers.objects.all(),
+            ),
         )
+
         mapping = {
             "partner_name": "partner.organization.name",
             "vendor_number": "partner.organization.vendor_number",
@@ -75,3 +93,4 @@ class Agreement(EtoolsDataMartModel):
             "signed_by_partner": "partner_manager.name",
             "terms_acknowledged_by": "terms_acknowledged_by.name",
         }
+
