@@ -66,7 +66,6 @@ class Agreement(EtoolsDataMartModel):
 
     class Options:
         source = PartnersAgreement
-        # queryset = lambda: PartnersAgreement.objects.select_related(
         queryset = PartnersAgreement.objects.select_related(
             "partner__organization",
             "signed_by",
@@ -93,4 +92,3 @@ class Agreement(EtoolsDataMartModel):
             "signed_by_partner": "partner_manager.name",
             "terms_acknowledged_by": "terms_acknowledged_by.name",
         }
-
