@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.db.models import JSONField
+from django.db.models import JSONField, Prefetch
 
 from celery.utils.log import get_task_logger
 
@@ -8,11 +8,21 @@ from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.mart.data.models.intervention import InterventionAbstract, InterventionLoader
+from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.sources.etools.models import (
     FundsFundsreservationheader,
     models,
+    PartnersFiletype,
     PartnersIntervention,
+    PartnersInterventionamendment,
+    PartnersInterventionattachment,
     PartnersInterventionbudget,
+    PartnersInterventionplannedvisits,
+    PartnersInterventionresultlink,
+    ReportsAppliedindicator,
+    ReportsLowerresult,
+    ReportsResult,
+    T2FTravelactivity,
 )
 
 logger = get_task_logger(__name__)
@@ -20,13 +30,56 @@ logger = get_task_logger(__name__)
 
 class InterventionBudgetLoader(InterventionLoader):
     def get_queryset(self):
-        return PartnersInterventionbudget.objects.select_related("intervention")
+        return (
+            PartnersInterventionbudget.objects.exclude(intervention__isnull=True)
+            .select_related(
+                "intervention",
+                # "intervention__unicef_signatory",
+                "intervention__agreement",
+                "intervention__agreement__partner",
+                "intervention__agreement__partner__organization",
+                "intervention__country_programme",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "intervention__FundsFundsreservationheader_intervention",
+                    queryset=FundsFundsreservationheader.objects.all(),
+                ),
+                Prefetch(
+                    "intervention__PartnersInterventionamendment_intervention",
+                    queryset=PartnersInterventionamendment.objects.all().order_by("signed_date"),
+                ),
+                Prefetch(
+                    "intervention__PartnersInterventionattachment_intervention",
+                    queryset=PartnersInterventionattachment.objects.all(),
+                ),
+                Prefetch(
+                    "intervention__PartnersInterventionplannedvisits_intervention",
+                    queryset=PartnersInterventionplannedvisits.objects.filter(year=self.context["today"].year),
+                ),
+                Prefetch(
+                    "intervention__PartnersInterventionresultlink_intervention__ReportsLowerresult_result_link__ReportsAppliedindicator_lower_result",
+                    queryset=ReportsAppliedindicator.objects.all(),
+                ),
+                Prefetch(
+                    "intervention__T2FTravelactivity_partnership",
+                    queryset=T2FTravelactivity.objects.filter(
+                        travel_type=TravelType.PROGRAMME_MONITORING,
+                        travels__status="completed",
+                        date__isnull=False,
+                    ).order_by("date"),
+                ),
+                Prefetch(
+                    "intervention__country_programme__ReportsResult_country_programme",
+                    queryset=ReportsResult.objects.all(),
+                ),
+            )
+        )
 
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
-
-        qs = self.get_queryset().exclude(intervention__isnull=True)
+        qs = self.get_queryset()
 
         paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
@@ -44,20 +97,20 @@ class InterventionBudgetLoader(InterventionLoader):
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
-    def get_fr_numbers(self, record: PartnersIntervention, values: dict, **kwargs):
+    def get_fr_numbers(self, record: PartnersInterventionbudget, values: dict, **kwargs):
         data = []
         ret = []
-        for fr in FundsFundsreservationheader.objects.filter(intervention=record):
-            ret.append(fr.fr_number)
+
+        for item in record.FundsFundsreservationheader_intervention.all():
+            ret.append(item.fr_number)
             data.append(
                 dict(
-                    fr_number=fr.fr_number,
-                    vendor_code=fr.vendor_code,
-                    fr_type=fr.fr_type,
-                    currency=fr.currency,
+                    fr_number=item.fr_number,
+                    vendor_code=item.vendor_code,
+                    fr_type=item.fr_type,
+                    currency=item.currency,
                 )
             )
-
         values["fr_numbers_data"] = data
         return ", ".join(ret)
 
