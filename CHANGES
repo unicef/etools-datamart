@@ -4,8 +4,9 @@
 * Improvements on data.intervention
 * Page size increase for speed up
 * Improvement on data.partner by preetching related T2FTravelactivity 
-* Improvement on data.partners_agreement 
-* Improvement on data.partners_interventionbudget 
+* Improvement on data.agreement (partners) 
+* Improvement on data.interventionbudget (partners)
+* Improvement on data.engagement 
 
 4.6.1 
 ----
