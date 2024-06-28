@@ -26,6 +26,14 @@ class PDIndicatorLoader(EtoolsLoader):
 
         return values
 
+    def apply_locations(self, indicator):
+        for location in indicator.locations.all():
+            indicator.location = location
+            filters = self.config.key(self, indicator)
+            values = self.get_values(indicator)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
+
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
@@ -38,22 +46,12 @@ class PDIndicatorLoader(EtoolsLoader):
             for indicator in page.object_list:
                 all_disaggregations = indicator.disaggregations.all()
                 if 0 == len(all_disaggregations):
-                    for location in indicator.locations.all():
-                        indicator.disaggregation = None
-                        indicator.location = location
-                        filters = self.config.key(self, indicator)
-                        values = self.get_values(indicator)
-                        op = self.process_record(filters, values)
-                        self.increment_counter(op)
+                    indicator.disaggregation = None
+                    self.apply_locations(indicator)
                 else:
                     for disaggregation in all_disaggregations:
                         indicator.disaggregation = disaggregation
-                        for location in indicator.locations.all():
-                            indicator.location = location
-                            filters = self.config.key(self, indicator)
-                            values = self.get_values(indicator)
-                            op = self.process_record(filters, values)
-                            self.increment_counter(op)
+                        self.apply_locations(indicator)
 
     def get_pd_url(self, record: ReportsAppliedindicator, values: dict, **kwargs):
         return reverse(
@@ -156,7 +154,12 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     class Options:
         source = ReportsAppliedindicator
         queryset = ReportsAppliedindicator.objects.select_related
-        ("indicator", "section")
+        (
+            "indicator",
+            "lower_result",
+            "lower_result__result_link__intervention",
+            "section",
+        )
 
         key = lambda loader, record: dict(
             schema_name=loader.context["country"].schema_name,
