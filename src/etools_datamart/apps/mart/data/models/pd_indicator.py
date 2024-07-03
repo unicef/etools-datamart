@@ -163,7 +163,7 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
             schema_name=loader.context["country"].schema_name,
             source_id=record.pk,
             source_location_id=record.location.pk,
-            source_disaggregation_id=record.disaggregation.pk if record.disaggregation else record.disaggregation,
+            source_disaggregation_id=record.disaggregation.pk if record.disaggregation else None,
         )
 
         mapping = add_location_mapping(
