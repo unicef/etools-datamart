@@ -62,14 +62,12 @@ class PDIndicatorLoader(EtoolsLoader):
     def get_disaggregation_name(self, record: ReportsAppliedindicator, values: dict, **kwargs):
         if record.disaggregation:
             return record.disaggregation.name
-        else:
-            return ""
+        return ""
 
     def get_disaggregation_active(self, record: ReportsAppliedindicator, values: dict, **kwargs):
         if record.disaggregation:
             return record.disaggregation.active
-        else:
-            return False
+        return False
 
 
 class PDIndicator(LocationMixin, EtoolsDataMartModel):
