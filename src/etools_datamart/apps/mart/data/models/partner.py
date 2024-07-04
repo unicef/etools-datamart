@@ -27,7 +27,7 @@ class PartnerLoader(EtoolsLoader):
                         date__isnull=False,
                         travels__status="completed",
                         travels__traveler=F("primary_traveler"),
-                    ).order_by("date"),
+                    ).order_by("-date"),
                 ),
             )
             .all()
