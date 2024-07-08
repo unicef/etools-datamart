@@ -274,7 +274,7 @@ class BaseLoader:
         #     return last_run - delta
         return self.etl_task.last_run
 
-    @cached_property
+    @property
     def previous_successful_run(self):
         from etools_datamart.apps.etl.models import EtlTaskHistory
 
