@@ -1,10 +1,7 @@
-4.8
+4.6.1
 ----
 * Changed loaders delta logic 
 * Increased PDIndicator.section_name field length 
-
-4.7
-----
 * Fix missing record issue fue to the case PDIndicator loader when where is no 
   ReportsDisaggragation for a given ReportsAppliedindicator record. 
 
