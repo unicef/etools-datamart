@@ -134,9 +134,9 @@ class EtoolsLoader(BaseLoader):
         use_delta = self.context["only_delta"] and not self.context["is_empty"]
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
-        if use_delta and (self.config.last_modify_field and self.last_run):
+        if use_delta and (self.config.last_modify_field and self.previous_successful_run):
             logger.debug(f"Loader {self}: use deltas")
-            qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.last_run})
+            qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.previous_successful_run})
         return qs
 
     def process_country(self):
