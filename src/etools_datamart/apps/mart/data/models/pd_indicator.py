@@ -116,7 +116,7 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     pd_url = models.CharField(max_length=254, blank=True, null=True)
 
     # from section
-    section_name = models.CharField(max_length=45, blank=True, null=True)
+    section_name = models.CharField(max_length=128, blank=True, null=True)
 
     # from blueprint
     title = models.CharField(max_length=1024, blank=True, null=True)
