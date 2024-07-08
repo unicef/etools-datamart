@@ -278,7 +278,7 @@ class BaseLoader:
     def previous_successful_run(self):
         from etools_datamart.apps.etl.models import EtlTaskHistory
 
-        return EtlTaskHistory.objects.filter(task=self.task.name).latest('timestamp').timestamp
+        return EtlTaskHistory.objects.filter(task=self.task.name).latest("timestamp").timestamp
 
     def is_running(self):
         self.etl_task.refresh_from_db()
