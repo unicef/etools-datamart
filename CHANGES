@@ -1,9 +1,9 @@
 4.6.1
 ----
-* Changed loaders delta logic 
+* Fix loaders delta logic
 * Increased PDIndicator.section_name field length 
-* Fix missing record issue fue to the case PDIndicator loader when where is no 
-  ReportsDisaggragation for a given ReportsAppliedindicator record. 
+* Fix missing record issue due to the case PDIndicator loader when there is no
+  ReportsDisaggregation for a given ReportsAppliedindicator record.
 
 4.6
 ----
