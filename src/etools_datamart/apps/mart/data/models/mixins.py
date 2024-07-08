@@ -57,7 +57,7 @@ class NestedLocationLoaderMixin:
     def get_locations(self, record, values: dict, **kwargs):
         location_list = list(
             Location.objects.filter(
-                source_id__in=list(record.flat_locations.values_list("id", flat=True)),
+                source_id__in=list(getattr(record, self.location_m2m_field).values_list("id", flat=True)),
                 schema_name=self.context["country"].schema_name,
             )
             .values("id", "name", "p_code", "admin_level", "admin_level_name", "latitude", "longitude")
