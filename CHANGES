@@ -1,3 +1,8 @@
+4.8
+----
+* Changed loaders delta logic 
+* Increased 
+
 4.7
 ----
 * Fix missing record issue fue to the case PDIndicator loader when where is no 
