@@ -12,25 +12,25 @@ from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.sources.etools.models import (
+    AuthUser,
     DjangoContentType,
     FundsFundsreservationheader,
+    LocationsLocation,
     PartnersIntervention,
     PartnersInterventionamendment,
     PartnersInterventionattachment,
     PartnersInterventionbudget,
+    PartnersInterventionFlatLocations,
+    PartnersInterventionOffices,
+    PartnersInterventionPartnerFocalPoints,
     PartnersInterventionplannedvisits,
     PartnersInterventionresultlink,
     PartnersInterventionSections,
-    ReportsSector,
-    PartnersInterventionOffices,
-    ReportsOffice,
     PartnersInterventionUnicefFocalPoints,
-    PartnersInterventionPartnerFocalPoints,
-    AuthUser,
-    PartnersInterventionFlatLocations,
-    LocationsLocation,
     ReportsAppliedindicator,
     ReportsLowerresult,
+    ReportsOffice,
+    ReportsSector,
     T2FTravelactivity,
 )
 
@@ -276,31 +276,31 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             Prefetch(
                 "PartnersInterventionOffices_intervention",
                 queryset=PartnersInterventionOffices.objects.all().order_by("id"),
-            ),    
+            ),
             Prefetch(
                 "PartnersInterventionOffices_intervention__office",
                 queryset=ReportsOffice.objects.all().order_by("id"),
-            ),    
+            ),
             Prefetch(
                 "PartnersInterventionUnicefFocalPoints_intervention",
                 queryset=PartnersInterventionUnicefFocalPoints.objects.all(),
-            ),    
+            ),
             Prefetch(
                 "PartnersInterventionUnicefFocalPoints_intervention__user",
                 queryset=AuthUser.objects.all(),
-            ),    
+            ),
             Prefetch(
                 "PartnersInterventionPartnerFocalPoints_intervention",
                 queryset=PartnersInterventionPartnerFocalPoints.objects.all(),
-            ),    
+            ),
             Prefetch(
                 "PartnersInterventionFlatLocations_intervention",
                 queryset=PartnersInterventionFlatLocations.objects.all(),
-            ),   
+            ),
             Prefetch(
                 "PartnersInterventionFlatLocations_intervention__location",
                 queryset=LocationsLocation.objects.all(),
-            ),   
+            ),
         )
 
     @cached_property
@@ -323,7 +323,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return None
 
     def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
-        #TODO: put extra logic to make it more reliable 
+        # TODO: put extra logic to make it more reliable
         for item in record.PartnersInterventionplannedvisits_intervention.all():
             planned = item.programmatic_q1 + item.programmatic_q2 + item.programmatic_q3
             return planned
@@ -360,12 +360,12 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_sections(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         for item in record.PartnersInterventionSections_intervention.all():
-                data.append(
-                   dict(
+            data.append(
+                dict(
                     source_id=item.section.id,
                     name=item.section.name,
                     description=item.section.description,
-                   )
+                )
             )
         values["sections_data"] = data
         return ", ".join([sec["name"] for sec in data])
@@ -414,7 +414,9 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         ret = []
         for member in record.PartnersInterventionPartnerFocalPoints_intervention.all():
             # member is AUTH_USER_MODEL
-            ret.append("{0.user.last_name} {0.user.first_name} ({0.user.email}) {0.user.profile.phone_number}".format(member))
+            ret.append(
+                "{0.user.last_name} {0.user.first_name} ({0.user.email}) {0.user.profile.phone_number}".format(member)
+            )
             data.append(
                 dict(
                     last_name=member.user.last_name,

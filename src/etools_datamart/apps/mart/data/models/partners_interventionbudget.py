@@ -35,7 +35,7 @@ class InterventionBudgetLoader(InterventionLoader):
             PartnersInterventionbudget.objects.exclude(intervention__isnull=True)
             .select_related(
                 "intervention",
-                #"intervention__unicef_signatory",
+                # "intervention__unicef_signatory",
                 "intervention__agreement",
                 "intervention__agreement__partner",
                 "intervention__agreement__partner__organization",
@@ -46,10 +46,10 @@ class InterventionBudgetLoader(InterventionLoader):
                     "intervention__FundsFundsreservationheader_intervention",
                     queryset=FundsFundsreservationheader.objects.all(),
                 ),
-                #Prefetch(
+                # Prefetch(
                 #    "intervention__agreement__partner__PartnersAgreement_partner",
                 #    queryset=PartnersPartnerorganization.objects.all(),
-                #),
+                # ),
                 Prefetch(
                     "intervention__PartnersInterventionamendment_intervention",
                     queryset=PartnersInterventionamendment.objects.all().order_by("signed_date"),
@@ -196,7 +196,6 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
             # has_unfunded_cash="PartnersInterventionbudget_intervention.has_unfunded_cash",
             # total_unfunded="PartnersInterventionbudget_intervention.total_unfunded",
             total_local="agreement.partner.total_local",
-            
             unicef_cash="agreement.partner.unicef_cash",
             unicef_cash_local="agreement.partner.unicef_cash_local",
             unicef_focal_points="-",
