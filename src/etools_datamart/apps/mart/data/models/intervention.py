@@ -20,6 +20,15 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionbudget,
     PartnersInterventionplannedvisits,
     PartnersInterventionresultlink,
+    PartnersInterventionSections,
+    ReportsSector,
+    PartnersInterventionOffices,
+    ReportsOffice,
+    PartnersInterventionUnicefFocalPoints,
+    PartnersInterventionPartnerFocalPoints,
+    AuthUser,
+    PartnersInterventionFlatLocations,
+    LocationsLocation,
     ReportsAppliedindicator,
     ReportsLowerresult,
     T2FTravelactivity,
@@ -250,12 +259,48 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                     travel_type=TravelType.PROGRAMME_MONITORING,
                     travels__status="completed",
                     date__isnull=False,
-                ).order_by("date"),
+                ).order_by("-date"),
             ),
             Prefetch(
                 "PartnersInterventionresultlink_intervention__ReportsLowerresult_result_link__ReportsAppliedindicator_lower_result",
                 queryset=ReportsAppliedindicator.objects.all(),
             ),
+            Prefetch(
+                "PartnersInterventionSections_intervention",
+                queryset=PartnersInterventionSections.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionSections_intervention__section",
+                queryset=ReportsSector.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionOffices_intervention",
+                queryset=PartnersInterventionOffices.objects.all().order_by("id"),
+            ),    
+            Prefetch(
+                "PartnersInterventionOffices_intervention__office",
+                queryset=ReportsOffice.objects.all().order_by("id"),
+            ),    
+            Prefetch(
+                "PartnersInterventionUnicefFocalPoints_intervention",
+                queryset=PartnersInterventionUnicefFocalPoints.objects.all(),
+            ),    
+            Prefetch(
+                "PartnersInterventionUnicefFocalPoints_intervention__user",
+                queryset=AuthUser.objects.all(),
+            ),    
+            Prefetch(
+                "PartnersInterventionPartnerFocalPoints_intervention",
+                queryset=PartnersInterventionPartnerFocalPoints.objects.all(),
+            ),    
+            Prefetch(
+                "PartnersInterventionFlatLocations_intervention",
+                queryset=PartnersInterventionFlatLocations.objects.all(),
+            ),   
+            Prefetch(
+                "PartnersInterventionFlatLocations_intervention__location",
+                queryset=LocationsLocation.objects.all(),
+            ),   
         )
 
     @cached_property
@@ -278,6 +323,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return None
 
     def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
+        #TODO: put extra logic to make it more reliable 
         for item in record.PartnersInterventionplannedvisits_intervention.all():
             planned = item.programmatic_q1 + item.programmatic_q2 + item.programmatic_q3
             return planned
@@ -313,13 +359,13 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     def get_sections(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
-        for section in record.sections.all():
-            data.append(
-                dict(
-                    source_id=section.id,
-                    name=section.name,
-                    description=section.description,
-                )
+        for item in record.PartnersInterventionSections_intervention.all():
+                data.append(
+                   dict(
+                    source_id=item.section.id,
+                    name=item.section.name,
+                    description=item.section.description,
+                   )
             )
         values["sections_data"] = data
         return ", ".join([sec["name"] for sec in data])
@@ -327,7 +373,7 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
         ta_date = None
         for item in record.T2FTravelactivity_partnership.all():
-            ta_date = item.date
+            return item.date
         return ta_date
 
     def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
@@ -341,11 +387,11 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionOffices
         data = []
-        for office in record.offices.order_by("id"):
+        for item in record.PartnersInterventionOffices_intervention.all():
             data.append(
                 dict(
-                    source_id=office.id,
-                    name=office.name,
+                    source_id=item.office.id,
+                    name=item.office.name,
                 )
             )
         values["offices_data"] = data
@@ -366,15 +412,15 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_partner_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
-        for member in record.partner_focal_points.all():
+        for member in record.PartnersInterventionPartnerFocalPoints_intervention.all():
             # member is AUTH_USER_MODEL
-            ret.append("{0.last_name} {0.first_name} ({0.email}) {0.profile.phone_number}".format(member))
+            ret.append("{0.user.last_name} {0.user.first_name} ({0.user.email}) {0.user.profile.phone_number}".format(member))
             data.append(
                 dict(
-                    last_name=member.last_name,
-                    first_name=member.first_name,
-                    email=member.email,
-                    phone=member.profile.phone_number,
+                    last_name=member.user.last_name,
+                    first_name=member.user.first_name,
+                    email=member.user.email,
+                    phone=member.user.profile.phone_number,
                 )
             )
 
@@ -403,13 +449,13 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
-        for member in record.unicef_focal_points.all():
-            ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
+        for item in record.PartnersInterventionPartnerFocalPoints_intervention.all():
+            ret.append("{0.user.last_name} {0.user.first_name} ({0.user.email})".format(item))
             data.append(
                 dict(
-                    last_name=member.last_name,
-                    first_name=member.first_name,
-                    email=member.email,
+                    last_name=item.user.last_name,
+                    first_name=item.user.first_name,
+                    email=item.user.email,
                 )
             )
 
