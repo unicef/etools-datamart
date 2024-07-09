@@ -19,6 +19,7 @@ from etools_datamart.apps.sources.etools.models import (
     PartnersInterventionbudget,
     PartnersInterventionplannedvisits,
     PartnersInterventionresultlink,
+    PartnersPartnerorganization,
     ReportsAppliedindicator,
     ReportsLowerresult,
     ReportsResult,
@@ -34,7 +35,7 @@ class InterventionBudgetLoader(InterventionLoader):
             PartnersInterventionbudget.objects.exclude(intervention__isnull=True)
             .select_related(
                 "intervention",
-                # "intervention__unicef_signatory",
+                #"intervention__unicef_signatory",
                 "intervention__agreement",
                 "intervention__agreement__partner",
                 "intervention__agreement__partner__organization",
@@ -45,6 +46,10 @@ class InterventionBudgetLoader(InterventionLoader):
                     "intervention__FundsFundsreservationheader_intervention",
                     queryset=FundsFundsreservationheader.objects.all(),
                 ),
+                #Prefetch(
+                #    "intervention__agreement__partner__PartnersAgreement_partner",
+                #    queryset=PartnersPartnerorganization.objects.all(),
+                #),
                 Prefetch(
                     "intervention__PartnersInterventionamendment_intervention",
                     queryset=PartnersInterventionamendment.objects.all().order_by("signed_date"),
@@ -79,7 +84,7 @@ class InterventionBudgetLoader(InterventionLoader):
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
-        qs = self.get_queryset()
+        qs = self.get_queryset().exclude(intervention__isnull=True)
 
         paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
@@ -139,3 +144,67 @@ class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
         model = PartnersInterventionbudget
         depends = (Location,)
         key = lambda loader, record: dict(schema_name=loader.context["country"].schema_name, source_id=record.pk)
+        mapping = dict(
+            agreement_reference_number="agreement.reference_number",
+            amendment_types="-",
+            attachment_types="-",
+            clusters="-",
+            contingency_pd="=",
+            country_programme="country_programme.name",
+            country_programme_id="country_programme.pk",
+            cp_outputs="-",
+            created="=",
+            cso_type="agreement.partner.organization.cso_type",
+            currency="agreement.partner.currency",
+            days_from_submission_to_signature="-",
+            days_from_prc_review_to_signature="-",
+            end_date="end",
+            fr_number="-",
+            outstanding_amt_local="-",
+            in_kind_amount="agreement.partner.in_kind_amount",
+            in_kind_amount_local="agreement.partner.in_kind_amount_local",
+            intervention_id="id",
+            last_amendment_date="i",
+            last_pv_date="-",
+            location="i",
+            number_of_amendments="i",
+            number_of_attachments="i",
+            offices="-",
+            offices_data="i",
+            partner_authorized_officer_signatory_id="partner_authorized_officer_signatory.pk",
+            partner_contribution="agreement.partner.partner_contribution",
+            partner_contribution_local="agreement.partner.partner_contribution_local",
+            partner_focal_points="-",
+            partner_focal_points_data="i",
+            partner_id="-",
+            partner_name="agreement.partner.organization.name",
+            partner_sea_risk_rating="i",
+            partner_signatory_email="partner_authorized_officer_signatory.email",
+            partner_signatory_first_name="partner_authorized_officer_signatory.first_name",
+            partner_signatory_last_name="partner_authorized_officer_signatory.last_name",
+            partner_signatory_phone="partner_authorized_officer_signatory.phone",
+            partner_signatory_title="partner_authorized_officer_signatory.title",
+            partner_source_id="agreement.partner.id",
+            partner_type="agreement.partner.organization.organization_type",
+            partner_vendor_number="agreement.partner.organization.vendor_number",
+            planned_programmatic_visits="-",
+            prc_review_document="-",
+            sections="-",
+            start_date="start",
+            status="=",
+            total="agreement.partner.total",
+            # has_unfunded_cash="PartnersInterventionbudget_intervention.has_unfunded_cash",
+            # total_unfunded="PartnersInterventionbudget_intervention.total_unfunded",
+            total_local="agreement.partner.total_local",
+            
+            unicef_cash="agreement.partner.unicef_cash",
+            unicef_cash_local="agreement.partner.unicef_cash_local",
+            unicef_focal_points="-",
+            unicef_focal_points_data="i",
+            # unicef_signatory_email='unicef_signatory.email',
+            # unicef_signatory_first_name='unicef_signatory.first_name',
+            # unicef_signatory_id='unicef_signatory.pk',
+            # unicef_signatory_last_name='unicef_signatory.last_name',
+            updated="modified",
+            cfei_number="=",
+        )
