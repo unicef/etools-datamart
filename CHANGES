@@ -1,17 +1,18 @@
-4.8
+4.7
 ----
-* Further improvements on data.fmquestion
-* Further improvements on data.intervention
+* Improvements on data.intervention
 * Page size increase for speed up
 * Improvement on data.partner by preetching related T2FTravelactivity 
 * Improvement on data.agreement (partners) 
 * Improvement on data.interventionbudget (partners)
 * Improvement on data.engagement 
 
-4.7
+4.6.1 
 ----
-* Fix missing record issue fue to the case PDIndicator loader when where is no 
-  ReportsDisaggragation for a given ReportsAppliedindicator record. 
+* Fix loaders delta logic
+* Increased PDIndicator.section_name field length 
+* Fix missing record issue due to the case PDIndicator loader when there is no
+  ReportsDisaggregation for a given ReportsAppliedindicator record.
 
 4.6
 ----
