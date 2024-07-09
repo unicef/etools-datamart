@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models import F, JSONField, Prefetch, Sum, Value
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
@@ -158,7 +158,7 @@ class InterventionAbstract(models.Model):
             intervention_id="id",
             last_amendment_date="i",
             last_pv_date="-",
-            location="i",
+            # location="i",
             # locations_data='i',
             # locations='-',
             number_of_amendments="i",
@@ -205,6 +205,7 @@ class InterventionAbstract(models.Model):
 
 class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
+    TRANSACTION_BY_BATCH = True
 
     def get_queryset(self):
         return (
@@ -413,6 +414,69 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         ).last()
         if attachment:
             return attachment.file
+
+    def process_country(self):
+        batch_size = 2000
+        logger.debug(f"Batch size:{batch_size}")
+
+        qs = self.filter_queryset(self.get_queryset())
+
+        paginator = DatamartPaginator(qs, batch_size)
+        sid = None
+
+        for page_idx in paginator.page_range:
+            if getattr(self, "TRANSACTION_BY_BATCH", False):
+                sid = transaction.savepoint()
+            try:
+                page = paginator.page(page_idx)
+                logger.debug(f"{page_idx} out of {len(paginator.page_range)} pages done")
+
+                ids_from_etools = list(page.object_list.values_list("id", flat=True))
+                datamart_objects = self.model.objects.filter(
+                    source_id__in=ids_from_etools, schema_name=self.context["country"].schema_name
+                )
+                datamart_source_ids = datamart_objects.values_list("source_id", flat=True)
+
+                # figure out which ones we don't have at all locally
+                to_create_remote_ids = [id for id in ids_from_etools if id not in datamart_source_ids]
+
+                # figure out which ones to update:
+                # this will be a list of update local objects with the new values if the local objects need updating
+                # create a map in memory with source_id and record
+                datamart_object_dict = {i.source_id: i for i in datamart_objects}
+                to_create, to_update = [], []
+
+                for record in page.object_list:
+                    values = self.get_values(record)
+                    if record.id in to_create_remote_ids:
+                        new_instance = self.model(**values)
+                        new_instance.source_id = record.id
+                        new_instance.schema_name = self.context["country"].schema_name
+                        to_create.append(new_instance)
+                        self.increment_counter("created")
+                        continue
+
+                    local_object_to_update = datamart_object_dict[record.id]
+                    if self.config.always_update or self.is_record_changed(local_object_to_update, values):
+                        for field, value in values.items():
+                            setattr(local_object_to_update, field, value)
+                        to_update.append(local_object_to_update)
+                        self.increment_counter("updated")
+                    else:
+                        self.increment_counter("unchanged")
+
+                # Time to bulk_create
+                self.model.objects.bulk_create(to_create)
+                # time to bulk_update
+                self.model.objects.bulk_update(to_update, fields=self.mapping.keys())
+
+            except Exception:
+                if sid:
+                    transaction.savepoint_rollback(sid)
+                raise
+            else:
+                if sid:
+                    transaction.savepoint_commit(sid)
 
 
 class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartModel):
