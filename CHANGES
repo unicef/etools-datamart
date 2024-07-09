@@ -1,13 +1,3 @@
-4.8
-----
-* Further improvements on data.fmquestion
-* Further improvements on data.intervention
-* Page size increase for speed up
-* Improvement on data.partner by preetching related T2FTravelactivity 
-* Improvement on data.agreement (partners) 
-* Improvement on data.interventionbudget (partners)
-* Improvement on data.engagement 
-
 4.7
 ----
 * Further improvements on data.fmquestion
