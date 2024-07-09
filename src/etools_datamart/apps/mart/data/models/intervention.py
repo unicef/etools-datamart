@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models import F, JSONField, Prefetch, Sum, Value
+from django.db.models import F, JSONField, Prefetch, Value
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 
@@ -12,12 +12,7 @@ from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.sources.etools.models import (
     DjangoContentType,
-    FundsFundsreservationheader,
     PartnersIntervention,
-    PartnersInterventionamendment,
-    PartnersInterventionattachment,
-    PartnersInterventionbudget,
-    PartnersInterventionplannedvisits,
     ReportsAppliedindicator,
     T2FTravelactivity,
 )
@@ -224,26 +219,11 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                 "unicef_focal_points",
                 "partner_focal_points",
                 "result_links",
-                Prefetch(
-                    "PartnersInterventionbudget_intervention",
-                    queryset=PartnersInterventionbudget.objects.all(),
-                ),
-                Prefetch(
-                    "PartnersInterventionamendment_intervention",
-                    queryset=PartnersInterventionamendment.objects.all().order_by("signed_date"),
-                ),
-                Prefetch(
-                    "FundsFundsreservationheader_intervention",
-                    queryset=FundsFundsreservationheader.objects.all(),
-                ),
-                Prefetch(
-                    "PartnersInterventionattachment_intervention",
-                    queryset=PartnersInterventionattachment.objects.all(),
-                ),
-                Prefetch(
-                    "PartnersInterventionplannedvisits_intervention",
-                    queryset=PartnersInterventionplannedvisits.objects.filter(year=self.context["today"].year),
-                ),
+                "PartnersInterventionbudget_intervention",
+                "PartnersInterventionamendment_intervention",
+                "FundsFundsreservationheader_intervention",
+                "PartnersInterventionattachment_intervention",
+                "PartnersInterventionplannedvisits_intervention",
                 Prefetch(
                     "T2FTravelactivity_partnership",
                     queryset=T2FTravelactivity.objects.filter(
@@ -281,12 +261,16 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     def get_partner_id(self, record: PartnersIntervention, values: dict, **kwargs):
         try:
-            data = Partner.objects.get(
-                schema_name=self.context["country"].schema_name,
-                source_id=record.agreement.partner.id,
+            data = (
+                Partner.objects.filter(
+                    schema_name=self.context["country"].schema_name,
+                    source_id=record.agreement.partner.id,
+                )
+                .values("pk", "sea_risk_rating_name")
+                .get()
             )
-            values["partner_sea_risk_rating"] = data.sea_risk_rating_name
-            return data.pk
+            values["partner_sea_risk_rating"] = data["sea_risk_rating_name"]
+            return data["pk"]
         except Partner.DoesNotExist:
             values["partner_sea_risk_rating"] = None
             return None
@@ -372,9 +356,11 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(fr_number_list)
 
     def get_outstanding_amt_local(self, record: PartnersIntervention, values: dict, **kwargs):
-        return record.FundsFundsreservationheader_intervention.aggregate(
-            outstanding_amt_local=Sum(F("outstanding_amt_local"), default=0.0)
-        ).get("outstanding_amt_local")
+        sum_outstanding_amt_local = 0
+        for item in record.FundsFundsreservationheader_intervention.all():
+            sum_outstanding_amt_local = sum_outstanding_amt_local + item.outstanding_amt_local
+
+        return sum_outstanding_amt_local
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
         values["cp_outputs_data"] = list(record.result_links.values("name", "wbs"))
@@ -401,19 +387,26 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
                 content_type=self._ct,
             )
             .order_by("-id")
+            .values("file")
             .first()
         )
         if attachment:
-            return attachment.file
+            return attachment["file"]
 
     def get_final_partnership_review(self, record: PartnersIntervention, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Attachment
 
-        attachment = Attachment.objects.filter(
-            pd_ssfa_number=record.number, code="partners_intervention_attachment", content_type="interventionattachment"
-        ).last()
+        attachment = (
+            Attachment.objects.filter(
+                pd_ssfa_number=record.number,
+                code="partners_intervention_attachment",
+                content_type="interventionattachment",
+            )
+            .values("file")
+            .last()
+        )
         if attachment:
-            return attachment.file
+            return attachment["file"]
 
     def process_country(self):
         batch_size = 2000
