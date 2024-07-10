@@ -25,9 +25,12 @@ def handle_task_failure(sender, task, task_id, exception=None, args=None, kwargs
         scope.set_extra("traceback", traceback)
         scope.set_extra("args", args)
         scope.set_extra("kwargs", kwargs)
-        scope.set_extra("kw", **kw)
 
-        sentry_sdk.capture_exception(exception)
+        for key, value in kw:
+            scope.set_extra(key, value)
+
+        if exception:
+            sentry_sdk.capture_exception(exception)
 
 
 class DatamartCelery(Celery):
