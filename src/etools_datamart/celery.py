@@ -15,22 +15,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "etools_datamart.config.settings
 logger = get_logger(__name__)
 
 
-def handle_task_failure(sender, task, task_id, exception=None, args=None, kwargs=None, traceback=None, **kw):
-
-    logger.error(f"Task {task.name} (ID: {task_id}) failed: {exception}")
-
+def handle_task_failure(
+    sender=None, task_id=None, exception=None, args=None, kwargs=None, traceback=None, einfo=None, **kw
+):
+    failure_details = f"#Task: {task_id} failed  \n Exception:{exception} \n Error info:|{einfo} "
+    logger.error(f"Failure: {failure_details}")
     with sentry_sdk.push_scope() as scope:
-        scope.set_extra("task_id", task_id)
-        scope.set_extra("task_name", task.name)
-        scope.set_extra("traceback", traceback)
-        scope.set_extra("args", args)
-        scope.set_extra("kwargs", kwargs)
-
-        for key, value in kw:
-            scope.set_extra(key, value)
-
-        if exception:
-            sentry_sdk.capture_exception(exception)
+        scope.set_extra("celery_task_failure_details", failure_details)
+        sentry_sdk.capture_exception(exception)
 
 
 class DatamartCelery(Celery):
@@ -43,6 +35,7 @@ class DatamartCelery(Celery):
 app = DatamartCelery("datamart")
 
 task_failure.connect(handle_task_failure)
+
 
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()

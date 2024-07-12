@@ -22,7 +22,7 @@ def healthcheck():
 #     sender.add_periodic_task(60.0, healthcheck.s(), name='healthcheck')
 
 
-@app.task
+@app.task()
 def simulate_failure():
     x = 1
     y = 0
