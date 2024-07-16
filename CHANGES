@@ -1,3 +1,7 @@
+4.6.2
+----
+* Add missing failure handler for celery tasks to capture the details of the failure
+
 4.6.1
 ----
 * Fix loaders delta logic
