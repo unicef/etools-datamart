@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
                 (
                     "export",
                     models.OneToOneField(
-                        blank=True,
-                        null=True,
+                        blank=False,
+                        null=False,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="unicef_rest_framework.export",
                     ),

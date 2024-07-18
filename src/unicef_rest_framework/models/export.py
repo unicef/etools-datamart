@@ -134,7 +134,7 @@ storage = get_storage()
 
 
 class ExportAccessLog(models.Model):
-    export = models.OneToOneField(Export, on_delete=models.CASCADE, blank=True, null=True)
+    export = models.OneToOneField(Export, on_delete=models.CASCADE, blank=False, null=False)
     access_history = JSONField(blank=False, null=False, default=list)
 
     objects = models.Manager()
