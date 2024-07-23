@@ -31,6 +31,10 @@ class FMQuestionLoader(EtoolsLoader):
     TRANSACTION_BY_BATCH = True
 
     def get_queryset(self):
+        """
+        TODO: Subquery loads db server significantly. Iterating over prefetched records to find the may be more
+        scalable as it offloads processing to datamart nodes.
+        """
         narrative_finding_subquery = (
             FieldMonitoringDataCollectionChecklistoverallfinding.objects.filter(
                 started_checklist_id=OuterRef("started_checklist_id")
@@ -72,11 +76,6 @@ class FMQuestionLoader(EtoolsLoader):
                     queryset=FieldMonitoringSettingsOption.objects.all(),
                     to_attr="prefetched_FieldMonitoringSettingsOption",
                 ),
-                Prefetch(
-                    "activity_question__FieldMonitoringDataCollectionActivityquestionoverallfinding_activity_question",
-                    queryset=FieldMonitoringDataCollectionActivityquestionoverallfinding.objects.all(),
-                    to_attr="prefetched_FieldMonitoringDataCollectionActivityquestionoverallfinding",
-                ),
             )
             .annotate(
                 site_name=F("activity_question__monitoring_activity__location_site__name"),
@@ -84,7 +83,6 @@ class FMQuestionLoader(EtoolsLoader):
                 narrative_overall_finding=Subquery(narrative_finding_subquery),
                 myvalue=F("value"),
             )
-            .all()
         )
 
         return qs
