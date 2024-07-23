@@ -3,6 +3,7 @@ import logging
 from django.core.cache import cache
 from django.db.models import *  # noqa
 from django.db.models.manager import BaseManager
+from django.utils.functional import cached_property
 
 from .query import TenantQuerySet
 
@@ -29,8 +30,6 @@ class TenantModel(Model):  # noqa
         return user_country
 
     def get_country_instance(self):
-        # from etools_datamart.apps.sources.etools.models import UsersCountry
-        # return UsersCountry.objects.get(schema_name=self.schema)
         return self.get_user_country(self.schema)
 
     class Meta:

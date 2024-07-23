@@ -16,25 +16,6 @@ class AttachmentLoader(EtoolsLoader):
             "attachment__uploaded_by",
         )
         # TODO: Limit the projected fields
-        """
-        .only("attachment__id",
-               "attachment__file", 
-               "attachment__hyperlink",
-               "attachment__code", 
-               "attachment__object_id",
-               
-
-               "attachment__file_type__id",
-               "attachment__file_type__name",
-
-               "attachment__content_type__model",
-               
-               "attachment__uploaded_by__username",
-               )
-        """
-
-    # def get_linked_to(self, record: AttachmentsAttachmentflat, values: dict, **kwargs):
-    #    return None
 
 
 class Attachment(EtoolsDataMartModel):
