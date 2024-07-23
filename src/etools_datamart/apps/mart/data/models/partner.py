@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnerOrganizationConst, PartnerType, TravelType
-from etools_datamart.apps.sources.etools.models import PartnersPartnerorganization, T2FTravelactivity
+from etools_datamart.apps.sources.etools.models import PartnersPartnerorganization, ReportsOffice, T2FTravelactivity
 
 
 class PartnerLoader(EtoolsLoader):
@@ -18,6 +18,8 @@ class PartnerLoader(EtoolsLoader):
             PartnersPartnerorganization.objects.select_related(
                 "planned_engagement",
                 "organization",
+                "lead_office",
+                "lead_section",
             )
             .prefetch_related(
                 Prefetch(
@@ -31,6 +33,7 @@ class PartnerLoader(EtoolsLoader):
                 ),
             )
             .all()
+            # TODO:Try getting only the required fields
         )
 
     def get_last_pv_date(self, record, values, **kwargs):
