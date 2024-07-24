@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import JSONField
+from django.forms import model_to_dict
 
 from etools_datamart.sentry import process_exception
 
@@ -54,28 +55,17 @@ class NestedLocationLoaderMixin:
     location_m2m_field = None
 
     def get_locations(self, record, values: dict, **kwargs):
-        locs = []
-        locations = getattr(record, self.location_m2m_field)
-        for location in locations.order_by("id"):
-            location_data = dict(
-                source_id=location.id,
-                name=location.name,
-                pcode=location.p_code,
-                level=location.admin_level,
-                levelname=location.admin_level_name,
-                latitude=None,
-                longitude=None,
+        location_list = list(
+            Location.objects.filter(
+                source_id__in=list(getattr(record, self.location_m2m_field).values_list("id", flat=True)),
+                schema_name=self.context["country"].schema_name,
             )
-            try:
-                loc = Location.objects.get(source_id=location.id, schema_name=self.context["country"].schema_name)
-                location_data["latitude"] = loc.latitude
-                location_data["longitude"] = loc.longitude
-            except Exception as e:
-                process_exception(e)
+            .values("id", "name", "p_code", "admin_level", "admin_level_name", "latitude", "longitude")
+            .order_by("id")
+        )
+        values["locations_data"] = location_list
 
-            locs.append(location_data)
-        values["locations_data"] = locs
-        return ", ".join([l["name"] for l in locs])
+        return ", ".join([l["name"] for l in location_list])
 
 
 class NestedLocationMixin(models.Model):
