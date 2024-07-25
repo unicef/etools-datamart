@@ -142,17 +142,22 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
 
 @register(ExportAccessLog)
 class ExportAccessLogAdmin(admin.ModelAdmin):
-    # readonly_fields = ("source", "access_history")  # Disable editing of these fields
+    readonly_fields = ("export", "access_history")  #
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
     def has_delete_permission(self, request, obj=None):
-        # Allow deletion if needed (optional)
         return False
 
     def display_access_history(self, obj):
         timestamps = [timezone.parse(ts).strftime("%Y-%m-%d %H:%M:%S") for ts in obj.access_history]
         return "<br>".join(timestamps)
 
-    display_access_history.short_description = "Access History"
-    list_display = ("export", "display_access_history")  # Fields to display in the admin list
+    display_access_history.short_description = "Export Access History"
+    list_display = ("export", "display_access_history")
     list_filter = ("export",)
     search_fields = ("export",)
