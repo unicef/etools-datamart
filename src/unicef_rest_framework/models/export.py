@@ -141,7 +141,10 @@ class ExportAccessLog(models.Model):
 
     @classmethod
     def log_access(cls, export_id):
-        timestamp = timezone.now().isoformat()
+        import datetime
+
+        utc_now = datetime.datetime.utcnow()
+        timestamp = utc_now.isoformat()
         access_log = cls.objects.get(export_id=export_id)
         if access_log:
             access_log.access_history.append(timestamp)
