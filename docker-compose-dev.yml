@@ -7,7 +7,7 @@ x-devdatamart-defaults: &devdatamart_defaults
     - db
     - redis
   volumes:
-    - "$PWD:/code"
+    - "./:/code"
   environment:
       DEBUG: 0
       DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
@@ -55,16 +55,14 @@ services:
       - traefik.http.services.datamart.loadBalancer.server.port=8080
       - traefik.enable=true
     volumes:
-      - $PWD:/code
-    ports:  
-      - "18080:8080"  
+      - ./:/code
   beat:
     container_name: datamart_beat
     << : *devdatamart_defaults
     working_dir: /code/src
     command: celery -A etools_datamart beat --loglevel=debug
     volumes:
-      - $PWD:/code
+      - ./:/code
 
   worker:
     container_name: datamart_worker
@@ -72,7 +70,7 @@ services:
     working_dir: /code/src
     command: celery -A etools_datamart worker --loglevel=debug
     volumes:
-      - $PWD:/code
+      - ./:/code
 
   db:
     image: postgis/postgis:12-3.2
@@ -86,31 +84,7 @@ services:
       POSTGRES_DB: etools_datamart
     volumes:
       - "$PWD/build/db:/var/lib/postgresql/data"
-
-  # Rely on etools and prp database instances running locally
-  #db-etools:
-  #  image: postgis/postgis:12-3.2
-  #  container_name: datamart_etools
-  #  shm_size: '1gb'
-  #  environment:
-  #    POSTGRES_USER: postgres
-  #    POSTGRES_PASSWORD:
-  #    POSTGRES_DB: etools
-  #  volumes:
-  #    - "$PWD/build/etools:/var/lib/postgresql/data"
-
-  db-prp:
-    image: postgis/postgis:12-3.2
-    shm_size: '1gb'
-    container_name: datamart_prp
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      #POSTGRES_USER: postgres
-      #POSTGRES_PASSWORD:
-      POSTGRES_DB: prp
-    volumes:
-      - "$PWD/build/prp:/var/lib/postgresql/data"
-
+  
   redis:
     image: redis:alpine
     container_name: datamart_redis

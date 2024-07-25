@@ -1,7 +1,7 @@
 from django.contrib.postgres.fields import ArrayField
 from django.core.paginator import Paginator
 from django.db import models
-from django.db.models import Count, JSONField
+from django.db.models import Count, JSONField, Prefetch
 from django.utils.translation import gettext as _
 
 from model_utils import Choices
@@ -15,6 +15,7 @@ from etools_datamart.apps.sources.etools.models import (
     AuditAudit,
     AuditEngagement,
     AuditEngagementActivePd,
+    AuditEngagementSections,
     AuditMicroassessment,
     AuditRisk,
     AuditSpecialaudit,
@@ -214,7 +215,7 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
 
     def get_active_pd(self, record: AuditEngagement, values: dict, **kwargs):
         ret = []
-        for o in AuditEngagementActivePd.objects.select_related("intervention").filter(engagement=record):
+        for o in record.prefetched_AuditEngagementActivePds:
             ret.append(
                 {
                     "title": o.intervention.title,
@@ -253,15 +254,17 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
         from etools_datamart.api.endpoints.datamart.actionpoint import ActionPointSimpleSerializer
 
         ret = []
-        for r in ActionPointsActionpoint.objects.filter(engagement=record).all():
+        for r in record.prefetched_ActionPoints:
             ret.append(ActionPointSimpleSerializer(r).data)
         return ret
 
     def get_key_internal_control_weaknesses(self, record: AuditEngagement, values: dict, **kwargs):
-        qs = AuditRisk.objects.filter(
-            blueprint__category__header="Key Internal Controls Weaknesses", engagement_id=record.id
-        )
-        return [risk.blueprint.header for risk in qs]
+        risks = []
+
+        for risk in record.prefetched_AuditRisks:
+            risks.append(risk.blueprint.header)
+
+        return risks
 
     def process_country(self):
         # TODO: Analyze more before batch processing
@@ -271,12 +274,31 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
                 "engagement_ptr__partner",
                 "engagement_ptr__agreement",
                 "engagement_ptr__agreement__auditor_firm",
+                "engagement_ptr__agreement__auditor_firm__organization",
                 "engagement_ptr__po_item",
             ).prefetch_related(
                 "engagement_ptr__authorized_officers",
                 "engagement_ptr__staff_members",
-                "engagement_ptr__AuditEngagementSections_engagement",
-                "engagement_ptr__AuditEngagementOffices_engagement",
+                Prefetch(
+                    "engagement_ptr__AuditEngagementSections_engagement",
+                    AuditEngagementSections.objects.all(),
+                    to_attr="prefetched_AuditEngagementSections",
+                ),
+                Prefetch(
+                    "engagement_ptr__ActionPointsActionpoint_engagement",
+                    ActionPointsActionpoint.objects.all(),
+                    to_attr="prefetched_ActionPoints",
+                ),
+                Prefetch(
+                    "engagement_ptr__AuditEngagementActivePd_engagement",
+                    AuditEngagementActivePd.objects.all(),
+                    to_attr="prefetched_AuditEngagementActivePds",
+                ),
+                Prefetch(
+                    "engagement_ptr__AuditRisk_engagement",
+                    AuditRisk.objects.filter(blueprint__category__header="Key Internal Controls Weaknesses"),
+                    to_attr="prefetched_AuditRisks",
+                ),
             ):
                 record.id = record.engagement_ptr_id
                 record.sub_type = m

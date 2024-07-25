@@ -1,3 +1,13 @@
+4.7
+----
+* Page size increase for speed up
+* Improvement on data.partner by prefetching related T2FTravelactivity 
+* Improvement on data.engagement 
+* Improvement on data.attachment 
+* Improvement on data.agreement (partners) 
+* Improvements on data.intervention
+* Improvement on data.interventionbudget
+
 4.6.3
 ----
 * As a workaround,increased precision of pdindicator's fields (target_denominator,target_numerator, 
@@ -8,7 +18,7 @@
 ----
 * Add missing failure handler for celery tasks to capture the details of the failure
 
-4.6.1
+4.6.1 
 ----
 * Fix loaders delta logic
 * Increased PDIndicator.section_name field length 

@@ -20,7 +20,7 @@ ENV PYTHONUNBUFFERED 1
 COPY Pipfile .
 COPY Pipfile.lock .
 
-RUN pipenv install --ignore-pipfile  --system
+RUN pipenv install --ignore-pipfile --dev --system
 
 EXPOSE 8000
 

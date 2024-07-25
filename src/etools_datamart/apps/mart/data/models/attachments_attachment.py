@@ -15,9 +15,7 @@ class AttachmentLoader(EtoolsLoader):
             "attachment__content_type",
             "attachment__uploaded_by",
         )
-
-    def get_linked_to(self, record: AttachmentsAttachmentflat, values: dict, **kwargs):
-        return None
+        # TODO: Limit the projected fields
 
 
 class Attachment(EtoolsDataMartModel):
@@ -55,9 +53,10 @@ class Attachment(EtoolsDataMartModel):
         source = AttachmentsAttachmentflat
         mapping = dict(
             file="attachment.file",
-            attachment_source_id="attachment.pk",
+            attachment_source_id="attachment.id",
             file_type="attachment.file_type.name",
-            file_type_id="file_type.pk",
+            # file_type_id="file_type.pk"
+            file_type_id="attachment.file_type.id",
             content_type="attachment.content_type.model",
             hyperlink="attachment.hyperlink",
             object_id="attachment.object_id",

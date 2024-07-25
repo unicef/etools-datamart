@@ -1,7 +1,9 @@
 import logging
 
+from django.core.cache import cache
 from django.db.models import *  # noqa
 from django.db.models.manager import BaseManager
+from django.utils.functional import cached_property
 
 from .query import TenantQuerySet
 
@@ -17,10 +19,18 @@ class TenantModel(Model):  # noqa
 
     objects = TenantManager()
 
-    def get_country_instance(self):
+    def get_user_country(self, schema_name):
         from etools_datamart.apps.sources.etools.models import UsersCountry
 
-        return UsersCountry.objects.get(schema_name=self.schema)
+        cache_key = f"user_country_{schema_name}"
+        user_country = cache.get(cache_key)
+        if user_country is None:
+            user_country = UsersCountry.objects.get(schema_name=schema_name)
+            cache.set(cache_key, user_country)
+        return user_country
+
+    def get_country_instance(self):
+        return self.get_user_country(self.schema)
 
     class Meta:
         abstract = True
