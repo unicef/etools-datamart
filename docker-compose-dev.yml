@@ -83,8 +83,39 @@ services:
       #POSTGRES_USER: postgres
       POSTGRES_DB: etools_datamart
     volumes:
-      - "$PWD/build/db:/var/lib/postgresql/data"
+      - "./build/db:/var/lib/postgresql/data"
+
+  # Rely on etools and prp database instances running locally
   
+  #NOTE: etools db server is to be launched with infra
+  #      Alternatively, uncomment definition below and copy etools db dump  
+
+  #db-etools:
+  #  image: postgis/postgis:12-3.2
+  #  container_name: datamart_etools
+  #  shm_size: '1gb'
+  #  environment:
+  #    #POSTGRES_USER: postgres
+  #    #POSTGRES_PASSWORD:
+  #    POSTGRES_DB: etools
+  #  volumes:
+  #    - "./build/etools:/var/lib/postgresql/data"
+
+  #NOTE: prp db server can be launched externally 
+  #      Alternatively, uncomment definition below and copy prp db dump  
+
+  #db-prp:
+  #  image: postgis/postgis:12-3.2
+  #  shm_size: '1gb'
+  #  container_name: datamart_prp
+  #  environment:
+  #   POSTGRES_HOST_AUTH_METHOD: trust
+  #   #POSTGRES_USER: postgres
+  #   #POSTGRES_PASSWORD:
+  #    POSTGRES_DB: prp
+  #  volumes:
+  #    - "./build/prp:/var/lib/postgresql/data"
+
   redis:
     image: redis:alpine
     container_name: datamart_redis
