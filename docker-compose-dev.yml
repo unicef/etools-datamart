@@ -7,7 +7,7 @@ x-devdatamart-defaults: &devdatamart_defaults
     - db
     - redis
   volumes:
-    - "./:/code"
+    - "$PWD:/code"
   environment:
       DEBUG: 0
       DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
@@ -55,14 +55,16 @@ services:
       - traefik.http.services.datamart.loadBalancer.server.port=8080
       - traefik.enable=true
     volumes:
-      - ./:/code
+      - $PWD:/code
+    ports:  
+      - "18080:8080"  
   beat:
     container_name: datamart_beat
     << : *devdatamart_defaults
     working_dir: /code/src
     command: celery -A etools_datamart beat --loglevel=debug
     volumes:
-      - ./:/code
+      - $PWD:/code
 
   worker:
     container_name: datamart_worker
@@ -70,7 +72,7 @@ services:
     working_dir: /code/src
     command: celery -A etools_datamart worker --loglevel=debug
     volumes:
-      - ./:/code
+      - $PWD:/code
 
   db:
     image: postgis/postgis:12-3.2
@@ -83,38 +85,31 @@ services:
       #POSTGRES_USER: postgres
       POSTGRES_DB: etools_datamart
     volumes:
-      - "./build/db:/var/lib/postgresql/data"
+      - "$PWD/build/db:/var/lib/postgresql/data"
 
   # Rely on etools and prp database instances running locally
-  
-  #NOTE: etools db server is to be launched with infra
-  #      Alternatively, uncomment definition below and copy etools db dump  
-
   #db-etools:
   #  image: postgis/postgis:12-3.2
   #  container_name: datamart_etools
   #  shm_size: '1gb'
   #  environment:
-  #    #POSTGRES_USER: postgres
-  #    #POSTGRES_PASSWORD:
+  #    POSTGRES_USER: postgres
+  #    POSTGRES_PASSWORD:
   #    POSTGRES_DB: etools
   #  volumes:
-  #    - "./build/etools:/var/lib/postgresql/data"
+  #    - "$PWD/build/etools:/var/lib/postgresql/data"
 
-  #NOTE: prp db server can be launched externally 
-  #      Alternatively, uncomment definition below and copy prp db dump  
-
-  #db-prp:
-  #  image: postgis/postgis:12-3.2
-  #  shm_size: '1gb'
-  #  container_name: datamart_prp
-  #  environment:
-  #   POSTGRES_HOST_AUTH_METHOD: trust
-  #   #POSTGRES_USER: postgres
-  #   #POSTGRES_PASSWORD:
-  #    POSTGRES_DB: prp
-  #  volumes:
-  #    - "./build/prp:/var/lib/postgresql/data"
+  db-prp:
+    image: postgis/postgis:12-3.2
+    shm_size: '1gb'
+    container_name: datamart_prp
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      #POSTGRES_USER: postgres
+      #POSTGRES_PASSWORD:
+      POSTGRES_DB: prp
+    volumes:
+      - "$PWD/build/prp:/var/lib/postgresql/data"
 
   redis:
     image: redis:alpine

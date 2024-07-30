@@ -173,6 +173,24 @@ class InterventionBudgetLoader(InterventionLoader):
                 op = self.process_record(filters, values)
                 self.increment_counter(op)
 
+    def get_fr_numbers(self, record: PartnersIntervention, values: dict, **kwargs):
+        data = []
+        ret = []
+
+        for fr in record.FundsFundsreservationheader_intervention.all():
+            ret.append(fr.fr_number)
+            data.append(
+                dict(
+                    fr_number=fr.fr_number,
+                    vendor_code=fr.vendor_code,
+                    fr_type=fr.fr_type,
+                    currency=fr.currency,
+                )
+            )
+
+        values["fr_numbers_data"] = data
+        return ", ".join(ret)
+
 
 class InterventionBudget(InterventionAbstract, EtoolsDataMartModel):
     created = models.DateTimeField(blank=True, null=True)
