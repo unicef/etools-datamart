@@ -102,13 +102,13 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     )
 
     # target = models.TextField()  # This field type is a guess.
-    target_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
+    target_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=6)
 
-    target_numerator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
+    target_numerator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=6)
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
-    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
-    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
+    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=6)
+    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=6)
 
     # from lower_result
     lower_result_name = models.CharField(max_length=500, blank=True, null=True)

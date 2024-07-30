@@ -1,3 +1,9 @@
+4.6.3
+----
+* As a workaround,increased precision of pdindicator's fields (target_denominator,target_numerator, 
+  baseline_denominator, baseline_numerator) to accomodate larger values.  
+* Added missing migration for explorer app. 
+
 4.6.2
 ----
 * Add missing failure handler for celery tasks to capture the details of the failure
