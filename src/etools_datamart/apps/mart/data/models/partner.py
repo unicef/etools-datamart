@@ -3,30 +3,44 @@ from datetime import date
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import F, JSONField
+from django.db.models import F, JSONField, Prefetch
 from django.utils.translation import gettext_lazy as _
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnerOrganizationConst, PartnerType, TravelType
-from etools_datamart.apps.sources.etools.models import PartnersPartnerorganization, T2FTravelactivity
+from etools_datamart.apps.sources.etools.models import PartnersPartnerorganization, ReportsOffice, T2FTravelactivity
 
 
 class PartnerLoader(EtoolsLoader):
     def get_queryset(self):
-        return PartnersPartnerorganization.objects.select_related("planned_engagement", "organization").all()
+        return (
+            PartnersPartnerorganization.objects.select_related(
+                "planned_engagement",
+                "organization",
+                "lead_office",
+                "lead_section",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "T2FTravelactivity_partner",
+                    queryset=T2FTravelactivity.objects.filter(
+                        travel_type=TravelType.PROGRAMME_MONITORING,
+                        date__isnull=False,
+                        travels__status="completed",
+                        travels__traveler=F("primary_traveler"),
+                    ).order_by("-date"),
+                ),
+            )
+            .all()
+            # TODO:Try getting only the required fields
+        )
 
     def get_last_pv_date(self, record, values, **kwargs):
-        # FIXME: improves this
-        activity = T2FTravelactivity.objects.filter(
-            partnership__agreement__partner=record,
-            travel_type=TravelType.PROGRAMME_MONITORING,
-            date__isnull=False,
-            travels__status="completed",
-            travels__traveler=F("primary_traveler"),
-        ).first()
-        if activity:
+        activity_date = None
+        for activity in record.T2FTravelactivity_partner.all():
             return activity.date
+        return activity_date
 
     def get_planned_engagement(self, record, values, **kwargs):
         try:
