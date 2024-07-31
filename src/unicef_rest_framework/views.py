@@ -21,7 +21,7 @@ from strategy_field.utils import fqn
 
 from unicef_rest_framework.forms import ExportForm
 from unicef_rest_framework.models import Export
-from unicef_rest_framework.models.export import storage
+from unicef_rest_framework.models.export import ExportAccessLog, storage
 from unicef_rest_framework.pagination import PageFilter
 from unicef_rest_framework.utils import get_query_string, parse_url
 
@@ -192,6 +192,7 @@ class ExportFetch(LoginRequiredMixin, DetailView):
         if record.check_access(request.user):
             try:
                 c = storage.open(record.file_id)
+                ExportAccessLog.log_access(record.id)
             except FileNotFoundError as e:
                 capture_exception(e)
                 return JsonResponse({"error": "File not found"}, status=404)

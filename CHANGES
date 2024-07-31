@@ -1,3 +1,7 @@
+4.7.0
+----
+* add feature that logs timestamp of access to exports
+
 4.6.4
 ----
 * Page size increase for speed up
@@ -16,19 +20,19 @@
 
 4.6.2
 ----
-* Add missing failure handler for celery tasks to capture the details of the failure
+* add missing failure handler for celery tasks to capture the details of the failure
 
 4.6.1 
 ----
-* Fix loaders delta logic
-* Increased PDIndicator.section_name field length 
-* Fix missing record issue due to the case PDIndicator loader when there is no
+* fix loaders delta logic
+* increased PDIndicator.section_name field length 
+* fix missing record issue due to the case PDIndicator loader when there is no
   ReportsDisaggregation for a given ReportsAppliedindicator record.
 
 4.6
 ----
-* First phase of reducing sql queries in etl loaders to reduce execution time
-* Apply ordering spacialized paginator
+* first phase of reducing sql queries in etl loaders to reduce execution time
+* apply ordering specialized paginator
 
 4.5
 ----
