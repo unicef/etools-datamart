@@ -25,8 +25,10 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
 
+        # TODO: Include engagement in qs
         qs = AuditSpecialaudit.objects.select_related(
             "engagement_ptr",
+            "engagement_ptr__",
             "engagement_ptr__agreement",
             "engagement_ptr__agreement__auditor_firm__organization",
         )
@@ -44,6 +46,14 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
                 self.increment_counter(op)
 
     def get_special_procedures_count(self, record, values, field_name):
+        values["pending_unsupported_amount"] = (
+            record._impl.financial_findings
+            - record.amount_refunded
+            - record.additional_supporting_documentation_provided
+            - record.justification_provided_and_accepted
+            - record.write_off_required
+        )
+
         return AuditSpecialauditrecommendation.objects.filter(audit=record._impl).count()
 
 
@@ -98,6 +108,18 @@ class AuditSpecial(EtoolsDataMartModel):
     action_points = JSONField(blank=True, null=True, default=dict)
     action_points_data = JSONField(blank=True, null=True, default=dict)
 
+    # Extension after amendment
+    write_off_required = models.DecimalField("Impairment", max_digits=20, decimal_places=2, blank=True, null=True)
+    justification_provided_and_accepted = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    amount_refunded = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    pending_unsupported_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    audited_expenditure = models.DecimalField(
+        verbose_name=_("Audited Expenditure $"), blank=True, null=True, decimal_places=2, max_digits=20
+    )
+    financial_findings = models.DecimalField(
+        verbose_name=_("Financial Findings $"), blank=True, null=True, decimal_places=2, max_digits=20
+    )
+
     loader = AuditSpecialLoader()
 
     class Meta:
@@ -117,4 +139,10 @@ class AuditSpecial(EtoolsDataMartModel):
             special_procedures_count="-",
             action_points="-",
             action_points_data="i",
+            # TODO mapping for added fields
+            financial_findings="_impl.financial_findings",
+            audited_expenditure="_impl.audited_expenditure",
+            # amount_refunded="_impl.amount_refunded",
+            # write_off_required="_impl.write_off_required",
+            # justification_provided_and_accepted = "_impl.justification_provided_and_accepted",
         )

@@ -7,6 +7,7 @@ from .audit_financial_finding import AuditFinancialFindingViewSet
 from .audit_micro_assessment import MicroAssessmentViewSet
 from .audit_result import AuditResultViewSet
 from .audit_special import AuditSpecialViewSet
+from .audit_special import AuditExtendedSpecialViewSet
 from .audit_spotcheck import SpotCheckFindingViewSet
 from .famindicator import FAMIndicatorViewSet
 from .fm_questions import FMOntrackViewSet, FMOptionsViewSet, FMQuestionViewSet
