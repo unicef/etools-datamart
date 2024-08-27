@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.paginator import Paginator
 from django.db import models
-from django.db.models import JSONField
+from django.db.models import JSONField, Prefetch
 from django.utils.translation import gettext as _
 
 from celery.utils.log import get_task_logger
@@ -13,7 +13,7 @@ from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.audit_engagement import EngagementMixin
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import AuditEngagementConsts
-from etools_datamart.apps.sources.etools.models import AuditSpecialaudit, AuditSpecialauditrecommendation
+from etools_datamart.apps.sources.etools.models import AuditAudit, AuditSpecialaudit, AuditSpecialauditrecommendation
 
 from .partner import Partner
 
@@ -28,9 +28,15 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
         # TODO: Include engagement in qs
         qs = AuditSpecialaudit.objects.select_related(
             "engagement_ptr",
-            "engagement_ptr__",
             "engagement_ptr__agreement",
             "engagement_ptr__agreement__auditor_firm__organization",
+            # "engagement_ptr__AuditAudit_engagement_ptr",
+        ).prefetch_related(
+            Prefetch(
+                "engagement_ptr__AuditAudit_engagement_ptr",
+                queryset=AuditAudit.objects.all(),
+                to_attr="prefetched_AuditAudits",
+            ),
         )
 
         paginator = DatamartPaginator(qs, batch_size)
@@ -46,8 +52,13 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
                 self.increment_counter(op)
 
     def get_special_procedures_count(self, record, values, field_name):
+        financial_findings = 0
+        audit = AuditAudit.objects.all().filter(engagement_ptr_id=record._impl.engagement_ptr_id)
+
+        # TODO: Retrieve financial findings from matching AuditAudit record
+
         values["pending_unsupported_amount"] = (
-            record._impl.financial_findings
+            financial_findings
             - record.amount_refunded
             - record.additional_supporting_documentation_provided
             - record.justification_provided_and_accepted
@@ -139,10 +150,10 @@ class AuditSpecial(EtoolsDataMartModel):
             special_procedures_count="-",
             action_points="-",
             action_points_data="i",
-            # TODO mapping for added fields
-            financial_findings="_impl.financial_findings",
-            audited_expenditure="_impl.audited_expenditure",
-            # amount_refunded="_impl.amount_refunded",
-            # write_off_required="_impl.write_off_required",
-            # justification_provided_and_accepted = "_impl.justification_provided_and_accepted",
+            # TODO mapping for added fields that will be fetched from AuditAudit
+            ##financial_findings="_impl.financial_findings",
+            ##audited_expenditure="_impl.audited_expenditure",
+            amount_refunded="amount_refunded",
+            write_off_required="write_off_required",
+            justification_provided_and_accepted="justification_provided_and_accepted",
         )
