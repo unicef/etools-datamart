@@ -1,3 +1,14 @@
+4.8.0
+----
+* New endpoint has been addded to be used for slighly modified version special audit export
+  The new end point is 'datamart/audit/extended-special-audit'
+
+  Upon deployment of this feature export 395 (https://datamart.unicef.io/admin/unicef_rest_framework/export/395/change/) 
+  needs to be updated for Url value '/api/latest/datamart/audit/extended-special-audit/' 
+  
+  This will make sure export 395 will have more fields in it while keeping /api/latest/datamart/audit/special-audit/ until 
+  it is dropped.   
+
 4.7.0
 ----
 * add feature that logs timestamp of access to exports
