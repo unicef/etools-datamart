@@ -27,9 +27,6 @@ router.register(r"datamart/audit/financial-findings", endpoints.AuditFinancialFi
 router.register(r"datamart/audit/micro-assessment", endpoints.MicroAssessmentViewSet)
 router.register(r"datamart/audit/results", endpoints.AuditResultViewSet)
 router.register(r"datamart/audit/special-audit", endpoints.AuditSpecialViewSet)
-router.register(
-    r"datamart/audit/extended-special-audit", endpoints.AuditExtendedSpecialViewSet, basename="extended-special-audit"
-)
 router.register(r"datamart/audit/spot-check-findings", endpoints.SpotCheckFindingViewSet)
 router.register(r"datamart/actionpoints", endpoints.ActionPointViewSet)
 router.register(r"datamart/locations", endpoints.LocationViewSet)
