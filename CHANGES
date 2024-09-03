@@ -1,3 +1,7 @@
+4.7.1
+----
+  AuditSpecial model has been extended to include the addional fields to allow export to include these changes. 
+  
 4.7.0
 ----
 * add feature that logs timestamp of access to exports
