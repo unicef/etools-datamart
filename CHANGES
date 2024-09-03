@@ -1,4 +1,4 @@
-4.8.0
+4.7.1
 ----
   AuditSpecial model has been extended to include the addional fields to allow export to include these changes. 
   
