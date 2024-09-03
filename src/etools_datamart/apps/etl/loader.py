@@ -40,6 +40,8 @@ RUN_COMMAND = 2
 RUN_SCHEDULE = 3
 RUN_QUEUED = 4
 RUN_AS_REQUIREMENT = 5
+RUN_CANCELED = 6
+
 RUN_TYPES = (
     (RUN_UNKNOWN, ""),
     (RUN_MANUAL, "Manual"),
@@ -47,6 +49,7 @@ RUN_TYPES = (
     (RUN_SCHEDULE, "Celery"),
     (RUN_QUEUED, "Forced queue"),
     (RUN_AS_REQUIREMENT, "Required by task"),
+    (RUN_CANCELED, "Canceled"),
 )
 
 
@@ -323,6 +326,8 @@ class BaseLoader:
         return False
 
     def process_record(self, filters, values):
+        #TODO: Check task cancel status     
+
         stdout = self.context["stdout"]
         verbosity = self.context["verbosity"]
         if stdout and verbosity > 2:  # pragma: no cover
@@ -426,6 +431,7 @@ class BaseLoader:
             locks.delete(self.config.lock_key)
             lock.release()
         except LockError:
+            # TODO: Unlock failres should be reported
             pass
 
     @cached_property
