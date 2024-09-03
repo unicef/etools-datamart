@@ -326,7 +326,7 @@ class BaseLoader:
         return False
 
     def process_record(self, filters, values):
-        #TODO: Check task cancel status     
+        # TODO: Check task cancel status
 
         stdout = self.context["stdout"]
         verbosity = self.context["verbosity"]

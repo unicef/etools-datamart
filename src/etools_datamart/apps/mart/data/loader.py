@@ -147,7 +147,7 @@ class EtoolsLoader(BaseLoader):
 
         paginator = DatamartPaginator(qs, batch_size)
         for page_idx in paginator.page_range:
-            # TODO: Check cancel status of the task 
+            # TODO: Check cancel status of the task
             page = paginator.page(page_idx)
             for record in page.object_list:
                 filters = self.config.key(self, record)

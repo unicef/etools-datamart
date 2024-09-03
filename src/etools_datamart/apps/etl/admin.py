@@ -340,14 +340,14 @@ class EtlTaskAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     def _cancel(self, request, pk, sync):
         obj = self.get_object(request, pk)
         try:
-            #TODO: Check the status just before if it is still cancelable  
+            # TODO: Check the status just before if it is still cancelable
 
             obj.status = "CANCELED"
             obj.elapsed = None
             obj.save()
             task = app.tasks.get(obj.task)
-            #TODO: Alternative way to  
-             
+            # TODO: Alternative way to
+
             if sync:
                 task(run_type=RUN_CANCELED)
             else:
