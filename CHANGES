@@ -1,3 +1,8 @@
+4.7.2
+----
+* Loader logic has been modified to delete records at country level in the target table when truncate option 
+  is enabled.  
+
 4.7.1
 ----
 * ExportAccessLog model and its usage changed. The export access logs include  username now.
