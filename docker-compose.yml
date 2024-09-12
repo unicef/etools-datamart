@@ -9,9 +9,10 @@ x-datamart-defaults: &datamart_defaults
   volumes:
     - "$PWD:/code"
   environment:
-      DEBUG: 1
+      DEBUG: 0
       DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
-      DATABASE_URL_ETOOLS: postgis://postgres:@db-etools:5432/etools
+      #NOTE: Please update ETOOLS DB server IP/name and port specific to your enviroment.
+      DATABASE_URL_ETOOLS: postgis://postgres:@192.168.244.151:5442/etools
       DATABASE_URL_PRP: postgis://postgres:@db-prp:5432/prp
       AUTOCREATE_USERS: "admin,123"
       CACHE_URL: "redis://redis:6379/1"
@@ -32,14 +33,13 @@ x-datamart-defaults: &datamart_defaults
       GEOS_LIBRARY_PATH: "/usr/lib/libgeos_c.so.1"
       GDAL_LIBRARY_PATH: "/usr/lib/libgdal.so"
       EXPORT_FILE_STORAGE: "django.core.files.storage.FileSystemStorage"
-
 services:
   proxy:
     image: traefik:v2.1
     command: --api.insecure=True --providers.docker
     ports:
       - "8083:80"
-      - "8080:8080"
+      - "8084:8080"
     container_name: datamart_proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -57,42 +57,63 @@ services:
   beat:
     container_name: datamart_beat
     << : *datamart_defaults
-    command: celery -A etools_datamart beat --loglevel=info --workdir=/code/src
+    working_dir: /code/src
+    #command: celery  beat  etools_datamart  --loglevel=info --workdir=/code/
+    #command: celery  beat  etools_datamart  --loglevel=info
+    #command: celery -A etools_datamart beat --loglevel=debug
+    command: bash -c "celery -A etools_datamart beat --loglevel=info"
+    #command: celery -A etools_datamart beat --loglevel=debug --workdir /code
+    environment:
+      - BACKEND_DEBUG=False
+      - DJANGO_SETTINGS_MODULE='etools_datamart.config.settings'
 
   worker:
     container_name: datamart_worker
     << : *datamart_defaults
-    command: celery -A etools_datamart worker --loglevel=info --workdir=/code/src
-
+    working_dir: /code/src
+    #command: celery worker etools_datamart --loglevel=info --workdir=/code/
+    #command: celery worker etools_datamart --loglevel=info
+    #command: celery -A etools_datamart worker --loglevel=debug
+    command: celery -A etools_datamart.celery worker --loglevel=info
+    #command: find . -name celery.py -print
+    #command: ['celery', 'worker, '-A', 'etools_datamart', '-l', 'info']
+    environment:
+      - BACKEND_DEBUG=True
+      - DJANGO_SETTINGS_MODULE='etools_datamart.config.settings'
+       
   db:
     image: postgis/postgis:12-3.2
     container_name: datamart_db
+    ports:
+      - "15432:5432"
     environment:
-      POSTGRES_PASSWORD:
-      POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+      #POSTGRES_PASSWORD:
+      #POSTGRES_USER: postgres
       POSTGRES_DB: etools_datamart
     volumes:
       - "$PWD/build/db:/var/lib/postgresql/data"
 
   # Rely on etools and prp database instances running locally
-  db-etools:
-    image: postgis/postgis:12-3.2
-    container_name: datamart_etools
-    shm_size: '1gb'
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD:
-      POSTGRES_DB: etools
-    volumes:
-      - "$PWD/build/etools:/var/lib/postgresql/data"
+  #db-etools:
+  #  image: postgis/postgis:12-3.2
+  #  container_name: datamart_etools
+  #  shm_size: '1gb'
+  #  environment:
+  #    POSTGRES_USER: postgres
+  #    POSTGRES_PASSWORD:
+  #    POSTGRES_DB: etools
+  #  volumes:
+  #    - "$PWD/build/etools:/var/lib/postgresql/data"
 
   db-prp:
     image: postgis/postgis:12-3.2
     shm_size: '1gb'
     container_name: datamart_prp
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      #POSTGRES_USER: postgres
+      #POSTGRES_PASSWORD:
       POSTGRES_DB: prp
     volumes:
       - "$PWD/build/prp:/var/lib/postgresql/data"
