@@ -134,20 +134,25 @@ storage = get_storage()
 
 
 class ExportAccessLog(models.Model):
-    export = models.OneToOneField(Export, on_delete=models.CASCADE, blank=False, null=False)
+    export = models.ForeignKey(Export, on_delete=models.CASCADE, unique=True, blank=False, null=False)
     access_history = JSONField(blank=False, null=False, default=list)
 
     objects = models.Manager()
 
     @classmethod
-    def log_access(cls, export_id):
+    def log_access(cls, export, username):
         import datetime
+        import json
 
         utc_now = datetime.datetime.utcnow()
         timestamp = utc_now.isoformat()
-        access_log = cls.objects.get(export_id=export_id)
-        if access_log:
-            access_log.access_history.append(timestamp)
+        log_entry = {"u": f"{username}", "t": f"{timestamp}"}
+
+        try:
+            access_log = cls.objects.get(export=export)
+            export_access_data = json.loads(access_log.access_history)
+            export_access_data.append(log_entry)
+            access_log.access_history = json.dumps(export_access_data)
             access_log.save()
-        else:
-            cls.objects.create(export_id=export_id, access_history=[timestamp])
+        except cls.DoesNotExist:
+            cls.objects.create(export=export, access_history=[log_entry])

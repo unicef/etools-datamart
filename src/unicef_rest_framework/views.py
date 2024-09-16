@@ -192,7 +192,8 @@ class ExportFetch(LoginRequiredMixin, DetailView):
         if record.check_access(request.user):
             try:
                 c = storage.open(record.file_id)
-                ExportAccessLog.log_access(record.id)
+                current_username = request.user.username
+                ExportAccessLog.log_access(record, current_username)
             except FileNotFoundError as e:
                 capture_exception(e)
                 return JsonResponse({"error": "File not found"}, status=404)

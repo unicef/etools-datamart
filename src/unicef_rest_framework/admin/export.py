@@ -154,8 +154,17 @@ class ExportAccessLogAdmin(admin.ModelAdmin):
         return False
 
     def display_access_history(self, obj):
-        timestamps = [timezone.parse(ts).strftime("%Y-%m-%d %H:%M:%S") for ts in obj.access_history]
-        return "<br>".join(timestamps)
+        access_history = obj.access_history
+        formatted_history = []
+        for entry in access_history:
+            user = entry.get("u")
+            timestamp_utc = entry.get("t")
+            if timestamp_utc:
+                timestamp_local = timezone.localtime(timezone.datetime.fromtimestamp(timestamp_utc))
+                formatted_timestamp = timestamp_local.strftime("%Y-%m-%d %H:%M:%S")
+                formatted_history.append(f"{user}: {formatted_timestamp}")
+
+        return ",".join(formatted_history)
 
     display_access_history.short_description = "Export Access History"
     list_display = ("export", "display_access_history")

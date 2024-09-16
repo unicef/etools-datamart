@@ -1,3 +1,7 @@
+4.7.1
+----
+* ExportAccessLog model and its usage changed. The export access logs include  username now.
+
 4.7.0
 ----
 * add feature that logs timestamp of access to exports
