@@ -240,18 +240,22 @@ class EtoolsLoader(BaseLoader):
                     self.results.context = self.context
                     # self.fields_to_compare = se
                     # self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
-                    if truncate:
-                        self.model.objects.truncate()
                     for i, country in enumerate(countries, 1):
                         if not getattr(self, "TRANSACTION_BY_BATCH", False):
                             sid = transaction.savepoint()
+
                         cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
                         self.context["country"] = country
+
                         if stdout and verbosity > 0:
                             stdout.write(
                                 f"{i:>3}/{total_countries} " f"{country.name:<25} " f"{country.schema_name:<25}"
                             )
                             stdout.flush()
+
+                        if truncate:
+                            country_records = self.model.objects.filter(schema_name=country.schema_name)
+                            country_records.delete()
 
                         connection.set_schemas([country.schema_name])
                         start_time = time.time()
