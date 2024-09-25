@@ -1,3 +1,8 @@
+4.7.5
+----
+* By extendin the expiry of cache that stores the etl country state and count, we get state and count info 
+  along with RUNNING status. 
+
 4.7.4
 ----
 * EtoolsUser endpoint filtering by groups 

@@ -250,7 +250,11 @@ class EtoolsLoader(BaseLoader):
                         if not getattr(self, "TRANSACTION_BY_BATCH", False):
                             sid = transaction.savepoint()
 
-                        cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
+                        cache.set(
+                            "STATUS:%s" % self.etl_task.task,
+                            "%s - %s" % (country, self.results.processed),
+                            timeout=10 * 60 * 60,
+                        )
                         self.context["country"] = country
 
                         if stdout and verbosity > 0:
@@ -314,7 +318,7 @@ class EtoolsLoader(BaseLoader):
             raise
         else:
             self.on_end(None)
-            cache.set("STATUS:%s" % self.etl_task.task, "completed - %s" % self.results.processed)
+            cache.set("STATUS:%s" % self.etl_task.task, "completed - %s" % self.results.processed, timeout=5 * 60)
         finally:
             if lock:  # pragma: no branch
                 try:
