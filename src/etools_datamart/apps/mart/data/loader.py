@@ -33,6 +33,9 @@ class EToolsLoaderOptions(BaseLoaderOptions):
 
 
 class EtoolsLoader(BaseLoader):
+
+    status_info_expiry = 10 * 60 * 60
+
     def get_mart_values(self, record=None):
         country = self.context["country"]
         ret = {
@@ -253,7 +256,7 @@ class EtoolsLoader(BaseLoader):
                         cache.set(
                             "STATUS:%s" % self.etl_task.task,
                             "%s - %s" % (country, self.results.processed),
-                            timeout=10 * 60 * 60,
+                            timeout=EtoolsLoader.status_info_expiry,
                         )
                         self.context["country"] = country
 
@@ -318,7 +321,11 @@ class EtoolsLoader(BaseLoader):
             raise
         else:
             self.on_end(None)
-            cache.set("STATUS:%s" % self.etl_task.task, "completed - %s" % self.results.processed, timeout=5 * 60)
+            cache.set(
+                "STATUS:%s" % self.etl_task.task,
+                "completed - %s" % self.results.processed,
+                timeout=EtoolsLoader.status_info_expiry,
+            )
         finally:
             if lock:  # pragma: no branch
                 try:
