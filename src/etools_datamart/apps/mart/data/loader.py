@@ -240,10 +240,13 @@ class EtoolsLoader(BaseLoader):
                 self.results.context = self.context
                 # self.fields_to_compare = se
                 # self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+
                 for i, country in enumerate(countries, 1):
                     sid = None
+
                     country_rollback = False
                     try:
+
                         if not getattr(self, "TRANSACTION_BY_BATCH", False):
                             sid = transaction.savepoint()
 
@@ -277,29 +280,32 @@ class EtoolsLoader(BaseLoader):
                         if self.config.sync_deleted_records(self):
                             self.remove_deleted()
                     except MaxRecordsException as me:
-                        msg = f"MaxRecordsException {me} encountered for {country.schema_name}-going to proceed with the next country"
-                        logger.warning(msg)
-                        sentry_sdk.capture_message(msg)
+                        raise
                     except Exception as e:
-                        msg = f"Exception {e} encountered for {country.schema_name}-rolling back and proceed with the next country"
+                        msg = f"Exception {e} encountered for {country.schema_name}-tx rolling back for this country and proceed with the next country"
                         logger.warning(msg)
                         sentry_sdk.capture_message(msg)
                         country_rollback = True
                     finally:
                         if country_rollback:
                             if sid:
+                                if stdout and verbosity > 2:
+                                    stdout.write(f"roling back for sid:{sid}")
                                 transaction.savepoint_rollback(sid)
                         else:
                             if sid:
+                                if stdout and verbosity > 2:
+                                    stdout.write(f"committing for sid:{sid}")
                                 transaction.savepoint_commit(sid)
-
                     if stdout and verbosity > 0:
                         stdout.write("\n")
 
             else:
-                logger.info(f"Unable to get lock for {self}")
-                # Log to sentry as well
-
+                msg = f"Unable to get lock for {self}"
+                logger.warning(msg)
+                sentry_sdk.capture_message(msg)
+        except MaxRecordsException:
+            pass
         except (RequiredIsMissing, RequiredIsRunning) as e:
             self.on_end(error=e, retry=True)
             raise
@@ -318,7 +324,8 @@ class EtoolsLoader(BaseLoader):
                     msg = f"Exception while attempting to release the lock- {e}"
                     logger.warning(msg)
                     sentry_sdk.capture_message(msg)
-                    # Log to sentry as well
+                else:
+                    logger.debug("released the lock")
         return self.results
 
 
