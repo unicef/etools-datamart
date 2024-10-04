@@ -1,3 +1,7 @@
+4.7.4
+----
+* EtoolsUser endpoint filtering by groups 
+
 4.7.3
 ----
 * Country level error reporting for ETL loader's generic loop.
