@@ -228,10 +228,14 @@ class GroupNameFilter(BaseFilterBackend):
         self.get_query_args(request)
         if self.query_args:
             q_objects = [Q(groups__icontains=group_name) for group_name in self.query_args]
+            query = Q() | Q()
+            for q_obj in q_objects:
+                query |= q_obj
+
             if self.negate:
-                queryset = queryset.exclude(reduce(Q.__or__, q_objects))
+                queryset = queryset.exclude(query)
             else:
-                queryset = queryset.filter(reduce(Q.__or__, q_objects))
+                queryset = queryset.filter(query)
         return queryset
 
     def to_html(self, request, queryset, view):
