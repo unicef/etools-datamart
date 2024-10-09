@@ -287,13 +287,12 @@ class EtoolsLoader(BaseLoader):
                         sentry_sdk.capture_message(msg)
                         country_rollback = True
                     finally:
-                        if country_rollback:
-                            if sid:
+                        if sid:
+                            if country_rollback:
                                 if stdout and verbosity > 2:
                                     stdout.write(f"roling back for sid:{sid}")
                                 transaction.savepoint_rollback(sid)
-                        else:
-                            if sid:
+                            else:
                                 if stdout and verbosity > 2:
                                     stdout.write(f"committing for sid:{sid}")
                                 transaction.savepoint_commit(sid)
