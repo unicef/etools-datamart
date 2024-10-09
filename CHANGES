@@ -1,6 +1,8 @@
 4.7.4
 ----
 * EtoolsUser endpoint filtering by groups 
+  Typical usage:
+  api/latest/datamart/users/?country_name=Afghanistan&group=FM%20User,UNICEF%20User
 
 4.7.3
 ----
