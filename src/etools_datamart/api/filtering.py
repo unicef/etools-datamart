@@ -226,9 +226,10 @@ class GroupNameFilter(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         self.get_query_args(request)
+
         if self.query_args:
             q_objects = [Q(groups__icontains=group_name) for group_name in self.query_args]
-            query = Q() | Q()
+            query = Q()
             for q_obj in q_objects:
                 query |= q_obj
 
