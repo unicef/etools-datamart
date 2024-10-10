@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
 from django.utils import timezone
 
+import sentry_sdk
 from celery.utils.log import get_task_logger
 from dateutil.utils import today
 from dynamic_serializer.core import get_attr
@@ -233,14 +234,19 @@ class EtoolsLoader(BaseLoader):
                     is_empty=not self.model.objects.exists(),
                     stdout=stdout,
                 )
-                # sid = transaction.savepoint()
-                sid = None
+
                 total_countries = len(countries)
-                try:
-                    self.results.context = self.context
-                    # self.fields_to_compare = se
-                    # self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
-                    for i, country in enumerate(countries, 1):
+
+                self.results.context = self.context
+                # self.fields_to_compare = se
+                # self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+
+                for i, country in enumerate(countries, 1):
+                    sid = None
+
+                    country_rollback = False
+                    try:
+
                         if not getattr(self, "TRANSACTION_BY_BATCH", False):
                             sid = transaction.savepoint()
 
@@ -273,17 +279,32 @@ class EtoolsLoader(BaseLoader):
                         self.post_process_country()
                         if self.config.sync_deleted_records(self):
                             self.remove_deleted()
+                    except MaxRecordsException as me:
+                        raise
+                    except Exception as e:
+                        msg = f"Exception {e} encountered for {country.schema_name}-tx rolling back for this country and proceed with the next country"
+                        logger.warning(msg)
+                        sentry_sdk.capture_message(msg)
+                        country_rollback = True
+                    finally:
+                        if sid:
+                            if country_rollback:
+                                if stdout and verbosity > 2:
+                                    stdout.write(f"roling back for sid:{sid}")
+                                transaction.savepoint_rollback(sid)
+                            else:
+                                if stdout and verbosity > 2:
+                                    stdout.write(f"committing for sid:{sid}")
+                                transaction.savepoint_commit(sid)
                     if stdout and verbosity > 0:
                         stdout.write("\n")
-                except MaxRecordsException:
-                    pass
-                except Exception:
-                    if sid:
-                        transaction.savepoint_rollback(sid)
-                    raise
-            else:
-                logger.info(f"Unable to get lock for {self}")
 
+            else:
+                msg = f"Unable to get lock for {self}"
+                logger.warning(msg)
+                sentry_sdk.capture_message(msg)
+        except MaxRecordsException:
+            pass
         except (RequiredIsMissing, RequiredIsRunning) as e:
             self.on_end(error=e, retry=True)
             raise
@@ -299,7 +320,11 @@ class EtoolsLoader(BaseLoader):
                 try:
                     lock.release()
                 except LockError as e:  # pragma: no cover
-                    logger.warning(e)
+                    msg = f"Exception while attempting to release the lock- {e}"
+                    logger.warning(msg)
+                    sentry_sdk.capture_message(msg)
+                else:
+                    logger.debug("released the lock")
         return self.results
 
 
