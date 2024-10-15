@@ -1,20 +1,32 @@
 from django.db import models
+from django.db.models import JSONField, Prefetch
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersAgreementConst
-from etools_datamart.apps.sources.etools.models import PartnersAgreement
+from etools_datamart.apps.sources.etools.models import (
+    AuthUser,
+    PartnersAgreement,
+    PartnersAgreementamendment,
+    PartnersAgreementAuthorizedOfficers,
+)
 
 
 class AgreementLoader(EtoolsLoader):
+
     def get_agreement_amendments(self, record: PartnersAgreement, values: dict, **kwargs):
-        return ",".join([a.number for a in record.amendments])
+        numbers = []
+        for item in record.PartnersAgreementamendment_agreement.all():
+            numbers.append(item.number)
+
+        return ",".join(numbers)
 
     def get_partner_authorized_officers(self, record: PartnersAgreement, values: dict, **kwargs):
-        # PartnersPartnerstaffmember.objects.filter(agreement_authorizations=original)
         officers = []
-        for authorized in record.authorized_officers.all():
-            officers.append("%s %s (%s)" % (authorized.last_name, authorized.first_name, authorized.email))
+        for authorized in record.PartnersAgreementAuthorizedOfficers_agreement.all():
+            officers.append(
+                "%s %s (%s)" % (authorized.user.last_name, authorized.user.first_name, authorized.user.email)
+            )
         return ",".join(officers)
 
 
@@ -61,12 +73,32 @@ class Agreement(EtoolsDataMartModel):
 
     class Options:
         source = PartnersAgreement
-        queryset = lambda: PartnersAgreement.objects.select_related(
-            "partner__organization",
-            "signed_by",
-            "partner_manager",
-            "terms_acknowledged_by",
+        queryset = (
+            PartnersAgreement.objects.select_related(
+                "partner__organization",
+                "signed_by",
+                "partner_manager",
+                "terms_acknowledged_by",
+                "country_programme",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "PartnersAgreementamendment_agreement",
+                    queryset=PartnersAgreementamendment.objects.all(),
+                ),
+                Prefetch(
+                    "PartnersAgreementAuthorizedOfficers_agreement",
+                    queryset=PartnersAgreementAuthorizedOfficers.objects.all(),
+                ),
+                Prefetch(
+                    "PartnersAgreementAuthorizedOfficers_agreement__user",
+                    queryset=AuthUser.objects.all(),
+                ),
+            )
+            .all
+            # TODO: Try getting only the required fields
         )
+
         mapping = {
             "partner_name": "partner.organization.name",
             "vendor_number": "partner.organization.vendor_number",

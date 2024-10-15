@@ -12,7 +12,7 @@
         "qs_exclude": "{}",
         "cache-hit": "False",
         "cache-ttl": "1y",
-        "Content-Length": "982",
+        "Content-Length": "985",
         "Referrer-Policy": "same-origin"
     },
     "data": {
@@ -43,7 +43,7 @@
         "measurement_specifications": null,
         "numerator_label": null,
         "pd_reference_number": null,
-        "target_denominator": "1.100",
+        "target_denominator": "1.100000",
         "target_numerator": null,
         "baseline_denominator": null,
         "baseline_numerator": null,

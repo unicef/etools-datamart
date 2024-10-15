@@ -7,7 +7,7 @@ from unicef_rest_framework.forms import DateRangePickerField
 from unicef_rest_framework.ordering import OrderingFilter
 
 from etools_datamart.api.endpoints.datamart.serializers import DataMartSerializer
-from etools_datamart.api.filtering import CountryNameFilter, DatamartQueryStringFilterBackend
+from etools_datamart.api.filtering import CountryNameFilter, DatamartQueryStringFilterBackend, GroupNameFilter
 from etools_datamart.apps.mart.data import models
 from etools_datamart.apps.sources.etools.models import UsersOffice
 
@@ -44,6 +44,7 @@ class EtoolsUserViewSet(common.DataMartViewSet):
     serializer_class = EtoolsUserSerializerStd
     filter_backends = [
         CountryNameFilter,
+        GroupNameFilter,
         DatamartQueryStringFilterBackend,
         OrderingFilter,
         DynamicSerializerFilter,

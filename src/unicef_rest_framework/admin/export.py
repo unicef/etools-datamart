@@ -1,8 +1,10 @@
 from datetime import timedelta
 
 from django.contrib import admin, messages
+from django.contrib.admin import ModelAdmin, register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from admin_extra_buttons.decorators import button
@@ -11,6 +13,7 @@ from adminfilters.mixin import AdminFiltersMixin
 from adminfilters.value import ValueFilter
 from humanize import precisedelta
 
+from unicef_rest_framework.models.export import ExportAccessLog
 from unicef_rest_framework.utils import humanize_size
 
 from etools_datamart.libs.admin_filters import SizeFilter, StatusFilter
@@ -135,3 +138,35 @@ class ExportAdmin(AdminFiltersMixin, ExtraButtonsMixin, admin.ModelAdmin):
         obj = self.model.objects.get(id=pk)
         url = reverse("urf:export-fetch", args=[obj.pk])
         return HttpResponseRedirect(url)
+
+
+@register(ExportAccessLog)
+class ExportAccessLogAdmin(admin.ModelAdmin):
+    readonly_fields = ("export", "access_history")  #
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def display_access_history(self, obj):
+        access_history = obj.access_history
+        formatted_history = []
+        for entry in access_history:
+            user = entry.get("u")
+            timestamp_utc = entry.get("t")
+            if timestamp_utc:
+                timestamp_local = timezone.localtime(timezone.datetime.fromtimestamp(timestamp_utc))
+                formatted_timestamp = timestamp_local.strftime("%Y-%m-%d %H:%M:%S")
+                formatted_history.append(f"{user}: {formatted_timestamp}")
+
+        return ",".join(formatted_history)
+
+    display_access_history.short_description = "Export Access History"
+    list_display = ("export", "display_access_history")
+    list_filter = ("export",)
+    search_fields = ("export",)

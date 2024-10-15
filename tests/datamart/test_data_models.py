@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import Mock
 
 from django.apps import apps
@@ -50,5 +51,6 @@ def test_model_sync_get_queryset(db, model, context):
     connection = connections["etools"]
     connection.set_schemas(["lebanon"])
     loader = model().loader
+    context["today"] = date.today()
     loader.context = context
     assert loader.get_queryset().count() >= 0

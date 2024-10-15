@@ -6,9 +6,11 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models import JSONField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import strip_tags
 
@@ -129,3 +131,28 @@ def get_storage():
 
 
 storage = get_storage()
+
+
+class ExportAccessLog(models.Model):
+    export = models.ForeignKey(Export, on_delete=models.CASCADE, unique=True, blank=False, null=False)
+    access_history = JSONField(blank=False, null=False, default=list)
+
+    objects = models.Manager()
+
+    @classmethod
+    def log_access(cls, export, username):
+        import datetime
+        import json
+
+        utc_now = datetime.datetime.utcnow()
+        timestamp = utc_now.isoformat()
+        log_entry = {"u": f"{username}", "t": f"{timestamp}"}
+
+        try:
+            access_log = cls.objects.get(export=export)
+            export_access_data = json.loads(access_log.access_history)
+            export_access_data.append(log_entry)
+            access_log.access_history = json.dumps(export_access_data)
+            access_log.save()
+        except cls.DoesNotExist:
+            cls.objects.create(export=export, access_history=[log_entry])

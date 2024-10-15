@@ -199,6 +199,7 @@ class LoaderTask(celery.Task):
             st = f"RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}"
             self.loader.etl_task.status = st
             self.loader.etl_task.save()
+            capture_exception()
             raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES, countdown=config.ETL_RETRY_COUNTDOWN)
         except BaseException as e:  # pragma: no cover
             logger.exception(e)
@@ -273,6 +274,12 @@ class BaseLoader:
         #     delta = datetime.timedelta(seconds=self.etl_task.elapsed)
         #     return last_run - delta
         return self.etl_task.last_run
+
+    @property
+    def previous_successful_run(self):
+        from etools_datamart.apps.etl.models import EtlTaskHistory
+
+        return EtlTaskHistory.objects.filter(task=self.task.name).latest("timestamp").timestamp
 
     def is_running(self):
         self.etl_task.refresh_from_db()
