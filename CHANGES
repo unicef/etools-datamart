@@ -1,7 +1,7 @@
 4.7.5
 ----
-* By extendin the expiry of cache that stores the etl country state and count, we get state and count info 
-  along with RUNNING status. 
+* Stage(country) and record count info along with RUNNING status are made available by extendin the expiry of the 
+  cache entry that stores the etl country and count. 
 
 4.7.4
 ----
