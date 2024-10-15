@@ -1,3 +1,8 @@
+4.7.5
+----
+* Stage(country) and record count info along with RUNNING status are made available by extendin the expiry of the 
+  cache entry that stores the etl country and count. 
+
 4.7.4
 ----
 * EtoolsUser endpoint filtering by groups 
