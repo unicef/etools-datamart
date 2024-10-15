@@ -1,0 +1,11 @@
+{% load rest_framework i18n query %}
+{#<h2>{% trans "Group" %}</h2>#}
+<div class="list-group">
+<label for="id_vendor_number" class="control-label ">Groups</label>
+<select name="group_name" multiple="multiple" data-allowclear="true" class="select2" style="width: 100%">
+{% for group in groups %}<option {% if group in selection %}selected="selected"{% endif %}>{{ group }}</option>
+{% endfor %}
+</select>
+</div>
+<script>
+</script>

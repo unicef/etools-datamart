@@ -11,7 +11,7 @@ from unicef_rest_framework.filtering import CoreAPIQueryStringFilterBackend
 
 from etools_datamart.apps.multitenant.exceptions import InvalidSchema, NotAuthorizedSchema
 from etools_datamart.apps.security.utils import conn, get_allowed_schemas
-from etools_datamart.apps.sources.etools.models import UsersCountry
+from etools_datamart.apps.sources.etools.models import AuthGroup, UsersCountry
 
 # from unicef_rest_framework.state import state
 cache = caches["api"]
@@ -194,4 +194,53 @@ class CountryNameFilter(BaseFilterBackend):
         self.get_query_args(request)
         template = loader.get_template(self.template)
         context = {"countries": self.all_countries, "selection": self.query_args, "header": "aaaaaa"}
+        return template.render(context, request)
+
+
+class GroupNameFilter(BaseFilterBackend):
+    query_param = "group"
+    template = "api/group_filter.html"
+
+    def get_query(self, request):
+        if f"{self.query_param}!" in request.GET:
+            return True, ",".join(request.GET.getlist(f"{self.query_param}!", ""))
+        elif self.query_param in request.GET:
+            return False, ",".join(request.GET.getlist(self.query_param, ""))
+
+        return "", ""
+
+    @cached_property
+    def all_groups(self):
+        return sorted(AuthGroup.objects.values_list("name", flat=True))
+
+    def get_query_args(self, request):
+        negate, value = self.get_query(request)
+        if not value:
+            if request.user.is_superuser:
+                self.query_args = []
+            else:
+                self.query_args = self.all_groups
+        else:
+            self.query_args = value.split(",")
+        self.negate = negate
+
+    def filter_queryset(self, request, queryset, view):
+        self.get_query_args(request)
+
+        if self.query_args:
+            q_objects = [Q(groups__icontains=group_name) for group_name in self.query_args]
+            query = Q()
+            for q_obj in q_objects:
+                query |= q_obj
+
+            if self.negate:
+                queryset = queryset.exclude(query)
+            else:
+                queryset = queryset.filter(query)
+        return queryset
+
+    def to_html(self, request, queryset, view):
+        self.get_query_args(request)
+        template = loader.get_template(self.template)
+        context = {"groups": self.all_groups, "selection": self.query_args, "header": "aaaaaa"}
         return template.render(context, request)
