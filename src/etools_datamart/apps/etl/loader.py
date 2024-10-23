@@ -127,6 +127,7 @@ class BaseLoaderOptions:
         "sync_deleted_records",
         "truncate",
         "depends",
+        "depends_as_str",
         "timeout",
         "lock_key",
         "always_update",
@@ -148,6 +149,7 @@ class BaseLoaderOptions:
         self.key = undefined
         self.timeout = None
         self.depends = ()
+        self.depends_as_str = ()
         self.filters = None
         self.last_modify_field = None
         self.sync_deleted_records = lambda a: config.SYNC_DELETED_RECORDS

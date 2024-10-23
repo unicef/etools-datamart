@@ -2,13 +2,13 @@ from django.contrib.gis.db import models as geomodels
 from django.db import models
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import FieldMonitoringSettingsLocationsite
 
 
 class LocationsiteLoader(EtoolsLoader):
     def get_parent(self, record: FieldMonitoringSettingsLocationsite, values: dict, **kwargs):
+        from etools_datamart.apps.mart.data.models import Location
 
         loc_fields = ["id", "name", "p_code", "level", "source_id", "admin_level", "admin_level_name"]
 
@@ -27,6 +27,8 @@ class LocationsiteLoader(EtoolsLoader):
 
 
 class Locationsite(EtoolsDataMartModel):
+    # from etools_datamart.apps.mart.data.models import Location
+
     name = models.CharField(max_length=254)
     p_code = models.CharField(max_length=32)
     point = geomodels.PointField(blank=True, null=True)
@@ -37,7 +39,7 @@ class Locationsite(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringSettingsLocationsite
-        depends = (Location,)
+        depends_as_str = ("etools_datamart.apps.mart.data.models.Location",)
         mapping = dict(
             parent="-",
         )

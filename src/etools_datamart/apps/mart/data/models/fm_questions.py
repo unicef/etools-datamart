@@ -10,7 +10,6 @@ from celery.utils.log import get_task_logger
 
 from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
-from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import (
     FieldMonitoringDataCollectionActivityoverallfinding,
@@ -219,6 +218,7 @@ class FMQuestionLoader(EtoolsLoader):
                     transaction.savepoint_commit(sid)
 
     def get_location(self, record: FieldMonitoringDataCollectionFinding, values: dict, **kwargs):
+        from etools_datamart.apps.mart.data.models import Location
 
         loc_fields = [
             "id",
@@ -361,7 +361,7 @@ class FMQuestion(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringDataCollectionFinding
-        depends = (Location,)
+        depends_as_str = ("etools_datamart.apps.mart.data.models.Location",)
         mapping = dict(
             question_id="id",
             title="activity_question.question.text",
@@ -581,6 +581,7 @@ class FMOntrack(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringDataCollectionActivityoverallfinding
+        depends_as_str = ("etools_datamart.apps.mart.data.models.Location",)
         mapping = dict(
             entity="i",
             entity_type="i",

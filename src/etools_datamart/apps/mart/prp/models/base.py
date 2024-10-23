@@ -107,6 +107,18 @@ class PrpBaseLoader(BaseLoader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
+
+                    import importlib
+
+                    for req_model_class_path in self.config.depends_as_str:
+                        module_path, class_name = req_model_class_path.rsplit(".", 1)
+                        module = importlib.import_module(module_path)
+                        model_cls = getattr(module, class_name)
+                        requirement = model_cls()
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        requirement.loader.check_refresh()
+
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
