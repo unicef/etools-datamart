@@ -37,6 +37,7 @@ class Locationsite(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringSettingsLocationsite
+        depends = (Location,)
         mapping = dict(
             parent="-",
         )

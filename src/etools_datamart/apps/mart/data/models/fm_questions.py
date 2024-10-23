@@ -361,6 +361,7 @@ class FMQuestion(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringDataCollectionFinding
+        depends = (Location,)
         mapping = dict(
             question_id="id",
             title="activity_question.question.text",
