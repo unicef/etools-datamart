@@ -2,13 +2,13 @@ from django.contrib.gis.db import models as geomodels
 from django.db import models
 
 from etools_datamart.apps.mart.data.loader import EtoolsLoader
+from etools_datamart.apps.mart.data.models import Location
 from etools_datamart.apps.mart.data.models.base import EtoolsDataMartModel
 from etools_datamart.apps.sources.etools.models import FieldMonitoringSettingsLocationsite
 
 
 class LocationsiteLoader(EtoolsLoader):
     def get_parent(self, record: FieldMonitoringSettingsLocationsite, values: dict, **kwargs):
-        from etools_datamart.apps.mart.data.models import Location
 
         loc_fields = ["id", "name", "p_code", "level", "source_id", "admin_level", "admin_level_name"]
 
