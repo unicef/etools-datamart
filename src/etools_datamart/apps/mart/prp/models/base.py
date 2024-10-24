@@ -57,7 +57,7 @@ from dateutil.utils import today
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, load_class, logger, RUN_UNKNOWN
 from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.sentry import process_exception
 
@@ -108,12 +108,8 @@ class PrpBaseLoader(BaseLoader):
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
 
-                    import importlib
-
                     for req_model_class_path in self.config.depends_as_str:
-                        module_path, class_name = req_model_class_path.rsplit(".", 1)
-                        module = importlib.import_module(module_path)
-                        model_cls = getattr(module, class_name)
+                        model_cls = load_class(req_model_class_path)
                         requirement = model_cls()
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)

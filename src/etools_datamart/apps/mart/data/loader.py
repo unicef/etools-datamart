@@ -14,7 +14,15 @@ from dynamic_serializer.core import get_attr
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, cache, EtlResult, has_attr, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import (
+    BaseLoader,
+    BaseLoaderOptions,
+    cache,
+    EtlResult,
+    has_attr,
+    load_class,
+    RUN_UNKNOWN,
+)
 from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.libs.time import strfelapsed
 from etools_datamart.sentry import process_exception
@@ -211,12 +219,8 @@ class EtoolsLoader(BaseLoader):
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
 
-                    import importlib
-
                     for req_model_class_path in self.config.depends_as_str:
-                        module_path, class_name = req_model_class_path.rsplit(".", 1)
-                        module = importlib.import_module(module_path)
-                        model_cls = getattr(module, class_name)
+                        model_cls = load_class(req_model_class_path)
                         requirement = model_cls()
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
@@ -432,9 +436,7 @@ class CommonSchemaLoader(EtoolsLoader):
                         requirement.loader.check_refresh()
 
                     for req_model_class_path in self.config.depends_as_str:
-                        module_path, class_name = req_model_class_path.rsplit(".", 1)
-                        module = importlib.import_module(module_path)
-                        model_cls = getattr(module, class_name)
+                        model_cls = load_class(req_model_class_path)
                         requirement = model_cls()
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
