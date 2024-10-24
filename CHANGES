@@ -1,23 +1,26 @@
 4.7.6
 ----
 * Missing dependencies for FMQuestionLoader, FMOntrack and LocationsiteLoader have been fixed.
-* Due to cycleic dependecy between classes, depends Option property was not possible to use. 
+* Due to cyclic dependecy between classes, 'depends' Option property was not possible to use. 
   To be able to declare dependency between datamart models (so their loaders), new Options 
-  property called 'depends_as_str' has been added. By having string defintion of dependent 
-  model classeses rather than direct references, construction of these dependent models now can 
-  be postponed to the loader execution time. This breaks the cyclic dependency. 
-
-  The design still supports depends property but we will deprecate this property in the future. 
+  property called 'depends_as_str' has been added. Instantiation of these dependent models now 
+  can be postponed to the loader execution time by having string definition of these model classes.
+  
+  This way, we managed to break the cyclic dependency.
+ 
+  The design still supports 'depends' property but we plan to deprecate this property in the 
+  future.
 
   Please make sure that tupple definition has ',' as in the example below; 
 
-  Example: 
+  Example:
 
   class FMQuestion:
       ... 
       Option:
          depends_as_str = ('etools_datamart.apps.mart.data.model.Location',)
   
+* paginator class for prp loader has been updated to the one used by etools loaders.
 
 4.7.5
 ----
