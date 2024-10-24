@@ -361,6 +361,7 @@ class FMQuestion(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringDataCollectionFinding
+        depends_as_str = ("etools_datamart.apps.mart.data.models.Location",)
         mapping = dict(
             question_id="id",
             title="activity_question.question.text",
@@ -580,6 +581,7 @@ class FMOntrack(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringDataCollectionActivityoverallfinding
+        depends_as_str = ("etools_datamart.apps.mart.data.models.Location",)
         mapping = dict(
             entity="i",
             entity_type="i",

@@ -14,7 +14,15 @@ from dynamic_serializer.core import get_attr
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, cache, EtlResult, has_attr, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import (
+    BaseLoader,
+    BaseLoaderOptions,
+    cache,
+    EtlResult,
+    has_attr,
+    load_class,
+    RUN_UNKNOWN,
+)
 from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.libs.time import strfelapsed
 from etools_datamart.sentry import process_exception
@@ -198,6 +206,7 @@ class EtoolsLoader(BaseLoader):
         run_type=RUN_UNKNOWN,
         **kwargs,
     ):
+
         logger.debug(f"Running loader {self}")
         lock = self.lock()
         truncate = self.config.truncate
@@ -209,6 +218,14 @@ class EtoolsLoader(BaseLoader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
+
+                    for req_model_class_path in self.config.depends_as_str:
+                        model_cls = load_class(req_model_class_path)
+                        requirement = model_cls()
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        requirement.loader.check_refresh()
+
                 connection = connections["etools"]
                 if kwargs.get("countries"):
                     countries = kwargs["countries"]
@@ -417,6 +434,14 @@ class CommonSchemaLoader(EtoolsLoader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
+
+                    for req_model_class_path in self.config.depends_as_str:
+                        model_cls = load_class(req_model_class_path)
+                        requirement = model_cls()
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        requirement.loader.check_refresh()
+
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
