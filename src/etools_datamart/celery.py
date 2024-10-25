@@ -1,13 +1,28 @@
 # import json
 import os
 
+import sentry_sdk
 from celery import Celery
+from celery.signals import task_failure
+from celery.utils.log import get_logger
 from kombu import Exchange, Queue
 from kombu.serialization import register
 
 from etools_datamart.apps.etl.results import etl_dumps, etl_loads
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "etools_datamart.config.settings")
+
+logger = get_logger(__name__)
+
+
+def handle_task_failure(
+    sender=None, task_id=None, exception=None, args=None, kwargs=None, traceback=None, einfo=None, **kw
+):
+    failure_details = f"#Task: {task_id} failed  \n Exception:{exception} \n Error info:|{einfo} "
+    logger.error(f"Failure: {failure_details}")
+    with sentry_sdk.push_scope() as scope:
+        scope.set_extra("celery_task_failure_details", failure_details)
+        sentry_sdk.capture_exception(exception)
 
 
 class DatamartCelery(Celery):
@@ -18,6 +33,10 @@ class DatamartCelery(Celery):
 
 
 app = DatamartCelery("datamart")
+
+task_failure.connect(handle_task_failure)
+
+
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 # app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])  # pragma

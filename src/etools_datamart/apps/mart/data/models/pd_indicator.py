@@ -26,6 +26,14 @@ class PDIndicatorLoader(EtoolsLoader):
 
         return values
 
+    def apply_locations(self, indicator):
+        for location in indicator.locations.all():
+            indicator.location = location
+            filters = self.config.key(self, indicator)
+            values = self.get_values(indicator)
+            op = self.process_record(filters, values)
+            self.increment_counter(op)
+
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")
@@ -36,20 +44,30 @@ class PDIndicatorLoader(EtoolsLoader):
         for page_idx in paginator.page_range:
             page = paginator.page(page_idx)
             for indicator in page.object_list:
-                for disaggregation in indicator.disaggregations.all():
-                    indicator.disaggregation = disaggregation
-                    for location in indicator.locations.all():
-                        indicator.location = location
-                        filters = self.config.key(self, indicator)
-                        values = self.get_values(indicator)
-                        op = self.process_record(filters, values)
-                        self.increment_counter(op)
+                all_disaggregations = indicator.disaggregations.all()
+                if 0 == len(all_disaggregations):
+                    indicator.disaggregation = None
+                    self.apply_locations(indicator)
+                else:
+                    for disaggregation in all_disaggregations:
+                        indicator.disaggregation = disaggregation
+                        self.apply_locations(indicator)
 
     def get_pd_url(self, record: ReportsAppliedindicator, values: dict, **kwargs):
         return reverse(
             "api:intervention-detail",
             args=["latest", record.lower_result.result_link.intervention.pk],
         )
+
+    def get_disaggregation_name(self, record: ReportsAppliedindicator, values: dict, **kwargs):
+        if record.disaggregation:
+            return record.disaggregation.name
+        return ""
+
+    def get_disaggregation_active(self, record: ReportsAppliedindicator, values: dict, **kwargs):
+        if record.disaggregation:
+            return record.disaggregation.active
+        return False
 
 
 class PDIndicator(LocationMixin, EtoolsDataMartModel):
@@ -84,13 +102,13 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     )
 
     # target = models.TextField()  # This field type is a guess.
-    target_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
+    target_denominator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=6)
 
-    target_numerator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=3)
+    target_numerator = models.DecimalField(blank=True, null=True, max_digits=25, decimal_places=6)
 
     # baseline = models.TextField(blank=True, null=True)  # This field type is a guess.
-    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
-    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=3)
+    baseline_denominator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=6)
+    baseline_numerator = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=6)
 
     # from lower_result
     lower_result_name = models.CharField(max_length=500, blank=True, null=True)
@@ -98,7 +116,7 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
     pd_url = models.CharField(max_length=254, blank=True, null=True)
 
     # from section
-    section_name = models.CharField(max_length=45, blank=True, null=True)
+    section_name = models.CharField(max_length=128, blank=True, null=True)
 
     # from blueprint
     title = models.CharField(max_length=1024, blank=True, null=True)
@@ -133,13 +151,19 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
 
     class Options:
         source = ReportsAppliedindicator
-        queryset = ReportsAppliedindicator.objects.select_related("indicator", "section").all
+        queryset = ReportsAppliedindicator.objects.select_related
+        (
+            "indicator",
+            "lower_result",
+            "lower_result__result_link__intervention",
+            "section",
+        )
 
         key = lambda loader, record: dict(
             schema_name=loader.context["country"].schema_name,
             source_id=record.pk,
             source_location_id=record.location.pk,
-            source_disaggregation_id=record.disaggregation.pk,
+            source_disaggregation_id=record.disaggregation.pk if record.disaggregation else None,
         )
 
         mapping = add_location_mapping(
@@ -156,8 +180,8 @@ class PDIndicator(LocationMixin, EtoolsDataMartModel):
                 result_link_intervention="lower_result.result_link.intervention.pk",
                 pd_reference_number="lower_result.result_link.intervention.reference_number",
                 pd_url="-",
-                disaggregation_name="disaggregation.name",
-                disaggregation_active="disaggregation.active",
+                disaggregation_name="-",
+                disaggregation_active="-",
                 location_name="location.name",
                 location_pcode="location.p_code",
                 location_level="location.admin_level",

@@ -12,7 +12,7 @@ x-devdatamart-defaults: &devdatamart_defaults
       DEBUG: 0
       DATABASE_URL: postgis://postgres:@db:5432/etools_datamart
       #NOTE: Please update ETOOLS DB server IP/name and port specific to your enviroment.
-      DATABASE_URL_ETOOLS: postgis://postgres:@192.168.24.151:5442/etools
+      DATABASE_URL_ETOOLS: postgis://postgres:@192.168.139.128:25432/etools
       DATABASE_URL_PRP: postgis://postgres:@db-prp:5432/prp
       AUTOCREATE_USERS: "admin,123"
       CACHE_URL: "redis://redis:6379/1"
@@ -56,6 +56,8 @@ services:
       - traefik.enable=true
     volumes:
       - $PWD:/code
+    ports:  
+      - "18080:8080"  
   beat:
     container_name: datamart_beat
     << : *devdatamart_defaults

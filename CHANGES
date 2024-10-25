@@ -1,7 +1,87 @@
+4.7.6
+----
+* Missing dependencies for FMQuestionLoader, FMOntrack and LocationsiteLoader have been fixed.
+* Due to cyclic dependecy between classes, 'depends' Option property was not possible to use. 
+  To be able to declare dependency between datamart models (so their loaders), new Options 
+  property called 'depends_as_str' has been added. Instantiation of these dependent models now 
+  can be postponed to the loader execution time by having string definition of these model classes.
+  
+  This way, we managed to break the cyclic dependency.
+ 
+  The design still supports 'depends' property but we plan to deprecate this property in the 
+  future.
+
+  Please make sure that tupple definition has ',' as in the example below; 
+
+  Example:
+
+  class FMQuestion:
+      ... 
+      Option:
+         depends_as_str = ('etools_datamart.apps.mart.data.model.Location',)
+  
+* paginator class for prp loader has been updated to the one used by etools loaders.
+
+4.7.5
+----
+* Stage(country) and record count info along with RUNNING status are made available by extendin 
+  the expiry of the cache entry that stores the etl country and count. 
+
+4.7.4
+----
+* EtoolsUser endpoint filtering by groups 
+  Typical usages:
+  api/latest/datamart/users/?country_name=Afghanistan&group=FM%20User
+  api/latest/datamart/users/?country_name=Afghanistan&group=FM%20User,UNICEF%20User
+
+4.7.3
+----
+* Country level error reporting for ETL loader's generic loop.
+
+4.7.2
+----
+* Loader logic has been modified to delete records at country level in the target table when truncate option 
+  is enabled.  
+
+4.7.1
+----
+* ExportAccessLog model and its usage changed. The export access logs include  username now.
+
+4.7.0
+----
+* add feature that logs timestamp of access to exports
+
+4.6.4
+----
+* Page size increase for speed up
+* Improvement on data.partner by prefetching related T2FTravelactivity 
+* Improvement on data.engagement 
+* Improvement on data.attachment 
+* Improvement on data.agreement (partners) 
+* Improvements on data.intervention
+* Improvement on data.interventionbudget
+
+4.6.3
+----
+* As a workaround,increased precision of pdindicator's fields (target_denominator,target_numerator, 
+  baseline_denominator, baseline_numerator) to accomodate larger values.  
+* Added missing migration for explorer app. 
+
+4.6.2
+----
+* add missing failure handler for celery tasks to capture the details of the failure
+
+4.6.1 
+----
+* fix loaders delta logic
+* increased PDIndicator.section_name field length 
+* fix missing record issue due to the case PDIndicator loader when there is no
+  ReportsDisaggregation for a given ReportsAppliedindicator record.
+
 4.6
 ----
-* First phase of reducing sql queries in etl loaders to reduce execution time
-* Apply ordering spacialized paginator
+* first phase of reducing sql queries in etl loaders to reduce execution time
+* apply ordering specialized paginator
 
 4.5
 ----

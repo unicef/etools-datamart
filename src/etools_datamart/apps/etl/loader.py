@@ -127,6 +127,7 @@ class BaseLoaderOptions:
         "sync_deleted_records",
         "truncate",
         "depends",
+        "depends_as_str",
         "timeout",
         "lock_key",
         "always_update",
@@ -148,6 +149,7 @@ class BaseLoaderOptions:
         self.key = undefined
         self.timeout = None
         self.depends = ()
+        self.depends_as_str = ()
         self.filters = None
         self.last_modify_field = None
         self.sync_deleted_records = lambda a: config.SYNC_DELETED_RECORDS
@@ -199,6 +201,7 @@ class LoaderTask(celery.Task):
             st = f"RETRY {self.request.retries}/{config.ETL_MAX_RETRIES}"
             self.loader.etl_task.status = st
             self.loader.etl_task.save()
+            capture_exception()
             raise self.retry(exc=e, max_retries=config.ETL_MAX_RETRIES, countdown=config.ETL_RETRY_COUNTDOWN)
         except BaseException as e:  # pragma: no cover
             logger.exception(e)
@@ -273,6 +276,12 @@ class BaseLoader:
         #     delta = datetime.timedelta(seconds=self.etl_task.elapsed)
         #     return last_run - delta
         return self.etl_task.last_run
+
+    @property
+    def previous_successful_run(self):
+        from etools_datamart.apps.etl.models import EtlTaskHistory
+
+        return EtlTaskHistory.objects.filter(task=self.task.name).latest("timestamp").timestamp
 
     def is_running(self):
         self.etl_task.refresh_from_db()
@@ -506,3 +515,12 @@ class BaseLoader:
 
     def consistency_check(self):
         pass
+
+
+def load_class(class_path: str):
+    import importlib
+
+    module_path, class_name = class_path.rsplit(".", 1)
+    module = importlib.import_module(module_path)
+    model_cls = getattr(module, class_name)
+    return model_cls

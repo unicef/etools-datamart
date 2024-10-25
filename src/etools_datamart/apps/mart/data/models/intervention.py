@@ -3,8 +3,8 @@ import logging
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.db import models
-from django.db.models import F, JSONField, Sum
+from django.db import models, transaction
+from django.db.models import F, JSONField, Prefetch, Q, Subquery, Sum
 from django.utils.functional import cached_property
 
 from etools_datamart.apps.etl.paginator import DatamartPaginator
@@ -12,13 +12,30 @@ from etools_datamart.apps.mart.data.loader import EtoolsLoader
 from etools_datamart.apps.mart.data.models.reports_office import Office
 from etools_datamart.apps.sources.etools.enrichment.consts import PartnersInterventionConst, TravelType
 from etools_datamart.apps.sources.etools.models import (
+    AuthUser,
     DjangoContentType,
     FundsFundsreservationheader,
+    LocationsLocation,
+    PartnersFiletype,
     PartnersIntervention,
     PartnersInterventionamendment,
+    PartnersInterventionattachment,
+    PartnersInterventionbudget,
+    PartnersInterventionFlatLocations,
+    PartnersInterventionOffices,
+    PartnersInterventionPartnerFocalPoints,
     PartnersInterventionplannedvisits,
+    PartnersInterventionresultlink,
+    PartnersInterventionreview,
+    PartnersInterventionSections,
+    PartnersInterventionUnicefFocalPoints,
     ReportsAppliedindicator,
+    ReportsLowerresult,
+    ReportsOffice,
+    ReportsResult,
+    ReportsSector,
     T2FTravelactivity,
+    UsersUserprofile,
 )
 
 from .base import EtoolsDataMartModel
@@ -158,8 +175,8 @@ class InterventionAbstract(models.Model):
             last_amendment_date="i",
             last_pv_date="-",
             location="i",
-            # locations_data='i',
-            # locations='-',
+            # locations_data="-",
+            # locations="-",
             number_of_amendments="i",
             number_of_attachments="i",
             offices="-",
@@ -206,8 +223,152 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     location_m2m_field = "flat_locations"
 
     def get_queryset(self):
-        return PartnersIntervention.objects.select_related("agreement", "agreement__partner").prefetch_related(
-            "sections", "flat_locations", "offices", "unicef_focal_points", "partner_focal_points", "result_links"
+        # TODO: Minimize the number of fields for tables joined with select_related
+        return PartnersIntervention.objects.select_related(
+            "agreement__partner__organization",
+            "unicef_signatory",
+            "country_programme",
+            "partner_authorized_officer_signatory",
+        ).prefetch_related(
+            Prefetch(
+                "PartnersInterventionbudget_intervention",
+                queryset=PartnersInterventionbudget.objects.all().only(
+                    "id",
+                    "currency",
+                    "total",
+                    "total_local",
+                    "in_kind_amount",
+                    "in_kind_amount_local",
+                    "intervention_id",
+                    "partner_contribution",
+                    "partner_contribution_local",
+                    "unicef_cash",
+                    "unicef_cash_local",
+                ),
+            ),
+            Prefetch(
+                "PartnersInterventionamendment_intervention",
+                queryset=PartnersInterventionamendment.objects.all()
+                .order_by("signed_date")
+                .only(
+                    "id",
+                    "signed_date",
+                    "intervention_id",
+                    "types",
+                ),
+            ),
+            Prefetch(
+                "FundsFundsreservationheader_intervention",
+                queryset=FundsFundsreservationheader.objects.all().only(
+                    "id",
+                    "fr_number",
+                    "outstanding_amt_local",
+                    "intervention_id",
+                ),
+            ),
+            Prefetch(
+                "PartnersInterventionattachment_intervention",
+                queryset=PartnersInterventionattachment.objects.all().only(
+                    "id",
+                    "intervention_id",
+                    "type_id",
+                ),
+            ),
+            Prefetch(
+                "PartnersInterventionattachment_intervention__type",
+                queryset=PartnersFiletype.objects.all().only(
+                    "id",
+                    "name",
+                ),
+            ),
+            Prefetch(
+                "PartnersInterventionplannedvisits_intervention",
+                queryset=PartnersInterventionplannedvisits.objects.filter(year=self.context["today"].year).only(
+                    "id",
+                    "intervention_id",
+                    "programmatic_q1",
+                    "programmatic_q2",
+                    "programmatic_q3",
+                ),
+            ),
+            Prefetch(
+                "T2FTravelactivity_partnership",
+                queryset=T2FTravelactivity.objects.filter(
+                    travel_type=TravelType.PROGRAMME_MONITORING,
+                    travels__status="completed",
+                    date__isnull=False,
+                )
+                .order_by("-date")
+                .only("id", "date", "travel_type", "partnership_id"),
+            ),
+            Prefetch(
+                "PartnersInterventionresultlink_intervention",
+                queryset=PartnersInterventionresultlink.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionresultlink_intervention__ReportsLowerresult_result_link__ReportsAppliedindicator_lower_result",
+                queryset=ReportsAppliedindicator.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionSections_intervention",
+                queryset=PartnersInterventionSections.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionSections_intervention__section",
+                queryset=ReportsSector.objects.only("id", "name", "description"),
+            ),
+            Prefetch(
+                "PartnersInterventionOffices_intervention",
+                queryset=PartnersInterventionOffices.objects.all().order_by("id"),
+            ),
+            Prefetch(
+                "PartnersInterventionOffices_intervention__office",
+                queryset=ReportsOffice.objects.all().order_by("id", "name"),
+            ),
+            Prefetch(
+                "PartnersInterventionUnicefFocalPoints_intervention",
+                queryset=PartnersInterventionUnicefFocalPoints.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionUnicefFocalPoints_intervention__user",
+                queryset=AuthUser.objects.only("id", "username", "first_name", "last_name", "email"),
+            ),
+            Prefetch(
+                "PartnersInterventionPartnerFocalPoints_intervention",
+                queryset=PartnersInterventionPartnerFocalPoints.objects.only("id", "intervention_id", "user_id"),
+            ),
+            Prefetch(
+                "PartnersInterventionPartnerFocalPoints_intervention__user",
+                queryset=AuthUser.objects.only("id", "username", "first_name", "last_name", "email", "profile"),
+            ),
+            Prefetch(
+                "PartnersInterventionPartnerFocalPoints_intervention__user__profile",
+                queryset=UsersUserprofile.objects.only("id", "phone_number", "user_id"),
+            ),
+            Prefetch(
+                "PartnersInterventionFlatLocations_intervention",
+                queryset=PartnersInterventionFlatLocations.objects.only("id", "intervention_id", "location_id"),
+            ),
+            Prefetch(
+                "PartnersInterventionFlatLocations_intervention__location",
+                queryset=LocationsLocation.objects.only(
+                    "id",
+                    "name",
+                    "admin_level",
+                    "p_code",
+                    "latitude",
+                    "admin_level_name",
+                    "longitude",
+                ),
+            ),
+            Prefetch(
+                "PartnersInterventionreview_intervention",
+                queryset=PartnersInterventionreview.objects.all(),
+            ),
+            Prefetch(
+                "PartnersInterventionresultlink_intervention__cp_output",
+                queryset=ReportsResult.objects.only("id", "name", "wbs"),
+            ),
         )
 
     @cached_property
@@ -230,27 +391,33 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             return None
 
     def get_planned_programmatic_visits(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionplannedvisits.objects.filter(intervention=record)
-        qs = qs.filter(year=self.context["today"].year)
-        qs = qs.annotate(
-            planned=F("programmatic_q1") + F("programmatic_q2") + F("programmatic_q3") + F("programmatic_q4")
-        )
-        record = qs.first()
-        if record:
-            return record.planned
+        # TODO: put extra logic to make it more reliable
+        for item in record.PartnersInterventionplannedvisits_intervention.all():
+            planned = item.programmatic_q1 + item.programmatic_q2 + item.programmatic_q3
+            return planned
 
     def get_attachment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = record.PartnersInterventionattachment_intervention.all()
-        values["number_of_attachments"] = qs.count()
-        return ", ".join(qs.values_list("type__name", flat=True))
+        count = 0
+        types_list = []
+        for item in record.PartnersInterventionattachment_intervention.all():
+            count = count + 1
+            types_list.append(str(item.type.name))
+
+        values["number_of_attachments"] = count
+
+        return ", ".join(types_list)
 
     def get_amendment_types(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = PartnersInterventionamendment.objects.filter(intervention=record).order_by("signed_date")
-        values["number_of_amendments"] = qs.count()
-        if qs:
-            values["last_amendment_date"] = qs.latest("signed_date").signed_date
-        types = [str(t) for t in qs.values_list("types", flat=True)]
-        return ", ".join(types)
+        count = 0
+        values["last_amendment_date"] = None
+        types_list = []
+        for item in record.PartnersInterventionamendment_intervention.all():
+            count = count + 1
+            values["last_amendment_date"] = item.signed_date
+            types_list.append(str(item.types))
+
+        values["number_of_amendments"] = count
+        return ", ".join(types_list)
 
     def get_days_from_prc_review_to_signature(self, record: PartnersIntervention, values: dict, **kwargs):
         i1 = record.review_date_prc
@@ -266,29 +433,22 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
 
     def get_sections(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
-        for section in record.sections.all():
+        for item in record.PartnersInterventionSections_intervention.all():
             data.append(
                 dict(
-                    source_id=section.id,
-                    name=section.name,
-                    description=section.description,
+                    source_id=item.section.id,
+                    name=item.section.name,
+                    description=item.section.description,
                 )
             )
         values["sections_data"] = data
         return ", ".join([sec["name"] for sec in data])
 
     def get_last_pv_date(self, record: PartnersIntervention, values: dict, **kwargs):
-        ta = (
-            T2FTravelactivity.objects.filter(
-                partnership__pk=record.pk,
-                travel_type=TravelType.PROGRAMME_MONITORING,
-                travels__status="completed",
-                date__isnull=False,
-            )
-            .order_by("date")
-            .last()
-        )
-        return ta.date if ta else None
+        ta_date = None
+        for item in record.T2FTravelactivity_partnership.all():
+            return item.date
+        return ta_date
 
     def get_unicef_signatory_name(self, record: PartnersIntervention, values: dict, **kwargs):
         if record.unicef_signatory:
@@ -301,36 +461,42 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
     def get_offices(self, record: PartnersIntervention, values: dict, **kwargs):
         # PartnersInterventionOffices
         data = []
-        for office in record.offices.order_by("id"):
+        for item in record.PartnersInterventionOffices_intervention.all():
             data.append(
                 dict(
-                    source_id=office.id,
-                    name=office.name,
+                    source_id=item.office.id,
+                    name=item.office.name,
                 )
             )
         values["offices_data"] = data
         return ", ".join([off["name"] for off in data])
 
     def get_clusters(self, record: PartnersIntervention, values: dict, **kwargs):
-        qs = ReportsAppliedindicator.objects.filter(lower_result__result_link__intervention=record)
         clusters = set()
-        for applied_indicator in qs.all():
-            if applied_indicator.cluster_name:
-                clusters.add(applied_indicator.cluster_name)
+        for result_link in record.PartnersInterventionresultlink_intervention.all():
+            # print(type(result_link))
+            for lower_result in result_link.ReportsLowerresult_result_link.all():
+                # print(type(lower_result))
+                for applied_indicator in lower_result.ReportsAppliedindicator_lower_result.all():
+                    # print(type(applied_indicator))
+                    if applied_indicator.cluster_name:
+                        clusters.add(applied_indicator.cluster_name)
         return ", ".join(clusters)
 
     def get_partner_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
-        for member in record.partner_focal_points.all():
+        for member in record.PartnersInterventionPartnerFocalPoints_intervention.all():
             # member is AUTH_USER_MODEL
-            ret.append("{0.last_name} {0.first_name} ({0.email}) {0.profile.phone_number}".format(member))
+            ret.append(
+                "{0.user.last_name} {0.user.first_name} ({0.user.email}) {0.user.profile.phone_number}".format(member)
+            )
             data.append(
                 dict(
-                    last_name=member.last_name,
-                    first_name=member.first_name,
-                    email=member.email,
-                    phone=member.profile.phone_number,
+                    last_name=member.user.last_name,
+                    first_name=member.user.first_name,
+                    email=member.user.email,
+                    phone=member.user.profile.phone_number,
                 )
             )
 
@@ -338,29 +504,40 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         return ", ".join(ret)
 
     def get_fr_number(self, record: PartnersIntervention, values: dict, **kwargs):
-        return ", ".join(
-            FundsFundsreservationheader.objects.filter(intervention=record).values_list("fr_number", flat=True)
-        )
+        fr_number_list = []
+
+        for item in record.FundsFundsreservationheader_intervention.all():
+            fr_number_list.append(item.fr_number)
+
+        return ", ".join(fr_number_list)
 
     def get_outstanding_amt_local(self, record: PartnersIntervention, values: dict, **kwargs):
-        return FundsFundsreservationheader.objects.filter(intervention=record).aggregate(Sum("outstanding_amt_local"))[
-            "outstanding_amt_local__sum"
-        ]
+        sum_outstanding_amt_local = 0
+        for item in record.FundsFundsreservationheader_intervention.all():
+            sum_outstanding_amt_local = sum_outstanding_amt_local + item.outstanding_amt_local
+
+        return sum_outstanding_amt_local
 
     def get_cp_outputs(self, record: PartnersIntervention, values: dict, **kwargs):
-        values["cp_outputs_data"] = list(record.result_links.values("name", "wbs"))
-        return ", ".join([rl.name for rl in record.result_links.all()])
+        outputs_data = []
+        outputs = []
+        for item in record.PartnersInterventionresultlink_intervention.all():
+            if item.cp_output:
+                outputs_data.append(dict(name=item.cp_output.name, wbs=item.cp_output.wbs))
+                outputs.append(item.cp_output.name)
+        values["cp_outputs_data"] = outputs_data
+        return ", ".join(outputs)
 
     def get_unicef_focal_points(self, record: PartnersIntervention, values: dict, **kwargs):
         data = []
         ret = []
-        for member in record.unicef_focal_points.all():
-            ret.append("{0.last_name} {0.first_name} ({0.email})".format(member))
+        for item in record.PartnersInterventionUnicefFocalPoints_intervention.all():
+            ret.append("{0.user.last_name} {0.user.first_name} ({0.user.email})".format(item))
             data.append(
                 dict(
-                    last_name=member.last_name,
-                    first_name=member.first_name,
-                    email=member.email,
+                    last_name=item.user.last_name,
+                    first_name=item.user.first_name,
+                    email=item.user.email,
                 )
             )
 
@@ -392,6 +569,29 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
         if attachment:
             return attachment.file
 
+    def get_locations(self, record: PartnersIntervention, values: dict, **kwargs):
+        locations = []
+        for item in record.PartnersInterventionFlatLocations_intervention.all():
+            locations.append(item.location.name)
+        return ", ".join(locations)
+
+    def get_locations_data(self, record: PartnersIntervention, values: dict, **kwargs):
+        locations_data = []
+        for item in record.PartnersInterventionFlatLocations_intervention.all():
+            # TODO: Check possible available json serialization
+            loc_data = dict(
+                name=item.location.name,
+                level=item.location.admin_level,
+                pcode=item.location.p_code,
+                latitude=item.location.latitude,
+                levelname=item.location.admin_level_name,
+                longitude=item.location.longitude,
+                source_id=item.location.id,
+            )
+            locations_data.append(loc_data)
+
+        return locations_data
+
 
 class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartModel):
     final_partnership_review = models.CharField(max_length=1024, null=True)
@@ -409,7 +609,7 @@ class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartMode
     class Options(InterventionAbstract.Options):
         mapping = dict(
             **InterventionAbstract.Options.mapping,
-            locations_data="i",
+            locations_data="-",
             locations="-",
             final_partnership_review="-",
         )

@@ -7,13 +7,22 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, models, transaction
 from django.utils import timezone
 
+import sentry_sdk
 from celery.utils.log import get_task_logger
 from dateutil.utils import today
 from dynamic_serializer.core import get_attr
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.etl.loader import BaseLoader, BaseLoaderOptions, cache, EtlResult, has_attr, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import (
+    BaseLoader,
+    BaseLoaderOptions,
+    cache,
+    EtlResult,
+    has_attr,
+    load_class,
+    RUN_UNKNOWN,
+)
 from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.libs.time import strfelapsed
 from etools_datamart.sentry import process_exception
@@ -32,6 +41,9 @@ class EToolsLoaderOptions(BaseLoaderOptions):
 
 
 class EtoolsLoader(BaseLoader):
+
+    status_info_expiry = 10 * 60 * 60
+
     def get_mart_values(self, record=None):
         country = self.context["country"]
         ret = {
@@ -134,9 +146,9 @@ class EtoolsLoader(BaseLoader):
         use_delta = self.context["only_delta"] and not self.context["is_empty"]
         if self.config.filters:
             qs = qs.filter(**self.config.filters)
-        if use_delta and (self.config.last_modify_field and self.last_run):
+        if use_delta and (self.config.last_modify_field and self.previous_successful_run):
             logger.debug(f"Loader {self}: use deltas")
-            qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.last_run})
+            qs = qs.filter(**{f"{self.config.last_modify_field}__gte": self.previous_successful_run})
         return qs
 
     def process_country(self):
@@ -194,6 +206,7 @@ class EtoolsLoader(BaseLoader):
         run_type=RUN_UNKNOWN,
         **kwargs,
     ):
+
         logger.debug(f"Running loader {self}")
         lock = self.lock()
         truncate = self.config.truncate
@@ -205,6 +218,14 @@ class EtoolsLoader(BaseLoader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
+
+                    for req_model_class_path in self.config.depends_as_str:
+                        model_cls = load_class(req_model_class_path)
+                        requirement = model_cls()
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        requirement.loader.check_refresh()
+
                 connection = connections["etools"]
                 if kwargs.get("countries"):
                     countries = kwargs["countries"]
@@ -233,25 +254,38 @@ class EtoolsLoader(BaseLoader):
                     is_empty=not self.model.objects.exists(),
                     stdout=stdout,
                 )
-                # sid = transaction.savepoint()
-                sid = None
+
                 total_countries = len(countries)
-                try:
-                    self.results.context = self.context
-                    # self.fields_to_compare = se
-                    # self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
-                    if truncate:
-                        self.model.objects.truncate()
-                    for i, country in enumerate(countries, 1):
+
+                self.results.context = self.context
+                # self.fields_to_compare = se
+                # self.fields_to_compare = [f for f in self.mapping.keys() if f not in ["seen"]]
+
+                for i, country in enumerate(countries, 1):
+                    sid = None
+
+                    country_rollback = False
+                    try:
+
                         if not getattr(self, "TRANSACTION_BY_BATCH", False):
                             sid = transaction.savepoint()
-                        cache.set("STATUS:%s" % self.etl_task.task, "%s - %s" % (country, self.results.processed))
+
+                        cache.set(
+                            "STATUS:%s" % self.etl_task.task,
+                            "%s - %s" % (country, self.results.processed),
+                            timeout=EtoolsLoader.status_info_expiry,
+                        )
                         self.context["country"] = country
+
                         if stdout and verbosity > 0:
                             stdout.write(
                                 f"{i:>3}/{total_countries} " f"{country.name:<25} " f"{country.schema_name:<25}"
                             )
                             stdout.flush()
+
+                        if truncate:
+                            country_records = self.model.objects.filter(schema_name=country.schema_name)
+                            country_records.delete()
 
                         connection.set_schemas([country.schema_name])
                         start_time = time.time()
@@ -269,17 +303,32 @@ class EtoolsLoader(BaseLoader):
                         self.post_process_country()
                         if self.config.sync_deleted_records(self):
                             self.remove_deleted()
+                    except MaxRecordsException as me:
+                        raise
+                    except Exception as e:
+                        msg = f"Exception {e} encountered for {country.schema_name}-tx rolling back for this country and proceed with the next country"
+                        logger.warning(msg)
+                        sentry_sdk.capture_message(msg)
+                        country_rollback = True
+                    finally:
+                        if sid:
+                            if country_rollback:
+                                if stdout and verbosity > 2:
+                                    stdout.write(f"roling back for sid:{sid}")
+                                transaction.savepoint_rollback(sid)
+                            else:
+                                if stdout and verbosity > 2:
+                                    stdout.write(f"committing for sid:{sid}")
+                                transaction.savepoint_commit(sid)
                     if stdout and verbosity > 0:
                         stdout.write("\n")
-                except MaxRecordsException:
-                    pass
-                except Exception:
-                    if sid:
-                        transaction.savepoint_rollback(sid)
-                    raise
-            else:
-                logger.info(f"Unable to get lock for {self}")
 
+            else:
+                msg = f"Unable to get lock for {self}"
+                logger.warning(msg)
+                sentry_sdk.capture_message(msg)
+        except MaxRecordsException:
+            pass
         except (RequiredIsMissing, RequiredIsRunning) as e:
             self.on_end(error=e, retry=True)
             raise
@@ -289,13 +338,21 @@ class EtoolsLoader(BaseLoader):
             raise
         else:
             self.on_end(None)
-            cache.set("STATUS:%s" % self.etl_task.task, "completed - %s" % self.results.processed)
+            cache.set(
+                "STATUS:%s" % self.etl_task.task,
+                "completed - %s" % self.results.processed,
+                timeout=EtoolsLoader.status_info_expiry,
+            )
         finally:
             if lock:  # pragma: no branch
                 try:
                     lock.release()
                 except LockError as e:  # pragma: no cover
-                    logger.warning(e)
+                    msg = f"Exception while attempting to release the lock- {e}"
+                    logger.warning(msg)
+                    sentry_sdk.capture_message(msg)
+                else:
+                    logger.debug("released the lock")
         return self.results
 
 
@@ -377,6 +434,14 @@ class CommonSchemaLoader(EtoolsLoader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
+
+                    for req_model_class_path in self.config.depends_as_str:
+                        model_cls = load_class(req_model_class_path)
+                        requirement = model_cls()
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        requirement.loader.check_refresh()
+
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
