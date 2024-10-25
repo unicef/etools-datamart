@@ -49,7 +49,6 @@ Report  #
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.paginator import Paginator
 from django.db import transaction
 from django.utils import timezone
 
@@ -58,7 +57,8 @@ from dateutil.utils import today
 from redis.exceptions import LockError
 
 from etools_datamart.apps.etl.exceptions import MaxRecordsException, RequiredIsMissing, RequiredIsRunning
-from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, logger, RUN_UNKNOWN
+from etools_datamart.apps.etl.loader import BaseLoader, EtlResult, load_class, logger, RUN_UNKNOWN
+from etools_datamart.apps.etl.paginator import DatamartPaginator
 from etools_datamart.sentry import process_exception
 
 logger = get_task_logger(__name__)
@@ -107,6 +107,14 @@ class PrpBaseLoader(BaseLoader):
                         if requirement.loader.is_running():
                             raise RequiredIsRunning(requirement)
                         requirement.loader.check_refresh()
+
+                    for req_model_class_path in self.config.depends_as_str:
+                        model_cls = load_class(req_model_class_path)
+                        requirement = model_cls()
+                        if requirement.loader.is_running():
+                            raise RequiredIsRunning(requirement)
+                        requirement.loader.check_refresh()
+
                 self.mapping = {}
                 mart_fields = self.model._meta.concrete_fields
                 for field in mart_fields:
@@ -134,7 +142,7 @@ class PrpBaseLoader(BaseLoader):
                     batch_size = settings.RESULTSET_BATCH_SIZE
                     logger.debug(f"Batch size:{batch_size}")
 
-                    paginator = Paginator(qs, batch_size)
+                    paginator = DatamartPaginator(qs, batch_size)
                     for page_idx in paginator.page_range:
                         page = paginator.page(page_idx)
                         for record in page.object_list:

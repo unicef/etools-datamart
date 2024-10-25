@@ -27,6 +27,8 @@ class LocationsiteLoader(EtoolsLoader):
 
 
 class Locationsite(EtoolsDataMartModel):
+    # from etools_datamart.apps.mart.data.models import Location
+
     name = models.CharField(max_length=254)
     p_code = models.CharField(max_length=32)
     point = geomodels.PointField(blank=True, null=True)
@@ -37,6 +39,7 @@ class Locationsite(EtoolsDataMartModel):
 
     class Options:
         source = FieldMonitoringSettingsLocationsite
+        depends_as_str = ("etools_datamart.apps.mart.data.models.Location",)
         mapping = dict(
             parent="-",
         )
