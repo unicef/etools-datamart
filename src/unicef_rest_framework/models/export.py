@@ -142,7 +142,6 @@ class ExportAccessLog(models.Model):
     @classmethod
     def log_access(cls, export, username):
         import datetime
-        import json
 
         utc_now = datetime.datetime.utcnow()
         timestamp = utc_now.isoformat()
@@ -150,9 +149,7 @@ class ExportAccessLog(models.Model):
 
         try:
             access_log = cls.objects.get(export=export)
-            export_access_data = json.loads(access_log.access_history)
-            export_access_data.append(log_entry)
-            access_log.access_history = json.dumps(export_access_data)
+            access_log.access_history.append(log_entry)
             access_log.save()
         except cls.DoesNotExist:
             cls.objects.create(export=export, access_history=[log_entry])
