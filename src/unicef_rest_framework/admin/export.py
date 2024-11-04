@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin, register
@@ -160,11 +160,17 @@ class ExportAccessLogAdmin(admin.ModelAdmin):
             user = entry.get("u")
             timestamp_utc = entry.get("t")
             if timestamp_utc:
-                timestamp_local = timezone.localtime(timezone.datetime.fromtimestamp(timestamp_utc))
-                formatted_timestamp = timestamp_local.strftime("%Y-%m-%d %H:%M:%S")
-                formatted_history.append(f"{user}: {formatted_timestamp}")
+                try:
+                    # Parse the ISO 8601 string to a datetime object
+                    timestamp_utc = datetime.fromisoformat(timestamp_utc)
+                    timestamp_local = timezone.localtime(timezone.make_aware(timestamp_utc))
+                    formatted_timestamp = timestamp_local.strftime("%Y-%m-%d %H:%M:%S")
+                    formatted_history.append(f"{user}: {formatted_timestamp}")
+                except ValueError:
+                    # Handle cases where the timestamp format is incorrect
+                    formatted_history.append(f"{user}: Invalid timestamp")
 
-        return ",".join(formatted_history)
+        return ", ".join(formatted_history)
 
     display_access_history.short_description = "Export Access History"
     list_display = ("export", "display_access_history")
