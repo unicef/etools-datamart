@@ -20,17 +20,15 @@ def handle_task_failure(
 ):
     kw_str = ""
     if kw:
-        for key, value in kw.items():
-            if len(kw_str) == 0:
-                kw_str = f"{key}:{value}"
-            else:
-                kw_str += "|" + f"{key}: {value}"
+        kw_str = "|".join(f"{key}={value}" for key, value in kw.items())
 
-    failure_details = f"#Task:{task_id} with args:{args} failed \
-                       \n#Exception:{exception} \
-                       \n#Error info:|{einfo} \
-                       \n#Traceback:{traceback} \
-                       \n#kw:{kw_str}"
+    failure_details = (
+        f"# Task: {task_id} with args: {args}\n"
+        f"# Exception: {exception}\n"
+        f"# Error info: |{einfo}\n"
+        f"# Traceback:\n{traceback}\n"
+        f"# kw: {kw_str}"
+    )
 
     logger.error(f"Failure: {failure_details}")
 
