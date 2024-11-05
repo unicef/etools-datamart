@@ -1,7 +1,12 @@
 4.7.9
 ----
+Further improve Celery task failure error report
+
+4.7.8
+----
 Make groups parameter name consistent 
 
+4.7.7
 ----
 Hotfix for export access log to handle non-standard  date format
 
