@@ -18,8 +18,20 @@ logger = get_logger(__name__)
 def handle_task_failure(
     sender=None, task_id=None, exception=None, args=None, kwargs=None, traceback=None, einfo=None, **kw
 ):
-    failure_details = f"#Task: {task_id} failed  \n Exception:{exception} \n Error info:|{einfo} "
+    kw_str = ""
+    if kw:
+        kw_str = "|".join(f"{key}={value}" for key, value in kw.items())
+
+    failure_details = (
+        f"# Task: {task_id} with args: {args}\n"
+        f"# Exception: {exception}\n"
+        f"# Error info: |{einfo}\n"
+        f"# Traceback:\n{traceback}\n"
+        f"# kw: {kw_str}"
+    )
+
     logger.error(f"Failure: {failure_details}")
+
     with sentry_sdk.push_scope() as scope:
         scope.set_extra("celery_task_failure_details", failure_details)
         sentry_sdk.capture_exception(exception)
