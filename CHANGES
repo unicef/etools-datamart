@@ -1,3 +1,10 @@
+4.7.8
+----
+Make groups parameter name consistent 
+
+----
+Hotfix for export access log to handle non-standard  date format
+
 4.7.6
 ----
 * Missing dependencies for FMQuestionLoader, FMOntrack and LocationsiteLoader have been fixed.
