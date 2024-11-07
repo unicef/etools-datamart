@@ -198,7 +198,7 @@ class CountryNameFilter(BaseFilterBackend):
 
 
 class GroupNameFilter(BaseFilterBackend):
-    query_param = "group"
+    query_param = "groups"
     template = "api/group_filter.html"
 
     def get_query(self, request):
