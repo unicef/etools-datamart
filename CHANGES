@@ -1,3 +1,7 @@
+4.7.11
+----
+CI pipline improvements for version tagging.
+
 4.7.10
 ----
 Further improve Celery task failure error report

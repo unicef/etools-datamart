@@ -103,22 +103,27 @@ jobs:
             TAG=${CIRCLE_BRANCH}
             (docker pull unicef/datamart:$BASE_TAG) ||
             (docker build -t unicef/datamart:$BASE_TAG -f Dockerfile-installed . && docker push unicef/datamart:$BASE_TAG)
-            docker build --build-arg BASE_TAG=$BASE_TAG -t unicef/datamart:$TAG .
+            docker build --build-arg BASE_TAG=$BASE_TAG -t unicef/datamart:$TAG
       - run:
           name: Pushing to Docker Hub
           command: |
+            #VERSION="$(cat /x/y/z/__init__.py | grep VERSION | awk '{print $3}')"
+            VERSION="4.7.11"
             TAG=${CIRCLE_BRANCH}
             BASE_TAG="$(md5sum Pipfile.lock | cut -c1-6)$(md5sum Dockerfile-installed | cut -c1-6)"
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push unicef/datamart:$TAG
+            docker push unicef/datamart:$VERSION
             if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
-              docker tag unicef/datamart:$BASE_TAG unicef/datamart:latest
+              docker tag unicef/datamart:$TAG unicef/datamart:"dev-$VERSION"
+              docker push unicef/datamart:"dev-$VERSION"
+              docker tag unicef/datamart:$TAG unicef/datamart:latest
               docker push unicef/datamart:latest
             elif (echo "master" | grep -q "$CIRCLE_BRANCH"); then
-              docker tag unicef/datamart:$BASE_TAG unicef/datamart:latest_prod
+              docker tag unicef/datamart:$TAG unicef/datamart:"prod-$VERSION"
+              docker push unicef/datamart:"prod-$VERSION"
+              docker tag unicef/datamart:$TAG unicef/datamart:latest_prod
               docker push unicef/datamart:latest_prod
-              docker tag unicef/datamart:$BASE_TAG unicef/datamart:4.7.6
-              docker push unicef/datamart:4.7.6
             else
               echo "Not a followed branch not pushing latest"
             fi
