@@ -107,11 +107,15 @@ jobs:
       - run:
           name: Pushing to Docker Hub
           command: |
-            #VERSION="$(cat /x/y/z/__init__.py | grep VERSION | awk '{print $3}')"
+            echo "Current directory: $(pwd)"
+            echo "Files in current directory: $(ls -)"
+            VERSION=$(grep 'VERSION =' src/etools_datamart/__init__.py | awk '{print $5}')
+            echo "VERSION value is $VERSION"
             VERSION="4.7.11"
             TAG=${CIRCLE_BRANCH}
             BASE_TAG="$(md5sum Pipfile.lock | cut -c1-6)$(md5sum Dockerfile-installed | cut -c1-6)"
             docker login -u $DOCKER_USER -p $DOCKER_PASS
+            echo "TAG value is $TAG"
             docker push unicef/datamart:$TAG
             docker push unicef/datamart:$VERSION
             if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
