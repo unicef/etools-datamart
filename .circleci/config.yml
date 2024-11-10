@@ -103,12 +103,12 @@ jobs:
             TAG=${CIRCLE_BRANCH}
             (docker pull unicef/datamart:$BASE_TAG) ||
             (docker build -t unicef/datamart:$BASE_TAG -f Dockerfile-installed . && docker push unicef/datamart:$BASE_TAG)
-            docker build --build-arg BASE_TAG=$BASE_TAG -t unicef/datamart:$TAG
+            docker build --build-arg BASE_TAG=$BASE_TAG -t unicef/datamart:$TAG .
       - run:
           name: Pushing to Docker Hub
           command: |
             echo "Current directory: $(pwd)"
-            echo "Files in current directory: $(ls -)"
+            echo "Files in current directory: $(ls -l)"
             VERSION=$(grep 'VERSION =' src/etools_datamart/__init__.py | awk '{print $5}')
             echo "VERSION value is $VERSION"
             VERSION="4.7.11"
