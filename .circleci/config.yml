@@ -26,7 +26,6 @@ jobs:
               echo "Files in current directory: $(ls -l)"
               VERSION=$(grep 'VERSION =' src/etools_datamart/__init__.py | awk '{print $5}')
               echo "VERSION value is $VERSION"
-              VERSION="4.7.11"
               docker tag unicef/datamart:$TAG unicef/datamart:"tag-$VERSION"
               docker push unicef/datamart:"tag-$VERSION"
               if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
@@ -119,7 +118,6 @@ jobs:
             echo "Files in current directory: $(ls -l)"
             VERSION=$(grep 'VERSION =' src/etools_datamart/__init__.py | awk '{print $5}')
             echo "VERSION value is $VERSION"
-            VERSION="4.7.11"
             TAG=${CIRCLE_BRANCH}
             BASE_TAG="$(md5sum Pipfile.lock | cut -c1-6)$(md5sum Dockerfile-installed | cut -c1-6)"
             docker login -u $DOCKER_USER -p $DOCKER_PASS
