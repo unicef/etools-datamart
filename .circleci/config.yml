@@ -117,17 +117,24 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             echo "TAG value is $TAG"
             docker push unicef/datamart:$TAG
-            docker push unicef/datamart:$VERSION
+            docker tag unicef/datamart:$TAG unicef/datamart:"tag-$VERSION"
+            docker push unicef/datamart:"tag-$VERSION"
+            docker tag unicef/datamart:$BASE_TAG unicef/datamart:"base_tag-$VERSION"
+            docker push unicef/datamart:"base_tag-$VERSION"
             if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
               docker tag unicef/datamart:$TAG unicef/datamart:"dev-$VERSION"
               docker push unicef/datamart:"dev-$VERSION"
-              docker tag unicef/datamart:$TAG unicef/datamart:latest
-              docker push unicef/datamart:latest
+              docker tag unicef/datamart:$TAG unicef/datamart:dev-latest
+              docker push unicef/datamart:dev-latest
+              docker tag unicef/datamart:$BASE_TAG unicef/datamart:base-dev-latest
+              docker push unicef/datamart:base-dev-latest
             elif (echo "master" | grep -q "$CIRCLE_BRANCH"); then
               docker tag unicef/datamart:$TAG unicef/datamart:"prod-$VERSION"
               docker push unicef/datamart:"prod-$VERSION"
               docker tag unicef/datamart:$TAG unicef/datamart:latest_prod
               docker push unicef/datamart:latest_prod
+              docker tag unicef/datamart:$BASE_TAG unicef/datamart:base-prod-latest
+              docker push unicef/datamart:base-prod-latest
             else
               echo "Not a followed branch not pushing latest"
             fi
