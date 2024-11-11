@@ -27,8 +27,8 @@ jobs:
               VERSION=$(grep 'VERSION =' src/etools_datamart/__init__.py | awk '{print $5}')
               VERSION=${VERSION//\"}
               echo "VERSION value is $VERSION"
-              docker tag unicef/datamart:$TAG unicef/datamart:"tag-$VERSION"
-              docker push unicef/datamart:"tag-$VERSION"
+              docker tag unicef/datamart:$TAG unicef/datamart:"cand-tag-$VERSION"
+              docker push unicef/datamart:"cand-tag-$VERSION"
               if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
                 docker tag unicef/datamart:$BASE_TAG unicef/datamart:latest
                 docker push unicef/datamart:latest
