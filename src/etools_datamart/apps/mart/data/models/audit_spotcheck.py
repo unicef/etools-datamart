@@ -69,6 +69,7 @@ class SpotCheckLoader(EngagementMixin, EtoolsLoader):
             - record.additional_supporting_documentation_provided
             - record.justification_provided_and_accepted
             - record.write_off_required
+            - record.amount_refunded
         )
 
 
