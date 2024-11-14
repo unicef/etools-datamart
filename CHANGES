@@ -1,3 +1,12 @@
+4.7.12
+----
+Formula for SpotCheckFindings.pending_unsupported_amount has been updated as below;
+    = audit_spotcheck.total_amount_of_ineligible_expenditure
+      audit_engagement.additional_supporting_documentation_provided
+      audit_engagement.justification_provided_and_accepted
+      audit_engagement.write_off_required
+      audit_engagement.amount_refunded
+      
 4.7.11
 ----
 CI pipline improvements for version tagging.
