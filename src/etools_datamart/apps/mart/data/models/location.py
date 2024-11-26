@@ -11,6 +11,34 @@ from etools_datamart.apps.sources.etools.models import LocationsLocation
 
 from ..loader import EtoolsLoader
 
+"""
+-- Set country; 
+SET search_path = public,<country>
+-- Get count for paging calculation;
+SELECT COUNT(*) AS "__count" FROM "locations_location"
+-- Paged fetch;
+SELECT '<country>' AS __schema, 
+       "locations_location"."id",
+       "locations_location"."name",
+       "locations_location"."latitude",
+       "locations_location"."longitude",
+       "locations_location"."p_code",
+       "locations_location"."point",
+       "locations_location"."geom",
+       "locations_location"."level",
+       "locations_location"."lft",
+       "locations_location"."parent_id",
+       "locations_location"."rght",
+       "locations_location"."tree_id",
+       "locations_location"."created",
+       "locations_location"."modified",
+       "locations_location"."is_active",
+       "locations_location"."admin_level",
+       "locations_location"."admin_level_name" 
+FROM "locations_location" 
+ORDER BY "locations_location"."id" ASC
+"""
+
 
 class LocationQuerySet(DataMartQuerySet):
     def batch_update_centroid(self):

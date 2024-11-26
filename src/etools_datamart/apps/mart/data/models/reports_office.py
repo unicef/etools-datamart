@@ -12,6 +12,16 @@ class OfficeLoader(EtoolsLoader):
 
 class Office(EtoolsDataMartModel):
     name = models.CharField(max_length=254, null=True, blank=True)
+    """
+    SET search_path = public, <country>
+    SELECT COUNT(*) AS "__count" FROM "reports_office"
+    
+    SELECT '<country>' AS __schema, 
+           "reports_office"."id", 
+           "reports_office"."name" 
+    FROM "reports_office" 
+    ORDER BY "reports_office"."id" ASC
+    """
 
     loader = OfficeLoader()
 
