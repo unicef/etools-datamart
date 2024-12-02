@@ -30,7 +30,7 @@ from etools_datamart.libs.time import strfelapsed
 from etools_datamart.sentry import process_exception
 
 from . import models
-from .loader import RUN_QUEUED, RUN_UNKNOWN
+from .loader import RUN_QUEUED, RUN_UNKNOWN, RUN_CANCELED
 
 cache = caches["default"]
 
@@ -40,6 +40,13 @@ def queue(modeladmin, request, queryset):
     for obj in queryset:
         modeladmin.queue(modeladmin, request, pk=obj.pk)
     modeladmin.message_user(request, "{0} task{1} queued".format(count, pluralize(count)), messages.SUCCESS)
+
+
+def cancel(modeladmin, request, queryset):
+    count = len(queryset)
+    for obj in queryset:
+        modeladmin.cancel(modeladmin, request, pk=obj.pk)
+    modeladmin.message_user(request, "{0} task{1} canceled".format(count, pluralize(count)), messages.SUCCESS)
 
 
 def unlock(modeladmin, request, queryset):
@@ -138,6 +145,7 @@ class EtlTaskAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         "_last_failure",
         "unlock_task",
         "queue_task",
+        "cancel_task",
         "data",
     )
     date_hierarchy = "last_run"
@@ -230,6 +238,16 @@ class EtlTaskAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
     queue_task.verbose_name = "queue"
 
+    def cancel_task(self, obj):
+        opts = self.model._meta
+        # TODO: if tasks is still in the queue or running enable the link
+        #      Otherwise no active link
+        url = reverse("admin:%s_%s_cancel" % (opts.app_label, opts.model_name), args=[obj.id])
+        # return format_html(f'<a href="{url}">cancel</a>')
+        return format_html("")
+
+    cancel_task.verbose_name = "cancel"
+
     def unlock_task(self, obj):
         if obj.content_type:
             locked = obj.content_type.model_class().loader.is_locked
@@ -319,9 +337,34 @@ class EtlTaskAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
         return HttpResponseRedirect(reverse("admin:etl_etltask_changelist"))
 
+    def _cancel(self, request, pk, sync):
+        obj = self.get_object(request, pk)
+        try:
+            # TODO: Check the status just before if it is still cancelable
+
+            obj.status = "CANCELED"
+            obj.elapsed = None
+            obj.save()
+            task = app.tasks.get(obj.task)
+            # TODO: Alternative way to
+
+            if sync:
+                task(run_type=RUN_CANCELED)
+            else:
+                task.delay(run_type=RUN_CANCELED)
+            self.message_user(request, f"Task '{obj.task}' canceled", messages.SUCCESS)
+        except Exception as e:  # pragma: no cover
+            process_exception(e)
+            self.message_user(request, f"Cannot queue '{obj.task}': {e}", messages.ERROR)
+        return HttpResponseRedirect(reverse("admin:etl_etltask_changelist"))
+
     @button()
     def queue(self, request, pk):
         return self._execute(request, pk, sync=False)
+
+    @button()
+    def cancel(self, request, pk):
+        return self._cancel(request, pk, sync=False)
 
     @button()
     def run(self, request, pk):
