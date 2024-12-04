@@ -6,23 +6,27 @@ from etools_datamart.apps.sources.etools.models import ReportsOffice
 
 
 class OfficeLoader(EtoolsLoader):
+    """
+    -- Office queries;
+    -- To be run per country schema
+    SET search_path = public,##COUNTRY##
+    -- Count for paging
+    SELECT COUNT(*) AS "__count" FROM "reports_office"
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "reports_office"."id",
+           "reports_office"."name"
+    FROM "reports_office"
+    ORDER BY "reports_office"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+    """
+
     def get_queryset(self):
         return ReportsOffice.objects.all()
 
 
 class Office(EtoolsDataMartModel):
     name = models.CharField(max_length=254, null=True, blank=True)
-    """
-    SET search_path = public, <country>
-    SELECT COUNT(*) AS "__count" FROM "reports_office"
-    
-    SELECT '<country>' AS __schema, 
-           "reports_office"."id", 
-           "reports_office"."name" 
-    FROM "reports_office" 
-    ORDER BY "reports_office"."id" ASC
-    """
-
     loader = OfficeLoader()
 
     class Options:

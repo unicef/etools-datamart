@@ -103,7 +103,7 @@ class SpotCheckLoader(EngagementMixin, EtoolsLoader):
     INNER JOIN "purchase_order_purchaseorder" ON ("audit_engagement"."agreement_id" = "purchase_order_purchaseorder"."id")
     INNER JOIN "purchase_order_auditorfirm" ON ("purchase_order_purchaseorder"."auditor_firm_id" = "purchase_order_auditorfirm"."id")
     INNER JOIN "organizations_organization" ON ("purchase_order_auditorfirm"."organization_id" = "organizations_organization"."id")
-    ORDER BY "audit_spotcheck"."engagement_ptr_id" ASC LIMIT ##PAGE_SIZE## OFSET ##PAGE_OFSET##;
+    ORDER BY "audit_spotcheck"."engagement_ptr_id" ASC LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
 
 
     SELECT '##COUNTRY##' AS __schema,
