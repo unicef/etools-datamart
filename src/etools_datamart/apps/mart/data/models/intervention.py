@@ -239,8 +239,9 @@ class InterventionLoader(NestedLocationLoaderMixin, EtoolsLoader):
             "users_country"."custom_dashboards" FROM
             "users_country" WHERE "users_country"."schema_name" = '##COUNTRY##' LIMIT 21
 
+    -- Set country schema
+    SET search_path = public, ##COUNTRY##;
     -- TODO: Pick only the required fields
-    SET search_path = public, albania;
     SELECT '##COUNTRY##' AS __schema,
         "partners_intervention"."id",
         "partners_intervention"."created",
@@ -858,6 +859,434 @@ class Intervention(NestedLocationMixin, InterventionAbstract, EtoolsDataMartMode
 
 
 class InterventionByLocationLoader(InterventionLoader):
+    """
+    -- To select the country schema
+    SET search_path = public,##COUNTRY##;
+
+    -- Count for paging
+    SELECT COUNT(*) AS "__count" FROM "partners_intervention"
+
+    -- Paged retreival
+    -- TODO: Determine the minimal number of fields.
+    SELECT 'afghanistan' AS __schema,
+           "partners_intervention"."id",
+           "partners_intervention"."created",
+           "partners_intervention"."modified",
+           "partners_intervention"."document_type",
+           "partners_intervention"."number",
+           "partners_intervention"."title",
+           "partners_intervention"."status",
+           "partners_intervention"."start",
+           "partners_intervention"."end",
+           "partners_intervention"."submission_date",
+           "partners_intervention"."submission_date_prc",
+           "partners_intervention"."review_date_prc",
+           "partners_intervention"."prc_review_document",
+           "partners_intervention"."signed_by_unicef_date",
+           "partners_intervention"."signed_by_partner_date",
+           "partners_intervention"."population_focus",
+           "partners_intervention"."agreement_id",
+           "partners_intervention"."unicef_signatory_id",
+           "partners_intervention"."signed_pd_document",
+           "partners_intervention"."country_programme_id",
+           "partners_intervention"."contingency_pd",
+           "partners_intervention"."metadata",
+           "partners_intervention"."in_amendment",
+           "partners_intervention"."reference_number_year",
+           "partners_intervention"."activation_letter",
+           "partners_intervention"."termination_doc",
+           "partners_intervention"."cfei_number",
+           "partners_intervention"."budget_owner_id",
+           "partners_intervention"."context",
+           "partners_intervention"."date_sent_to_partner",
+           "partners_intervention"."equity_narrative",
+           "partners_intervention"."equity_rating",
+           "partners_intervention"."gender_narrative",
+           "partners_intervention"."gender_rating",
+           "partners_intervention"."hq_support_cost",
+           "partners_intervention"."implementation_strategy",
+           "partners_intervention"."ip_program_contribution",
+           "partners_intervention"."partner_accepted",
+           "partners_intervention"."sustainability_narrative",
+           "partners_intervention"."sustainability_rating",
+           "partners_intervention"."unicef_accepted",
+           "partners_intervention"."unicef_court",
+           "partners_intervention"."unicef_review_type",
+           "partners_intervention"."humanitarian_flag",
+           "partners_intervention"."capacity_development",
+           "partners_intervention"."other_info",
+           "partners_intervention"."other_partners_involved",
+           "partners_intervention"."technical_guidance",
+           "partners_intervention"."cash_transfer_modalities",
+           "partners_intervention"."cancel_justification",
+           "partners_intervention"."date_partnership_review_performed",
+           "partners_intervention"."accepted_on_behalf_of_partner",
+           "partners_intervention"."activation_protocol",
+           "partners_intervention"."confidential",
+           "partners_intervention"."has_activities_involving_children",
+           "partners_intervention"."has_data_processing_agreement",
+           "partners_intervention"."has_special_conditions_for_construction",
+           "partners_intervention"."final_review_approved",
+           "partners_intervention"."other_details",
+           "partners_intervention"."partner_authorized_officer_signatory_id",
+
+           "partners_agreement"."id",
+           "partners_agreement"."created",
+           "partners_agreement"."modified",
+           "partners_agreement"."start",
+           "partners_agreement"."end",
+           "partners_agreement"."agreement_type",
+           "partners_agreement"."agreement_number",
+           "partners_agreement"."attached_agreement",
+           "partners_agreement"."signed_by_unicef_date",
+           "partners_agreement"."signed_by_partner_date",
+           "partners_agreement"."partner_id",
+           "partners_agreement"."signed_by_id",
+           "partners_agreement"."status",
+           "partners_agreement"."country_programme_id",
+           "partners_agreement"."reference_number_year",
+           "partners_agreement"."special_conditions_pca",
+           "partners_agreement"."terms_acknowledged_by_id",
+           "partners_agreement"."partner_manager_id",
+
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date",
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name",
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id",
+
+           "organizations_organization"."id",
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id",
+
+           "auth_user"."id",
+           "auth_user"."password",
+           "auth_user"."last_login",
+           "auth_user"."is_superuser",
+           "auth_user"."username",
+           "auth_user"."first_name",
+           "auth_user"."last_name",
+           "auth_user"."email",
+           "auth_user"."is_staff",
+           "auth_user"."is_active",
+           "auth_user"."date_joined",
+           "auth_user"."middle_name",
+           "auth_user"."created",
+           "auth_user"."modified",
+           "auth_user"."preferences",
+
+           "reports_countryprogramme"."id",
+           "reports_countryprogramme"."name",
+           "reports_countryprogramme"."wbs",
+           "reports_countryprogramme"."from_date",
+           "reports_countryprogramme"."to_date",
+           "reports_countryprogramme"."invalid",
+
+           AO."id",
+           AO."password",
+           AO."last_login",
+           AO."is_superuser",
+           AO."username",
+           AO."first_name",
+           AO."last_name",
+           AO."email",
+           AO."is_staff",
+           AO."is_active",
+           AO."date_joined",
+           AO."middle_name",
+           AO."created",
+           AO."modified",
+           AO."preferences"
+    FROM "partners_intervention"
+          INNER JOIN "partners_agreement" ON ("partners_intervention"."agreement_id" = "partners_agreement"."id")
+          INNER JOIN "partners_partnerorganization" ON ("partners_agreement"."partner_id" = "partners_partnerorganization"."id")
+          INNER JOIN "organizations_organization" ON ("partners_partnerorganization"."organization_id" = "organizations_organization"."id")
+          LEFT OUTER JOIN "auth_user" ON ("partners_intervention"."unicef_signatory_id" = "auth_user"."id")
+          LEFT OUTER JOIN "reports_countryprogramme" ON ("partners_intervention"."country_programme_id" = "reports_countryprogramme"."id")
+          LEFT OUTER JOIN "auth_user" AO ON ("partners_intervention"."partner_authorized_officer_signatory_id" = AO."id")
+    ORDER BY "partners_intervention"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##
+
+
+    --
+    SELECT "partners_interventionbudget"."id",
+           "partners_interventionbudget"."partner_contribution",
+           "partners_interventionbudget"."unicef_cash",
+           "partners_interventionbudget"."in_kind_amount",
+           "partners_interventionbudget"."partner_contribution_local",
+           "partners_interventionbudget"."unicef_cash_local",
+           "partners_interventionbudget"."in_kind_amount_local",
+           "partners_interventionbudget"."total",
+           "partners_interventionbudget"."intervention_id",
+           "partners_interventionbudget"."total_local",
+           "partners_interventionbudget"."currency"
+    FROM "partners_interventionbudget"
+    WHERE "partners_interventionbudget"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE## )
+
+
+    --
+    SELECT "partners_interventionamendment"."id",
+           "partners_interventionamendment"."signed_date",
+           "partners_interventionamendment"."intervention_id",
+           "partners_interventionamendment"."types"
+    FROM "partners_interventionamendment"
+    WHERE "partners_interventionamendment"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##)
+    ORDER BY "partners_interventionamendment"."signed_date" ASC;
+
+    --
+    SELECT "funds_fundsreservationheader"."id",
+           "funds_fundsreservationheader"."fr_number",
+           "funds_fundsreservationheader"."intervention_id",
+           "funds_fundsreservationheader"."outstanding_amt_local"
+    FROM "funds_fundsreservationheader"
+    WHERE "funds_fundsreservationheader"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##);
+
+
+    --
+    SELECT "partners_interventionattachment"."id",
+           "partners_interventionattachment"."intervention_id",
+           "partners_interventionattachment"."type_id"
+    FROM "partners_interventionattachment"
+    WHERE "partners_interventionattachment"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##);
+
+
+    --
+    SELECT "partners_interventionplannedvisits"."id",
+           "partners_interventionplannedvisits"."intervention_id",
+           "partners_interventionplannedvisits"."programmatic_q1",
+           "partners_interventionplannedvisits"."programmatic_q2",
+           "partners_interventionplannedvisits"."programmatic_q3"
+    FROM "partners_interventionplannedvisits"
+    WHERE ("partners_interventionplannedvisits"."year" = ##YEAR##
+    AND "partners_interventionplannedvisits"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##));
+
+
+    --
+    SELECT "t2f_travelactivity"."id",
+           "t2f_travelactivity"."travel_type",
+           "t2f_travelactivity"."date",
+           "t2f_travelactivity"."partnership_id"
+    FROM "t2f_travelactivity"
+    INNER JOIN "t2f_travelactivity_travels" ON ("t2f_travelactivity"."id" = "t2f_travelactivity_travels"."travelactivity_id")
+    INNER JOIN "t2f_travel" ON ("t2f_travelactivity_travels"."travel_id" = "t2f_travel"."id")
+    WHERE ("t2f_travelactivity"."date" IS NOT NULL
+           AND "t2f_travelactivity"."travel_type" = 'Programmatic Visit'
+           AND "t2f_travel"."status" = 'completed'
+           AND "t2f_travelactivity"."partnership_id" IN (##PARTNERSHIP_IDs_IN_THE_PAGE##))
+    ORDER BY "t2f_travelactivity"."date" DESC;
+
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_interventionresultlink"."id",
+           "partners_interventionresultlink"."cp_output_id",
+           "partners_interventionresultlink"."intervention_id",
+           "partners_interventionresultlink"."created",
+           "partners_interventionresultlink"."modified",
+           "partners_interventionresultlink"."code"
+    FROM "partners_interventionresultlink"
+    WHERE "partners_interventionresultlink"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##);
+
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "reports_lowerresult"."id",
+           "reports_lowerresult"."name",
+           "reports_lowerresult"."code",
+           "reports_lowerresult"."result_link_id",
+           "reports_lowerresult"."created",
+           "reports_lowerresult"."modified",
+           "reports_lowerresult"."is_active"
+    FROM "reports_lowerresult"
+    WHERE "reports_lowerresult"."result_link_id" IN (##INTERVENTION__RESULT_LINK_IDs_IN_THE_PAGE##);
+
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "reports_appliedindicator"."id",
+           "reports_appliedindicator"."context_code",
+           "reports_appliedindicator"."assumptions",
+           "reports_appliedindicator"."total",
+           "reports_appliedindicator"."indicator_id",
+           "reports_appliedindicator"."lower_result_id",
+           "reports_appliedindicator"."means_of_verification",
+           "reports_appliedindicator"."cluster_indicator_id",
+           "reports_appliedindicator"."cluster_indicator_title",
+           "reports_appliedindicator"."cluster_name",
+           "reports_appliedindicator"."created",
+           "reports_appliedindicator"."modified",
+           "reports_appliedindicator"."response_plan_name",
+           "reports_appliedindicator"."section_id",
+           "reports_appliedindicator"."is_active",
+           "reports_appliedindicator"."is_high_frequency",
+           "reports_appliedindicator"."baseline",
+           "reports_appliedindicator"."denominator_label",
+           "reports_appliedindicator"."label",
+           "reports_appliedindicator"."measurement_specifications",
+           "reports_appliedindicator"."numerator_label",
+           "reports_appliedindicator"."target"
+    FROM "reports_appliedindicator"
+    WHERE "reports_appliedindicator"."lower_result_id" IN (##REPORTS_LOWERRESULT_IDs_IN_THE_PAGE##);
+
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_intervention_sections"."id",
+           "partners_intervention_sections"."intervention_id",
+           "partners_intervention_sections"."section_id"
+    FROM "partners_intervention_sections"
+    WHERE "partners_intervention_sections"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##);
+
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_intervention_offices"."id",
+           "partners_intervention_offices"."intervention_id",
+           "partners_intervention_offices"."office_id"
+    FROM "partners_intervention_offices"
+    WHERE "partners_intervention_offices"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##)
+    ORDER BY "partners_intervention_offices"."id" ASC;
+
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_intervention_unicef_focal_points"."id",
+           "partners_intervention_unicef_focal_points"."intervention_id",
+           "partners_intervention_unicef_focal_points"."user_id"
+    FROM "partners_intervention_unicef_focal_points"
+    WHERE "partners_intervention_unicef_focal_points"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##);
+
+
+    -- auth_user for  partners_intervention_unicef_focal_points
+    SELECT "auth_user"."id",
+           "auth_user"."username",
+           "auth_user"."first_name",
+           "auth_user"."last_name",
+           "auth_user"."email"
+    FROM "auth_user" WHERE "auth_user"."id" IN (##LIST OF partners_intervention_unicef_focal_points"."user_id IN THE PAGE##)
+
+
+    --
+    SELECT "partners_intervention_partner_focal_points"."id",
+           "partners_intervention_partner_focal_points"."intervention_id",
+           "partners_intervention_partner_focal_points"."user_id"
+    FROM "partners_intervention_partner_focal_points"
+    WHERE "partners_intervention_partner_focal_points"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##);
+
+
+    -- auth_use for partners_intervention_partner_focal_points
+    SELECT "auth_user"."id",
+           "auth_user"."username",
+           "auth_user"."first_name",
+           "auth_user"."last_name",
+           "auth_user"."email"
+    FROM "auth_user"
+    WHERE "auth_user"."id" IN (##LIST OF "partners_intervention_partner_focal_points"."user_id" IN THE PAGE ##)
+
+
+    -- ????
+    SELECT "users_userprofile"."id",
+           "users_userprofile"."phone_number",
+           "users_userprofile"."user_id"
+    FROM "users_userprofile"
+    WHERE "users_userprofile"."user_id" IN (?????)
+
+
+    --
+    SELECT "partners_intervention_flat_locations"."id",
+           "partners_intervention_flat_locations"."intervention_id",
+           "partners_intervention_flat_locations"."location_id"
+    FROM "partners_intervention_flat_locations"
+    WHERE "partners_intervention_flat_locations"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##)
+
+
+    --
+    SELECT "locations_location"."id",
+           "locations_location"."name",
+           "locations_location"."latitude",
+           "locations_location"."longitude",
+           "locations_location"."p_code",
+           "locations_location"."admin_level",
+           "locations_location"."admin_level_name"
+    FROM "locations_location" WHERE "locations_location"."id" IN (##LIST OF "partners_intervention_flat_locations"."location_id IN THE PAGE##)
+
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_interventionreview"."id",
+           "partners_interventionreview"."created",
+           "partners_interventionreview"."modified",
+           "partners_interventionreview"."review_type",
+           "partners_interventionreview"."overall_approval",
+           "partners_interventionreview"."amendment_id",
+           "partners_interventionreview"."intervention_id",
+           "partners_interventionreview"."actions_list",
+           "partners_interventionreview"."budget_is_aligned",
+           "partners_interventionreview"."ges_considered",
+           "partners_interventionreview"."meeting_date",
+           "partners_interventionreview"."overall_approver_id",
+           "partners_interventionreview"."overall_comment",
+           "partners_interventionreview"."partner_comparative_advantage",
+           "partners_interventionreview"."pd_is_guided",
+           "partners_interventionreview"."pd_is_relevant",
+           "partners_interventionreview"."relationship_is_represented",
+           "partners_interventionreview"."relationships_are_positive",
+           "partners_interventionreview"."supply_issues_considered",
+           "partners_interventionreview"."submitted_by_id",
+           "partners_interventionreview"."review_date",
+           "partners_interventionreview"."sent_back_comment"
+    FROM "partners_interventionreview"
+    WHERE "partners_interventionreview"."intervention_id" IN (##PARTNER_INTERVENTION_IDs_IN_THE_PAGE##)
+
+    --
+    SELECT "reports_result"."id",
+           "reports_result"."name",
+           "reports_result"."wbs"
+    FROM "reports_result"
+    WHERE "reports_result"."id" IN (????)
+    """
+
     def get_values(self, record):
         values = super().get_values(record)
         values["location"] = Location.objects.filter(
