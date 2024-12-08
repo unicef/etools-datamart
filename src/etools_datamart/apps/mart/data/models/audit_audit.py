@@ -25,8 +25,10 @@ class AuditLoader(EngagementMixin, EtoolsLoader):
     """
     -- Set country schema
     SET search_path = public, ##COUNTRY##;
+
     -- Count for paging;
     SELECT COUNT(*) AS "__count" FROM "audit_audit";
+
     -- Audit
     SELECT '##COUNTRY##' AS __schema,
            "audit_audit"."engagement_ptr_id",
@@ -168,6 +170,7 @@ class AuditLoader(EngagementMixin, EtoolsLoader):
     FROM   "audit_engagement_offices"
     WHERE "audit_engagement_sections"."engagement_id" in  (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##);
 
+
     --Audit Financial Findings: Summing can be left to (T)ransform stage
     SELECT "audit_financialfinding"."audit_id",
             SUM("audit_financialfinding"."amount") as amount_sum
@@ -211,7 +214,6 @@ class AuditLoader(EngagementMixin, EtoolsLoader):
     WHERE "action_points_actionpoint"."engagement_id" in (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##)
     GROUP BY "action_points_actionpoint"."engagement_id", "categories_category"."description"
     ORDER BY "action_points_actionpoint"."engagement_id", "categories_category"."description" ASC
-
     """
 
     def process_country(self):
