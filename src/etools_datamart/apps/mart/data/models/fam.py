@@ -17,6 +17,142 @@ from etools_datamart.apps.sources.etools.models import (
 
 
 class FAMIndicatorLoader(EtoolsLoader):
+    """
+    --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_spotcheck"
+    INNER JOIN "audit_engagement" ON ("audit_spotcheck"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'partner_contacted');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_spotcheck"
+    INNER JOIN "audit_engagement" ON ("audit_spotcheck"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'report_submitted');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_spotcheck"
+    INNER JOIN "audit_engagement" ON ("audit_spotcheck"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'final');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_spoteck"
+    INNER JOIN "audit_engagement" ON ("audit_spotcheck"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'cancelled');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_audit"
+    INNER JOIN "audit_engagement" ON ("audit_audit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'partner_contacted');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_audit"
+    INNER JOIN "audit_engagement" ON ("audit_audit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND     "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'report_submitted');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_audit"
+    INNER JOIN "audit_engagement" ON ("audit_audit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'final');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_audit"
+    INNER JOIN "audit_engagement" ON ("audit_audit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'cancelled');
+
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_specialaudit"
+    INNER JOIN "audit_engagement" ON ("audit_specialaudit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'partner_contacted');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_specialaudit"
+    INNER JOIN "audit_engagement" ON ("audit_specialaudit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'report_submitted');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_specialaudit"
+    INNER JOIN "audit_engagement" ON ("audit_specialaudit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'final');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_specialaudit"
+    INNER JOIN "audit_engagement" ON ("audit_specialaudit"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'cancelled');
+
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_microassessment"
+    INNER JOIN "audit_engagement" ON ("audit_microassessment"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'partner_contacted')
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_microassessment"
+    INNER JOIN "audit_engagement" ON ("audit_microassessment"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'report_submitted')
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_microassessment"
+    INNER JOIN "audit_engagement" ON ("audit_microassessment"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'final')
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_microassessment"
+    INNER JOIN "audit_engagement" ON ("audit_microassessment"."engagement_ptr_id" = "audit_engagement"."id")
+    WHERE (EXTRACT(MONTH FROM "audit_engagement"."start_date") = ##CURRENT_MONTH##
+    AND "audit_engagement"."start_date" BETWEEN '##YEAR##-01-01'::date AND '##YEAR##-12-31'::date
+    AND "audit_engagement"."status" = 'cancelled')
+
+    """
+
     PARTNER_CONTACTED = "partner_contacted"
     REPORT_SUBMITTED = "report_submitted"
     FINAL = "final"
