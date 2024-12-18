@@ -1,3 +1,8 @@
+4.7.13
+----
+* Improved FMQuestion and FMOntrack loaders to extract latitude and longitude from 
+Location.point when Location.longitude and Location.latitude.
+
 4.7.12
 ----
 Formula for SpotCheckFindings.pending_unsupported_amount has been updated as below;
