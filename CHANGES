@@ -1,4 +1,4 @@
-4.7.7.h1
+4.7.7.1
 ----
 * Hotfix to extract latitute and longtitute from Location.point when Location.longtitute aand
 Location.latitute
