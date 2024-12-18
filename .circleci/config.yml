@@ -21,6 +21,14 @@ jobs:
             else
               docker build -t unicef/datamart:$BASE_TAG -f Dockerfile-installed .
               docker push unicef/datamart:$BASE_TAG
+              docker build --build-arg BASE_TAG=$BASE_TAG -t unicef/datamart:$TAG .
+              echo "Current directory: $(pwd)"
+              echo "Files in current directory: $(ls -l)"
+              VERSION=$(grep 'VERSION =' src/etools_datamart/__init__.py | awk '{print $5}')
+              VERSION=${VERSION//\"}
+              echo "VERSION value is $VERSION"
+              docker tag unicef/datamart:$TAG unicef/datamart:"cand-tag-$VERSION"
+              docker push unicef/datamart:"cand-tag-$VERSION"
               if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
                 docker tag unicef/datamart:$BASE_TAG unicef/datamart:latest
                 docker push unicef/datamart:latest
@@ -107,18 +115,34 @@ jobs:
       - run:
           name: Pushing to Docker Hub
           command: |
+            echo "Current directory: $(pwd)"
+            echo "Files in current directory: $(ls -l)"
+            VERSION=$(grep 'VERSION =' src/etools_datamart/__init__.py | awk '{print $5}')
+            VERSION=${VERSION//\"}
+            echo "VERSION value is $VERSION"
             TAG=${CIRCLE_BRANCH}
             BASE_TAG="$(md5sum Pipfile.lock | cut -c1-6)$(md5sum Dockerfile-installed | cut -c1-6)"
             docker login -u $DOCKER_USER -p $DOCKER_PASS
+            echo "TAG value is $TAG"
             docker push unicef/datamart:$TAG
+            docker tag unicef/datamart:$TAG unicef/datamart:"tag-$VERSION"
+            docker push unicef/datamart:"tag-$VERSION"
+            docker tag unicef/datamart:$BASE_TAG unicef/datamart:"base_tag-$VERSION"
+            docker push unicef/datamart:"base_tag-$VERSION"
             if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
-              docker tag unicef/datamart:$BASE_TAG unicef/datamart:latest
-              docker push unicef/datamart:latest
+              docker tag unicef/datamart:$TAG unicef/datamart:"dev-$VERSION"
+              docker push unicef/datamart:"dev-$VERSION"
+              docker tag unicef/datamart:$TAG unicef/datamart:dev-latest
+              docker push unicef/datamart:dev-latest
+              docker tag unicef/datamart:$BASE_TAG unicef/datamart:base-dev-latest
+              docker push unicef/datamart:base-dev-latest
             elif (echo "master" | grep -q "$CIRCLE_BRANCH"); then
-              docker tag unicef/datamart:$BASE_TAG unicef/datamart:latest_prod
+              docker tag unicef/datamart:$TAG unicef/datamart:"prod-$VERSION"
+              docker push unicef/datamart:"prod-$VERSION"
+              docker tag unicef/datamart:$TAG unicef/datamart:latest_prod
               docker push unicef/datamart:latest_prod
-              docker tag unicef/datamart:$BASE_TAG unicef/datamart:4.7.6
-              docker push unicef/datamart:4.7.6
+              docker tag unicef/datamart:$BASE_TAG unicef/datamart:base-prod-latest
+              docker push unicef/datamart:base-prod-latest
             else
               echo "Not a followed branch not pushing latest"
             fi

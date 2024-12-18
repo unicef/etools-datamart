@@ -25,6 +25,24 @@ from etools_datamart.apps.sources.etools.models import (
 logger = get_task_logger(__name__)
 
 
+def extract_latitude(location):
+    if location.latitude is not None:
+        return location.latitude
+    elif location.point is not None:
+        return location.point.y
+    else:
+        return None
+
+
+def extract_longitude(location):
+    if location.longitude is not None:
+        return location.latitude
+    elif location.point is not None:
+        return location.point.x
+    else:
+        return None
+
+
 class FMQuestionLoader(EtoolsLoader):
     """Loader for FM Questions"""
 
@@ -244,8 +262,8 @@ class FMQuestionLoader(EtoolsLoader):
                 "admin_level": instance.admin_level,
                 "source_id": instance.source_id,
                 "location_type": instance.admin_level_name,
-                "latitude": instance.latitude,
-                "longitude": instance.longitude,
+                "latitude": extract_latitude(instance),
+                "longitude": extract_longitude(instance),
             }
         except Location.DoesNotExist:
             return {key: "N/A" for key in loc_fields}
@@ -486,8 +504,8 @@ class FMOntrackLoader(EtoolsLoader):
                 "admin_level": instance.admin_level,
                 "source_id": instance.source_id,
                 "location_type": instance.admin_level_name,
-                "latitude": instance.latitude,
-                "longitude": instance.longitude,
+                "latitude": extract_latitude(instance),
+                "longitude": extract_longitude(instance),
             }
         except Location.DoesNotExist:
             return {key: "N/A" for key in loc_fields}

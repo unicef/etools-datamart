@@ -1,3 +1,9 @@
+4.7.7.h1
+----
+* Hotfix to extract latitute and longtitute from Location.point when Location.longtitute aand
+Location.latitute
+* Also, CI script has been updated to use 
+
 4.7.6
 ----
 * Missing dependencies for FMQuestionLoader, FMOntrack and LocationsiteLoader have been fixed.
