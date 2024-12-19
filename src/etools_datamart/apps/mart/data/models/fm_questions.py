@@ -38,7 +38,7 @@ def extract_latitude(location):
 
 def extract_longitude(location):
     if location.longitude is not None:
-        return location.latitude
+        return location.longitude
     elif location.point is not None:
         return location.point.x
     elif location.geom is not None:
