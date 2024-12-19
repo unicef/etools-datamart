@@ -1,3 +1,7 @@
+4.7.14
+----
+* Fix logic error extract_longitude function
+
 4.7.13
 ----
 * Improved FMQuestion and FMOntrack loaders to extract latitude and longitude from 
