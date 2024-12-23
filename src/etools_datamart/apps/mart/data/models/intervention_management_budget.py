@@ -25,7 +25,7 @@ class InterventionManagementBudgetLoader(EtoolsLoader):
 
     --
     SELECT '##COUNTRY##' AS __schema, 
-           "partners_interventionmanagementbudgetitem"."id",
+           "partners_interventionmanagementbudgetitem"."id",              -- directly mapped to source_id
            "partners_interventionmanagementbudgetitem"."name",
            "partners_interventionmanagementbudgetitem"."kind",
            "partners_interventionmanagementbudgetitem"."unicef_cash",     -- directly mapped to .unicef_cash

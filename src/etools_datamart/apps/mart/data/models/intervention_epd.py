@@ -48,7 +48,7 @@ class InterventionEPDLoader(EtoolsLoader):
 
     --
     SELECT 'afghanistan' AS __schema, 
-           "partners_intervention"."id",
+           "partners_intervention"."id",                                -- directly mapped to .source_id 
            "partners_intervention"."created",
            "partners_intervention"."modified",
            "partners_intervention"."document_type",
@@ -76,32 +76,32 @@ class InterventionEPDLoader(EtoolsLoader):
            "partners_intervention"."termination_doc",
            "partners_intervention"."cfei_number",
            "partners_intervention"."budget_owner_id",
-           "partners_intervention"."context",                           -- directly mapped 
-           "partners_intervention"."date_sent_to_partner",              -- directly mapped    
-           "partners_intervention"."equity_narrative",                  -- directly mapped   
-           "partners_intervention"."equity_rating",                     -- directly mapped   
-           "partners_intervention"."gender_narrative",                  -- directly mapped    
-           "partners_intervention"."gender_rating",                     -- directly mapped  
-           "partners_intervention"."hq_support_cost",                   -- directly mapped 
-           "partners_intervention"."implementation_strategy",           -- directly mapped  
-           "partners_intervention"."ip_program_contribution",           -- directly mapped
-           "partners_intervention"."partner_accepted",                  -- directly mapped
-           "partners_intervention"."sustainability_narrative",          -- directly mapped  
-           "partners_intervention"."sustainability_rating",             -- directly mapped 
-           "partners_intervention"."unicef_accepted",                   -- directly mapped    
-           "partners_intervention"."unicef_court",                      -- directly mapped   
-           "partners_intervention"."unicef_review_type",                -- directly mapped 
-           "partners_intervention"."humanitarian_flag",                 -- directly mapped  
-           "partners_intervention"."capacity_development",              -- directly mapped 
-           "partners_intervention"."other_info",                        -- directly mapped  
-           "partners_intervention"."other_partners_involved",           -- directly mapped  
-           "partners_intervention"."technical_guidance",                -- directly mapped 
-           "partners_intervention"."cash_transfer_modalities",          -- directly mapped 
-           "partners_intervention"."cancel_justification",              -- directly mapped   
-           "partners_intervention"."date_partnership_review_performed", -- directly mapped 
-           "partners_intervention"."accepted_on_behalf_of_partner",     -- directly mapped  
-           "partners_intervention"."activation_protocol",               -- directly mapped  
-           "partners_intervention"."confidential",                      -- directly mapped 
+           "partners_intervention"."context",                           -- directly mapped to .date_sent_to_partner
+           "partners_intervention"."date_sent_to_partner",              -- directly mapped to .equity_narrative   
+           "partners_intervention"."equity_narrative",                  -- directly mapped to .equity_narrative   
+           "partners_intervention"."equity_rating",                     -- directly mapped to .equity_ratting      
+           "partners_intervention"."gender_narrative",                  -- directly mapped to .gender_narrative   
+           "partners_intervention"."gender_rating",                     -- directly mapped to .gender_rating 
+           "partners_intervention"."hq_support_cost",                   -- directly mapped to .hq_support_cost 
+           "partners_intervention"."implementation_strategy",           -- directly mapped to .implementation_strategy 
+           "partners_intervention"."ip_program_contribution",           -- directly mapped to .ip_program_contribution 
+           "partners_intervention"."partner_accepted",                  -- directly mapped to .partner_accepted
+           "partners_intervention"."sustainability_narrative",          -- directly mapped to .sustainability_narrative 
+           "partners_intervention"."sustainability_rating",             -- directly mapped to .sustainability_rating
+           "partners_intervention"."unicef_accepted",                   -- directly mapped to .unicef_accepted   
+           "partners_intervention"."unicef_court",                      -- directly mapped to .unicef_court  
+           "partners_intervention"."unicef_review_type",                -- directly mapped to .humanitarian_flag
+           "partners_intervention"."humanitarian_flag",                 -- directly mapped to .capacity_development
+           "partners_intervention"."capacity_development",              -- directly mapped to .other_info
+           "partners_intervention"."other_info",                        -- directly mapped to .other_partners_involved 
+           "partners_intervention"."other_partners_involved",           -- directly mapped to .technical_guidance 
+           "partners_intervention"."technical_guidance",                -- directly mapped to .cash_transfer_modalities
+           "partners_intervention"."cash_transfer_modalities",          -- directly mapped to .cancel_justification
+           "partners_intervention"."cancel_justification",              -- directly mapped to .date_partnership_review_performed  
+           "partners_intervention"."date_partnership_review_performed", -- directly mapped  to .accepted_on_behalf_of_partner
+           "partners_intervention"."accepted_on_behalf_of_partner",     -- directly mapped to .accepted_on_behalf_of_partner
+           "partners_intervention"."activation_protocol",               -- directly mapped to .activation_protocol
+           "partners_intervention"."confidential",                      -- directly mapped to .confidential 
            "partners_intervention"."has_activities_involving_children",
            "partners_intervention"."has_data_processing_agreement",
            "partners_intervention"."has_special_conditions_for_construction",
