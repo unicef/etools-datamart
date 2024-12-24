@@ -1,3 +1,9 @@
+
+4.7.15
+----
+* ExportAccessLog usage has been simplified by keeping the last access as the sole purpose 
+  it to see if an export is in use at all. 
+
 4.7.14
 ----
 * Fix logic error extract_longitude function
@@ -9,7 +15,7 @@ Location.point when Location.longitude and Location.latitude.
 
 4.7.12
 ----
-Formula for SpotCheckFindings.pending_unsupported_amount has been updated as below;
+* Formula for SpotCheckFindings.pending_unsupported_amount has been updated as below;
     = audit_spotcheck.total_amount_of_ineligible_expenditure
       audit_engagement.additional_supporting_documentation_provided
       audit_engagement.justification_provided_and_accepted
@@ -18,19 +24,19 @@ Formula for SpotCheckFindings.pending_unsupported_amount has been updated as bel
       
 4.7.11
 ----
-CI pipline improvements for version tagging.
+* CI pipline improvements for version tagging.
 
 4.7.10
 ----
-Further improve Celery task failure error report
+* Further improve Celery task failure error report
 
 4.7.9
 ----
-Make groups parameter name consistent 
+* Make groups parameter name consistent 
 
 
 ----
-Hotfix for export access log to handle non-standard  date format
+* Hotfix for export access log to handle non-standard  date format
 
 4.7.6
 ----
