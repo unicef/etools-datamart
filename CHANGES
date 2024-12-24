@@ -1,3 +1,7 @@
+4.7.15
+----
+* Bump jinja2 from 3.1.3 to 3.1.5
+
 4.7.14
 ----
 * Fix logic error extract_longitude function
