@@ -149,7 +149,11 @@ class ExportAccessLog(models.Model):
 
         try:
             access_log = cls.objects.get(export=export)
-            access_log.access_history = [log_entry]
+
+            while len(access_log.access_history) >= 3:
+                access_log.access_history.pop(0)
+
+            access_log.access_history.append(log_entry)
             access_log.save()
         except cls.DoesNotExist:
             cls.objects.create(export=export, access_history=[log_entry])
