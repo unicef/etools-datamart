@@ -18,7 +18,7 @@ class PartnerLoader(EtoolsLoader):
     SET search_path = public,##COUNTRY##;
 
     -- Count for paging
-    SELECT COUNT(*) AS "__count" FROM "partners_partnerorganization
+    SELECT COUNT(*) AS "__count" FROM "partners_partnerorganization;
 
     -- Partner Organization
     SELECT '##COUNTRY##' AS __schema,
@@ -104,7 +104,7 @@ class PartnerLoader(EtoolsLoader):
     INNER JOIN "organizations_organization" ON ("partners_partnerorganization"."organization_id" = "organizations_organization"."id")
     LEFT OUTER JOIN "partners_plannedengagement" ON ("partners_partnerorganization"."id" = "partners_plannedengagement"."partner_id")
     ORDER BY "partners_partnerorganization"."id" ASC
-    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
 
 
     --  Travel Activity
@@ -122,7 +122,7 @@ class PartnerLoader(EtoolsLoader):
     WHERE ("t2f_travelactivity"."date" IS NOT NULL AND "t2f_travelactivity"."travel_type" = 'Programmatic Visit'
            AND "t2f_travel"."status" = 'completed' AND "t2f_travel"."traveler_id" = ("t2f_travelactivity"."primary_traveler_id")
            AND "t2f_travelactivity"."partner_id" IN (##PARTNER_ID_LIST_IN_THE_PAGE##)
-    ORDER BY "t2f_travelactivity"."date" DESC
+    ORDER BY "t2f_travelactivity"."date" DESC;
 
     """
 
