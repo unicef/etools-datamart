@@ -20,6 +20,312 @@ def get_pd_output_names(obj: PartnersIntervention):
 
 
 class ReportIndicatorLoader(NestedLocationLoaderMixin, EtoolsLoader):
+    """
+    --
+    SET search_path = public,afghanistan;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "reports_appliedindicator";
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "reports_appliedindicator"."id",
+           "reports_appliedindicator"."context_code",
+           "reports_appliedindicator"."assumptions",
+           "reports_appliedindicator"."total",
+           "reports_appliedindicator"."indicator_id",
+           "reports_appliedindicator"."lower_result_id",
+           "reports_appliedindicator"."means_of_verification",
+           "reports_appliedindicator"."cluster_indicator_id",
+           "reports_appliedindicator"."cluster_indicator_title",
+           "reports_appliedindicator"."cluster_name",
+           "reports_appliedindicator"."created",
+           "reports_appliedindicator"."modified",
+           "reports_appliedindicator"."response_plan_name",
+           "reports_appliedindicator"."section_id",
+           "reports_appliedindicator"."is_active",
+           "reports_appliedindicator"."is_high_frequency",
+           "reports_appliedindicator"."baseline",
+           "reports_appliedindicator"."denominator_label",
+           "reports_appliedindicator"."label",
+           "reports_appliedindicator"."measurement_specifications",
+           "reports_appliedindicator"."numerator_label",
+           "reports_appliedindicator"."target",
+
+           "reports_indicatorblueprint"."id",
+           "reports_indicatorblueprint"."title",
+           "reports_indicatorblueprint"."description",
+           "reports_indicatorblueprint"."code",
+           "reports_indicatorblueprint"."subdomain",
+           "reports_indicatorblueprint"."disaggregatable",
+           "reports_indicatorblueprint"."unit",
+           "reports_indicatorblueprint"."calculation_formula_across_locations",
+           "reports_indicatorblueprint"."calculation_formula_across_periods",
+           "reports_indicatorblueprint"."created",
+           "reports_indicatorblueprint"."display_type",
+           "reports_indicatorblueprint"."modified",
+
+           "reports_lowerresult"."id",
+           "reports_lowerresult"."name",
+           "reports_lowerresult"."code",
+           "reports_lowerresult"."result_link_id",
+           "reports_lowerresult"."created",
+           "reports_lowerresult"."modified",
+           "reports_lowerresult"."is_active",
+
+           "partners_interventionresultlink"."id",
+           "partners_interventionresultlink"."cp_output_id",
+           "partners_interventionresultlink"."intervention_id",
+           "partners_interventionresultlink"."created",
+           "partners_interventionresultlink"."modified",
+           "partners_interventionresultlink"."code",
+
+           "reports_result"."id",
+           "reports_result"."name",
+           "reports_result"."code",
+           "reports_result"."result_type_id",
+           "reports_result"."sector_id",
+           "reports_result"."gic_code",
+           "reports_result"."gic_name",
+           "reports_result"."humanitarian_tag",
+           "reports_result"."level",
+           "reports_result"."lft",
+           "reports_result"."parent_id",
+           "reports_result"."rght",
+           "reports_result"."sic_code",
+           "reports_result"."sic_name",
+           "reports_result"."tree_id",
+           "reports_result"."vision_id",
+           "reports_result"."wbs",
+           "reports_result"."activity_focus_code",
+           "reports_result"."activity_focus_name",
+           "reports_result"."hidden",
+           "reports_result"."from_date",
+           "reports_result"."to_date",
+           "reports_result"."ram",
+           "reports_result"."country_programme_id",
+           "reports_result"."created",
+           "reports_result"."modified",
+           "reports_result"."humanitarian_marker_code",
+           "reports_result"."humanitarian_marker_name",
+           "reports_result"."programme_area_code",
+           "reports_result"."programme_area_name",
+
+           "partners_intervention"."id",
+           "partners_intervention"."created",
+           "partners_intervention"."modified",
+           "partners_intervention"."document_type",
+           "partners_intervention"."number",
+           "partners_intervention"."title",
+           "partners_intervention"."status",
+           "partners_intervention"."start",
+           "partners_intervention"."end",
+           "partners_intervention"."submission_date",
+           "partners_intervention"."submission_date_prc",
+           "partners_intervention"."review_date_prc",
+           "partners_intervention"."prc_review_document",
+           "partners_intervention"."signed_by_unicef_date",
+           "partners_intervention"."signed_by_partner_date",
+           "partners_intervention"."population_focus",
+           "partners_intervention"."agreement_id",
+           "partners_intervention"."unicef_signatory_id",
+           "partners_intervention"."signed_pd_document",
+           "partners_intervention"."country_programme_id",
+           "partners_intervention"."contingency_pd",
+           "partners_intervention"."metadata",
+           "partners_intervention"."in_amendment",
+           "partners_intervention"."reference_number_year",
+           "partners_intervention"."activation_letter",
+           "partners_intervention"."termination_doc",
+           "partners_intervention"."cfei_number",
+           "partners_intervention"."budget_owner_id",
+           "partners_intervention"."context",
+           "partners_intervention"."date_sent_to_partner",
+           "partners_intervention"."equity_narrative",
+           "partners_intervention"."equity_rating",
+           "partners_intervention"."gender_narrative",
+           "partners_intervention"."gender_rating",
+           "partners_intervention"."hq_support_cost",
+           "partners_intervention"."implementation_strategy",
+           "partners_intervention"."ip_program_contribution",
+           "partners_intervention"."partner_accepted",
+           "partners_intervention"."sustainability_narrative",
+           "partners_intervention"."sustainability_rating",
+           "partners_intervention"."unicef_accepted",
+           "partners_intervention"."unicef_court",
+           "partners_intervention"."unicef_review_type",
+           "partners_intervention"."humanitarian_flag",
+           "partners_intervention"."capacity_development",
+           "partners_intervention"."other_info",
+           "partners_intervention"."other_partners_involved",
+           "partners_intervention"."technical_guidance",
+           "partners_intervention"."cash_transfer_modalities",
+           "partners_intervention"."cancel_justification",
+           "partners_intervention"."date_partnership_review_performed",
+           "partners_intervention"."accepted_on_behalf_of_partner",
+           "partners_intervention"."activation_protocol",
+           "partners_intervention"."confidential",
+           "partners_intervention"."has_activities_involving_children",
+           "partners_intervention"."has_data_processing_agreement",
+           "partners_intervention"."has_special_conditions_for_construction",
+           "partners_intervention"."final_review_approved",
+           "partners_intervention"."other_details",
+           "partners_intervention"."partner_authorized_officer_signatory_id",
+
+           "partners_agreement"."id",
+           "partners_agreement"."created",
+           "partners_agreement"."modified",
+           "partners_agreement"."start",
+           "partners_agreement"."end",
+           "partners_agreement"."agreement_type",
+           "partners_agreement"."agreement_number",
+           "partners_agreement"."attached_agreement",
+           "partners_agreement"."signed_by_unicef_date",
+           "partners_agreement"."signed_by_partner_date",
+           "partners_agreement"."partner_id",
+           "partners_agreement"."signed_by_id",
+           "partners_agreement"."status",
+           "partners_agreement"."country_programme_id",
+           "partners_agreement"."reference_number_year",
+           "partners_agreement"."special_conditions_pca",
+           "partners_agreement"."terms_acknowledged_by_id",
+           "partners_agreement"."partner_manager_id",
+
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date",
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name",
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id",
+
+           "organizations_organization"."id",
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id",
+
+           "reports_sector"."id",
+           "reports_sector"."name",
+           "reports_sector"."description",
+           "reports_sector"."alternate_id",
+           "reports_sector"."alternate_name",
+           "reports_sector"."dashboard",
+           "reports_sector"."color",
+           "reports_sector"."created",
+           "reports_sector"."modified",
+           "reports_sector"."active" FROM "reports_appliedindicator"
+    LEFT OUTER JOIN "reports_indicatorblueprint" ON ("reports_appliedindicator"."indicator_id" = "reports_indicatorblueprint"."id")
+    INNER JOIN "reports_lowerresult" ON ("reports_appliedindicator"."lower_result_id" = "reports_lowerresult"."id")
+    INNER JOIN "partners_interventionresultlink" ON ("reports_lowerresult"."result_link_id" = "partners_interventionresultlink"."id")
+    LEFT OUTER JOIN "reports_result" ON ("partners_interventionresultlink"."cp_output_id" = "reports_result"."id")
+    INNER JOIN "partners_intervention" ON ("partners_interventionresultlink"."intervention_id" = "partners_intervention"."id")
+    INNER JOIN "partners_agreement" ON ("partners_intervention"."agreement_id" = "partners_agreement"."id")
+    INNER JOIN "partners_partnerorganization" ON ("partners_agreement"."partner_id" = "partners_partnerorganization"."id")
+    INNER JOIN "organizations_organization" ON ("partners_partnerorganization"."organization_id" = "organizations_organization"."id")
+    LEFT OUTER JOIN "reports_sector" ON ("reports_appliedindicator"."section_id" = "reports_sector"."id")
+    ORDER BY "reports_appliedindicator"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+
+    --
+    SELECT ("reports_appliedindicator_locations"."appliedindicator_id") AS "_prefetch_related_val_appliedindicator_id",
+           '##COUNTRY##' AS __schema,
+           "locations_location"."id",
+           "locations_location"."name",
+           "locations_location"."latitude",
+           "locations_location"."longitude",
+           "locations_location"."p_code",
+           "locations_location"."point",
+           "locations_location"."geom",
+           "locations_location"."level",
+           "locations_location"."lft",
+           "locations_location"."parent_id",
+           "locations_location"."rght",
+           "locations_location"."tree_id",
+           "locations_location"."created",
+           "locations_location"."modified",
+           "locations_location"."is_active",
+           "locations_location"."admin_level",
+           "locations_location"."admin_level_name"
+    FROM "locations_location" INNER JOIN "reports_appliedindicator_locations" ON ("locations_location"."id" = "reports_appliedindicator_locations"."location_id")
+    WHERE "reports_appliedindicator_locations"."appliedindicator_id" IN (##LIST of reports_appliedindicator"."id" in the page##);
+
+
+    --
+    SELECT ("reports_appliedindicator_disaggregation"."appliedindicator_id") AS "_prefetch_related_val_appliedindicator_id",
+           '##COUNTRY##' AS __schema,
+           "reports_disaggregation"."id",
+           "reports_disaggregation"."created",
+           "reports_disaggregation"."modified",
+           "reports_disaggregation"."name",
+           "reports_disaggregation"."active"
+    FROM "reports_disaggregation"
+    INNER JOIN "reports_appliedindicator_disaggregation" ON ("reports_disaggregation"."id" = "reports_appliedindicator_disaggregation"."disaggregation_id")
+    WHERE "reports_appliedindicator_disaggregation"."appliedindicator_id" IN (##LIST of reports_appliedindicator"."id" in the page##);
+
+
+       --
+    SELECT '##COUNTRY##' AS __schema,
+           "reports_resulttype"."id",
+           "reports_resulttype"."name"
+    FROM "reports_resulttype"
+    WHERE "reports_resulttype"."id" IN (## List of reports_result"."result_type_id" in the page ## );
+
+    --
+    SELECT '##COUNTRY## AS __schema,
+           "reports_lowerresult"."id",
+           "reports_lowerresult"."name",
+           "reports_lowerresult"."code",
+           "reports_lowerresult"."result_link_id",
+           "reports_lowerresult"."created",
+           "reports_lowerresult"."modified",
+           "reports_lowerresult"."is_active"
+    FROM "reports_lowerresult"
+    WHERE "reports_lowerresult"."result_link_id" in (## LIST OF "reports_lowerresult"."result_link_id" IN THE PAGE ##)
+    ORDER BY "reports_lowerresult"."modified" ASC;
+
+
+    """
+
     location_m2m_field = "locations"
 
     def get_baseline_denominator(self, record, values, field_name):
