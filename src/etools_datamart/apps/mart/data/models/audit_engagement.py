@@ -196,7 +196,7 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
            "audit_engagement"."write_off_required",
            "audit_engagement"."cancel_comment",
            "audit_engagement"."explanation_for_additional_information",
-           "audit_engagement"."partner_id", 
+           "audit_engagement"."partner_id",
            "audit_engagement"."joint_audit",
            "audit_engagement"."agreement_id",
            "audit_engagement"."po_item_id",
@@ -253,7 +253,7 @@ class EngagementlLoader(EngagementMixin, EtoolsLoader):
            "purchase_order_purchaseorder"."contract_start_date",
            "purchase_order_purchaseorder"."contract_end_date",
            "purchase_order_purchaseorder"."auditor_firm_id",
-           
+
            "purchase_order_auditorfirm"."id",
            "purchase_order_auditorfirm"."created",
            "purchase_order_auditorfirm"."modified",

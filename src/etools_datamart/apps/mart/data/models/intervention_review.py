@@ -31,7 +31,7 @@ class InterventionReviewLoader(EtoolsLoader):
            "partners_interventionreview"."budget_is_aligned",
            "partners_interventionreview"."ges_considered",
            "partners_interventionreview"."meeting_date",
-           "partners_interventionreview"."overall_approver_id",           -- to overall_approver = get approver and set "{0.last_name} {0.first_name} ({0.email})".format(record.overall_approver) 
+           "partners_interventionreview"."overall_approver_id",           -- to overall_approver = get approver and set "{0.last_name} {0.first_name} ({0.email})".format(record.overall_approver)
            "partners_interventionreview"."overall_comment",
            "partners_interventionreview"."partner_comparative_advantage", -- to partner_comparative_advantage
            "partners_interventionreview"."pd_is_guided",                  -- to pd_is_guided
