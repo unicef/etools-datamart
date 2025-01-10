@@ -316,7 +316,12 @@ class FMQuestionLoader(EtoolsLoader):
     WHERE "field_monitoring_settings_option"."question_id" IN (##LIST OF "field_monitoring_settings_question"."id" IN THE PAGE##);
 
 
-    SELECT "field_monitoring_data_collection_finding"."id" FROM "field_monitoring_data_collection_finding" INNER JOIN "field_monitoring_data_collection_activityquestion" ON ("field_monitoring_data_collection_finding"."activity_question_id" = "field_monitoring_data_collection_activityquestion"."id") INNER JOIN "field_monitoring_planning_monitoringactivity" ON ("field_monitoring_data_collection_activityquestion"."monitoring_activity_id" = "field_monitoring_planning_monitoringactivity"."id") LEFT OUTER JOIN "field_monitoring_settings_locationsite" ON ("field_monitoring_planning_monitoringactivity"."location_site_id" = "field_monitoring_settings_locationsite"."id") LEFT OUTER JOIN "locations_location" ON ("field_monitoring_planning_monitoringactivity"."location_id" = "locations_location"."id")
+    SELECT "field_monitoring_data_collection_finding"."id"
+    FROM "field_monitoring_data_collection_finding"
+         INNER JOIN "field_monitoring_data_collection_activityquestion" ON ("field_monitoring_data_collection_finding"."activity_question_id" = "field_monitoring_data_collection_activityquestion"."id")
+         INNER JOIN "field_monitoring_planning_monitoringactivity" ON ("field_monitoring_data_collection_activityquestion"."monitoring_activity_id" = "field_monitoring_planning_monitoringactivity"."id")
+         LEFT OUTER JOIN "field_monitoring_settings_locationsite" ON ("field_monitoring_planning_monitoringactivity"."location_site_id" = "field_monitoring_settings_locationsite"."id")
+         LEFT OUTER JOIN "locations_location" ON ("field_monitoring_planning_monitoringactivity"."location_id" = "locations_location"."id")
 
 
     """
@@ -688,6 +693,118 @@ class FMQuestion(EtoolsDataMartModel):
 class FMOntrackLoader(EtoolsLoader):
     """Loader for FM Ontrack"""
 
+    """
+    --
+    SET search_path = public,##COUNTRY##
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "field_monitoring_data_collection_activityoverallfinding";
+    
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "field_monitoring_data_collection_activityoverallfinding"."id",
+           "field_monitoring_data_collection_activityoverallfinding"."narrative_finding",
+           "field_monitoring_data_collection_activityoverallfinding"."on_track",
+           "field_monitoring_data_collection_activityoverallfinding"."cp_output_id",
+           "field_monitoring_data_collection_activityoverallfinding"."intervention_id",
+           "field_monitoring_data_collection_activityoverallfinding"."monitoring_activity_id",
+           "field_monitoring_data_collection_activityoverallfinding"."partner_id"
+    FROM "field_monitoring_data_collection_activityoverallfinding"
+    ORDER BY "field_monitoring_data_collection_activityoverallfinding"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "field_monitoring_planning_monitoringactivity"."id",
+           "field_monitoring_planning_monitoringactivity"."created",
+           "field_monitoring_planning_monitoringactivity"."modified",
+           "field_monitoring_planning_monitoringactivity"."deleted_at",
+           "field_monitoring_planning_monitoringactivity"."monitor_type",
+           "field_monitoring_planning_monitoringactivity"."start_date",
+           "field_monitoring_planning_monitoringactivity"."end_date",
+           "field_monitoring_planning_monitoringactivity"."status",
+           "field_monitoring_planning_monitoringactivity"."location_id",
+           "field_monitoring_planning_monitoringactivity"."location_site_id",
+           "field_monitoring_planning_monitoringactivity"."visit_lead_id",
+           "field_monitoring_planning_monitoringactivity"."tpm_partner_id",
+           "field_monitoring_planning_monitoringactivity"."cancel_reason",
+           "field_monitoring_planning_monitoringactivity"."reject_reason",
+           "field_monitoring_planning_monitoringactivity"."field_office_id",
+           "field_monitoring_planning_monitoringactivity"."report_reject_reason",
+           "field_monitoring_planning_monitoringactivity"."number"
+    FROM "field_monitoring_planning_monitoringactivity"
+    WHERE "field_monitoring_planning_monitoringactivity"."id"
+    IN (## LIST OF "field_monitoring_data_collection_activityoverallfinding"."monitoring_activity_id" in the page##);
+    
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "locations_location"."id",
+           "locations_location"."name",
+           "locations_location"."latitude",
+           "locations_location"."longitude",
+           "locations_location"."p_code",
+           "locations_location"."point",
+           "locations_location"."geom",
+           "locations_location"."level",
+           "locations_location"."lft",
+           "locations_location"."parent_id",
+           "locations_location"."rght",
+           "locations_location"."tree_id",
+           "locations_location"."created",
+           "locations_location"."modified",
+           "locations_location"."is_active",
+           "locations_location"."admin_level",
+           "locations_location"."admin_level_name" 
+    FROM "locations_location" 
+    WHERE "locations_location"."id" 
+    IN(## LIST OF field_monitoring_planning_monitoringactivity"."location_id" in the page##);
+
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date", 
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name", 
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id" 
+    FROM "partners_partnerorganization" 
+    WHERE "partners_partnerorganization"."id" IN (## ##);
+
+
+    """
+
     def get_overall_finding_rating(
         self,
         record: FieldMonitoringDataCollectionActivityoverallfinding,
@@ -896,6 +1013,16 @@ class FMOntrack(EtoolsDataMartModel):
             person_responsible_email="monitoring_activity.visit_lead.email",
             team_members="-",
         )
+
+
+"""
+Queries for Loader:   
+  
+  
+  
+  ===FieldMonitoringSettingsOption
+
+"""
 
 
 class FMOptions(EtoolsDataMartModel):

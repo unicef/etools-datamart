@@ -37,6 +37,17 @@ SELECT '<country>' AS __schema,
        "locations_location"."admin_level_name" 
 FROM "locations_location" 
 ORDER BY "locations_location"."id" ASC
+ LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##; 
+
+
+-- After retrieving the changes
+UPDATE "data_location" SET point = ST_Centroid(geom::geometry),
+latitude = ST_Y(ST_Centroid(geom::geometry)),
+longitude = ST_X(ST_Centroid(geom::geometry))
+WHERE point IS NULL AND geom IS NOT NULL;
+--
+UPDATE "data_location" SET latitude = NULL, longitude = NULL WHERE point IS NULL;
+
 """
 
 

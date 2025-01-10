@@ -10,6 +10,54 @@ from etools_datamart.apps.sources.etools.models import AuthUser
 
 
 class UserStatsLoader(EtoolsLoader):
+    """
+    --
+    SELECT "users_country"."id",
+           "users_country"."schema_name",
+           "users_country"."name",
+           "users_country"."business_area_code",
+           "users_country"."initial_zoom",
+           "users_country"."latitude",
+           "users_country"."longitude",
+           "users_country"."country_short_code",
+           "users_country"."vision_sync_enabled",
+           "users_country"."vision_last_synced",
+           "users_country"."local_currency_id",
+           "users_country"."long_name",
+           "users_country"."iso3_code",
+           "users_country"."custom_dashboards"
+    FROM "users_country"
+    WHERE NOT ("users_country"."schema_name" IN ('public'))
+    ORDER BY "users_country"."name" ASC;
+
+    --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    SELECT COUNT(*) AS "__count" --
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE "users_userprofile"."country_id" IN (## List  of "users_country"."id" in the page ##);
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE ("users_userprofile"."country_id" IN (## List of "users_country"."id" in the page ##)
+    AND "auth_user"."email"::text LIKE '%@unicef.org');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE ("users_userprofile"."country_id" IN (## List of "users_country"."id" in the page ##)
+    AND EXTRACT(MONTH FROM "auth_user"."last_login" AT TIME ZONE 'UTC') = 1) ;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE ("users_userprofile"."country_id" IN (## List of "users_country"."id" in the page ##)
+    AND "auth_user"."email"::text LIKE '%@unicef.org'
+    AND EXTRACT(MONTH FROM "auth_user"."last_login" AT TIME ZONE 'UTC') = 1)
+    """
+
     def get_queryset(self):
         return self.config.source.objects.filter(profile__country=self.context["country"])
         # return AuthUser.objects.filter(profile__country=self.context['country'])

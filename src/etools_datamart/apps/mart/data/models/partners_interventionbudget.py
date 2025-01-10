@@ -522,7 +522,7 @@ class InterventionBudgetLoader(InterventionLoader):
       FROM "partners_intervention_flat_locations"
       WHERE "partners_intervention_flat_locations"."intervention_id" IN (## List of "partners_intervention"."id" in the page##);
 
-    locations_data = []
+      locations_data = []
           for item in record.PartnersInterventionFlatLocations_intervention.all():
               # TODO: Check possible available json serialization
               loc_data = dict(

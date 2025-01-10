@@ -63,9 +63,25 @@ SELECT '##COUNTRY##' AS __schema,
        "action_points_actionpoint"."status", 
        "action_points_actionpoint"."description", 
        "action_points_actionpoint"."due_date", 
-       "action_points_actionpoint"."date_of_completion", 
-       
+       "action_points_actionpoint"."date_of_completion",
        "action_points_actionpoint"."assigned_by_id",
+       "action_points_actionpoint"."assigned_to_id",
+       "action_points_actionpoint"."section_id",
+       "action_points_actionpoint"."tpm_activity_id",
+       "action_points_actionpoint"."high_priority",
+       "action_points_actionpoint"."travel_activity_id",
+       "action_points_actionpoint"."category_id",
+       "action_points_actionpoint"."psea_assessment_id",
+       "action_points_actionpoint"."reference_number",
+       "action_points_actionpoint"."monitoring_activity_id",
+       "action_points_actionpoint"."engagement_id",
+       "action_points_actionpoint"."intervention_id",
+       "action_points_actionpoint"."location_id",
+       "action_points_actionpoint"."office_id",
+       "action_points_actionpoint"."partner_id",
+       "action_points_actionpoint"."author_id",
+       "action_points_actionpoint"."cp_output_id",
+
        "assigned_by_auth_user"."password", 
        "assigned_by_auth_user"."last_login", 
        "assigned_by_auth_user"."is_superuser", 
@@ -80,8 +96,6 @@ SELECT '##COUNTRY##' AS __schema,
        "assigned_by_auth_user"."created", 
        "assigned_by_auth_user"."modified", 
        "assigned_by_auth_user"."preferences"
-
-       "action_points_actionpoint"."assigned_to_id", 
        "assigned_to_auth_user"."password", 
        "assigned_to_auth_user"."last_login", 
        "assigned_to_auth_user"."is_superuser", 
@@ -97,7 +111,6 @@ SELECT '##COUNTRY##' AS __schema,
        "assigned_to_auth_user"."modified", 
        "assigned_to_auth_user"."preferences"
        
-       "action_points_actionpoint"."author_id", 
        "author_auth_user"."password", 
        "author_auth_user"."last_login", 
        "author_auth_user"."is_superuser", 
@@ -113,7 +126,6 @@ SELECT '##COUNTRY##' AS __schema,
        "author_auth_user"."modified", 
        "author_auth_user"."preferences"
               
-       "action_points_actionpoint"."cp_output_id", 
        "reports_result"."name", 
        "reports_result"."code", 
        "reports_result"."result_type_id", 
@@ -144,12 +156,6 @@ SELECT '##COUNTRY##' AS __schema,
        "reports_result"."programme_area_code", 
        "reports_result"."programme_area_name"
 
-       "action_points_actionpoint"."engagement_id", 
-       "action_points_actionpoint"."intervention_id", 
-       "action_points_actionpoint"."location_id", 
-       "action_points_actionpoint"."office_id", 
-
-       "action_points_actionpoint"."partner_id", 
        "partners_partnerorganization"."id", 
        "partners_partnerorganization"."description", 
        "partners_partnerorganization"."address", 
@@ -188,8 +194,8 @@ SELECT '##COUNTRY##' AS __schema,
        "partners_partnerorganization"."sea_risk_rating_name", 
        "partners_partnerorganization"."lead_office_id", 
        "partners_partnerorganization"."lead_section_id", 
-
        "partners_partnerorganization"."organization_id"  
+
        "organizations_organization"."created", 
        "organizations_organization"."modified", 
        "organizations_organization"."name", 
@@ -198,31 +204,14 @@ SELECT '##COUNTRY##' AS __schema,
        "organizations_organization"."cso_type", 
        "organizations_organization"."short_name", 
        "organizations_organization"."other", 
-       "organizations_organization"."parent_id"
+       "organizations_organization"."parent_id",
 
-
-       "action_points_actionpoint"."section_id", 
-
-       "action_points_actionpoint"."tpm_activity_id", 
-       
-       "action_points_actionpoint"."high_priority", 
-       
-       "action_points_actionpoint"."travel_activity_id",
        "t2f_travelactivity"."travel_type",
        "t2f_travelactivity"."date", 
        "t2f_travelactivity"."partner_id", 
        "t2f_travelactivity"."partnership_id", 
        "t2f_travelactivity"."primary_traveler_id", 
-       "t2f_travelactivity"."result_id",  
-
-      
-       "action_points_actionpoint"."category_id", 
-       
-       "action_points_actionpoint"."psea_assessment_id", 
-       
-       "action_points_actionpoint"."reference_number", 
-       
-       "action_points_actionpoint"."monitoring_activity_id" 
+       "t2f_travelactivity"."result_id"  
 
 FROM "action_points_actionpoint"
      "assigned_by_auth_user"
@@ -237,8 +226,6 @@ ORDER BY "action_points_actionpoint"."id" ASC
 LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
 
 -- 
-
--- 
 SELECT "django_content_type"."id", 
        "django_content_type"."app_label", 
        "django_content_type"."model" 
@@ -246,6 +233,7 @@ FROM "django_content_type"
 WHERE ("django_content_type"."app_label" = 'action_points' 
         AND "django_content_type"."model" = 'actionpoint') 
 
+--
 SELECT '##COUNTRY##' AS __schema, 
        "django_comments"."id", 
        "django_comments"."object_pk", 
@@ -261,7 +249,7 @@ SELECT '##COUNTRY##' AS __schema,
        "django_comments"."site_id", 
        "django_comments"."user_id" 
 FROM "django_comments" 
-WHERE ("django_comments"."content_type_id" = 270 
+WHERE ("django_comments"."content_type_id" = django_content_type"."id" )
 AND "django_comments"."object_pk" = '2')
 
 """

@@ -112,9 +112,8 @@ class InterventionManagementBudgetLoader(EtoolsLoader):
     ORDER BY "partners_interventionmanagementbudgetitem"."id" ASC 
     LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;  
 
-
     --
-    SELECT 'argentina' AS __schema, 
+    SELECT '##COUNTRY##' AS __schema, 
            "partners_agreement"."id",
            "partners_agreement"."created",
            "partners_agreement"."modified",
@@ -136,7 +135,7 @@ class InterventionManagementBudgetLoader(EtoolsLoader):
     FROM "partners_agreement" WHERE "partners_agreement"."id" IN (##List of "partners_intervention"."agreement_id" in the page ##);
 
     --
-    SELECT 'argentina' AS __schema, 
+    SELECT '##COUNTRY##' AS __schema, 
            "partners_partnerorganization"."id", 
            "partners_partnerorganization"."description",
            "partners_partnerorganization"."address",

@@ -20,9 +20,9 @@ class InterventionReviewLoader(EtoolsLoader):
     -- TODO: Pick only the required fields
     --
     SELECT '##COUNTRY##' AS __schema,
-           "partners_interventionreview"."id",                  -- to source_id
-           "partners_interventionreview"."created",             -- to review_created
-           "partners_interventionreview"."modified",            -- to review_modified
+           "partners_interventionreview"."id",                           -- to source_id
+           "partners_interventionreview"."created",                      -- to review_created
+           "partners_interventionreview"."modified",                     -- to review_modified
            "partners_interventionreview"."review_type",
            "partners_interventionreview"."overall_approval",
            "partners_interventionreview"."amendment_id",
@@ -31,7 +31,7 @@ class InterventionReviewLoader(EtoolsLoader):
            "partners_interventionreview"."budget_is_aligned",
            "partners_interventionreview"."ges_considered",
            "partners_interventionreview"."meeting_date",
-           "partners_interventionreview"."overall_approver_id", -- to overall_approver = get approver and set "{0.last_name} {0.first_name} ({0.email})".format(record.overall_approver) to overall_approver
+           "partners_interventionreview"."overall_approver_id",           -- to overall_approver = get approver and set "{0.last_name} {0.first_name} ({0.email})".format(record.overall_approver) 
            "partners_interventionreview"."overall_comment",
            "partners_interventionreview"."partner_comparative_advantage", -- to partner_comparative_advantage
            "partners_interventionreview"."pd_is_guided",                  -- to pd_is_guided
@@ -39,16 +39,16 @@ class InterventionReviewLoader(EtoolsLoader):
            "partners_interventionreview"."relationship_is_represented",   -- to relationship_is_represented
            "partners_interventionreview"."relationships_are_positive",    -- to relationships_are_positive
            "partners_interventionreview"."supply_issues_considered",
-           "partners_interventionreview"."submitted_by_id",     -- to overall_approver = get submitted_by and set "{0.last_name} {0.first_name} ({0.email})".format(record.submitted_by)
-           "partners_interventionreview"."review_date",         -- to review_date
-           "partners_interventionreview"."sent_back_comment",   -- to sent_back_comment
+           "partners_interventionreview"."submitted_by_id",               -- to submitted_by = get submitted_by and set "{0.last_name} {0.first_name} ({0.email})".format(record.submitted_by)
+           "partners_interventionreview"."review_date",                   -- to review_date
+           "partners_interventionreview"."sent_back_comment",             -- to sent_back_comment
 
-           'syria' AS __schema, "partners_intervention"."id",
+           "partners_intervention"."id",
            "partners_intervention"."created",
            "partners_intervention"."modified",
            "partners_intervention"."document_type",
-           "partners_intervention"."number",            --   to pd_number
-           "partners_intervention"."title",             --   to title
+           "partners_intervention"."number",                              -- to pd_number
+           "partners_intervention"."title",                               -- to title
            "partners_intervention"."status",
            "partners_intervention"."start",
            "partners_intervention"."end",

@@ -47,7 +47,7 @@ class InterventionEPDLoader(EtoolsLoader):
     FROM "partners_intervention";
 
     --
-    SELECT 'afghanistan' AS __schema, 
+    SELECT '##COUNTRY##' AS __schema, 
            "partners_intervention"."id",                                -- directly mapped to .source_id 
            "partners_intervention"."created",
            "partners_intervention"."modified",

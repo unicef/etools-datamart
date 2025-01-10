@@ -37,7 +37,6 @@ class PartnerHactLoader(EtoolsLoader):
     SELECT COUNT(*) AS "__count"
     FROM "partners_partnerorganization";
 
-
     --
     SELECT '##COUNTRY##' AS __schema,
           "partners_partnerorganization"."id",
@@ -79,6 +78,7 @@ class PartnerHactLoader(EtoolsLoader):
           "partners_partnerorganization"."lead_office_id",
           "partners_partnerorganization"."lead_section_id",
           "partners_partnerorganization"."organization_id",
+
           "organizations_organization"."id",
           "organizations_organization"."created",
           "organizations_organization"."modified",
@@ -95,9 +95,9 @@ class PartnerHactLoader(EtoolsLoader):
     LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
 
     --
-    SELECT 'afghanistan' AS __schema,
+    SELECT '##COUNTRY##' AS __schema,
            "activities_activity"."id",
-           activities_activity"."date",
+           "activities_activity"."date",
            "activities_activity"."cp_output_id",
            "activities_activity"."intervention_id",
            "activities_activity"."partner_id"
@@ -105,7 +105,7 @@ class PartnerHactLoader(EtoolsLoader):
     WHERE "activities_activity"."partner_id" IN (## LIST OF ##);
 
     --
-    SELECT 'afghanistan' AS __schema,
+    SELECT ''##COUNTRY##' AS __schema,
             "tpm_tpmactivity"."activity_ptr_id",
             "tpm_tpmactivity"."additional_information",
             "tpm_tpmactivity"."is_pv",
@@ -115,14 +115,14 @@ class PartnerHactLoader(EtoolsLoader):
     WHERE "tpm_tpmactivity"."activity_ptr_id" IN (##LIST OF "activities_activity"."id" for the PAGE##);
 
     --
-    SELECT 'afghanistan' AS __schema,
+    SELECT '##COUNTRY##' AS __schema,
            "field_monitoring_planning_monitoringactivitygroup"."id",
            "field_monitoring_planning_monitoringactivitygroup"."partner_id"
     FROM "field_monitoring_planning_monitoringactivitygroup"
     WHERE "field_monitoring_planning_monitoringactivitygroup"."partner_id" IN (##  ##);
 
     --
-    SELECT 'afghanistan' AS __schema,
+    SELECT '##COUNTRY##' AS __schema,
            "t2f_travel"."id",
            "t2f_travel"."created",
            "t2f_travel"."completed_at",
@@ -166,7 +166,7 @@ class PartnerHactLoader(EtoolsLoader):
     AND "t2f_travel"."traveler_id" = ("t2f_travelactivity"."primary_traveler_id"));
 
     --
-    SELECT 'afghanistan' AS __schema,
+    SELECT '##COUNTRY##' AS __schema,
            "tpm_tpmactivity"."activity_ptr_id",
            "tpm_tpmactivity"."additional_information",
            "tpm_tpmactivity"."is_pv",
@@ -178,7 +178,7 @@ class PartnerHactLoader(EtoolsLoader):
     WHERE ("activities_activity"."date" BETWEEN '2024-01-01'::date AND '2024-12-31'::date AND "activities_activity"."partner_id" = 1 AND "tpm_tpmactivity"."is_pv" AND "tpm_tpmvisit"."status" = 'unicef_approved')
 
     --
-    SELECT 'afghanistan' AS __schema,
+    SELECT '##COUNTRY##' AS __schema,
            "field_monitoring_planning_monitoringactivity"."id",
            "field_monitoring_planning_monitoringactivity"."created",
            "field_monitoring_planning_monitoringactivity"."modified",
@@ -248,7 +248,7 @@ class PartnerHactLoader(EtoolsLoader):
                         WHERE U0."partner_id" = 476)))
 
     --
-    SELECT 'afghanistan' AS __schema,
+    SELECT '##COUNTRY##' AS __schema,
            "audit_spotcheck"."engagement_ptr_id",
            "audit_spotcheck"."total_amount_tested",
            "audit_spotcheck"."total_amount_of_ineligible_expenditure",

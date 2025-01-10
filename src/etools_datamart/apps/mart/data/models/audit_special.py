@@ -73,6 +73,7 @@ class AuditSpecialLoader(EngagementMixin, EtoolsLoader):
           "purchase_order_purchaseorder"."contract_start_date",
           "purchase_order_purchaseorder"."contract_end_date",
           "purchase_order_purchaseorder"."auditor_firm_id",
+          
           "purchase_order_auditorfirm"."id",
           "purchase_order_auditorfirm"."created",
           "purchase_order_auditorfirm"."modified",
