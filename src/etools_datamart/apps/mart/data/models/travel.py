@@ -8,6 +8,122 @@ from .base import EtoolsDataMartModel
 
 
 class TravelLoader(EtoolsLoader):
+    """
+    --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "t2f_travel";
+
+    --
+    SELECT 'afghanistan' AS __schema,
+           "t2f_travel"."id",
+           "t2f_travel"."created",
+           "t2f_travel"."completed_at",
+           "t2f_travel"."canceled_at",
+           "t2f_travel"."submitted_at",
+           "t2f_travel"."rejected_at",
+           "t2f_travel"."approved_at",
+           "t2f_travel"."rejection_note",
+           "t2f_travel"."cancellation_note",
+           "t2f_travel"."certification_note",
+           "t2f_travel"."report_note",
+           "t2f_travel"."misc_expenses",
+           "t2f_travel"."status",
+           "t2f_travel"."start_date",
+           "t2f_travel"."end_date",
+           "t2f_travel"."purpose",
+           "t2f_travel"."additional_note",
+           "t2f_travel"."international_travel",
+           "t2f_travel"."ta_required",
+           "t2f_travel"."reference_number",
+           "t2f_travel"."hidden",
+           "t2f_travel"."mode_of_travel",
+           "t2f_travel"."estimated_travel_cost",
+           "t2f_travel"."is_driver",
+           "t2f_travel"."preserved_expenses_local",
+           "t2f_travel"."approved_cost_traveler",
+           "t2f_travel"."approved_cost_travel_agencies",
+           "t2f_travel"."currency_id",
+           "t2f_travel"."office_id",
+           "t2f_travel"."supervisor_id",
+           "t2f_travel"."traveler_id",
+           "t2f_travel"."first_submission_date",
+           "t2f_travel"."preserved_expenses_usd",
+           "t2f_travel"."section_id"
+    FROM "t2f_travel"
+    ORDER BY "t2f_travel"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+
+    -- Adapted to make it prefetch
+    SELECT '##COUNTRY##' AS __schema,
+           "reports_office"."id",
+           "reports_office"."name"
+    FROM "reports_office"
+    WHERE "reports_office"."id" IN (##List of  "t2f_travel"."office_id" in the page ##);
+
+    -- Adapted to make it prefetch
+    SELECT 'afghanistan' AS __schema,
+        "reports_sector"."id",
+        "reports_sector"."name",
+        "reports_sector"."description",
+        "reports_sector"."alternate_id",
+        "reports_sector"."alternate_name",
+        "reports_sector"."dashboard",
+        "reports_sector"."color",
+        "reports_sector"."created",
+        "reports_sector"."modified",
+        "reports_sector"."active"
+    FROM "reports_sector" WHERE "reports_sector"."id" in (## List of "t2f_travel"."section_id" in the page##);
+
+
+    -- Adapted to make it prefetch
+    SELECT "auth_user"."id",
+           "auth_user"."password",
+           "auth_user"."last_login",
+           "auth_user"."is_superuser",
+           "auth_user"."username",
+           "auth_user"."first_name",
+           "auth_user"."last_name",
+           "auth_user"."email",
+           "auth_user"."is_staff",
+           "auth_user"."is_active",
+           "auth_user"."date_joined",
+           "auth_user"."middle_name",
+           "auth_user"."created",
+           "auth_user"."modified",
+           "auth_user"."preferences"
+    FROM "auth_user" WHERE "auth_user"."id"  in (## List of "t2f_travel"."supervisor_id" in the page ##)'
+
+    -- Adapted to make it prefetch
+    SELECT "auth_user"."id",
+           "auth_user"."password",
+           "auth_user"."last_login",
+           "auth_user"."is_superuser",
+           "auth_user"."username",
+           "auth_user"."first_name",
+           "auth_user"."last_name",
+           "auth_user"."email",
+           "auth_user"."is_staff",
+           "auth_user"."is_active",
+           "auth_user"."date_joined",
+           "auth_user"."middle_name",
+           "auth_user"."created",
+           "auth_user"."modified",
+           "auth_user"."preferences"
+    FROM "auth_user" WHERE "auth_user"."id"  in (## List of "t2f_travel"."traveler_id" in the page ##)'
+
+
+    -- Adapted to make it prefetch
+    SELECT "t2f_travelattachment"."type",
+           "t2f_travelattachment"."file"
+    FROM "t2f_travelattachment"
+    WHERE "t2f_travelattachment"."travel_id" IN (##List of "t2f_travel"."id" in the page ##)
+
+    """
+
     def get_attachments(self, record, values, **kwargs):
         return ",\n".join(
             list(map(lambda x: ":".join(x), record.T2FTravelattachment_travel.values_list("type", "file")))

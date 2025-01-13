@@ -16,26 +16,6 @@ logger = get_task_logger(__name__)
 
 class AuditFinancialfindingLoader(EtoolsLoader):
     """
-
-    -- To list contries to iterate through.
-    SELECT "users_country"."id",
-           "users_country"."schema_name",
-           "users_country"."name",
-           "users_country"."business_area_code",
-           "users_country"."initial_zoom",
-           "users_country"."latitude",
-           "users_country"."longitude",
-           "users_country"."country_short_code",
-           "users_country"."vision_sync_enabled",
-           "users_country"."vision_last_synced",
-           "users_country"."local_currency_id",
-           "users_country"."long_name",
-           "users_country"."iso3_code",
-           "users_country"."custom_dashboards"
-    FROM "users_country"
-    WHERE NOT ("users_country"."schema_name" IN ('public'))
-    ORDER BY "users_country"."name" ASC;
-
     --
     SET search_path = public, ##COUNTRY##;
 
