@@ -1,0 +1,369 @@
+loaders:
+ - actiopoint:
+   -target: data_actionpoint
+   -sources:
+      db: etools 
+      primary: action_points_actionpoint
+
+   -fields:
+    "source_id":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "action_points_actionpoint"."id"
+
+    "country_name":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression:| 
+                      "__schema"
+
+    "schema_name":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression:| 
+                      "__schema"
+
+    "reference_number":
+      -mapping: 
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression:| 
+                      "action_points_actionpoint"."reference_number"
+
+
+    "author_username":
+      -mapping:           
+          - type: direct
+          - value: 
+              - query:
+                  - name:  primary
+                  - expression: | 
+                      "author_auth_user.username"
+
+    "assigned_by_name":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: assigned_by
+                - expression: |
+                    "auth_user"."name"         
+
+    "assigned_by_email":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: assigned_by 
+                - expression:|
+                    "auth_user"."email"         
+    
+    "assigned_to_name":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query:  
+                - name:  assigned_to
+                - expression: |
+                    "auth_user"."name"        
+
+    "assigned_to_email":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: assigned_to
+                - expression: |
+                    "auth_user"."email"      
+
+    "created":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."created"      
+
+    "modified":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."modified"      
+
+    "status":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."status"      
+
+    "description":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."description"      
+
+    "due_date":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."due_date"      
+
+    "date_of_completion":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."date_of_completion"      
+
+
+    "high_priority": 
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint".high_priority",         
+ 
+
+    "cp_output":    
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: reports_result
+                - expression: |
+                    "reports_result"."name"         
+
+
+    "cp_output_id":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."cp_output_id"         
+
+
+
+    "engagement_source_id":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: primary
+                - expression: |
+                    "action_points_actionpoint"."engagement_id" 
+
+
+
+    "engagement_type":
+       - mapping:           
+          - type: direct
+          - value: 
+              - query: 
+                - name: TOBEFILLED
+                - expression: |
+                    "TOBEFILLED"         
+
+
+   -queries:
+    primary:
+        - type: paged
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+            "        
+            SET search_path = public, ##COUNTRY##;
+
+            -- Count for paging;
+            SELECT COUNT(*) AS "__count" FROM "action_points_actionpoint"
+
+            SELECT 'afghanistan' AS __schema, 
+                    "action_points_actionpoint"."id",
+                    "action_points_actionpoint"."created",
+                    "action_points_actionpoint"."modified",
+                    "action_points_actionpoint"."status",
+                    "action_points_actionpoint"."description",
+                    "action_points_actionpoint"."due_date",
+                    "action_points_actionpoint"."date_of_completion",
+                    "action_points_actionpoint"."assigned_by_id",
+                    "action_points_actionpoint"."assigned_to_id",
+                    "action_points_actionpoint"."author_id",
+                    "action_points_actionpoint"."cp_output_id",
+                    "action_points_actionpoint"."engagement_id",
+                    "action_points_actionpoint"."intervention_id",
+                    "action_points_actionpoint"."location_id",
+                    "action_points_actionpoint"."office_id",
+                    "action_points_actionpoint"."partner_id",
+                    "action_points_actionpoint"."section_id",
+                    "action_points_actionpoint"."tpm_activity_id",
+                    "action_points_actionpoint"."high_priority",
+                    "action_points_actionpoint"."travel_activity_id",
+                    "action_points_actionpoint"."category_id",
+                    "action_points_actionpoint"."psea_assessment_id",
+                    "action_points_actionpoint"."reference_number",
+                    "action_points_actionpoint"."monitoring_activity_id"
+            FROM "action_points_actionpoint"
+            ORDER BY "action_points_actionpoint"."id" ASC
+            LIMIT ##PAGE_SIZE OFFSET ##PAGE_OFFSET##;
+            "
+
+    assigned_by:
+        - type: paged
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+            "  
+            -- Adapted to paged 
+            SELECT "auth_user"."id",
+                "auth_user"."password",
+                "auth_user"."last_login",
+                "auth_user"."is_superuser",
+                "auth_user"."username",
+                "auth_user"."first_name",
+                "auth_user"."last_name",
+                "auth_user"."email",
+                "auth_user"."is_staff",
+                "auth_user"."is_active",
+                "auth_user"."date_joined",
+                "auth_user"."middle_name",
+                "auth_user"."created",
+                "auth_user"."modified",
+                "auth_user"."preferences"
+            FROM "auth_user" as prefetched_assigned_by 
+            WHERE "auth_user"."id" 
+               IN (## List of "action_points_actionpoint"."assigned_by_id" in the page ##); 
+            "  
+
+    assigned_to:
+        - type: paged
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+            "     
+            -- Adapted to paged 
+            SELECT "auth_user"."id",
+                "auth_user"."password",
+                "auth_user"."last_login",
+                "auth_user"."is_superuser",
+                "auth_user"."username",
+                "auth_user"."first_name",
+                "auth_user"."last_name",
+                "auth_user"."email",
+                "auth_user"."is_staff",
+                "auth_user"."is_active",
+                "auth_user"."date_joined",
+                "auth_user"."middle_name",
+                "auth_user"."created",
+                "auth_user"."modified",
+                "auth_user"."preferences"
+            FROM "auth_user" as prefetched_assigned_to 
+            WHERE "auth_user"."id" 
+               IN (## List of "action_points_actionpoint"."assigned_to_id" in the page ##);
+            "  
+
+    reports_result:
+        - type: paged
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+            "        
+            -- Adapted to paged 
+            SELECT 'afghanistan' AS __schema,
+                "reports_result"."id",
+                "reports_result"."name",
+                "reports_result"."code",
+                "reports_result"."result_type_id",
+                "reports_result"."sector_id",
+                "reports_result"."gic_code",
+                "reports_result"."gic_name",
+                "reports_result"."humanitarian_tag",
+                "reports_result"."level",
+                "reports_result"."lft",
+                "reports_result"."parent_id",
+                "reports_result"."rght",
+                "reports_result"."sic_code",
+                "reports_result"."sic_name",
+                "reports_result"."tree_id",
+                "reports_result"."vision_id",
+                "reports_result"."wbs",
+                "reports_result"."activity_focus_code", 
+                "reports_result"."activity_focus_name",
+                "reports_result"."hidden",
+                "reports_result"."from_date",
+                "reports_result"."to_date",
+                "reports_result"."ram",
+                "reports_result"."country_programme_id",
+                "reports_result"."created",
+                "reports_result"."modified",
+                "reports_result"."humanitarian_marker_code",
+                "reports_result"."humanitarian_marker_name",
+                "reports_result"."programme_area_code",
+                "reports_result"."programme_area_name" 
+            FROM "reports_result" 
+            WHERE "reports_result"."id" 
+            IN (## List of "action_points_actionpoint"."cp_output_id" in the page ##);
+            "
+
+    django_content:
+        - type: allrecords
+        - expression: |
+            "SELECT "django_content_type"."id", 
+                    "django_content_type"."app_label", 
+                    "django_content_type"."model" 
+            FROM "django_content_type" 
+            WHERE ("django_content_type"."app_label" = 'action_points' 
+                    AND "django_content_type"."model" = 'actionpoint');
+            "
+
+    django_comments:
+        - type: allrecords
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+            "SELECT '##COUNTRY##' AS __schema, 
+                "django_comments"."id", 
+                "django_comments"."object_pk", 
+                "django_comments"."user_name", 
+                "django_comments"."user_email", 
+                "django_comments"."user_url", 
+                "django_comments"."comment", 
+                "django_comments"."submit_date", 
+                "django_comments"."ip_address", 
+                "django_comments"."is_public", 
+                "django_comments"."is_removed", 
+                "django_comments"."content_type_id", 
+                "django_comments"."site_id", 
+                "django_comments"."user_id" 
+            FROM "django_comments" 
+            WHERE ("django_comments"."content_type_id" = django_content_type"."id" )
+            AND "django_comments"."object_pk" = '2');
+            "
+
+      
+
+ 
