@@ -1,0 +1,295 @@
+loaders:
+ - actiopoint:
+   -target: data_attachment
+   -sources:
+      db: etools 
+      primary: attachments_attachmentflat
+
+   -fields:
+    "source_id":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "action_points_actionpoint"."id"
+
+    "country_name":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "__schema"
+
+    "schema_name":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "__schema"
+
+    "agreement_reference_number":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."agreement_reference_number"
+
+    "created":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression:| 
+                      "attachments_attachmentflat"."created"
+
+    "file_link":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."file_link"
+
+    "filename":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."filename"
+
+    "object_link":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."object_link"
+
+    "partner":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression:| 
+                      "attachments_attachmentflat"."partner"
+
+    "partner_type":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."partner_type"
+    "pd_ssfa":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."pd_ssfa"
+
+    "pd_ssfa_number":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."pd_ssfa_number"
+
+    "source":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."source"
+
+    "vendor_number":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "attachments_attachmentflat"."vendor_number"
+
+    "attachment_source_id" :
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "unicef_attachments_attachment"."id"
+    
+    "file":  
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "unicef_attachments_attachment"."file"
+    
+
+    "file_type":  
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "unicef_attachments_filetype"."name"
+    
+    "file_type_id":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "unicef_attachments_filetype"."id"
+    
+    "hyperlink":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "unicef_attachments_attachment"."hyperlink"
+
+    "code":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "unicef_attachments_attachment"."code"
+
+    "uploaded_by":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "auth_user"."username"
+    
+    "object_id": 
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "unicef_attachments_attachment"."object_id"
+
+    "content_type": 
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "django_content_type"."model"
+
+
+   -queries:
+    primary:
+        - type: paged
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+            """ 
+            -- Set country schema
+            SET search_path = public, ##COUNTRY##;
+
+            -- Count for paging;
+            SELECT COUNT(*) AS "__count" 
+            FROM "attachments_attachmentflat"
+
+            SELECT '##COUNTRY##' AS __schema,
+                  "attachments_attachmentflat"."id",
+                  "attachments_attachmentflat"."partner",
+                  "attachments_attachmentflat"."partner_type",
+                  "attachments_attachmentflat"."vendor_number",
+                  "attachments_attachmentflat"."pd_ssfa_number",
+                  "attachments_attachmentflat"."file_type",
+                  "attachments_attachmentflat"."file_link",
+                  "attachments_attachmentflat"."uploaded_by",
+                  "attachments_attachmentflat"."attachment_id",
+                  "attachments_attachmentflat"."filename",
+                  "attachments_attachmentflat"."agreement_reference_number",
+                  "attachments_attachmentflat"."object_link",
+                  "attachments_attachmentflat"."source",
+                  "attachments_attachmentflat"."pd_ssfa",
+                  "attachments_attachmentflat"."created",
+                  "attachments_attachmentflat"."ip_address",
+
+                  "unicef_attachments_attachment"."id",
+                  "unicef_attachments_attachment"."created",
+                  "unicef_attachments_attachment"."modified",
+                  "unicef_attachments_attachment"."file",
+                  "unicef_attachments_attachment"."hyperlink",
+                  "unicef_attachments_attachment"."object_id",
+                  "unicef_attachments_attachment"."code",
+                  "unicef_attachments_attachment"."content_type_id",
+                  "unicef_attachments_attachment"."file_type_id",
+                  "unicef_attachments_attachment"."uploaded_by_id",
+                  "unicef_attachments_attachment"."ip_address",
+
+                  "django_content_type"."id",
+                  "django_content_type"."app_label",
+                  "django_content_type"."model",
+
+                  "unicef_attachments_filetype"."id",
+                  "unicef_attachments_filetype"."order",
+                  "unicef_attachments_filetype"."name",
+                  "unicef_attachments_filetype"."label",
+                  "unicef_attachments_filetype"."code",
+                  "unicef_attachments_filetype"."group",
+
+                  "auth_user"."id", "auth_user"."password",
+                  "auth_user"."last_login",
+                  "auth_user"."is_superuser",
+                  "auth_user"."username",
+                  "auth_user"."first_name",
+                  "auth_user"."last_name",
+                  "auth_user"."email",
+                  "auth_user"."is_staff",
+                  "auth_user"."is_active",
+                  "auth_user"."date_joined",
+                  "auth_user"."middle_name",
+                  "auth_user"."created",
+                  "auth_user"."modified",
+                  "auth_user"."preferences"
+
+            FROM "attachments_attachmentflat"
+            INNER JOIN "unicef_attachments_attachment" ON ("attachments_attachmentflat"."attachment_id" = "unicef_attachments_attachment"."id")
+            LEFT OUTER JOIN "django_content_type" ON ("unicef_attachments_attachment"."content_type_id" = "django_content_type"."id")
+            LEFT OUTER JOIN "unicef_attachments_filetype" ON ("unicef_attachments_attachment"."file_type_id" = "unicef_attachments_filetype"."id")
+            LEFT OUTER JOIN "auth_user" ON ("unicef_attachments_attachment"."uploaded_by_id" = "auth_user"."id")
+            ORDER BY "attachments_attachmentflat"."id" ASC
+            LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+            """
+
+

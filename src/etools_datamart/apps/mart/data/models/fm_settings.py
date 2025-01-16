@@ -7,51 +7,6 @@ from etools_datamart.apps.sources.etools.models import FieldMonitoringSettingsLo
 
 
 class LocationsiteLoader(EtoolsLoader):
-    """
-    --
-    SET search_path = public,##COUNTRY##;
-
-    --
-    SELECT COUNT(*) AS "__count"
-    FROM "field_monitoring_settings_locationsite";
-
-    -- field_monitoring_settings_locationsite entries for the page
-    SELECT '##COUNTRY##' AS __schema,
-           "field_monitoring_settings_locationsite"."id",
-           "field_monitoring_settings_locationsite"."created",
-           "field_monitoring_settings_locationsite"."modified",
-           "field_monitoring_settings_locationsite"."name",
-           "field_monitoring_settings_locationsite"."p_code",
-           "field_monitoring_settings_locationsite"."point",
-           "field_monitoring_settings_locationsite"."is_active",
-           "field_monitoring_settings_locationsite"."parent_id"
-    FROM "field_monitoring_settings_locationsite"
-    ORDER BY "field_monitoring_settings_locationsite"."id" ASC
-    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
-
-    -- Location entries for the page
-    SELECT '##COUNTRY##' AS __schema,
-    "locations_location"."id",
-    "locations_location"."name",
-    "locations_location"."latitude",
-    "locations_location"."longitude",
-    "locations_location"."p_code",
-    "locations_location"."point",
-    "locations_location"."geom",
-    "locations_location"."level",
-    "locations_location"."lft",
-    "locations_location"."parent_id",
-    "locations_location"."rght",
-    "locations_location"."tree_id",
-    "locations_location"."created",
-    "locations_location"."modified",
-    "locations_location"."is_active",
-    "locations_location"."admin_level",
-    "locations_location"."admin_level_name"
-    FROM "locations_location"
-    WHERE "locations_location"."id"  IN (## LIST OF "field_monitoring_settings_locationsite"."parent_id" IN THE PAGE##) ;
-    """
-
     def get_parent(self, record: FieldMonitoringSettingsLocationsite, values: dict, **kwargs):
         from etools_datamart.apps.mart.data.models import Location
 
