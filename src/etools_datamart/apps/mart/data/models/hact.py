@@ -8,6 +8,34 @@ from etools_datamart.apps.sources.etools.models import HactAggregatehact
 
 
 class HACTLoader(EtoolsLoader):
+    """
+    --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    --
+    --FOR EACH ##YEAR##  IN (2018, 2019. 2020, 2021,...  <THIS YEAR>)
+    --Perform following;
+    SELECT '##COUNTRY##' AS __schema,
+           "hact_aggregatehact"."id",
+           "hact_aggregatehact"."created",
+           "hact_aggregatehact"."modified",
+           "hact_aggregatehact"."year",
+           "hact_aggregatehact"."partner_values"
+    FROM "hact_aggregatehact"
+    WHERE "hact_aggregatehact"."year" =##YEAR##)
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    --NOTE:
+    --When available JSON properties are to be retrieved;
+    --"hact_aggregatehact"."partner_values"["assurance_activities"]["micro_assessment"],
+    --"hact_aggregatehact"."partner_values"["assurance_activities"]["programmatic_visits"]["completed"],
+    --"hact_aggregatehact"."partner_values"["assurance_activities"]["spot_checks"]["follow_up"],
+    --"hact_aggregatehact"."partner_values"["assurance_activities"]["spot_checks"]["completed"],
+    --"hact_aggregatehact"."partner_values"["assurance_activities"]["scheduled_audit"],
+    --"hact_aggregatehact"."partner_values"["assurance_activities"]["special_audit"]
+    """
+
     def get_queryset(self):
         return self.config.source.objects.filter(year=self.context["year"])
         # return HactAggregatehact.objects.filter(year=self.context['year'])

@@ -7,9 +7,94 @@ from etools_datamart.apps.sources.etools.models import AuthUser
 
 
 class EtoolsUserLoader(CommonSchemaLoader):
+    """
+    --
+    SELECT COUNT(*) AS "__count" FROM "auth_user";
+
+    --
+    SELECT "auth_user"."id",
+           "auth_user"."password",
+           "auth_user"."last_login",        -- mapped to .last_login
+           "auth_user"."is_superuser",      -- mapped to .is_superuser
+           "auth_user"."username",          -- mapped to .username
+           "auth_user"."first_name",        -- mapped to .first_name
+           "auth_user"."last_name",         -- mapped to .last_name
+           "auth_user"."email",             -- mapped to .email
+           "auth_user"."is_staff",          -- mapped to .is_staff
+           "auth_user"."is_active",         -- mapped to .is_active
+           "auth_user"."date_joined",       -- mapped to .date_joined
+           "auth_user"."middle_name",       -- mapped to .middle_name
+           "auth_user"."created",           -- mapped to .created
+           "auth_user"."modified",          -- mapped to .modified
+           "auth_user"."preferences"
+    FROM "auth_user"
+    ORDER BY "auth_user"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    --
+    SELECT "users_userprofile"."id",
+           "users_userprofile"."job_title",              -- mapped to .modified
+           "users_userprofile"."phone_number",           -- mapped to .phone_number
+           "users_userprofile"."country_id",
+           "users_userprofile"."office_id",
+           "users_userprofile"."country_override_id",
+           "users_userprofile"."_partner_staff_member",  -- mapped to .partner_staff_member
+           "users_userprofile"."guid",                   -- mapped to .guid
+           "users_userprofile"."org_unit_code",          -- mapped to .org_unit_code
+           "users_userprofile"."org_unit_name",          -- mapped to .org_unit_name
+           "users_userprofile"."post_number",            -- mapped to .post_number
+           "users_userprofile"."post_title",             -- mapped to .post_title
+           "users_userprofile"."staff_id",               -- mapped to .staff_id
+           "users_userprofile"."vendor_number",          -- mapped to .vendor_number
+           "users_userprofile"."oic_id",                 -- mapped to .oic
+           "users_userprofile"."supervisor_id",          -- mapped to .superviser
+           "users_userprofile"."organization_id",
+           "users_userprofile"."receive_tpm_notifications",
+           "users_userprofile"."user_id"
+    FROM "users_userprofile"
+    WHERE "users_userprofile"."user_id"(##List of  "auth_user"."id" in the page ##);
+
+    --
+    SELECT "organizations_organization"."id",
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id"
+    FROM "organizations_organization"
+    WHERE "organizations_organization"."id" in (## List of "users_userprofile"."organization_id" in the page##);
+
+    --
+    SELECT DISTINCT "auth_group"."name"
+    FROM "users_realm"
+    INNER JOIN "auth_group" ON ("users_realm"."group_id" = "auth_group"."id")
+    WHERE "users_realm"."user_id" IN (## List of "auth_user"."id" in the page##);
+
+    --
+    SELECT DISTINCT "users_country"."name"              -- maps to .country_name
+    FROM "users_realm"
+    INNER JOIN "users_country" ON ("users_realm"."country_id" = "users_country"."id")
+    WHERE "users_realm"."user_id" IN (## List of "auth_user"."id" in the page##);
+
+    --
+    SELECT "users_office"."id",
+           "users_office"."name",                    -- mapped to .office
+           "users_office"."zonal_chief_id"
+    FROM "users_office"
+    WHERE "users_office"."id" IN (## List of "users_userprofile"."office_id" in the page##);
+
+
+    """
+
+    ##  maps to .groups
     def get_groups(self, record, values, **kwargs):
         return ", ".join(record.UsersRealm_user.values_list("group__name", flat=True).distinct())
 
+    ##  maps to .countries_available
     def get_countries_available(self, record, values, **kwargs):
         try:
             return ", ".join(record.UsersRealm_user.values_list("country__name", flat=True).distinct())

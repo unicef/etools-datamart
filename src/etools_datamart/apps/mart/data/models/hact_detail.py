@@ -57,6 +57,84 @@ def get_item(d, target, default: object = "N/A", sep="|"):
 
 
 class HACTDetailLoader(EtoolsLoader):
+    """
+    --Loader for HACTHistory (HACTDetailLoader)
+
+    --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "hact_hacthistory";
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "hact_hacthistory"."id",
+           "hact_hacthistory"."created",
+           "hact_hacthistory"."modified",
+           "hact_hacthistory"."year",
+           "hact_hacthistory"."partner_values",
+           "hact_hacthistory"."partner_id",
+
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date",
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name",
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id"
+    FROM "hact_hacthistory"
+    INNER JOIN "partners_partnerorganization" ON ("hact_hacthistory"."partner_id" = "partners_partnerorganization"."id")
+    ORDER BY "hact_hacthistory"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    --
+    SELECT "organizations_organization"."id",
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id"
+    FROM "organizations_organization"
+    WHERE "organizations_organization"."id" IN (## LIST OF "partners_partnerorganization"."organization_id" IN THE PAGE ##);
+    """
+
     def get_pv_completed_year(self, record, values, field_name):
         ret = 0
         for i in range(1, 5):

@@ -13,6 +13,119 @@ from etools_datamart.apps.sources.etools.models import PartnersPartnerorganizati
 
 
 class PartnerLoader(EtoolsLoader):
+    """
+    -- To run per country schema
+    SET search_path = public,##COUNTRY##;
+
+    -- Count for paging
+    SELECT COUNT(*) AS "__count" FROM "partners_partnerorganization;
+
+    -- Partner Organization
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date",
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name",
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id",
+
+           "reports_office"."id",
+           "reports_office"."name", '
+
+           "reports_sector"."id",
+           "reports_sector"."name",
+           "reports_sector"."description",
+           "reports_sector"."alternate_id",
+           "reports_sector"."alternate_name",
+           "reports_sector"."dashboard",
+           "reports_sector"."color",
+           "reports_sector"."created",
+           "reports_sector"."modified",
+           "reports_sector"."active",
+
+           "organizations_organization"."id",
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id",
+
+           "partners_plannedengagement"."id",
+           "partners_plannedengagement"."created",
+           "partners_plannedengagement"."modified",
+           "partners_plannedengagement"."spot_check_planned_q1",
+           "partners_plannedengagement"."spot_check_planned_q2",
+           "partners_plannedengagement"."spot_check_planned_q3",
+           "partners_plannedengagement"."spot_check_planned_q4",
+           "partners_plannedengagement"."scheduled_audit",
+           "partners_plannedengagement"."special_audit",
+           "partners_plannedengagement"."spot_check_follow_up",
+           "partners_plannedengagement"."partner_id"
+    FROM "partners_partnerorganization"
+    LEFT OUTER JOIN "reports_office" ON ("partners_partnerorganization"."lead_office_id" = "reports_office"."id")
+    LEFT OUTER JOIN "reports_sector" ON ("partners_partnerorganization"."lead_section_id" = "reports_sector"."id")
+    INNER JOIN "organizations_organization" ON ("partners_partnerorganization"."organization_id" = "organizations_organization"."id")
+    LEFT OUTER JOIN "partners_plannedengagement" ON ("partners_partnerorganization"."id" = "partners_plannedengagement"."partner_id")
+    ORDER BY "partners_partnerorganization"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+
+    --  Travel Activity
+    SELECT  '##COUNTRY##' AS __schema,
+            "t2f_travelactivity"."id",
+            "t2f_travelactivity"."travel_type",
+            "t2f_travelactivity"."date",
+            "t2f_travelactivity"."partner_id",
+            "t2f_travelactivity"."partnership_id",
+            "t2f_travelactivity"."primary_traveler_id",
+            "t2f_travelactivity"."result_id"
+    FROM "t2f_travelactivity"
+    INNER JOIN "t2f_travelactivity_travels" ON ("t2f_travelactivity"."id" = "t2f_travelactivity_travels"."travelactivity_id")
+    INNER JOIN "t2f_travel" ON ("t2f_travelactivity_travels"."travel_id" = "t2f_travel"."id")
+    WHERE ("t2f_travelactivity"."date" IS NOT NULL AND "t2f_travelactivity"."travel_type" = 'Programmatic Visit'
+           AND "t2f_travel"."status" = 'completed' AND "t2f_travel"."traveler_id" = ("t2f_travelactivity"."primary_traveler_id")
+           AND "t2f_travelactivity"."partner_id" IN (##PARTNER_ID_LIST_IN_THE_PAGE##)
+    ORDER BY "t2f_travelactivity"."date" DESC;
+
+    """
+
     def get_queryset(self):
         return (
             PartnersPartnerorganization.objects.select_related(

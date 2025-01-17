@@ -10,6 +10,35 @@ from etools_datamart.apps.sources.etools.models import AuthUser
 
 
 class UserStatsLoader(EtoolsLoader):
+    """
+        --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    SELECT COUNT(*) AS "__count" --
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE "users_userprofile"."country_id" IN (## List  of "users_country"."id" in the page ##);
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE ("users_userprofile"."country_id" IN (## List of "users_country"."id" in the page ##)
+    AND "auth_user"."email"::text LIKE '%@unicef.org');
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE ("users_userprofile"."country_id" IN (## List of "users_country"."id" in the page ##)
+    AND EXTRACT(MONTH FROM "auth_user"."last_login" AT TIME ZONE 'UTC') = 1) ;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "auth_user" INNER JOIN "users_userprofile" ON ("auth_user"."id" = "users_userprofile"."user_id")
+    WHERE ("users_userprofile"."country_id" IN (## List of "users_country"."id" in the page ##)
+    AND "auth_user"."email"::text LIKE '%@unicef.org'
+    AND EXTRACT(MONTH FROM "auth_user"."last_login" AT TIME ZONE 'UTC') = 1)
+    """
+
     def get_queryset(self):
         return self.config.source.objects.filter(profile__country=self.context["country"])
         # return AuthUser.objects.filter(profile__country=self.context['country'])

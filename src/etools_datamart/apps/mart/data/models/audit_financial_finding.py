@@ -15,6 +15,35 @@ logger = get_task_logger(__name__)
 
 
 class AuditFinancialfindingLoader(EtoolsLoader):
+    """
+    --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "audit_financialfinding"."id",
+           "audit_financialfinding"."title",
+           "audit_financialfinding"."local_amount",
+           "audit_financialfinding"."amount",
+           "audit_financialfinding"."description",
+           "audit_financialfinding"."recommendation",
+           "audit_financialfinding"."ip_comments",
+           "audit_financialfinding"."audit_id"
+    FROM "audit_financialfinding"
+    ORDER BY "audit_financialfinding"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+
+    -- Also FROM DATAMART DB;
+    SELECT source_id as audit_id,
+            auditor_number as partner_vendor_number,
+            auditor as partner_name,
+            reference_number as audit_reference_number,
+            status as audit_status
+    FROM data_audit
+    WHERE source_id in ##LIST OF "audit_financialfinding"."audit_id" IN THE PAGE##;
+    """
+
     def process_country(self):
         country = self.context["country"]
         batch_size = settings.RESULTSET_BATCH_SIZE

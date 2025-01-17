@@ -21,6 +21,167 @@ logger = get_task_logger(__name__)
 
 
 class MicroAssessmentLoader(EngagementMixin, EtoolsLoader):
+    """
+    --
+    SET search_path = public, ##COUNTRY##;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "audit_microassessment";
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "audit_microassessment"."engagement_ptr_id",
+           "audit_microassessment"."questionnaire_version",
+
+           "audit_engagement"."id",
+           "audit_engagement"."created",
+           "audit_engagement"."modified",
+           "audit_engagement"."status",
+           "audit_engagement"."partner_contacted_at",
+           "audit_engagement"."engagement_type",
+           "audit_engagement"."start_date",
+           "audit_engagement"."end_date",
+           "audit_engagement"."total_value",
+           "audit_engagement"."date_of_field_visit",
+           "audit_engagement"."date_of_draft_report_to_ip",
+           "audit_engagement"."date_of_comments_by_ip",
+           "audit_engagement"."date_of_draft_report_to_unicef",
+           "audit_engagement"."date_of_comments_by_unicef",
+           "audit_engagement"."date_of_report_submit",
+           "audit_engagement"."date_of_final_report",
+           "audit_engagement"."date_of_cancel",
+           "audit_engagement"."amount_refunded",
+           "audit_engagement"."additional_supporting_documentation_provided",
+           "audit_engagement"."justification_provided_and_accepted",
+           "audit_engagement"."write_off_required",
+           "audit_engagement"."cancel_comment",
+           "audit_engagement"."explanation_for_additional_information",
+           "audit_engagement"."partner_id",
+           "audit_engagement"."joint_audit",
+           "audit_engagement"."agreement_id",
+           "audit_engagement"."po_item_id",
+           "audit_engagement"."shared_ip_with",
+           "audit_engagement"."exchange_rate",
+           "audit_engagement"."currency_of_report",
+           "audit_engagement"."reference_number",
+           "audit_engagement"."year_of_audit"
+    FROM "audit_microassessment"
+    INNER JOIN "audit_engagement" ON ("audit_microassessment"."engagement_ptr_id" = "audit_engagement"."id")
+    ORDER BY "audit_microassessment"."engagement_ptr_id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+
+    -- Partner organization records for audit_engagement records
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date",
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name",
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id"
+
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id"
+    FROM "partners_partnerorganization"
+        INNER JOIN "organizations_organization" ON ("partners_partnerorganization"."organization_id"="organizations_organization"."id")
+    WHERE "partners_partnerorganization"."id" IN (##LIST OF "audit_engagement"."partner_id" IN THE PAGE## )
+
+    --
+    SELECT "purchase_order_purchaseorder"."id",
+           "purchase_order_purchaseorder"."created",
+           "purchase_order_purchaseorder"."modified",
+           "purchase_order_purchaseorder"."order_number",
+           "purchase_order_purchaseorder"."contract_start_date",
+           "purchase_order_purchaseorder"."contract_end_date",
+           "purchase_order_purchaseorder"."auditor_firm_id",
+
+           "purchase_order_auditorfirm"."created",
+           "purchase_order_auditorfirm"."modified",
+           "purchase_order_auditorfirm"."street_address",
+           "purchase_order_auditorfirm"."city",
+           "purchase_order_auditorfirm"."postal_code",
+           "purchase_order_auditorfirm"."country",
+           "purchase_order_auditorfirm"."email",
+           "purchase_order_auditorfirm"."phone_number",
+           "purchase_order_auditorfirm"."blocked",
+           "purchase_order_auditorfirm"."hidden",
+           "purchase_order_auditorfirm"."deleted_flag",
+           "purchase_order_auditorfirm"."vision_synced",
+           "purchase_order_auditorfirm"."unicef_users_allowed",
+           "purchase_order_auditorfirm"."organization_id"
+    FROM "purchase_order_purchaseorder"
+    INNER JOIN  "purchase_order_auditorfirm" ON ("purchase_order_purchaseorder"."auditor_firm_id"="purchase_order_auditorfirm"."id")
+    WHERE "purchase_order_purchaseorder"."id" IN (## LIST OF "audit_engagement"."agreement_id"## IN THE PAGE##);
+
+
+    SELECT 'afghanistan' AS __schema,
+           "audit_risk"."id",
+           "audit_risk"."value",
+           "audit_risk"."extra",
+           "audit_risk"."blueprint_id",
+           "audit_risk"."engagement_id"
+    FROM "audit_risk"
+    INNER JOIN "audit_riskblueprint" ON ("audit_risk"."blueprint_id" = "audit_riskblueprint"."id")
+    INNER JOIN "audit_riskcategory" ON ("audit_riskblueprint"."category_id" = "audit_riskcategory"."id") WHERE ("audit_riskcategory"."code" = 'ma_global_assessment'
+          AND "audit_risk"."engagement_id" IN (## LIST OF "audit_microassessment"."engagement_ptr_id" in the PAGE##)));
+
+
+    SELECT '##COUNTRY##' AS __schema,
+           "audit_riskblueprint"."id",
+           "audit_riskblueprint"."order",
+           "audit_riskblueprint"."weight",
+           "audit_riskblueprint"."is_key",
+           "audit_riskblueprint"."header",
+           "audit_riskblueprint"."description",
+           "audit_riskblueprint"."category_id"
+    FROM "audit_riskblueprint"
+    WHERE "audit_riskblueprint"."id" IN( ##LIST OF "audit_risk"."blueprint_id" IN THE PAGE##)
+
+
+
+    """
+
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")

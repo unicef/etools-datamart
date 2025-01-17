@@ -6,6 +6,75 @@ from etools_datamart.apps.sources.etools.models import ReportsResult
 
 
 class Result(EtoolsDataMartModel):
+    """
+    --
+    SET search_path = public, ##PRODUCT##;
+
+    --
+    SELECT COUNT(*) AS "__count" FROM "reports_result";
+
+    --
+    SELECT 'afghanistan' AS __schema,
+          "reports_result"."id",
+          "reports_result"."name",                      -- mapped to .name
+          "reports_result"."code",                      -- mapped to .code
+          "reports_result"."result_type_id",
+          "reports_result"."sector_id",
+          "reports_result"."gic_code",                  -- mapped to .gic_code
+          "reports_result"."gic_name",                  -- mapped to .gic_name
+          "reports_result"."humanitarian_tag",          -- mapped to .humanitarian_tag
+          "reports_result"."level",
+          "reports_result"."lft",
+          "reports_result"."parent_id",
+          "reports_result"."rght",
+          "reports_result"."sic_code",                  -- mapped to .sic_code
+          "reports_result"."sic_name",                  -- mapped to .sic_name
+          "reports_result"."tree_id",
+          "reports_result"."vision_id",
+          "reports_result"."wbs",
+          "reports_result"."activity_focus_code",       -- mapped to .activity_focus_code
+          "reports_result"."activity_focus_name",       -- mapped to .activity_focus_name
+          "reports_result"."hidden",
+          "reports_result"."from_date",                 -- mapped to .from_date
+          "reports_result"."to_date",                   -- mapped to .to_date
+          "reports_result"."ram",                       -- mapped to .ram
+          "reports_result"."country_programme_id",
+          "reports_result"."created",
+          "reports_result"."modified",
+          "reports_result"."humanitarian_marker_code",  -- mapped to .humanitarian_marker_code
+          "reports_result"."humanitarian_marker_name",  -- mapped to .humanitarian_marker_name
+          "reports_result"."programme_area_code",       -- mapped to .programme_area_code
+          "reports_result"."programme_area_name"        -- mapped to .programme_area_name
+    FROM "reports_result"
+    ORDER BY "reports_result"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+          "reports_resulttype"."id",
+          "reports_resulttype"."name"                   --  mapped to .result_type
+    FROM "reports_resulttype"
+    WHERE "reports_resulttype"."id" in (## List of "reports_result"."result_type_id" in the page##);
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+          "reports_countryprogramme"."id",
+          "reports_countryprogramme"."name",           -- mapped to .country_programme
+          "reports_countryprogramme"."wbs",            -- mapped to .wbs
+          "reports_countryprogramme"."from_date",
+          "reports_countryprogramme"."to_date",
+          "reports_countryprogramme"."invalid"
+    FROM "reports_countryprogramme"
+    WHERE "reports_countryprogramme"."id" in (## List of "reports_result"."country_programme_id" in the page##);
+
+
+    SELECT id,
+           name                                        -- mapped to .section
+    FROM ReportsSector
+    WHERE id in (## List of "reports_result"."sector_id" in the page ##)
+
+    """
+
     name = models.TextField(blank=True, null=True)
     code = models.CharField(max_length=50, blank=True, null=True)
     result_type = models.CharField(max_length=150, blank=True, null=True)

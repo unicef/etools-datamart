@@ -38,6 +38,158 @@ class InterventionSimpleAbstract(models.Model):
 
 class InterventionEPDLoader(EtoolsLoader):
     pass
+    """
+    --  
+    SET search_path = public,##COUNTRY##;
+
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "partners_intervention";
+
+    --
+    SELECT '##COUNTRY##' AS __schema, 
+           "partners_intervention"."id",                                -- directly mapped to .source_id 
+           "partners_intervention"."created",
+           "partners_intervention"."modified",
+           "partners_intervention"."document_type",
+           "partners_intervention"."number",
+           "partners_intervention"."title",
+           "partners_intervention"."status",
+           "partners_intervention"."start",
+           "partners_intervention"."end",
+           "partners_intervention"."submission_date",
+           "partners_intervention"."submission_date_prc",
+           "partners_intervention"."review_date_prc",
+           "partners_intervention"."prc_review_document",
+           "partners_intervention"."signed_by_unicef_date",
+           "partners_intervention"."signed_by_partner_date",
+           "partners_intervention"."population_focus",
+           "partners_intervention"."agreement_id",
+           "partners_intervention"."unicef_signatory_id",
+           "partners_intervention"."signed_pd_document",
+           "partners_intervention"."country_programme_id",
+           "partners_intervention"."contingency_pd",
+           "partners_intervention"."metadata",
+           "partners_intervention"."in_amendment",
+           "partners_intervention"."reference_number_year",
+           "partners_intervention"."activation_letter",
+           "partners_intervention"."termination_doc",
+           "partners_intervention"."cfei_number",
+           "partners_intervention"."budget_owner_id",
+           "partners_intervention"."context",                           -- directly mapped to .date_sent_to_partner
+           "partners_intervention"."date_sent_to_partner",              -- directly mapped to .equity_narrative   
+           "partners_intervention"."equity_narrative",                  -- directly mapped to .equity_narrative   
+           "partners_intervention"."equity_rating",                     -- directly mapped to .equity_ratting      
+           "partners_intervention"."gender_narrative",                  -- directly mapped to .gender_narrative   
+           "partners_intervention"."gender_rating",                     -- directly mapped to .gender_rating 
+           "partners_intervention"."hq_support_cost",                   -- directly mapped to .hq_support_cost 
+           "partners_intervention"."implementation_strategy",           -- directly mapped to .implementation_strategy 
+           "partners_intervention"."ip_program_contribution",           -- directly mapped to .ip_program_contribution 
+           "partners_intervention"."partner_accepted",                  -- directly mapped to .partner_accepted
+           "partners_intervention"."sustainability_narrative",          -- directly mapped to .sustainability_narrative 
+           "partners_intervention"."sustainability_rating",             -- directly mapped to .sustainability_rating
+           "partners_intervention"."unicef_accepted",                   -- directly mapped to .unicef_accepted   
+           "partners_intervention"."unicef_court",                      -- directly mapped to .unicef_court  
+           "partners_intervention"."unicef_review_type",                -- directly mapped to .humanitarian_flag
+           "partners_intervention"."humanitarian_flag",                 -- directly mapped to .capacity_development
+           "partners_intervention"."capacity_development",              -- directly mapped to .other_info
+           "partners_intervention"."other_info",                        -- directly mapped to .other_partners_involved 
+           "partners_intervention"."other_partners_involved",           -- directly mapped to .technical_guidance 
+           "partners_intervention"."technical_guidance",                -- directly mapped to .cash_transfer_modalities
+           "partners_intervention"."cash_transfer_modalities",          -- directly mapped to .cancel_justification
+           "partners_intervention"."cancel_justification",              -- directly mapped to .date_partnership_review_performed  
+           "partners_intervention"."date_partnership_review_performed", -- directly mapped  to .accepted_on_behalf_of_partner
+           "partners_intervention"."accepted_on_behalf_of_partner",     -- directly mapped to .accepted_on_behalf_of_partner
+           "partners_intervention"."activation_protocol",               -- directly mapped to .activation_protocol
+           "partners_intervention"."confidential",                      -- directly mapped to .confidential 
+           "partners_intervention"."has_activities_involving_children",
+           "partners_intervention"."has_data_processing_agreement",
+           "partners_intervention"."has_special_conditions_for_construction",
+           "partners_intervention"."final_review_approved",
+           "partners_intervention"."other_details", 
+           "partners_intervention"."partner_authorized_officer_signatory_id",
+
+           "partners_agreement"."id", 
+           "partners_agreement"."created",
+           "partners_agreement"."modified",
+           "partners_agreement"."start",
+           "partners_agreement"."end",
+           "partners_agreement"."agreement_type",
+           "partners_agreement"."agreement_number",
+           "partners_agreement"."attached_agreement",
+           "partners_agreement"."signed_by_unicef_date",
+           "partners_agreement"."signed_by_partner_date",
+           "partners_agreement"."partner_id",
+           "partners_agreement"."signed_by_id",
+           "partners_agreement"."status",
+           "partners_agreement"."country_programme_id",
+           "partners_agreement"."reference_number_year",
+           "partners_agreement"."special_conditions_pca",
+           "partners_agreement"."terms_acknowledged_by_id",
+           "partners_agreement"."partner_manager_id", 
+
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date",
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name",
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id" ,
+
+           "organizations_organization"."id",
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id",
+
+           "auth_user"."id",
+           "auth_user"."username"                                      -- directly mapped to .budget_owner 
+
+    FROM "partners_intervention",
+    INNER JOIN "partners_agreement" ON ("partners_intervention"."agreement_id" = "partners_intervention"."agreement_id")
+    INNER JOIN "partners_partnerorganization" ON ("partners_partnerorganization"."id" =  "partners_agreement"."partner_id") 
+    INNER JOIN "organizations_organization" ON ("organizations_organization"."id" = "partners_partnerorganization"."organization_id")
+    INNER JOIN "auth_user" ON ( "auth_user"."id" = "partners_intervention"."budget_owner_id" )
+    ORDER BY "partners_intervention"."id" ASC 
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##; 
+    """
 
 
 class InterventionEPD(InterventionSimpleAbstract, EtoolsDataMartModel):

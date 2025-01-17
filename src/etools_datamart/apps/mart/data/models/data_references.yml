@@ -1,0 +1,519 @@
+# This file lists source tables for datamart etl loaders. It also lists the 
+# target datamart  tables (with prefix data_) that depend of on these source tables.
+
+# TODO: More etools source tables are to be added with their targets
+# TODO: prp db's source tables are to be added 
+# TODO: The fields of these source tables  un use by the are to be added 
+
+
+datamart_db:
+  shared_schema:
+    audit: 
+      targets:
+        - data_auditfinancialfinding
+
+etools_db:
+  
+  SHARED_SCHEMA:
+    auth_user:
+      targets:
+        - data_action_points   
+        - data_attachment 
+        - data_engagement
+        - data_interventionepd
+        - data_intervention
+        - data_agreement           
+        - data_assessment
+        - data_interventionbudget   
+        - data_etoolsuser
+        - data_userstats
+
+    auth_group:
+      targets:
+        - data_etoolsuser
+
+    categories_category:  
+      targets:
+        - data_audit
+        - data_spotcheck 
+
+    django_content_type:
+      targets:
+        - data_action_points
+        - data_attachment
+        - data_engagement
+
+    users_country:    
+      targets:
+        - data_agreement           
+        - data_interventionbudget
+        - data_etoolsuser
+        - data_userstats  
+
+    users_office:
+      targets:
+      - data_etoolsuser
+
+    users_realm:
+      targets:
+      - data_etoolsuser
+
+    users_userprofile:
+      targets:
+      - data_interventionbudget    
+      - data_etoolsuser
+      - data_userstats
+  
+  COUNTRY_SCHEMA:
+     activities_activity:
+       targets: 
+         - data_partnerhact    
+
+     action_points_actionpoint:
+       targets: 
+         - data_action_points
+         - data_audit
+         - data_auditspecial 
+         - data_spotcheck 
+
+     #- data_assigned_by_auth_user 
+    
+     attachments_attachmentflat:
+       targets: 
+         - data_attachment
+
+     audit_audit:
+       targets:
+        - data_audit
+        - data_auditresult
+        - data_famindicator
+          
+          
+     audit_engagement:
+      targets:
+        - data_audit
+        - data_engagement
+        - data_microassessment
+        - data_auditresult
+        - data_auditspecial 
+        - data_spotcheck
+        - data_famindicator
+        - data_partnerhact 
+
+     audit_engagement_active_pd:
+      targets:
+        - data_engagement
+
+
+     audit_engagement_authorized_officers:
+      targets:
+        - data_engagement
+
+     audit_engagement_offices:
+      targets:
+        - data_audit
+        - data_auditspecial
+        - data_spotcheck 
+
+     audit_engagement_sections:
+       targets:
+        - data_audit
+        - data_engagement
+        - data_auditspecial 
+        - data_spotcheck
+
+     audit_engagement_staff_members:
+      targets:
+        - data_engagement
+
+     audit_financialfinding:
+       targets:
+        - data_audit
+        - data_auditfinancialfinding
+        - data_auditresult
+
+     audit_finding:
+       targets:
+        - data_spotcheck
+
+     audit_keyinternalcontrol:
+       targets:
+        - data_audit
+        - data_auditresult
+
+     audit_microassessment:
+       targets:
+        - data_engagement
+        - data_microassessment
+
+     audit_risk:
+       targets:
+        - data_engagement
+        - data_microassessment
+        - data_auditresult
+
+     audit_specialaudit:
+       targets:
+        - data_auditspecial         
+        - data_famindication    
+
+     audit_specialauditrecommendation:
+       targets:
+        - data_auditspecial 
+
+     audit_spotcheck:
+       targets:
+       - data_spotcheck 
+       - data_famindicator
+       - data_partnerhact
+
+     audit_riskblueprint:
+       targets:
+        - data_engagement
+        - data_microassessment
+
+     audit_riskcategory:
+       targets:
+        - data_engagement
+        - data_microassessment
+
+     django_comments:
+       targets:
+        - data_action_points
+
+     field_monitoring_data_collection_finding:
+       targets:
+        - data_fmquestion   
+
+     field_monitoring_data_collection_activityquestionoverallfinding:
+       targets:
+        - data_fmquestion
+        - data_fmontrack   
+    
+     field_monitoring_data_collection_checklistoverallfinding:    
+       targets:
+        - data_fmquestion   
+
+     field_monitoring_planning_monitoringactivitygroup:
+       targets:
+        -
+
+     field_monitoring_data_collection_activityquestion:
+       targets:
+        - data_fmquestion   
+
+     field_monitoring_data_collection_startedchecklist:
+       targets:
+        - data_fmquestion   
+
+     field_monitoring_planning_monitoringactivity:
+       targets:
+        - data_fmquestion
+        - data_fmontrack
+        - data_partnerhact   
+
+     field_monitoring_settings_category:
+       targets:
+        - data_fmquestion   
+
+     field_monitoring_settings_locationsite:
+       targets:
+        - data_fmquestion 
+        - data_locationsite  
+
+     field_monitoring_settings_method:
+       targets:
+        - data_fmquestion   
+
+     field_monitoring_settings_option:
+       targets:
+        - data_fmquestion
+        - data_fmoption   
+
+
+     field_monitoring_settings_question_methods:
+       targets:
+        - data_fmquestion   
+
+     funds_fundsreservationheader:
+       targets:
+        - data_fundreservationheader
+        - data_fundreservation
+        - data_intervention
+        - data_interventionbudget
+
+
+     funds_fundsreservationitem:
+       targets:
+        - data_fundreservation
+
+     funds_donor:
+       targets:
+        - data_grant
+
+     funds_grant:
+       targets:
+        - data_grant
+
+     hact_aggregatehact:
+       targets:
+        - data_hact
+
+     hact_hacthistory:
+       targets:
+        - data_hacthistory
+
+     locations_location:
+       targets:
+        - data_fmquestion
+        - data_fmontrack  
+        - data_locationsite
+        - data_intervention
+        - data_location
+        - data_interventionbudget            
+  
+     organizations_organization:
+       targets:
+        - data_action_points   
+        - data_audit
+        - data_engagement
+        - data_microassessment
+        - data_auditresult
+        - data_auditspecial
+        - data_spotcheck
+        - data_fmquestion
+        - data_hacthistory
+        - data_interventionactivity  
+        - data_partnersinterventioncountryprogrammes
+        - data_interventionepd
+        - data_interventionmanagementbudget
+        - data_interventionplannedvisits
+        - data_interventionreview
+        - data_intervention   
+        - data_partnerhact
+        - data_partner       
+        - data_agreement
+        - data_assessment
+        - data_interventionbudget  
+        - data_etoolsuser
+ 
+     partners_agreement:    
+        targets:
+        - data_interventionactivity 
+        - data_partnersinterventioncountryprogrammes
+        - data_interventionepd
+        - data_interventionmanagementbudget
+        - data_interventionplannedvisits
+        - data_interventionreview
+        - data_intervention
+        - data_agreement
+        - data_interventionbudget        
+
+     partners_agreementamendment:
+        targets:
+        - data_agreement    
+
+     partners_agreement_authorized_officer:
+        targets:
+        - data_agreement    
+
+     partners_assessment:
+        targets:
+        - data_assessment   
+
+     partners_filetype:
+      targets: 
+      - data_interventionbudget 
+
+     partners_intervention:
+       targets:
+        - data_engagement
+        - data_fmquestion
+        - data_fmontrack
+        - data_fundreservationheader
+        - data_fundreservation   
+        - data_interventionactivity 
+        - data_partnersinterventioncountryprogrammes
+        - data_interventionepd
+        - data_interventionmanagementbudget
+        - data_interventionplannedvisits
+        - data_interventionreview
+        - data_intervention
+        - data_interventionbudget        
+
+     partners_interventionamendment:
+        targets:
+        - data_interventionbudget  
+
+     partners_interventionattachment:
+        targets:
+        - data_intervention        
+        - data_interventionbudget  
+
+     partners_intervention_country_programmes:
+       targets:
+         - data_partnersinterventioncountryprogrammes
+ 
+     partners_interventionresultlink:
+       targets: 
+        - data_interventionactivity 
+        - data_interventionbudget  
+
+     partners_interventionmanagementbudget:
+       targets: 
+        - data_interventionmanagementbudget
+        - data_intervention
+        - data_interventionbudget        
+
+     partners_interventionmanagementbudgetitem:
+       targets: 
+        - data_interventionmanagementbudget
+
+     partners_interventionplannedvisits:
+       targets: 
+        - data_interventionplannedvisits
+        - data_intervention        
+        - data_interventionbudget    
+
+     partners_interventionreview:
+       targets: 
+        - data_interventionreview
+
+     partners_intervention_sections:
+       targets: 
+        - data_interventionbudget    
+
+     partners_intervention_flat_locations:
+       targets: 
+        - data_intervention        
+        - data_interventionbudget  
+
+     partners_intervention_offices:
+      targets: 
+        - data_interventionbudget
+
+     partners_intervention_partner_focal_points:
+       targets: 
+        - data_intervention      
+        - data_interventionbudget  
+
+     partners_intervention_unicef_focal_points:
+       targets: 
+        - data_intervention
+        - data_interventionbudget          
+
+     partners_partnerorganization:
+       targets:
+        - data_action_points  
+        - data_audit
+        - data_engagement
+        - data_microassessment
+        - data_auditresult
+        - data_spotcheck
+        - data_fmquestion
+        - data_hacthistory
+        - data_interventionactivity 
+        - data_partnersinterventioncountryprogrammes
+        - data_interventionepd
+        - data_interventionmanagementbudget
+        - data_interventionplannedvisits
+        - data_interventionreview
+        - data_intervention
+        - data_partnerhact
+        - data_partner
+        - data_agreement
+        - data_assessment
+        - data_interventionbudget   
+
+     partners_plannedengagement:
+       targets: 
+        - data_partner            
+
+     purchase_order_auditorfirm:
+       targets:
+        - data_audit
+        - data_engagement
+        - data_microassessment
+        - data_auditspecial 
+        - data_spotcheck
+     purchase_order_purchaseorder:
+       targets:
+        - data_audit
+        - data_engagement
+        - data_microassessment
+        - data_auditspecial 
+        - data_spotcheck
+     purchase_order_purchaseorderitem:
+       targets:
+        - data_engagement
+
+     reports_appliedindicator:
+      targets:
+       - data_interventionbudget
+       - data_reportindicator
+
+     reports_countryprogramme:
+       targets:
+       - data_partnersinterventioncountryprogrammes
+       - data_intervention
+       - data_agreement
+       - data_interventionbudget           
+
+     reports_interventionactivity:
+       targets: 
+        - data_interventionactivity 
+
+     reports_interventionactivityitem:
+       targets: 
+        - data_interventionactivity 
+      
+     reports_lowerresult:
+       targets: 
+        - data_interventionactivity 
+        - data_interventionbudget  
+
+     reports_office:
+        targets: 
+        - data_partner   
+        - data_interventionbudget  
+
+     reports_result:
+       targets: 
+         - data_action_points
+         - data_fmquestion
+         - data_interventionbudget
+         - data_report   
+
+     reports_sector:
+        targets: 
+        - data_partner   
+        - data_interventionbudget
+        - data_section 
+ 
+     t2f_travel: 
+      targets:
+        - data_partnerhact
+        - data_partner 
+        - data_interventionbudget  
+
+     t2f_travelactivity: 
+       targets:
+        - data_action_points 
+        - data_partner 
+        - data_interventionbudget  
+      
+     tpm_tpmactivity: 
+       targets:
+        - data_partnerhact
+
+     unicef_attachments_attachment:
+       targets: 
+        - data_attachment
+        - data_engagement
+
+     unicef_attachments_filetype:
+       targets: 
+        - data_attachment
+     
+
+prp_db:

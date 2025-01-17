@@ -22,6 +22,200 @@ logger = get_task_logger(__name__)
 
 
 class AuditLoader(EngagementMixin, EtoolsLoader):
+    """
+    -- Set country schema
+    SET search_path = public, ##COUNTRY##;
+
+    -- Count for paging;
+    SELECT COUNT(*) AS "__count" FROM "audit_audit";
+
+    -- Audit
+    SELECT '##COUNTRY##' AS __schema,
+           "audit_audit"."engagement_ptr_id",
+           "audit_audit"."audited_expenditure",
+           "audit_audit"."financial_findings",
+           "audit_audit"."audit_opinion",
+           "audit_audit"."audited_expenditure_local",
+           "audit_audit"."financial_findings_local",
+
+           "audit_engagement"."id",
+           "audit_engagement"."created",
+           "audit_engagement"."modified",
+           "audit_engagement"."status",
+           "audit_engagement"."partner_contacted_at",
+           "audit_engagement"."engagement_type",
+           "audit_engagement"."start_date",
+           "audit_engagement"."end_date",
+           "audit_engagement"."total_value",
+           "audit_engagement"."date_of_field_visit",
+           "audit_engagement"."date_of_draft_report_to_ip",
+           "audit_engagement"."date_of_comments_by_ip",
+           "audit_engagement"."date_of_draft_report_to_unicef",
+           "audit_engagement"."date_of_comments_by_unicef",
+           "audit_engagement"."date_of_report_submit",
+           "audit_engagement"."date_of_final_report",
+           "audit_engagement"."date_of_cancel",
+           "audit_engagement"."amount_refunded",
+           "audit_engagement"."additional_supporting_documentation_provided",
+           "audit_engagement"."justification_provided_and_accepted",
+           "audit_engagement"."write_off_required",
+           "audit_engagement"."cancel_comment",
+           "audit_engagement"."explanation_for_additional_information",
+           "audit_engagement"."partner_id",
+           "audit_engagement"."joint_audit",
+           "audit_engagement"."agreement_id",
+           "audit_engagement"."po_item_id",
+           "audit_engagement"."shared_ip_with",
+           "audit_engagement"."exchange_rate",
+           "audit_engagement"."currency_of_report",
+           "audit_engagement"."reference_number",
+           "audit_engagement"."year_of_audit",
+
+           "purchase_order_purchaseorder"."id",
+           "purchase_order_purchaseorder"."created",
+           "purchase_order_purchaseorder"."modified",
+           "purchase_order_purchaseorder"."order_number",
+           "purchase_order_purchaseorder"."contract_start_date",
+           "purchase_order_purchaseorder"."contract_end_date",
+           "purchase_order_purchaseorder"."auditor_firm_id",
+           "purchase_order_auditorfirm"."id",
+           "purchase_order_auditorfirm"."created",
+           "purchase_order_auditorfirm"."modified",
+           "purchase_order_auditorfirm"."street_address",
+           "purchase_order_auditorfirm"."city",
+           "purchase_order_auditorfirm"."postal_code",
+           "purchase_order_auditorfirm"."country",
+           "purchase_order_auditorfirm"."email",
+           "purchase_order_auditorfirm"."phone_number",
+           "purchase_order_auditorfirm"."blocked",
+           "purchase_order_auditorfirm"."hidden",
+           "purchase_order_auditorfirm"."deleted_flag",
+           "purchase_order_auditorfirm"."vision_synced",
+           "purchase_order_auditorfirm"."unicef_users_allowed",
+           "purchase_order_auditorfirm"."organization_id",
+
+           "organizations_organization"."id",
+           "organizations_organization"."created",
+           "organizations_organization"."modified",
+           "organizations_organization"."name",
+           "organizations_organization"."vendor_number",
+           "organizations_organization"."organization_type",
+           "organizations_organization"."cso_type",
+           "organizations_organization"."short_name",
+           "organizations_organization"."other",
+           "organizations_organization"."parent_id",
+
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date",
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           --"partners_partnerorganiazation"."sea_risk_rating_name",
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id"
+
+    FROM "audit_audit"
+    INNER JOIN "audit_engagement" ON ("audit_audit"."engagement_ptr_id" = "audit_engagement"."id")
+    INNER JOIN "purchase_order_purchaseorder" ON ("audit_engagement"."agreement_id" = "purchase_order_purchaseorder"."id")
+    INNER JOIN "purchase_order_auditorfirm" ON ("purchase_order_purchaseorder"."auditor_firm_id" = "purchase_order_auditorfirm"."id")
+    INNER JOIN "organizations_organization" ON ("purchase_order_auditorfirm"."organization_id" = "organizations_organization"."id")
+    INNER JOIN "partners_partnerorganization" ON ("partners_partnerorganization"."id" = audit_engagement"."partner_id")
+    ORDER BY "audit_audit"."engagement_ptr_id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    --Audit Engagement Sections
+    SELECT '##COUNTRY##' AS __schema,
+           "audit_engagement_sections"."id",
+           "audit_engagement_sections"."engagement_id",
+           "audit_engagement_sections"."section_id"
+    FROM  "audit_engagement_sections"
+    WHERE "audit_engagement_sections"."engagement_id" in  (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##);
+
+    --Audit Engagement Offices
+    SELECT '##COUNTRY##' AS __schema,
+           "audit_engagement_offices"."id",
+           "audit_engagement_offices"."engagement_id",
+           "audit_engagement_offices"."office_id"
+    FROM   "audit_engagement_offices"
+    WHERE "audit_engagement_sections"."engagement_id" in  (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##);
+
+
+    --Audit Financial Findings: Summing can be left to (T)ransform stage
+    SELECT "audit_financialfinding"."audit_id",
+            SUM("audit_financialfinding"."amount") as amount_sum
+    FROM "audit_financialfinding"
+    WHERE "audit_financialfinding"."audit_id" in (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##)
+    GROUP BY "audit_financialfinding"."audit_id"
+    ORDER BY "audit_financialfinding"."audit_id" ASC;
+
+    --Audit Key Internal Count per audit_id
+    SELECT audit_id,
+           COUNT(*) AS "__count"
+    FROM "audit_keyinternalcontrol"
+    WHERE "audit_keyinternalcontrol"."audit_id" in (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##)
+    GROUP BY audit_id
+    ORDER BY audit_id ASC;
+
+    -- Action Point Status Counts: Counting can be left to (T)ransform stage
+    SELECT "engagement_id",
+           "action_points_actionpoint"."status",
+           COUNT("action_points_actionpoint"."status") AS "count"
+    FROM "action_points_actionpoint"
+    WHERE "action_points_actionpoint"."engagement_id" in (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##)
+    GROUP BY "action_points_actionpoint"."engagement_id"
+    ORDER BY "action_points_actionpoint"."status" ASC;
+
+    -- Action Point High Priority count per engagement_id : Counting can be left to (T)ransform stage
+    SELECT "action_points_actionpoint"."engagement_id"
+           "action_points_actionpoint"."high_priority",
+           COUNT("action_points_actionpoint"."high_priority") AS "count"
+    FROM "action_points_actionpoint"
+    WHERE "action_points_actionpoint"."engagement_id" in (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##)
+    GROUP BY "action_points_actionpoint"."engagement_id","action_points_actionpoint"."high_priority"
+    ORDER BY "action_points_actionpoint"."engagement_id","action_points_actionpoint"."high_priority" ASC
+
+    -- Count description per engagement_id : Counting can be left to (T)ransform stage
+    SELECT "categories_category"."description",
+           "action_points_actionpoint"."engagement_id",
+           COUNT("categories_category"."description") AS "count"
+    FROM "action_points_actionpoint"
+    LEFT OUTER JOIN "categories_category" ON ("action_points_actionpoint"."category_id" = "categories_category"."id")
+    WHERE "action_points_actionpoint"."engagement_id" in (##LIST_OF_ENAGAGEMENT_IDs_IN_THE_PAGE##)
+    GROUP BY "action_points_actionpoint"."engagement_id", "categories_category"."description"
+    ORDER BY "action_points_actionpoint"."engagement_id", "categories_category"."description" ASC
+    """
+
     def process_country(self):
         batch_size = settings.RESULTSET_BATCH_SIZE
         logger.debug(f"Batch size:{batch_size}")

@@ -48,6 +48,284 @@ def extract_longitude(location):
 
 
 class FMQuestionLoader(EtoolsLoader):
+    """
+    SELECT '##COUNTRY##' AS __schema,
+           "field_monitoring_data_collection_finding"."id",
+           "field_monitoring_data_collection_finding"."value",
+           "field_monitoring_data_collection_finding"."activity_question_id",
+           "field_monitoring_data_collection_finding"."started_checklist_id",
+           "field_monitoring_settings_locationsite"."name" AS "site_name",
+           "locations_location"."name" AS "location_name",
+
+           (SELECT U0."narrative_finding"
+            FROM "field_monitoring_data_collection_checklistoverallfinding" U0
+            WHERE (U0."started_checklist_id" = ("field_monitoring_data_collection_finding"."started_checklist_id")
+            AND (U0."partner_id" = ("field_monitoring_data_collection_activityquestion"."partner_id")
+                 OR U0."cp_output_id" = ("field_monitoring_data_collection_activityquestion"."cp_output_id")
+                 OR U0."intervention_id" = ("field_monitoring_data_collection_activityquestion"."intervention_id"))) LIMIT 1) AS "narrative_overall_finding",
+
+            "field_monitoring_data_collection_finding"."value" AS "myvalue",
+
+            "field_monitoring_data_collection_activityquestion"."specific_details",
+            "field_monitoring_data_collection_activityquestion"."is_enabled",
+            "field_monitoring_data_collection_activityquestion"."cp_output_id",
+            "field_monitoring_data_collection_activityquestion"."intervention_id",
+            "field_monitoring_data_collection_activityquestion"."monitoring_activity_id",
+            "field_monitoring_data_collection_activityquestion"."partner_id",
+            "field_monitoring_data_collection_activityquestion"."question_id",
+            "field_monitoring_data_collection_activityquestion"."is_hact",
+            "field_monitoring_data_collection_activityquestion"."text",
+
+            "reports_result"."name", "reports_result"."code",
+            "reports_result"."result_type_id",
+            "reports_result"."sector_id",
+            "reports_result"."gic_code",
+            "reports_result"."gic_name",
+            "reports_result"."humanitarian_tag",
+            "reports_result"."level", "reports_result"."lft",
+            "reports_result"."parent_id",
+            "reports_result"."rght",
+            "reports_result"."sic_code",
+            "reports_result"."sic_name",
+            "reports_result"."tree_id",
+            "reports_result"."vision_id",
+            "reports_result"."wbs",
+            "reports_result"."activity_focus_code",
+            "reports_result"."activity_focus_name",
+            "reports_result"."hidden",
+            "reports_result"."from_date",
+            "reports_result"."to_date",
+            "reports_result"."ram",
+            "reports_result"."country_programme_id",
+            "reports_result"."created",
+            "reports_result"."modified",
+            "reports_result"."humanitarian_marker_code",
+            "reports_result"."humanitarian_marker_name",
+            "reports_result"."programme_area_code",
+            "reports_result"."programme_area_name",
+
+            "partners_intervention"."id",
+            "partners_intervention"."created",
+            "partners_intervention"."modified",
+            "partners_intervention"."document_type",
+            "partners_intervention"."number",
+            "partners_intervention"."title",
+            "partners_intervention"."status",
+            "partners_intervention"."start",
+            "partners_intervention"."end",
+            "partners_intervention"."submission_date",
+            "partners_intervention"."submission_date_prc",
+            "partners_intervention"."review_date_prc",
+            "partners_intervention"."prc_review_document",
+            "partners_intervention"."signed_by_unicef_date",
+            "partners_intervention"."signed_by_partner_date",
+            "partners_intervention"."population_focus",
+            "partners_intervention"."agreement_id",
+            "partners_intervention"."unicef_signatory_id",
+            "partners_intervention"."signed_pd_document",
+            "partners_intervention"."country_programme_id",
+            "partners_intervention"."contingency_pd",
+            "partners_intervention"."metadata",
+            "partners_intervention"."in_amendment",
+            "partners_intervention"."reference_number_year",
+            "partners_intervention"."activation_letter",
+            "partners_intervention"."termination_doc",
+            "partners_intervention"."cfei_number",
+            "partners_intervention"."budget_owner_id",
+            "partners_intervention"."context",
+            "partners_intervention"."date_sent_to_partner",
+            "partners_intervention"."equity_narrative",
+            "partners_intervention"."equity_rating",
+            "partners_intervention"."gender_narrative",
+            "partners_intervention"."gender_rating",
+            "partners_intervention"."hq_support_cost",
+            "partners_intervention"."implementation_strategy",
+            "partners_intervention"."ip_program_contribution",
+            "partners_intervention"."partner_accepted",
+            "partners_intervention"."sustainability_narrative",
+            "partners_intervention"."sustainability_rating",
+            "partners_intervention"."unicef_accepted",
+            "partners_intervention"."unicef_court",
+            "partners_intervention"."unicef_review_type",
+            "partners_intervention"."humanitarian_flag",
+            "partners_intervention"."capacity_development",
+            "partners_intervention"."other_info",
+            "partners_intervention"."other_partners_involved",
+            "partners_intervention"."technical_guidance",
+            "partners_intervention"."cash_transfer_modalities",
+            "partners_intervention"."cancel_justification",
+            "partners_intervention"."date_partnership_review_performed",
+            "partners_intervention"."accepted_on_behalf_of_partner",
+            "partners_intervention"."activation_protocol",
+            "partners_intervention"."confidential",
+            "partners_intervention"."has_activities_involving_children",
+            "partners_intervention"."has_data_processing_agreement",
+            "partners_intervention"."has_special_conditions_for_construction",
+            "partners_intervention"."final_review_approved", "partners_intervention"."other_details",
+            "partners_intervention"."partner_authorized_officer_signatory_id",
+
+
+            "field_monitoring_planning_monitoringactivity"."id",
+            "field_monitoring_planning_monitoringactivity"."created",
+            "field_monitoring_planning_monitoringactivity"."modified",
+            "field_monitoring_planning_monitoringactivity"."deleted_at",
+            "field_monitoring_planning_monitoringactivity"."monitor_type",
+            "field_monitoring_planning_monitoringactivity"."start_date",
+            "field_monitoring_planning_monitoringactivity"."end_date",
+            "field_monitoring_planning_monitoringactivity"."status",
+            "field_monitoring_planning_monitoringactivity"."location_id",
+            "field_monitoring_planning_monitoringactivity"."location_site_id",
+            "field_monitoring_planning_monitoringactivity"."visit_lead_id",
+            "field_monitoring_planning_monitoringactivity"."tpm_partner_id",
+            "field_monitoring_planning_monitoringactivity"."cancel_reason",
+            "field_monitoring_planning_monitoringactivity"."reject_reason",
+            "field_monitoring_planning_monitoringactivity"."field_office_id",
+            "field_monitoring_planning_monitoringactivity"."report_reject_reason",
+            "field_monitoring_planning_monitoringactivity"."number", 'botswana' AS __schema,
+
+            "locations_location"."id",
+            "locations_location"."name",
+            "locations_location"."latitude",
+            "locations_location"."longitude",
+            "locations_location"."p_code",
+            "locations_location"."point",
+            "locations_location"."geom",
+            "locations_location"."level",
+            "locations_location"."lft",
+            "locations_location"."parent_id",
+            "locations_location"."rght",
+            "locations_location"."tree_id",
+            "locations_location"."created",
+            "locations_location"."modified",
+            "locations_location"."is_active",
+            "locations_location"."admin_level",
+            "locations_location"."admin_level_name",
+
+            "field_monitoring_settings_locationsite"."id", "
+            "field_monitoring_settings_locationsite"."created",
+            "field_monitoring_settings_locationsite"."modified",
+            "field_monitoring_settings_locationsite"."name",
+            "field_monitoring_settings_locationsite"."p_code",
+            "field_monitoring_settings_locationsite"."point",
+            "field_monitoring_settings_locationsite"."is_active",
+            "field_monitoring_settings_locationsite"."parent_id",
+
+            "partners_partnerorganization"."id",
+            "partners_partnerorganization"."description",
+            "partners_partnerorganization"."address",
+            "partners_partnerorganization"."email",
+            "partners_partnerorganization"."phone_number",
+            "partners_partnerorganization"."alternate_id",
+            "partners_partnerorganization"."alternate_name",
+            "partners_partnerorganization"."rating",
+            "partners_partnerorganization"."core_values_assessment_date",
+            "partners_partnerorganization"."vision_synced",
+            "partners_partnerorganization"."type_of_assessment",
+            "partners_partnerorganization"."last_assessment_date",
+            "partners_partnerorganization"."hidden",
+            "partners_partnerorganization"."deleted_flag",
+            "partners_partnerorganization"."total_ct_cp",
+            "partners_partnerorganization"."total_ct_cy",
+            "partners_partnerorganization"."blocked",
+            "partners_partnerorganization"."city",
+            "partners_partnerorganization"."country",
+            "partners_partnerorganization"."postal_code",
+            "partners_partnerorganization"."shared_with",
+            "partners_partnerorganization"."street_address",
+            "partners_partnerorganization"."hact_values",
+            "partners_partnerorganization"."created",
+            "partners_partnerorganization"."modified",
+            "partners_partnerorganization"."net_ct_cy",
+            "partners_partnerorganization"."reported_cy",
+            "partners_partnerorganization"."total_ct_ytd",
+            "partners_partnerorganization"."basis_for_risk_rating",
+            "partners_partnerorganization"."manually_blocked",
+            "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+            "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+            "partners_partnerorganization"."highest_risk_rating_name",
+            "partners_partnerorganization"."highest_risk_rating_type",
+            "partners_partnerorganization"."psea_assessment_date",
+            "partners_partnerorganization"."sea_risk_rating_name",
+            "partners_partnerorganization"."lead_office_id",
+            "partners_partnerorganization"."lead_section_id",
+            "partners_partnerorganization"."organization_id",
+
+            "organizations_organization"."id",
+            "organizations_organization"."created",
+            "organizations_organization"."modified",
+            "organizations_organization"."name",
+            "organizations_organization"."vendor_number",
+            "organizations_organization"."organization_type",
+            "organizations_organization"."cso_type",
+            "organizations_organization"."short_name",
+            "organizations_organization"."other",
+            "organizations_organization"."parent_id",
+
+            "field_monitoring_settings_question"."id",
+            "field_monitoring_settings_question"."answer_type",
+            "field_monitoring_settings_question"."choices_size",
+            "field_monitoring_settings_question"."level",
+            "field_monitoring_settings_question"."text",
+            "field_monitoring_settings_question"."is_hact",
+            "field_monitoring_settings_question"."is_custom",
+            "field_monitoring_settings_question"."is_active",
+            "field_monitoring_settings_question"."category_id",
+
+            "field_monitoring_settings_category"."id",
+            "field_monitoring_settings_category"."order",
+            "field_monitoring_settings_category"."name",
+
+            "field_monitoring_data_collection_activityquestionoverallfinding"."id",
+            "field_monitoring_data_collection_activityquestionoverallfinding"."value",
+            "field_monitoring_data_collection_activityquestionoverallfinding"."activity_question_id",
+
+            "field_monitoring_data_collection_startedchecklist"."id",
+            "field_monitoring_data_collection_startedchecklist"."information_source",
+            "field_monitoring_data_collection_startedchecklist"."author_id",
+            "field_monitoring_data_collection_startedchecklist"."method_id",
+            "field_monitoring_data_collection_startedchecklist"."monitoring_activity_id",
+
+            "field_monitoring_settings_method"."id",
+            "field_monitoring_settings_method"."name",
+            "field_monitoring_settings_method"."use_information_source",
+            "field_monitoring_settings_method"."short_name"
+
+    FROM "field_monitoring_data_collection_finding"
+         INNER JOIN "field_monitoring_data_collection_activityquestion" ON ("field_monitoring_data_collection_finding"."activity_question_id" = "field_monitoring_data_collection_activityquestion"."id") INNER JOIN "field_monitoring_planning_monitoringactivity" ON ("field_monitoring_data_collection_activityquestion"."monitoring_activity_id" = "field_monitoring_planning_monitoringactivity"."id")
+         LEFT OUTER JOIN "field_monitoring_settings_locationsite" ON ("field_monitoring_planning_monitoringactivity"."location_site_id" = "field_monitoring_settings_locationsite"."id")
+         LEFT OUTER JOIN "locations_location" ON ("field_monitoring_planning_monitoringactivity"."location_id" = "locations_location"."id")
+         INNER JOIN "field_monitoring_data_collection_startedchecklist" ON ("field_monitoring_data_collection_finding"."started_checklist_id" = "field_monitoring_data_collection_startedchecklist"."id") LEFT OUTER JOIN "partners_partnerorganization" ON ("field_monitoring_data_collection_activityquestion"."partner_id" = "partners_partnerorganization"."id")
+         LEFT OUTER JOIN "reports_result" ON ("field_monitoring_data_collection_activityquestion"."cp_output_id" = "reports_result"."id") LEFT OUTER JOIN "partners_intervention" ON ("field_monitoring_data_collection_activityquestion"."intervention_id" = "partners_intervention"."id") LEFT OUTER JOIN "organizations_organization" ON ("partners_partnerorganization"."organization_id" = "organizations_organization"."id") INNER JOIN "field_monitoring_settings_question" ON ("field_monitoring_data_collection_activityquestion"."question_id" = "field_monitoring_settings_question"."id") INNER JOIN "field_monitoring_settings_category" ON ("field_monitoring_settings_question"."category_id" = "field_monitoring_settings_category"."id") LEFT OUTER JOIN "field_monitoring_data_collection_activityquestionoverallfinding" ON ("field_monitoring_data_collection_activityquestion"."id" = "field_monitoring_data_collection_activityquestionoverallfinding"."activity_question_id") INNER JOIN "field_monitoring_settings_method" ON ("field_monitoring_data_collection_startedchecklist"."method_id" = "field_monitoring_settings_method"."id")
+    ORDER BY "field_monitoring_data_collection_finding"."id" ASC LIMIT 66
+
+
+    SELECT '##COUNTRY##' AS __schema,
+           "field_monitoring_settings_question_methods"."id",
+           "field_monitoring_settings_question_methods"."question_id",
+           "field_monitoring_settings_question_methods"."method_id"
+    FROM "field_monitoring_settings_question_methods"
+    WHERE "field_monitoring_settings_question_methods"."question_id" IN (##LIST OF "field_monitoring_settings_question"."id" IN THE PAGE##);
+
+
+    SELECT '##COUNTRY##' AS __schema,
+            "field_monitoring_settings_option"."id",
+            "field_monitoring_settings_option"."label",
+            "field_monitoring_settings_option"."value",
+            "field_monitoring_settings_option"."question_id"
+    FROM "field_monitoring_settings_option"
+    WHERE "field_monitoring_settings_option"."question_id" IN (##LIST OF "field_monitoring_settings_question"."id" IN THE PAGE##);
+
+
+    SELECT "field_monitoring_data_collection_finding"."id"
+    FROM "field_monitoring_data_collection_finding"
+         INNER JOIN "field_monitoring_data_collection_activityquestion" ON ("field_monitoring_data_collection_finding"."activity_question_id" = "field_monitoring_data_collection_activityquestion"."id")
+         INNER JOIN "field_monitoring_planning_monitoringactivity" ON ("field_monitoring_data_collection_activityquestion"."monitoring_activity_id" = "field_monitoring_planning_monitoringactivity"."id")
+         LEFT OUTER JOIN "field_monitoring_settings_locationsite" ON ("field_monitoring_planning_monitoringactivity"."location_site_id" = "field_monitoring_settings_locationsite"."id")
+         LEFT OUTER JOIN "locations_location" ON ("field_monitoring_planning_monitoringactivity"."location_id" = "locations_location"."id")
+
+
+    """
+
     """Loader for FM Questions"""
 
     TRANSACTION_BY_BATCH = True
@@ -415,6 +693,118 @@ class FMQuestion(EtoolsDataMartModel):
 class FMOntrackLoader(EtoolsLoader):
     """Loader for FM Ontrack"""
 
+    """
+    --
+    SET search_path = public,##COUNTRY##
+    --
+    SELECT COUNT(*) AS "__count"
+    FROM "field_monitoring_data_collection_activityoverallfinding";
+    
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "field_monitoring_data_collection_activityoverallfinding"."id",
+           "field_monitoring_data_collection_activityoverallfinding"."narrative_finding",
+           "field_monitoring_data_collection_activityoverallfinding"."on_track",
+           "field_monitoring_data_collection_activityoverallfinding"."cp_output_id",
+           "field_monitoring_data_collection_activityoverallfinding"."intervention_id",
+           "field_monitoring_data_collection_activityoverallfinding"."monitoring_activity_id",
+           "field_monitoring_data_collection_activityoverallfinding"."partner_id"
+    FROM "field_monitoring_data_collection_activityoverallfinding"
+    ORDER BY "field_monitoring_data_collection_activityoverallfinding"."id" ASC
+    LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "field_monitoring_planning_monitoringactivity"."id",
+           "field_monitoring_planning_monitoringactivity"."created",
+           "field_monitoring_planning_monitoringactivity"."modified",
+           "field_monitoring_planning_monitoringactivity"."deleted_at",
+           "field_monitoring_planning_monitoringactivity"."monitor_type",
+           "field_monitoring_planning_monitoringactivity"."start_date",
+           "field_monitoring_planning_monitoringactivity"."end_date",
+           "field_monitoring_planning_monitoringactivity"."status",
+           "field_monitoring_planning_monitoringactivity"."location_id",
+           "field_monitoring_planning_monitoringactivity"."location_site_id",
+           "field_monitoring_planning_monitoringactivity"."visit_lead_id",
+           "field_monitoring_planning_monitoringactivity"."tpm_partner_id",
+           "field_monitoring_planning_monitoringactivity"."cancel_reason",
+           "field_monitoring_planning_monitoringactivity"."reject_reason",
+           "field_monitoring_planning_monitoringactivity"."field_office_id",
+           "field_monitoring_planning_monitoringactivity"."report_reject_reason",
+           "field_monitoring_planning_monitoringactivity"."number"
+    FROM "field_monitoring_planning_monitoringactivity"
+    WHERE "field_monitoring_planning_monitoringactivity"."id"
+    IN (## LIST OF "field_monitoring_data_collection_activityoverallfinding"."monitoring_activity_id" in the page##);
+    
+    --
+    SELECT '##COUNTRY##' AS __schema,
+           "locations_location"."id",
+           "locations_location"."name",
+           "locations_location"."latitude",
+           "locations_location"."longitude",
+           "locations_location"."p_code",
+           "locations_location"."point",
+           "locations_location"."geom",
+           "locations_location"."level",
+           "locations_location"."lft",
+           "locations_location"."parent_id",
+           "locations_location"."rght",
+           "locations_location"."tree_id",
+           "locations_location"."created",
+           "locations_location"."modified",
+           "locations_location"."is_active",
+           "locations_location"."admin_level",
+           "locations_location"."admin_level_name" 
+    FROM "locations_location" 
+    WHERE "locations_location"."id" 
+    IN(## LIST OF field_monitoring_planning_monitoringactivity"."location_id" in the page##);
+
+    SELECT '##COUNTRY##' AS __schema,
+           "partners_partnerorganization"."id",
+           "partners_partnerorganization"."description",
+           "partners_partnerorganization"."address",
+           "partners_partnerorganization"."email",
+           "partners_partnerorganization"."phone_number",
+           "partners_partnerorganization"."alternate_id",
+           "partners_partnerorganization"."alternate_name",
+           "partners_partnerorganization"."rating",
+           "partners_partnerorganization"."core_values_assessment_date",
+           "partners_partnerorganization"."vision_synced",
+           "partners_partnerorganization"."type_of_assessment",
+           "partners_partnerorganization"."last_assessment_date", 
+           "partners_partnerorganization"."hidden",
+           "partners_partnerorganization"."deleted_flag",
+           "partners_partnerorganization"."total_ct_cp",
+           "partners_partnerorganization"."total_ct_cy",
+           "partners_partnerorganization"."blocked",
+           "partners_partnerorganization"."city",
+           "partners_partnerorganization"."country",
+           "partners_partnerorganization"."postal_code",
+           "partners_partnerorganization"."shared_with",
+           "partners_partnerorganization"."street_address",
+           "partners_partnerorganization"."hact_values",
+           "partners_partnerorganization"."created",
+           "partners_partnerorganization"."modified",
+           "partners_partnerorganization"."net_ct_cy",
+           "partners_partnerorganization"."reported_cy",
+           "partners_partnerorganization"."total_ct_ytd",
+           "partners_partnerorganization"."basis_for_risk_rating",
+           "partners_partnerorganization"."manually_blocked",
+           "partners_partnerorganization"."outstanding_dct_amount_6_to_9_months_usd",
+           "partners_partnerorganization"."outstanding_dct_amount_more_than_9_months_usd",
+           "partners_partnerorganization"."highest_risk_rating_name",
+           "partners_partnerorganization"."highest_risk_rating_type",
+           "partners_partnerorganization"."psea_assessment_date",
+           "partners_partnerorganization"."sea_risk_rating_name", 
+           "partners_partnerorganization"."lead_office_id",
+           "partners_partnerorganization"."lead_section_id",
+           "partners_partnerorganization"."organization_id" 
+    FROM "partners_partnerorganization" 
+    WHERE "partners_partnerorganization"."id" IN (## ##);
+
+
+    """
+
     def get_overall_finding_rating(
         self,
         record: FieldMonitoringDataCollectionActivityoverallfinding,
@@ -623,6 +1013,16 @@ class FMOntrack(EtoolsDataMartModel):
             person_responsible_email="monitoring_activity.visit_lead.email",
             team_members="-",
         )
+
+
+"""
+Queries for Loader:   
+  
+  
+  
+  ===FieldMonitoringSettingsOption
+
+"""
 
 
 class FMOptions(EtoolsDataMartModel):

@@ -1,0 +1,142 @@
+loaders:
+ - locationsite:
+   -target: data_ocationsite
+   -sources:
+      db: etools 
+      primary: "field_monitoring_settings_locationsite"
+
+   -fields:
+    "source_id":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "action_points_actionpoint"."id"
+
+    "country_name":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "__schema"
+
+    "schema_name":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                      "__schema"
+
+    "name": 
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                     "field_monitoring_settings_locationsite"."name"
+    "p_code": 
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                     "field_monitoring_settings_locationsite"."p_code"
+
+    "point": 
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                     "field_monitoring_settings_locationsite"."point"
+
+    "is_active": 
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: primary
+                  - expression: | 
+                     "field_monitoring_settings_locationsite"."is_active"
+
+    "parent":
+      -mapping:  
+          - type: direct
+          - value: 
+              - query:
+                  - name: locations
+                  - expression: | 
+                     {  
+                        "id": "locations_location"."id",
+                        "name": "locations_location"."name",
+                        "p_code": "locations_location"."p_code",
+                        "admin_level": "locations_location"."admin_level",
+                        "source_id": "locations_location"."source_id",
+                        "location_type": "",
+                     }
+
+   -queries:
+    primary:
+        - type: paged
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+              """
+              --
+              SET search_path = public,##COUNTRY##;
+              --
+              SELECT COUNT(*) AS "__count"
+              FROM "field_monitoring_settings_locationsite";
+
+              -- field_monitoring_settings_locationsite entries for the page
+              SELECT '##COUNTRY##' AS __schema,
+                    "field_monitoring_settings_locationsite"."id",
+                    "field_monitoring_settings_locationsite"."created",
+                    "field_monitoring_settings_locationsite"."modified",
+                    "field_monitoring_settings_locationsite"."name",
+                    "field_monitoring_settings_locationsite"."p_code",
+                    "field_monitoring_settings_locationsite"."point",
+                    "field_monitoring_settings_locationsite"."is_active",
+                    "field_monitoring_settings_locationsite"."parent_id"
+              FROM "field_monitoring_settings_locationsite"
+              ORDER BY "field_monitoring_settings_locationsite"."id" ASC
+              LIMIT ##PAGE_SIZE## OFFSET ##PAGE_OFFSET##;
+
+    locations:
+        - type: paged
+        - db: datamart
+        - comment: "Need optimization. Not all the fields are required"
+        - expression: |
+              """
+              SET search_path = public,##COUNTRY##;
+
+              -- Location entries for the page
+              SELECT '##COUNTRY##' AS __schema,
+              "locations_location"."id",
+              "locations_location"."name",
+              "locations_location"."latitude",
+              "locations_location"."longitude",
+              "locations_location"."p_code",
+              "locations_location"."point",
+              "locations_location"."geom",
+              "locations_location"."level",
+              "locations_location"."lft",
+              "locations_location"."parent_id",
+              "locations_location"."rght",
+              "locations_location"."tree_id",
+              "locations_location"."created",
+              "locations_location"."modified",
+              "locations_location"."is_active",
+              "locations_location"."admin_level",
+              "locations_location"."admin_level_name"
+              FROM "locations_location"
+              WHERE "locations_location"."id"  IN (## LIST OF "field_monitoring_settings_locationsite"."parent_id" IN THE PAGE##) ;
+              """
